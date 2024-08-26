@@ -23,14 +23,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseResponse;
-import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -84,8 +84,8 @@ public class TaskInstanceOperationFunctionTest {
         TaskInstancePauseOperationFunction taskInstancePauseOperationFunction =
                 new TaskInstancePauseOperationFunction();
 
-        UpdateWorkflowHostOperationFunction updateWorkflowHostOperationFunction =
-                new UpdateWorkflowHostOperationFunction(
+        TakeOverTaskOperationFunction takeOverTaskOperationFunction =
+                new TakeOverTaskOperationFunction(
                         messageRetryRunner);
 
         WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder = new WorkerTaskExecutorFactoryBuilder(
@@ -104,7 +104,7 @@ public class TaskInstanceOperationFunctionTest {
         TaskInstanceOperationFunctionManager taskInstanceOperationFunctionManager =
                 new TaskInstanceOperationFunctionManager(
                         taskInstanceKillOperationFunction,
-                        updateWorkflowHostOperationFunction,
+                        takeOverTaskOperationFunction,
                         taskInstanceDispatchOperationFunction,
                         taskInstancePauseOperationFunction);
 
@@ -112,7 +112,7 @@ public class TaskInstanceOperationFunctionTest {
                 taskInstanceOperationFunctionManager.getTaskInstanceKillOperationFunction());
         Assertions.assertEquals(taskInstancePauseOperationFunction,
                 taskInstanceOperationFunctionManager.getTaskInstancePauseOperationFunction());
-        Assertions.assertEquals(updateWorkflowHostOperationFunction,
+        Assertions.assertEquals(takeOverTaskOperationFunction,
                 taskInstanceOperationFunctionManager.getUpdateWorkflowHostOperationFunction());
         Assertions.assertEquals(taskInstanceDispatchOperationFunction,
                 taskInstanceOperationFunctionManager.getTaskInstanceDispatchOperationFunction());
@@ -120,8 +120,8 @@ public class TaskInstanceOperationFunctionTest {
 
     @Test
     public void testUpdateWorkflowHostOperationFunction() {
-        UpdateWorkflowHostOperationFunction updateWorkflowHostOperationFunction =
-                new UpdateWorkflowHostOperationFunction(
+        TakeOverTaskOperationFunction takeOverTaskOperationFunction =
+                new TakeOverTaskOperationFunction(
                         messageRetryRunner);
 
         try (MockedStatic<LogUtils> logUtilsMockedStatic = Mockito.mockStatic(LogUtils.class)) {
@@ -129,10 +129,10 @@ public class TaskInstanceOperationFunctionTest {
                     .when(() -> LogUtils
                             .setTaskInstanceIdMDC(any(Integer.class)))
                     .then(invocationOnMock -> null);
-            UpdateWorkflowHostRequest request = new UpdateWorkflowHostRequest();
+            TakeOverTaskRequest request = new TakeOverTaskRequest();
             request.setTaskInstanceId(1);
             request.setWorkflowHost("host");
-            UpdateWorkflowHostResponse taskInstanceDispatchResponse = updateWorkflowHostOperationFunction.operate(
+            TakeOverTaskResponse taskInstanceDispatchResponse = takeOverTaskOperationFunction.operate(
                     request);
             Assertions.assertEquals(taskInstanceDispatchResponse.isSuccess(), false);
         }
@@ -151,11 +151,11 @@ public class TaskInstanceOperationFunctionTest {
                         .when(() -> WorkerTaskExecutorHolder.get(any(Integer.class)))
                         .thenReturn(workerTaskExecutor);
                 int taskInstanceId = 111;
-                UpdateWorkflowHostRequest request = new UpdateWorkflowHostRequest();
+                TakeOverTaskRequest request = new TakeOverTaskRequest();
                 request.setTaskInstanceId(taskInstanceId);
                 request.setWorkflowHost("host");
 
-                UpdateWorkflowHostResponse taskInstanceDispatchResponse = updateWorkflowHostOperationFunction.operate(
+                TakeOverTaskResponse taskInstanceDispatchResponse = takeOverTaskOperationFunction.operate(
                         request);
                 Assertions.assertEquals(taskInstanceDispatchResponse.isSuccess(), true);
             }

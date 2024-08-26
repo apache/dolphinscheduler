@@ -18,20 +18,18 @@
 package org.apache.dolphinscheduler.server.master.runner.task.switchtask;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
-import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
-import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -49,20 +47,21 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
     public static final String TASK_TYPE = "SWITCH";
 
-    private final WorkflowExecuteRunnable workflowExecuteRunnable;
+    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
     private final TaskInstance taskInstance;
 
-    public SwitchLogicTask(WorkflowExecuteRunnable workflowExecuteRunnable,
-                           TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        super(workflowExecuteRunnable,
+    public SwitchLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                           TaskExecutionContext taskExecutionContext) {
+        super(workflowExecutionRunnable,
                 taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {
                 }));
-        this.workflowExecuteRunnable = workflowExecuteRunnable;
-        this.taskInstance =
-                workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId()).orElseThrow(
-                        () -> new LogicTaskInitializeException(
-                                "Cannot find the task instance in workflow execute runnable"));
+        this.workflowExecutionRunnable = workflowExecutionRunnable;
+        this.taskInstance = workflowExecutionRunnable
+                .getWorkflowExecuteContext()
+                .getWorkflowExecutionGraph()
+                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                .getTaskInstance();
     }
 
     @Override
@@ -129,7 +128,8 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
         if (branchNode == null) {
             throw new IllegalArgumentException("The branch is empty, please check the switch task configuration");
         }
-        if (!workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowGraph().getDag().containsNode(branchNode)) {
+        if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowGraph()
+                .getTaskNodeByCode(branchNode) == null) {
             throw new IllegalArgumentException(
                     "The branch(code= " + branchNode
                             + ") is not in the dag, please check the switch task configuration");
@@ -137,11 +137,11 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
     }
 
     private String getTaskName(Long taskCode) {
-        Optional<TaskNode> taskNode = Optional.ofNullable(workflowExecuteRunnable.getWorkflowExecuteContext())
+        return Optional.ofNullable(workflowExecutionRunnable.getWorkflowExecuteContext())
                 .map(IWorkflowExecuteContext::getWorkflowGraph)
-                .map(IWorkflowGraph::getDag)
-                .map(dag -> dag.getNode(taskCode));
-        return taskNode.map(TaskNode::getName).orElse(null);
+                .map(iWorkflowGraph -> iWorkflowGraph.getTaskNodeByCode(taskCode))
+                .map(TaskDefinition::getName)
+                .orElse(null);
     }
 
 }

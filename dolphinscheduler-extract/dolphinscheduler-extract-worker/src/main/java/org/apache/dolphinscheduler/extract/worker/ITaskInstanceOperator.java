@@ -19,28 +19,28 @@ package org.apache.dolphinscheduler.extract.worker;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseResponse;
-import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 
 @RpcService
 public interface ITaskInstanceOperator {
 
     @RpcMethod
-    TaskInstanceDispatchResponse dispatchTask(TaskInstanceDispatchRequest taskInstanceDispatchRequest);
+    TaskInstanceDispatchResponse dispatchTask(final TaskInstanceDispatchRequest taskInstanceDispatchRequest);
 
     @RpcMethod
-    TaskInstanceKillResponse killTask(TaskInstanceKillRequest taskInstanceKillRequest);
+    TaskInstanceKillResponse killTask(final TaskInstanceKillRequest taskInstanceKillRequest);
 
     @RpcMethod
-    TaskInstancePauseResponse pauseTask(TaskInstancePauseRequest taskPauseRequest);
+    TaskInstancePauseResponse pauseTask(final TaskInstancePauseRequest taskPauseRequest);
 
     @RpcMethod
-    UpdateWorkflowHostResponse updateWorkflowInstanceHost(UpdateWorkflowHostRequest updateWorkflowHostRequest);
+    TakeOverTaskResponse takeOverTask(final TakeOverTaskRequest takeOverTaskRequest);
 
 }

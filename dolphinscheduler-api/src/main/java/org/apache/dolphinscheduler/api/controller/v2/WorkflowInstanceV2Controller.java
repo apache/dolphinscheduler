@@ -134,10 +134,10 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @PostMapping(value = "/{workflowInstanceId}/execute/{executeType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.EXECUTE_PROCESS_INSTANCE_ERROR)
-    public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                          @PathVariable("workflowInstanceId") Integer workflowInstanceId,
-                          @PathVariable("executeType") ExecuteType executeType) {
-        Map<String, Object> result = execService.execute(loginUser, workflowInstanceId, executeType);
-        return returnDataList(result);
+    public Result<Void> execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                @PathVariable("workflowInstanceId") Integer workflowInstanceId,
+                                @PathVariable("executeType") ExecuteType executeType) {
+        execService.controlWorkflowInstance(loginUser, workflowInstanceId, executeType);
+        return Result.success();
     }
 }

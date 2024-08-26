@@ -259,6 +259,8 @@ public class TaskExecutionContext implements Serializable {
 
     private int dispatchFailTimes;
 
+    private boolean failover;
+
     public int increaseDispatchFailTimes() {
         return ++dispatchFailTimes;
     }

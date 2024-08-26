@@ -22,9 +22,6 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * command types
- */
 public enum CommandType {
 
     /**
@@ -43,19 +40,62 @@ public enum CommandType {
      * 11 recover serial wait
      * 12 start a task node in a process instance
      */
+    /**
+     * Start the workflow definition, will generate a new workflow instance and start from the StartNodeList, if StartNodeList is empty will start from the beginning tasks.
+     */
     START_PROCESS(0, "start a new process"),
+    /**
+     * todo: remove this command, this command doesn't used?
+     */
     START_CURRENT_TASK_PROCESS(1, "start a new process from current nodes"),
+    /**
+     * Recover the workflow instance from tolerance fault, these may happened when the master is crashed.
+     * Will recover the workflow instance from the last running task node.
+     */
     RECOVER_TOLERANCE_FAULT_PROCESS(2, "recover tolerance fault process"),
-    RECOVER_SUSPENDED_PROCESS(3, "recover suspended process"),
-    START_FAILURE_TASK_PROCESS(4, "start process from failure task nodes"),
+    /**
+     * Recover the workflow instance from pause status, will start from the paused and unTriggered task instance.
+     */
+    RECOVER_SUSPENDED_PROCESS(3, "Recover suspended workflow instance"),
+    /**
+     * Recover the workflow instance from failure task nodes, will start from the failed task nodes.
+     * In fact this command has the same logic with RECOVER_SUSPENDED_PROCESS.
+     */
+    START_FAILURE_TASK_PROCESS(4, "Recover workflow instance from failure tasks"),
+    /**
+     * Backfill the workflow, will use complementScheduleDateList to generate the workflow instance.
+     */
     COMPLEMENT_DATA(5, "complement data"),
+    /**
+     * Start workflow from scheduler, will generate a new workflow instance and start from the beginning tasks.
+     * This command is same with START_PROCESS but with different trigger source.
+     */
     SCHEDULER(6, "start a new process from scheduler"),
+    /**
+     * Repeat running a workflow instance, will mark the history task instances' flag to no and start from the beginning tasks.
+     */
     REPEAT_RUNNING(7, "repeat running a process"),
+    /**
+     * Pause a workflow instance, will pause the running tasks, but not all tasks will be paused.
+     */
     PAUSE(8, "pause a process"),
+    /**
+     * Stop a workflow instance, will kill the running tasks.
+     */
     STOP(9, "stop a process"),
-    RECOVER_WAITING_THREAD(10, "recover waiting thread"),
+    /**
+     * Recover from the serial-wait state.
+     * todo: We may need to remove these command, and use the workflow instance origin command type when notify from serial wait.
+     */
     RECOVER_SERIAL_WAIT(11, "recover serial wait"),
+    /**
+     * Trigger the workflow instance from the given StartNodeList, will mark the task instance which is behind the given StartNodeList flag to no
+     * and retrigger the task instances.
+     */
     EXECUTE_TASK(12, "start a task node in a process instance"),
+    /**
+     * Used in dynamic logic task instance.
+     */
     DYNAMIC_GENERATION(13, "dynamic generation"),
     ;
 

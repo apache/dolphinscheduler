@@ -26,9 +26,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 public enum WorkflowExecutionStatus {
 
-    // This class is split from <code>ExecutionStatus</code> #11339.
-    // In order to compatible with the old value, the code is not consecutive
-    SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
     READY_PAUSE(2, "ready pause"),
     PAUSE(3, "pause"),
@@ -36,24 +33,19 @@ public enum WorkflowExecutionStatus {
     STOP(5, "stop"),
     FAILURE(6, "failure"),
     SUCCESS(7, "success"),
-    DELAY_EXECUTION(12, "delay execution"),
     SERIAL_WAIT(14, "serial wait"),
     WAIT_TO_RUN(17, "wait to run"),
-    ;
+    FAILOVER(18, "failover");
 
     private static final Map<Integer, WorkflowExecutionStatus> CODE_MAP = new HashMap<>();
     private static final int[] NEED_FAILOVER_STATES = new int[]{
-            SUBMITTED_SUCCESS.getCode(),
             RUNNING_EXECUTION.getCode(),
-            DELAY_EXECUTION.getCode(),
             READY_PAUSE.getCode(),
             READY_STOP.getCode()
     };
 
     private static final int[] NOT_TERMINAL_STATUS = new int[]{
-            SUBMITTED_SUCCESS.getCode(),
             RUNNING_EXECUTION.getCode(),
-            DELAY_EXECUTION.getCode(),
             READY_PAUSE.getCode(),
             READY_STOP.getCode(),
             SERIAL_WAIT.getCode(),
@@ -83,11 +75,28 @@ public enum WorkflowExecutionStatus {
     }
 
     public boolean canStop() {
-        return this == RUNNING_EXECUTION || this == READY_PAUSE;
+        return this == RUNNING_EXECUTION
+                || this == READY_PAUSE
+                || this == READY_STOP
+                || this == SERIAL_WAIT
+                || this == WAIT_TO_RUN;
+    }
+
+    public boolean canDirectStopInDB() {
+        return this == SERIAL_WAIT || this == WAIT_TO_RUN;
+    }
+
+    public boolean canPause() {
+        return this == RUNNING_EXECUTION
+                || this == READY_PAUSE
+                || this == SERIAL_WAIT;
+    }
+
+    public boolean canDirectPauseInDB() {
+        return this == SERIAL_WAIT || this == WAIT_TO_RUN;
     }
 
     public boolean isFinished() {
-        // todo: do we need to remove pause/block in finished judge?
         return isSuccess() || isFailure() || isStop() || isPause();
     }
 
@@ -144,6 +153,6 @@ public enum WorkflowExecutionStatus {
 
     @Override
     public String toString() {
-        return "WorkflowExecutionStatus{" + "code=" + code + ", desc='" + desc + '\'' + '}';
+        return name();
     }
 }

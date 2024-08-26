@@ -19,20 +19,11 @@ package org.apache.dolphinscheduler.extract.master;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupResponse;
 
 @RpcService
 public interface IWorkflowInstanceService {
 
     @RpcMethod
     void clearWorkflowMetrics(Long workflowDefinitionCode);
-
-    @RpcMethod
-    WorkflowExecuteDto getWorkflowExecutingData(Integer workflowInstanceId);
-
-    @RpcMethod
-    TaskInstanceWakeupResponse wakeupTaskInstance(TaskInstanceWakeupRequest taskWakeupRequest);
 
 }

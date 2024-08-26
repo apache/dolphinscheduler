@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -86,6 +87,17 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
         return upsertTaskInstance(taskInstance);
+    }
+
+    @Override
+    public void markTaskInstanceInvalid(List<TaskInstance> taskInstances) {
+        if (CollectionUtils.isEmpty(taskInstances)) {
+            return;
+        }
+        for (TaskInstance taskInstance : taskInstances) {
+            taskInstance.setFlag(Flag.NO);
+            mybatisMapper.updateById(taskInstance);
+        }
     }
 
     private TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance) {
@@ -183,5 +195,12 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     public TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId, long depTaskCode,
                                                                        int testFlag) {
         return mybatisMapper.findLastTaskInstance(processInstanceId, depTaskCode, testFlag);
+    }
+
+    @Override
+    public void updateTaskInstanceState(Integer taskInstanceId,
+                                        TaskExecutionStatus originState,
+                                        TaskExecutionStatus targetState) {
+        mybatisMapper.updateTaskInstanceState(taskInstanceId, originState.getCode(), targetState.getCode());
     }
 }

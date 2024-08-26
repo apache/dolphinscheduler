@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispat
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.IWorkerLoadBalancer;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
 
 import java.util.Optional;
 
@@ -46,15 +46,15 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        final TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+    protected void doDispatch(ITaskExecutionRunnable ITaskExecutionRunnable) throws TaskDispatchException {
+        final TaskExecutionContext taskExecutionContext = ITaskExecutionRunnable.getTaskExecutionContext();
         final String taskName = taskExecutionContext.getTaskName();
         final String workerAddress = taskExecutionContext.getHost();
         try {
-            ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                    .getProxyClient(workerAddress, ITaskInstanceOperator.class);
-            TaskInstanceDispatchResponse taskInstanceDispatchResponse = taskInstanceOperator
-                    .dispatchTask(new TaskInstanceDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
+            final TaskInstanceDispatchResponse taskInstanceDispatchResponse = SingletonJdkDynamicRpcClientProxyFactory
+                    .withService(ITaskInstanceOperator.class)
+                    .withHost(workerAddress)
+                    .dispatchTask(new TaskInstanceDispatchRequest(ITaskExecutionRunnable.getTaskExecutionContext()));
             if (!taskInstanceDispatchResponse.isDispatchSuccess()) {
                 throw new TaskDispatchException("Dispatch task: " + taskName + " to " + workerAddress + " failed: "
                         + taskInstanceDispatchResponse);
@@ -67,8 +67,8 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecuteRunnable) {
-        String workerGroup = taskExecuteRunnable.getTaskExecutionContext().getWorkerGroup();
+    protected Optional<Host> getTaskInstanceDispatchHost(ITaskExecutionRunnable ITaskExecutionRunnable) {
+        String workerGroup = ITaskExecutionRunnable.getTaskExecutionContext().getWorkerGroup();
         return workerLoadBalancer.select(workerGroup).map(Host::of);
     }
 }

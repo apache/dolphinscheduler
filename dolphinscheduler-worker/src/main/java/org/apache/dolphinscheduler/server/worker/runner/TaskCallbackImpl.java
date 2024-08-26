@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
@@ -44,13 +44,13 @@ public class TaskCallbackImpl implements TaskCallBack {
         // todo: use listener
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
+                ITaskExecutionEvent.TaskInstanceExecutionEventType.RUNNING);
     }
 
     @Override
     public void updateTaskInstanceInfo(int taskInstanceId) {
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
+                ITaskExecutionEvent.TaskInstanceExecutionEventType.RUNNING);
     }
 
 }

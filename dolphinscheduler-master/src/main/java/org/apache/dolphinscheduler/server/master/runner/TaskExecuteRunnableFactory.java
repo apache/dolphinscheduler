@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
 
 /**
@@ -25,7 +27,17 @@ import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCr
  *
  * @param <T> TaskExecuteRunnable
  */
-public interface TaskExecuteRunnableFactory<T extends TaskExecuteRunnable> {
+public interface TaskExecuteRunnableFactory<T extends ITaskExecutionRunnable> {
+
+    /**
+     * Create a task execution runnable which related to the task code
+     *
+     * @param workflowExecuteRunnable
+     * @param taskCode
+     * @throws TaskExecuteRunnableCreateException
+     */
+    ITaskExecutionRunnable createTaskExecutionRunnable(IWorkflowExecutionRunnable workflowExecuteRunnable,
+                                                       Long taskCode);
 
     T createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException;
 

@@ -19,21 +19,33 @@ package org.apache.dolphinscheduler.extract.worker;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionFinishEventAck;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionInfoEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionFailedEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionKilledEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionPausedEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionSuccessEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionDispatchedEventAck;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionRunningEventAck;
 
 @RpcService
 public interface ITaskInstanceExecutionEventAckListener {
+
+    @RpcMethod
+    void handleTaskInstanceDispatchedEventAck(final TaskInstanceExecutionDispatchedEventAck taskInstanceExecutionDispatchedEventAck);
 
     // todo: If we use sync, then we don't need ack here
     @RpcMethod
     void handleTaskInstanceExecutionRunningEventAck(TaskInstanceExecutionRunningEventAck taskInstanceExecutionRunningEventAck);
 
     @RpcMethod
-    void handleTaskInstanceExecutionFinishEventAck(TaskInstanceExecutionFinishEventAck taskInstanceExecutionFinishEventAck);
+    void handleTaskExecutionSuccessEventAck(TaskExecutionSuccessEventAck taskExecutionSuccessEventAck);
 
     @RpcMethod
-    void handleTaskInstanceExecutionInfoEventAck(TaskInstanceExecutionInfoEventAck taskInstanceExecutionInfoEventAck);
+    void handleTaskExecutionPausedEventAck(TaskExecutionPausedEventAck taskExecutionPausedEventAck);
+
+    @RpcMethod
+    void handleTaskExecutionFailedEventAck(TaskExecutionFailedEventAck taskExecutionFailedEventAck);
+
+    @RpcMethod
+    void handleTaskExecutionKilledEventAck(TaskExecutionKilledEventAck taskExecutionKilledEventAck);
 
 }

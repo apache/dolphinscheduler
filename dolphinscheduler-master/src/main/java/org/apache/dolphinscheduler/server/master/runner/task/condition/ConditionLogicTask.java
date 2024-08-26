@@ -26,8 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
-import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 
 import java.util.List;
@@ -47,10 +46,10 @@ public class ConditionLogicTask extends BaseSyncLogicTask<ConditionsParameters> 
 
     private final TaskInstanceDao taskInstanceDao;
 
-    public ConditionLogicTask(WorkflowExecuteRunnable workflowExecuteRunnable,
+    public ConditionLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
                               TaskExecutionContext taskExecutionContext,
-                              TaskInstanceDao taskInstanceDao) throws LogicTaskInitializeException {
-        super(workflowExecuteRunnable, taskExecutionContext,
+                              TaskInstanceDao taskInstanceDao) {
+        super(workflowExecutionRunnable, taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<ConditionsParameters>() {
                 }));
         this.taskInstanceDao = taskInstanceDao;

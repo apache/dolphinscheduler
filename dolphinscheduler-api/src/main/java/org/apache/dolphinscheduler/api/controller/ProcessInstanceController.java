@@ -420,6 +420,10 @@ public class ProcessInstanceController extends BaseController {
         return returnDataList(result);
     }
 
+    // Todo: This is unstable, in some case the command trigger failed, we cannot get workflow instance
+    // And it's a bad design to use trigger code to get workflow instance why not directly get by workflow instanceId or
+    // inject the trigger id into workflow instance?
+    @Deprecated
     @Operation(summary = "queryProcessInstanceListByTrigger", description = "QUERY_PROCESS_INSTANCE_BY_TRIGGER_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),

@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.scheduler.quartz;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
+import org.apache.dolphinscheduler.extract.master.command.ScheduleWorkflowCommandParam;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -98,6 +100,11 @@ public class ProcessScheduleTask extends QuartzJobBean {
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
+
+        final ScheduleWorkflowCommandParam scheduleWorkflowCommandParam = ScheduleWorkflowCommandParam.builder()
+                .timeZone(schedule.getTimezoneId())
+                .build();
+        command.setCommandParam(JSONUtils.toJsonString(scheduleWorkflowCommandParam));
 
         commandService.createCommand(command);
     }

@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -32,15 +34,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WorkerTaskExecutorThreadPool {
 
+    private final WorkerMessageSender workerMessageSender;
+
     private final ThreadPoolExecutor threadPoolExecutor;
 
     private final WorkerConfig workerConfig;
 
-    public WorkerTaskExecutorThreadPool(WorkerConfig workerConfig) {
+    public WorkerTaskExecutorThreadPool(WorkerConfig workerConfig, WorkerMessageSender workerMessageSender) {
         this.threadPoolExecutor =
                 ThreadUtils.newDaemonFixedThreadExecutor("WorkerTaskExecutorThreadPool", workerConfig.getExecThreads());
         threadPoolExecutor.prestartAllCoreThreads();
         this.workerConfig = workerConfig;
+        this.workerMessageSender = workerMessageSender;
 
         WorkerServerMetrics.registerWorkerExecuteQueueSizeGauge(this::getWaitingTaskExecutorSize);
         WorkerServerMetrics.registerWorkerActiveExecuteThreadGauge(this::getRunningTaskExecutorSize);
@@ -50,6 +55,7 @@ public class WorkerTaskExecutorThreadPool {
         synchronized (WorkerTaskExecutorThreadPool.class) {
             if (TaskExecuteThreadsFullPolicy.CONTINUE.equals(workerConfig.getTaskExecuteThreadsFullPolicy())) {
                 WorkerTaskExecutorHolder.put(workerTaskExecutor);
+                sendDispatchedEvent(workerTaskExecutor);
                 threadPoolExecutor.execute(workerTaskExecutor);
                 return true;
             }
@@ -59,9 +65,16 @@ public class WorkerTaskExecutorThreadPool {
                 return false;
             }
             WorkerTaskExecutorHolder.put(workerTaskExecutor);
+            sendDispatchedEvent(workerTaskExecutor);
             threadPoolExecutor.execute(workerTaskExecutor);
             return true;
         }
+    }
+
+    private void sendDispatchedEvent(WorkerTaskExecutor workerTaskExecutor) {
+        workerMessageSender.sendMessageWithRetry(
+                workerTaskExecutor.getTaskExecutionContext(),
+                ITaskExecutionEvent.TaskInstanceExecutionEventType.DISPATCH);
     }
 
     public boolean isOverload() {

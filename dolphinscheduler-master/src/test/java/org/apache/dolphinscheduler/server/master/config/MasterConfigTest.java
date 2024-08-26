@@ -40,11 +40,11 @@ public class MasterConfigTest {
     public void getServerLoadProtection() {
         MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         assertTrue(serverLoadProtection.isEnabled());
-        assertEquals(0.77, serverLoadProtection.getMaxSystemCpuUsagePercentageThresholds());
-        assertEquals(0.77, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
-        assertEquals(0.77, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
-        assertEquals(0.77, serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds());
-        assertEquals(0.77, serverLoadProtection.getMaxDiskUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxSystemCpuUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxDiskUsagePercentageThresholds());
     }
 
     @Test
@@ -55,8 +55,8 @@ public class MasterConfigTest {
 
         CommandFetchStrategy.IdSlotBasedFetchConfig idSlotBasedFetchConfig =
                 (CommandFetchStrategy.IdSlotBasedFetchConfig) commandFetchStrategy.getConfig();
-        assertThat(idSlotBasedFetchConfig.getIdStep()).isEqualTo(3);
-        assertThat(idSlotBasedFetchConfig.getFetchSize()).isEqualTo(11);
+        assertThat(idSlotBasedFetchConfig.getIdStep()).isEqualTo(1);
+        assertThat(idSlotBasedFetchConfig.getFetchSize()).isEqualTo(10);
     }
 
     @Test

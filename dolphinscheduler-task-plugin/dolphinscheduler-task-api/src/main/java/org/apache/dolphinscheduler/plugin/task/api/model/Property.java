@@ -23,9 +23,15 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import java.io.Serializable;
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Property implements Serializable {
 
     private static final long serialVersionUID = -4045513703397452451L;
@@ -48,16 +54,6 @@ public class Property implements Serializable {
      * value
      */
     private String value;
-
-    public Property() {
-    }
-
-    public Property(String prop, Direct direct, DataType type, String value) {
-        this.prop = prop;
-        this.direct = direct;
-        this.type = type;
-        this.value = value;
-    }
 
     @Override
     public boolean equals(Object o) {

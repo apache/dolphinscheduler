@@ -152,10 +152,10 @@
             </foreach>
         </if>
     </update>
-    <update id="updateProcessInstanceByState">
+    <update id="updateWorkflowInstanceState">
         update t_ds_process_instance
-        set state = #{destState}
-        where state = #{originState}
+        set state = #{targetState}
+        where id = #{workflowInstanceId} and state = #{originState}
     </update>
 
     <update id="updateProcessInstanceByTenantCode">

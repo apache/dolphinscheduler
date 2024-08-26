@@ -428,7 +428,8 @@ public class ProcessAlertManager {
         return JSONUtils.toJsonString(content);
     }
 
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance,
+                                     TaskInstance taskInstance,
                                      ProjectUser projectUser) {
         alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
     }

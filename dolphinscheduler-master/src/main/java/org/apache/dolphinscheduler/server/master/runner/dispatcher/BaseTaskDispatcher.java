@@ -18,9 +18,10 @@
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
 import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
 
 import java.util.Optional;
 
@@ -30,11 +31,12 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseTaskDispatcher implements TaskDispatcher {
 
     @Override
-    public void dispatchTask(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        String taskName = taskExecuteRunnable.getTaskExecutionContext().getTaskName();
-        String taskInstanceDispatchAddress;
+    public void dispatchTask(ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException {
+        final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
+        final String taskName = taskExecutionRunnable.getTaskExecutionContext().getTaskName();
+        final String taskInstanceDispatchAddress;
         try {
-            taskInstanceDispatchAddress = getTaskInstanceDispatchHost(taskExecuteRunnable)
+            taskInstanceDispatchAddress = getTaskInstanceDispatchHost(taskExecutionRunnable)
                     .map(Host::getAddress)
                     .orElseThrow(() -> new TaskDispatchException("Cannot find the host to execute task: " + taskName));
         } catch (WorkerGroupNotFoundException workerGroupNotFoundException) {
@@ -42,15 +44,20 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
             // throw WorkerGroupNotFoundException unless the worker group is not exist in database
             throw new TaskDispatchException("Dispatch task: " + taskName + " failed", workerGroupNotFoundException);
         }
-        taskExecuteRunnable.getTaskExecutionContext().setHost(taskInstanceDispatchAddress);
-        // todo: add dispatch address here to avoid set host in TaskExecuteRunnable before
-        doDispatch(taskExecuteRunnable);
-        taskExecuteRunnable.getTaskInstance().setHost(taskInstanceDispatchAddress);
+        // We inject the host here to avoid when we dispatched the task to worker, but the worker is crash.
+        // Then we can use the host to do worker failover.
+        taskExecutionContext.setHost(taskInstanceDispatchAddress);
+        taskExecutionRunnable.getTaskInstance().setHost(taskInstanceDispatchAddress);
+        doDispatch(taskExecutionRunnable);
+        // todo: update the task state and host here, otherwise when the master failover the task host is null
+        // but it already dispatched to worker
+        // Or when the worker receive the task, it should wait the master send a start event to it.
+        // the second solution is better
         log.info("Success dispatch task {} to {}.", taskName, taskInstanceDispatchAddress);
     }
 
-    protected abstract void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException;
+    protected abstract void doDispatch(ITaskExecutionRunnable ITaskExecutionRunnable) throws TaskDispatchException;
 
-    protected abstract Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
+    protected abstract Optional<Host> getTaskInstanceDispatchHost(ITaskExecutionRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
 
 }

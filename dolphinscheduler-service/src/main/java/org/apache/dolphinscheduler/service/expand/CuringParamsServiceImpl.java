@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -97,6 +98,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
 
     /**
      * here it is judged whether external expansion calculation is required and the calculation result is obtained
+     *
      * @param processInstanceId
      * @param globalParamMap
      * @param globalParamList
@@ -198,11 +200,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
-        Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+        ICommandParam commandParam = JSONUtils.parseObject(processInstance.getCommandParam(), ICommandParam.class);
+        String timeZone = commandParam.getTimeZone();
 
         // built-in params
-        Map<String, String> builtInParams = setBuiltInParamsMap(taskInstance, timeZone);
+        Map<String, String> builtInParams = setBuiltInParamsMap(taskInstance, processInstance, timeZone);
 
         // project-level params
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
@@ -227,8 +229,9 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             prepareParamsMap.putAll(localParams);
         }
 
-        if (MapUtils.isNotEmpty(cmdParam)) {
-            prepareParamsMap.putAll(parseWorkflowStartParam(cmdParam));
+        if (CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
+            prepareParamsMap.putAll(commandParam.getCommandParams().stream()
+                    .collect(Collectors.toMap(Property::getProp, Function.identity())));
         }
 
         Iterator<Map.Entry<String, Property>> iter = prepareParamsMap.entrySet().iterator();
@@ -266,12 +269,15 @@ public class CuringParamsServiceImpl implements CuringParamsService {
 
     /**
      * build all built-in parameters
+     *
      * @param taskInstance
      * @param timeZone
      */
-    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance, String timeZone) {
-        CommandType commandType = taskInstance.getProcessInstance().getCmdTypeIfComplement();
-        Date scheduleTime = taskInstance.getProcessInstance().getScheduleTime();
+    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
+                                                    ProcessInstance workflowInstance,
+                                                    String timeZone) {
+        CommandType commandType = workflowInstance.getCmdTypeIfComplement();
+        Date scheduleTime = workflowInstance.getScheduleTime();
 
         Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
@@ -279,18 +285,17 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             params.put(PARAMETER_TASK_EXECUTE_PATH, taskInstance.getExecutePath());
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
-        params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getTaskDefine().getName());
-        params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskDefine().getCode()));
-        params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getProcessInstance().getId()));
-        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME,
-                taskInstance.getProcessInstance().getProcessDefinition().getName());
-        params.put(PARAMETER_WORKFLOW_DEFINITION_CODE,
-                Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getCode()));
-        params.put(PARAMETER_PROJECT_NAME, taskInstance.getProcessInstance().getProcessDefinition().getProjectName());
-        params.put(PARAMETER_PROJECT_CODE,
-                Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getProjectCode()));
+        params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getName());
+        params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskCode()));
+        params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getProcessInstanceId()));
+        // todo: set workflow definitionName and projectName
+        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, null);
+        params.put(PARAMETER_WORKFLOW_DEFINITION_CODE, Long.toString(workflowInstance.getProcessDefinitionCode()));
+        params.put(PARAMETER_PROJECT_NAME, null);
+        params.put(PARAMETER_PROJECT_CODE, Long.toString(workflowInstance.getProjectCode()));
         return params;
     }
+
     private Map<String, Property> setGlobalParamsMap(ProcessInstance processInstance) {
         Map<String, Property> globalParamsMap = new HashMap<>(16);
 

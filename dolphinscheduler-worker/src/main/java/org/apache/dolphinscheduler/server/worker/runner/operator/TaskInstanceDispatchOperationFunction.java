@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorFactoryBuilder;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
@@ -47,6 +48,9 @@ public class TaskInstanceDispatchOperationFunction
 
     @Autowired
     private WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool;
+
+    @Autowired
+    private WorkerMessageSender workerMessageSender;
 
     public TaskInstanceDispatchOperationFunction(
                                                  WorkerConfig workerConfig,
@@ -78,7 +82,8 @@ public class TaskInstanceDispatchOperationFunction
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
             WorkerTaskExecutor workerTaskExecutor = workerTaskExecutorFactoryBuilder
-                    .createWorkerTaskExecutorFactory(taskExecutionContext).createWorkerTaskExecutor();
+                    .createWorkerTaskExecutorFactory(taskExecutionContext)
+                    .createWorkerTaskExecutor();
             if (!workerTaskExecutorThreadPool.submitWorkerTaskExecutor(workerTaskExecutor)) {
                 log.info("Submit task: {} to wait queue failed", taskExecutionContext.getTaskName());
                 return TaskInstanceDispatchResponse.failed(taskExecutionContext.getTaskInstanceId(),

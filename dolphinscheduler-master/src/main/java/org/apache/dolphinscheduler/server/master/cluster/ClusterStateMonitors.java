@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
+import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
+import org.apache.dolphinscheduler.server.master.engine.system.event.WorkerFailoverEvent;
+
+import java.util.Date;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,23 +36,22 @@ public class ClusterStateMonitors {
     private ClusterManager clusterManager;
 
     @Autowired
-    private AlertDao alertDao;
+    private SystemEventBus systemEventBus;
 
     public void start() {
-        this.clusterManager.getMasterClusters()
+        clusterManager.getMasterClusters()
                 .registerListener((IClusters.ServerRemovedListener<MasterServerMetadata>) this::masterRemoved);
-        this.clusterManager.getWorkerClusters()
+        clusterManager.getWorkerClusters()
                 .registerListener((IClusters.ServerRemovedListener<WorkerServerMetadata>) this::workerRemoved);
         log.info("ClusterStateMonitors started...");
     }
 
     void masterRemoved(MasterServerMetadata masterServer) {
-        // todo: unify the alert message
-        alertDao.sendServerStoppedAlert(masterServer.getAddress(), "MASTER");
+        systemEventBus.publish(MasterFailoverEvent.of(masterServer.getAddress(), new Date()));
     }
 
     void workerRemoved(WorkerServerMetadata workerServer) {
-        alertDao.sendServerStoppedAlert(workerServer.getAddress(), "WORKER");
+        systemEventBus.publish(WorkerFailoverEvent.of(workerServer.getAddress(), new Date()));
     }
 
 }

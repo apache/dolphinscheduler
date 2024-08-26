@@ -279,6 +279,12 @@
         order by end_time desc limit 1
     </select>
 
+    <delete id="updateTaskInstanceState">
+        update t_ds_task_instance
+        set state = #{targetState}
+        where id = #{taskInstanceId} and state = #{originState}
+    </delete>
+
     <delete id="deleteByWorkflowInstanceId">
         delete
         from t_ds_task_instance

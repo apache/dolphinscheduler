@@ -21,11 +21,15 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class JdbcRegistryThreadFactory {
 
     public static ScheduledExecutorService getDefaultSchedulerThreadExecutor() {
-        return ThreadUtils.newDaemonScheduledExecutorService("jdbc-registry-default-scheduler-thread-pool",
-                Runtime.getRuntime().availableProcessors());
+        final String threadNameFormat = "ds-jdbc-registry-default-scheduler-thread-%d";
+        final int threadSize = Runtime.getRuntime().availableProcessors();
+        return ThreadUtils.newDaemonScheduledExecutorService(threadNameFormat, threadSize);
     }
 
 }

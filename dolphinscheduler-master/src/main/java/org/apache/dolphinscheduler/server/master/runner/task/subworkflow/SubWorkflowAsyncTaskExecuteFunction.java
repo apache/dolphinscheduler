@@ -36,6 +36,8 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
     private final ProcessInstanceDao processInstanceDao;
     private ProcessInstance subWorkflowInstance;
 
+    private SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
+
     public SubWorkflowAsyncTaskExecuteFunction(TaskExecutionContext taskExecutionContext,
                                                ProcessInstanceDao processInstanceDao) {
         this.taskExecutionContext = taskExecutionContext;
@@ -44,10 +46,8 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
 
     @Override
     public @NonNull AsyncTaskExecutionStatus getAsyncTaskExecutionStatus() {
-        // query the status of sub workflow instance
         if (subWorkflowInstance == null) {
-            subWorkflowInstance = processInstanceDao.querySubProcessInstanceByParentId(
-                    taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+            createSubWorkflowInstanceIfAbsent();
         }
         if (subWorkflowInstance == null) {
             log.info("The sub workflow instance doesn't created");
@@ -59,6 +59,15 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
                     : AsyncTaskExecutionStatus.FAILED;
         }
         return AsyncTaskExecutionStatus.RUNNING;
+    }
+
+    private void createSubWorkflowInstanceIfAbsent() {
+        // todo: we need to creat sub workflow instance here, rather than create command
+        // create command might occur duplicate sub workflow instance when failover
+        // generate the sub workflow instance
+        subWorkflowInstance = processInstanceDao.querySubProcessInstanceByParentId(
+                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+
     }
 
     @Override

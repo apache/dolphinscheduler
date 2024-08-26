@@ -145,12 +145,4 @@ public class ExecutorAPITest {
         }
     }
 
-    @Test
-    @Order(2)
-    public void testStartCheckProcessDefinition() {
-        HttpResponse testStartCheckProcessDefinitionResponse =
-                executorPage.startCheckProcessDefinition(loginUser, projectCode, processDefinitionCode);
-        Assertions.assertTrue(testStartCheckProcessDefinitionResponse.getBody().getSuccess());
-    }
-
 }

@@ -31,8 +31,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
+import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceController;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -281,16 +282,19 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
 
     private void doKillRunningSubWorkflowInstances(List<ProcessInstance> runningSubProcessInstanceList) throws MasterTaskExecuteException {
         for (ProcessInstance subProcessInstance : runningSubProcessInstanceList) {
-            subProcessInstance.setState(WorkflowExecutionStatus.READY_STOP);
-            processInstanceDao.updateById(subProcessInstance);
-            if (subProcessInstance.getState().isFinished()) {
-                log.info("The process instance [{}] is finished, no need to stop", subProcessInstance.getId());
-                continue;
-            }
             try {
-                sendToSubProcess(taskExecutionContext, subProcessInstance);
-                log.info("Success send [{}] request to SubWorkflow's master: {}", WorkflowExecutionStatus.READY_STOP,
-                        subProcessInstance.getHost());
+                WorkflowInstanceStopResponse workflowInstanceStopResponse = SingletonJdkDynamicRpcClientProxyFactory
+                        .withService(IWorkflowInstanceController.class)
+                        .withHost(subProcessInstance.getHost())
+                        .stopWorkflowInstance(new WorkflowInstanceStopRequest(subProcessInstance.getId()));
+                if (workflowInstanceStopResponse.isSuccess()) {
+                    log.info("Stop SubWorkflow: {} successfully", subProcessInstance.getName());
+                } else {
+                    throw new MasterTaskExecuteException(
+                            "Stop subWorkflow: " + subProcessInstance.getName() + " failed");
+                }
+            } catch (MasterTaskExecuteException me) {
+                throw me;
             } catch (Exception e) {
                 throw new MasterTaskExecuteException(
                         String.format("Send stop request to SubWorkflow's master: %s failed",
@@ -305,45 +309,6 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
             subProcessInstance.setState(WorkflowExecutionStatus.STOP);
             processInstanceDao.updateById(subProcessInstance);
         }
-    }
-
-    private void changeRunningSubprocessInstancesToStop(WorkflowExecutionStatus stopStatus) throws MasterTaskExecuteException {
-        this.haveBeenCanceled = true;
-        List<ProcessInstance> existsSubProcessInstanceList =
-                subWorkflowService.getAllDynamicSubWorkflow(processInstance.getId(), taskInstance.getTaskCode());
-        List<ProcessInstance> runningSubProcessInstanceList =
-                subWorkflowService.filterRunningProcessInstances(existsSubProcessInstanceList);
-        for (ProcessInstance subProcessInstance : runningSubProcessInstanceList) {
-            subProcessInstance.setState(stopStatus);
-            processInstanceDao.updateById(subProcessInstance);
-            if (subProcessInstance.getState().isFinished()) {
-                log.info("The process instance [{}] is finished, no need to stop", subProcessInstance.getId());
-                return;
-            }
-            try {
-                sendToSubProcess(taskExecutionContext, subProcessInstance);
-                log.info("Success send [{}] request to SubWorkflow's master: {}", stopStatus,
-                        subProcessInstance.getHost());
-            } catch (Exception e) {
-                throw new MasterTaskExecuteException(
-                        String.format("Send stop request to SubWorkflow's master: %s failed",
-                                subProcessInstance.getHost()),
-                        e);
-            }
-        }
-    }
-
-    private void sendToSubProcess(TaskExecutionContext taskExecutionContext, ProcessInstance subProcessInstance) {
-        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
-        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId(),
-                subProcessInstance.getState(),
-                subProcessInstance.getId(),
-                0);
-        iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
     }
 
     public boolean isCancel() {

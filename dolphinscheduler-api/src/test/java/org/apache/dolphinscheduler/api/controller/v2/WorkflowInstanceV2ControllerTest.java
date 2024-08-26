@@ -104,10 +104,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
     public void testExecuteWorkflowInstance() {
         User loginUser = getLoginUser();
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-
-        Mockito.when(execService.execute(any(), eq(1), any(ExecuteType.class))).thenReturn(result);
+        Mockito.doNothing().when(execService).controlWorkflowInstance(any(), eq(1), any(ExecuteType.class));
 
         Result result1 = workflowInstanceV2Controller.execute(loginUser, 1, ExecuteType.STOP);
         Assertions.assertTrue(result1.isSuccess());

@@ -53,4 +53,11 @@ public enum Flag {
     public String getDescp() {
         return descp;
     }
+
+    public static Flag of(int code) {
+        if (code == 0) {
+            return NO;
+        }
+        return YES;
+    }
 }

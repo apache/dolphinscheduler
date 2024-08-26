@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SingletonJdkDynamicRpcClientProxyFactory {
 
     private static final JdkDynamicRpcClientProxyFactory INSTANCE = new JdkDynamicRpcClientProxyFactory(
@@ -26,6 +30,23 @@ public class SingletonJdkDynamicRpcClientProxyFactory {
 
     public static <T> T getProxyClient(String serverAddress, Class<T> clazz) {
         return INSTANCE.getProxyClient(serverAddress, clazz);
+    }
+
+    public static <T> JdkDynamicRpcClientProxyBuilder<T> withService(Class<T> serviceClazz) {
+        return new JdkDynamicRpcClientProxyBuilder<>(serviceClazz);
+    }
+
+    public static class JdkDynamicRpcClientProxyBuilder<T> {
+
+        private final Class<T> serviceClazz;
+
+        public JdkDynamicRpcClientProxyBuilder(Class<T> serviceClazz) {
+            this.serviceClazz = serviceClazz;
+        }
+
+        public T withHost(String serviceHost) {
+            return getProxyClient(serviceHost, serviceClazz);
+        }
     }
 
 }

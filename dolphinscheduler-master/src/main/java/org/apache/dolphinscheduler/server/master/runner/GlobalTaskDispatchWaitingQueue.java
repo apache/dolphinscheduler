@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
+
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,42 +30,53 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * The class is used to store {@link TaskExecuteRunnable} which needs to be dispatched. The {@link TaskExecuteRunnable}
- * will be stored in {@link PriorityDelayQueue}, if the {@link TaskExecuteRunnable}'s delay time is 0, then it will be
+ * The class is used to store {@link ITaskExecutionRunnable} which needs to be dispatched. The {@link ITaskExecutionRunnable}
+ * will be stored in {@link PriorityDelayQueue}, if the {@link ITaskExecutionRunnable}'s delay time is 0, then it will be
  * consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
  * <p>
- * The order of {@link TaskExecuteRunnable} in the {@link PriorityDelayQueue} is determined by {@link TaskExecuteRunnable#compareTo}.
+ * The order of {@link ITaskExecutionRunnable} in the {@link PriorityDelayQueue} is determined by {@link ITaskExecutionRunnable#compareTo}.
  */
 @Slf4j
 @Component
 public class GlobalTaskDispatchWaitingQueue {
 
-    private final PriorityDelayQueue<DelayEntry<TaskExecuteRunnable>> priorityDelayQueue = new PriorityDelayQueue<>();
+    private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
+    private final PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> priorityDelayQueue =
+            new PriorityDelayQueue<>();
 
     /**
-     * Submit a {@link TaskExecuteRunnable} with delay time 0, it will be consumed immediately.
+     * Submit a {@link ITaskExecutionRunnable} with delay time 0, it will be consumed immediately.
      */
-    public void dispatchTaskExecuteRunnable(TaskExecuteRunnable taskExecuteRunnable) {
-        dispatchTaskExecuteRunnableWithDelay(taskExecuteRunnable, 0);
+    public synchronized void dispatchTaskExecuteRunnable(ITaskExecutionRunnable ITaskExecutionRunnable) {
+        dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable, 0);
     }
 
     /**
-     * Submit a {@link TaskExecuteRunnable} with delay time, if the delay time <= 0 then it can be consumed.
+     * Submit a {@link ITaskExecutionRunnable} with delay time, if the delay time <= 0 then it can be consumed.
      */
-    public void dispatchTaskExecuteRunnableWithDelay(TaskExecuteRunnable taskExecuteRunnable, long delayTimeMills) {
-        priorityDelayQueue.add(new DelayEntry<>(delayTimeMills, taskExecuteRunnable));
+    public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,
+                                                                  long delayTimeMills) {
+        waitingTaskInstanceIds.add(taskExecutionRunnable.getTaskInstance().getId());
+        priorityDelayQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
     }
 
     /**
-     * Consume {@link TaskExecuteRunnable} from the {@link PriorityDelayQueue}, only the delay time <= 0 can be consumed.
+     * Consume {@link ITaskExecutionRunnable} from the {@link PriorityDelayQueue}, only the delay time <= 0 can be consumed.
      */
     @SneakyThrows
-    public TaskExecuteRunnable takeTaskExecuteRunnable() {
-        return priorityDelayQueue.take().getData();
+    public ITaskExecutionRunnable takeTaskExecuteRunnable() {
+        ITaskExecutionRunnable taskExecutionRunnable = priorityDelayQueue.take().getData();
+        while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
+            taskExecutionRunnable = priorityDelayQueue.take().getData();
+        }
+        return taskExecutionRunnable;
     }
 
     public int getWaitingDispatchTaskNumber() {
-        return priorityDelayQueue.size();
+        return waitingTaskInstanceIds.size();
     }
 
+    public synchronized boolean markTaskExecutionRunnableRemoved(ITaskExecutionRunnable taskExecutionRunnable) {
+        return waitingTaskInstanceIds.remove(taskExecutionRunnable.getTaskInstance().getId());
+    }
 }

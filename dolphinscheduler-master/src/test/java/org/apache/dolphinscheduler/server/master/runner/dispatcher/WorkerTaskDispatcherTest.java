@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.IWorkerLoadBalancer;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.Optional;
 
@@ -39,9 +39,10 @@ public class WorkerTaskDispatcherTest {
         Mockito.when(workerLoadBalancer.select(Mockito.any())).thenReturn(Optional.of("localhost:1234"));
         WorkerTaskDispatcher workerTaskDispatcher = new WorkerTaskDispatcher(workerLoadBalancer);
 
-        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
-        Mockito.when(taskExecuteRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
-        Optional<Host> taskInstanceDispatchHost = workerTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable);
+        ITaskExecutionRunnable ITaskExecutionRunnable = Mockito.mock(ITaskExecutionRunnable.class);
+        Mockito.when(ITaskExecutionRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
+        Optional<Host> taskInstanceDispatchHost =
+                workerTaskDispatcher.getTaskInstanceDispatchHost(ITaskExecutionRunnable);
         Assertions.assertEquals("localhost:1234", taskInstanceDispatchHost.get().getAddress());
     }
 }

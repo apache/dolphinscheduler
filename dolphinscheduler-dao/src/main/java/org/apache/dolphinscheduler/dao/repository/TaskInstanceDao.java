@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -40,30 +41,39 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * Submit a task instance to DB.
-     * @param taskInstance task instance
+     *
+     * @param taskInstance    task instance
      * @param processInstance process instance
      * @return task instance
      */
     boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
 
     /**
+     * Mark the task instance as invalid
+     */
+    void markTaskInstanceInvalid(List<TaskInstance> taskInstances);
+
+    /**
      * Query list of valid task instance by process instance id
+     *
      * @param processInstanceId processInstanceId
-     * @param testFlag test flag
+     * @param testFlag          test flag
      * @return list of valid task instance
      */
     List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag);
 
     /**
      * Query list of task instance by process instance id and task code
+     *
      * @param processInstanceId processInstanceId
-     * @param taskCode task code
+     * @param taskCode          task code
      * @return list of valid task instance
      */
     TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer processInstanceId, Long taskCode);
 
     /**
      * find previous task list by work process id
+     *
      * @param processInstanceId processInstanceId
      * @return task instance list
      */
@@ -71,6 +81,7 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * find task instance by cache_key
+     *
      * @param cacheKey cache key
      * @return task instance
      */
@@ -78,6 +89,7 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * clear task instance cache by cache_key
+     *
      * @param cacheKey cache key
      * @return task instance
      */
@@ -91,8 +103,8 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
      * find last task instance list corresponding to taskCodes in the date interval
      *
      * @param processInstanceId Task's parent process instance id
-     * @param taskCodes taskCodes
-     * @param testFlag test flag
+     * @param taskCodes         taskCodes
+     * @param testFlag          test flag
      * @return task instance list
      */
     List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
@@ -108,4 +120,7 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
      */
     TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId,
                                                                 long depTaskCode, int testFlag);
+
+    void updateTaskInstanceState(Integer taskInstanceId, TaskExecutionStatus originState,
+                                 TaskExecutionStatus targetState);
 }

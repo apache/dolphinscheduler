@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum ProcessExecutionTypeEnum {
 
     PARALLEL(0, "parallel"),
+    // todo: the serial is unstable, so we don't support them now
     SERIAL_WAIT(1, "serial wait"),
     SERIAL_DISCARD(2, "serial discard"),
     SERIAL_PRIORITY(3, "serial priority");
@@ -43,22 +44,6 @@ public enum ProcessExecutionTypeEnum {
         for (ProcessExecutionTypeEnum executionType : ProcessExecutionTypeEnum.values()) {
             EXECUTION_STATUS_MAP.put(executionType.code, executionType);
         }
-    }
-
-    public boolean typeIsSerial() {
-        return this != PARALLEL;
-    }
-
-    public boolean typeIsSerialWait() {
-        return this == SERIAL_WAIT;
-    }
-
-    public boolean typeIsSerialDiscard() {
-        return this == SERIAL_DISCARD;
-    }
-
-    public boolean typeIsSerialPriority() {
-        return this == SERIAL_PRIORITY;
     }
 
     public int getCode() {

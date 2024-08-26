@@ -17,22 +17,39 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.CommandDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
+import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceController;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
+import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -40,66 +57,69 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameters> {
 
     public static final String TASK_TYPE = "SUB_PROCESS";
-    private final WorkflowExecuteRunnable workflowExecuteRunnable;
+
+    private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
+
     private final ProcessInstanceDao processInstanceDao;
 
-    public SubWorkflowLogicTask(TaskExecutionContext taskExecutionContext,
-                                WorkflowExecuteRunnable workflowExecuteRunnable,
-                                ProcessInstanceDao processInstanceDao) {
+    private final ProcessDefinitionDao processDefinitionDao;
+
+    private final CommandDao commandDao;
+
+    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+
+    private final SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
+
+    public SubWorkflowLogicTask(final TaskExecutionContext taskExecutionContext,
+                                final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                final ApplicationContext applicationContext) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubProcessParameters>() {
                 }));
-        this.workflowExecuteRunnable = workflowExecuteRunnable;
-        this.processInstanceDao = processInstanceDao;
+        this.processDefinitionDao = applicationContext.getBean(ProcessDefinitionDao.class);
+        this.processInstanceDao = applicationContext.getBean(ProcessInstanceDao.class);
+        this.commandDao = applicationContext.getBean(CommandDao.class);
+        this.logicTaskInstanceExecutionEventSenderManager =
+                applicationContext.getBean(LogicTaskInstanceExecutionEventSenderManager.class);
+        this.workflowExecutionRunnable = workflowExecutionRunnable;
+        this.subWorkflowLogicTaskRuntimeContext = initializeSubWorkflowLogicTaskRuntimeContext();
+        taskExecutionContext.setAppIds(JSONUtils.toJsonString(subWorkflowLogicTaskRuntimeContext));
+        logicTaskInstanceExecutionEventSenderManager.runningEventSender().sendMessage(taskExecutionContext);
     }
 
     @Override
     public AsyncTaskExecuteFunction getAsyncTaskExecuteFunction() {
-        // todo: create sub workflow instance here?
         return new SubWorkflowAsyncTaskExecuteFunction(taskExecutionContext, processInstanceDao);
     }
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        if (workflowExecuteRunnable == null) {
-            log.warn("Cannot find WorkflowExecuteRunnable");
-            return;
-        }
         ProcessInstance subProcessInstance =
                 processInstanceDao.querySubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
-        if (subProcessInstance == null) {
-            log.info("SubWorkflow instance is null");
-            return;
-        }
-        TaskInstance taskInstance =
-                workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId()).orElse(null);
-        if (taskInstance == null) {
-            // we don't need to do this check, the task instance shouldn't be null
-            log.info("TaskInstance is null");
-            return;
-        }
-        if (taskInstance.getState().isFinished()) {
-            log.info("The task instance is finished, no need to pause");
-            return;
-        }
-        subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_PAUSE, "ready pause sub workflow");
-        processInstanceDao.updateById(subProcessInstance);
+
         try {
-            sendToSubProcess(taskExecutionContext, subProcessInstance);
-            log.info("Success send pause request to SubWorkflow's master: {}", subProcessInstance.getHost());
+            WorkflowInstancePauseResponse pauseResponse = SingletonJdkDynamicRpcClientProxyFactory
+                    .withService(IWorkflowInstanceController.class)
+                    .withHost(subProcessInstance.getHost())
+                    .pauseWorkflowInstance(new WorkflowInstancePauseRequest(subProcessInstance.getId()));
+            if (pauseResponse.isSuccess()) {
+                log.info("Pause sub workflowInstance: {}", subProcessInstance.getName() + " success");
+            } else {
+                throw new MasterTaskExecuteException(
+                        "Pause sub workflowInstance: " + subProcessInstance.getName() + " failed with response: "
+                                + pauseResponse);
+            }
+        } catch (MasterTaskExecuteException me) {
+            throw me;
         } catch (Exception e) {
-            throw new MasterTaskExecuteException(String.format("Send pause request to SubWorkflow's master: %s failed",
-                    subProcessInstance.getHost()), e);
+            throw new MasterTaskExecuteException(
+                    "Send pause request to SubWorkflow's master: " + subProcessInstance.getName() + " failed", e);
         }
     }
 
     @Override
     public void kill() {
-        if (workflowExecuteRunnable == null) {
-            log.warn("Cannot find WorkflowExecuteRunnable");
-            return;
-        }
         ProcessInstance subProcessInstance =
                 processInstanceDao.querySubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
@@ -107,38 +127,90 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             log.info("SubWorkflow instance is null");
             return;
         }
-        TaskInstance taskInstance =
-                workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId()).orElse(null);
-        if (taskInstance == null) {
-            // we don't need to do this check, the task instance shouldn't be null
-            log.info("TaskInstance is null");
-            return;
-        }
-        if (subProcessInstance.getState().isFinished()) {
-            log.info("The subProcessInstance is finished, no need to pause");
-            return;
-        }
-        subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by kill task");
-        processInstanceDao.updateById(subProcessInstance);
         try {
-            sendToSubProcess(taskExecutionContext, subProcessInstance);
-            log.info("Success send kill request to SubWorkflow's master: {}", subProcessInstance.getHost());
+            WorkflowInstanceStopResponse stopResponse = SingletonJdkDynamicRpcClientProxyFactory
+                    .withService(IWorkflowInstanceController.class)
+                    .withHost(subProcessInstance.getHost())
+                    .stopWorkflowInstance(new WorkflowInstanceStopRequest(subProcessInstance.getId()));
+            if (stopResponse.isSuccess()) {
+                log.info("Kill sub workflowInstance: {}", subProcessInstance.getName() + " success");
+            } else {
+                log.error("Kill sub workflowInstance: {} failed with response: {}", subProcessInstance.getName(),
+                        stopResponse);
+            }
         } catch (Exception e) {
             log.error("Send kill request to SubWorkflow's master: {} failed", subProcessInstance.getHost(), e);
         }
     }
 
-    private void sendToSubProcess(TaskExecutionContext taskExecutionContext,
-                                  ProcessInstance subProcessInstance) {
-        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
-        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId(),
-                subProcessInstance.getState(),
-                subProcessInstance.getId(),
-                0);
-        iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
+    private SubWorkflowLogicTaskRuntimeContext initializeSubWorkflowLogicTaskRuntimeContext() {
+        if (taskExecutionContext.isFailover() && StringUtils.isNotEmpty(taskExecutionContext.getAppIds())) {
+            return JSONUtils.parseObject(taskExecutionContext.getAppIds(), SubWorkflowLogicTaskRuntimeContext.class);
+        }
+        // If the task is not in failover mode or the runtime context is not exist
+        // then we should create the runtime context by command type we should start/recover from failure...
+        final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
+        final ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        switch (workflowInstance.getCommandType()) {
+            case START_PROCESS:
+            case SCHEDULER:
+            case START_CURRENT_TASK_PROCESS:
+            case RECOVER_SERIAL_WAIT:
+            case COMPLEMENT_DATA:
+                return createSubWorkflowInstanceFromWorkflowDefinition();
+            case REPEAT_RUNNING:
+            case START_FAILURE_TASK_PROCESS:
+            case RECOVER_SUSPENDED_PROCESS:
+                return createSubWorkflowInstanceWithWorkflowInstance();
+            default:
+                throw new IllegalArgumentException("Unsupported command type: " + workflowInstance.getCommandType());
+        }
+    }
+
+    private SubWorkflowLogicTaskRuntimeContext createSubWorkflowInstanceFromWorkflowDefinition() {
+        final ProcessInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final ICommandParam commandParam =
+                JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
+        final RunWorkflowCommandParam runWorkflowCommandParam =
+                RunWorkflowCommandParam.builder()
+                        .commandParams(new ArrayList<>(taskExecutionContext.getPrepareParamsMap().values()))
+                        .startNodes(new ArrayList<>())
+                        .timeZone(commandParam.getTimeZone())
+                        .subWorkflowInstance(true)
+                        .build();
+
+        final ProcessDefinition subWorkflowDefinition = getSubWorkflowDefinition();
+        final Command command = Command.builder()
+                .commandType(workflowInstance.getCommandType())
+                .processDefinitionCode(subWorkflowDefinition.getCode())
+                .processDefinitionVersion(subWorkflowDefinition.getVersion())
+                .executorId(workflowInstance.getExecutorId())
+                .commandParam(JSONUtils.toJsonString(runWorkflowCommandParam))
+                .taskDependType(TaskDependType.TASK_POST)
+                .failureStrategy(workflowInstance.getFailureStrategy())
+                .warningType(workflowInstance.getWarningType())
+                .warningGroupId(workflowInstance.getWarningGroupId())
+                .startTime(new Date())
+                .processInstancePriority(workflowInstance.getProcessInstancePriority())
+                .updateTime(new Date())
+                .workerGroup(taskExecutionContext.getWorkerGroup())
+                .tenantCode(taskExecutionContext.getTenantCode())
+                .dryRun(taskExecutionContext.getDryRun())
+                .testFlag(taskExecutionContext.getTestFlag())
+                .build();
+        commandDao.insert(command);
+        return SubWorkflowLogicTaskRuntimeContext.builder()
+                .subWorkflowCommandId(command.getId())
+                .build();
+    }
+
+    private SubWorkflowLogicTaskRuntimeContext createSubWorkflowInstanceWithWorkflowInstance() {
+        return null;
+    }
+
+    private ProcessDefinition getSubWorkflowDefinition() {
+        return processDefinitionDao.queryByCode(taskParameters.getProcessDefinitionCode()).orElseThrow(
+                () -> new IllegalArgumentException(
+                        "Cannot find the sub workflow definition: " + taskParameters.getProcessDefinitionCode()));
     }
 }

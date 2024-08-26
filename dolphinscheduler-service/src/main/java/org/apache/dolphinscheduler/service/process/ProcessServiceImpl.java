@@ -107,8 +107,6 @@ import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.common.ILogService;
-import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -265,114 +263,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private TriggerRelationService triggerRelationService;
-
-    /**
-     * todo: split this method
-     * handle Command (construct ProcessInstance from Command) , wrapped in transaction
-     *
-     * @param host    host
-     * @param command found command
-     * @return process instance
-     */
-    @Override
-    @Transactional
-    public @Nullable ProcessInstance handleCommand(String host,
-                                                   Command command) throws CronParseException, CodeGenerateException {
-        ProcessInstance processInstance = constructProcessInstance(command, host);
-        // cannot construct process instance, return null
-        if (processInstance == null) {
-            log.error("scan command, command parameter is error: {}", command);
-            commandService.moveToErrorCommand(command, "process instance is null");
-            return null;
-        }
-        processInstance.setCommandType(command.getCommandType());
-        processInstance.addHistoryCmd(command.getCommandType());
-        processInstance.setTestFlag(command.getTestFlag());
-        // if the processDefinition is serial
-        ProcessDefinition processDefinition = this.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
-        if (processDefinition.getExecutionType().typeIsSerial()) {
-            saveSerialProcess(processInstance, processDefinition);
-            if (processInstance.getState() != WorkflowExecutionStatus.RUNNING_EXECUTION) {
-                setSubProcessParam(processInstance);
-                triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
-                deleteCommandWithCheck(command.getId());
-                // todo: this is a bad design to return null here, whether trigger the task
-                return null;
-            }
-        } else {
-            processInstanceDao.upsertProcessInstance(processInstance);
-        }
-        triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
-        setSubProcessParam(processInstance);
-        deleteCommandWithCheck(command.getId());
-        return processInstance;
-    }
-
-    protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        processInstance.setStateWithDesc(WorkflowExecutionStatus.SERIAL_WAIT, "wait by serial_wait strategy");
-        processInstanceDao.performTransactionalUpsert(processInstance);
-        // serial wait
-        // when we get the running instance(or waiting instance) only get the priority instance(by id)
-        if (processDefinition.getExecutionType().typeIsSerialWait()) {
-            List<ProcessInstance> runningProcessInstances =
-                    this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
-                            processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(),
-                            org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
-                            processInstance.getId());
-            if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
-                        "submit from serial_wait strategy");
-                processInstanceDao.performTransactionalUpsert(processInstance);
-            }
-        } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
-            List<ProcessInstance> runningProcessInstances =
-                    this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
-                            processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(),
-                            org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
-                            processInstance.getId());
-            if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
-                processInstance.setStateWithDesc(WorkflowExecutionStatus.STOP, "stop by serial_discard strategy");
-                processInstanceDao.performTransactionalUpsert(processInstance);
-                return;
-            }
-            processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
-                    "submit from serial_discard strategy");
-            processInstanceDao.performTransactionalUpsert(processInstance);
-        } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
-            List<ProcessInstance> runningProcessInstances =
-                    this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
-                            processInstance.getProcessDefinitionCode(),
-                            processInstance.getProcessDefinitionVersion(),
-                            org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
-                            processInstance.getId());
-            for (ProcessInstance info : runningProcessInstances) {
-                info.setCommandType(CommandType.STOP);
-                info.addHistoryCmd(CommandType.STOP);
-                info.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by serial_priority strategy");
-                boolean update = processInstanceDao.updateById(info);
-                // determine whether the process is normal
-                if (update) {
-                    try {
-                        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(info.getHost(),
-                                        ITaskInstanceExecutionEventListener.class);
-                        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent =
-                                new WorkflowInstanceStateChangeEvent(info.getId(), 0, info.getState(), info.getId(), 0);
-                        iTaskInstanceExecutionEventListener
-                                .onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
-                    } catch (Exception e) {
-                        log.error("sendResultError", e);
-                    }
-                }
-            }
-            processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
-                    "submit by serial_priority strategy");
-            processInstanceDao.performTransactionalUpsert(processInstance);
-        }
-    }
 
     /**
      * find process instance detail by id
@@ -779,8 +669,6 @@ public class ProcessServiceImpl implements ProcessService {
                 processInstance.setRunTimes(runTime + 1);
                 break;
             case START_CURRENT_TASK_PROCESS:
-                break;
-            case RECOVER_WAITING_THREAD:
                 break;
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
@@ -2080,11 +1968,6 @@ public class ProcessServiceImpl implements ProcessService {
                 }
             }
         }
-    }
-
-    @Override
-    public void saveCommandTrigger(Integer commandId, Integer processInstanceId) {
-        triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
 
     private Map<String, Object> createCommandParams(ProcessInstance processInstance) {

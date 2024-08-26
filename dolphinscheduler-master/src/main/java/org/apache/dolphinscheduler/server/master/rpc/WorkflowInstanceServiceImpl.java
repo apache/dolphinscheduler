@@ -18,28 +18,15 @@
 package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
-import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupResponse;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.service.ExecutingService;
-
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class WorkflowInstanceServiceImpl implements IWorkflowInstanceService {
-
-    @Autowired
-    private ExecutingService executingService;
-
-    @Autowired
-    private TaskInstanceWakeupOperationFunction taskInstanceWakeupOperationFunction;
 
     @Override
     public void clearWorkflowMetrics(Long workflowDefinitionCode) {
@@ -47,16 +34,4 @@ public class WorkflowInstanceServiceImpl implements IWorkflowInstanceService {
         ProcessInstanceMetrics.cleanUpProcessInstanceCountMetricsByDefinitionCode(workflowDefinitionCode);
     }
 
-    @Override
-    public WorkflowExecuteDto getWorkflowExecutingData(Integer workflowInstanceId) {
-        log.info("Receive getWorkflowExecutingData request: {}", workflowInstanceId);
-        Optional<WorkflowExecuteDto> workflowExecuteDtoOptional =
-                executingService.queryWorkflowExecutingData(workflowInstanceId);
-        return workflowExecuteDtoOptional.orElse(null);
-    }
-
-    @Override
-    public TaskInstanceWakeupResponse wakeupTaskInstance(TaskInstanceWakeupRequest taskWakeupRequest) {
-        return taskInstanceWakeupOperationFunction.operate(taskWakeupRequest);
-    }
 }

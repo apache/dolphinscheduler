@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.message.TaskInstanceExecutionEventSender;
@@ -44,7 +44,7 @@ public class WorkerMessageSender {
     @Autowired
     private List<TaskInstanceExecutionEventSender> messageSenders;
 
-    private final Map<ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender> messageSenderMap =
+    private final Map<ITaskExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender> messageSenderMap =
             new HashMap<>();
 
     @PostConstruct
@@ -55,33 +55,18 @@ public class WorkerMessageSender {
 
     // todo: use message rather than context
     public void sendMessageWithRetry(@NonNull TaskExecutionContext taskExecutionContext,
-                                     @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType) {
+                                     @NonNull ITaskExecutionEvent.TaskInstanceExecutionEventType eventType) {
         TaskInstanceExecutionEventSender messageSender = messageSenderMap.get(eventType);
         if (messageSender == null) {
-            throw new IllegalArgumentException("The messageType is invalidated, messageType: " + eventType);
+            log.error("The messageSender is invalidated, messageType: {}", eventType);
+            return;
         }
-        ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent = messageSender.buildEvent(taskExecutionContext);
+        ITaskExecutionEvent iTaskExecutionEvent = messageSender.buildEvent(taskExecutionContext);
         try {
-            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), iTaskInstanceExecutionEvent);
-            messageSender.sendEvent(iTaskInstanceExecutionEvent);
+            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), iTaskExecutionEvent);
+            messageSender.sendEvent(iTaskExecutionEvent);
         } catch (Exception e) {
-            log.error("Send message error, eventType: {}, event: {}", eventType, iTaskInstanceExecutionEvent);
-        }
-    }
-
-    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext,
-                            @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType taskInstanceExecutionEventType) {
-        TaskInstanceExecutionEventSender messageSender = messageSenderMap.get(taskInstanceExecutionEventType);
-        if (messageSender == null) {
-            throw new IllegalArgumentException(
-                    "The eventType is invalidated, eventType: " + taskInstanceExecutionEventType);
-        }
-        ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent = messageSender.buildEvent(taskExecutionContext);
-        try {
-            messageSender.sendEvent(iTaskInstanceExecutionEvent);
-        } catch (Exception e) {
-            log.error("Send message error, eventType: {}, event: {}", taskInstanceExecutionEventType,
-                    iTaskInstanceExecutionEvent);
+            log.error("Send message error, eventType: {}, event: {}", eventType, iTaskExecutionEvent);
         }
     }
 

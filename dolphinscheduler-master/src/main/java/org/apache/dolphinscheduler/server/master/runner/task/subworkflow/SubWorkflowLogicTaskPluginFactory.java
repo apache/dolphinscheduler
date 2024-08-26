@@ -17,16 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -34,20 +34,20 @@ import org.springframework.stereotype.Component;
 public class SubWorkflowLogicTaskPluginFactory implements ILogicTaskPluginFactory<SubWorkflowLogicTask> {
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private ApplicationContext applicationContext;
+
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowRepository IWorkflowRepository;
 
     @Override
     public SubWorkflowLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(workflowInstanceId);
-        if (workflowExecuteRunnable == null) {
+        final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        final IWorkflowExecutionRunnable workflowExecutionRunnable = IWorkflowRepository.get(workflowInstanceId);
+        if (workflowExecutionRunnable == null) {
             throw new LogicTaskInitializeException(
                     "Cannot find the WorkflowExecuteRunnable by : " + workflowInstanceId);
         }
-        return new SubWorkflowLogicTask(taskExecutionContext, workflowExecuteRunnable, processInstanceDao);
+        return new SubWorkflowLogicTask(taskExecutionContext, workflowExecutionRunnable, applicationContext);
     }
 
     @Override
