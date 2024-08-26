@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -26,6 +28,7 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,11 +57,7 @@ class ProcessInstanceDaoImplTest extends BaseDaoTest {
                 workflowDefinitionVersion, status)));
 
         processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
-                WorkflowExecutionStatus.SUBMITTED_SUCCESS));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.RUNNING_EXECUTION));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
-                WorkflowExecutionStatus.DELAY_EXECUTION));
         processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.READY_PAUSE));
         processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
@@ -67,8 +66,37 @@ class ProcessInstanceDaoImplTest extends BaseDaoTest {
                 WorkflowExecutionStatus.SERIAL_WAIT));
         processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.WAIT_TO_RUN));
-        assertEquals(7, processInstanceDao
+        assertEquals(5, processInstanceDao
                 .queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion, status).size());
+    }
+
+    @Test
+    void updateWorkflowInstanceState_success() {
+        ProcessInstance workflowInstance = createWorkflowInstance(
+                1L, 1, WorkflowExecutionStatus.RUNNING_EXECUTION);
+        processInstanceDao.insert(workflowInstance);
+
+        assertDoesNotThrow(() -> processInstanceDao.updateWorkflowInstanceState(
+                workflowInstance.getId(),
+                WorkflowExecutionStatus.RUNNING_EXECUTION,
+                WorkflowExecutionStatus.SUCCESS));
+    }
+
+    @Test
+    void updateWorkflowInstanceState_failed() {
+        ProcessInstance workflowInstance = createWorkflowInstance(
+                1L, 1, WorkflowExecutionStatus.RUNNING_EXECUTION);
+        processInstanceDao.insert(workflowInstance);
+
+        UnsupportedOperationException unsupportedOperationException = assertThrows(UnsupportedOperationException.class,
+                () -> processInstanceDao.updateWorkflowInstanceState(
+                        workflowInstance.getId(),
+                        WorkflowExecutionStatus.READY_STOP,
+                        WorkflowExecutionStatus.STOP));
+        Assertions.assertEquals("updateWorkflowInstance " + workflowInstance.getId()
+                + " state failed, expect original state is " + WorkflowExecutionStatus.READY_STOP.name()
+                + " actual state is : {} " + workflowInstance.getState().name(),
+                unsupportedOperationException.getMessage());
     }
 
     @Test

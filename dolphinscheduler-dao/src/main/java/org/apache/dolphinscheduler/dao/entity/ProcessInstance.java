@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -49,6 +50,8 @@ import com.google.common.base.Strings;
  */
 @NoArgsConstructor
 @Data
+@Builder
+@AllArgsConstructor
 @TableName("t_ds_process_instance")
 public class ProcessInstance {
 
@@ -89,14 +92,17 @@ public class ProcessInstance {
 
     private String host;
 
+    @Deprecated
     @TableField(exist = false)
     private ProcessDefinition processDefinition;
+
     private CommandType commandType;
 
     private String commandParam;
 
     private TaskDependType taskDependType;
 
+    @Deprecated
     private int maxTryTimes;
 
     private FailureStrategy failureStrategy;
@@ -189,6 +195,7 @@ public class ProcessInstance {
     /**
      * serial queue next processInstanceId
      */
+    @Deprecated
     private int nextProcessInstanceId;
 
     /**

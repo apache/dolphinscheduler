@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
@@ -59,6 +60,22 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
     }
 
     @Override
+    public void updateWorkflowInstanceState(Integer workflowInstanceId, WorkflowExecutionStatus originalStatus,
+                                            WorkflowExecutionStatus targetStatus) {
+        int update = mybatisMapper.updateWorkflowInstanceState(workflowInstanceId, originalStatus, targetStatus);
+        if (update != 1) {
+            ProcessInstance processInstance = mybatisMapper.selectById(workflowInstanceId);
+            if (processInstance == null) {
+                throw new UnsupportedOperationException("updateWorkflowInstance " + workflowInstanceId
+                        + " state failed, the workflow instance is not exist in db");
+            }
+            throw new UnsupportedOperationException(
+                    "updateWorkflowInstance " + workflowInstanceId + " state failed, expect original state is "
+                            + originalStatus.name() + " actual state is : {} " + processInstance.getState().name());
+        }
+    }
+
+    @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
     public void performTransactionalUpsert(ProcessInstance processInstance) {
         this.upsertProcessInstance(processInstance);
@@ -68,8 +85,8 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * find last scheduler process instance in the date interval
      *
      * @param processDefinitionCode definitionCode
-     * @param taskDefinitionCode definitionCode
-     * @param dateInterval   dateInterval
+     * @param taskDefinitionCode    definitionCode
+     * @param dateInterval          dateInterval
      * @return process instance
      */
     @Override
@@ -142,5 +159,17 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
                                                                   int[] states) {
         return mybatisMapper.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
                 states);
+    }
+
+    @Override
+    public List<String> queryNeedFailoverMasters() {
+        return mybatisMapper
+                .queryNeedFailoverProcessInstanceHost(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+    }
+
+    @Override
+    public List<ProcessInstance> queryNeedFailoverWorkflowInstances(String masterAddress) {
+        return mybatisMapper.queryByHostAndStatus(masterAddress,
+                WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 }

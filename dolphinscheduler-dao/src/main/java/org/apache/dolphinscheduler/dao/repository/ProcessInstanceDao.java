@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
@@ -32,6 +33,13 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
     void upsertProcessInstance(ProcessInstance processInstance);
 
     /**
+     * Update workflow instance from originState to targetState
+     */
+    void updateWorkflowInstanceState(Integer workflowInstanceId,
+                                     WorkflowExecutionStatus originState,
+                                     WorkflowExecutionStatus targetState);
+
+    /**
      * performs an "upsert" operation (update or insert) on a ProcessInstance object within a new transaction
      *
      * @param processInstance processInstance
@@ -42,8 +50,8 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
      * find last scheduler process instance in the date interval
      *
      * @param processDefinitionCode definitionCode
-     * @param taskDefinitionCode definitionCode
-     * @param dateInterval   dateInterval
+     * @param taskDefinitionCode    definitionCode
+     * @param dateInterval          dateInterval
      * @return process instance
      */
     ProcessInstance queryLastSchedulerProcessInterval(Long processDefinitionCode, Long taskDefinitionCode,
@@ -53,7 +61,7 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
      * find last manual process instance interval
      *
      * @param definitionCode process definition code
-     * @param taskCode taskCode
+     * @param taskCode       taskCode
      * @param dateInterval   dateInterval
      * @return process instance
      */
@@ -81,4 +89,11 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
     List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
                                                            int workflowDefinitionVersion,
                                                            int[] states);
+
+    List<String> queryNeedFailoverMasters();
+
+    /**
+     * Query the workflow instances under the master that need to be failover.
+     */
+    List<ProcessInstance> queryNeedFailoverWorkflowInstances(String masterAddress);
 }

@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ThreadUtilsTest {
@@ -31,7 +34,16 @@ class ThreadUtilsTest {
             throw new IllegalArgumentException("I am an exception");
         });
         Thread.sleep(1_000);
-        Assertions.assertEquals(1, DefaultUncaughtExceptionHandler.getUncaughtExceptionCount());
+        assertEquals(1, DefaultUncaughtExceptionHandler.getUncaughtExceptionCount());
 
+    }
+
+    @Test
+    void newDaemonThreadFactory() {
+        final ThreadFactory threadFactory = ThreadUtils.newDaemonThreadFactory("DemonThread-%d");
+        final Thread thread = threadFactory.newThread(() -> {
+        });
+        assertTrue(thread.isDaemon());
+        assertEquals("DemonThread-0", thread.getName());
     }
 }

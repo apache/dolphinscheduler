@@ -241,7 +241,8 @@ public class AlertDao {
      * @param taskInstance    taskInstance
      * @param projectUser     projectUser
      */
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance,
+                                     TaskInstance taskInstance,
                                      ProjectUser projectUser) {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);

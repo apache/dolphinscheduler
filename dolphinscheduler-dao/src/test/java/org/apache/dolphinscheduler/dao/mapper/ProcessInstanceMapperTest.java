@@ -78,7 +78,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstance.setProjectCode(1L);
         processInstance.setStartTime(start);
         processInstance.setEndTime(end);
-        processInstance.setState(WorkflowExecutionStatus.SUBMITTED_SUCCESS);
+        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         processInstance.setTestFlag(0);
         processInstanceMapper.insert(processInstance);
         return processInstance;
@@ -207,7 +207,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
 
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
-        processInstanceMapper.updateProcessInstanceByState(WorkflowExecutionStatus.RUNNING_EXECUTION,
+
+        processInstanceMapper.updateWorkflowInstanceState(processInstance.getId(),
+                WorkflowExecutionStatus.RUNNING_EXECUTION,
                 WorkflowExecutionStatus.SUCCESS);
 
         ProcessInstance processInstance1 = processInstanceMapper.selectById(processInstance.getId());

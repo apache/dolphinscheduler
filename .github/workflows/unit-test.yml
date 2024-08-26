@@ -111,7 +111,7 @@ jobs:
   result:
     name: Unit Test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: [ unit-test, paths-filter ]
     if: always()
     steps:

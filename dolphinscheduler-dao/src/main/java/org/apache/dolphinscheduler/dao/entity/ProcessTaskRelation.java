@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -32,6 +34,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @TableName("t_ds_process_task_relation")
 public class ProcessTaskRelation {
@@ -85,6 +89,7 @@ public class ProcessTaskRelation {
     /**
      * condition type
      */
+    @Deprecated
     private ConditionType conditionType;
 
     /**
@@ -92,6 +97,7 @@ public class ProcessTaskRelation {
      */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+    @Deprecated
     private String conditionParams;
 
     /**

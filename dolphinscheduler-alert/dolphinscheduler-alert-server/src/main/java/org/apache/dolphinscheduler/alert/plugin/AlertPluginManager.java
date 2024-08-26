@@ -84,11 +84,7 @@ public final class AlertPluginManager {
             String name = entry.getKey();
             AlertChannelFactory factory = entry.getValue();
 
-            log.info("Registering alert plugin: {} - {}", name, factory.getClass().getSimpleName());
-
             final AlertChannel alertChannel = factory.create();
-
-            log.info("Registered alert plugin: {} - {}", name, factory.getClass().getSimpleName());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
 
@@ -99,6 +95,8 @@ public final class AlertPluginManager {
             final int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
 
             alertPluginMap.put(id, alertChannel);
+
+            log.info("Success register alert plugin: {}", name);
         }
     }
 

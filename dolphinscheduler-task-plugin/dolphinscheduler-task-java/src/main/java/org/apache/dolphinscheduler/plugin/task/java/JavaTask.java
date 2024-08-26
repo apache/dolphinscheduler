@@ -217,7 +217,7 @@ public class JavaTask extends AbstractTask {
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
         log.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
         if (!Files.exists(Paths.get(fileName))) {
-            log.info("the java source code:{}, will be write to the file: {}", fileName, sourceCode);
+            log.info("the java source code:{}, will be write to the file: {}", sourceCode, fileName);
             // write data to file
             FileUtils.writeStringToFile(new File(fileName),
                     sourceCode,
