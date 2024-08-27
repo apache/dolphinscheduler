@@ -54,7 +54,7 @@ class CommandDaoImplTest extends BaseDaoTest {
         // Generate commandSize commands
         int id = 1;
         for (int j = 0; j < commandSize; j++) {
-            Command command = generateCommand(CommandType.START_WORKFLOW, 0);
+            Command command = generateCommand(CommandType.START_PROCESS, 0);
             command.setId(id);
             commandDao.insert(command);
             id += idStep;

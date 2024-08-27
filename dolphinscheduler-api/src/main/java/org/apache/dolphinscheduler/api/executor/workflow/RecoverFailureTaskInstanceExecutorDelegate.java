@@ -49,7 +49,7 @@ public class RecoverFailureTaskInstanceExecutorDelegate
         }
 
         Command command = Command.builder()
-                .commandType(CommandType.START_FAILURE_TASK_WORKFLOW)
+                .commandType(CommandType.START_FAILURE_TASK_PROCESS)
                 .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
                 .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
                 .processInstanceId(workflowInstance.getId())

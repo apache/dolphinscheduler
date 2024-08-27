@@ -32,7 +32,7 @@ public class RunWorkflowCommandParam extends AbstractCommandParam {
 
     @Override
     public CommandType getCommandType() {
-        return CommandType.START_WORKFLOW;
+        return CommandType.START_PROCESS;
     }
 
 }

@@ -46,7 +46,7 @@ public class RecoverSuspendedWorkflowInstanceExecutorDelegate
                             workflowInstance.getState()));
         }
         final Command command = Command.builder()
-                .commandType(CommandType.RECOVER_SUSPENDED_WORKFLOW)
+                .commandType(CommandType.RECOVER_SUSPENDED_PROCESS)
                 .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
                 .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
                 .processInstanceId(workflowInstance.getId())

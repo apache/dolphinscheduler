@@ -107,7 +107,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("startNodeList", startNodeList);
         paramsMap.add("taskDependType", String.valueOf(taskDependType));
-        paramsMap.add("execType", CommandType.START_WORKFLOW.name());
+        paramsMap.add("execType", CommandType.START_PROCESS.name());
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
         paramsMap.add("runMode", String.valueOf(runMode));
@@ -148,7 +148,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("startNodeList", startNodeList);
         paramsMap.add("taskDependType", String.valueOf(taskDependType));
-        paramsMap.add("execType", CommandType.START_WORKFLOW.name());
+        paramsMap.add("execType", CommandType.START_PROCESS.name());
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
         paramsMap.add("runMode", String.valueOf(runMode));
@@ -188,7 +188,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("startNodeList", startNodeList);
         paramsMap.add("taskDependType", String.valueOf(taskDependType));
-        paramsMap.add("execType", CommandType.START_WORKFLOW.name());
+        paramsMap.add("execType", CommandType.START_PROCESS.name());
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
         paramsMap.add("runMode", String.valueOf(runMode));

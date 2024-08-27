@@ -74,15 +74,15 @@ public class WorkflowAlertManager {
      */
     private String getCommandCnName(CommandType commandType) {
         switch (commandType) {
-            case RECOVER_TOLERANCE_FAULT_WORKFLOW:
+            case RECOVER_TOLERANCE_FAULT_PROCESS:
                 return "recover fault tolerance workflow";
-            case RECOVER_SUSPENDED_WORKFLOW:
+            case RECOVER_SUSPENDED_PROCESS:
                 return "recover suspended workflow";
-            case START_CURRENT_TASK_WORKFLOW:
+            case START_CURRENT_TASK_PROCESS:
                 return "start current task workflow";
-            case START_FAILURE_TASK_WORKFLOW:
+            case START_FAILURE_TASK_PROCESS:
                 return "start failure task workflow";
-            case START_WORKFLOW:
+            case START_PROCESS:
                 return "start workflow";
             case REPEAT_RUNNING:
                 return "repeat running";

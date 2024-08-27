@@ -46,7 +46,7 @@ class DynamicCommandUtilsTest {
         parameters = new HashMap<>();
 
         // Populate processInstance with some dummy data
-        workflowInstance.setCommandType(CommandType.START_WORKFLOW);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
         workflowInstance.setFailureStrategy(null); // update this
         workflowInstance.setWarningType(null); // update this
         workflowInstance.setGlobalParams("{\"prop\":\"value\"}");
@@ -89,16 +89,16 @@ class DynamicCommandUtilsTest {
     @Test
     void testCreateCommandCommandType() {
         // Scenario 1: CommandType is START_PROCESS
-        workflowInstance.setCommandType(CommandType.START_WORKFLOW);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
         Command command1 = DynamicCommandUtils.createCommand(workflowInstance, subProcessDefinitionCode,
                 subProcessDefinitionVersion, parameters);
         Assertions.assertEquals(CommandType.DYNAMIC_GENERATION, command1.getCommandType());
 
         // Scenario 2: CommandType is not START_PROCESS
-        workflowInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
+        workflowInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         Command command2 = DynamicCommandUtils.createCommand(workflowInstance, subProcessDefinitionCode,
                 subProcessDefinitionVersion, parameters);
-        Assertions.assertEquals(CommandType.START_FAILURE_TASK_WORKFLOW, command2.getCommandType());
+        Assertions.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command2.getCommandType());
     }
 
     @Test

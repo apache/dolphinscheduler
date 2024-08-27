@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Lists;
 
 /**
- * This handler used to handle {@link CommandType#START_FAILURE_TASK_WORKFLOW}.
+ * This handler used to handle {@link CommandType#START_FAILURE_TASK_PROCESS}.
  * <p> Will start the failure/pause/killed and other task instance which is behind success tasks instance but not been triggered.
  */
 @Component
@@ -212,7 +212,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
 
     @Override
     public CommandType commandType() {
-        return CommandType.START_FAILURE_TASK_WORKFLOW;
+        return CommandType.START_FAILURE_TASK_PROCESS;
     }
 
 }

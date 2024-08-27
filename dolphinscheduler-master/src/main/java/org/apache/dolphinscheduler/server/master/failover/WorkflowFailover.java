@@ -55,7 +55,7 @@ public class WorkflowFailover {
 
         final Command failoverCommand = Command.builder()
                 .commandParam(JSONUtils.toJsonString(failoverWorkflowCommandParam))
-                .commandType(CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW)
+                .commandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)
                 .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
                 .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
                 .processInstanceId(workflowInstance.getId())

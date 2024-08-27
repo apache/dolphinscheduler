@@ -152,15 +152,15 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         switch (workflowInstance.getCommandType()) {
-            case START_WORKFLOW:
+            case START_PROCESS:
             case SCHEDULER:
-            case START_CURRENT_TASK_WORKFLOW:
+            case START_CURRENT_TASK_PROCESS:
             case RECOVER_SERIAL_WAIT:
             case COMPLEMENT_DATA:
                 return createSubWorkflowInstanceFromWorkflowDefinition();
             case REPEAT_RUNNING:
-            case START_FAILURE_TASK_WORKFLOW:
-            case RECOVER_SUSPENDED_WORKFLOW:
+            case START_FAILURE_TASK_PROCESS:
+            case RECOVER_SUSPENDED_PROCESS:
                 return createSubWorkflowInstanceWithWorkflowInstance();
             default:
                 throw new IllegalArgumentException("Unsupported command type: " + workflowInstance.getCommandType());

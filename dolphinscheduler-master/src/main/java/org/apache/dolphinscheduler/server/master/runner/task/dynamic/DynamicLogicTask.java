@@ -131,8 +131,8 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                     workflowInstanceDao.updateById(processInstance);
                 });
                 break;
-            case START_FAILURE_TASK_WORKFLOW:
-            case RECOVER_TOLERANCE_FAULT_WORKFLOW:
+            case START_FAILURE_TASK_PROCESS:
+            case RECOVER_TOLERANCE_FAULT_PROCESS:
                 List<WorkflowInstance> failedWorkflowInstances =
                         subWorkflowService.filterFailedProcessInstances(existsSubWorkflowInstanceList);
                 failedWorkflowInstances.forEach(processInstance -> {

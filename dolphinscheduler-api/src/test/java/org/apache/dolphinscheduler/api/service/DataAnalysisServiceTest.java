@@ -267,10 +267,10 @@ public class DataAnalysisServiceTest {
 
         // when command found then return combination result
         CommandCount normalCommandCount = new CommandCount();
-        normalCommandCount.setCommandType(CommandType.START_WORKFLOW);
+        normalCommandCount.setCommandType(CommandType.START_PROCESS);
         normalCommandCount.setCount(10);
         CommandCount errorCommandCount = new CommandCount();
-        errorCommandCount.setCommandType(CommandType.START_WORKFLOW);
+        errorCommandCount.setCommandType(CommandType.START_PROCESS);
         errorCommandCount.setCount(5);
         when(commandMapper.countCommandState(any(), any(), any()))
                 .thenReturn(Collections.singletonList(normalCommandCount));
@@ -280,7 +280,7 @@ public class DataAnalysisServiceTest {
         commandStateCounts = dataAnalysisServiceImpl.countCommandState(user);
 
         CommandStateCount commandStateCount = new CommandStateCount();
-        commandStateCount.setCommandState(CommandType.START_WORKFLOW);
+        commandStateCount.setCommandState(CommandType.START_PROCESS);
         commandStateCount.setNormalCount(10);
         commandStateCount.setErrorCount(5);
         assertThat(commandStateCounts).asList().containsOnlyOnce(commandStateCount);

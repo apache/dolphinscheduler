@@ -159,7 +159,7 @@ class DynamicLogicTaskTest {
 
     @Test
     void testResetProcessInstanceStatus_StartFailureTaskProcess() {
-        workflowInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
+        workflowInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         WorkflowInstance failedSubWorkflowInstance = new WorkflowInstance();
         failedSubWorkflowInstance.setState(WorkflowExecutionStatus.FAILURE);
         List<WorkflowInstance> subWorkflowInstances = Arrays.asList(failedSubWorkflowInstance);

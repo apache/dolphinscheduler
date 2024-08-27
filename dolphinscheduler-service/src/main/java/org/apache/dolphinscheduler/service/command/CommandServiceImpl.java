@@ -107,8 +107,8 @@ public class CommandServiceImpl implements CommandService {
         boolean isNeedCreate = true;
         EnumMap<CommandType, Integer> cmdTypeMap = new EnumMap<>(CommandType.class);
         cmdTypeMap.put(CommandType.REPEAT_RUNNING, 1);
-        cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_WORKFLOW, 1);
-        cmdTypeMap.put(CommandType.START_FAILURE_TASK_WORKFLOW, 1);
+        cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, 1);
+        cmdTypeMap.put(CommandType.START_FAILURE_TASK_PROCESS, 1);
         CommandType commandType = command.getCommandType();
 
         if (!cmdTypeMap.containsKey(commandType)) {

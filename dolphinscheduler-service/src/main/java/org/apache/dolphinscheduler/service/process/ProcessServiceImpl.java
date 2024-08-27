@@ -595,7 +595,7 @@ public class ProcessServiceImpl implements ProcessService {
         CommandType commandTypeIfComplement = getCommandTypeIfComplement(workflowInstance, command);
         // reset global params while repeat running and recover tolerance fault process is needed by cmdParam
         if (commandTypeIfComplement == CommandType.REPEAT_RUNNING ||
-                commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW ||
+                commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS ||
                 commandTypeIfComplement == CommandType.RECOVER_SERIAL_WAIT) {
             setGlobalParamIfCommanded(workflowDefinition, cmdParam);
         }
@@ -638,11 +638,11 @@ public class ProcessServiceImpl implements ProcessService {
         WorkflowExecutionStatus runStatus = WorkflowExecutionStatus.RUNNING_EXECUTION;
         int runTime = workflowInstance.getRunTimes();
         switch (commandType) {
-            case START_WORKFLOW:
+            case START_PROCESS:
             case DYNAMIC_GENERATION:
                 break;
-            case START_FAILURE_TASK_WORKFLOW:
-            case RECOVER_SUSPENDED_WORKFLOW:
+            case START_FAILURE_TASK_PROCESS:
+            case RECOVER_SUSPENDED_PROCESS:
                 List<TaskInstance> needToStartTaskInstances = taskInstanceDao
                         .queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
                                 workflowInstance.getTestFlag())
@@ -667,9 +667,9 @@ public class ProcessServiceImpl implements ProcessService {
                 workflowInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 workflowInstance.setRunTimes(runTime + 1);
                 break;
-            case START_CURRENT_TASK_WORKFLOW:
+            case START_CURRENT_TASK_PROCESS:
                 break;
-            case RECOVER_TOLERANCE_FAULT_WORKFLOW:
+            case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
                 // If the workflow instance is in ready state, we will change to running, this can avoid the workflow
                 // instance
@@ -1055,7 +1055,7 @@ public class ProcessServiceImpl implements ProcessService {
         WorkflowInstanceRelation instanceMap =
                 workflowInstanceMapDao.queryWorkflowMapByParent(parentWorkflowInstance.getId(), task.getId());
         if (null != instanceMap
-                && CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW == parentWorkflowInstance.getCommandType()) {
+                && CommandType.RECOVER_TOLERANCE_FAULT_PROCESS == parentWorkflowInstance.getCommandType()) {
             // recover failover tolerance would not create a new command when the sub command already have been created
             return;
         }
@@ -1065,7 +1065,7 @@ public class ProcessServiceImpl implements ProcessService {
             childInstance = findProcessInstanceById(instanceMap.getProcessInstanceId());
         }
         if (childInstance != null && childInstance.getState() == WorkflowExecutionStatus.SUCCESS
-                && CommandType.START_FAILURE_TASK_WORKFLOW == parentWorkflowInstance.getCommandType()) {
+                && CommandType.START_FAILURE_TASK_PROCESS == parentWorkflowInstance.getCommandType()) {
             log.info("sub process instance {} status is success, so skip creating command", childInstance.getId());
             return;
         }
@@ -1353,7 +1353,7 @@ public class ProcessServiceImpl implements ProcessService {
         cmd.setProcessInstanceId(workflowInstance.getId());
         cmd.setCommandParam(JSONUtils.toJsonString(createCommandParams(workflowInstance)));
         cmd.setExecutorId(workflowInstance.getExecutorId());
-        cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW);
+        cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setProcessInstancePriority(workflowInstance.getProcessInstancePriority());
         cmd.setTestFlag(workflowInstance.getTestFlag());
         commandService.createCommand(cmd);

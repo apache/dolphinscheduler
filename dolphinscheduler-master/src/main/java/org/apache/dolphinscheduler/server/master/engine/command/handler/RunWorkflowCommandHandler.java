@@ -51,7 +51,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * Used to handle the {@link CommandType#START_WORKFLOW} which will start the workflow definition.
+ * Used to handle the {@link CommandType#START_PROCESS} which will start the workflow definition.
  * <p> You can specify the start nodes at {@link RunWorkflowCommandParam}
  */
 @Component
@@ -141,6 +141,6 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
 
     @Override
     public CommandType commandType() {
-        return CommandType.START_WORKFLOW;
+        return CommandType.START_PROCESS;
     }
 }

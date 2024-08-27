@@ -45,7 +45,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * This handler used to handle {@link CommandType#RECOVER_TOLERANCE_FAULT_WORKFLOW}.
+ * This handler used to handle {@link CommandType#RECOVER_TOLERANCE_FAULT_PROCESS}.
  * <p> Will do failover of the workflow instance and recover it to the origin state.
  */
 @Component
@@ -142,7 +142,7 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
 
     @Override
     public CommandType commandType() {
-        return CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW;
+        return CommandType.RECOVER_TOLERANCE_FAULT_PROCESS;
     }
 
 }

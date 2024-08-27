@@ -52,7 +52,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         // insertOne
         ErrorCommand errorCommand = new ErrorCommand();
         errorCommand.setId(10101);
-        errorCommand.setCommandType(CommandType.START_WORKFLOW);
+        errorCommand.setCommandType(CommandType.START_PROCESS);
         errorCommand.setUpdateTime(new Date());
         errorCommand.setStartTime(new Date());
         errorCommandMapper.insert(errorCommand);

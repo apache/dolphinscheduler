@@ -109,7 +109,7 @@ public class WorkflowAlertManagerTest {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(1);
         workflowInstance.setName("test-process-01");
-        workflowInstance.setCommandType(CommandType.START_WORKFLOW);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         workflowInstance.setRunTimes(0);
         workflowInstance.setStartTime(new Date());

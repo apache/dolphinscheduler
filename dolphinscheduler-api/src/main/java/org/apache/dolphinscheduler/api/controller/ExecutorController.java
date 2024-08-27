@@ -153,7 +153,7 @@ public class ExecutorController extends BaseController {
                                                            @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
                                                            @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
         switch (execType) {
-            case START_WORKFLOW:
+            case START_PROCESS:
                 final WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
                         .loginUser(loginUser)
                         .workflowDefinitionCode(processDefinitionCode)

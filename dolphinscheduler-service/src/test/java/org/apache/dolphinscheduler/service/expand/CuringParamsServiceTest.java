@@ -116,27 +116,27 @@ public class CuringParamsServiceTest {
 
         // test globalParamList is null
         String result = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertNull(result);
         Assertions.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, null,
-                CommandType.START_CURRENT_TASK_WORKFLOW, null, null));
+                CommandType.START_CURRENT_TASK_PROCESS, null, null));
         Assertions.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, null,
-                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null));
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
 
         // test globalParamList is not null
         Property property = new Property("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
         globalParamList.add(property);
 
         String result2 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, globalParamList,
-                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
 
         String result3 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_WORKFLOW, null, null);
+                CommandType.START_CURRENT_TASK_PROCESS, null, null);
         Assertions.assertEquals(result3, JSONUtils.toJsonString(globalParamList));
 
         String result4 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertEquals(result4, JSONUtils.toJsonString(globalParamList));
 
         // test var $ startsWith
@@ -152,7 +152,7 @@ public class CuringParamsServiceTest {
         globalParamList.add(property4);
 
         String result5 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
 
         Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
@@ -174,7 +174,7 @@ public class CuringParamsServiceTest {
         }
 
         String result6 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertEquals(result6, JSONUtils.toJsonString(globalParamList));
     }
 

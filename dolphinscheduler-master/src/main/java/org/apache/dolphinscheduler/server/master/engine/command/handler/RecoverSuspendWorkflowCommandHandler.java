@@ -29,6 +29,6 @@ public class RecoverSuspendWorkflowCommandHandler extends RecoverFailureTaskComm
 
     @Override
     public CommandType commandType() {
-        return CommandType.RECOVER_SUSPENDED_WORKFLOW;
+        return CommandType.RECOVER_SUSPENDED_PROCESS;
     }
 }
