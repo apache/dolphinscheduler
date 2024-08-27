@@ -42,7 +42,7 @@ import org.springframework.test.web.servlet.MvcResult;
  */
 public class WorkflowTaskRelationControllerTest extends AbstractControllerTest {
 
-    @MockBean(name = "processTaskRelationServiceImpl")
+    @MockBean
     private WorkflowTaskRelationService workflowTaskRelationService;
 
     @Test
