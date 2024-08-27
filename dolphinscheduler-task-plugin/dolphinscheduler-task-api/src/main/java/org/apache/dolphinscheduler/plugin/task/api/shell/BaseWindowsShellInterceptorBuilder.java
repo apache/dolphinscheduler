@@ -84,7 +84,7 @@ public abstract class BaseWindowsShellInterceptorBuilder<T extends BaseWindowsSh
         // todo: support tenant in widnows
         List<String> bootstrapCommand = new ArrayList<>();
         bootstrapCommand.add(shellInterpreter());
-        // bug Resolve the issue of unresponsive execution of bat in CMD.exe under window
+        // Resolve the issue of unresponsive execution of bat in CMD.exe under window
         if (SystemUtils.IS_OS_WINDOWS) {
             bootstrapCommand.add("/c");
         }
