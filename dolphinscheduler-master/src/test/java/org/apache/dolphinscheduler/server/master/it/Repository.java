@@ -53,6 +53,10 @@ public class Repository {
                 .collect(Collectors.toList());
     }
 
+    public ProcessInstance queryWorkflowInstance(final Integer workflowInstanceId) {
+        return workflowInstanceDao.queryById(workflowInstanceId);
+    }
+
     /**
      * Return the list of task instances for a given workflow definition in ascending order of their IDs.
      */
@@ -61,6 +65,16 @@ public class Repository {
                 .stream()
                 .flatMap(workflowInstance -> taskInstanceDao.queryByWorkflowInstanceId(workflowInstance.getId())
                         .stream())
+                .sorted(Comparator.comparingInt(TaskInstance::getId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Return the list of task instances for a given workflow definition in ascending order of their IDs.
+     */
+    public List<TaskInstance> queryTaskInstance(final Integer workflowInstanceId) {
+        return taskInstanceDao.queryByWorkflowInstanceId(workflowInstanceId)
+                .stream()
                 .sorted(Comparator.comparingInt(TaskInstance::getId))
                 .collect(Collectors.toList());
     }

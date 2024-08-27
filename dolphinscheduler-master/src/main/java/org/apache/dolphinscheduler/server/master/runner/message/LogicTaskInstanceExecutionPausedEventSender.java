@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.message;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.ITaskExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskExecutionPausedEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -31,7 +31,7 @@ public class LogicTaskInstanceExecutionPausedEventSender
 
     @Override
     public void sendMessage(final TaskExecutionPausedEvent taskExecutionPausedEvent) {
-        SingletonJdkDynamicRpcClientProxyFactory
+        Clients
                 .withService(ITaskExecutionEventListener.class)
                 .withHost(taskExecutionPausedEvent.getWorkflowInstanceHost())
                 .onTaskInstanceExecutionPaused(taskExecutionPausedEvent);

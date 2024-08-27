@@ -89,7 +89,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     final Integer version = 1;
     final boolean allLevelDependent = false;
     final JsonObject expectResponseContent = gson
-            .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":1,\"success\":true,\"failed\":false}",
+            .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":[1],\"success\":true,\"failed\":false}",
                     JsonObject.class);
 
     final ImmutableMap<String, Object> executeServiceResult =
@@ -123,7 +123,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
         paramsMap.add("version", String.valueOf(version));
 
-        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1L);
+        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1);
 
         // When
         final MvcResult mvcResult = mockMvc
@@ -163,7 +163,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
         paramsMap.add("version", String.valueOf(version));
 
-        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1L);
+        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1);
 
         // When
         final MvcResult mvcResult = mockMvc
@@ -203,7 +203,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
         paramsMap.add("version", String.valueOf(version));
 
-        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1L);
+        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1);
 
         // When
         final MvcResult mvcResult = mockMvc
@@ -229,7 +229,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("scheduleTime", scheduleTime);
         paramsMap.add("version", String.valueOf(version));
 
-        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1L);
+        when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1);
 
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)

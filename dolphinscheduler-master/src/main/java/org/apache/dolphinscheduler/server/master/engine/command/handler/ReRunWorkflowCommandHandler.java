@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import java.util.Date;
@@ -48,6 +49,9 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     /**
      * Generate the repeat running workflow instance.
      * <p> Will use the origin workflow instance, but will update the following fields. Need to note we cannot not
@@ -71,6 +75,7 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setCommandType(command.getCommandType());
         workflowInstance.setRestartTime(new Date());
+        workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstance.setEndTime(null);
         workflowInstance.setRunTimes(workflowInstance.getRunTimes() + 1);
         workflowInstanceDao.updateById(workflowInstance);

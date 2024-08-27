@@ -15,25 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.extract.master.transportor.workflow;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class WorkflowInstanceStopResponse {
+@AllArgsConstructor
+public class WorkflowManualTriggerResponse {
 
     private boolean success;
+
     private String message;
 
-    public static WorkflowInstanceStopResponse success() {
-        return new WorkflowInstanceStopResponse(true, null);
+    private Integer workflowInstanceId;
+
+    public static WorkflowManualTriggerResponse fail(String message) {
+        return WorkflowManualTriggerResponse.builder()
+                .success(false)
+                .message(message)
+                .build();
     }
 
-    public static WorkflowInstanceStopResponse fail(String message) {
-        return new WorkflowInstanceStopResponse(false, message);
+    public static WorkflowManualTriggerResponse success(Integer workflowInstanceId) {
+        return WorkflowManualTriggerResponse.builder()
+                .success(true)
+                .workflowInstanceId(workflowInstanceId)
+                .build();
     }
 }

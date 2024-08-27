@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 public enum WorkflowExecutionStatus {
 
+    SUBMITTED_SUCCESS(0, "submitted"),
     RUNNING_EXECUTION(1, "running"),
     READY_PAUSE(2, "ready pause"),
     PAUSE(3, "pause"),
@@ -45,6 +46,7 @@ public enum WorkflowExecutionStatus {
     };
 
     private static final int[] NOT_TERMINAL_STATUS = new int[]{
+            SUBMITTED_SUCCESS.getCode(),
             RUNNING_EXECUTION.getCode(),
             READY_PAUSE.getCode(),
             READY_STOP.getCode(),

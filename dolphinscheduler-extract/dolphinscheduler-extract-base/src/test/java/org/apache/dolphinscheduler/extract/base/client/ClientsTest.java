@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SingletonJdkDynamicRpcClientProxyFactoryTest {
+public class ClientsTest {
 
     private SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery;
 
@@ -55,15 +55,17 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
     @Test
     public void getProxyClient() {
-        IService proxyClient =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(serverAddress, IService.class);
+        IService proxyClient = Clients
+                .withService(IService.class)
+                .withHost(serverAddress);
         Assertions.assertNotNull(proxyClient);
     }
 
     @Test
     public void testPing() {
-        IService proxyClient =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(serverAddress, IService.class);
+        IService proxyClient = Clients
+                .withService(IService.class)
+                .withHost(serverAddress);
         assertEquals("pong", proxyClient.ping("ping"));
 
         MethodInvocationException methodInvocationException =
@@ -73,8 +75,9 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
     @Test
     public void testVoid() {
-        IService proxyClient =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(serverAddress, IService.class);
+        IService proxyClient = Clients
+                .withService(IService.class)
+                .withHost(serverAddress);
         assertDoesNotThrow(proxyClient::voidMethod);
     }
 

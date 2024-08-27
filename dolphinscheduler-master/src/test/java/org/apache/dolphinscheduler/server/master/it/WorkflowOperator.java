@@ -17,29 +17,27 @@
 
 package org.apache.dolphinscheduler.server.master.it;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceController;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerResponse;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
-
-import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,49 +45,48 @@ import org.springframework.stereotype.Component;
 public class WorkflowOperator {
 
     @Autowired
-    private CommandDao commandDao;
-
-    @Autowired
-    private IWorkflowInstanceController workflowInstanceController;
+    private IWorkflowControlClient workflowInstanceController;
 
     @Autowired
     private SchedulerApi schedulerApi;
 
+    public Integer manualTriggerWorkflow(final WorkflowTriggerDTO workflowTriggerDTO) {
+        final WorkflowManualTriggerRequest workflowManualTriggerRequest = WorkflowManualTriggerRequest.builder()
+                .userId(workflowTriggerDTO.workflowDefinition.getUserId())
+                .workflowDefinitionCode(workflowTriggerDTO.workflowDefinition.getCode())
+                .workflowDefinitionVersion(workflowTriggerDTO.workflowDefinition.getVersion())
+                .startNodes(workflowTriggerDTO.getRunWorkflowCommandParam().getStartNodes())
+                .startParamList(workflowTriggerDTO.getRunWorkflowCommandParam().getCommandParams())
+                .build();
+
+        final WorkflowManualTriggerResponse manualTriggerWorkflowResponse =
+                workflowInstanceController.manualTriggerWorkflow(workflowManualTriggerRequest);
+        Assertions.assertThat(manualTriggerWorkflowResponse.isSuccess()).isTrue();
+
+        return manualTriggerWorkflowResponse.getWorkflowInstanceId();
+    }
+
     public void backfillWorkflow(final WorkflowBackfillDTO workflowBackfillDTO) {
         final ProcessDefinition workflowDefinition = workflowBackfillDTO.getWorkflow();
-        final Command command = Command.builder()
-                .commandType(CommandType.COMPLEMENT_DATA)
-                .processDefinitionCode(workflowDefinition.getCode())
-                .processDefinitionVersion(workflowDefinition.getVersion())
-                .executorId(workflowDefinition.getUserId())
-                .scheduleTime(DateUtils.stringToDate(
-                        workflowBackfillDTO.getBackfillWorkflowCommandParam().getBackfillTimeList().get(0)))
-                .commandParam(JSONUtils.toJsonString(workflowBackfillDTO.getBackfillWorkflowCommandParam()))
-                .startTime(new Date())
-                .updateTime(new Date())
+
+        final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
+                .userId(workflowDefinition.getUserId())
+                .workflowCode(workflowDefinition.getCode())
+                .workflowVersion(workflowDefinition.getVersion())
+                .startNodes(workflowBackfillDTO.getBackfillWorkflowCommandParam().getStartNodes())
+                .startParamList(workflowBackfillDTO.getBackfillWorkflowCommandParam().getCommandParams())
+                .backfillTimeList(workflowBackfillDTO.getBackfillWorkflowCommandParam().getBackfillTimeList())
                 .build();
-        commandDao.insert(command);
+        final WorkflowBackfillTriggerResponse backfillTriggerResponse =
+                workflowInstanceController.backfillTriggerWorkflow(backfillTriggerRequest);
+
+        Assertions.assertThat(backfillTriggerResponse.isSuccess()).isTrue();
     }
 
     public void schedulingWorkflow(final WorkflowSchedulingDTO workflowSchedulingDTO) {
         final Project project = workflowSchedulingDTO.getProject();
         final Schedule schedule = workflowSchedulingDTO.getSchedule();
         schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
-    }
-
-    public void triggerWorkflow(final WorkflowTriggerDTO workflowTriggerDTO) {
-        final ProcessDefinition workflowDefinition = workflowTriggerDTO.getWorkflowDefinition();
-        final RunWorkflowCommandParam runWorkflowCommandParam = workflowTriggerDTO.getRunWorkflowCommandParam();
-        final Command command = Command.builder()
-                .commandType(CommandType.START_PROCESS)
-                .processDefinitionCode(workflowDefinition.getCode())
-                .processDefinitionVersion(workflowDefinition.getVersion())
-                .executorId(workflowDefinition.getUserId())
-                .commandParam(JSONUtils.toJsonString(runWorkflowCommandParam))
-                .startTime(new Date())
-                .updateTime(new Date())
-                .build();
-        commandDao.insert(command);
     }
 
     public WorkflowInstancePauseResponse pauseWorkflowInstance(Integer workflowInstanceId) {

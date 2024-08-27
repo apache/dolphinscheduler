@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.task.client;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
@@ -51,7 +51,7 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
         final String taskName = taskInstance.getName();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 
-        final LogicTaskPauseResponse pauseResponse = SingletonJdkDynamicRpcClientProxyFactory
+        final LogicTaskPauseResponse pauseResponse = Clients
                 .withService(ILogicTaskInstanceOperator.class)
                 .withHost(taskInstance.getHost())
                 .pauseLogicTask(new LogicTaskPauseRequest(taskInstance.getId()));
@@ -69,7 +69,7 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
         final String taskName = taskInstance.getName();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 
-        final LogicTaskKillResponse killResponse = SingletonJdkDynamicRpcClientProxyFactory
+        final LogicTaskKillResponse killResponse = Clients
                 .withService(ILogicTaskInstanceOperator.class)
                 .withHost(taskInstance.getHost())
                 .killLogicTask(new LogicTaskKillRequest(taskInstance.getId()));

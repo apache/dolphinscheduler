@@ -15,49 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.extract.master.transportor.workflow;
 
-import java.util.Date;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.NoArgsConstructor;
 
 @Data
-@TableName("t_ds_trigger_relation")
-public class TriggerRelation {
+@AllArgsConstructor
+@NoArgsConstructor
+public class WorkflowInstanceStopResponse {
 
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private boolean success;
+    private String message;
 
-    /**
-     * trigger code
-     */
-    private long triggerCode;
+    public static WorkflowInstanceStopResponse success() {
+        return new WorkflowInstanceStopResponse(true, null);
+    }
 
-    /**
-     * triggerType
-     */
-    private int triggerType;
-
-    /**
-     * jobId
-     */
-    private Integer jobId;
-
-    /**
-     * create time
-     */
-    private Date createTime;
-
-    /**
-     * update time
-     */
-    private Date updateTime;
-
+    public static WorkflowInstanceStopResponse fail(String message) {
+        return new WorkflowInstanceStopResponse(false, message);
+    }
 }

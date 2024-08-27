@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
 import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -307,9 +307,10 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         AlertSendResponse alertSendResponse;
 
         try {
-            IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory
-                    .getProxyClient(alertServerAddress.getAddress(), IAlertOperator.class);
-            alertSendResponse = alertOperator.sendTestAlert(alertTestSendRequest);
+            alertSendResponse = Clients
+                    .withService(IAlertOperator.class)
+                    .withHost(alertServerAddress.getAddress())
+                    .sendTestAlert(alertTestSendRequest);
             log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
         } catch (Exception e) {
             log.error("Send alert: {} to: {} failed", alertTestSendRequest, alertServerAddress, e);

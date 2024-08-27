@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
@@ -56,7 +55,6 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
                         PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList()))
                 .dryRun(workflowTriggerRequest.getDryRun())
                 .testFlag(workflowTriggerRequest.getTestFlag())
-                .triggerCode(CodeGenerateUtils.genCode())
                 .build();
 
         ProcessDefinition workflowDefinition = processDefinitionDao

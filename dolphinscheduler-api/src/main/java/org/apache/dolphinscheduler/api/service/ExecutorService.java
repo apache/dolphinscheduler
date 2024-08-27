@@ -25,19 +25,20 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ExecutorService {
 
     /**
-     * Trigger the workflow and return the trigger code.
+     * Trigger the workflow and return the workflow instance id.
      */
-    Long triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest);
+    Integer triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest);
 
     /**
-     * Backfill the workflow and return the trigger code.
+     * Backfill the workflow and return the workflow instance ids.
      */
-    Long backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest);
+    List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest);
 
     /**
      * check whether the process definition can be executed

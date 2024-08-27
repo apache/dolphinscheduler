@@ -15,17 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class WorkflowInstanceStopRequest {
+import lombok.NonNull;
 
-    private Integer workflowInstanceId;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class UserDaoImpl extends BaseDao<User, UserMapper> implements UserDao {
+
+    public UserDaoImpl(@NonNull UserMapper userMapper) {
+        super(userMapper);
+    }
 
 }

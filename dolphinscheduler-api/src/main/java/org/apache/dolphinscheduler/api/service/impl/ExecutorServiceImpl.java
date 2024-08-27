@@ -81,7 +81,6 @@ import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -159,9 +158,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private WorkerGroupService workerGroupService;
 
     @Autowired
-    private TriggerRelationService triggerRelationService;
-
-    @Autowired
     private TenantMapper tenantMapper;
 
     @Autowired
@@ -184,22 +180,19 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Override
     @Transactional
-    public Long triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest) {
-        final TriggerWorkflowDTO triggerWorkflowDTO =
-                triggerWorkflowRequestTransformer.transform(workflowTriggerRequest);
+    public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
+        final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
         triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
-        executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
-        return triggerWorkflowDTO.getTriggerCode();
+        return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
     }
 
     @Override
     @Transactional
-    public Long backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
+    public List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
         final BackfillWorkflowDTO backfillWorkflowDTO =
                 backfillWorkflowRequestTransformer.transform(workflowBackFillRequest);
         backfillWorkflowDTOValidator.validate(backfillWorkflowDTO);
-        executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
-        return backfillWorkflowDTO.getTriggerCode();
+        return executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
     }
 
     /**

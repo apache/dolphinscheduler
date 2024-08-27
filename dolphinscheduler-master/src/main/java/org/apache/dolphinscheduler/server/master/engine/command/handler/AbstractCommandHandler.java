@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.W
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,9 +66,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     @Override
     public WorkflowExecutionRunnable handleCommand(final Command command) {
-        final WorkflowExecuteContextBuilder workflowExecuteContextBuilder = WorkflowExecuteContext
-                .builder()
-                .withWorkflowInstanceLifecycleListeners(workflowLifecycleListeners)
+        final WorkflowExecuteContextBuilder workflowExecuteContextBuilder = WorkflowExecuteContext.builder()
                 .withCommand(command);
 
         assembleWorkflowDefinition(workflowExecuteContextBuilder);
@@ -94,7 +91,8 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     protected void assembleWorkflowInstanceLifecycleListeners(
                                                               final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        workflowExecuteContextBuilder.setWorkflowInstanceLifecycleListeners(new ArrayList<>());
+        workflowExecuteContextBuilder.setWorkflowInstanceLifecycleListeners(
+                workflowExecuteContextBuilder.getWorkflowInstanceLifecycleListeners());
     }
 
     protected void assembleWorkflowDefinition(

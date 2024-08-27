@@ -30,10 +30,10 @@ import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceController;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -283,8 +283,8 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     private void doKillRunningSubWorkflowInstances(List<ProcessInstance> runningSubProcessInstanceList) throws MasterTaskExecuteException {
         for (ProcessInstance subProcessInstance : runningSubProcessInstanceList) {
             try {
-                WorkflowInstanceStopResponse workflowInstanceStopResponse = SingletonJdkDynamicRpcClientProxyFactory
-                        .withService(IWorkflowInstanceController.class)
+                WorkflowInstanceStopResponse workflowInstanceStopResponse = Clients
+                        .withService(IWorkflowControlClient.class)
                         .withHost(subProcessInstance.getHost())
                         .stopWorkflowInstance(new WorkflowInstanceStopRequest(subProcessInstance.getId()));
                 if (workflowInstanceStopResponse.isSuccess()) {
