@@ -48,7 +48,7 @@ import org.springframework.util.MultiValueMap;
  */
 public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
-    @MockBean(name = "processInstanceService")
+    @MockBean
     private WorkflowInstanceService workflowInstanceService;
 
     @Test
