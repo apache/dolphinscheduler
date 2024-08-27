@@ -335,10 +335,22 @@ public abstract class AbstractCommandExecutor {
         int processId = 0;
 
         try {
-            Field f = process.getClass().getDeclaredField(TaskConstants.PID);
-            f.setAccessible(true);
-
-            processId = f.getInt(process);
+            if (SystemUtils.IS_OS_WINDOWS) {
+                /**
+                 * Resolve the issue of not being able to obtain PID under the window
+                 */
+                Field f = process.getClass().getDeclaredField("handle");
+                f.setAccessible(true);
+                long handle = f.getLong(process);
+                Kernel32 kernel = Kernel32.INSTANCE;
+                WinNT.HANDLE winntHandle = new WinNT.HANDLE();
+                winntHandle.setPointer(Pointer.createConstant(handle));
+                processId = kernel.GetProcessId(winntHandle);
+            } else {
+                Field f = process.getClass().getDeclaredField(TaskConstants.PID);
+                f.setAccessible(true);
+                processId = f.getInt(process);
+            }
         } catch (Exception e) {
             log.error("Get task pid failed", e);
         }
