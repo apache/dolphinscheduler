@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionLogServiceImpl;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
@@ -53,13 +53,13 @@ public class TaskDefinitionLogServiceTest {
     @Mock
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
-    private List<ProcessTaskRelationLog> getProcessTaskRelationList() {
-        ProcessTaskRelationLog processTaskRelationLog1 = new ProcessTaskRelationLog();
+    private List<WorkflowTaskRelationLog> getProcessTaskRelationList() {
+        WorkflowTaskRelationLog processTaskRelationLog1 = new WorkflowTaskRelationLog();
         processTaskRelationLog1.setPreTaskCode(0L);
         processTaskRelationLog1.setPostTaskCode(1L);
         processTaskRelationLog1.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLog2 = new ProcessTaskRelationLog();
+        WorkflowTaskRelationLog processTaskRelationLog2 = new WorkflowTaskRelationLog();
         processTaskRelationLog2.setPreTaskCode(0L);
         processTaskRelationLog2.setPostTaskCode(1L);
         processTaskRelationLog2.setPostTaskVersion(2);

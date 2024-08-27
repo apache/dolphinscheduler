@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -81,7 +81,7 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
                 .backfillParams(backfillParams)
                 .build();
 
-        ProcessDefinition workflowDefinition = processDefinitionDao
+        WorkflowDefinition workflowDefinition = processDefinitionDao
                 .queryByCode(workflowBackFillRequest.getWorkflowDefinitionCode())
                 .orElseThrow(() -> new ServiceException(
                         "Cannot find the workflow: " + workflowBackFillRequest.getWorkflowDefinitionCode()));

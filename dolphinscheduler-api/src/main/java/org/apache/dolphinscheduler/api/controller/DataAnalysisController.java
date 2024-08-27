@@ -86,7 +86,7 @@ public class DataAnalysisController extends BaseController {
                 dataAnalysisService.getTaskInstanceStateCountByProject(loginUser, projectCode, startDate, endDate));
     }
 
-    @Operation(summary = "countProcessInstanceState", description = "COUNT_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "countProcessInstanceState", description = "COUNT_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
@@ -106,7 +106,7 @@ public class DataAnalysisController extends BaseController {
                 dataAnalysisService.getWorkflowInstanceStateCountByProject(loginUser, projectCode, startDate, endDate));
     }
 
-    @Operation(summary = "countDefinitionByUser", description = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
+    @Operation(summary = "countDefinitionByUser", description = "COUNT_WORKFLOW_DEFINITION_BY_USER_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })

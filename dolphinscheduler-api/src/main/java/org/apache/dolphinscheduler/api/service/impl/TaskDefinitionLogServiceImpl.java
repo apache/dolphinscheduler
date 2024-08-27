@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 
@@ -43,16 +43,16 @@ public class TaskDefinitionLogServiceImpl implements TaskDefinitionLogService {
 
     @Override
     public void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        List<ProcessTaskRelationLog> processTaskRelations =
+        List<WorkflowTaskRelationLog> processTaskRelations =
                 processTaskRelationLogDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (CollectionUtils.isEmpty(processTaskRelations)) {
             return;
         }
         // delete task definition
         Set<Long> needToDeleteTaskDefinitionCodes = new HashSet<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            needToDeleteTaskDefinitionCodes.add(processTaskRelation.getPreTaskCode());
-            needToDeleteTaskDefinitionCodes.add(processTaskRelation.getPostTaskCode());
+        for (WorkflowTaskRelation workflowTaskRelation : processTaskRelations) {
+            needToDeleteTaskDefinitionCodes.add(workflowTaskRelation.getPreTaskCode());
+            needToDeleteTaskDefinitionCodes.add(workflowTaskRelation.getPostTaskCode());
         }
         taskDefinitionLogDao.deleteByTaskDefinitionCodes(needToDeleteTaskDefinitionCodes);
         // delete task workflow relation

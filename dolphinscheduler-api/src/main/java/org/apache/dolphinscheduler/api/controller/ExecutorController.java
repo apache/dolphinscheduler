@@ -104,9 +104,9 @@ public class ExecutorController extends BaseController {
      * @param executionOrder            complement data in some kind of order
      * @return start process result code
      */
-    @Operation(summary = "startProcessInstance", description = "RUN_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "startProcessInstance", description = "RUN_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class), example = "100"),
+            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class), example = "100"),
             @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema = @Schema(implementation = String.class), example = "2022-04-06 00:00:00,2022-04-06 00:00:00"),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),
@@ -115,7 +115,7 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "processInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
@@ -130,7 +130,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
-    @OperatorLog(auditType = AuditType.PROCESS_START)
+    @OperatorLog(auditType = AuditType.WORKFLOW_START)
     public Result<List<Integer>> triggerWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                            @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
                                                            @RequestParam(value = "scheduleTime") String scheduleTime,
@@ -152,7 +152,6 @@ public class ExecutorController extends BaseController {
                                                            @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
                                                            @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
                                                            @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
-
         switch (execType) {
             case START_PROCESS:
                 final WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
@@ -227,9 +226,9 @@ public class ExecutorController extends BaseController {
      * @param executionOrder            complement data in some kind of order
      * @return start process result code
      */
-    @Operation(summary = "batchStartProcessInstance", description = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "batchStartProcessInstance", description = "BATCH_RUN_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCodes", description = "PROCESS_DEFINITION_CODE_LIST", required = true, schema = @Schema(implementation = String.class, example = "1,2,3")),
+            @Parameter(name = "processDefinitionCodes", description = "WORKFLOW_DEFINITION_CODE_LIST", required = true, schema = @Schema(implementation = String.class, example = "1,2,3")),
             @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", required = true, schema = @Schema(implementation = String.class, example = "2022-04-06 00:00:00,2022-04-06 00:00:00")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),
@@ -238,7 +237,7 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
-            @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "processInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
@@ -252,7 +251,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_START_PROCESS_INSTANCE_ERROR)
-    @OperatorLog(auditType = AuditType.PROCESS_BATCH_START)
+    @OperatorLog(auditType = AuditType.WORKFLOW_BATCH_START)
     public Result<List<Integer>> batchTriggerWorkflowDefinitions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
                                                                  @RequestParam(value = "scheduleTime") String scheduleTime,
@@ -274,7 +273,6 @@ public class ExecutorController extends BaseController {
                                                                  @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
                                                                  @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
                                                                  @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
-
         List<Long> workflowDefinitionCodes = Arrays.stream(processDefinitionCodes.split(Constants.COMMA))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
@@ -310,15 +308,15 @@ public class ExecutorController extends BaseController {
     /**
      * do action to process instance: pause, stop, repeat, recover from pause, recover from stop
      */
-    @Operation(summary = "execute", description = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "execute", description = "EXECUTE_ACTION_TO_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "processInstanceId", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "executeType", description = "EXECUTE_TYPE", required = true, schema = @Schema(implementation = ExecuteType.class))
     })
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
-    @OperatorLog(auditType = AuditType.PROCESS_EXECUTE)
+    @OperatorLog(auditType = AuditType.WORKFLOW_EXECUTE)
     public Result<Void> controlWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @RequestParam("processInstanceId") Integer processInstanceId,
                                                 @RequestParam("executeType") ExecuteType executeType) {
@@ -334,7 +332,7 @@ public class ExecutorController extends BaseController {
      * @param executeType        execute type
      * @return execute result code
      */
-    @Operation(summary = "batchExecute", description = "BATCH_EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "batchExecute", description = "BATCH_EXECUTE_ACTION_TO_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = int.class)),
             @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
@@ -343,7 +341,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
-    @OperatorLog(auditType = AuditType.PROCESS_BATCH_RERUN)
+    @OperatorLog(auditType = AuditType.WORKFLOW_BATCH_RERUN)
     public Result<Void> batchControlWorkflowInstance(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @RequestParam("processInstanceIds") String processInstanceIds,
                                                      @RequestParam("executeType") ExecuteType executeType) {
@@ -428,16 +426,16 @@ public class ExecutorController extends BaseController {
      * @param taskDependType    task depend type
      * @return execute result code
      */
-    @Operation(summary = "execute-task", description = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "execute-task", description = "EXECUTE_ACTION_TO_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "processInstanceId", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "startNodeList", description = "START_NODE_LIST", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", required = true, schema = @Schema(implementation = TaskDependType.class))
     })
     @PostMapping(value = "/execute-task")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
-    @OperatorLog(auditType = AuditType.PROCESS_EXECUTE)
+    @OperatorLog(auditType = AuditType.WORKFLOW_EXECUTE)
     public Result executeTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                               @RequestParam("processInstanceId") Integer processInstanceId,

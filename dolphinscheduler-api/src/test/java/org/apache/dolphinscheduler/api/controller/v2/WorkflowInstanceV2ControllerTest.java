@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Collections;
@@ -64,9 +64,9 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
         workflowInstanceQueryRequest.setPageSize(10);
 
         Result result = new Result();
-        PageInfo<ProcessInstance> pageInfo =
+        PageInfo<WorkflowInstance> pageInfo =
                 new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-        pageInfo.setTotalList(Collections.singletonList(new ProcessInstance()));
+        pageInfo.setTotalList(Collections.singletonList(new WorkflowInstance()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -83,7 +83,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
         User loginUser = getLoginUser();
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DATA_LIST, new ProcessInstance());
+        result.put(DATA_LIST, new WorkflowInstance());
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processInstanceService.queryProcessInstanceById(any(), eq(1))).thenReturn(result);

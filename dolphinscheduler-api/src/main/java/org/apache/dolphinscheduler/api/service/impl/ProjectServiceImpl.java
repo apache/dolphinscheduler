@@ -32,9 +32,9 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -397,12 +397,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         List<User> userList = userMapper.selectByIds(projectList.stream()
                 .map(Project::getUserId).distinct().collect(Collectors.toList()));
         Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
-        List<ProjectProcessDefinitionCount> projectProcessDefinitionCountList =
+        List<ProjectWorkflowDefinitionCount> projectWorkflowDefinitionCountList =
                 processDefinitionMapper.queryProjectProcessDefinitionCountByProjectCodes(
                         projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
-        Map<Long, Integer> projectProcessDefinitionCountMap = projectProcessDefinitionCountList.stream()
-                .collect(Collectors.toMap(ProjectProcessDefinitionCount::getProjectCode,
-                        ProjectProcessDefinitionCount::getCount));
+        Map<Long, Integer> projectProcessDefinitionCountMap = projectWorkflowDefinitionCountList.stream()
+                .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,
+                        ProjectWorkflowDefinitionCount::getCount));
         for (Project project : projectList) {
             project.setUserName(userMap.get(project.getUserId()));
             project.setDefCount(projectProcessDefinitionCountMap.getOrDefault(project.getCode(), 0));
@@ -489,10 +489,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         assert project != null;
 
-        List<ProcessDefinition> processDefinitionList =
+        List<WorkflowDefinition> workflowDefinitionList =
                 processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
-        if (!processDefinitionList.isEmpty()) {
+        if (!workflowDefinitionList.isEmpty()) {
             log.warn("Please delete the process definitions in project first! project code:{}.", projectCode);
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;

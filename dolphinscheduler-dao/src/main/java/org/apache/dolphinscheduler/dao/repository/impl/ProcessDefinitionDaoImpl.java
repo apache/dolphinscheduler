@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
@@ -38,7 +38,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Repository
-public class ProcessDefinitionDaoImpl extends BaseDao<ProcessDefinition, ProcessDefinitionMapper>
+public class ProcessDefinitionDaoImpl extends BaseDao<WorkflowDefinition, ProcessDefinitionMapper>
         implements
             ProcessDefinitionDao {
 
@@ -47,13 +47,13 @@ public class ProcessDefinitionDaoImpl extends BaseDao<ProcessDefinition, Process
     }
 
     @Override
-    public PageListingResult<ProcessDefinition> listingProcessDefinition(int pageNumber, int pageSize, String searchVal,
-                                                                         int userId, long projectCode) {
-        Page<ProcessDefinition> page = new Page<>(pageNumber, pageSize);
-        IPage<ProcessDefinition> processDefinitions =
+    public PageListingResult<WorkflowDefinition> listingProcessDefinition(int pageNumber, int pageSize, String searchVal,
+                                                                          int userId, long projectCode) {
+        Page<WorkflowDefinition> page = new Page<>(pageNumber, pageSize);
+        IPage<WorkflowDefinition> processDefinitions =
                 mybatisMapper.queryDefineListPaging(page, searchVal, userId, projectCode);
 
-        return PageListingResult.<ProcessDefinition>builder()
+        return PageListingResult.<WorkflowDefinition>builder()
                 .totalCount(processDefinitions.getTotal())
                 .currentPage(pageNumber)
                 .pageSize(pageSize)
@@ -62,7 +62,7 @@ public class ProcessDefinitionDaoImpl extends BaseDao<ProcessDefinition, Process
     }
 
     @Override
-    public Optional<ProcessDefinition> queryByCode(long code) {
+    public Optional<WorkflowDefinition> queryByCode(long code) {
         return Optional.ofNullable(mybatisMapper.queryByCode(code));
     }
 
@@ -72,7 +72,7 @@ public class ProcessDefinitionDaoImpl extends BaseDao<ProcessDefinition, Process
     }
 
     @Override
-    public List<ProcessDefinition> queryByCodes(Collection<Long> processDefinitionCodes) {
+    public List<WorkflowDefinition> queryByCodes(Collection<Long> processDefinitionCodes) {
         if (CollectionUtils.isEmpty(processDefinitionCodes)) {
             return Collections.emptyList();
         }

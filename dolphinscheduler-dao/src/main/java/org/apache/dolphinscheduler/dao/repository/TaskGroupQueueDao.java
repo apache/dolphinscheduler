@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.List;
 public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
 
     /**
-     * Delete {@link TaskGroupQueue} by {@link ProcessInstance#getId()}
+     * Delete {@link TaskGroupQueue} by {@link WorkflowInstance#getId()}
      *
      * @param workflowInstanceIds workflowInstanceIds
      */

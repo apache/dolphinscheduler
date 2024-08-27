@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.it;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -42,25 +42,25 @@ public class Repository {
     /**
      * Return the list of process instances for a given workflow definition in ascending order of their IDs.
      */
-    public List<ProcessInstance> queryWorkflowInstance(final ProcessDefinition workflowDefinition) {
+    public List<WorkflowInstance> queryWorkflowInstance(final WorkflowDefinition workflowDefinition) {
         return workflowInstanceDao.queryAll()
                 .stream()
                 .filter(workflowInstance -> workflowInstance.getProcessDefinitionCode()
                         .equals(workflowDefinition.getCode()))
                 .filter(workflowInstance -> workflowInstance.getProcessDefinitionVersion() == workflowDefinition
                         .getVersion())
-                .sorted(Comparator.comparingInt(ProcessInstance::getId))
+                .sorted(Comparator.comparingInt(WorkflowInstance::getId))
                 .collect(Collectors.toList());
     }
 
-    public ProcessInstance queryWorkflowInstance(final Integer workflowInstanceId) {
+    public WorkflowInstance queryWorkflowInstance(final Integer workflowInstanceId) {
         return workflowInstanceDao.queryById(workflowInstanceId);
     }
 
     /**
      * Return the list of task instances for a given workflow definition in ascending order of their IDs.
      */
-    public List<TaskInstance> queryTaskInstance(final ProcessDefinition workflowDefinition) {
+    public List<TaskInstance> queryTaskInstance(final WorkflowDefinition workflowDefinition) {
         return queryWorkflowInstance(workflowDefinition)
                 .stream()
                 .flatMap(workflowInstance -> taskInstanceDao.queryByWorkflowInstanceId(workflowInstance.getId())

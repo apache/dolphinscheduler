@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -44,11 +44,11 @@ public interface ExecutorService {
      * check whether the process definition can be executed
      *
      * @param projectCode       project code
-     * @param processDefinition process definition
+     * @param workflowDefinition process definition
      * @param processDefineCode process definition code
      * @param version           process definition version
      */
-    void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode,
+    void checkProcessDefinitionValid(long projectCode, WorkflowDefinition workflowDefinition, long processDefineCode,
                                      Integer version);
 
     /**
@@ -75,10 +75,10 @@ public interface ExecutorService {
     /**
      * check if the current process has subprocesses and all subprocesses are valid
      *
-     * @param processDefinition
+     * @param workflowDefinition
      * @return check result
      */
-    boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
+    boolean checkSubProcessDefinitionValid(WorkflowDefinition workflowDefinition);
 
     /**
      * force start Task Instance

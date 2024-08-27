@@ -24,7 +24,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USE
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ProcessLineageService;
+import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
@@ -67,7 +67,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ProcessLineageController extends BaseController {
 
     @Autowired
-    private ProcessLineageService processLineageService;
+    private WorkflowLineageService workflowLineageService;
 
     @Operation(summary = "queryLineageByWorkFlowName", description = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/query-by-name")
@@ -78,7 +78,7 @@ public class ProcessLineageController extends BaseController {
                                                                            @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName) {
         processDefinitionName = ParameterUtils.handleEscapes(processDefinitionName);
         List<WorkFlowRelationDetail> workFlowLineages =
-                processLineageService.queryWorkFlowLineageByName(projectCode, processDefinitionName);
+                workflowLineageService.queryWorkFlowLineageByName(projectCode, processDefinitionName);
         return Result.success(workFlowLineages);
     }
 
@@ -89,7 +89,7 @@ public class ProcessLineageController extends BaseController {
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @PathVariable(value = "workFlowCode") long workFlowCode) {
-        WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.DATA_LIST, workFlowLineage);
         return Result.success(result);
@@ -103,7 +103,7 @@ public class ProcessLineageController extends BaseController {
                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
             Map<String, Object> result = new HashMap<>();
-            WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineage(projectCode);
+            WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineage(projectCode);
             result.put(Constants.DATA_LIST, workFlowLineage);
             return Result.success(result);
         } catch (Exception e) {
@@ -123,8 +123,8 @@ public class ProcessLineageController extends BaseController {
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
     })
     @PostMapping(value = "/tasks/verify-delete")
@@ -136,7 +136,7 @@ public class ProcessLineageController extends BaseController {
                                                            @RequestParam(value = "taskCode", required = true) long taskCode) {
         Result<Map<String, Object>> result = new Result<>();
         Optional<String> taskDepMsg =
-                processLineageService.taskDependentMsg(projectCode, processDefinitionCode, taskCode);
+                workflowLineageService.taskDependentMsg(projectCode, processDefinitionCode, taskCode);
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }
@@ -149,8 +149,8 @@ public class ProcessLineageController extends BaseController {
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "projectCode", description = "WORKFLOW_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workFlowCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
     })
     @GetMapping(value = "/query-dependent-tasks")
     @ResponseStatus(HttpStatus.OK)
@@ -161,7 +161,7 @@ public class ProcessLineageController extends BaseController {
                                                            @RequestParam(value = "taskCode", required = false) Long taskCode) {
         Map<String, Object> result = new HashMap<>();
         List<DependentLineageTask> dependentLineageTaskList =
-                processLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode);
+                workflowLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode);
         result.put(Constants.DATA_LIST, dependentLineageTaskList);
         return Result.success(result);
     }

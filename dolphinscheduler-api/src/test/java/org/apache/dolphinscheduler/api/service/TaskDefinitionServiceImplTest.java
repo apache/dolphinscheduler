@@ -35,10 +35,10 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -115,7 +115,7 @@ public class TaskDefinitionServiceImplTest {
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Mock
-    private ProcessDefinitionService processDefinitionService;
+    private WorkflowDefinitionService workflowDefinitionService;
 
     @Mock
     private ProcessTaskRelationLogDao processTaskRelationLogDao;
@@ -283,37 +283,37 @@ public class TaskDefinitionServiceImplTest {
     @Test
     public void testUpdateDag() {
         User loginUser = getLoginUser();
-        ProcessDefinition processDefinition = getProcessDefinition();
-        processDefinition.setId(null);
-        List<ProcessTaskRelation> processTaskRelationList = getProcessTaskRelationList();
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setId(null);
+        List<WorkflowTaskRelation> workflowTaskRelationList = getProcessTaskRelationList();
         TaskDefinitionLog taskDefinitionLog = getTaskDefinitionLog();
         ArrayList<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         taskDefinitionLogs.add(taskDefinitionLog);
         Integer version = 1;
-        when(processDefinitionMapper.queryByCode(isA(long.class))).thenReturn(processDefinition);
+        when(processDefinitionMapper.queryByCode(isA(long.class))).thenReturn(workflowDefinition);
 
         // saveProcessDefine
         when(processDefineLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
-        when(processDefineLogMapper.insert(isA(ProcessDefinitionLog.class))).thenReturn(1);
-        when(processDefinitionMapper.insert(isA(ProcessDefinitionLog.class))).thenReturn(1);
+        when(processDefineLogMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
+        when(processDefinitionMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
         int insertVersion =
-                processServiceImpl.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
-        when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE))
+                processServiceImpl.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
+        when(processService.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE))
                 .thenReturn(insertVersion);
         assertEquals(insertVersion, version + 1);
 
         // saveTaskRelation
-        List<ProcessTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
-        when(processTaskRelationMapper.queryByProcessCode(eq(processDefinition.getCode())))
-                .thenReturn(processTaskRelationList);
+        List<WorkflowTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
+        when(processTaskRelationMapper.queryByProcessCode(eq(workflowDefinition.getCode())))
+                .thenReturn(workflowTaskRelationList);
         when(processTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
         when(processTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
-        int insertResult = processServiceImpl.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
-                processDefinition.getCode(), insertVersion, processTaskRelationLogList, taskDefinitionLogs,
+        int insertResult = processServiceImpl.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
+                workflowDefinition.getCode(), insertVersion, processTaskRelationLogList, taskDefinitionLogs,
                 Boolean.TRUE);
         assertEquals(Constants.EXIT_CODE_SUCCESS, insertResult);
         Assertions.assertDoesNotThrow(
-                () -> taskDefinitionService.updateDag(loginUser, processDefinition.getCode(), processTaskRelationList,
+                () -> taskDefinitionService.updateDag(loginUser, workflowDefinition.getCode(), workflowTaskRelationList,
                         taskDefinitionLogs));
     }
 
@@ -416,12 +416,12 @@ public class TaskDefinitionServiceImplTest {
         return project;
     }
 
-    private ProcessDefinition getProcessDefinition() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProjectCode(PROJECT_CODE);
-        processDefinition.setCode(PROCESS_DEFINITION_CODE);
-        processDefinition.setVersion(VERSION);
-        return processDefinition;
+    private WorkflowDefinition getProcessDefinition() {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setProjectCode(PROJECT_CODE);
+        workflowDefinition.setCode(PROCESS_DEFINITION_CODE);
+        workflowDefinition.setVersion(VERSION);
+        return workflowDefinition;
     }
 
     private TaskDefinition getTaskDefinition() {
@@ -450,44 +450,44 @@ public class TaskDefinitionServiceImplTest {
         return taskDefinitionLog;
     }
 
-    private List<ProcessTaskRelation> getProcessTaskRelationList() {
-        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+    private List<WorkflowTaskRelation> getProcessTaskRelationList() {
+        List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
 
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setProjectCode(PROJECT_CODE);
-        processTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
-        processTaskRelation.setPreTaskCode(TASK_CODE);
-        processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        workflowTaskRelation.setProjectCode(PROJECT_CODE);
+        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setPreTaskCode(TASK_CODE);
+        workflowTaskRelation.setPostTaskCode(TASK_CODE + 1L);
 
-        processTaskRelationList.add(processTaskRelation);
-        return processTaskRelationList;
+        workflowTaskRelationList.add(workflowTaskRelation);
+        return workflowTaskRelationList;
     }
 
-    private List<ProcessTaskRelation> getProcessTaskRelationListV2() {
-        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+    private List<WorkflowTaskRelation> getProcessTaskRelationListV2() {
+        List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
 
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        fillProcessTaskRelation(processTaskRelation);
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        fillProcessTaskRelation(workflowTaskRelation);
 
-        processTaskRelationList.add(processTaskRelation);
-        processTaskRelation = new ProcessTaskRelation();
-        fillProcessTaskRelation(processTaskRelation);
-        processTaskRelation.setPreTaskCode(4L);
-        processTaskRelationList.add(processTaskRelation);
-        return processTaskRelationList;
+        workflowTaskRelationList.add(workflowTaskRelation);
+        workflowTaskRelation = new WorkflowTaskRelation();
+        fillProcessTaskRelation(workflowTaskRelation);
+        workflowTaskRelation.setPreTaskCode(4L);
+        workflowTaskRelationList.add(workflowTaskRelation);
+        return workflowTaskRelationList;
     }
 
-    private void fillProcessTaskRelation(ProcessTaskRelation processTaskRelation) {
-        processTaskRelation.setProjectCode(PROJECT_CODE);
-        processTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
-        processTaskRelation.setPreTaskCode(TASK_CODE);
-        processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
+    private void fillProcessTaskRelation(WorkflowTaskRelation workflowTaskRelation) {
+        workflowTaskRelation.setProjectCode(PROJECT_CODE);
+        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setPreTaskCode(TASK_CODE);
+        workflowTaskRelation.setPostTaskCode(TASK_CODE + 1L);
     }
 
-    private List<ProcessTaskRelationLog> getProcessTaskRelationLogList() {
-        List<ProcessTaskRelationLog> processTaskRelationLogList = new ArrayList<>();
+    private List<WorkflowTaskRelationLog> getProcessTaskRelationLogList() {
+        List<WorkflowTaskRelationLog> processTaskRelationLogList = new ArrayList<>();
 
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
         processTaskRelationLog.setProjectCode(PROJECT_CODE);
         processTaskRelationLog.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
         processTaskRelationLog.setPreTaskCode(TASK_CODE);
@@ -497,24 +497,24 @@ public class TaskDefinitionServiceImplTest {
         return processTaskRelationLogList;
     }
 
-    private List<ProcessTaskRelation> getProcessTaskRelationList2() {
-        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+    private List<WorkflowTaskRelation> getProcessTaskRelationList2() {
+        List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
 
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setProjectCode(PROJECT_CODE);
-        processTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
-        processTaskRelation.setPreTaskCode(TASK_CODE);
-        processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        workflowTaskRelation.setProjectCode(PROJECT_CODE);
+        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setPreTaskCode(TASK_CODE);
+        workflowTaskRelation.setPostTaskCode(TASK_CODE + 1L);
 
-        processTaskRelationList.add(processTaskRelation);
+        workflowTaskRelationList.add(workflowTaskRelation);
 
-        ProcessTaskRelation processTaskRelation2 = new ProcessTaskRelation();
-        processTaskRelation2.setProjectCode(PROJECT_CODE);
-        processTaskRelation2.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
-        processTaskRelation2.setPreTaskCode(TASK_CODE - 1);
-        processTaskRelation2.setPostTaskCode(TASK_CODE);
-        processTaskRelationList.add(processTaskRelation2);
+        WorkflowTaskRelation workflowTaskRelation2 = new WorkflowTaskRelation();
+        workflowTaskRelation2.setProjectCode(PROJECT_CODE);
+        workflowTaskRelation2.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation2.setPreTaskCode(TASK_CODE - 1);
+        workflowTaskRelation2.setPostTaskCode(TASK_CODE);
+        workflowTaskRelationList.add(workflowTaskRelation2);
 
-        return processTaskRelationList;
+        return workflowTaskRelationList;
     }
 }

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -78,7 +78,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        ProcessDefinition obj = processDefinitionMapper.queryByCode(objId);
+        WorkflowDefinition obj = processDefinitionMapper.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

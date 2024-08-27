@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.Param;
@@ -33,7 +33,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 /**
  * process definition mapper interface
  */
-public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
+public interface ProcessDefinitionMapper extends BaseMapper<WorkflowDefinition> {
 
     /**
      * query process definition by code
@@ -41,12 +41,12 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return process definition
      */
-    ProcessDefinition queryByCode(@Param("code") long code);
+    WorkflowDefinition queryByCode(@Param("code") long code);
 
     /**
      * update
      */
-    int updateById(@Param("et") ProcessDefinition processDefinition);
+    int updateById(@Param("et") WorkflowDefinition workflowDefinition);
 
     /**
      * delete process definition by code
@@ -62,7 +62,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param codes codes
      * @return process definition list
      */
-    List<ProcessDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
+    List<WorkflowDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
 
     /**
      * verify process definition by name
@@ -71,8 +71,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param name name
      * @return process definition
      */
-    ProcessDefinition verifyByDefineName(@Param("projectCode") long projectCode,
-                                         @Param("processDefinitionName") String name);
+    WorkflowDefinition verifyByDefineName(@Param("projectCode") long projectCode,
+                                          @Param("processDefinitionName") String name);
 
     /**
      * query process definition by name
@@ -81,8 +81,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param name name
      * @return process definition
      */
-    ProcessDefinition queryByDefineName(@Param("projectCode") long projectCode,
-                                        @Param("processDefinitionName") String name);
+    WorkflowDefinition queryByDefineName(@Param("projectCode") long projectCode,
+                                         @Param("processDefinitionName") String name);
 
     /**
      * query process definition by id
@@ -90,7 +90,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param processDefineId processDefineId
      * @return process definition
      */
-    ProcessDefinition queryByDefineId(@Param("processDefineId") int processDefineId);
+    WorkflowDefinition queryByDefineId(@Param("processDefineId") int processDefineId);
 
     /**
      * process definition page
@@ -101,20 +101,20 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param projectCode projectCode
      * @return process definition IPage
      */
-    IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
-                                                   @Param("searchVal") String searchVal,
-                                                   @Param("userId") int userId,
-                                                   @Param("projectCode") long projectCode);
+    IPage<WorkflowDefinition> queryDefineListPaging(IPage<WorkflowDefinition> page,
+                                                    @Param("searchVal") String searchVal,
+                                                    @Param("userId") int userId,
+                                                    @Param("projectCode") long projectCode);
 
     /**
      * Filter process definitions
      *
      * @param page page
-     * @param processDefinition process definition object
+     * @param workflowDefinition process definition object
      * @return process definition IPage
      */
-    IPage<ProcessDefinition> filterProcessDefinition(IPage<ProcessDefinition> page,
-                                                     @Param("pd") ProcessDefinition processDefinition);
+    IPage<WorkflowDefinition> filterProcessDefinition(IPage<WorkflowDefinition> page,
+                                                      @Param("pd") WorkflowDefinition workflowDefinition);
 
     /**
      * query all process definition list
@@ -122,7 +122,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param projectCode projectCode
      * @return process definition list
      */
-    List<ProcessDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
+    List<WorkflowDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
 
     /**
      * query process definition list
@@ -139,7 +139,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param ids ids
      * @return process definition list
      */
-    List<ProcessDefinition> queryDefinitionListByIdList(@Param("ids") Integer[] ids);
+    List<WorkflowDefinition> queryDefinitionListByIdList(@Param("ids") Integer[] ids);
 
     /**
      * Statistics process definition group by project codes list
@@ -174,5 +174,5 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     List<Long> queryDefinitionCodeListByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 
-    List<ProjectProcessDefinitionCount> queryProjectProcessDefinitionCountByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
+    List<ProjectWorkflowDefinitionCount> queryProjectProcessDefinitionCountByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 }

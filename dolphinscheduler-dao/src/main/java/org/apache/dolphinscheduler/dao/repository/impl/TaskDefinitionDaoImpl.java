@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -67,14 +67,14 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
 
     @Override
     public List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        if (processDefinition == null) {
+        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (workflowDefinition == null) {
             log.error("Cannot find process definition, code: {}", processDefinitionCode);
             return Lists.newArrayList();
         }
 
-        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                processDefinition.getCode(), processDefinition.getVersion());
+        List<WorkflowTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
+                workflowDefinition.getCode(), workflowDefinition.getVersion());
         Set<TaskDefinition> taskDefinitionSet = processTaskRelations
                 .stream()
                 .filter(p -> p.getPostTaskCode() > 0)

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -86,7 +86,7 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
     }
 
     private void doTaskTimeoutAlert(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final ProcessInstance workflowInstance = taskExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = taskExecutionRunnable.getWorkflowInstance();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         // todo: inject the projectUser
         processAlertManager.sendTaskTimeoutAlert(workflowInstance, taskInstance, null);

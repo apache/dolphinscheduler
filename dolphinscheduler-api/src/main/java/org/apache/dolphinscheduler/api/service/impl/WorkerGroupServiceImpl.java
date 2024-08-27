@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -393,16 +393,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
-        List<ProcessInstance> processInstances = processInstanceMapper
+        List<WorkflowInstance> workflowInstances = processInstanceMapper
                 .queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                         org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
-        if (CollectionUtils.isNotEmpty(processInstances)) {
+        if (CollectionUtils.isNotEmpty(workflowInstances)) {
             List<Integer> processInstanceIds =
-                    processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
+                    workflowInstances.stream().map(WorkflowInstance::getId).collect(Collectors.toList());
             log.warn(
                     "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
-                    processInstances.size(), processInstanceIds);
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+                    workflowInstances.size(), processInstanceIds);
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, workflowInstances.size());
             return result;
         }
 

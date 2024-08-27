@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -84,7 +84,7 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
                                             final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
         final Command command = workflowExecuteContextBuilder.getCommand();
         final int workflowInstanceId = command.getProcessInstanceId();
-        final ProcessInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
+        final WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
         final WorkflowFailoverCommandParam workflowFailoverCommandParam = JSONUtils.parseObject(
                 command.getCommandParam(),

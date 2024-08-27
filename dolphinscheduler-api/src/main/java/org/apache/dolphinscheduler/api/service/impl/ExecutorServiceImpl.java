@@ -36,8 +36,8 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
-import org.apache.dolphinscheduler.api.service.ProcessLineageService;
+import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
+import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
@@ -59,9 +59,9 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
@@ -137,7 +137,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private WorkflowDefinitionService workflowDefinitionService;
 
     @Autowired
     private CommandService commandService;
@@ -161,7 +161,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TenantMapper tenantMapper;
 
     @Autowired
-    private ProcessLineageService processLineageService;
+    private WorkflowLineageService workflowLineageService;
 
     @Autowired
     private TriggerWorkflowRequestTransformer triggerWorkflowRequestTransformer;
@@ -199,22 +199,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * check whether the process definition can be executed
      *
      * @param projectCode       project code
-     * @param processDefinition process definition
+     * @param workflowDefinition process definition
      */
     @Override
-    public void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
+    public void checkProcessDefinitionValid(long projectCode, WorkflowDefinition workflowDefinition,
                                             long processDefineCode, Integer version) {
         // check process definition exists
-        if (projectCode != processDefinition.getProjectCode()) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getCode());
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowDefinition.getCode());
         }
         // check process definition online
-        if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getCode(),
-                    processDefinition.getVersion());
+        if (workflowDefinition.getReleaseState() != ReleaseState.ONLINE) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, workflowDefinition.getCode(),
+                    workflowDefinition.getVersion());
         }
         // check sub process definition online
-        if (!checkSubProcessDefinitionValid(processDefinition)) {
+        if (!checkSubProcessDefinitionValid(workflowDefinition)) {
             throw new ServiceException(Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
         }
     }
@@ -222,19 +222,19 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * check whether the current process has subprocesses and validate all subprocesses
      *
-     * @param processDefinition
+     * @param workflowDefinition
      * @return check result
      */
     @Override
-    public boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition) {
+    public boolean checkSubProcessDefinitionValid(WorkflowDefinition workflowDefinition) {
         // query all subprocesses under the current process
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryDownstreamByProcessDefinitionCode(processDefinition.getCode());
-        if (processTaskRelations.isEmpty()) {
+        List<WorkflowTaskRelation> workflowTaskRelations =
+                processTaskRelationMapper.queryDownstreamByProcessDefinitionCode(workflowDefinition.getCode());
+        if (workflowTaskRelations.isEmpty()) {
             return true;
         }
         Set<Long> relationCodes =
-                processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toSet());
+                workflowTaskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toSet());
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
 
         // find out the process definition code
@@ -249,8 +249,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         // check sub releaseState
-        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryByCodes(processDefinitionCodeSet);
-        return processDefinitions.stream()
+        List<WorkflowDefinition> workflowDefinitions = processDefinitionMapper.queryByCodes(processDefinitionCodeSet);
+        return workflowDefinitions.stream()
                 .filter(definition -> definition.getReleaseState().equals(ReleaseState.OFFLINE))
                 .collect(Collectors.toSet())
                 .isEmpty();
@@ -275,7 +275,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkNotNull(workflowInstanceId, "workflowInstanceId cannot be null");
         checkNotNull(executeType, "executeType cannot be null");
 
-        ProcessInstance workflowInstance = processInstanceDao
+        WorkflowInstance workflowInstance = processInstanceDao
                 .queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId));
 
@@ -345,22 +345,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
 
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
+        WorkflowInstance workflowInstance = processService.findProcessInstanceDetailById(processInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
-        if (!processInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinished()) {
             log.error("Can not execute task for process instance which is not finished, processInstanceId:{}.",
                     processInstanceId);
             putMsg(response, Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED);
             return response;
         }
 
-        ProcessDefinition processDefinition =
-                processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+        WorkflowDefinition workflowDefinition =
+                processService.findProcessDefinition(workflowInstance.getProcessDefinitionCode(),
+                        workflowInstance.getProcessDefinitionVersion());
+        workflowDefinition.setReleaseState(ReleaseState.ONLINE);
+        this.checkProcessDefinitionValid(projectCode, workflowDefinition, workflowInstance.getProcessDefinitionCode(),
+                workflowInstance.getProcessDefinitionVersion());
 
         // get the startParams user specified at the first starting while repeat running is needed
 
@@ -386,12 +386,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         Command command = new Command();
         command.setCommandType(CommandType.EXECUTE_TASK);
-        command.setProcessDefinitionCode(processDefinition.getCode());
+        command.setProcessDefinitionCode(workflowDefinition.getCode());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
-        command.setProcessDefinitionVersion(processDefinition.getVersion());
+        command.setProcessDefinitionVersion(workflowDefinition.getVersion());
         command.setProcessInstanceId(processInstanceId);
-        command.setTestFlag(processInstance.getTestFlag());
+        command.setTestFlag(workflowInstance.getTestFlag());
 
         // Add taskDependType
         command.setTaskDependType(taskDependType);
@@ -399,9 +399,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (!commandService.verifyIsNeedCreateCommand(command)) {
             log.warn(
                     "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
-                    processDefinition.getCode(), processDefinition.getVersion(), processInstanceId);
+                    workflowDefinition.getCode(), workflowDefinition.getVersion(), processInstanceId);
             putMsg(response, Status.PROCESS_INSTANCE_EXECUTING_COMMAND,
-                    String.valueOf(processDefinition.getCode()));
+                    String.valueOf(workflowDefinition.getCode()));
             return response;
         }
 
@@ -411,13 +411,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (create > 0) {
             log.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
-                    processDefinition.getVersion());
+                    workflowDefinition.getVersion());
             putMsg(response, Status.SUCCESS);
         } else {
             log.error(
                     "Execute process instance failed because create {} command error, processDefinitionCode:{}, processDefinitionVersion:{}， processInstanceId:{}.",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
-                    processDefinition.getVersion(),
+                    workflowDefinition.getVersion(),
                     processInstanceId);
             putMsg(response, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
@@ -622,7 +622,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   boolean allLevelDependent) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 checkDependentProcessDefinitionValid(
-                        processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode),
+                        workflowLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode),
                         processDefinitionCycle, workerGroup,
                         processDefinitionCode);
 
@@ -636,7 +636,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 List<DependentProcessDefinition> childDependentList = childList
                         .stream()
                         .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
-                                processLineageService.queryDownstreamDependentProcessDefinitions(
+                                workflowLineageService.queryDownstreamDependentProcessDefinitions(
                                         dependentProcessDefinition.getProcessDefinitionCode()),
                                 processDefinitionCycle,
                                 workerGroup,

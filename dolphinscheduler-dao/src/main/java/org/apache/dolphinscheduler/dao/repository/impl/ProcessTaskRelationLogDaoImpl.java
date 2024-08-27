@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
@@ -31,7 +31,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProcessTaskRelationLogDaoImpl extends BaseDao<ProcessTaskRelationLog, ProcessTaskRelationLogMapper>
+public class ProcessTaskRelationLogDaoImpl extends BaseDao<WorkflowTaskRelationLog, ProcessTaskRelationLogMapper>
         implements
             ProcessTaskRelationLogDao {
 
@@ -40,7 +40,7 @@ public class ProcessTaskRelationLogDaoImpl extends BaseDao<ProcessTaskRelationLo
     }
 
     @Override
-    public List<ProcessTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode) {
+    public List<WorkflowTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode) {
         return mybatisMapper.queryByProcessCode(workflowDefinitionCode);
     }
 
@@ -50,7 +50,7 @@ public class ProcessTaskRelationLogDaoImpl extends BaseDao<ProcessTaskRelationLo
     }
 
     @Override
-    public int batchInsert(List<ProcessTaskRelationLog> taskRelationList) {
+    public int batchInsert(List<WorkflowTaskRelationLog> taskRelationList) {
         if (CollectionUtils.isEmpty(taskRelationList)) {
             return 0;
         }

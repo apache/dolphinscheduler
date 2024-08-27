@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -575,11 +575,11 @@ public class ProjectServiceTest {
         return userList;
     }
 
-    private List<ProcessDefinition> getProcessDefinitions() {
-        List<ProcessDefinition> list = new ArrayList<>();
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProjectCode(1L);
-        list.add(processDefinition);
+    private List<WorkflowDefinition> getProcessDefinitions() {
+        List<WorkflowDefinition> list = new ArrayList<>();
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setProjectCode(1L);
+        list.add(workflowDefinition);
         return list;
     }
 

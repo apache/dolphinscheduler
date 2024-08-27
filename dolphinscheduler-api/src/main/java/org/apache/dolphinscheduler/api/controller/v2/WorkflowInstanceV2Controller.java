@@ -68,7 +68,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
      * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
      * @return workflow instance list
      */
-    @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
+    @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_WORKFLOW_INSTANCE_LIST_NOTES")
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
@@ -111,7 +111,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{workflowInstanceId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
+    @ApiException(Status.DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR)
     public Result<Void> deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         processInstanceService.deleteProcessInstanceById(loginUser, workflowInstanceId);

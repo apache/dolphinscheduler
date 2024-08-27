@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -282,11 +282,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      */
     @Override
     public TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
-        if (processDefinition == null) {
+        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(workflowCode);
+        if (workflowDefinition == null) {
             throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
         }
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, processDefinition.getProjectCode());
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, workflowDefinition.getProjectCode());
 
         List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(null, null, null,
                 workflowCode, Constants.QUERY_ALL_ON_WORKFLOW, null);

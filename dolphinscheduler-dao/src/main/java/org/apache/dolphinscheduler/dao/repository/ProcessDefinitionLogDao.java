@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 
-public interface ProcessDefinitionLogDao extends IDao<ProcessDefinitionLog> {
+public interface ProcessDefinitionLogDao extends IDao<WorkflowDefinitionLog> {
 
-    ProcessDefinitionLog queryByDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
+    WorkflowDefinitionLog queryByDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 }

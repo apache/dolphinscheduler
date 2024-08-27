@@ -21,8 +21,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_S
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -67,7 +67,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     private final TaskDefinitionDao taskDefinitionDao;
     private final TaskInstanceDao taskInstanceDao;
 
-    private final ProcessInstance processInstance;
+    private final WorkflowInstance workflowInstance;
     private final Date dependentDate;
     private final List<DependentExecute> dependentTaskList;
     private final Map<String, DependResult> dependResultMap;
@@ -86,7 +86,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         this.processDefinitionDao = processDefinitionDao;
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
-        this.processInstance =
+        this.workflowInstance =
                 processInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
         this.dependentDate = calculateDependentDate();
         this.dependentTaskList = initializeDependentTaskList();
@@ -113,8 +113,8 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     }
 
     private Date calculateDependentDate() {
-        if (processInstance.getScheduleTime() != null) {
-            return processInstance.getScheduleTime();
+        if (workflowInstance.getScheduleTime() != null) {
+            return workflowInstance.getScheduleTime();
         } else {
             return new Date();
         }
@@ -137,9 +137,9 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
 
         final Map<Long, Project> projectCodeMap = projectDao.queryByCodes(new ArrayList<>(projectCodes)).stream()
                 .collect(Collectors.toMap(Project::getCode, Function.identity()));
-        final Map<Long, ProcessDefinition> processDefinitionMap =
+        final Map<Long, WorkflowDefinition> processDefinitionMap =
                 processDefinitionDao.queryByCodes(processDefinitionCodes).stream()
-                        .collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
+                        .collect(Collectors.toMap(WorkflowDefinition::getCode, Function.identity()));
         final Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes).stream()
                 .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
         final TaskInstance taskInstance =
@@ -154,9 +154,9 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                             throw new RuntimeException(
                                     "The dependent task's project is not exist, dependentItem: " + dependentItem);
                         }
-                        ProcessDefinition processDefinition =
+                        WorkflowDefinition workflowDefinition =
                                 processDefinitionMap.get(dependentItem.getDefinitionCode());
-                        if (processDefinition == null) {
+                        if (workflowDefinition == null) {
                             log.error("The dependent task's workflow is not exist, dependentItem: {}", dependentItem);
                             throw new RuntimeException(
                                     "The dependent task's workflow is not exist, dependentItem: " + dependentItem);
@@ -165,14 +165,14 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                             log.info("Add dependent task:");
                             log.info("DependentRelation: {}", dependentTaskModel.getRelation());
                             log.info("ProjectName: {}", project.getName());
-                            log.info("WorkflowName: {}", processDefinition.getName());
+                            log.info("WorkflowName: {}", workflowDefinition.getName());
                             log.info("TaskName: {}", "ALL");
                             log.info("DependentKey: {}", dependentItem.getKey());
                         } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
                             log.info("Add dependent task:");
                             log.info("DependentRelation: {}", dependentTaskModel.getRelation());
                             log.info("ProjectName: {}", project.getName());
-                            log.info("WorkflowName: {}", processDefinition.getName());
+                            log.info("WorkflowName: {}", workflowDefinition.getName());
                             log.info("DependentKey: {}", dependentItem.getKey());
                         } else {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
@@ -186,13 +186,13 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                             log.info("Add dependent task:");
                             log.info("DependentRelation: {}", dependentTaskModel.getRelation());
                             log.info("ProjectName: {}", project.getName());
-                            log.info("WorkflowName: {}", processDefinition.getName());
+                            log.info("WorkflowName: {}", workflowDefinition.getName());
                             log.info("TaskName: {}", taskDefinition.getName());
                             log.info("DependentKey: {}", dependentItem.getKey());
                         }
                     }
                     return new DependentExecute(dependentTaskModel.getDependItemList(),
-                            dependentTaskModel.getRelation(), processInstance, taskInstance);
+                            dependentTaskModel.getRelation(), workflowInstance, taskInstance);
                 }).collect(Collectors.toList());
         log.info("Initialized dependent task list");
         return dependentExecutes;
@@ -203,7 +203,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         Map<String, Long> dependVarPoolEndTimeMap = new HashMap<>();
         for (DependentExecute dependentExecute : dependentTaskList) {
             DependResult dependResult =
-                    dependentExecute.getModelDependResult(dependentDate, processInstance.getTestFlag());
+                    dependentExecute.getModelDependResult(dependentDate, workflowInstance.getTestFlag());
             if (dependResult == DependResult.SUCCESS) {
                 Map<String, Property> varPoolPropertyMap = dependentExecute.getDependTaskVarPoolPropertyMap();
                 Map<String, Long> varPoolEndTimeMap = dependentExecute.getDependTaskVarPoolEndTimeMap();
@@ -219,7 +219,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     private boolean isAllDependentTaskFinished() {
         boolean isAllDependentTaskFinished = true;
         for (DependentExecute dependentExecute : dependentTaskList) {
-            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag(),
+            if (!dependentExecute.finish(dependentDate, workflowInstance.getTestFlag(),
                     dependentParameters.getDependence().getFailurePolicy(),
                     dependentParameters.getDependence().getFailureWaitingTime())) {
                 isAllDependentTaskFinished = false;

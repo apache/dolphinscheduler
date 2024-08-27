@@ -21,8 +21,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
@@ -101,7 +101,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         final long workflowDefinitionCode = command.getProcessDefinitionCode();
         final int workflowDefinitionVersion = command.getProcessDefinitionVersion();
 
-        final ProcessDefinition workflowDefinition = workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(
+        final WorkflowDefinition workflowDefinition = workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(
                 workflowDefinitionCode,
                 workflowDefinitionVersion);
         checkArgument(workflowDefinition != null,
@@ -113,7 +113,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     protected void assembleWorkflowGraph(
                                          final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final ProcessDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
+        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
         workflowExecuteContextBuilder.setWorkflowGraph(workflowGraphFactory.createWorkflowGraph(workflowDefinition));
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     protected List<String> parseStartNodesFromWorkflowInstance(
                                                                final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final ProcessInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
         final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
         checkArgument(commandParam != null, "Invalid command param : " + workflowInstance.getCommandParam());
         List<Long> startCodes = commandParam.getStartNodes();
@@ -141,7 +141,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     }
 
-    protected List<TaskInstance> getValidTaskInstance(final ProcessInstance workflowInstance) {
+    protected List<TaskInstance> getValidTaskInstance(final WorkflowInstance workflowInstance) {
         return taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
                 workflowInstance.getId(),
                 workflowInstance.getTestFlag());

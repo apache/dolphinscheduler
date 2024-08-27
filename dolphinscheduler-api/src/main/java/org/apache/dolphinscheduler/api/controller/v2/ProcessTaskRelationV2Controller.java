@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -55,7 +55,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * process task relation controller
  */
-@Tag(name = "PROCESS_TASK_RELATION_TAG")
+@Tag(name = "WORKFLOW_TASK_RELATION_TAG")
 @RestController
 @RequestMapping("v2/relations")
 public class ProcessTaskRelationV2Controller extends BaseController {
@@ -70,15 +70,15 @@ public class ProcessTaskRelationV2Controller extends BaseController {
      * @param TaskRelationCreateRequest process task definition json contains the object you want to create
      * @return Result object created
      */
-    @Operation(summary = "create", description = "CREATE_PROCESS_TASK_RELATION_NOTES")
+    @Operation(summary = "create", description = "CREATE_WORKFLOW_TASK_RELATION_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_TASK_RELATION_ERROR)
-    public Result<ProcessTaskRelation> createTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                          @RequestBody TaskRelationCreateRequest TaskRelationCreateRequest) {
-        ProcessTaskRelation processTaskRelation =
+    public Result<WorkflowTaskRelation> createTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @RequestBody TaskRelationCreateRequest TaskRelationCreateRequest) {
+        WorkflowTaskRelation workflowTaskRelation =
                 processTaskRelationService.createProcessTaskRelationV2(loginUser, TaskRelationCreateRequest);
-        return Result.success(processTaskRelation);
+        return Result.success(workflowTaskRelation);
     }
 
     /**
@@ -88,7 +88,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
      * @param codePair code pair you want to delete the task relation, use `upstream,downstream` as example, will delete exists relation upstream -> downstream, throw error if not exists
      * @return delete result code
      */
-    @Operation(summary = "delete", description = "DELETE_PROCESS_TASK_RELATION_NOTES")
+    @Operation(summary = "delete", description = "DELETE_WORKFLOW_TASK_RELATION_NOTES")
     @Parameters({
             @Parameter(name = "code-pair", description = "TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456,78901", required = true))
     })
@@ -118,12 +118,12 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR)
-    public Result<List<ProcessTaskRelation>> updateUpstreamTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                          @PathVariable("code") Long code,
-                                                                          @RequestBody TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationService
+    public Result<List<WorkflowTaskRelation>> updateUpstreamTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                           @PathVariable("code") Long code,
+                                                                           @RequestBody TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
+        List<WorkflowTaskRelation> workflowTaskRelations = processTaskRelationService
                 .updateUpstreamTaskDefinitionWithSyncDag(loginUser, code, Boolean.TRUE,
                         taskRelationUpdateUpstreamRequest);
-        return Result.success(processTaskRelations);
+        return Result.success(workflowTaskRelations);
     }
 }

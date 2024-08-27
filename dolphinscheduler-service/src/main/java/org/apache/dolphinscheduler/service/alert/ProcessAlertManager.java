@@ -28,9 +28,9 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowAlertContent;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -105,18 +105,18 @@ public class ProcessAlertManager {
     /**
      * get process instance content
      *
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @param taskInstances task instance list
      * @return process instance format content
      */
-    public String getContentProcessInstance(ProcessInstance processInstance,
+    public String getContentProcessInstance(WorkflowInstance workflowInstance,
                                             List<TaskInstance> taskInstances,
                                             ProjectUser projectUser) {
 
         String res = "";
-        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
+        WorkflowDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
+                        workflowInstance.getProcessDefinitionVersion());
 
         String modifyBy = "";
         if (processDefinitionLog != null) {
@@ -124,40 +124,40 @@ public class ProcessAlertManager {
             modifyBy = operator == null ? "" : operator.getUserName();
         }
 
-        if (processInstance.getState().isSuccess()) {
-            List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
-            ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
+        if (workflowInstance.getState().isSuccess()) {
+            List<WorkflowAlertContent> successTaskList = new ArrayList<>(1);
+            WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
                     .projectCode(projectUser.getProjectCode())
                     .projectName(projectUser.getProjectName())
                     .owner(projectUser.getUserName())
-                    .processId(processInstance.getId())
-                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                    .processName(processInstance.getName())
-                    .processType(processInstance.getCommandType())
-                    .processState(processInstance.getState())
+                    .processId(workflowInstance.getId())
+                    .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
+                    .processName(workflowInstance.getName())
+                    .processType(workflowInstance.getCommandType())
+                    .processState(workflowInstance.getState())
                     .modifyBy(modifyBy)
-                    .recovery(processInstance.getRecovery())
-                    .runTimes(processInstance.getRunTimes())
-                    .processStartTime(processInstance.getStartTime())
-                    .processEndTime(processInstance.getEndTime())
-                    .processHost(processInstance.getHost())
+                    .recovery(workflowInstance.getRecovery())
+                    .runTimes(workflowInstance.getRunTimes())
+                    .processStartTime(workflowInstance.getStartTime())
+                    .processEndTime(workflowInstance.getEndTime())
+                    .processHost(workflowInstance.getHost())
                     .build();
-            successTaskList.add(processAlertContent);
+            successTaskList.add(workflowAlertContent);
             res = JSONUtils.toJsonString(successTaskList);
-        } else if (processInstance.getState().isFailure()) {
+        } else if (workflowInstance.getState().isFailure()) {
 
-            List<ProcessAlertContent> failedTaskList = new ArrayList<>();
+            List<WorkflowAlertContent> failedTaskList = new ArrayList<>();
             for (TaskInstance task : taskInstances) {
                 if (task.getState().isSuccess()) {
                     continue;
                 }
-                ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
+                WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
                         .projectCode(projectUser.getProjectCode())
                         .projectName(projectUser.getProjectName())
                         .owner(projectUser.getUserName())
-                        .processId(processInstance.getId())
-                        .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                        .processName(processInstance.getName())
+                        .processId(workflowInstance.getId())
+                        .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
+                        .processName(workflowInstance.getName())
                         .modifyBy(modifyBy)
                         .taskCode(task.getTaskCode())
                         .taskName(task.getName())
@@ -169,7 +169,7 @@ public class ProcessAlertManager {
                         .taskPriority(task.getTaskInstancePriority().getDescp())
                         .logPath(task.getLogPath())
                         .build();
-                failedTaskList.add(processAlertContent);
+                failedTaskList.add(workflowAlertContent);
             }
             res = JSONUtils.toJsonString(failedTaskList);
         }
@@ -180,17 +180,17 @@ public class ProcessAlertManager {
     /**
      * getting worker fault tolerant content
      *
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @param toleranceTaskList tolerance task list
      * @return worker tolerance content
      */
-    private String getWorkerToleranceContent(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
+    private String getWorkerToleranceContent(WorkflowInstance workflowInstance, List<TaskInstance> toleranceTaskList) {
 
-        List<ProcessAlertContent> toleranceTaskInstanceList = new ArrayList<>();
+        List<WorkflowAlertContent> toleranceTaskInstanceList = new ArrayList<>();
 
-        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
+        WorkflowDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
+                        workflowInstance.getProcessDefinitionVersion());
         String modifyBy = "";
         if (processDefinitionLog != null) {
             User operator = userMapper.selectById(processDefinitionLog.getOperator());
@@ -198,10 +198,10 @@ public class ProcessAlertManager {
         }
 
         for (TaskInstance taskInstance : toleranceTaskList) {
-            ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
-                    .processId(processInstance.getId())
-                    .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                    .processName(processInstance.getName())
+            WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
+                    .processId(workflowInstance.getId())
+                    .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
+                    .processName(workflowInstance.getName())
                     .modifyBy(modifyBy)
                     .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
@@ -209,7 +209,7 @@ public class ProcessAlertManager {
                     .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
                     .retryTimes(taskInstance.getRetryTimes())
                     .build();
-            toleranceTaskInstanceList.add(processAlertContent);
+            toleranceTaskInstanceList.add(workflowAlertContent);
         }
         return JSONUtils.toJsonString(toleranceTaskInstanceList);
     }
@@ -217,19 +217,19 @@ public class ProcessAlertManager {
     /**
      * send worker alert fault tolerance
      *
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @param toleranceTaskList tolerance task list
      */
-    public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
+    public void sendAlertWorkerToleranceFault(WorkflowInstance workflowInstance, List<TaskInstance> toleranceTaskList) {
         try {
             Alert alert = new Alert();
             alert.setTitle("worker fault tolerance");
-            String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
+            String content = getWorkerToleranceContent(workflowInstance, toleranceTaskList);
             alert.setContent(content);
             alert.setWarningType(WarningType.FAILURE);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(
-                    processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
+                    workflowInstance.getWarningGroupId() == null ? 1 : workflowInstance.getWarningGroupId());
             alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
             alertDao.addAlert(alert);
 
@@ -242,28 +242,28 @@ public class ProcessAlertManager {
     /**
      * send process instance alert
      *
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @param taskInstances task instance list
      */
-    public void sendAlertProcessInstance(ProcessInstance processInstance,
+    public void sendAlertProcessInstance(WorkflowInstance workflowInstance,
                                          List<TaskInstance> taskInstances,
                                          ProjectUser projectUser) {
-        if (!isNeedToSendWarning(processInstance)) {
+        if (!isNeedToSendWarning(workflowInstance)) {
             return;
         }
         Alert alert = new Alert();
-        String cmdName = getCommandCnName(processInstance.getCommandType());
-        String success = processInstance.getState().isSuccess() ? "success" : "failed";
+        String cmdName = getCommandCnName(workflowInstance.getCommandType());
+        String success = workflowInstance.getState().isSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
-        alert.setWarningType(processInstance.getState().isSuccess() ? WarningType.SUCCESS : WarningType.FAILURE);
-        String content = getContentProcessInstance(processInstance, taskInstances, projectUser);
+        alert.setWarningType(workflowInstance.getState().isSuccess() ? WarningType.SUCCESS : WarningType.FAILURE);
+        String content = getContentProcessInstance(workflowInstance, taskInstances, projectUser);
         alert.setContent(content);
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alert.setProjectCode(projectUser.getProjectCode());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
-        alert.setAlertType(processInstance.getState().isSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
+        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(workflowInstance.getId());
+        alert.setAlertType(workflowInstance.getState().isSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
                 : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
     }
@@ -271,28 +271,28 @@ public class ProcessAlertManager {
     /**
      * check if need to be send warning
      *
-     * @param processInstance
+     * @param workflowInstance
      * @return
      */
-    public boolean isNeedToSendWarning(ProcessInstance processInstance) {
-        if (Flag.YES == processInstance.getIsSubProcess()) {
+    public boolean isNeedToSendWarning(WorkflowInstance workflowInstance) {
+        if (Flag.YES == workflowInstance.getIsSubProcess()) {
             return false;
         }
         boolean sendWarning = false;
-        WarningType warningType = processInstance.getWarningType();
+        WarningType warningType = workflowInstance.getWarningType();
         switch (warningType) {
             case ALL:
-                if (processInstance.getState().isFinished()) {
+                if (workflowInstance.getState().isFinished()) {
                     sendWarning = true;
                 }
                 break;
             case SUCCESS:
-                if (processInstance.getState().isSuccess()) {
+                if (workflowInstance.getState().isSuccess()) {
                     sendWarning = true;
                 }
                 break;
             case FAILURE:
-                if (processInstance.getState().isFailure()) {
+                if (workflowInstance.getState().isFailure()) {
                     sendWarning = true;
                 }
                 break;
@@ -304,25 +304,25 @@ public class ProcessAlertManager {
     /**
      * Send a close alert event, if the processInstance has sent alert before, then will insert a closed event.
      *
-     * @param processInstance success process instance
+     * @param workflowInstance success process instance
      */
-    public void closeAlert(ProcessInstance processInstance) {
+    public void closeAlert(WorkflowInstance workflowInstance) {
         if (!PropertyUtils.getBoolean(Constants.AUTO_CLOSE_ALERT, false)) {
             return;
         }
-        List<Alert> alerts = alertDao.listAlerts(processInstance.getId());
+        List<Alert> alerts = alertDao.listAlerts(workflowInstance.getId());
         if (CollectionUtils.isEmpty(alerts)) {
             // no need to close alert
             return;
         }
 
         Alert alert = new Alert();
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setUpdateTime(new Date());
         alert.setCreateTime(new Date());
-        alert.setProjectCode(processInstance.getProcessDefinition().getProjectCode());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
+        alert.setProjectCode(workflowInstance.getWorkflowDefinition().getProjectCode());
+        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.CLOSE_ALERT);
         alertDao.addAlert(alert);
     }
@@ -330,29 +330,29 @@ public class ProcessAlertManager {
     /**
      * send process timeout alert
      *
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @param projectUser     projectUser
      */
-    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
-        alertDao.sendProcessTimeoutAlert(processInstance, projectUser);
+    public void sendProcessTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
+        alertDao.sendProcessTimeoutAlert(workflowInstance, projectUser);
     }
 
     /**
      * send data quality task alert
      */
-    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result, ProcessInstance processInstance) {
+    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result, WorkflowInstance workflowInstance) {
         Alert alert = new Alert();
         String state = DqTaskState.of(result.getState()).getDescription();
         alert.setTitle("DataQualityResult [" + result.getTaskName() + "] " + state);
         String content = getDataQualityAlterContent(result);
         alert.setContent(content);
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alert.setProjectCode(result.getProjectCode());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
+        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(workflowInstance.getId());
         // might need to change to data quality status
-        alert.setAlertType(processInstance.getState().isSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
+        alert.setAlertType(workflowInstance.getState().isSuccess() ? AlertType.PROCESS_INSTANCE_SUCCESS
                 : AlertType.PROCESS_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
     }
@@ -360,15 +360,15 @@ public class ProcessAlertManager {
     /**
      * send data quality task error alert
      */
-    public void sendTaskErrorAlert(TaskInstance taskInstance, ProcessInstance processInstance) {
+    public void sendTaskErrorAlert(TaskInstance taskInstance, WorkflowInstance workflowInstance) {
         Alert alert = new Alert();
         alert.setTitle("Task [" + taskInstance.getName() + "] Failure Warning");
         String content = getTaskAlterContent(taskInstance);
         alert.setContent(content);
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
+        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.TASK_FAILURE);
         alertDao.addAlert(alert);
     }
@@ -428,28 +428,28 @@ public class ProcessAlertManager {
         return JSONUtils.toJsonString(content);
     }
 
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance,
+    public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,
                                      TaskInstance taskInstance,
                                      ProjectUser projectUser) {
-        alertDao.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
+        alertDao.sendTaskTimeoutAlert(workflowInstance, taskInstance, projectUser);
     }
 
     /**
      *
      * check node type and process blocking flag, then insert a block record into db
      *
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @param projectUser the project owner
      */
-    public void sendProcessBlockingAlert(ProcessInstance processInstance,
+    public void sendProcessBlockingAlert(WorkflowInstance workflowInstance,
                                          ProjectUser projectUser) {
         Alert alert = new Alert();
-        String cmdName = getCommandCnName(processInstance.getCommandType());
-        List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
+        String cmdName = getCommandCnName(workflowInstance.getCommandType());
+        List<WorkflowAlertContent> blockingNodeList = new ArrayList<>(1);
 
-        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
+        WorkflowDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
+                        workflowInstance.getProcessDefinitionVersion());
 
         String modifyBy = "";
         if (processDefinitionLog != null) {
@@ -457,29 +457,29 @@ public class ProcessAlertManager {
             modifyBy = operator == null ? "" : operator.getUserName();
         }
 
-        ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
+        WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
                 .owner(projectUser.getUserName())
-                .processId(processInstance.getId())
-                .processName(processInstance.getName())
-                .processType(processInstance.getCommandType())
-                .processState(processInstance.getState())
+                .processId(workflowInstance.getId())
+                .processName(workflowInstance.getName())
+                .processType(workflowInstance.getCommandType())
+                .processState(workflowInstance.getState())
                 .modifyBy(modifyBy)
-                .runTimes(processInstance.getRunTimes())
-                .processStartTime(processInstance.getStartTime())
-                .processEndTime(processInstance.getEndTime())
-                .processHost(processInstance.getHost())
+                .runTimes(workflowInstance.getRunTimes())
+                .processStartTime(workflowInstance.getStartTime())
+                .processEndTime(workflowInstance.getEndTime())
+                .processHost(workflowInstance.getHost())
                 .build();
-        blockingNodeList.add(processAlertContent);
+        blockingNodeList.add(workflowAlertContent);
         String content = JSONUtils.toJsonString(blockingNodeList);
         alert.setTitle(cmdName + " Blocked");
         alert.setContent(content);
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alert.setProjectCode(projectUser.getProjectCode());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
+        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
+        alert.setProcessInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.PROCESS_INSTANCE_BLOCKED);
         alertDao.addAlert(alert);
     }

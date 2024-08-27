@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
  * Process Instance Map Dao implementation
  */
 @Repository
-public class ProcessInstanceMapDaoImpl extends BaseDao<ProcessInstanceMap, ProcessInstanceMapMapper>
+public class ProcessInstanceMapDaoImpl extends BaseDao<WorkflowInstanceRelation, ProcessInstanceMapMapper>
         implements
             ProcessInstanceMapDao {
 
@@ -41,7 +41,7 @@ public class ProcessInstanceMapDaoImpl extends BaseDao<ProcessInstanceMap, Proce
     }
 
     @Override
-    public ProcessInstanceMap queryWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId) {
+    public WorkflowInstanceRelation queryWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId) {
         return mybatisMapper.queryByParentId(parentWorkProcessId, parentTaskId);
     }
 

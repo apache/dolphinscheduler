@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -121,7 +121,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     @Test
     public void testCreateSchedulesV2() {
         Project project = this.getProject();
-        ProcessDefinition processDefinition = this.getProcessDefinition();
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
         Schedule schedule = this.getSchedule();
 
         ScheduleCreateRequest scheduleCreateRequest = new ScheduleCreateRequest();
@@ -135,7 +135,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // error project permissions
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, project, null);
@@ -396,14 +396,14 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         return project;
     }
 
-    private ProcessDefinition getProcessDefinition() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setName(processDefinitionName);
-        processDefinition.setCode(processDefinitionCode);
-        processDefinition.setProjectCode(projectCode);
-        processDefinition.setVersion(processDefinitionVersion);
-        processDefinition.setUserId(userId);
-        return processDefinition;
+    private WorkflowDefinition getProcessDefinition() {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setName(processDefinitionName);
+        workflowDefinition.setCode(processDefinitionCode);
+        workflowDefinition.setProjectCode(projectCode);
+        workflowDefinition.setVersion(processDefinitionVersion);
+        workflowDefinition.setUserId(userId);
+        return workflowDefinition;
     }
 
     private Schedule getSchedule() {

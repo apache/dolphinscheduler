@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -53,8 +53,8 @@ public interface ProcessTaskRelationService {
      * @param taskRelationCreateRequest project code
      * @return ProcessTaskRelation object
      */
-    ProcessTaskRelation createProcessTaskRelationV2(User loginUser,
-                                                    TaskRelationCreateRequest taskRelationCreateRequest);
+    WorkflowTaskRelation createProcessTaskRelationV2(User loginUser,
+                                                     TaskRelationCreateRequest taskRelationCreateRequest);
 
     /**
      * delete process task relation
@@ -89,10 +89,10 @@ public interface ProcessTaskRelationService {
      * @param needSyncDag needSyncDag
      * @param taskRelationUpdateUpstreamRequest relation downstream code
      */
-    List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
-                                                                      long taskCode,
-                                                                      Boolean needSyncDag,
-                                                                      TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
+    List<WorkflowTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
+                                                                       long taskCode,
+                                                                       Boolean needSyncDag,
+                                                                       TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
 
     /**
      * delete task upstream relation
@@ -159,7 +159,7 @@ public interface ProcessTaskRelationService {
     Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode,
                                    long postTaskCode);
 
-    List<ProcessTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
+    List<WorkflowTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

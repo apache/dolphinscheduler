@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.tools.lineage;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessTaskLineageDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
@@ -47,15 +47,15 @@ public class MigrateLineageService {
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private ProcessTaskLineageDao processTaskLineageDao;
+    private WorkflowTaskLineageDao workflowTaskLineageDao;
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
     public void migrateLineageOnce() {
         try {
-            List<ProcessTaskLineage> processTaskLineageList = getAllProcessLineages();
-            int insertResult = processTaskLineageDao.batchInsert(processTaskLineageList);
+            List<WorkflowTaskLineage> workflowTaskLineageList = getAllProcessLineages();
+            int insertResult = workflowTaskLineageDao.batchInsert(workflowTaskLineageList);
             if (insertResult > 0) {
                 log.info("Migrate lineage successfully, insert count: {}", insertResult);
             } else {
@@ -66,33 +66,33 @@ public class MigrateLineageService {
         }
     }
 
-    private List<ProcessTaskLineage> getAllProcessLineages() {
+    private List<WorkflowTaskLineage> getAllProcessLineages() {
         List<TaskDefinition> taskDefinitionList =
                 taskDefinitionMapper.queryDefinitionsByTaskType(DependentLogicTaskChannelFactory.NAME);
-        List<ProcessTaskRelation> processTaskRelationList =
+        List<WorkflowTaskRelation> workflowTaskRelationList =
                 processTaskRelationMapper.queryByTaskCodes(taskDefinitionList.stream()
                         .map(TaskDefinition::getCode).toArray(Long[]::new));
-        List<ProcessTaskLineage> processTaskLineageList = new ArrayList<>();
+        List<WorkflowTaskLineage> workflowTaskLineageList = new ArrayList<>();
 
         for (TaskDefinition taskDefinition : taskDefinitionList) {
-            parseDependentTaskParams(taskDefinition, processTaskLineageList);
+            parseDependentTaskParams(taskDefinition, workflowTaskLineageList);
 
-            for (ProcessTaskLineage processTaskLineage : processTaskLineageList) {
-                processTaskRelationList.stream()
+            for (WorkflowTaskLineage workflowTaskLineage : workflowTaskLineageList) {
+                workflowTaskRelationList.stream()
                         .filter(processTaskRelation -> processTaskRelation.getPreTaskCode() == taskDefinition.getCode()
                                 || processTaskRelation.getPostTaskCode() == taskDefinition.getCode())
                         .findFirst()
                         .ifPresent(processTaskRelation -> {
-                            processTaskLineage.setProcessDefinitionCode(processTaskRelation.getProcessDefinitionCode());
-                            processTaskLineage
-                                    .setProcessDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
+                            workflowTaskLineage.setWorkflowDefinitionCode(processTaskRelation.getProcessDefinitionCode());
+                            workflowTaskLineage
+                                    .setWorkflowDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
                         });
             }
         }
-        return processTaskLineageList;
+        return workflowTaskLineageList;
     }
 
-    private void parseDependentTaskParams(TaskDefinition taskDefinition, List<ProcessTaskLineage> taskLineageList) {
+    private void parseDependentTaskParams(TaskDefinition taskDefinition, List<WorkflowTaskLineage> taskLineageList) {
         DependentParameters dependentParameters =
                 JSONUtils.parseObject(taskDefinition.getTaskParams(), DependentParameters.class);
         if (dependentParameters != null) {
@@ -102,11 +102,11 @@ public class MigrateLineageService {
                 for (DependentTaskModel taskModel : dependTaskList) {
                     List<DependentItem> dependItemList = taskModel.getDependItemList();
                     for (DependentItem dependentItem : dependItemList) {
-                        ProcessTaskLineage processTaskLineage = new ProcessTaskLineage();
-                        processTaskLineage.setDeptProjectCode(dependentItem.getProjectCode());
-                        processTaskLineage.setDeptProcessDefinitionCode(dependentItem.getDefinitionCode());
-                        processTaskLineage.setDeptTaskDefinitionCode(dependentItem.getDepTaskCode());
-                        taskLineageList.add(processTaskLineage);
+                        WorkflowTaskLineage workflowTaskLineage = new WorkflowTaskLineage();
+                        workflowTaskLineage.setDeptProjectCode(dependentItem.getProjectCode());
+                        workflowTaskLineage.setDeptWorkflowDefinitionCode(dependentItem.getDefinitionCode());
+                        workflowTaskLineage.setDeptTaskDefinitionCode(dependentItem.getDepTaskCode());
+                        taskLineageList.add(workflowTaskLineage);
                     }
                 }
             }

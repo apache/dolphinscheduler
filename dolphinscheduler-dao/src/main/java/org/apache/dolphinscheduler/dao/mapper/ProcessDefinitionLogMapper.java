@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -34,7 +34,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * process definition log mapper interface
  */
 @CacheConfig(cacheNames = "processDefinition", keyGenerator = "cacheKeyGenerator")
-public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinitionLog> {
+public interface ProcessDefinitionLogMapper extends BaseMapper<WorkflowDefinitionLog> {
 
     /**
      * query the certain process definition version info by process definition code and version number
@@ -44,7 +44,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @return the process definition version info
      */
     @Cacheable(sync = true)
-    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
+    WorkflowDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
      * query process definition log by name
@@ -53,8 +53,8 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param name process definition name
      * @return process definition log list
      */
-    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode,
-                                                     @Param("name") String name);
+    List<WorkflowDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode,
+                                                      @Param("name") String name);
 
     /**
      * query process definition log list
@@ -62,7 +62,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param code process definition code
      * @return process definition log list
      */
-    List<ProcessDefinitionLog> queryByDefinitionCode(@Param("code") long code);
+    List<WorkflowDefinitionLog> queryByDefinitionCode(@Param("code") long code);
 
     /**
      * query max version for definition
@@ -72,7 +72,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
     /**
      * query max version definition log
      */
-    ProcessDefinitionLog queryMaxVersionDefinitionLog(@Param("code") long code);
+    WorkflowDefinitionLog queryMaxVersionDefinitionLog(@Param("code") long code);
 
     /**
      * query the paging process definition version list by pagination info
@@ -82,9 +82,9 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param projectCode project code
      * @return the paging process definition version list
      */
-    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
-                                                                     @Param("code") long code,
-                                                                     @Param("projectCode") long projectCode);
+    IPage<WorkflowDefinitionLog> queryProcessDefinitionVersionsPaging(Page<WorkflowDefinitionLog> page,
+                                                                      @Param("code") long code,
+                                                                      @Param("projectCode") long projectCode);
 
     /**
      * delete the certain process definition version by process definition id and version number

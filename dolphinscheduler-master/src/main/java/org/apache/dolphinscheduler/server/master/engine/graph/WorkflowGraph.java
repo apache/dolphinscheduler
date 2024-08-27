@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.graph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import java.util.ArrayList;
@@ -40,9 +40,9 @@ public class WorkflowGraph implements IWorkflowGraph {
 
     private final Map<String, List<String>> successors;
 
-    public WorkflowGraph(List<ProcessTaskRelation> processTaskRelations, List<TaskDefinition> taskDefinitions) {
+    public WorkflowGraph(List<WorkflowTaskRelation> workflowTaskRelations, List<TaskDefinition> taskDefinitions) {
         checkNotNull(taskDefinitions, "taskDefinitions can not be null");
-        checkNotNull(processTaskRelations, "taskDefinitions can not be null");
+        checkNotNull(workflowTaskRelations, "taskDefinitions can not be null");
         this.predecessors = new HashMap<>();
         this.successors = new HashMap<>();
 
@@ -54,7 +54,7 @@ public class WorkflowGraph implements IWorkflowGraph {
                 .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
 
         addTaskNodes(taskDefinitions);
-        addTaskEdge(processTaskRelations);
+        addTaskEdge(workflowTaskRelations);
     }
 
     @Override
@@ -112,10 +112,10 @@ public class WorkflowGraph implements IWorkflowGraph {
                 });
     }
 
-    private void addTaskEdge(List<ProcessTaskRelation> processTaskRelations) {
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            long pre = processTaskRelation.getPreTaskCode();
-            long post = processTaskRelation.getPostTaskCode();
+    private void addTaskEdge(List<WorkflowTaskRelation> workflowTaskRelations) {
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelations) {
+            long pre = workflowTaskRelation.getPreTaskCode();
+            long post = workflowTaskRelation.getPostTaskCode();
             if (pre > 0 && post > 0) {
 
                 if (!taskDefinitionCodeMap.containsKey(pre)) {

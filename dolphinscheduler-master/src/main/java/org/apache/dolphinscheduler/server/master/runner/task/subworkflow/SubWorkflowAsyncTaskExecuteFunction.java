@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
@@ -34,7 +34,7 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
 
     private final TaskExecutionContext taskExecutionContext;
     private final ProcessInstanceDao processInstanceDao;
-    private ProcessInstance subWorkflowInstance;
+    private WorkflowInstance subWorkflowInstance;
 
     private SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
 

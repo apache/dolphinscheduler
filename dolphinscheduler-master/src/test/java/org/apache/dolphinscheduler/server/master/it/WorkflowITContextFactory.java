@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.it;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -95,13 +95,13 @@ public class WorkflowITContextFactory {
         }
     }
 
-    private void initializeWorkflowInstanceToDB(ProcessInstance workflowInstance) {
+    private void initializeWorkflowInstanceToDB(WorkflowInstance workflowInstance) {
         processInstanceDao.insert(workflowInstance);
     }
 
-    private void initializeWorkflowDefinitionToDB(final ProcessDefinition workflowDefinition) {
+    private void initializeWorkflowDefinitionToDB(final WorkflowDefinition workflowDefinition) {
         processDefinitionDao.insert(workflowDefinition);
-        final ProcessDefinitionLog workflowDefinitionLog = new ProcessDefinitionLog(workflowDefinition);
+        final WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
         workflowDefinitionLog.setOperator(workflowDefinition.getUserId());
         workflowDefinitionLog.setOperateTime(new Date());
         processDefinitionLogDao.insert(workflowDefinitionLog);
@@ -118,11 +118,11 @@ public class WorkflowITContextFactory {
         }
     }
 
-    private void initializeTaskRelationsToDB(final List<ProcessTaskRelation> taskRelations) {
-        for (final ProcessTaskRelation taskRelation : taskRelations) {
+    private void initializeTaskRelationsToDB(final List<WorkflowTaskRelation> taskRelations) {
+        for (final WorkflowTaskRelation taskRelation : taskRelations) {
             processTaskRelationMapper.insert(taskRelation);
 
-            final ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(taskRelation);
+            final WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog(taskRelation);
             processTaskRelationLog.setOperateTime(new Date());
             processTaskRelationLogDao.insert(processTaskRelationLog);
         }

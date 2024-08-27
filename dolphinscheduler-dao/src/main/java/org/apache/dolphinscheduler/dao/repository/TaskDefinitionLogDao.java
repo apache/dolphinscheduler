@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public interface TaskDefinitionLogDao extends IDao<TaskDefinitionLog> {
     List<TaskDefinitionLog> queryByWorkflowDefinitionCodeAndVersion(Long workflowDefinitionCode,
                                                                     Integer workflowDefinitionVersion);
 
-    List<TaskDefinitionLog> queryTaskDefineLogList(List<ProcessTaskRelation> processTaskRelations);
+    List<TaskDefinitionLog> queryTaskDefineLogList(List<WorkflowTaskRelation> workflowTaskRelations);
 
     void deleteByTaskDefinitionCodes(Set<Long> taskDefinitionCodes);
 }

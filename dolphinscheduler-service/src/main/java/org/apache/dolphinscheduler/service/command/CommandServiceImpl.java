@@ -26,9 +26,9 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
@@ -135,9 +135,9 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public Command createSubProcessCommand(ProcessInstance parentProcessInstance, ProcessInstance childInstance,
-                                           ProcessInstanceMap instanceMap, TaskInstance task) {
-        CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
+    public Command createSubProcessCommand(WorkflowInstance parentWorkflowInstance, WorkflowInstance childInstance,
+                                           WorkflowInstanceRelation instanceMap, TaskInstance task) {
+        CommandType commandType = getSubCommandType(parentWorkflowInstance, childInstance);
         Map<String, Object> subProcessParam = JSONUtils.toMap(task.getTaskParams(), String.class, Object.class);
         long childDefineCode = 0L;
         if (subProcessParam.containsKey(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
@@ -150,7 +150,7 @@ public class CommandServiceImpl implements CommandService {
                 return null;
             }
         }
-        ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
+        WorkflowDefinition subWorkflowDefinition = processDefineMapper.queryByCode(childDefineCode);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
@@ -164,26 +164,26 @@ public class CommandServiceImpl implements CommandService {
                 fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
             }
         }
-        String processParam = ParamUtils.getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);
+        String processParam = ParamUtils.getSubWorkFlowParam(instanceMap, parentWorkflowInstance, fatherParams);
         int subProcessInstanceId =
                 childInstance == null ? 0 : (childInstance.getId() == null ? 0 : childInstance.getId());
         return new Command(
                 commandType,
                 TaskDependType.TASK_POST,
-                parentProcessInstance.getFailureStrategy(),
-                parentProcessInstance.getExecutorId(),
-                subProcessDefinition.getCode(),
+                parentWorkflowInstance.getFailureStrategy(),
+                parentWorkflowInstance.getExecutorId(),
+                subWorkflowDefinition.getCode(),
                 processParam,
-                parentProcessInstance.getWarningType(),
-                parentProcessInstance.getWarningGroupId(),
-                parentProcessInstance.getScheduleTime(),
+                parentWorkflowInstance.getWarningType(),
+                parentWorkflowInstance.getWarningGroupId(),
+                parentWorkflowInstance.getScheduleTime(),
                 task.getWorkerGroup(),
                 task.getEnvironmentCode(),
-                parentProcessInstance.getProcessInstancePriority(),
-                parentProcessInstance.getDryRun(),
+                parentWorkflowInstance.getProcessInstancePriority(),
+                parentWorkflowInstance.getDryRun(),
                 subProcessInstanceId,
-                subProcessDefinition.getVersion(),
-                parentProcessInstance.getTestFlag());
+                subWorkflowDefinition.getVersion(),
+                parentWorkflowInstance.getTestFlag());
     }
 
     /**
@@ -191,10 +191,10 @@ public class CommandServiceImpl implements CommandService {
      * child instance exist: child command = fatherCommand
      * child instance not exists: child command = fatherCommand[0]
      */
-    private CommandType getSubCommandType(ProcessInstance parentProcessInstance, ProcessInstance childInstance) {
-        CommandType commandType = parentProcessInstance.getCommandType();
+    private CommandType getSubCommandType(WorkflowInstance parentWorkflowInstance, WorkflowInstance childInstance) {
+        CommandType commandType = parentWorkflowInstance.getCommandType();
         if (childInstance == null) {
-            String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
+            String fatherHistoryCommand = parentWorkflowInstance.getHistoryCmd();
             commandType = CommandType.valueOf(fatherHistoryCommand.split(Constants.COMMA)[0]);
         }
         return commandType;

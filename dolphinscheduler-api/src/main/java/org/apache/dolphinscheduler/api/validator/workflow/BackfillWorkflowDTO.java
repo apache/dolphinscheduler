@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
@@ -46,7 +46,7 @@ public class BackfillWorkflowDTO {
 
     private User loginUser;
 
-    private ProcessDefinition workflowDefinition;
+    private WorkflowDefinition workflowDefinition;
 
     private List<Long> startNodes;
 

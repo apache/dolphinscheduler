@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -448,32 +448,32 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
                     "The TaskInstance: " + taskInstance.getId() + " state is " + taskInstance.getState()
                             + ", no need to notify");
         }
-        ProcessInstance processInstance = processInstanceDao.queryById(taskInstance.getProcessInstanceId());
-        if (processInstance == null) {
+        WorkflowInstance workflowInstance = processInstanceDao.queryById(taskInstance.getProcessInstanceId());
+        if (workflowInstance == null) {
             throw new UnsupportedOperationException(
                     "The WorkflowInstance: " + taskInstance.getProcessInstanceId()
                             + " is not exist, no need to notify");
         }
-        if (processInstance.getState() != WorkflowExecutionStatus.RUNNING_EXECUTION) {
+        if (workflowInstance.getState() != WorkflowExecutionStatus.RUNNING_EXECUTION) {
             throw new UnsupportedOperationException(
-                    "The WorkflowInstance: " + processInstance.getId() + " state is " + processInstance.getState()
+                    "The WorkflowInstance: " + workflowInstance.getId() + " state is " + workflowInstance.getState()
                             + ", no need to notify");
         }
-        if (processInstance.getHost() == null || Constants.NULL.equals(processInstance.getHost())) {
+        if (workflowInstance.getHost() == null || Constants.NULL.equals(workflowInstance.getHost())) {
             throw new UnsupportedOperationException(
-                    "WorkflowInstance host is null, maybe it is in failover: " + processInstance);
+                    "WorkflowInstance host is null, maybe it is in failover: " + workflowInstance);
         }
 
         TaskGroupSlotAcquireSuccessNotifyRequest taskGroupSlotAcquireSuccessNotifyRequest =
                 TaskGroupSlotAcquireSuccessNotifyRequest.builder()
-                        .workflowInstanceId(processInstance.getId())
+                        .workflowInstanceId(workflowInstance.getId())
                         .taskInstanceId(taskInstance.getId())
                         .build();
 
         TaskGroupSlotAcquireSuccessNotifyResponse taskGroupSlotAcquireSuccessNotifyResponse =
                 Clients
                         .withService(ITaskInstanceController.class)
-                        .withHost(processInstance.getHost())
+                        .withHost(workflowInstance.getHost())
                         .notifyTaskGroupSlotAcquireSuccess(taskGroupSlotAcquireSuccessNotifyRequest);
         if (!taskGroupSlotAcquireSuccessNotifyResponse.isSuccess()) {
             throw new UnsupportedOperationException(

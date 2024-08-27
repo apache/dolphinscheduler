@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 
 import java.util.List;
 
 /**
  * Process Instance Map DAO
  */
-public interface ProcessInstanceMapDao extends IDao<ProcessInstanceMap> {
+public interface ProcessInstanceMapDao extends IDao<WorkflowInstanceRelation> {
 
     /**
      * find work process map by parent process id and parent task id.
@@ -32,7 +32,7 @@ public interface ProcessInstanceMapDao extends IDao<ProcessInstanceMap> {
      * @param parentTaskId        parentTaskId
      * @return process instance map
      */
-    ProcessInstanceMap queryWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId);
+    WorkflowInstanceRelation queryWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId);
 
     List<Integer> querySubWorkflowInstanceIds(int workflowInstanceId);
 

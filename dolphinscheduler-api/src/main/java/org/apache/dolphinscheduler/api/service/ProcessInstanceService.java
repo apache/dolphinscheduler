@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQuer
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ public interface ProcessInstanceService {
                                                  long projectCode,
                                                  Integer processId);
 
-    ProcessInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer processId);
+    WorkflowInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer processId);
 
     /**
      * query process instance by id
@@ -85,18 +85,18 @@ public interface ProcessInstanceService {
      * @param otherParamsJson   otherParamsJson handle other params
      * @return process instance list
      */
-    Result<PageInfo<ProcessInstance>> queryProcessInstanceList(User loginUser,
-                                                               long projectCode,
-                                                               long processDefineCode,
-                                                               String startDate,
-                                                               String endDate,
-                                                               String searchVal,
-                                                               String executorName,
-                                                               WorkflowExecutionStatus stateType,
-                                                               String host,
-                                                               String otherParamsJson,
-                                                               Integer pageNo,
-                                                               Integer pageSize);
+    Result<PageInfo<WorkflowInstance>> queryProcessInstanceList(User loginUser,
+                                                                long projectCode,
+                                                                long processDefineCode,
+                                                                String startDate,
+                                                                String endDate,
+                                                                String searchVal,
+                                                                String executorName,
+                                                                WorkflowExecutionStatus stateType,
+                                                                String host,
+                                                                String otherParamsJson,
+                                                                Integer pageNo,
+                                                                Integer pageSize);
 
     /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
@@ -210,8 +210,8 @@ public interface ProcessInstanceService {
      * @param states                states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode,
-                                                            int[] states);
+    List<WorkflowInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode,
+                                                             int[] states);
 
     /**
      * query process instance by processDefinitionCode and stateArray
@@ -221,9 +221,9 @@ public interface ProcessInstanceService {
      * @param states                    states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                           int workflowDefinitionVersion,
-                                                           int[] states);
+    List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                            int workflowDefinitionVersion,
+                                                            int[] states);
 
     /**
      * query process instance by processDefinitionCode
@@ -232,8 +232,8 @@ public interface ProcessInstanceService {
      * @param size                  size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,
-                                                   int size);
+    List<WorkflowInstance> queryByProcessDefineCode(Long processDefinitionCode,
+                                                    int size);
 
     /**
      * query process instance list bt trigger code

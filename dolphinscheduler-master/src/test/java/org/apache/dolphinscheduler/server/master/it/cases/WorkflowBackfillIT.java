@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.it.cases;
 
 import static org.awaitility.Awaitility.await;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
@@ -62,7 +62,7 @@ public class WorkflowBackfillIT extends AbstractMasterIntegrationTest {
     public void testSerialBackfillWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/backfill/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
                 .backfillTimeList(
@@ -81,7 +81,7 @@ public class WorkflowBackfillIT extends AbstractMasterIntegrationTest {
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    final List<ProcessInstance> workflowInstances = repository.queryWorkflowInstance(workflow);
+                    final List<WorkflowInstance> workflowInstances = repository.queryWorkflowInstance(workflow);
                     Assertions
                             .assertThat(workflowInstances)
                             .hasSize(4);

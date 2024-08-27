@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 /**
  * process instance map mapper interface
  */
-public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap> {
+public interface ProcessInstanceMapMapper extends BaseMapper<WorkflowInstanceRelation> {
 
     /**
      * query process instance by parentId
@@ -36,15 +36,15 @@ public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap>
      * @param parentTaskId parentTaskId
      * @return process instance map
      */
-    ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId,
-                                       @Param("parentTaskId") int parentTaskId);
+    WorkflowInstanceRelation queryByParentId(@Param("parentProcessId") int parentProcessId,
+                                             @Param("parentTaskId") int parentTaskId);
 
     /**
      * query by sub process id
      * @param subProcessId subProcessId
      * @return process instance map
      */
-    ProcessInstanceMap queryBySubProcessId(@Param("subProcessId") Integer subProcessId);
+    WorkflowInstanceRelation queryBySubProcessId(@Param("subProcessId") Integer subProcessId);
 
     /**
      * delete by parent process id

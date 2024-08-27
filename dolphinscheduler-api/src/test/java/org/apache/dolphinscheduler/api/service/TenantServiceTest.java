@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -291,11 +291,11 @@ public class TenantServiceTest {
         return userList;
     }
 
-    private List<ProcessInstance> getInstanceList() {
-        List<ProcessInstance> processInstances = new ArrayList<>();
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstances.add(processInstance);
-        return processInstances;
+    private List<WorkflowInstance> getInstanceList() {
+        List<WorkflowInstance> workflowInstances = new ArrayList<>();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstances.add(workflowInstance);
+        return workflowInstances;
     }
 
     private List<Schedule> getScheduleList() {

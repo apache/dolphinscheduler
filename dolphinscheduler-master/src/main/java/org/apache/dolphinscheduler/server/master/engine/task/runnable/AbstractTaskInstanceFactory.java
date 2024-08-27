@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
 import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
@@ -101,7 +101,7 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setTaskExecuteType(taskDefinition.getTaskExecuteType());
     }
 
-    protected void injectMetadataFromWorkflowInstance(TaskInstance taskInstance, ProcessInstance workflowInstance) {
+    protected void injectMetadataFromWorkflowInstance(TaskInstance taskInstance, WorkflowInstance workflowInstance) {
         taskInstance.setProcessInstanceId(workflowInstance.getId());
         taskInstance.setProcessInstanceName(workflowInstance.getName());
         taskInstance.setProjectCode(workflowInstance.getProjectCode());

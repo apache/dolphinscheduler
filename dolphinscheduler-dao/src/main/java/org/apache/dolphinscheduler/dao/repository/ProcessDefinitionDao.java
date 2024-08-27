@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public interface ProcessDefinitionDao extends IDao<ProcessDefinition> {
+public interface ProcessDefinitionDao extends IDao<WorkflowDefinition> {
 
     /**
      * Listing the process definition belongs to the given userId and projectCode.
@@ -34,16 +34,16 @@ public interface ProcessDefinitionDao extends IDao<ProcessDefinition> {
      */
     // todo: Right now this method will use fuzzy query at searchVal, this will be very slow if there are exist a lot of
     // processDefinition belongs to the target user/project.
-    PageListingResult<ProcessDefinition> listingProcessDefinition(
+    PageListingResult<WorkflowDefinition> listingProcessDefinition(
                                                                   int pageNumber,
                                                                   int pageSize,
                                                                   @Nullable String searchVal,
                                                                   int userId,
                                                                   long projectCode);
 
-    Optional<ProcessDefinition> queryByCode(long code);
+    Optional<WorkflowDefinition> queryByCode(long code);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 
-    List<ProcessDefinition> queryByCodes(Collection<Long> processDefinitionCodes);
+    List<WorkflowDefinition> queryByCodes(Collection<Long> processDefinitionCodes);
 }

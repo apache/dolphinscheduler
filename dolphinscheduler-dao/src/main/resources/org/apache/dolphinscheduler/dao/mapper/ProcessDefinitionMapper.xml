@@ -23,7 +23,7 @@
         global_params, flag, locations, warning_group_id, create_time, timeout, update_time,execution_type
     </sql>
 
-    <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
         pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,pd.execution_type
         from t_ds_process_definition pd
@@ -36,13 +36,13 @@
         where code = #{code}
     </delete>
 
-    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition
         where code = #{code}
     </select>
-    <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition
@@ -55,7 +55,7 @@
         </if>
     </select>
 
-    <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, p.id as project_id, pd.user_id, pd.description,
         pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,
         u.user_name,p.name as project_name,pd.execution_type
@@ -65,7 +65,7 @@
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>
-    <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         SELECT
         <include refid="baseSql"/>
         FROM t_ds_process_definition
@@ -82,8 +82,8 @@
         order by update_time desc, id asc
     </select>
     <select id="filterProcessDefinition"
-            parameterType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
-            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
+            parameterType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
+            resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
     >
         SELECT
         <include refid="baseSql"/>
@@ -102,7 +102,7 @@
         order by update_time desc, id asc
     </select>
 
-    <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition
@@ -122,7 +122,7 @@
             </foreach>
         </if>
     </select>
-    <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition
@@ -166,7 +166,7 @@
         group by td.user_id,tu.user_name
     </select>
 
-    <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+    <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         SELECT
             pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
             pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout,
@@ -195,7 +195,7 @@
             </foreach>
     </select>
 
-    <select id="queryProjectProcessDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount">
+    <select id="queryProjectProcessDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount">
         select
             project_code as projectCode
             ,count(*) as count

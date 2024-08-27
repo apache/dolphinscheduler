@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
@@ -238,13 +238,13 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
-        processInstances.add(processInstance);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
+        workflowInstances.add(workflowInstance);
         Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
-                .thenReturn(processInstances);
+                .thenReturn(workflowInstances);
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),

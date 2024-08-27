@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
@@ -65,8 +65,8 @@ public class ProcessAlertManagerTest {
     @Test
     public void sendWarningWorkerToleranceFaultTest() {
         // process instance
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setName("test");
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setName("test");
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setName("test-task-1");
@@ -75,7 +75,7 @@ public class ProcessAlertManagerTest {
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
 
-        processAlertManager.sendAlertWorkerToleranceFault(processInstance, taskInstanceList);
+        processAlertManager.sendAlertWorkerToleranceFault(workflowInstance, taskInstanceList);
     }
 
     /**
@@ -84,20 +84,20 @@ public class ProcessAlertManagerTest {
     @Test
     public void sendWarnningOfProcessInstanceTest() {
         // process instance
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setWarningType(WarningType.SUCCESS);
-        processInstance.setState(WorkflowExecutionStatus.SUCCESS);
-        processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
-        processInstance.setWarningGroupId(1);
-        processInstance.setProcessDefinitionCode(1L);
-        processInstance.setProcessDefinitionVersion(1);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setWarningType(WarningType.SUCCESS);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        workflowInstance.setCommandType(CommandType.COMPLEMENT_DATA);
+        workflowInstance.setWarningGroupId(1);
+        workflowInstance.setProcessDefinitionCode(1L);
+        workflowInstance.setProcessDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
         TaskInstance taskInstance = new TaskInstance();
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
 
-        processAlertManager.sendAlertProcessInstance(processInstance, taskInstanceList, projectUser);
+        processAlertManager.sendAlertProcessInstance(workflowInstance, taskInstanceList, projectUser);
     }
 
     /**
@@ -106,21 +106,21 @@ public class ProcessAlertManagerTest {
     @Test
     public void sendBlockingAlertTest() {
         // process instance
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        processInstance.setName("test-process-01");
-        processInstance.setCommandType(CommandType.START_PROCESS);
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstance.setRunTimes(0);
-        processInstance.setStartTime(new Date());
-        processInstance.setEndTime(new Date());
-        processInstance.setHost("127.0.0.1");
-        processInstance.setWarningGroupId(1);
-        processInstance.setProcessDefinitionCode(1L);
-        processInstance.setProcessDefinitionVersion(1);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setName("test-process-01");
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        workflowInstance.setRunTimes(0);
+        workflowInstance.setStartTime(new Date());
+        workflowInstance.setEndTime(new Date());
+        workflowInstance.setHost("127.0.0.1");
+        workflowInstance.setWarningGroupId(1);
+        workflowInstance.setProcessDefinitionCode(1L);
+        workflowInstance.setProcessDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
 
-        processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
+        processAlertManager.sendProcessBlockingAlert(workflowInstance, projectUser);
     }
 }

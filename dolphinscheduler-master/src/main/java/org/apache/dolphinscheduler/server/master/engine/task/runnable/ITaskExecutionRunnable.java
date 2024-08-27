@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -48,7 +48,7 @@ public interface ITaskExecutionRunnable
 
     IWorkflowExecutionGraph getWorkflowExecutionGraph();
 
-    ProcessInstance getWorkflowInstance();
+    WorkflowInstance getWorkflowInstance();
 
     TaskInstance getTaskInstance();
 

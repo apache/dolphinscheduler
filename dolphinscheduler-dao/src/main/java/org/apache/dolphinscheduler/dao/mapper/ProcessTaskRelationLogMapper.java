@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -29,7 +29,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 /**
  * process task relation log mapper interface
  */
-public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRelationLog> {
+public interface ProcessTaskRelationLogMapper extends BaseMapper<WorkflowTaskRelationLog> {
 
     /**
      * query process task relation log
@@ -38,8 +38,8 @@ public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRela
      * @param processVersion process version
      * @return process task relation log
      */
-    List<ProcessTaskRelationLog> queryByProcessCodeAndVersion(@Param("processCode") long processCode,
-                                                              @Param("processVersion") int processVersion);
+    List<WorkflowTaskRelationLog> queryByProcessCodeAndVersion(@Param("processCode") long processCode,
+                                                               @Param("processVersion") int processVersion);
 
     /**
      * batch insert process task relation
@@ -47,7 +47,7 @@ public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRela
      * @param taskRelationList taskRelationList
      * @return int
      */
-    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
+    int batchInsert(@Param("taskRelationList") List<WorkflowTaskRelationLog> taskRelationList);
 
     /**
      * delete process task relation log by processCode and version
@@ -65,17 +65,17 @@ public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRela
      * @param processTaskRelationLog  processTaskRelationLog
      * @return int
      */
-    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
+    int deleteRelation(@Param("processTaskRelationLog") WorkflowTaskRelationLog processTaskRelationLog);
 
     /**
      * query process task relation log
      *
-     * @param processTaskRelation processTaskRelation
+     * @param workflowTaskRelation processTaskRelation
      * @return process task relation log
      */
-    ProcessTaskRelationLog queryRelationLogByRelation(@Param("processTaskRelation") ProcessTaskRelation processTaskRelation);
+    WorkflowTaskRelationLog queryRelationLogByRelation(@Param("processTaskRelation") WorkflowTaskRelation workflowTaskRelation);
 
-    List<ProcessTaskRelationLog> queryByProcessCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
+    List<WorkflowTaskRelationLog> queryByProcessCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 
     void deleteByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 }

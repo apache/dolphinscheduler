@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -31,7 +31,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 /**
  * process task relation mapper interface
  */
-public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelation> {
+public interface ProcessTaskRelationMapper extends BaseMapper<WorkflowTaskRelation> {
 
     /**
      * process task relation by projectCode and processCode
@@ -39,12 +39,12 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return ProcessTaskRelation list
      */
-    List<ProcessTaskRelation> queryByProcessCode(@Param("processCode") long processCode);
+    List<WorkflowTaskRelation> queryByProcessCode(@Param("processCode") long processCode);
 
     /**
      * update
      */
-    int updateById(@Param("et") ProcessTaskRelation processTaskRelation);
+    int updateById(@Param("et") WorkflowTaskRelation workflowTaskRelation);
 
     /**
      * delete process task relation by processCode
@@ -61,7 +61,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCodes taskCode list
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryByTaskCodes(@Param("taskCodes") Long[] taskCodes);
+    List<WorkflowTaskRelation> queryByTaskCodes(@Param("taskCodes") Long[] taskCodes);
 
     /**
      * process task relation by taskCode
@@ -69,7 +69,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryByTaskCode(@Param("taskCode") long taskCode);
+    List<WorkflowTaskRelation> queryByTaskCode(@Param("taskCode") long taskCode);
 
     /**
      * batch insert process task relation
@@ -77,7 +77,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskRelationList taskRelationList
      * @return int
      */
-    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelation> taskRelationList);
+    int batchInsert(@Param("taskRelationList") List<WorkflowTaskRelation> taskRelationList);
 
     /**
      * query downstream process task relation by taskCode
@@ -85,7 +85,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryDownstreamByTaskCode(@Param("taskCode") long taskCode);
+    List<WorkflowTaskRelation> queryDownstreamByTaskCode(@Param("taskCode") long taskCode);
 
     /**
      * query upstream process task relation by taskCode
@@ -94,8 +94,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode,
-                                                  @Param("taskCode") long taskCode);
+    List<WorkflowTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode,
+                                                   @Param("taskCode") long taskCode);
 
     /**
      * query downstream process task relation by taskCode
@@ -104,8 +104,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param taskCode taskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode,
-                                                    @Param("taskCode") long taskCode);
+    List<WorkflowTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode,
+                                                     @Param("taskCode") long taskCode);
 
     /**
      * query task relation by codes
@@ -115,9 +115,9 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param preTaskCodes preTaskCode list
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode,
-                                                   @Param("taskCode") long taskCode,
-                                                   @Param("preTaskCodes") Long[] preTaskCodes);
+    List<WorkflowTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode,
+                                                    @Param("taskCode") long taskCode,
+                                                    @Param("preTaskCodes") Long[] preTaskCodes);
 
     /**
      * query process task relation by process definition code
@@ -126,8 +126,8 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processDefinitionVersion process definition version
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryProcessTaskRelationsByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode,
-                                                                               @Param("processDefinitionVersion") Integer processDefinitionVersion);
+    List<WorkflowTaskRelation> queryProcessTaskRelationsByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode,
+                                                                                @Param("processDefinitionVersion") Integer processDefinitionVersion);
 
     /**
      * count upstream by codes
@@ -144,10 +144,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
     /**
      * batch update process task relation pre task
      *
-     * @param processTaskRelationList process task relation list
+     * @param workflowTaskRelationList process task relation list
      * @return update num
      */
-    int batchUpdateProcessTaskRelationPreTask(@Param("processTaskRelationList") List<ProcessTaskRelation> processTaskRelationList);
+    int batchUpdateProcessTaskRelationPreTask(@Param("processTaskRelationList") List<WorkflowTaskRelation> workflowTaskRelationList);
 
     /**
      * query by code
@@ -158,10 +158,10 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param postTaskCode postTaskCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryByCode(@Param("projectCode") long projectCode,
-                                          @Param("processDefinitionCode") long processDefinitionCode,
-                                          @Param("preTaskCode") long preTaskCode,
-                                          @Param("postTaskCode") long postTaskCode);
+    List<WorkflowTaskRelation> queryByCode(@Param("projectCode") long projectCode,
+                                           @Param("processDefinitionCode") long processDefinitionCode,
+                                           @Param("preTaskCode") long preTaskCode,
+                                           @Param("postTaskCode") long postTaskCode);
 
     /**
      * delete process task relation
@@ -169,7 +169,7 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processTaskRelationLog processTaskRelationLog
      * @return int
      */
-    int deleteRelation(@Param("processTaskRelationLog") ProcessTaskRelationLog processTaskRelationLog);
+    int deleteRelation(@Param("processTaskRelationLog") WorkflowTaskRelationLog processTaskRelationLog);
 
     /**
      * count by code
@@ -190,25 +190,25 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processDefinitionCode
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
+    List<WorkflowTaskRelation> queryDownstreamByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
     /**
      * Filter process task relation
      *
      * @param page page
-     * @param processTaskRelation process definition object
+     * @param workflowTaskRelation process definition object
      * @return process task relation IPage
      */
-    IPage<ProcessTaskRelation> filterProcessTaskRelation(IPage<ProcessTaskRelation> page,
-                                                         @Param("relation") ProcessTaskRelation processTaskRelation);
+    IPage<WorkflowTaskRelation> filterProcessTaskRelation(IPage<WorkflowTaskRelation> page,
+                                                          @Param("relation") WorkflowTaskRelation workflowTaskRelation);
 
     /**
      * batch update process task relation version
      *
-     * @param processTaskRelationList process task relation list
+     * @param workflowTaskRelationList process task relation list
      * @return update num
      */
-    int updateProcessTaskRelationTaskVersion(@Param("processTaskRelation") ProcessTaskRelation processTaskRelationList);
+    int updateProcessTaskRelationTaskVersion(@Param("processTaskRelation") WorkflowTaskRelation workflowTaskRelationList);
 
     Long queryTaskCodeByTaskName(@Param("workflowCode") Long workflowCode,
                                  @Param("taskName") String taskName);
@@ -223,6 +223,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param postTaskVersion postTaskVersion
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryProcessTaskRelationByTaskCodeAndTaskVersion(@Param("taskCode") long taskCode,
-                                                                               @Param("postTaskVersion") long postTaskVersion);
+    List<WorkflowTaskRelation> queryProcessTaskRelationByTaskCodeAndTaskVersion(@Param("taskCode") long taskCode,
+                                                                                @Param("postTaskVersion") long postTaskVersion);
 }

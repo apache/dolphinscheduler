@@ -17,46 +17,46 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessTaskLineageMapper">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkflowTaskLineageMapper">
     <sql id="baseSql">
         id
-        , process_definition_code
-        , process_definition_version
+        , workflow_definition_code
+        , workflow_definition_version
         , task_definition_code
         , task_definition_version
         , dept_project_code
-        , dept_process_definition_code
+        , dept_workflow_definition_code
         , dept_task_definition_code
         , create_time
         , update_time
     </sql>
 
-    <delete id="batchDeleteByProcessDefinitionCode">
+    <delete id="batchDeleteByWorkflowDefinitionCode">
         delete from t_ds_process_task_lineage
-        where process_definition_code in
-        <foreach collection="processDefinitionCodes" index="index" item="i" open="(" separator="," close=")">
+        where workflow_definition_code in
+        <foreach collection="workflowDefinitionCodes" index="index" item="i" open="(" separator="," close=")">
             #{i}
         </foreach>
     </delete>
 
     <insert id="batchInsert">
-        insert into t_ds_process_task_lineage (process_definition_code, process_definition_version, task_definition_code,
-        task_definition_version, dept_project_code, dept_process_definition_code, dept_task_definition_code)
+        insert into t_ds_process_task_lineage (workflow_definition_code, workflow_definition_version, task_definition_code,
+        task_definition_version, dept_project_code, dept_workflow_definition_code, dept_task_definition_code)
         values
-        <foreach collection="processTaskLineages" item="processTaskLineage" separator=",">
-            (#{processTaskLineage.processDefinitionCode},#{processTaskLineage.processDefinitionVersion},
-            #{processTaskLineage.taskDefinitionCode},#{processTaskLineage.taskDefinitionVersion},
-            #{processTaskLineage.deptProjectCode},#{processTaskLineage.deptProcessDefinitionCode},
-            #{processTaskLineage.deptTaskDefinitionCode})
+        <foreach collection="workflowTaskLineages" item="workflowTaskLineage" separator=",">
+            (#{workflowTaskLineage.workflowDefinitionCode},#{workflowTaskLineage.workflowDefinitionVersion},
+            #{workflowTaskLineage.taskDefinitionCode},#{workflowTaskLineage.taskDefinitionVersion},
+            #{workflowTaskLineage.deptProjectCode},#{workflowTaskLineage.deptWorkflowDefinitionCode},
+            #{workflowTaskLineage.deptTaskDefinitionCode})
         </foreach>
     </insert>
 
-    <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
+    <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage">
         select
             <include refid="baseSql"/>
         from
         t_ds_process_task_lineage
-        where process_definition_code in (select code from t_ds_process_definition where project_code = #{projectCode})
+        where workflow_definition_code in (select code from t_ds_process_definition where project_code = #{projectCode})
     </select>
 
     <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
@@ -70,7 +70,7 @@
             ,schd.release_state as schedule_publish_status
         from t_ds_process_definition pd
         left join t_ds_schedules schd on pd.code = schd.process_definition_code
-        where pd.code = #{processDefinitionCode}
+        where pd.code = #{workflowDefinitionCode}
     </select>
 
     <select id="queryWorkFlowLineageByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
@@ -85,13 +85,13 @@
         from t_ds_process_definition pd
         left join t_ds_schedules schd on pd.code = schd.process_definition_code
         where 1=1
-        <if test="processDefinitionName != null and processDefinitionName != ''">
-            and pd.name = #{processDefinitionName}
+        <if test="workflowDefinitionName != null and workflowDefinitionName != ''">
+            and pd.name = #{workflowDefinitionName}
         </if>
         and pd.project_code = #{projectCode}
     </select>
 
-    <select id="queryWorkFlowLineageByDept" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
+    <select id="queryWorkFlowLineageByDept" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage">
         select
             <include refid="baseSql"/>
         from
@@ -100,18 +100,18 @@
         <if test="deptProjectCode != null and deptProjectCode != 0">
         and dept_project_code = #{deptProjectCode}
         </if>
-        and dept_process_definition_code = #{deptProcessDefinitionCode}
+        and dept_workflow_definition_code = #{deptWorkflowDefinitionCode}
         <if test="deptTaskDefinitionCode != null and deptTaskDefinitionCode != 0">
         and dept_task_definition_code = #{deptTaskDefinitionCode}
         </if>
     </select>
 
-    <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
+    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage">
         select
             <include refid="baseSql"/>
         from
         t_ds_process_task_lineage
-        where process_definition_code = #{processDefinitionCode}
+        where workflow_definition_code = #{workflowDefinitionCode}
     </select>
 
 </mapper>

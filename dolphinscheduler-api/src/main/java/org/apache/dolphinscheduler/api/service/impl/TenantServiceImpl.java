@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -234,9 +234,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
 
-        List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
-        if (CollectionUtils.isNotEmpty(processInstances)) {
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
+        List<WorkflowInstance> workflowInstances = getProcessInstancesByTenant(tenant);
+        if (CollectionUtils.isNotEmpty(workflowInstances)) {
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, workflowInstances.size());
         }
 
         List<Schedule> schedules = scheduleMapper.queryScheduleListByTenant(tenant.getTenantCode());
@@ -257,7 +257,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         processInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
     }
 
-    private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {
+    private List<WorkflowInstance> getProcessInstancesByTenant(Tenant tenant) {
         return processInstanceMapper.queryByTenantCodeAndStatus(tenant.getTenantCode(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
     }

@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.scheduler.quartz;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
@@ -46,9 +47,6 @@ public class ProcessScheduleTask extends QuartzJobBean {
 
     @Autowired
     private ProcessService processService;
-
-    @Autowired
-    private CommandService commandService;
 
     @Autowired
     private IWorkflowControlClient workflowInstanceController;
@@ -77,14 +75,14 @@ public class ProcessScheduleTask extends QuartzJobBean {
             return;
         }
 
-        ProcessDefinition processDefinition =
+        WorkflowDefinition workflowDefinition =
                 processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
         // release state : online/offline
-        ReleaseState releaseState = processDefinition.getReleaseState();
+        ReleaseState releaseState = workflowDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
             log.warn(
                     "process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}",
-                    projectId, processDefinition.getId());
+                    projectId, workflowDefinition.getId());
             return;
         }
 
@@ -92,8 +90,8 @@ public class ProcessScheduleTask extends QuartzJobBean {
                 .userId(schedule.getUserId())
                 .scheduleTIme(scheduledFireTime)
                 .timezoneId(schedule.getTimezoneId())
-                .workflowCode(processDefinition.getCode())
-                .workflowVersion(processDefinition.getVersion())
+                .workflowCode(workflowDefinition.getCode())
+                .workflowVersion(workflowDefinition.getVersion())
                 .failureStrategy(schedule.getFailureStrategy())
                 .taskDependType(TaskDependType.TASK_POST)
                 .warningType(schedule.getWarningType())

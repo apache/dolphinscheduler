@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
@@ -43,28 +43,28 @@ public class WorkflowFailover {
     private CommandDao commandDao;
 
     @Transactional
-    public void failoverWorkflow(final ProcessInstance processInstance) {
+    public void failoverWorkflow(final WorkflowInstance workflowInstance) {
         workflowInstanceDao.updateWorkflowInstanceState(
-                processInstance.getId(),
-                processInstance.getState(),
+                workflowInstance.getId(),
+                workflowInstance.getState(),
                 WorkflowExecutionStatus.FAILOVER);
 
         final WorkflowFailoverCommandParam failoverWorkflowCommandParam = WorkflowFailoverCommandParam.builder()
-                .workflowExecutionStatus(processInstance.getState())
+                .workflowExecutionStatus(workflowInstance.getState())
                 .build();
 
         final Command failoverCommand = Command.builder()
                 .commandParam(JSONUtils.toJsonString(failoverWorkflowCommandParam))
                 .commandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)
-                .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(processInstance.getProcessDefinitionVersion())
-                .processInstanceId(processInstance.getId())
+                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
+                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
+                .processInstanceId(workflowInstance.getId())
                 .build();
         commandDao.insert(failoverCommand);
         log.info("Success failover workflowInstance: [id={}, name={}, state={}]",
-                processInstance.getId(),
-                processInstance.getName(),
-                processInstance.getState().name());
+                workflowInstance.getId(),
+                workflowInstance.getName(),
+                workflowInstance.getState().name());
     }
 
 }

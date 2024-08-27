@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
@@ -27,7 +27,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProcessDefinitionLogDaoImpl extends BaseDao<ProcessDefinitionLog, ProcessDefinitionLogMapper>
+public class ProcessDefinitionLogDaoImpl extends BaseDao<WorkflowDefinitionLog, ProcessDefinitionLogMapper>
         implements
             ProcessDefinitionLogDao {
 
@@ -36,8 +36,8 @@ public class ProcessDefinitionLogDaoImpl extends BaseDao<ProcessDefinitionLog, P
     }
 
     @Override
-    public ProcessDefinitionLog queryByDefinitionCodeAndVersion(long workflowDefinitionCode,
-                                                                int workflowDefinitionVersion) {
+    public WorkflowDefinitionLog queryByDefinitionCodeAndVersion(long workflowDefinitionCode,
+                                                                 int workflowDefinitionVersion) {
         return mybatisMapper.queryByDefinitionCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion);
     }
 

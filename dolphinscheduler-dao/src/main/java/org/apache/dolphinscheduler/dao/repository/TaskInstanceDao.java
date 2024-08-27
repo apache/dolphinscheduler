@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -43,10 +43,10 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
      * Submit a task instance to DB.
      *
      * @param taskInstance    task instance
-     * @param processInstance process instance
+     * @param workflowInstance process instance
      * @return task instance
      */
-    boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
+    boolean submitTaskInstanceToDB(TaskInstance taskInstance, WorkflowInstance workflowInstance);
 
     /**
      * Mark the task instance as invalid

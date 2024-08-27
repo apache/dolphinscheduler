@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
@@ -36,8 +36,8 @@ import org.springframework.context.ApplicationContext;
 public class TaskExecutionRunnableBuilder {
 
     private final IWorkflowExecutionGraph workflowExecutionGraph;
-    private final ProcessDefinition workflowDefinition;
-    private final ProcessInstance workflowInstance;
+    private final WorkflowDefinition workflowDefinition;
+    private final WorkflowInstance workflowInstance;
     private final TaskDefinition taskDefinition;
     private final TaskInstance taskInstance;
 

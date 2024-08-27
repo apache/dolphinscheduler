@@ -53,7 +53,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * process task relation controller
  */
-@Tag(name = "PROCESS_TASK_RELATION_TAG")
+@Tag(name = "WORKFLOW_TASK_RELATION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/process-task-relation")
 public class ProcessTaskRelationController extends BaseController {
@@ -71,10 +71,10 @@ public class ProcessTaskRelationController extends BaseController {
      * @param postTaskCode postTaskCode
      * @return create result code
      */
-    @Operation(summary = "save", description = "CREATE_PROCESS_TASK_RELATION_NOTES")
+    @Operation(summary = "save", description = "CREATE_WORKFLOW_TASK_RELATION_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
@@ -107,10 +107,10 @@ public class ProcessTaskRelationController extends BaseController {
      * @param taskCode the post task code
      * @return delete result code
      */
-    @Operation(summary = "deleteRelation", description = "DELETE_PROCESS_TASK_RELATION_NOTES")
+    @Operation(summary = "deleteRelation", description = "DELETE_WORKFLOW_TASK_RELATION_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @DeleteMapping(value = "/{taskCode}")
@@ -233,7 +233,7 @@ public class ProcessTaskRelationController extends BaseController {
     @Operation(summary = "deleteEdge", description = "DELETE_EDGE_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })

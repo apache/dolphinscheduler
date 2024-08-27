@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
@@ -43,7 +43,7 @@ public class PauseWorkflowInstanceExecutorDelegate
 
     @Override
     public Void execute(PauseWorkflowInstanceOperation workflowInstanceControlRequest) {
-        final ProcessInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
+        final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
         exceptionIfWorkflowInstanceCannotPause(workflowInstance);
         if (ifWorkflowInstanceCanDirectPauseInDB(workflowInstance)) {
             directPauseInDB(workflowInstance);
@@ -53,7 +53,7 @@ public class PauseWorkflowInstanceExecutorDelegate
         return null;
     }
 
-    private void exceptionIfWorkflowInstanceCannotPause(ProcessInstance workflowInstance) {
+    private void exceptionIfWorkflowInstanceCannotPause(WorkflowInstance workflowInstance) {
         WorkflowExecutionStatus workflowInstanceState = workflowInstance.getState();
         if (workflowInstanceState.canPause()) {
             return;
@@ -63,11 +63,11 @@ public class PauseWorkflowInstanceExecutorDelegate
                         + ", can not pause");
     }
 
-    private boolean ifWorkflowInstanceCanDirectPauseInDB(ProcessInstance workflowInstance) {
+    private boolean ifWorkflowInstanceCanDirectPauseInDB(WorkflowInstance workflowInstance) {
         return workflowInstance.getState().canDirectPauseInDB();
     }
 
-    private void directPauseInDB(ProcessInstance workflowInstance) {
+    private void directPauseInDB(WorkflowInstance workflowInstance) {
         workflowInstanceDao.updateWorkflowInstanceState(
                 workflowInstance.getId(),
                 workflowInstance.getState(),
@@ -78,7 +78,7 @@ public class PauseWorkflowInstanceExecutorDelegate
                 WorkflowExecutionStatus.PAUSE.name());
     }
 
-    private void pauseInMaster(ProcessInstance workflowInstance) {
+    private void pauseInMaster(WorkflowInstance workflowInstance) {
         try {
             final WorkflowInstancePauseResponse pauseResponse = Clients
                     .withService(IWorkflowControlClient.class)
@@ -103,7 +103,7 @@ public class PauseWorkflowInstanceExecutorDelegate
 
         private final PauseWorkflowInstanceExecutorDelegate pauseWorkflowInstanceExecutorDelegate;
 
-        private ProcessInstance workflowInstance;
+        private WorkflowInstance workflowInstance;
 
         private User executeUser;
 
@@ -111,7 +111,7 @@ public class PauseWorkflowInstanceExecutorDelegate
             this.pauseWorkflowInstanceExecutorDelegate = pauseWorkflowInstanceExecutorDelegate;
         }
 
-        public PauseWorkflowInstanceExecutorDelegate.PauseWorkflowInstanceOperation onWorkflowInstance(ProcessInstance workflowInstance) {
+        public PauseWorkflowInstanceExecutorDelegate.PauseWorkflowInstanceOperation onWorkflowInstance(WorkflowInstance workflowInstance) {
             this.workflowInstance = workflowInstance;
             return this;
         }

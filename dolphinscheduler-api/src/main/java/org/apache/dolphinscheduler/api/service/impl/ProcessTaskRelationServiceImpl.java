@@ -28,10 +28,10 @@ import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -122,25 +122,25 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        if (processDefinition == null) {
+        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (workflowDefinition == null) {
             log.error("Process definition does not exist, processCode:{}.", processDefinitionCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
-        if (processDefinition.getProjectCode() != projectCode) {
+        if (workflowDefinition.getProjectCode() != projectCode) {
             log.error("Process definition's project does not match project {}.", projectCode);
             putMsg(result, Status.PROJECT_PROCESS_NOT_MATCH);
             return result;
         }
-        updateProcessDefiniteVersion(loginUser, result, processDefinition);
-        List<ProcessTaskRelation> processTaskRelationList =
+        updateProcessDefiniteVersion(loginUser, result, workflowDefinition);
+        List<WorkflowTaskRelation> workflowTaskRelationList =
                 processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
-        List<ProcessTaskRelation> processTaskRelations = Lists.newArrayList(processTaskRelationList);
-        if (!processTaskRelations.isEmpty()) {
-            Map<Long, ProcessTaskRelation> preTaskCodeMap =
-                    processTaskRelations.stream().filter(r -> r.getPostTaskCode() == postTaskCode)
-                            .collect(Collectors.toMap(ProcessTaskRelation::getPreTaskCode,
+        List<WorkflowTaskRelation> workflowTaskRelations = Lists.newArrayList(workflowTaskRelationList);
+        if (!workflowTaskRelations.isEmpty()) {
+            Map<Long, WorkflowTaskRelation> preTaskCodeMap =
+                    workflowTaskRelations.stream().filter(r -> r.getPostTaskCode() == postTaskCode)
+                            .collect(Collectors.toMap(WorkflowTaskRelation::getPreTaskCode,
                                     processTaskRelation -> processTaskRelation));
             if (!preTaskCodeMap.isEmpty()) {
                 if (preTaskCodeMap.containsKey(preTaskCode) || (!preTaskCodeMap.containsKey(0L) && preTaskCode == 0L)) {
@@ -149,36 +149,36 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 }
                 if (preTaskCodeMap.containsKey(0L) && preTaskCode != 0L) {
                     // delete no upstream
-                    processTaskRelations.remove(preTaskCodeMap.get(0L));
+                    workflowTaskRelations.remove(preTaskCodeMap.get(0L));
                 }
             }
         }
         TaskDefinition postTaskDefinition = taskDefinitionMapper.queryByCode(postTaskCode);
-        ProcessTaskRelation processTaskRelation = setRelation(processDefinition, postTaskDefinition);
+        WorkflowTaskRelation workflowTaskRelation = setRelation(workflowDefinition, postTaskDefinition);
         if (preTaskCode != 0L) {
             TaskDefinition preTaskDefinition = taskDefinitionMapper.queryByCode(preTaskCode);
-            List<ProcessTaskRelation> upstreamTaskRelationList = processTaskRelations.stream()
+            List<WorkflowTaskRelation> upstreamTaskRelationList = workflowTaskRelations.stream()
                     .filter(r -> r.getPostTaskCode() == preTaskCode).collect(Collectors.toList());
             // upstream is or not exist
             if (upstreamTaskRelationList.isEmpty()) {
-                ProcessTaskRelation preProcessTaskRelation = setRelation(processDefinition, preTaskDefinition);
-                preProcessTaskRelation.setPreTaskCode(0L);
-                preProcessTaskRelation.setPreTaskVersion(0);
-                processTaskRelations.add(preProcessTaskRelation);
+                WorkflowTaskRelation preWorkflowTaskRelation = setRelation(workflowDefinition, preTaskDefinition);
+                preWorkflowTaskRelation.setPreTaskCode(0L);
+                preWorkflowTaskRelation.setPreTaskVersion(0);
+                workflowTaskRelations.add(preWorkflowTaskRelation);
             }
-            processTaskRelation.setPreTaskCode(preTaskDefinition.getCode());
-            processTaskRelation.setPreTaskVersion(preTaskDefinition.getVersion());
+            workflowTaskRelation.setPreTaskCode(preTaskDefinition.getCode());
+            workflowTaskRelation.setPreTaskVersion(preTaskDefinition.getVersion());
         } else {
-            processTaskRelation.setPreTaskCode(0L);
-            processTaskRelation.setPreTaskVersion(0);
+            workflowTaskRelation.setPreTaskCode(0L);
+            workflowTaskRelation.setPreTaskVersion(0);
         }
-        processTaskRelations.add(processTaskRelation);
-        updateRelation(loginUser, result, processDefinition, processTaskRelations);
+        workflowTaskRelations.add(workflowTaskRelation);
+        updateRelation(loginUser, result, workflowDefinition, workflowTaskRelations);
         return result;
     }
 
-    private ProcessTaskRelationLog persist2ProcessTaskRelationLog(User user, ProcessTaskRelation processTaskRelation) {
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+    private WorkflowTaskRelationLog persist2ProcessTaskRelationLog(User user, WorkflowTaskRelation workflowTaskRelation) {
+        WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
         processTaskRelationLog.setOperator(user.getId());
         processTaskRelationLog.setOperateTime(new Date());
         int result = processTaskRelationLogMapper.insert(processTaskRelationLog);
@@ -189,13 +189,13 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         return processTaskRelationLog;
     }
 
-    private List<ProcessTaskRelationLog> batchPersist2ProcessTaskRelationLog(User user,
-                                                                             List<ProcessTaskRelation> processTaskRelations) {
+    private List<WorkflowTaskRelationLog> batchPersist2ProcessTaskRelationLog(User user,
+                                                                              List<WorkflowTaskRelation> workflowTaskRelations) {
         Date now = new Date();
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
 
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelations) {
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
             processTaskRelationLog.setOperator(user.getId());
             processTaskRelationLog.setOperateTime(now);
             processTaskRelationLogs.add(processTaskRelationLog);
@@ -207,17 +207,17 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         return processTaskRelationLogs;
     }
 
-    private void updateVersions(ProcessTaskRelation processTaskRelation) {
+    private void updateVersions(WorkflowTaskRelation workflowTaskRelation) {
         // workflow
-        ProcessDefinition processDefinition =
-                processDefinitionMapper.queryByCode(processTaskRelation.getProcessDefinitionCode());
-        processTaskRelation.setProcessDefinitionVersion(processDefinition.getVersion());
+        WorkflowDefinition workflowDefinition =
+                processDefinitionMapper.queryByCode(workflowTaskRelation.getProcessDefinitionCode());
+        workflowTaskRelation.setProcessDefinitionVersion(workflowDefinition.getVersion());
 
         // tasks
-        TaskDefinition preTaskDefinition = taskDefinitionMapper.queryByCode(processTaskRelation.getPreTaskCode());
-        processTaskRelation.setPreTaskVersion(preTaskDefinition.getVersion());
-        TaskDefinition postTaskDefinition = taskDefinitionMapper.queryByCode(processTaskRelation.getPostTaskCode());
-        processTaskRelation.setPostTaskVersion(postTaskDefinition.getVersion());
+        TaskDefinition preTaskDefinition = taskDefinitionMapper.queryByCode(workflowTaskRelation.getPreTaskCode());
+        workflowTaskRelation.setPreTaskVersion(preTaskDefinition.getVersion());
+        TaskDefinition postTaskDefinition = taskDefinitionMapper.queryByCode(workflowTaskRelation.getPostTaskCode());
+        workflowTaskRelation.setPostTaskVersion(postTaskDefinition.getVersion());
     }
 
     /**
@@ -229,61 +229,61 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     @Transactional
-    public ProcessTaskRelation createProcessTaskRelationV2(User loginUser,
-                                                           TaskRelationCreateRequest taskRelationCreateRequest) {
-        ProcessTaskRelation processTaskRelation = taskRelationCreateRequest.convert2ProcessTaskRelation();
-        ProcessDefinition processDefinition =
-                processDefinitionMapper.queryByCode(processTaskRelation.getProcessDefinitionCode());
-        if (processDefinition == null) {
+    public WorkflowTaskRelation createProcessTaskRelationV2(User loginUser,
+                                                            TaskRelationCreateRequest taskRelationCreateRequest) {
+        WorkflowTaskRelation workflowTaskRelation = taskRelationCreateRequest.convert2ProcessTaskRelation();
+        WorkflowDefinition workflowDefinition =
+                processDefinitionMapper.queryByCode(workflowTaskRelation.getProcessDefinitionCode());
+        if (workflowDefinition == null) {
             throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
-                    String.valueOf(processTaskRelation.getProcessDefinitionCode()));
+                    String.valueOf(workflowTaskRelation.getProcessDefinitionCode()));
         }
-        if (processTaskRelation.getProjectCode() == 0) {
-            processTaskRelation.setProjectCode(processDefinition.getProjectCode());
+        if (workflowTaskRelation.getProjectCode() == 0) {
+            workflowTaskRelation.setProjectCode(workflowDefinition.getProjectCode());
         }
-        Project project = projectMapper.queryByCode(processTaskRelation.getProjectCode());
+        Project project = projectMapper.queryByCode(workflowTaskRelation.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         // persistence process task relation and process task relation log to database
-        this.updateVersions(processTaskRelation);
-        int insert = processTaskRelationMapper.insert(processTaskRelation);
+        this.updateVersions(workflowTaskRelation);
+        int insert = processTaskRelationMapper.insert(workflowTaskRelation);
         if (insert <= 0) {
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR, processTaskRelation.getPreTaskCode(),
-                    processTaskRelation.getPostTaskCode());
+            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR, workflowTaskRelation.getPreTaskCode(),
+                    workflowTaskRelation.getPostTaskCode());
         }
-        this.persist2ProcessTaskRelationLog(loginUser, processTaskRelation);
+        this.persist2ProcessTaskRelationLog(loginUser, workflowTaskRelation);
 
-        return processTaskRelation;
+        return workflowTaskRelation;
     }
 
-    private ProcessTaskRelation setRelation(ProcessDefinition processDefinition, TaskDefinition taskDefinition) {
+    private WorkflowTaskRelation setRelation(WorkflowDefinition workflowDefinition, TaskDefinition taskDefinition) {
         Date now = new Date();
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setProjectCode(processDefinition.getProjectCode());
-        processTaskRelation.setProcessDefinitionCode(processDefinition.getCode());
-        processTaskRelation.setProcessDefinitionVersion(processDefinition.getVersion());
-        processTaskRelation.setPostTaskCode(taskDefinition.getCode());
-        processTaskRelation.setPostTaskVersion(taskDefinition.getVersion());
-        processTaskRelation.setConditionType(ConditionType.NONE);
-        processTaskRelation.setConditionParams("{}");
-        processTaskRelation.setCreateTime(now);
-        processTaskRelation.setUpdateTime(now);
-        return processTaskRelation;
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        workflowTaskRelation.setProjectCode(workflowDefinition.getProjectCode());
+        workflowTaskRelation.setProcessDefinitionCode(workflowDefinition.getCode());
+        workflowTaskRelation.setProcessDefinitionVersion(workflowDefinition.getVersion());
+        workflowTaskRelation.setPostTaskCode(taskDefinition.getCode());
+        workflowTaskRelation.setPostTaskVersion(taskDefinition.getVersion());
+        workflowTaskRelation.setConditionType(ConditionType.NONE);
+        workflowTaskRelation.setConditionParams("{}");
+        workflowTaskRelation.setCreateTime(now);
+        workflowTaskRelation.setUpdateTime(now);
+        return workflowTaskRelation;
     }
 
     private void updateProcessDefiniteVersion(User loginUser, Map<String, Object> result,
-                                              ProcessDefinition processDefinition) {
-        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+                                              WorkflowDefinition workflowDefinition) {
+        int insertVersion = processService.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion <= 0) {
             log.error("Update process definition error, projectCode:{}, processDefinitionCode:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode());
-            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                    workflowDefinition.getProjectCode(), workflowDefinition.getCode());
+            putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
+            throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
         } else
             log.info(
                     "Update process definition complete, new version is {}, projectCode:{}, processDefinitionCode:{}.",
-                    insertVersion, processDefinition.getProjectCode(), processDefinition.getCode());
-        processDefinition.setVersion(insertVersion);
+                    insertVersion, workflowDefinition.getProjectCode(), workflowDefinition.getCode());
+        workflowDefinition.setVersion(insertVersion);
     }
 
     /**
@@ -312,8 +312,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
             return result;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        if (processDefinition == null) {
+        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (workflowDefinition == null) {
             log.error("Process definition does not exist, processDefinitionCode:{}.", processDefinitionCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
@@ -324,22 +324,22 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelations =
+        List<WorkflowTaskRelation> workflowTaskRelations =
                 processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
-        List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-        if (CollectionUtils.isEmpty(processTaskRelationList)) {
+        List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
+        if (CollectionUtils.isEmpty(workflowTaskRelationList)) {
             log.error("Process task relations are empty, projectCode:{}, processDefinitionCode:{}.", projectCode,
                     processDefinitionCode);
             putMsg(result, Status.DATA_IS_NULL, "processTaskRelationList");
             return result;
         }
         List<Long> downstreamList = Lists.newArrayList();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            if (processTaskRelation.getPreTaskCode() == taskCode) {
-                downstreamList.add(processTaskRelation.getPostTaskCode());
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelations) {
+            if (workflowTaskRelation.getPreTaskCode() == taskCode) {
+                downstreamList.add(workflowTaskRelation.getPostTaskCode());
             }
-            if (processTaskRelation.getPostTaskCode() == taskCode) {
-                processTaskRelationList.remove(processTaskRelation);
+            if (workflowTaskRelation.getPostTaskCode() == taskCode) {
+                workflowTaskRelationList.remove(workflowTaskRelation);
             }
         }
         if (CollectionUtils.isNotEmpty(downstreamList)) {
@@ -350,8 +350,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.TASK_HAS_DOWNSTREAM, downstream);
             return result;
         }
-        updateProcessDefiniteVersion(loginUser, result, processDefinition);
-        updateRelation(loginUser, result, processDefinition, processTaskRelationList);
+        updateProcessDefiniteVersion(loginUser, result, workflowDefinition);
+        updateRelation(loginUser, result, workflowDefinition, workflowTaskRelationList);
         if (TaskTypeUtils.isConditionTask(taskDefinition.getTaskType())
                 || TaskTypeUtils.isSubWorkflowTask(taskDefinition.getTaskType())
                 || TaskTypeUtils.isDependentTask(taskDefinition.getTaskType())) {
@@ -380,24 +380,24 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     public void deleteTaskProcessRelationV2(User loginUser,
                                             long preTaskCode,
                                             long postTaskCode) {
-        ProcessTaskRelation processTaskRelation =
+        WorkflowTaskRelation workflowTaskRelation =
                 new TaskRelationFilterRequest(preTaskCode, postTaskCode).convert2TaskDefinition();
 
-        Page<ProcessTaskRelation> page =
+        Page<WorkflowTaskRelation> page =
                 new Page<>(new TaskRelationFilterRequest(preTaskCode, postTaskCode).getPageNo(),
                         new TaskRelationFilterRequest(preTaskCode, postTaskCode).getPageSize());
-        IPage<ProcessTaskRelation> processTaskRelationIPage =
-                processTaskRelationMapper.filterProcessTaskRelation(page, processTaskRelation);
+        IPage<WorkflowTaskRelation> processTaskRelationIPage =
+                processTaskRelationMapper.filterProcessTaskRelation(page, workflowTaskRelation);
 
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationIPage.getRecords();
-        if (processTaskRelations.size() != 1) {
-            throw new ServiceException(Status.PROCESS_TASK_RELATION_NOT_EXPECT, 1, processTaskRelations.size());
+        List<WorkflowTaskRelation> workflowTaskRelations = processTaskRelationIPage.getRecords();
+        if (workflowTaskRelations.size() != 1) {
+            throw new ServiceException(Status.PROCESS_TASK_RELATION_NOT_EXPECT, 1, workflowTaskRelations.size());
         }
 
-        ProcessTaskRelation processTaskRelationDb = processTaskRelations.get(0);
-        Project project = projectMapper.queryByCode(processTaskRelationDb.getProjectCode());
+        WorkflowTaskRelation workflowTaskRelationDb = workflowTaskRelations.get(0);
+        Project project = projectMapper.queryByCode(workflowTaskRelationDb.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
-        processTaskRelationMapper.deleteById(processTaskRelationDb.getId());
+        processTaskRelationMapper.deleteById(workflowTaskRelationDb.getId());
     }
 
     /**
@@ -410,55 +410,55 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
      */
     @Override
     @Transactional
-    public List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
-                                                                             long taskCode,
-                                                                             Boolean needSyncDag,
-                                                                             TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
+    public List<WorkflowTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
+                                                                              long taskCode,
+                                                                              Boolean needSyncDag,
+                                                                              TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
         TaskDefinition downstreamTask = taskDefinitionMapper.queryByCode(taskCode);
         if (downstreamTask == null) {
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
         List<Long> upstreamTaskCodes = taskRelationUpdateUpstreamRequest.getUpstreams();
 
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setPostTaskCode(taskCode);
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        workflowTaskRelation.setPostTaskCode(taskCode);
 
-        Page<ProcessTaskRelation> page = new Page<>(taskRelationUpdateUpstreamRequest.getPageNo(),
+        Page<WorkflowTaskRelation> page = new Page<>(taskRelationUpdateUpstreamRequest.getPageNo(),
                 taskRelationUpdateUpstreamRequest.getPageSize());
-        IPage<ProcessTaskRelation> processTaskRelationExistsIPage =
-                processTaskRelationMapper.filterProcessTaskRelation(page, processTaskRelation);
-        List<ProcessTaskRelation> processTaskRelationExists = processTaskRelationExistsIPage.getRecords();
+        IPage<WorkflowTaskRelation> processTaskRelationExistsIPage =
+                processTaskRelationMapper.filterProcessTaskRelation(page, workflowTaskRelation);
+        List<WorkflowTaskRelation> workflowTaskRelationExists = processTaskRelationExistsIPage.getRecords();
 
-        ProcessDefinition processDefinition = null;
-        if (CollectionUtils.isNotEmpty(processTaskRelationExists)) {
-            processDefinition =
-                    processDefinitionMapper.queryByCode(processTaskRelationExists.get(0).getProcessDefinitionCode());
+        WorkflowDefinition workflowDefinition = null;
+        if (CollectionUtils.isNotEmpty(workflowTaskRelationExists)) {
+            workflowDefinition =
+                    processDefinitionMapper.queryByCode(workflowTaskRelationExists.get(0).getProcessDefinitionCode());
         } else if (taskRelationUpdateUpstreamRequest.getWorkflowCode() != 0L) {
-            processDefinition =
+            workflowDefinition =
                     processDefinitionMapper.queryByCode(taskRelationUpdateUpstreamRequest.getWorkflowCode());
         }
-        if (processDefinition == null) {
+        if (workflowDefinition == null) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                     taskRelationUpdateUpstreamRequest.toString());
         }
-        processDefinition.setUpdateTime(new Date());
-        int insertVersion = processDefinition.getVersion();
+        workflowDefinition.setUpdateTime(new Date());
+        int insertVersion = workflowDefinition.getVersion();
         if (needSyncDag) {
             insertVersion =
-                    this.saveProcessDefine(loginUser, processDefinition);
+                    this.saveProcessDefine(loginUser, workflowDefinition);
             if (insertVersion <= 0) {
-                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
             }
         }
         // get new relation to create and out of date relation to delete
         List<Long> taskCodeCreates = upstreamTaskCodes
                 .stream()
-                .filter(upstreamTaskCode -> processTaskRelationExists.stream().noneMatch(
+                .filter(upstreamTaskCode -> workflowTaskRelationExists.stream().noneMatch(
                         processTaskRelationExist -> processTaskRelationExist.getPreTaskCode() == upstreamTaskCode))
                 .collect(Collectors.toList());
-        List<Integer> taskCodeDeletes = processTaskRelationExists.stream()
+        List<Integer> taskCodeDeletes = workflowTaskRelationExists.stream()
                 .filter(ptr -> !upstreamTaskCodes.contains(ptr.getPreTaskCode()))
-                .map(ProcessTaskRelation::getId)
+                .map(WorkflowTaskRelation::getId)
                 .collect(Collectors.toList());
 
         // delete relation not exists
@@ -470,7 +470,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
 
         // create relation not exists
-        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
+        List<WorkflowTaskRelation> workflowTaskRelations = new ArrayList<>();
         for (long createCode : taskCodeCreates) {
             long upstreamCode = 0L;
             int version = 0;
@@ -483,41 +483,41 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 upstreamCode = upstreamTask.getCode();
                 version = upstreamTask.getVersion();
             }
-            ProcessTaskRelation processTaskRelationCreate =
-                    new ProcessTaskRelation(null, processDefinition.getVersion(), downstreamTask.getProjectCode(),
-                            processDefinition.getCode(), upstreamCode, version,
+            WorkflowTaskRelation workflowTaskRelationCreate =
+                    new WorkflowTaskRelation(null, workflowDefinition.getVersion(), downstreamTask.getProjectCode(),
+                            workflowDefinition.getCode(), upstreamCode, version,
                             downstreamTask.getCode(), downstreamTask.getVersion(), null, null);
-            processTaskRelations.add(processTaskRelationCreate);
+            workflowTaskRelations.add(workflowTaskRelationCreate);
         }
-        int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelations);
-        if (batchInsert != processTaskRelations.size()) {
+        int batchInsert = processTaskRelationMapper.batchInsert(workflowTaskRelations);
+        if (batchInsert != workflowTaskRelations.size()) {
             throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_CREATE_ERROR, taskCodeCreates);
         }
 
         // batch sync to process task relation log
-        int saveTaskRelationResult = saveTaskRelation(loginUser, processDefinition, insertVersion);
+        int saveTaskRelationResult = saveTaskRelation(loginUser, workflowDefinition, insertVersion);
         if (saveTaskRelationResult != Constants.EXIT_CODE_SUCCESS) {
             log.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
+                    workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
         }
         log.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
-                processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
-        processTaskRelations.get(0).setProcessDefinitionVersion(insertVersion);
-        return processTaskRelations;
+                workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
+        workflowTaskRelations.get(0).setProcessDefinitionVersion(insertVersion);
+        return workflowTaskRelations;
     }
 
-    public int saveTaskRelation(User loginUser, ProcessDefinition processDefinition,
+    public int saveTaskRelation(User loginUser, WorkflowDefinition workflowDefinition,
                                 int processDefinitionVersion) {
-        long projectCode = processDefinition.getProjectCode();
-        long processDefinitionCode = processDefinition.getCode();
-        List<ProcessTaskRelation> taskRelations =
+        long projectCode = workflowDefinition.getProjectCode();
+        long processDefinitionCode = workflowDefinition.getCode();
+        List<WorkflowTaskRelation> taskRelations =
                 processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
-        List<ProcessTaskRelationLog> taskRelationList =
-                taskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
+        List<WorkflowTaskRelationLog> taskRelationList =
+                taskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
 
         List<Long> taskCodeList =
-                taskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toList());
+                taskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toList());
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(taskCodeList);
         List<TaskDefinitionLog> taskDefinitionLogs =
                 taskDefinitions.stream().map(TaskDefinitionLog::new).collect(Collectors.toList());
@@ -532,7 +532,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinitionLog -> taskDefinitionLog));
         }
         Date now = new Date();
-        for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
+        for (WorkflowTaskRelationLog processTaskRelationLog : taskRelationList) {
             processTaskRelationLog.setProjectCode(projectCode);
             processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
             processTaskRelationLog.setProcessDefinitionVersion(processDefinitionVersion);
@@ -555,9 +555,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         if (CollectionUtils.isNotEmpty(taskRelations)) {
             Set<Integer> processTaskRelationSet =
-                    taskRelations.stream().map(ProcessTaskRelation::hashCode).collect(toSet());
+                    taskRelations.stream().map(WorkflowTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet =
-                    taskRelationList.stream().map(ProcessTaskRelationLog::hashCode).collect(toSet());
+                    taskRelationList.stream().map(WorkflowTaskRelationLog::hashCode).collect(toSet());
             boolean isSame = org.apache.commons.collections.CollectionUtils.isEqualCollection(processTaskRelationSet,
                     taskRelationSet);
             if (isSame) {
@@ -565,47 +565,47 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             }
             processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
         }
-        List<ProcessTaskRelation> processTaskRelations =
-                taskRelationList.stream().map(ProcessTaskRelation::new).collect(Collectors.toList());
-        int insert = processTaskRelationMapper.batchInsert(processTaskRelations);
+        List<WorkflowTaskRelation> workflowTaskRelations =
+                taskRelationList.stream().map(WorkflowTaskRelation::new).collect(Collectors.toList());
+        int insert = processTaskRelationMapper.batchInsert(workflowTaskRelations);
         int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
         return (insert & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
     }
 
-    public int saveProcessDefine(User loginUser, ProcessDefinition processDefinition) {
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
-        Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
+    public int saveProcessDefine(User loginUser, WorkflowDefinition workflowDefinition) {
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
+        Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(workflowDefinition.getCode());
         int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
         processDefinitionLog.setVersion(insertVersion);
         processDefinitionLog.setOperator(loginUser.getId());
-        processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
+        processDefinitionLog.setOperateTime(workflowDefinition.getUpdateTime());
         processDefinitionLog.setId(null);
         int insertLog = processDefinitionLogMapper.insert(processDefinitionLog);
 
-        processDefinitionLog.setId(processDefinition.getId());
+        processDefinitionLog.setId(workflowDefinition.getId());
         int result = processDefinitionMapper.updateById(processDefinitionLog);
         return (insertLog & result) > 0 ? insertVersion : 0;
     }
 
-    private void updateRelation(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition,
-                                List<ProcessTaskRelation> processTaskRelationList) {
-        List<ProcessTaskRelationLog> relationLogs =
-                processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
-        int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
-                processDefinition.getCode(),
-                processDefinition.getVersion(), relationLogs, Lists.newArrayList(), Boolean.TRUE);
+    private void updateRelation(User loginUser, Map<String, Object> result, WorkflowDefinition workflowDefinition,
+                                List<WorkflowTaskRelation> workflowTaskRelationList) {
+        List<WorkflowTaskRelationLog> relationLogs =
+                workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
+        int insertResult = processService.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
+                workflowDefinition.getCode(),
+                workflowDefinition.getVersion(), relationLogs, Lists.newArrayList(), Boolean.TRUE);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {
             log.info(
                     "Update task relations complete, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
+                    workflowDefinition.getProjectCode(), workflowDefinition.getCode(), workflowDefinition.getVersion());
             putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, processDefinition);
+            result.put(Constants.DATA_LIST, workflowDefinition);
         } else {
             log.error(
                     "Update task relations error, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}.",
-                    processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
-            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                    workflowDefinition.getProjectCode(), workflowDefinition.getCode(), workflowDefinition.getVersion());
+            putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
+            throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
         }
     }
 
@@ -633,7 +633,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
             return result;
         }
-        List<ProcessTaskRelation> upstreamList = processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
+        List<WorkflowTaskRelation> upstreamList = processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
         if (CollectionUtils.isEmpty(upstreamList)) {
             log.error("Upstream tasks based on the task do not exist, theTaskDefinitionCode:{}.", taskCode);
             putMsg(result, Status.DATA_IS_NULL, "taskCode");
@@ -648,7 +648,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<Long> currentUpstreamList =
-                upstreamList.stream().map(ProcessTaskRelation::getPreTaskCode).collect(Collectors.toList());
+                upstreamList.stream().map(WorkflowTaskRelation::getPreTaskCode).collect(Collectors.toList());
         if (currentUpstreamList.contains(0L)) {
             log.error("Upstream taskCodes based on the task contain, theTaskDefinitionCode:{}.", taskCode);
             putMsg(result, Status.DATA_IS_NOT_VALID, "currentUpstreamList");
@@ -663,36 +663,36 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DATA_IS_NOT_VALID, invalidPreTaskCodes);
             return result;
         }
-        ProcessDefinition processDefinition =
+        WorkflowDefinition workflowDefinition =
                 processDefinitionMapper.queryByCode(upstreamList.get(0).getProcessDefinitionCode());
-        if (processDefinition == null) {
+        if (workflowDefinition == null) {
             log.error("Process definition does not exist, processDefinitionCode:{}.",
                     upstreamList.get(0).getProcessDefinitionCode());
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST,
                     String.valueOf(upstreamList.get(0).getProcessDefinitionCode()));
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(processDefinition.getCode());
-        List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-        List<ProcessTaskRelation> processTaskRelationWaitRemove = Lists.newArrayList();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
+        List<WorkflowTaskRelation> workflowTaskRelations =
+                processTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
+        List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
+        List<WorkflowTaskRelation> workflowTaskRelationWaitRemove = Lists.newArrayList();
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelationList) {
             if (currentUpstreamList.size() > 1) {
-                if (currentUpstreamList.contains(processTaskRelation.getPreTaskCode())) {
-                    currentUpstreamList.remove(processTaskRelation.getPreTaskCode());
-                    processTaskRelationWaitRemove.add(processTaskRelation);
+                if (currentUpstreamList.contains(workflowTaskRelation.getPreTaskCode())) {
+                    currentUpstreamList.remove(workflowTaskRelation.getPreTaskCode());
+                    workflowTaskRelationWaitRemove.add(workflowTaskRelation);
                 }
             } else {
-                if (processTaskRelation.getPostTaskCode() == taskCode
+                if (workflowTaskRelation.getPostTaskCode() == taskCode
                         && (currentUpstreamList.isEmpty() || tmpCurrent.isEmpty())) {
-                    processTaskRelation.setPreTaskVersion(0);
-                    processTaskRelation.setPreTaskCode(0L);
+                    workflowTaskRelation.setPreTaskVersion(0);
+                    workflowTaskRelation.setPreTaskCode(0L);
                 }
             }
         }
-        processTaskRelationList.removeAll(processTaskRelationWaitRemove);
-        updateProcessDefiniteVersion(loginUser, result, processDefinition);
-        updateRelation(loginUser, result, processDefinition, processTaskRelationList);
+        workflowTaskRelationList.removeAll(workflowTaskRelationWaitRemove);
+        updateProcessDefiniteVersion(loginUser, result, workflowDefinition);
+        updateRelation(loginUser, result, workflowDefinition, workflowTaskRelationList);
         return result;
     }
 
@@ -720,7 +720,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
             return result;
         }
-        List<ProcessTaskRelation> downstreamList =
+        List<WorkflowTaskRelation> downstreamList =
                 processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode);
         if (CollectionUtils.isEmpty(downstreamList)) {
             log.error("Downstream tasks based on the task do not exist, theTaskDefinitionCode:{}.", taskCode);
@@ -734,23 +734,23 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
             return result;
         }
-        ProcessDefinition processDefinition =
+        WorkflowDefinition workflowDefinition =
                 processDefinitionMapper.queryByCode(downstreamList.get(0).getProcessDefinitionCode());
-        if (processDefinition == null) {
+        if (workflowDefinition == null) {
             log.error("Process definition does not exist, processDefinitionCode:{}.",
                     downstreamList.get(0).getProcessDefinitionCode());
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST,
                     String.valueOf(downstreamList.get(0).getProcessDefinitionCode()));
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(processDefinition.getCode());
-        List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-        processTaskRelationList
+        List<WorkflowTaskRelation> workflowTaskRelations =
+                processTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
+        List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
+        workflowTaskRelationList
                 .removeIf(processTaskRelation -> postTaskCodeList.contains(processTaskRelation.getPostTaskCode())
                         && processTaskRelation.getPreTaskCode() == taskCode);
-        updateProcessDefiniteVersion(loginUser, result, processDefinition);
-        updateRelation(loginUser, result, processDefinition, processTaskRelationList);
+        updateProcessDefiniteVersion(loginUser, result, workflowDefinition);
+        updateRelation(loginUser, result, workflowDefinition, workflowTaskRelationList);
         return result;
     }
 
@@ -770,11 +770,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelationList =
+        List<WorkflowTaskRelation> workflowTaskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
-            Set<TaskDefinition> taskDefinitions = processTaskRelationList
+        if (CollectionUtils.isNotEmpty(workflowTaskRelationList)) {
+            Set<TaskDefinition> taskDefinitions = workflowTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
                         TaskDefinition taskDefinition = buildTaskDefinition();
@@ -807,11 +807,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelationList =
+        List<WorkflowTaskRelation> workflowTaskRelationList =
                 processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode);
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(processTaskRelationList)) {
-            Set<TaskDefinition> taskDefinitions = processTaskRelationList
+        if (CollectionUtils.isNotEmpty(workflowTaskRelationList)) {
+            Set<TaskDefinition> taskDefinitions = workflowTaskRelationList
                     .stream()
                     .map(processTaskRelation -> {
                         TaskDefinition taskDefinition = buildTaskDefinition();
@@ -848,29 +848,29 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        if (processDefinition == null) {
+        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (workflowDefinition == null) {
             log.error("Process definition does not exist, projectCode：{}， processDefinitionCode:{}.", projectCode,
                     processDefinitionCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
-        List<ProcessTaskRelation> processTaskRelations =
+        List<WorkflowTaskRelation> workflowTaskRelations =
                 processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
-        List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
-        if (CollectionUtils.isEmpty(processTaskRelationList)) {
+        List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
+        if (CollectionUtils.isEmpty(workflowTaskRelationList)) {
             log.error("Process task relations are empty, projectCode:{}, processDefinitionCode:{}.", projectCode,
                     processDefinitionCode);
             putMsg(result, Status.DATA_IS_NULL, "processTaskRelationList");
             return result;
         }
-        Map<Long, List<ProcessTaskRelation>> taskRelationMap = new HashMap<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
-            taskRelationMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
+        Map<Long, List<WorkflowTaskRelation>> taskRelationMap = new HashMap<>();
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelationList) {
+            taskRelationMap.compute(workflowTaskRelation.getPostTaskCode(), (k, v) -> {
                 if (v == null) {
                     v = new ArrayList<>();
                 }
-                v.add(processTaskRelation);
+                v.add(workflowTaskRelation);
                 return v;
             });
         }
@@ -879,40 +879,40 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         if (taskRelationMap.get(postTaskCode).size() > 1) {
-            for (ProcessTaskRelation processTaskRelation : taskRelationMap.get(postTaskCode)) {
-                if (processTaskRelation.getPreTaskCode() == preTaskCode) {
-                    int delete = processTaskRelationMapper.deleteById(processTaskRelation.getId());
+            for (WorkflowTaskRelation workflowTaskRelation : taskRelationMap.get(postTaskCode)) {
+                if (workflowTaskRelation.getPreTaskCode() == preTaskCode) {
+                    int delete = processTaskRelationMapper.deleteById(workflowTaskRelation.getId());
                     if (delete == 0) {
                         log.error(
                                 "Delete task relation edge error, processTaskRelationId:{}, preTaskCode:{}, postTaskCode:{}",
-                                processTaskRelation.getId(), preTaskCode, postTaskCode);
+                                workflowTaskRelation.getId(), preTaskCode, postTaskCode);
                         putMsg(result, Status.DELETE_EDGE_ERROR);
                         throw new ServiceException(Status.DELETE_EDGE_ERROR);
                     } else
                         log.info(
                                 "Delete task relation edge complete, processTaskRelationId:{}, preTaskCode:{}, postTaskCode:{}",
-                                processTaskRelation.getId(), preTaskCode, postTaskCode);
-                    processTaskRelationList.remove(processTaskRelation);
+                                workflowTaskRelation.getId(), preTaskCode, postTaskCode);
+                    workflowTaskRelationList.remove(workflowTaskRelation);
                 }
             }
         } else {
-            ProcessTaskRelation processTaskRelation = taskRelationMap.get(postTaskCode).get(0);
-            processTaskRelationList.remove(processTaskRelation);
-            processTaskRelation.setPreTaskVersion(0);
-            processTaskRelation.setPreTaskCode(0L);
-            processTaskRelationList.add(processTaskRelation);
+            WorkflowTaskRelation workflowTaskRelation = taskRelationMap.get(postTaskCode).get(0);
+            workflowTaskRelationList.remove(workflowTaskRelation);
+            workflowTaskRelation.setPreTaskVersion(0);
+            workflowTaskRelation.setPreTaskCode(0L);
+            workflowTaskRelationList.add(workflowTaskRelation);
             log.info(
                     "Delete task relation through set invalid value for it: preTaskCode from {} to 0, processTaskRelationId:{}.",
-                    preTaskCode, processTaskRelation.getId());
+                    preTaskCode, workflowTaskRelation.getId());
         }
-        updateProcessDefiniteVersion(loginUser, result, processDefinition);
-        updateRelation(loginUser, result, processDefinition, processTaskRelationList);
+        updateProcessDefiniteVersion(loginUser, result, workflowDefinition);
+        updateRelation(loginUser, result, workflowDefinition, workflowTaskRelationList);
         return result;
     }
 
     @Override
-    public List<ProcessTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode,
-                                                                   int workflowDefinitionVersion) {
+    public List<WorkflowTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode,
+                                                                    int workflowDefinitionVersion) {
         return processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(workflowDefinitionCode,
                 workflowDefinitionVersion);
     }

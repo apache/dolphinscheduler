@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -232,11 +232,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             throw new ServiceException("The task instance is not under the project: " + projectCode);
         }
 
-        ProcessInstance processInstance = workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())
                 .orElseThrow(
                         () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, task.getProcessInstanceId()));
-        if (!processInstance.getState().isFinished()) {
-            throw new ServiceException("The workflow instance is not finished: " + processInstance.getState()
+        if (!workflowInstance.getState().isFinished()) {
+            throw new ServiceException("The workflow instance is not finished: " + workflowInstance.getState()
                     + " cannot force start task instance");
         }
 

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 
@@ -39,7 +39,7 @@ public class RecoverSuspendedWorkflowInstanceExecutorDelegate
 
     @Override
     public Void execute(RecoverSuspendedWorkflowInstanceOperation workflowInstanceControlRequest) {
-        final ProcessInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
+        final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
         if (!workflowInstance.getState().isPause() && !workflowInstance.getState().isStop()) {
             throw new ServiceException(
                     String.format("The workflow instance: %s state is %s, cannot recovery", workflowInstance.getName(),
@@ -62,7 +62,7 @@ public class RecoverSuspendedWorkflowInstanceExecutorDelegate
 
         private final RecoverSuspendedWorkflowInstanceExecutorDelegate recoverSuspendedWorkflowInstanceExecutorDelegate;
 
-        private ProcessInstance workflowInstance;
+        private WorkflowInstance workflowInstance;
 
         private User executeUser;
 
@@ -70,7 +70,7 @@ public class RecoverSuspendedWorkflowInstanceExecutorDelegate
             this.recoverSuspendedWorkflowInstanceExecutorDelegate = recoverSuspendedWorkflowInstanceExecutorDelegate;
         }
 
-        public RecoverSuspendedWorkflowInstanceExecutorDelegate.RecoverSuspendedWorkflowInstanceOperation onWorkflowInstance(ProcessInstance workflowInstance) {
+        public RecoverSuspendedWorkflowInstanceExecutorDelegate.RecoverSuspendedWorkflowInstanceOperation onWorkflowInstance(WorkflowInstance workflowInstance) {
             this.workflowInstance = workflowInstance;
             return this;
         }

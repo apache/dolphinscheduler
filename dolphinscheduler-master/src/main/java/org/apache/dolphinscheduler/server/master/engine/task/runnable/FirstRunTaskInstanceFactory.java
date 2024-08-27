@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -46,7 +46,7 @@ public class FirstRunTaskInstanceFactory extends AbstractTaskInstanceFactory<Fir
     @Override
     public TaskInstance createTaskInstance(FirstRunTaskInstanceBuilder builder) {
         final TaskDefinition taskDefinition = Preconditions.checkNotNull(builder.taskDefinition);
-        final ProcessInstance workflowInstance = Preconditions.checkNotNull(builder.workflowInstance);
+        final WorkflowInstance workflowInstance = Preconditions.checkNotNull(builder.workflowInstance);
 
         TaskInstance taskInstance = new TaskInstance();
         injectMetadataFromTaskDefinition(taskInstance, taskDefinition);
@@ -72,7 +72,7 @@ public class FirstRunTaskInstanceFactory extends AbstractTaskInstanceFactory<Fir
 
         private final FirstRunTaskInstanceFactory firstRunTaskInstanceFactory;
 
-        private ProcessInstance workflowInstance;
+        private WorkflowInstance workflowInstance;
 
         private TaskDefinition taskDefinition;
 
@@ -80,7 +80,7 @@ public class FirstRunTaskInstanceFactory extends AbstractTaskInstanceFactory<Fir
             this.firstRunTaskInstanceFactory = firstRunTaskInstanceFactory;
         }
 
-        public FirstRunTaskInstanceBuilder withWorkflowInstance(ProcessInstance workflowInstance) {
+        public FirstRunTaskInstanceBuilder withWorkflowInstance(WorkflowInstance workflowInstance) {
             this.workflowInstance = workflowInstance;
             return this;
         }

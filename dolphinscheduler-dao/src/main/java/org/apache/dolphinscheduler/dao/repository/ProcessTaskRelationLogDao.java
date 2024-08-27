@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface ProcessTaskRelationLogDao extends IDao<ProcessTaskRelationLog> {
+public interface ProcessTaskRelationLogDao extends IDao<WorkflowTaskRelationLog> {
 
-    List<ProcessTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode);
+    List<WorkflowTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 
@@ -35,5 +35,5 @@ public interface ProcessTaskRelationLogDao extends IDao<ProcessTaskRelationLog> 
      * @param taskRelationList taskRelationList
      * @return int
      */
-    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
+    int batchInsert(@Param("taskRelationList") List<WorkflowTaskRelationLog> taskRelationList);
 }

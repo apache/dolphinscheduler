@@ -23,8 +23,8 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_FATHER_PARAMS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.MapUtils;
@@ -60,17 +60,17 @@ public class ParamUtils {
     /**
      * Get sub workflow parameters
      * @param instanceMap process instance map
-     * @param parentProcessInstance  parent process instance
+     * @param parentWorkflowInstance  parent process instance
      * @param fatherParams fatherParams
      * @return sub workflow parameters
      */
-    public static String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance,
+    public static String getSubWorkFlowParam(WorkflowInstanceRelation instanceMap, WorkflowInstance parentWorkflowInstance,
                                              Map<String, String> fatherParams) {
         // set sub work process command
         String processMapStr = JSONUtils.toJsonString(instanceMap);
         Map<String, String> cmdParam = JSONUtils.toMap(processMapStr);
-        if (parentProcessInstance.isComplementData()) {
-            Map<String, String> parentParam = JSONUtils.toMap(parentProcessInstance.getCommandParam());
+        if (parentWorkflowInstance.isComplementData()) {
+            Map<String, String> parentParam = JSONUtils.toMap(parentWorkflowInstance.getCommandParam());
             String endTime = parentParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
             String startTime = parentParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
             String scheduleTime = parentParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);

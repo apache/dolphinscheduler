@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Repository
-public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInstanceMapper>
+public class ProcessInstanceDaoImpl extends BaseDao<WorkflowInstance, ProcessInstanceMapper>
         implements
             ProcessInstanceDao {
 
@@ -51,11 +51,11 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
     }
 
     @Override
-    public void upsertProcessInstance(@NonNull ProcessInstance processInstance) {
-        if (processInstance.getId() != null) {
-            updateById(processInstance);
+    public void upsertProcessInstance(@NonNull WorkflowInstance workflowInstance) {
+        if (workflowInstance.getId() != null) {
+            updateById(workflowInstance);
         } else {
-            insert(processInstance);
+            insert(workflowInstance);
         }
     }
 
@@ -64,21 +64,21 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
                                             WorkflowExecutionStatus targetStatus) {
         int update = mybatisMapper.updateWorkflowInstanceState(workflowInstanceId, originalStatus, targetStatus);
         if (update != 1) {
-            ProcessInstance processInstance = mybatisMapper.selectById(workflowInstanceId);
-            if (processInstance == null) {
+            WorkflowInstance workflowInstance = mybatisMapper.selectById(workflowInstanceId);
+            if (workflowInstance == null) {
                 throw new UnsupportedOperationException("updateWorkflowInstance " + workflowInstanceId
                         + " state failed, the workflow instance is not exist in db");
             }
             throw new UnsupportedOperationException(
                     "updateWorkflowInstance " + workflowInstanceId + " state failed, expect original state is "
-                            + originalStatus.name() + " actual state is : {} " + processInstance.getState().name());
+                            + originalStatus.name() + " actual state is : {} " + workflowInstance.getState().name());
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-    public void performTransactionalUpsert(ProcessInstance processInstance) {
-        this.upsertProcessInstance(processInstance);
+    public void performTransactionalUpsert(WorkflowInstance workflowInstance) {
+        this.upsertProcessInstance(workflowInstance);
     }
 
     /**
@@ -90,9 +90,9 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * @return process instance
      */
     @Override
-    public ProcessInstance queryLastSchedulerProcessInterval(Long processDefinitionCode, Long taskDefinitionCode,
-                                                             DateInterval dateInterval,
-                                                             int testFlag) {
+    public WorkflowInstance queryLastSchedulerProcessInterval(Long processDefinitionCode, Long taskDefinitionCode,
+                                                              DateInterval dateInterval,
+                                                              int testFlag) {
         return mybatisMapper.queryLastSchedulerProcess(
                 processDefinitionCode,
                 taskDefinitionCode,
@@ -110,8 +110,8 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * @return process instance
      */
     @Override
-    public ProcessInstance queryLastManualProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
-                                                          int testFlag) {
+    public WorkflowInstance queryLastManualProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
+                                                           int testFlag) {
         return mybatisMapper.queryLastManualProcess(definitionCode,
                 taskCode,
                 dateInterval.getStartTime(),
@@ -126,7 +126,7 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * @return process instance
      */
     @Override
-    public ProcessInstance queryFirstScheduleProcessInstance(Long definitionCode) {
+    public WorkflowInstance queryFirstScheduleProcessInstance(Long definitionCode) {
         return mybatisMapper.queryFirstScheduleProcessInstance(definitionCode);
     }
 
@@ -137,26 +137,26 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * @return process instance
      */
     @Override
-    public ProcessInstance queryFirstStartProcessInstance(Long definitionCode) {
+    public WorkflowInstance queryFirstStartProcessInstance(Long definitionCode) {
         return mybatisMapper.queryFirstStartProcessInstance(definitionCode);
     }
 
     @Override
-    public ProcessInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId) {
-        ProcessInstance processInstance = null;
-        ProcessInstanceMap processInstanceMap =
+    public WorkflowInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId) {
+        WorkflowInstance workflowInstance = null;
+        WorkflowInstanceRelation workflowInstanceRelation =
                 processInstanceMapMapper.queryByParentId(processInstanceId, taskInstanceId);
-        if (processInstanceMap == null || processInstanceMap.getProcessInstanceId() == 0) {
-            return processInstance;
+        if (workflowInstanceRelation == null || workflowInstanceRelation.getProcessInstanceId() == 0) {
+            return workflowInstance;
         }
-        processInstance = queryById(processInstanceMap.getProcessInstanceId());
-        return processInstance;
+        workflowInstance = queryById(workflowInstanceRelation.getProcessInstanceId());
+        return workflowInstance;
     }
 
     @Override
-    public List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                                  int workflowDefinitionVersion,
-                                                                  int[] states) {
+    public List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                   int workflowDefinitionVersion,
+                                                                   int[] states) {
         return mybatisMapper.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
                 states);
     }
@@ -168,7 +168,7 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
     }
 
     @Override
-    public List<ProcessInstance> queryNeedFailoverWorkflowInstances(String masterAddress) {
+    public List<WorkflowInstance> queryNeedFailoverWorkflowInstances(String masterAddress) {
         return mybatisMapper.queryByHostAndStatus(masterAddress,
                 WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
