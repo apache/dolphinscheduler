@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.service.expand;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -116,27 +116,27 @@ public class CuringParamsServiceTest {
 
         // test globalParamList is null
         String result = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
         Assertions.assertNull(result);
         Assertions.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, null,
-                CommandType.START_CURRENT_TASK_PROCESS, null, null));
+                CommandType.START_CURRENT_TASK_WORKFLOW, null, null));
         Assertions.assertNull(dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, null,
-                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
+                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null));
 
         // test globalParamList is not null
         Property property = new Property("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
         globalParamList.add(property);
 
         String result2 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, globalParamList,
-                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
         Assertions.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
 
         String result3 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_PROCESS, null, null);
+                CommandType.START_CURRENT_TASK_WORKFLOW, null, null);
         Assertions.assertEquals(result3, JSONUtils.toJsonString(globalParamList));
 
         String result4 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
         Assertions.assertEquals(result4, JSONUtils.toJsonString(globalParamList));
 
         // test var $ startsWith
@@ -152,7 +152,7 @@ public class CuringParamsServiceTest {
         globalParamList.add(property4);
 
         String result5 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
         Assertions.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
 
         Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
@@ -174,7 +174,7 @@ public class CuringParamsServiceTest {
         }
 
         String result6 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
-                CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
+                CommandType.START_CURRENT_TASK_WORKFLOW, scheduleTime, null);
         Assertions.assertEquals(result6, JSONUtils.toJsonString(globalParamList));
     }
 

@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 
 import java.util.Date;
@@ -49,7 +49,7 @@ public class RecoverFailureTaskInstanceExecutorDelegate
         }
 
         Command command = Command.builder()
-                .commandType(CommandType.START_FAILURE_TASK_PROCESS)
+                .commandType(CommandType.START_FAILURE_TASK_WORKFLOW)
                 .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
                 .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
                 .processInstanceId(workflowInstance.getId())

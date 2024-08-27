@@ -19,20 +19,20 @@ package org.apache.dolphinscheduler.service.command;
 
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_WORKFLOW_ID_STRING;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +63,7 @@ class MessageServiceImplTest {
     private CommandMapper commandMapper;
 
     @Mock
-    private ProcessDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper processDefineMapper;
 
     @Mock
     private ScheduleMapper scheduleMapper;
@@ -88,22 +88,22 @@ class MessageServiceImplTest {
 
         // father history: start; child null == command type: start
         parentInstance.setHistoryCmd("START_PROCESS");
-        parentInstance.setCommandType(CommandType.START_PROCESS);
+        parentInstance.setCommandType(CommandType.START_WORKFLOW);
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(10L);
         Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(workflowDefinition);
         Mockito.when(processDefineMapper.queryByCode(10L)).thenReturn(workflowDefinition);
         command = commandService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.START_PROCESS, command.getCommandType());
+        Assertions.assertEquals(CommandType.START_WORKFLOW, command.getCommandType());
 
         // father history: start,start failure; child null == command type: start
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
+        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
         parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
         command = commandService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.START_PROCESS, command.getCommandType());
+        Assertions.assertEquals(CommandType.START_WORKFLOW, command.getCommandType());
 
         // father history: scheduler,start failure; child null == command type: scheduler
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
+        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
         parentInstance.setHistoryCmd("SCHEDULER,START_FAILURE_TASK_PROCESS");
         command = commandService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assertions.assertEquals(CommandType.SCHEDULER, command.getCommandType());
@@ -112,7 +112,7 @@ class MessageServiceImplTest {
 
         String startString = "2020-01-01 00:00:00";
         String endString = "2020-01-10 00:00:00";
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
+        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
         parentInstance.setHistoryCmd("COMPLEMENT_DATA,START_FAILURE_TASK_PROCESS");
         Map<String, String> complementMap = new HashMap<>();
         complementMap.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, startString);
@@ -129,10 +129,10 @@ class MessageServiceImplTest {
 
         // father history: start,failure,start failure; child not null == command type: start failure
         childInstance = new WorkflowInstance();
-        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
+        parentInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
         parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
         command = commandService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
-        Assertions.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
+        Assertions.assertEquals(CommandType.START_FAILURE_TASK_WORKFLOW, command.getCommandType());
     }
 
     @Test
@@ -142,14 +142,14 @@ class MessageServiceImplTest {
 
         Command command = new Command();
         command.setCommandType(CommandType.REPEAT_RUNNING);
-        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\"}");
+        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_WORKFLOW_ID_STRING + "\":\"111\"}");
         commands.add(command);
         Mockito.when(commandMapper.selectList(null)).thenReturn(commands);
         Assertions.assertFalse(commandService.verifyIsNeedCreateCommand(command));
 
         Command command1 = new Command();
         command1.setCommandType(CommandType.REPEAT_RUNNING);
-        command1.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"222\"}");
+        command1.setCommandParam("{\"" + CMD_PARAM_RECOVER_WORKFLOW_ID_STRING + "\":\"222\"}");
         Assertions.assertTrue(commandService.verifyIsNeedCreateCommand(command1));
 
         Command command2 = new Command();
@@ -162,7 +162,7 @@ class MessageServiceImplTest {
         Command command = new Command();
         command.setProcessDefinitionCode(123);
         command.setCommandParam("{\"ProcessInstanceId\":222}");
-        command.setCommandType(CommandType.START_PROCESS);
+        command.setCommandType(CommandType.START_WORKFLOW);
         int mockResult = 1;
         Mockito.when(commandMapper.insert(command)).thenReturn(mockResult);
         int exeMethodResult = commandService.createCommand(command);

@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 
@@ -46,7 +46,7 @@ public class TaskDefinitionLogDaoImpl extends BaseDao<TaskDefinitionLog, TaskDef
             TaskDefinitionLogDao {
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     public TaskDefinitionLogDaoImpl(@NonNull TaskDefinitionLogMapper taskDefinitionLogMapper) {
         super(taskDefinitionLogMapper);
@@ -56,7 +56,7 @@ public class TaskDefinitionLogDaoImpl extends BaseDao<TaskDefinitionLog, TaskDef
     public List<TaskDefinitionLog> queryByWorkflowDefinitionCodeAndVersion(Long workflowDefinitionCode,
                                                                            Integer workflowDefinitionVersion) {
 
-        List<WorkflowTaskRelation> workflowTaskRelationLogs = processTaskRelationLogMapper
+        List<WorkflowTaskRelation> workflowTaskRelationLogs = workflowTaskRelationLogMapper
                 .queryByProcessCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion)
                 .stream()
                 .map(p -> (WorkflowTaskRelation) p)

@@ -34,13 +34,13 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -86,7 +86,7 @@ public class ProjectServiceTest {
     private ProjectUserMapper projectUserMapper;
 
     @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
     private UserMapper userMapper;
@@ -259,7 +259,7 @@ public class ProjectServiceTest {
         Assertions.assertTrue(Status.USER_NO_WRITE_PROJECT_PERM.getCode() == result.getCode());
 
         // DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
-        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
+        Mockito.when(workflowDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(1);
         Mockito.when(
@@ -276,7 +276,7 @@ public class ProjectServiceTest {
 
         // success
         Mockito.when(projectMapper.deleteById(1)).thenReturn(1);
-        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
+        Mockito.when(workflowDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
         result = projectService.deleteProject(loginUser, 1L);
         logger.info(result.toString());
         Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());

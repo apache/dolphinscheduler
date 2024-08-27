@@ -38,6 +38,6 @@ public class WorkflowFailoverCommandParam extends AbstractCommandParam {
 
     @Override
     public CommandType getCommandType() {
-        return CommandType.RECOVER_TOLERANCE_FAULT_PROCESS;
+        return CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW;
     }
 }

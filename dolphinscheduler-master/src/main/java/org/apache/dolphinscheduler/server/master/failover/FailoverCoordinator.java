@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.failover;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -56,7 +56,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
     private TaskFailover taskFailover;
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;

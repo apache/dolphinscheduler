@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
@@ -50,14 +50,14 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Lists;
 
 /**
- * This handler used to handle {@link CommandType#START_FAILURE_TASK_PROCESS}.
+ * This handler used to handle {@link CommandType#START_FAILURE_TASK_WORKFLOW}.
  * <p> Will start the failure/pause/killed and other task instance which is behind success tasks instance but not been triggered.
  */
 @Component
 public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -212,7 +212,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
 
     @Override
     public CommandType commandType() {
-        return CommandType.START_FAILURE_TASK_PROCESS;
+        return CommandType.START_FAILURE_TASK_WORKFLOW;
     }
 
 }

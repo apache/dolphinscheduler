@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.server.master.cluster.MasterSlotManager;
 import org.apache.dolphinscheduler.server.master.config.CommandFetchStrategy;
-import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +65,7 @@ public class IdSlotBasedCommandFetcher implements ICommandFetcher {
                 idSlotBasedFetchConfig.getFetchSize());
         long cost = System.currentTimeMillis() - scheduleStartTime;
         log.info("[Slot-{}/{}] Fetch {} commands in {}ms.", currentSlotIndex, totalSlot, commands.size(), cost);
-        ProcessInstanceMetrics.recordCommandQueryTime(cost);
+        WorkflowInstanceMetrics.recordCommandQueryTime(cost);
         return commands;
     }
 

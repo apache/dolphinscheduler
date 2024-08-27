@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WorkflowTaskRelationLogMapperTest extends BaseDaoTest {
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     /**
      * insert
@@ -48,14 +48,14 @@ public class WorkflowTaskRelationLogMapperTest extends BaseDaoTest {
         processTaskRelationLog.setPreTaskCode(2L);
         processTaskRelationLog.setUpdateTime(new Date());
         processTaskRelationLog.setCreateTime(new Date());
-        processTaskRelationLogMapper.insert(processTaskRelationLog);
+        workflowTaskRelationLogMapper.insert(processTaskRelationLog);
         return processTaskRelationLog;
     }
 
     @Test
     public void testQueryByProcessCodeAndVersion() {
         WorkflowTaskRelationLog processTaskRelationLog = insertOne();
-        List<WorkflowTaskRelationLog> processTaskRelationLogs = processTaskRelationLogMapper
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = workflowTaskRelationLogMapper
                 .queryByProcessCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(0, processTaskRelationLogs.size());
     }

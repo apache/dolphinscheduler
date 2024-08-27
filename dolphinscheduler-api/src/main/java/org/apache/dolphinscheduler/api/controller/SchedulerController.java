@@ -135,7 +135,7 @@ public class SchedulerController extends BaseController {
     }
 
     /**
-     * updateProcessInstance schedule
+     * updateWorkflowInstance schedule
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -317,7 +317,7 @@ public class SchedulerController extends BaseController {
      * @param processInstancePriority process instance priority
      * @return update result code
      */
-    @Operation(summary = "updateScheduleByProcessDefinitionCode", description = "UPDATE_SCHEDULE_BY_PROCESS_DEFINITION_CODE_NOTES")
+    @Operation(summary = "updateScheduleByWorkflowDefinitionCode", description = "UPDATE_SCHEDULE_BY_PROCESS_DEFINITION_CODE_NOTES")
     @Parameters({
             @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "12345678")),
             @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
@@ -344,7 +344,7 @@ public class SchedulerController extends BaseController {
                                                         @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                                         @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") long environmentCode,
                                                         @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
-        Map<String, Object> result = schedulerService.updateScheduleByProcessDefinitionCode(loginUser, projectCode,
+        Map<String, Object> result = schedulerService.updateScheduleByWorkflowDefinitionCode(loginUser, projectCode,
                 processDefinitionCode, schedule,
                 warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, tenantCode,
                 environmentCode);

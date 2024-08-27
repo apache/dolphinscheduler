@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.service.command;
 
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_WORKFLOW_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -26,15 +26,15 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.service.utils.ParamUtils;
@@ -72,7 +72,7 @@ public class CommandServiceImpl implements CommandService {
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper processDefineMapper;
 
     @Override
     public void moveToErrorCommand(Command command, String message) {
@@ -107,8 +107,8 @@ public class CommandServiceImpl implements CommandService {
         boolean isNeedCreate = true;
         EnumMap<CommandType, Integer> cmdTypeMap = new EnumMap<>(CommandType.class);
         cmdTypeMap.put(CommandType.REPEAT_RUNNING, 1);
-        cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, 1);
-        cmdTypeMap.put(CommandType.START_FAILURE_TASK_PROCESS, 1);
+        cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_WORKFLOW, 1);
+        cmdTypeMap.put(CommandType.START_FAILURE_TASK_WORKFLOW, 1);
         CommandType commandType = command.getCommandType();
 
         if (!cmdTypeMap.containsKey(commandType)) {
@@ -116,7 +116,7 @@ public class CommandServiceImpl implements CommandService {
         }
 
         ObjectNode cmdParamObj = JSONUtils.parseObject(command.getCommandParam());
-        int processInstanceId = cmdParamObj.path(CMD_PARAM_RECOVER_PROCESS_ID_STRING).asInt();
+        int processInstanceId = cmdParamObj.path(CMD_PARAM_RECOVER_WORKFLOW_ID_STRING).asInt();
 
         List<Command> commands = commandMapper.selectList(null);
         // for all commands
@@ -126,7 +126,7 @@ public class CommandServiceImpl implements CommandService {
             }
             ObjectNode tempObj = JSONUtils.parseObject(tmpCommand.getCommandParam());
             if (tempObj != null
-                    && processInstanceId == tempObj.path(CMD_PARAM_RECOVER_PROCESS_ID_STRING).asInt()) {
+                    && processInstanceId == tempObj.path(CMD_PARAM_RECOVER_WORKFLOW_ID_STRING).asInt()) {
                 isNeedCreate = false;
                 break;
             }
@@ -140,11 +140,11 @@ public class CommandServiceImpl implements CommandService {
         CommandType commandType = getSubCommandType(parentWorkflowInstance, childInstance);
         Map<String, Object> subProcessParam = JSONUtils.toMap(task.getTaskParams(), String.class, Object.class);
         long childDefineCode = 0L;
-        if (subProcessParam.containsKey(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
+        if (subProcessParam.containsKey(CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE)) {
             try {
                 childDefineCode =
                         Long.parseLong(
-                                String.valueOf(subProcessParam.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
+                                String.valueOf(subProcessParam.get(CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE)));
             } catch (NumberFormatException nfe) {
                 log.error("processDefinitionCode is not a number", nfe);
                 return null;

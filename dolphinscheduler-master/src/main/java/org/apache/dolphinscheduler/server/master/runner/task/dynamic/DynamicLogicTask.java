@@ -22,18 +22,18 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -64,11 +64,11 @@ import com.google.common.collect.Lists;
 public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
 
     public static final String TASK_TYPE = "DYNAMIC";
-    private final ProcessInstanceDao processInstanceDao;
+    private final WorkflowInstanceDao workflowInstanceDao;
 
     private final SubWorkflowService subWorkflowService;
 
-    private final ProcessDefinitionMapper processDefineMapper;
+    private final WorkflowDefinitionMapper processDefineMapper;
 
     private final CommandMapper commandMapper;
 
@@ -81,22 +81,22 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     private boolean haveBeenCanceled = false;
 
     public DynamicLogicTask(TaskExecutionContext taskExecutionContext,
-                            ProcessInstanceDao processInstanceDao,
+                            WorkflowInstanceDao workflowInstanceDao,
                             TaskInstanceDao taskInstanceDao,
                             SubWorkflowService subWorkflowService,
                             ProcessService processService,
-                            ProcessDefinitionMapper processDefineMapper,
+                            WorkflowDefinitionMapper processDefineMapper,
                             CommandMapper commandMapper) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<DynamicParameters>() {
                 }));
-        this.processInstanceDao = processInstanceDao;
+        this.workflowInstanceDao = workflowInstanceDao;
         this.subWorkflowService = subWorkflowService;
         this.processService = processService;
         this.processDefineMapper = processDefineMapper;
         this.commandMapper = commandMapper;
 
-        this.workflowInstance = processInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
+        this.workflowInstance = workflowInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
         this.taskInstance = taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
     }
 
@@ -128,16 +128,16 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
             case REPEAT_RUNNING:
                 existsSubWorkflowInstanceList.forEach(processInstance -> {
                     processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    processInstanceDao.updateById(processInstance);
+                    workflowInstanceDao.updateById(processInstance);
                 });
                 break;
-            case START_FAILURE_TASK_PROCESS:
-            case RECOVER_TOLERANCE_FAULT_PROCESS:
+            case START_FAILURE_TASK_WORKFLOW:
+            case RECOVER_TOLERANCE_FAULT_WORKFLOW:
                 List<WorkflowInstance> failedWorkflowInstances =
                         subWorkflowService.filterFailedProcessInstances(existsSubWorkflowInstanceList);
                 failedWorkflowInstances.forEach(processInstance -> {
                     processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    processInstanceDao.updateById(processInstance);
+                    workflowInstanceDao.updateById(processInstance);
                 });
                 break;
         }
@@ -159,7 +159,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                     dynamicStartParams);
             WorkflowInstance subWorkflowInstance = createSubProcessInstance(command);
             subWorkflowInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-            processInstanceDao.insert(subWorkflowInstance);
+            workflowInstanceDao.insert(subWorkflowInstance);
             command.setProcessInstanceId(subWorkflowInstance.getId());
             workflowInstanceList.add(subWorkflowInstance);
         }
@@ -307,7 +307,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     private void doKillWaitToRunSubWorkflowInstances(List<WorkflowInstance> waitToRunWorkflowInstances) {
         for (WorkflowInstance subWorkflowInstance : waitToRunWorkflowInstances) {
             subWorkflowInstance.setState(WorkflowExecutionStatus.STOP);
-            processInstanceDao.updateById(subWorkflowInstance);
+            workflowInstanceDao.updateById(subWorkflowInstance);
         }
     }
 

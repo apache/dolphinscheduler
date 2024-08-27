@@ -130,7 +130,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     /**
-     * updateProcessInstance datasource
+     * updateWorkflowInstance datasource
      *
      * @param loginUser login user
      * @return update result code
@@ -189,7 +189,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     /**
-     * updateProcessInstance datasource
+     * updateWorkflowInstance datasource
      *
      * @param id datasource id
      * @return data source detail

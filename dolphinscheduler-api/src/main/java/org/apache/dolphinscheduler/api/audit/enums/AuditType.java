@@ -44,8 +44,6 @@ import static org.apache.dolphinscheduler.common.enums.AuditModelType.ENVIRONMEN
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.FILE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.FOLDER;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.K8S_NAMESPACE;
-import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKFLOW;
-import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKFLOW_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROJECT;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.SCHEDULE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK;
@@ -55,6 +53,8 @@ import static org.apache.dolphinscheduler.common.enums.AuditModelType.TENANT;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TOKEN;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.USER;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKFLOW;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKFLOW_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.YARN_QUEUE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_DELETE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_RERUN;
@@ -83,7 +83,6 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.ClusterAuditOperatorI
 import org.apache.dolphinscheduler.api.audit.operator.impl.DatasourceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.EnvironmentAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.K8SNamespaceAuditOperatorImpl;
-import org.apache.dolphinscheduler.api.audit.operator.impl.WorkflowAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ProcessInstanceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ProjectAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ResourceAuditOperatorImpl;
@@ -95,6 +94,7 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.TenantAuditOperatorIm
 import org.apache.dolphinscheduler.api.audit.operator.impl.TokenAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.UserAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.WorkerGroupAuditOperatorImpl;
+import org.apache.dolphinscheduler.api.audit.operator.impl.WorkflowAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.YarnQueueAuditOperatorImpl;
 import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;

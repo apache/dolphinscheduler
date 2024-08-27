@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.service.subworkflow;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.List;

@@ -21,8 +21,8 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -161,7 +161,8 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
                     parameters);
             command.setProcessInstanceId(subWorkflowInstance.getId());
             commandMapper.insert(command);
-            log.info("start sub process instance, sub process instance id: {}, command: {}", subWorkflowInstance.getId(),
+            log.info("start sub process instance, sub process instance id: {}, command: {}",
+                    subWorkflowInstance.getId(),
                     command);
         }
     }

@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.api.dto.workflow;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.VERSION_FIRST;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.util.Date;

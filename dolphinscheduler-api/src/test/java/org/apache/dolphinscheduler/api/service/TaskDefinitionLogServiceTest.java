@@ -22,9 +22,9 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionLogServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,12 +46,12 @@ public class TaskDefinitionLogServiceTest {
     private TaskDefinitionLogServiceImpl taskDefinitionLogService;
 
     @Mock
-    private ProcessTaskRelationLogDao processTaskRelationLogDao;
+    private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
 
     @Mock
     private TaskDefinitionLogDao taskDefinitionLogDao;
     @Mock
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     private List<WorkflowTaskRelationLog> getProcessTaskRelationList() {
         WorkflowTaskRelationLog processTaskRelationLog1 = new WorkflowTaskRelationLog();
@@ -72,10 +72,10 @@ public class TaskDefinitionLogServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testDeleteTaskByWorkflowDefinitionCode() {
-        when(processTaskRelationLogDao.queryByWorkflowDefinitionCode(1L)).thenReturn(Collections.emptyList());
+        when(workflowTaskRelationLogDao.queryByWorkflowDefinitionCode(1L)).thenReturn(Collections.emptyList());
         assertDoesNotThrow(() -> taskDefinitionLogService.deleteTaskByWorkflowDefinitionCode(1L));
 
-        when(processTaskRelationLogDao.queryByWorkflowDefinitionCode(2L)).thenReturn(getProcessTaskRelationList());
+        when(workflowTaskRelationLogDao.queryByWorkflowDefinitionCode(2L)).thenReturn(getProcessTaskRelationList());
         assertDoesNotThrow(() -> taskDefinitionLogService.deleteTaskByWorkflowDefinitionCode(2L));
     }
 }

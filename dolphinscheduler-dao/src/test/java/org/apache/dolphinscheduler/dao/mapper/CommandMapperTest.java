@@ -56,7 +56,7 @@ public class CommandMapperTest extends BaseDaoTest {
     private CommandMapper commandMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * test insert
@@ -148,7 +148,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         WorkflowDefinition workflowDefinition = createProcessDefinition();
 
-        createCommand(CommandType.START_PROCESS, workflowDefinition.getCode());
+        createCommand(CommandType.START_WORKFLOW, workflowDefinition.getCode());
 
         List<Command> actualCommand = commandMapper.selectList(new QueryWrapper<>());
 
@@ -164,7 +164,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         WorkflowDefinition workflowDefinition = createProcessDefinition();
 
-        createCommandMap(count, CommandType.START_PROCESS, workflowDefinition.getCode());
+        createCommandMap(count, CommandType.START_WORKFLOW, workflowDefinition.getCode());
 
         Date startTime = DateUtils.stringToDate("2019-12-29 00:10:00");
 
@@ -253,7 +253,7 @@ public class CommandMapperTest extends BaseDaoTest {
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUpdateTime(new Date());
 
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         return workflowDefinition;
     }
@@ -280,7 +280,7 @@ public class CommandMapperTest extends BaseDaoTest {
      * @return
      */
     private Command createCommand() {
-        return createCommand(CommandType.START_PROCESS, 1);
+        return createCommand(CommandType.START_WORKFLOW, 1);
     }
 
     /**

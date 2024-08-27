@@ -42,7 +42,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
     private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * insert
@@ -52,7 +52,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         // insertOne
         ErrorCommand errorCommand = new ErrorCommand();
         errorCommand.setId(10101);
-        errorCommand.setCommandType(CommandType.START_PROCESS);
+        errorCommand.setCommandType(CommandType.START_WORKFLOW);
         errorCommand.setUpdateTime(new Date());
         errorCommand.setStartTime(new Date());
         errorCommandMapper.insert(errorCommand);
@@ -85,7 +85,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         workflowDefinition.setUserId(101);
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         errorCommand.setProcessDefinitionCode(workflowDefinition.getCode());
         errorCommandMapper.updateById(errorCommand);

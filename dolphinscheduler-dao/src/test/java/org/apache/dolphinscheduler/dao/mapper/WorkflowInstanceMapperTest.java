@@ -40,10 +40,10 @@ import com.google.common.collect.Lists;
 public class WorkflowInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -60,7 +60,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         workflowInstance.setEndTime(end);
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
 
-        processInstanceMapper.insert(workflowInstance);
+        workflowInstanceMapper.insert(workflowInstance);
         return workflowInstance;
     }
 
@@ -80,7 +80,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         workflowInstance.setEndTime(end);
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         workflowInstance.setTestFlag(0);
-        processInstanceMapper.insert(workflowInstance);
+        workflowInstanceMapper.insert(workflowInstance);
         return workflowInstance;
     }
 
@@ -92,9 +92,9 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         // insertOne
         WorkflowInstance workflowInstanceMap = insertOne();
         // update
-        int update = processInstanceMapper.updateById(workflowInstanceMap);
+        int update = workflowInstanceMapper.updateById(workflowInstanceMap);
         Assertions.assertEquals(1, update);
-        processInstanceMapper.deleteById(workflowInstanceMap.getId());
+        workflowInstanceMapper.deleteById(workflowInstanceMap.getId());
     }
 
     /**
@@ -103,7 +103,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testDelete() {
         WorkflowInstance workflowInstanceMap = insertOne();
-        int delete = processInstanceMapper.deleteById(workflowInstanceMap.getId());
+        int delete = workflowInstanceMapper.deleteById(workflowInstanceMap.getId());
         Assertions.assertEquals(1, delete);
     }
 
@@ -114,9 +114,9 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
     public void testQuery() {
         WorkflowInstance workflowInstance = insertOne();
         // query
-        List<WorkflowInstance> dataSources = processInstanceMapper.selectList(null);
+        List<WorkflowInstance> dataSources = workflowInstanceMapper.selectList(null);
         Assertions.assertNotEquals(0, dataSources.size());
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
     }
 
     /**
@@ -125,11 +125,11 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQueryDetailById() {
         WorkflowInstance workflowInstance = insertOne();
-        processInstanceMapper.updateById(workflowInstance);
+        workflowInstanceMapper.updateById(workflowInstance);
 
-        WorkflowInstance workflowInstance1 = processInstanceMapper.queryDetailById(workflowInstance.getId());
+        WorkflowInstance workflowInstance1 = workflowInstanceMapper.queryDetailById(workflowInstance.getId());
         Assertions.assertNotNull(workflowInstance1);
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
     }
 
     /**
@@ -140,15 +140,15 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance = insertOne();
         workflowInstance.setHost("192.168.2.155");
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstanceMapper.updateById(workflowInstance);
+        workflowInstanceMapper.updateById(workflowInstance);
 
         int[] stateArray = new int[]{
                 TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
                 TaskExecutionStatus.SUCCESS.getCode()};
 
-        List<WorkflowInstance> workflowInstances = processInstanceMapper.queryByHostAndStatus(null, stateArray);
+        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByHostAndStatus(null, stateArray);
 
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
         Assertions.assertNotEquals(0, workflowInstances.size());
     }
 
@@ -168,7 +168,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         WorkflowInstance workflowInstance = insertOne();
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
@@ -177,11 +177,11 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         workflowInstance.setIsSubProcess(Flag.NO);
         workflowInstance.setStartTime(new Date());
 
-        processInstanceMapper.updateById(workflowInstance);
+        workflowInstanceMapper.updateById(workflowInstance);
 
         Page<WorkflowInstance> page = new Page(1, 3);
 
-        IPage<WorkflowInstance> processInstanceIPage = processInstanceMapper.queryProcessInstanceListPaging(
+        IPage<WorkflowInstance> processInstanceIPage = workflowInstanceMapper.queryProcessInstanceListPaging(
                 page,
                 workflowDefinition.getProjectCode(),
                 workflowInstance.getProcessDefinitionCode(),
@@ -193,8 +193,8 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
                 null);
         Assertions.assertNotEquals(0, processInstanceIPage.getTotal());
 
-        processDefinitionMapper.deleteById(workflowDefinition.getId());
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowDefinitionMapper.deleteById(workflowDefinition.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
     }
 
     /**
@@ -206,15 +206,15 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance = insertOne();
 
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstanceMapper.updateById(workflowInstance);
+        workflowInstanceMapper.updateById(workflowInstance);
 
-        processInstanceMapper.updateWorkflowInstanceState(workflowInstance.getId(),
+        workflowInstanceMapper.updateWorkflowInstanceState(workflowInstance.getId(),
                 WorkflowExecutionStatus.RUNNING_EXECUTION,
                 WorkflowExecutionStatus.SUCCESS);
 
-        WorkflowInstance workflowInstance1 = processInstanceMapper.selectById(workflowInstance.getId());
+        WorkflowInstance workflowInstance1 = workflowInstanceMapper.selectById(workflowInstance.getId());
 
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
         Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS, workflowInstance1.getState());
 
     }
@@ -227,12 +227,12 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance = insertOne();
 
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos =
-                processInstanceMapper.countWorkflowInstanceStateByProjectCodes(null, null,
+                workflowInstanceMapper.countWorkflowInstanceStateByProjectCodes(null, null,
                         Lists.newArrayList(workflowInstance.getProjectCode()));
 
         Assertions.assertNotEquals(0, workflowInstanceStatusCountDtos.size());
 
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
     }
 
     /**
@@ -244,15 +244,15 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance1 = insertOne();
 
         List<WorkflowInstance> workflowInstances =
-                processInstanceMapper.queryByProcessDefineCode(workflowInstance.getProcessDefinitionCode(), 1);
+                workflowInstanceMapper.queryByProcessDefineCode(workflowInstance.getProcessDefinitionCode(), 1);
         Assertions.assertEquals(1, workflowInstances.size());
 
         workflowInstances =
-                processInstanceMapper.queryByProcessDefineCode(workflowInstance.getProcessDefinitionCode(), 2);
+                workflowInstanceMapper.queryByProcessDefineCode(workflowInstance.getProcessDefinitionCode(), 2);
         Assertions.assertEquals(2, workflowInstances.size());
 
-        processInstanceMapper.deleteById(workflowInstance.getId());
-        processInstanceMapper.deleteById(workflowInstance1.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance1.getId());
     }
 
     /**
@@ -262,14 +262,14 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
     public void testQueryLastSchedulerProcess() {
         WorkflowInstance workflowInstance = insertOne();
         workflowInstance.setScheduleTime(new Date());
-        processInstanceMapper.updateById(workflowInstance);
+        workflowInstanceMapper.updateById(workflowInstance);
 
         WorkflowInstance workflowInstance1 =
-                processInstanceMapper.queryLastSchedulerProcess(workflowInstance.getProcessDefinitionCode(), 0L, null,
+                workflowInstanceMapper.queryLastSchedulerProcess(workflowInstance.getProcessDefinitionCode(), 0L, null,
                         null,
                         workflowInstance.getTestFlag());
         Assertions.assertNotEquals(null, workflowInstance1);
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
     }
 
     /**
@@ -278,24 +278,24 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQueryLastManualProcess() {
         WorkflowInstance workflowInstance = insertOne();
-        processInstanceMapper.updateById(workflowInstance);
+        workflowInstanceMapper.updateById(workflowInstance);
 
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
         WorkflowInstance workflowInstance1 =
-                processInstanceMapper.queryLastManualProcess(workflowInstance.getProcessDefinitionCode(), null, start,
+                workflowInstanceMapper.queryLastManualProcess(workflowInstance.getProcessDefinitionCode(), null, start,
                         end,
                         workflowInstance.getTestFlag());
         Assertions.assertEquals(workflowInstance1.getId(), workflowInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
         workflowInstance1 =
-                processInstanceMapper.queryLastManualProcess(workflowInstance.getProcessDefinitionCode(), null, start,
+                workflowInstanceMapper.queryLastManualProcess(workflowInstance.getProcessDefinitionCode(), null, start,
                         end,
                         workflowInstance.getTestFlag());
         Assertions.assertNull(workflowInstance1);
 
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
 
     }
 
@@ -304,7 +304,8 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
      */
     private boolean isSortedByDuration(List<WorkflowInstance> workflowInstances) {
         for (int i = 1; i < workflowInstances.size(); i++) {
-            long d1 = workflowInstances.get(i).getEndTime().getTime() - workflowInstances.get(i).getStartTime().getTime();
+            long d1 =
+                    workflowInstances.get(i).getEndTime().getTime() - workflowInstances.get(i).getStartTime().getTime();
             long d2 = workflowInstances.get(i - 1).getEndTime().getTime()
                     - workflowInstances.get(i - 1).getStartTime().getTime();
             if (d1 > d2) {
@@ -331,15 +332,15 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         Date start = new Date(2020, 1, 1, 1, 1, 1);
         Date end = new Date(2021, 1, 1, 1, 1, 1);
         List<WorkflowInstance> workflowInstances =
-                processInstanceMapper.queryTopNProcessInstance(2, start, end, WorkflowExecutionStatus.SUCCESS, 0L);
+                workflowInstanceMapper.queryTopNProcessInstance(2, start, end, WorkflowExecutionStatus.SUCCESS, 0L);
         Assertions.assertEquals(2, workflowInstances.size());
         Assertions.assertTrue(isSortedByDuration(workflowInstances));
         for (WorkflowInstance workflowInstance : workflowInstances) {
             Assertions.assertTrue(workflowInstance.getState().isSuccess());
         }
-        processInstanceMapper.deleteById(workflowInstance1.getId());
-        processInstanceMapper.deleteById(workflowInstance2.getId());
-        processInstanceMapper.deleteById(workflowInstance3.getId());
+        workflowInstanceMapper.deleteById(workflowInstance1.getId());
+        workflowInstanceMapper.deleteById(workflowInstance2.getId());
+        workflowInstanceMapper.deleteById(workflowInstance3.getId());
 
     }
 }

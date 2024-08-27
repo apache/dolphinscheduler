@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 
 import java.util.Date;
 import java.util.List;
@@ -42,7 +42,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
     private ProjectMapper projectMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     /**
      * insert
@@ -59,7 +59,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
         processDefinitionLog.setVersion(1);
         processDefinitionLog.setUpdateTime(new Date());
         processDefinitionLog.setCreateTime(new Date());
-        processDefinitionLogMapper.insert(processDefinitionLog);
+        workflowDefinitionLogMapper.insert(processDefinitionLog);
         return processDefinitionLog;
     }
 
@@ -79,7 +79,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
 
         processDefinitionLog.setUpdateTime(new Date());
         processDefinitionLog.setCreateTime(new Date());
-        processDefinitionLogMapper.insert(processDefinitionLog);
+        workflowDefinitionLogMapper.insert(processDefinitionLog);
         return processDefinitionLog;
     }
 
@@ -106,7 +106,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
         user.setId(101);
         userMapper.insert(user);
 
-        List<WorkflowDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
+        List<WorkflowDefinitionLog> processDefinitionLogs = workflowDefinitionLogMapper
                 .queryByDefinitionName(1L, "def 1");
         Assertions.assertEquals(1, processDefinitionLogs.size());
 
@@ -116,7 +116,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryByDefinitionCode() {
         insertOne();
 
-        List<WorkflowDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
+        List<WorkflowDefinitionLog> processDefinitionLogs = workflowDefinitionLogMapper
                 .queryByDefinitionCode(1L);
         Assertions.assertNotEquals(0, processDefinitionLogs.size());
     }
@@ -125,7 +125,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryByDefinitionCodeAndVersion() {
         insertOne();
 
-        WorkflowDefinitionLog processDefinitionLogs = processDefinitionLogMapper
+        WorkflowDefinitionLog processDefinitionLogs = workflowDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(null, processDefinitionLogs);
     }
@@ -135,7 +135,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
         insertTwo();
 
-        Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(1L);
+        Integer version = workflowDefinitionLogMapper.queryMaxVersionForDefinition(1L);
         Assertions.assertEquals(2, version == null ? 1 : version);
     }
 
@@ -144,7 +144,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
         Page<WorkflowDefinitionLog> page = new Page(1, 3);
         IPage<WorkflowDefinitionLog> processDefinitionLogs =
-                processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
+                workflowDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
         Assertions.assertNotEquals(0, processDefinitionLogs.getTotal());
     }
 
@@ -152,7 +152,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
     public void testDeleteByProcessDefinitionCodeAndVersion() {
         insertOne();
         Page<WorkflowDefinitionLog> page = new Page(1, 3);
-        int processDefinitionLogs = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(1L, 1);
+        int processDefinitionLogs = workflowDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(0, processDefinitionLogs);
     }
 
@@ -161,7 +161,7 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
         insertTwo();
 
-        WorkflowDefinitionLog processDefinitionLog2 = processDefinitionLogMapper.queryMaxVersionDefinitionLog(1L);
+        WorkflowDefinitionLog processDefinitionLog2 = workflowDefinitionLogMapper.queryMaxVersionDefinitionLog(1L);
         Assertions.assertEquals(2, processDefinitionLog2.getVersion());
     }
 

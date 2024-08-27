@@ -21,12 +21,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
@@ -50,7 +50,7 @@ import org.springframework.context.ApplicationContext;
 public abstract class AbstractCommandHandler implements ICommandHandler {
 
     @Autowired
-    protected ProcessDefinitionLogDao workflowDefinitionLogDao;
+    protected WorkflowDefinitionLogDao workflowDefinitionLogDao;
 
     @Autowired
     protected WorkflowGraphFactory workflowGraphFactory;

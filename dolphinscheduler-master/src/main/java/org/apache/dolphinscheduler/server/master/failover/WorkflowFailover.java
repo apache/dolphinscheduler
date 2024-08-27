@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkflowFailover {
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private CommandDao commandDao;
@@ -55,7 +55,7 @@ public class WorkflowFailover {
 
         final Command failoverCommand = Command.builder()
                 .commandParam(JSONUtils.toJsonString(failoverWorkflowCommandParam))
-                .commandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)
+                .commandType(CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW)
                 .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
                 .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
                 .processInstanceId(workflowInstance.getId())

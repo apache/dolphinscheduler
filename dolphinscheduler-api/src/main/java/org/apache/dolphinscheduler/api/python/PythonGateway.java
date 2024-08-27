@@ -25,27 +25,26 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -53,12 +52,13 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -102,7 +102,7 @@ public class PythonGateway {
     private static final int ADMIN_USER_ID = 1;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private ProjectService projectService;
@@ -189,7 +189,7 @@ public class PythonGateway {
         }
 
         WorkflowDefinition workflowDefinition =
-                processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+                workflowDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
         // In the case project exists, but current workflow still not created, we should also return the init
         // version of it
         if (workflowDefinition == null) {
@@ -309,8 +309,8 @@ public class PythonGateway {
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         WorkflowDefinition workflowDefinition = null;
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
-            workflowDefinition = processDefinitionMapper.queryByDefineName(projectCode, workflowName);
+        if (verifyStatus == Status.WORKFLOW_DEFINITION_NAME_EXIST) {
+            workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
         } else if (verifyStatus != Status.SUCCESS) {
             String msg =
                     "Verify workflow exists status is invalid, neither SUCCESS or WORKFLOW_NAME_EXIST.";
@@ -378,7 +378,7 @@ public class PythonGateway {
         User user = usersService.queryUser(userName);
         Project project = projectMapper.queryByName(projectName);
         WorkflowDefinition workflowDefinition =
-                processDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
+                workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
 
         // make sure workflow online
         workflowDefinitionService.onlineWorkflowDefinition(user, project.getCode(), workflowDefinition.getCode());
@@ -577,7 +577,7 @@ public class PythonGateway {
         result.put("projectCode", projectCode);
 
         WorkflowDefinition workflowDefinition =
-                processDefinitionMapper.queryByDefineName(projectCode, workflowName);
+                workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
         if (workflowDefinition == null) {
             String msg = String.format("Can not find valid workflow by name %s", workflowName);
             log.error(msg);

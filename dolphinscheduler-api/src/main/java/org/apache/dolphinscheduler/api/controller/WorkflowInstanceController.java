@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +63,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * process instance controller
+ * workflow instance controller
  */
 @Tag(name = "WORKFLOW_INSTANCE_TAG")
 @RestController
@@ -72,10 +72,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class WorkflowInstanceController extends BaseController {
 
     @Autowired
-    private ProcessInstanceService processInstanceService;
+    private WorkflowInstanceService workflowInstanceService;
 
     /**
-     * query process instance list paging
+     * query workflow instance list paging
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -88,9 +88,9 @@ public class WorkflowInstanceController extends BaseController {
      * @param startTime start time
      * @param endTime end time
      * @param otherParamsJson otherParamsJson handle other params
-     * @return process instance list
+     * @return workflow instance list
      */
-    @Operation(summary = "queryProcessInstanceListPaging", description = "QUERY_WORKFLOW_INSTANCE_LIST_NOTES")
+    @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_WORKFLOW_INSTANCE_LIST_NOTES")
     @Parameters({
             @Parameter(name = "processDefineCode", description = "WORKFLOW_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "100")),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
@@ -104,63 +104,64 @@ public class WorkflowInstanceController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
-    public Result queryProcessInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
-                                           @RequestParam(value = "searchVal", required = false) String searchVal,
-                                           @RequestParam(value = "executorName", required = false) String executorName,
-                                           @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
-                                           @RequestParam(value = "host", required = false) String host,
-                                           @RequestParam(value = "startDate", required = false) String startTime,
-                                           @RequestParam(value = "endDate", required = false) String endTime,
-                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
-                                           @RequestParam("pageNo") Integer pageNo,
-                                           @RequestParam("pageSize") Integer pageSize) {
+    @ApiException(Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
+    public Result queryWorkflowInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                            @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
+                                            @RequestParam(value = "searchVal", required = false) String searchVal,
+                                            @RequestParam(value = "executorName", required = false) String executorName,
+                                            @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
+                                            @RequestParam(value = "host", required = false) String host,
+                                            @RequestParam(value = "startDate", required = false) String startTime,
+                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                            @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
+                                            @RequestParam("pageNo") Integer pageNo,
+                                            @RequestParam("pageSize") Integer pageSize) {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime,
+        return workflowInstanceService.queryWorkflowInstanceList(loginUser, projectCode, processDefineCode, startTime,
                 endTime,
                 searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
     }
 
     /**
-     * query task list by process instance id
+     * query task list by workflow instance id
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param id process instance id
-     * @return task list for the process instance
+     * @param id workflow instance id
+     * @return task list for the workflow instance
      */
-    @Operation(summary = "queryTaskListByProcessId", description = "QUERY_TASK_LIST_BY_WORKFLOW_INSTANCE_ID_NOTES")
+    @Operation(summary = "queryTaskListByWorkflowInstanceId", description = "QUERY_TASK_LIST_BY_WORKFLOW_INSTANCE_ID_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR)
-    public Result queryTaskListByProcessId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @PathVariable("id") Integer id) throws IOException {
-        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, id);
+    @ApiException(Status.QUERY_TASK_LIST_BY_WORKFLOW_INSTANCE_ID_ERROR)
+    public Result queryTaskListByWorkflowInstanceId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                    @PathVariable("id") Integer id) throws IOException {
+        Map<String, Object> result =
+                workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, id);
         return returnDataList(result);
     }
 
     /**
-     * update process instance
+     * update workflow instance
      *
      * @param loginUser login user
      * @param projectCode project code
      * @param taskRelationJson process task relation json
      * @param taskDefinitionJson taskDefinitionJson
-     * @param id process instance id
+     * @param id workflow instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
      * @param locations locations
      * @return update result code
      */
-    @Operation(summary = "updateProcessInstance", description = "UPDATE_WORKFLOW_INSTANCE_NOTES")
+    @Operation(summary = "updateWorkflowInstance", description = "UPDATE_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
             @Parameter(name = "taskRelationJson", description = "TASK_RELATION_JSON", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskDefinitionJson", description = "TASK_DEFINITION_JSON", schema = @Schema(implementation = String.class)),
@@ -173,127 +174,127 @@ public class WorkflowInstanceController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.UPDATE_PROCESS_INSTANCE_ERROR)
+    @ApiException(Status.UPDATE_WORKFLOW_INSTANCE_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_INSTANCE_UPDATE)
-    public Result updateProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                        @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
-                                        @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
-                                        @PathVariable(value = "id") Integer id,
-                                        @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
-                                        @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
-                                        @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
-                                        @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout) {
-        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
+    public Result updateWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                         @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
+                                         @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                         @PathVariable(value = "id") Integer id,
+                                         @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
+                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
+                                         @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                         @RequestParam(value = "locations", required = false) String locations,
+                                         @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout) {
+        Map<String, Object> result = workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, id,
                 taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout);
         return returnDataList(result);
     }
 
     /**
-     * query process instance by id
+     * query workflow instance by id
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param id process instance id
-     * @return process instance detail
+     * @param id workflow instance id
+     * @return workflow instance detail
      */
-    @Operation(summary = "queryProcessInstanceById", description = "QUERY_WORKFLOW_INSTANCE_BY_ID_NOTES")
+    @Operation(summary = "queryWorkflowInstanceById", description = "QUERY_WORKFLOW_INSTANCE_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result queryProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @PathVariable("id") Integer id) {
-        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectCode, id);
+    @ApiException(Status.QUERY_WORKFLOW_INSTANCE_BY_ID_ERROR)
+    public Result queryWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                            @PathVariable("id") Integer id) {
+        Map<String, Object> result = workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, id);
         return returnDataList(result);
     }
 
     /**
-     * query top n process instance order by running duration
+     * query top n workflow instance order by running duration
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param size number of process instance
+     * @param size number of workflow instance
      * @param startTime start time
      * @param endTime end time
-     * @return list of process instance
+     * @return list of workflow instance
      */
-    @Operation(summary = "queryTopNLongestRunningProcessInstance", description = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "queryTopNLongestRunningWorkflowInstance", description = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
     @Parameters({
-            @Parameter(name = "size", description = "PROCESS_INSTANCE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
-            @Parameter(name = "startTime", description = "PROCESS_INSTANCE_START_TIME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "endTime", description = "PROCESS_INSTANCE_END_TIME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "size", description = "WORKFLOW_INSTANCE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "startTime", description = "WORKFLOW_INSTANCE_START_TIME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endTime", description = "WORKFLOW_INSTANCE_END_TIME", required = true, schema = @Schema(implementation = String.class)),
     })
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result<WorkflowInstance> queryTopNLongestRunningProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                           @RequestParam("size") Integer size,
-                                                                           @RequestParam(value = "startTime", required = true) String startTime,
-                                                                           @RequestParam(value = "endTime", required = true) String endTime) {
-        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,
+    @ApiException(Status.QUERY_WORKFLOW_INSTANCE_BY_ID_ERROR)
+    public Result<WorkflowInstance> queryTopNLongestRunningWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                            @RequestParam("size") Integer size,
+                                                                            @RequestParam(value = "startTime", required = true) String startTime,
+                                                                            @RequestParam(value = "endTime", required = true) String endTime) {
+        Map<String, Object> result = workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
                 projectCode, size, startTime, endTime);
         return returnDataList(result);
     }
 
     /**
-     * delete process instance by id, at the same time,
+     * delete workflow instance by id, at the same time,
      * delete task instance and their mapping relation data
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id workflow instance id
      * @return delete result code
      */
-    @Operation(summary = "deleteProcessInstanceById", description = "DELETE_WORKFLOW_INSTANCE_BY_ID_NOTES")
+    @Operation(summary = "deleteWorkflowInstanceById", description = "DELETE_WORKFLOW_INSTANCE_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
+    @ApiException(Status.DELETE_WORKFLOW_INSTANCE_BY_ID_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_INSTANCE_DELETE)
-    public Result<Void> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @PathVariable("id") Integer id) {
-        processInstanceService.deleteProcessInstanceById(loginUser, id);
+    public Result<Void> deleteWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                   @PathVariable("id") Integer id) {
+        workflowInstanceService.deleteWorkflowInstanceById(loginUser, id);
         return Result.success();
     }
 
     /**
-     * query sub process instance detail info by task id
+     * query sub workflow instance detail info by task id
      *
      * @param loginUser login user
      * @param projectCode project code
      * @param taskId task id
-     * @return sub process instance detail
+     * @return sub workflow instance detail
      */
-    @Operation(summary = "querySubProcessInstanceByTaskCode", description = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
+    @Operation(summary = "querySubWorkflowInstanceByTaskCode", description = "QUERY_SUB_WORKFLOW_INSTANCE_BY_TASK_CODE_NOTES")
     @Parameters({
             @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
     @GetMapping(value = "/query-sub-by-parent")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
-    public Result querySubProcessInstanceByTaskId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @RequestParam("taskId") Integer taskId) {
+    @ApiException(Status.QUERY_SUB_WORKFLOW_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
+    public Result querySubWorkflowInstanceByTaskId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                   @RequestParam("taskId") Integer taskId) {
         Map<String, Object> result =
-                processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, taskId);
+                workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, taskId);
         return returnDataList(result);
     }
 
     /**
-     * query parent process instance detail info by sub process instance id
+     * query parent workflow instance detail info by sub workflow instance id
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param subId sub process id
+     * @param subId sub workflow id
      * @return parent instance detail
      */
     @Operation(summary = "queryParentInstanceBySubId", description = "QUERY_PARENT_WORKFLOW_INSTANCE_BY_SUB_WORKFLOW_INSTANCE_ID_NOTES")
@@ -302,40 +303,40 @@ public class WorkflowInstanceController extends BaseController {
     })
     @GetMapping(value = "/query-parent-by-sub")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR)
+    @ApiException(Status.QUERY_PARENT_WORKFLOW_INSTANCE_DETAIL_INFO_BY_SUB_WORKFLOW_INSTANCE_ID_ERROR)
     public Result queryParentInstanceBySubId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @RequestParam("subId") Integer subId) {
-        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, subId);
+        Map<String, Object> result = workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, subId);
         return returnDataList(result);
     }
 
     /**
-     * query dynamic sub process instance detail info by task id
+     * query dynamic sub workflow instance detail info by task id
      *
      * @param loginUser login user
      * @param taskId task id
-     * @return sub process instance detail
+     * @return sub workflow instance detail
      */
-    @Operation(summary = "queryDynamicSubWorkflowInstances", description = "QUERY_DYNAMIC_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
+    @Operation(summary = "queryDynamicSubWorkflowInstances", description = "QUERY_DYNAMIC_SUB_WORKFLOW_INSTANCE_BY_TASK_CODE_NOTES")
     @Parameters({
             @Parameter(name = "taskId", description = "taskInstanceId", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @GetMapping(value = "/query-dynamic-sub-workflows")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
+    @ApiException(Status.QUERY_SUB_WORKFLOW_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
     public Result<List<DynamicSubWorkflowDto>> queryDynamicSubWorkflowInstances(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                                 @RequestParam("taskId") Integer taskId) {
         List<DynamicSubWorkflowDto> dynamicSubWorkflowDtos =
-                processInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
+                workflowInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
         return new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
     }
 
     /**
-     * query process instance global variables and local variables
+     * query workflow instance global variables and local variables
      *
      * @param loginUser login user
-     * @param id process instance id
+     * @param id workflow instance id
      * @return variables data
      */
     @Operation(summary = "viewVariables", description = "QUERY_WORKFLOW_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
@@ -344,11 +345,11 @@ public class WorkflowInstanceController extends BaseController {
     })
     @GetMapping(value = "/{id}/view-variables")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
+    @ApiException(Status.QUERY_WORKFLOW_INSTANCE_ALL_VARIABLES_ERROR)
     public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                 @PathVariable("id") Integer id) {
-        Map<String, Object> result = processInstanceService.viewVariables(projectCode, id);
+        Map<String, Object> result = workflowInstanceService.viewVariables(projectCode, id);
         return returnDataList(result);
     }
 
@@ -357,7 +358,7 @@ public class WorkflowInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id workflow instance id
      * @return gantt tree data
      */
     @Operation(summary = "vieGanttTree", description = "VIEW_GANTT_NOTES")
@@ -366,35 +367,35 @@ public class WorkflowInstanceController extends BaseController {
     })
     @GetMapping(value = "/{id}/view-gantt")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR)
+    @ApiException(Status.ENCAPSULATION_WORKFLOW_INSTANCE_GANTT_STRUCTURE_ERROR)
     public Result viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("id") Integer id) throws Exception {
-        Map<String, Object> result = processInstanceService.viewGantt(projectCode, id);
+        Map<String, Object> result = workflowInstanceService.viewGantt(projectCode, id);
         return returnDataList(result);
     }
 
     /**
-     * batch delete process instance by ids, at the same time,
+     * batch delete workflow instance by ids, at the same time,
      * delete task instance and their mapping relation data
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceIds process instance id
+     * @param processInstanceIds workflow instance id
      * @return delete result code
      */
-    @Operation(summary = "batchDeleteProcessInstanceByIds", description = "BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_NOTES")
+    @Operation(summary = "batchDeleteWorkflowInstanceByIds", description = "BATCH_DELETE_WORKFLOW_INSTANCE_BY_IDS_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = int.class)),
             @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
+    @ApiException(Status.BATCH_DELETE_WORKFLOW_INSTANCE_BY_IDS_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_INSTANCE_BATCH_DELETE)
-    public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @PathVariable long projectCode,
-                                                  @RequestParam("processInstanceIds") String processInstanceIds) {
+    public Result batchDeleteWorkflowInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @PathVariable long projectCode,
+                                                   @RequestParam("processInstanceIds") String processInstanceIds) {
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
@@ -404,16 +405,16 @@ public class WorkflowInstanceController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    processInstanceService.deleteProcessInstanceById(loginUser, processInstanceId);
+                    workflowInstanceService.deleteWorkflowInstanceById(loginUser, processInstanceId);
                 } catch (Exception e) {
                     log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
-                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(Status.WORKFLOW_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
             }
         }
         if (!deleteFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join("\n", deleteFailedIdList));
+            putMsg(result, Status.BATCH_DELETE_WORKFLOW_INSTANCE_BY_IDS_ERROR, String.join("\n", deleteFailedIdList));
         } else {
             putMsg(result, Status.SUCCESS);
         }
@@ -424,18 +425,18 @@ public class WorkflowInstanceController extends BaseController {
     // And it's a bad design to use trigger code to get workflow instance why not directly get by workflow instanceId or
     // inject the trigger id into workflow instance?
     @Deprecated
-    @Operation(summary = "queryProcessInstanceListByTrigger", description = "QUERY_PROCESS_INSTANCE_BY_TRIGGER_NOTES")
+    @Operation(summary = "queryWorkflowInstanceListByTrigger", description = "QUERY_WORKFLOW_INSTANCE_BY_TRIGGER_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),
             @Parameter(name = "triggerCode", description = "TRIGGER_CODE", required = true, schema = @Schema(implementation = Long.class))
     })
     @GetMapping("/trigger")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
-    public Result queryProcessInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                     @PathVariable long projectCode,
-                                                     @RequestParam(value = "triggerCode") Long triggerCode) {
-        Map<String, Object> result = processInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
+    @ApiException(QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
+    public Result queryWorkflowInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                      @PathVariable long projectCode,
+                                                      @RequestParam(value = "triggerCode") Long triggerCode) {
+        Map<String, Object> result = workflowInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return returnDataList(result);
     }
 }

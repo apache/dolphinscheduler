@@ -25,7 +25,7 @@ public class CommandKeyConstants {
     /**
      * command parameter keys
      */
-    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
+    public static final String CMD_PARAM_RECOVER_WORKFLOW_ID_STRING = "ProcessInstanceId";
 
     public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
 
@@ -35,9 +35,9 @@ public class CommandKeyConstants {
 
     public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
 
-    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
+    public static final String CMD_PARAM_SUB_WORKFLOW_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_CODE = "processDefinitionCode";
+    public static final String CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE = "processDefinitionCode";
 
     public static final String CMD_PARAM_START_NODES = "StartNodeList";
 

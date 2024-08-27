@@ -17,20 +17,20 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_WORKFLOW_TASK_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_WORKFLOW_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UPSTREAM_TASK_WORKFLOW_RELATION_ERROR;
 
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationDeleteRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
+import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ProcessTaskRelationV2Controller extends BaseController {
 
     @Autowired
-    private ProcessTaskRelationService processTaskRelationService;
+    private WorkflowTaskRelationService workflowTaskRelationService;
 
     /**
      * create resource process task relation
@@ -73,11 +73,11 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_WORKFLOW_TASK_RELATION_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROCESS_TASK_RELATION_ERROR)
+    @ApiException(CREATE_WORKFLOW_TASK_RELATION_ERROR)
     public Result<WorkflowTaskRelation> createTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                            @RequestBody TaskRelationCreateRequest TaskRelationCreateRequest) {
         WorkflowTaskRelation workflowTaskRelation =
-                processTaskRelationService.createProcessTaskRelationV2(loginUser, TaskRelationCreateRequest);
+                workflowTaskRelationService.createWorkflowTaskRelationV2(loginUser, TaskRelationCreateRequest);
         return Result.success(workflowTaskRelation);
     }
 
@@ -94,11 +94,11 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{code-pair}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_PROCESS_RELATION_ERROR)
+    @ApiException(DELETE_TASK_WORKFLOW_RELATION_ERROR)
     public Result deleteTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable("code-pair") String codePair) {
         TaskRelationDeleteRequest taskRelationDeleteRequest = new TaskRelationDeleteRequest(codePair);
-        processTaskRelationService.deleteTaskProcessRelationV2(loginUser, taskRelationDeleteRequest.getUpstreamCode(),
+        workflowTaskRelationService.deleteTaskWorkflowRelationV2(loginUser, taskRelationDeleteRequest.getUpstreamCode(),
                 taskRelationDeleteRequest.getDownstreamCode());
         return Result.success();
     }
@@ -117,11 +117,11 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR)
+    @ApiException(UPDATE_UPSTREAM_TASK_WORKFLOW_RELATION_ERROR)
     public Result<List<WorkflowTaskRelation>> updateUpstreamTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                            @PathVariable("code") Long code,
                                                                            @RequestBody TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
-        List<WorkflowTaskRelation> workflowTaskRelations = processTaskRelationService
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationService
                 .updateUpstreamTaskDefinitionWithSyncDag(loginUser, code, Boolean.TRUE,
                         taskRelationUpdateUpstreamRequest);
         return Result.success(workflowTaskRelations);

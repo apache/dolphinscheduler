@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.tools.lineage;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
@@ -50,7 +50,7 @@ public class MigrateLineageService {
     private WorkflowTaskLineageDao workflowTaskLineageDao;
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     public void migrateLineageOnce() {
         try {
@@ -70,7 +70,7 @@ public class MigrateLineageService {
         List<TaskDefinition> taskDefinitionList =
                 taskDefinitionMapper.queryDefinitionsByTaskType(DependentLogicTaskChannelFactory.NAME);
         List<WorkflowTaskRelation> workflowTaskRelationList =
-                processTaskRelationMapper.queryByTaskCodes(taskDefinitionList.stream()
+                workflowTaskRelationMapper.queryByTaskCodes(taskDefinitionList.stream()
                         .map(TaskDefinition::getCode).toArray(Long[]::new));
         List<WorkflowTaskLineage> workflowTaskLineageList = new ArrayList<>();
 
@@ -83,7 +83,8 @@ public class MigrateLineageService {
                                 || processTaskRelation.getPostTaskCode() == taskDefinition.getCode())
                         .findFirst()
                         .ifPresent(processTaskRelation -> {
-                            workflowTaskLineage.setWorkflowDefinitionCode(processTaskRelation.getProcessDefinitionCode());
+                            workflowTaskLineage
+                                    .setWorkflowDefinitionCode(processTaskRelation.getProcessDefinitionCode());
                             workflowTaskLineage
                                     .setWorkflowDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
                         });

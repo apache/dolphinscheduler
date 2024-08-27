@@ -34,16 +34,16 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
@@ -75,9 +75,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * task instance service impl
- */
 @Service
 @Slf4j
 public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
@@ -110,14 +107,14 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     private TaskGroupQueueService taskGroupQueueService;
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     /**
-     * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
+     * query task list by project, workflow instance, task name, task start time, task end time, task status, keyword paging
      *
      * @param loginUser         login user
      * @param projectCode       project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param searchVal         search value
      * @param taskName          task name
      * @param taskCode          task code
@@ -132,9 +129,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Override
     public Result queryTaskListPaging(User loginUser,
                                       long projectCode,
-                                      Integer processInstanceId,
-                                      String processInstanceName,
-                                      String processDefinitionName,
+                                      Integer workflowInstanceId,
+                                      String workflowInstanceName,
+                                      String workflowDefinitionName,
                                       String taskName,
                                       Long taskCode,
                                       String executorName,
@@ -159,11 +156,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<TaskInstance> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
-            // stream task without process instance
+            // stream task without workflow instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
                     page,
                     projectCode,
-                    processDefinitionName,
+                    workflowDefinitionName,
                     searchVal,
                     taskName,
                     taskCode,
@@ -177,8 +174,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                     page,
                     projectCode,
-                    processInstanceId,
-                    processInstanceName,
+                    workflowInstanceId,
+                    workflowInstanceName,
                     searchVal,
                     taskName,
                     taskCode,
@@ -234,7 +231,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())
                 .orElseThrow(
-                        () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, task.getProcessInstanceId()));
+                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, task.getProcessInstanceId()));
         if (!workflowInstance.getState().isFinished()) {
             throw new ServiceException("The workflow instance is not finished: " + workflowInstance.getState()
                     + " cannot force start task instance");

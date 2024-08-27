@@ -30,7 +30,7 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
 
     @Override
     public void validate(final TriggerWorkflowDTO triggerWorkflowDTO) {
-        if (triggerWorkflowDTO.getExecType() != CommandType.START_PROCESS) {
+        if (triggerWorkflowDTO.getExecType() != CommandType.START_WORKFLOW) {
             throw new IllegalArgumentException("The execType should be START_PROCESS");
         }
         if (triggerWorkflowDTO.getWorkflowDefinition() == null) {

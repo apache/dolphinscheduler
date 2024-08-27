@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
@@ -48,7 +48,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DynamicLogicTaskTest {
 
     @Mock
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     private TaskInstanceDao taskInstanceDao;
@@ -60,7 +60,7 @@ class DynamicLogicTaskTest {
     private ProcessService processService;
 
     @Mock
-    private ProcessDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper processDefineMapper;
 
     @Mock
     private CommandMapper commandMapper;
@@ -79,10 +79,10 @@ class DynamicLogicTaskTest {
         dynamicParameters = new DynamicParameters();
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         workflowInstance = new WorkflowInstance();
-        Mockito.when(processInstanceDao.queryById(Mockito.any())).thenReturn(workflowInstance);
+        Mockito.when(workflowInstanceDao.queryById(Mockito.any())).thenReturn(workflowInstance);
         dynamicLogicTask = new DynamicLogicTask(
                 taskExecutionContext,
-                processInstanceDao,
+                workflowInstanceDao,
                 taskInstanceDao,
                 subWorkflowService,
                 processService,
@@ -113,7 +113,7 @@ class DynamicLogicTaskTest {
 
         dynamicLogicTask = new DynamicLogicTask(
                 taskExecutionContext,
-                processInstanceDao,
+                workflowInstanceDao,
                 taskInstanceDao,
                 subWorkflowService,
                 processService,
@@ -153,13 +153,13 @@ class DynamicLogicTaskTest {
 
         dynamicLogicTask.resetProcessInstanceStatus(subWorkflowInstances);
 
-        Mockito.verify(processInstanceDao).updateById(subWorkflowInstance);
+        Mockito.verify(workflowInstanceDao).updateById(subWorkflowInstance);
         Assertions.assertEquals(WorkflowExecutionStatus.WAIT_TO_RUN, subWorkflowInstance.getState());
     }
 
     @Test
     void testResetProcessInstanceStatus_StartFailureTaskProcess() {
-        workflowInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
+        workflowInstance.setCommandType(CommandType.START_FAILURE_TASK_WORKFLOW);
         WorkflowInstance failedSubWorkflowInstance = new WorkflowInstance();
         failedSubWorkflowInstance.setState(WorkflowExecutionStatus.FAILURE);
         List<WorkflowInstance> subWorkflowInstances = Arrays.asList(failedSubWorkflowInstance);
@@ -168,7 +168,7 @@ class DynamicLogicTaskTest {
 
         dynamicLogicTask.resetProcessInstanceStatus(subWorkflowInstances);
 
-        Mockito.verify(processInstanceDao).updateById(failedSubWorkflowInstance);
+        Mockito.verify(workflowInstanceDao).updateById(failedSubWorkflowInstance);
         Assertions.assertEquals(WorkflowExecutionStatus.WAIT_TO_RUN, failedSubWorkflowInstance.getState());
     }
 

@@ -35,22 +35,22 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
@@ -100,28 +100,28 @@ public class TaskDefinitionServiceImplTest {
     private ProcessService processService;
 
     @Mock
-    private ProcessDefinitionLogMapper processDefineLogMapper;
+    private WorkflowDefinitionLogMapper processDefineLogMapper;
 
     @Mock
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Mock
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Mock
-    private ProcessTaskRelationService processTaskRelationService;
+    private WorkflowTaskRelationService workflowTaskRelationService;
 
     @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
     private WorkflowDefinitionService workflowDefinitionService;
 
     @Mock
-    private ProcessTaskRelationLogDao processTaskRelationLogDao;
+    private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
 
     @Mock
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     private static final String TASK_PARAMETER =
             "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";;
@@ -290,24 +290,24 @@ public class TaskDefinitionServiceImplTest {
         ArrayList<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         taskDefinitionLogs.add(taskDefinitionLog);
         Integer version = 1;
-        when(processDefinitionMapper.queryByCode(isA(long.class))).thenReturn(workflowDefinition);
+        when(workflowDefinitionMapper.queryByCode(isA(long.class))).thenReturn(workflowDefinition);
 
-        // saveProcessDefine
+        // saveWorkflowDefine
         when(processDefineLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
         when(processDefineLogMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
-        when(processDefinitionMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
+        when(workflowDefinitionMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
         int insertVersion =
-                processServiceImpl.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
-        when(processService.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE))
+                processServiceImpl.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
+        when(processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE))
                 .thenReturn(insertVersion);
         assertEquals(insertVersion, version + 1);
 
         // saveTaskRelation
         List<WorkflowTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
-        when(processTaskRelationMapper.queryByProcessCode(eq(workflowDefinition.getCode())))
+        when(workflowTaskRelationMapper.queryByProcessCode(eq(workflowDefinition.getCode())))
                 .thenReturn(workflowTaskRelationList);
-        when(processTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
-        when(processTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
+        when(workflowTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
+        when(workflowTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
         int insertResult = processServiceImpl.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
                 workflowDefinition.getCode(), insertVersion, processTaskRelationLogList, taskDefinitionLogs,
                 Boolean.TRUE);
@@ -364,13 +364,13 @@ public class TaskDefinitionServiceImplTest {
             when(taskDefinitionMapper.queryByCodeList(Mockito.anySet()))
                     .thenReturn(Arrays.asList(taskDefinition, taskDefinitionSecond));
 
-            when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
+            when(workflowTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
                     .thenReturn(getProcessTaskRelationListV2());
-            when(processDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE))
+            when(workflowDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE))
                     .thenReturn(getProcessDefinition());
-            when(processTaskRelationMapper.batchInsert(Mockito.anyList())).thenReturn(1);
-            when(processTaskRelationMapper.updateById(Mockito.any())).thenReturn(1);
-            when(processTaskRelationLogDao.batchInsert(Mockito.anyList())).thenReturn(2);
+            when(workflowTaskRelationMapper.batchInsert(Mockito.anyList())).thenReturn(1);
+            when(workflowTaskRelationMapper.updateById(Mockito.any())).thenReturn(1);
+            when(workflowTaskRelationLogDao.batchInsert(Mockito.anyList())).thenReturn(2);
             // success
             Map<String, Object> successMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
                     taskDefinitionJson, UPSTREAM_CODE);

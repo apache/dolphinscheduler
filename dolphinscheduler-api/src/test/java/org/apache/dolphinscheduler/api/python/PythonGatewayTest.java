@@ -19,13 +19,13 @@ package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -53,7 +53,7 @@ public class PythonGatewayTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -67,7 +67,7 @@ public class PythonGatewayTest {
         Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
 
         WorkflowDefinition workflowDefinition = getTestProcessDefinition();
-        Mockito.when(processDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinition.getName()))
+        Mockito.when(workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinition.getName()))
                 .thenReturn(workflowDefinition);
 
         TaskDefinition taskDefinition = getTestTaskDefinition();
@@ -85,7 +85,7 @@ public class PythonGatewayTest {
         Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
 
         WorkflowDefinition workflowDefinition = getTestProcessDefinition();
-        Mockito.when(processDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinition.getName()))
+        Mockito.when(workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinition.getName()))
                 .thenReturn(workflowDefinition);
 
         TaskDefinition taskDefinition = getTestTaskDefinition();

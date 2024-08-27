@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.api.vo;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.List;
 

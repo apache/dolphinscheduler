@@ -44,7 +44,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class WorkflowTaskLineageControllerTest {
 
     @InjectMocks
-    private ProcessLineageController processLineageController;
+    private WorkflowLineageController workflowLineageController;
 
     @Mock
     private WorkflowLineageServiceImpl workFlowLineageService;
@@ -75,7 +75,7 @@ public class WorkflowTaskLineageControllerTest {
         String searchVal = "test";
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal))
                 .thenReturn(Collections.emptyList());
-        assertDoesNotThrow(() -> processLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal));
+        assertDoesNotThrow(() -> workflowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal));
     }
 
 }

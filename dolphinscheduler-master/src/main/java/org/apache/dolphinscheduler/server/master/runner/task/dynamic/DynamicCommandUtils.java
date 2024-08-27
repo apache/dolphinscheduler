@@ -40,7 +40,7 @@ public class DynamicCommandUtils {
                                         Integer subProcessDefinitionVersion,
                                         Map<String, String> parameters) {
         Command command = new Command();
-        if (workflowInstance.getCommandType().equals(CommandType.START_PROCESS)) {
+        if (workflowInstance.getCommandType().equals(CommandType.START_WORKFLOW)) {
             command.setCommandType(CommandType.DYNAMIC_GENERATION);
         } else {
             command.setCommandType(workflowInstance.getCommandType());

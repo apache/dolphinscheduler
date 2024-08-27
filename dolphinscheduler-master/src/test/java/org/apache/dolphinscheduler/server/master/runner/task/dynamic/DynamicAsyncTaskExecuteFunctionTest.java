@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner.task.dynamic;
 
 import static org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction.AsyncTaskExecutionStatus;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
 import org.apache.dolphinscheduler.service.subworkflow.SubWorkflowService;
@@ -66,7 +66,7 @@ class DynamicAsyncTaskExecuteFunctionTest {
 
         function = new DynamicAsyncTaskExecuteFunction(
                 null,
-            workflowInstance,
+                workflowInstance,
                 taskInstance,
                 dynamicLogicTask,
                 commandMapper,

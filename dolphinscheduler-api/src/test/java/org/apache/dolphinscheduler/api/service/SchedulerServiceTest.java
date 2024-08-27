@@ -29,16 +29,16 @@ import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -64,7 +64,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private SchedulerServiceImpl schedulerService;
 
     @Mock
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Mock
     private MonitorService monitorService;
@@ -79,7 +79,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private ProjectMapper projectMapper;
 
     @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
     private ProjectService projectService;
@@ -132,10 +132,11 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project permissions
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
+        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, project, null);
@@ -144,7 +145,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
-        // we do not check method `executorService.checkProcessDefinitionValid` because it should be check in
+        // we do not check method `executorService.checkWorkflowDefinitionValid` because it should be check in
         // executorServiceTest
         // error process definition already exists schedule
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, null);
@@ -242,10 +243,11 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project permissions
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode))
+        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode))
                 .thenReturn(this.getProcessDefinition());
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject());
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
@@ -294,10 +296,11 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(this.getSchedule());
         exception =
                 Assertions.assertThrows(ServiceException.class, () -> schedulerService.getSchedule(user, scheduleId));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project permissions
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode))
+        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode))
                 .thenReturn(this.getProcessDefinition());
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject());
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
@@ -351,10 +354,11 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.updateSchedulesV2(user, scheduleId, scheduleUpdateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project permissions
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode))
+        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode))
                 .thenReturn(this.getProcessDefinition());
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject());
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)

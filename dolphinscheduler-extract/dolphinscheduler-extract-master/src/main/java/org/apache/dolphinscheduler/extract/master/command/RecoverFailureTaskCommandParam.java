@@ -32,6 +32,6 @@ public class RecoverFailureTaskCommandParam extends AbstractCommandParam {
 
     @Override
     public CommandType getCommandType() {
-        return CommandType.START_FAILURE_TASK_PROCESS;
+        return CommandType.START_FAILURE_TASK_WORKFLOW;
     }
 }

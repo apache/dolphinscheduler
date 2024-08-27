@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -45,10 +45,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     private TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     /**
      * insert
@@ -75,7 +75,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         workflowInstance.setProcessDefinitionCode(1L);
         workflowInstance.setProjectCode(1L);
         workflowInstance.setTestFlag(0);
-        processInstanceMapper.insert(workflowInstance);
+        workflowInstanceMapper.insert(workflowInstance);
         return workflowInstance;
     }
 
@@ -245,7 +245,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         definition.setProjectCode(1111L);
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(definition);
+        workflowDefinitionMapper.insert(definition);
 
         // insert ProcessInstance
         WorkflowInstance workflowInstance = insertProcessInstance();
@@ -267,9 +267,9 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 "",
                 TaskExecuteType.BATCH,
                 null, null);
-        processInstanceMapper.deleteById(workflowInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
-        processDefinitionMapper.deleteById(definition.getId());
+        workflowDefinitionMapper.deleteById(definition.getId());
         Assertions.assertEquals(0, taskInstanceIPage.getTotal());
 
     }

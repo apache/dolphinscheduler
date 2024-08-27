@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.List;
 import java.util.Set;

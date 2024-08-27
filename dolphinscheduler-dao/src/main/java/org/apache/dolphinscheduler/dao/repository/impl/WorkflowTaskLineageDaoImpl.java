@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskLineageMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WorkflowTaskLineageDaoImpl extends BaseDao<WorkflowTaskLineage, WorkflowTaskLineageMapper>
         implements
-    WorkflowTaskLineageDao {
+            WorkflowTaskLineageDao {
 
     public WorkflowTaskLineageDaoImpl(@NonNull WorkflowTaskLineageMapper workflowTaskLineageMapper) {
         super(workflowTaskLineageMapper);

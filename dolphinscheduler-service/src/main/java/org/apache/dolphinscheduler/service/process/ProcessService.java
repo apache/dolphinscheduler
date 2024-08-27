@@ -31,11 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -43,6 +38,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
@@ -57,7 +57,7 @@ public interface ProcessService {
     WorkflowInstance constructProcessInstance(Command command,
                                               String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
-    Optional<WorkflowInstance> findProcessInstanceDetailById(int processId);
+    Optional<WorkflowInstance> findWorkflowInstanceDetailById(int processId);
 
     WorkflowInstance findProcessInstanceById(int processId);
 
@@ -90,9 +90,9 @@ public interface ProcessService {
 
     int deleteWorkProcessMapByParentId(int parentWorkProcessId);
 
-    WorkflowInstance findSubProcessInstance(Integer parentProcessId, Integer parentTaskId);
+    WorkflowInstance findSubWorkflowInstance(Integer parentProcessId, Integer parentTaskId);
 
-    WorkflowInstance findParentProcessInstance(Integer subProcessId);
+    WorkflowInstance findParentWorkflowInstance(Integer subProcessId);
 
     void changeOutParam(TaskInstance taskInstance);
 
@@ -127,8 +127,8 @@ public interface ProcessService {
 
     int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine);
 
-    int saveProcessDefine(User operator, WorkflowDefinition workflowDefinition, Boolean syncDefine,
-                          Boolean isFromProcessDefine);
+    int saveWorkflowDefine(User operator, WorkflowDefinition workflowDefinition, Boolean syncDefine,
+                           Boolean isFromProcessDefine);
 
     int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
                          List<WorkflowTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,

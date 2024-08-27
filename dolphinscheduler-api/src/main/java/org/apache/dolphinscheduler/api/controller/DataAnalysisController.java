@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.COMMAND_STATE_COUNT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_INSTANCE_STATE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.COUNT_WORKFLOW_DEFINITION_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.COUNT_WORKFLOW_INSTANCE_STATE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUEUE_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_INSTANCE_STATE_COUNT_ERROR;
@@ -94,7 +94,7 @@ public class DataAnalysisController extends BaseController {
     })
     @GetMapping(value = "/process-state-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COUNT_PROCESS_INSTANCE_STATE_ERROR)
+    @ApiException(COUNT_WORKFLOW_INSTANCE_STATE_ERROR)
     public Result<WorkflowInstanceCountVO> getWorkflowInstanceStateCount(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                          @RequestParam(value = "startDate", required = false) String startDate,
                                                                          @RequestParam(value = "endDate", required = false) String endDate,
@@ -112,7 +112,7 @@ public class DataAnalysisController extends BaseController {
     })
     @GetMapping(value = "/define-user-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
+    @ApiException(COUNT_WORKFLOW_DEFINITION_USER_ERROR)
     public Result<WorkflowDefinitionCountVO> countDefinitionByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                    @RequestParam(value = "projectCode", required = false) Long projectCode) {
         if (projectCode == null) {

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Data;
-
 import java.util.Date;
+
+import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 

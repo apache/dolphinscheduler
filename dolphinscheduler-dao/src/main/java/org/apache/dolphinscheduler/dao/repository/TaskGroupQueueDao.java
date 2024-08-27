@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import java.util.List;
 

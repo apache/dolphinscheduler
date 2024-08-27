@@ -24,15 +24,15 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceController;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcquireSuccessNotifyRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcquireSuccessNotifyResponse;
@@ -95,7 +95,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     private static int DEFAULT_LIMIT = 1000;
 
@@ -448,7 +448,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
                     "The TaskInstance: " + taskInstance.getId() + " state is " + taskInstance.getState()
                             + ", no need to notify");
         }
-        WorkflowInstance workflowInstance = processInstanceDao.queryById(taskInstance.getProcessInstanceId());
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryById(taskInstance.getProcessInstanceId());
         if (workflowInstance == null) {
             throw new UnsupportedOperationException(
                     "The WorkflowInstance: " + taskInstance.getProcessInstanceId()

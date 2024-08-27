@@ -24,12 +24,12 @@ import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImp
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -103,7 +103,8 @@ public class WorkflowDefinitionControllerTest {
                 .thenReturn(result);
 
         Result response =
-                workflowDefinitionController.createWorkflowDefinition(user, projectCode, name, description, globalParams,
+                workflowDefinitionController.createWorkflowDefinition(user, projectCode, name, description,
+                        globalParams,
                         locations, timeout, relationJson, taskDefinitionJson, "",
                         WorkflowExecutionTypeEnum.PARALLEL);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
@@ -130,7 +131,7 @@ public class WorkflowDefinitionControllerTest {
     @Test
     public void testVerifyWorkflowDefinitionName() {
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST);
+        putMsg(result, Status.WORKFLOW_DEFINITION_NAME_EXIST);
         long projectCode = 1L;
         String name = "dag_test";
 
@@ -138,7 +139,7 @@ public class WorkflowDefinitionControllerTest {
                 .thenReturn(result);
 
         Result response = workflowDefinitionController.verifyWorkflowDefinitionName(user, projectCode, name, 0);
-        Assertions.assertTrue(response.isStatus(Status.PROCESS_DEFINITION_NAME_EXIST));
+        Assertions.assertTrue(response.isStatus(Status.WORKFLOW_DEFINITION_NAME_EXIST));
     }
 
     @Test
@@ -211,7 +212,8 @@ public class WorkflowDefinitionControllerTest {
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, workflowDefinition);
 
-        Mockito.when(processDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, code)).thenReturn(result);
+        Mockito.when(processDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, code))
+                .thenReturn(result);
         Result response = workflowDefinitionController.queryWorkflowDefinitionByCode(user, projectCode, code);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
@@ -228,7 +230,8 @@ public class WorkflowDefinitionControllerTest {
 
         Mockito.when(processDefinitionService.batchCopyWorkflowDefinition(user, projectCode, code, targetProjectCode))
                 .thenReturn(result);
-        Result response = workflowDefinitionController.copyWorkflowDefinition(user, projectCode, code, targetProjectCode);
+        Result response =
+                workflowDefinitionController.copyWorkflowDefinition(user, projectCode, code, targetProjectCode);
 
         Assertions.assertTrue(response != null && response.isSuccess());
     }
@@ -372,8 +375,10 @@ public class WorkflowDefinitionControllerTest {
 
         PageInfo<WorkflowDefinition> pageInfo = new PageInfo<>(1, 10);
 
-        Mockito.when(processDefinitionService.queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId,
-                pageNo, pageSize)).thenReturn(pageInfo);
+        Mockito.when(
+                processDefinitionService.queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId,
+                        pageNo, pageSize))
+                .thenReturn(pageInfo);
         Result<PageInfo<WorkflowDefinition>> response = workflowDefinitionController
                 .queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize);
 

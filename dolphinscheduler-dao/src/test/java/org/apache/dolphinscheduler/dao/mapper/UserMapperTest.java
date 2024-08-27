@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,10 +58,10 @@ public class UserMapperTest extends BaseDaoTest {
     private QueueMapper queueMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     /**
      * insert one user
@@ -336,9 +336,9 @@ public class UserMapperTest extends BaseDaoTest {
         insertProcessDefinition(user.getId());
         WorkflowDefinitionLog log = insertProcessDefinitionLog(user.getId());
         long processDefinitionCode = log.getCode();
-        List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
                 null);
-        UserWithProcessDefinitionCode userWithCode = userWithCodes.stream()
+        UserWithWorkflowDefinitionCode userWithCode = userWithCodes.stream()
                 .filter(code -> code.getProcessDefinitionCode() == processDefinitionCode)
                 .findAny().orElse(null);
         assert userWithCode != null;
@@ -356,7 +356,7 @@ public class UserMapperTest extends BaseDaoTest {
         processDefinitionLog.setUpdateTime(new Date());
         processDefinitionLog.setCreateTime(new Date());
         processDefinitionLog.setOperator(operator);
-        processDefinitionLogMapper.insert(processDefinitionLog);
+        workflowDefinitionLogMapper.insert(processDefinitionLog);
         return processDefinitionLog;
     }
 
@@ -370,7 +370,7 @@ public class UserMapperTest extends BaseDaoTest {
         workflowDefinition.setUserId(operator);
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
         return workflowDefinition;
     }
 

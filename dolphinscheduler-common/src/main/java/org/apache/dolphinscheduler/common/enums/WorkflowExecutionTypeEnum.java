@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import lombok.Getter;
-
 import java.util.HashMap;
+
+import lombok.Getter;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 

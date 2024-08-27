@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseRequest;
@@ -60,9 +60,9 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
 
     private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
 
-    private final ProcessInstanceDao processInstanceDao;
+    private final WorkflowInstanceDao workflowInstanceDao;
 
-    private final ProcessDefinitionDao processDefinitionDao;
+    private final WorkflowDefinitionDao workflowDefinitionDao;
 
     private final CommandDao commandDao;
 
@@ -76,8 +76,8 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubProcessParameters>() {
                 }));
-        this.processDefinitionDao = applicationContext.getBean(ProcessDefinitionDao.class);
-        this.processInstanceDao = applicationContext.getBean(ProcessInstanceDao.class);
+        this.workflowDefinitionDao = applicationContext.getBean(WorkflowDefinitionDao.class);
+        this.workflowInstanceDao = applicationContext.getBean(WorkflowInstanceDao.class);
         this.commandDao = applicationContext.getBean(CommandDao.class);
         this.logicTaskInstanceExecutionEventSenderManager =
                 applicationContext.getBean(LogicTaskInstanceExecutionEventSenderManager.class);
@@ -89,13 +89,13 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
 
     @Override
     public AsyncTaskExecuteFunction getAsyncTaskExecuteFunction() {
-        return new SubWorkflowAsyncTaskExecuteFunction(taskExecutionContext, processInstanceDao);
+        return new SubWorkflowAsyncTaskExecuteFunction(taskExecutionContext, workflowInstanceDao);
     }
 
     @Override
     public void pause() throws MasterTaskExecuteException {
         WorkflowInstance subWorkflowInstance =
-                processInstanceDao.querySubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
+                workflowInstanceDao.querySubWorkflowInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
 
         try {
@@ -121,7 +121,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
     @Override
     public void kill() {
         WorkflowInstance subWorkflowInstance =
-                processInstanceDao.querySubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
+                workflowInstanceDao.querySubWorkflowInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
         if (subWorkflowInstance == null) {
             log.info("SubWorkflow instance is null");
@@ -152,15 +152,15 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         switch (workflowInstance.getCommandType()) {
-            case START_PROCESS:
+            case START_WORKFLOW:
             case SCHEDULER:
-            case START_CURRENT_TASK_PROCESS:
+            case START_CURRENT_TASK_WORKFLOW:
             case RECOVER_SERIAL_WAIT:
             case COMPLEMENT_DATA:
                 return createSubWorkflowInstanceFromWorkflowDefinition();
             case REPEAT_RUNNING:
-            case START_FAILURE_TASK_PROCESS:
-            case RECOVER_SUSPENDED_PROCESS:
+            case START_FAILURE_TASK_WORKFLOW:
+            case RECOVER_SUSPENDED_WORKFLOW:
                 return createSubWorkflowInstanceWithWorkflowInstance();
             default:
                 throw new IllegalArgumentException("Unsupported command type: " + workflowInstance.getCommandType());
@@ -209,7 +209,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
     }
 
     private WorkflowDefinition getSubWorkflowDefinition() {
-        return processDefinitionDao.queryByCode(taskParameters.getProcessDefinitionCode()).orElseThrow(
+        return workflowDefinitionDao.queryByCode(taskParameters.getProcessDefinitionCode()).orElseThrow(
                 () -> new IllegalArgumentException(
                         "Cannot find the sub workflow definition: " + taskParameters.getProcessDefinitionCode()));
     }

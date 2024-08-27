@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-import org.apache.dolphinscheduler.dao.entity.WorkflowAlertContent;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowAlertContent;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -219,7 +219,7 @@ public class AlertDao {
         alert.setProjectCode(projectUser.getProjectCode());
         alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
         alert.setProcessInstanceId(workflowInstance.getId());
-        alert.setAlertType(AlertType.PROCESS_INSTANCE_TIMEOUT);
+        alert.setAlertType(AlertType.WORKFLOW_INSTANCE_TIMEOUT);
         saveTaskTimeoutAlert(alert, content, alertGroupId);
     }
 

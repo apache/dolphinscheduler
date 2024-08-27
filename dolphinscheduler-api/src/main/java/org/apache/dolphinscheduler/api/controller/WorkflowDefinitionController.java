@@ -44,10 +44,10 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
@@ -155,7 +155,8 @@ public class WorkflowDefinitionController extends BaseController {
                                          @RequestParam(value = "codes", required = true) String codes,
                                          @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
         return returnDataList(
-                workflowDefinitionService.batchCopyWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode));
+                workflowDefinitionService.batchCopyWorkflowDefinition(loginUser, projectCode, codes,
+                        targetProjectCode));
     }
 
     /**
@@ -180,7 +181,8 @@ public class WorkflowDefinitionController extends BaseController {
                                          @RequestParam(value = "codes", required = true) String codes,
                                          @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
         return returnDataList(
-                workflowDefinitionService.batchMoveWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode));
+                workflowDefinitionService.batchMoveWorkflowDefinition(loginUser, projectCode, codes,
+                        targetProjectCode));
     }
 
     /**
@@ -203,8 +205,9 @@ public class WorkflowDefinitionController extends BaseController {
                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                @RequestParam(value = "name", required = true) String name,
                                                @RequestParam(value = "code", required = false, defaultValue = "0") long processDefinitionCode) {
-        Map<String, Object> result = workflowDefinitionService.verifyWorkflowDefinitionName(loginUser, projectCode, name,
-                processDefinitionCode);
+        Map<String, Object> result =
+                workflowDefinitionService.verifyWorkflowDefinitionName(loginUser, projectCode, name,
+                        processDefinitionCode);
         return returnDataList(result);
     }
 
@@ -450,7 +453,8 @@ public class WorkflowDefinitionController extends BaseController {
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
     public Result queryWorkflowDefinitionSimpleList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        Map<String, Object> result = workflowDefinitionService.queryWorkflowDefinitionSimpleList(loginUser, projectCode);
+        Map<String, Object> result =
+                workflowDefinitionService.queryWorkflowDefinitionSimpleList(loginUser, projectCode);
         return returnDataList(result);
     }
 
@@ -478,13 +482,13 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST_PAGING_ERROR)
     public Result<PageInfo<WorkflowDefinition>> queryWorkflowDefinitionListPaging(
-                                                                                @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                                                @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
-                                                                                @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
-                                                                                @RequestParam("pageNo") Integer pageNo,
-                                                                                @RequestParam("pageSize") Integer pageSize) {
+                                                                                  @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                                  @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
+                                                                                  @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
+                                                                                  @RequestParam("pageNo") Integer pageNo,
+                                                                                  @RequestParam("pageSize") Integer pageSize) {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);

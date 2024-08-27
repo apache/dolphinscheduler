@@ -59,7 +59,7 @@ import com.google.common.primitives.Bytes;
 @Slf4j
 public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService {
 
-    private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
+    private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]: %s%s";
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;

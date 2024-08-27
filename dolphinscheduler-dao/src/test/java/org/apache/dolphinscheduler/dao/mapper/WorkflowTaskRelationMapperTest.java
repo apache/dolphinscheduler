@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WorkflowTaskRelationMapperTest extends BaseDaoTest {
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     /**
      * insert
@@ -49,21 +49,21 @@ public class WorkflowTaskRelationMapperTest extends BaseDaoTest {
         workflowTaskRelation.setPreTaskCode(2L);
         workflowTaskRelation.setUpdateTime(new Date());
         workflowTaskRelation.setCreateTime(new Date());
-        processTaskRelationMapper.insert(workflowTaskRelation);
+        workflowTaskRelationMapper.insert(workflowTaskRelation);
         return workflowTaskRelation;
     }
 
     @Test
     public void testQueryByProcessCode() {
         WorkflowTaskRelation workflowTaskRelation = insertOne();
-        List<WorkflowTaskRelation> workflowTaskRelations = processTaskRelationMapper.queryByProcessCode(1L);
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper.queryByProcessCode(1L);
         Assertions.assertNotEquals(0, workflowTaskRelations.size());
     }
 
     @Test
     public void testQueryByTaskCode() {
         WorkflowTaskRelation workflowTaskRelation = insertOne();
-        List<WorkflowTaskRelation> workflowTaskRelations = processTaskRelationMapper.queryByTaskCode(2L);
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper.queryByTaskCode(2L);
         Assertions.assertNotEquals(0, workflowTaskRelations.size());
     }
 
@@ -72,14 +72,14 @@ public class WorkflowTaskRelationMapperTest extends BaseDaoTest {
         WorkflowTaskRelation workflowTaskRelation = insertOne();
 
         Long[] codes = Arrays.array(1L, 2L);
-        List<WorkflowTaskRelation> workflowTaskRelations = processTaskRelationMapper.queryByTaskCodes(codes);
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper.queryByTaskCodes(codes);
         Assertions.assertNotEquals(0, workflowTaskRelations.size());
     }
 
     @Test
     public void testDeleteByCode() {
         WorkflowTaskRelation workflowTaskRelation = insertOne();
-        int i = processTaskRelationMapper.deleteByCode(1L, 1L);
+        int i = workflowTaskRelationMapper.deleteByCode(1L, 1L);
         Assertions.assertNotEquals(0, i);
     }
 

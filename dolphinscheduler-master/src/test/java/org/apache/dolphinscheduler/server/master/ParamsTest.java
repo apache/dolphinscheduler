@@ -42,7 +42,7 @@ public class ParamsTest {
 
         // start process
         Map<String, String> timeParams = BusinessTimeUtils
-                .getBusinessTime(CommandType.START_PROCESS,
+                .getBusinessTime(CommandType.START_WORKFLOW,
                         new Date(), null);
 
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);

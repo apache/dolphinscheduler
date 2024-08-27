@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 
 import java.sql.Connection;
 import java.sql.Date;

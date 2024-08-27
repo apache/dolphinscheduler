@@ -53,11 +53,11 @@ public class BusinessTimeUtils {
                 if (runTime == null) {
                     return result;
                 }
-            case START_PROCESS:
-            case START_CURRENT_TASK_PROCESS:
-            case RECOVER_TOLERANCE_FAULT_PROCESS:
-            case RECOVER_SUSPENDED_PROCESS:
-            case START_FAILURE_TASK_PROCESS:
+            case START_WORKFLOW:
+            case START_CURRENT_TASK_WORKFLOW:
+            case RECOVER_TOLERANCE_FAULT_WORKFLOW:
+            case RECOVER_SUSPENDED_WORKFLOW:
+            case START_FAILURE_TASK_WORKFLOW:
             case REPEAT_RUNNING:
             case DYNAMIC_GENERATION:
             case SCHEDULER:

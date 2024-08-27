@@ -21,16 +21,16 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_S
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -63,7 +63,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     private final TaskExecutionContext taskExecutionContext;
     private final DependentParameters dependentParameters;
     private final ProjectDao projectDao;
-    private final ProcessDefinitionDao processDefinitionDao;
+    private final WorkflowDefinitionDao workflowDefinitionDao;
     private final TaskDefinitionDao taskDefinitionDao;
     private final TaskInstanceDao taskInstanceDao;
 
@@ -76,18 +76,18 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     public DependentAsyncTaskExecuteFunction(TaskExecutionContext taskExecutionContext,
                                              DependentParameters dependentParameters,
                                              ProjectDao projectDao,
-                                             ProcessDefinitionDao processDefinitionDao,
+                                             WorkflowDefinitionDao workflowDefinitionDao,
                                              TaskDefinitionDao taskDefinitionDao,
                                              TaskInstanceDao taskInstanceDao,
-                                             ProcessInstanceDao processInstanceDao) {
+                                             WorkflowInstanceDao workflowInstanceDao) {
         this.taskExecutionContext = taskExecutionContext;
         this.dependentParameters = dependentParameters;
         this.projectDao = projectDao;
-        this.processDefinitionDao = processDefinitionDao;
+        this.workflowDefinitionDao = workflowDefinitionDao;
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
         this.workflowInstance =
-                processInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
+                workflowInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
         this.dependentDate = calculateDependentDate();
         this.dependentTaskList = initializeDependentTaskList();
         log.info("Initialized dependent task list successfully");
@@ -138,7 +138,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         final Map<Long, Project> projectCodeMap = projectDao.queryByCodes(new ArrayList<>(projectCodes)).stream()
                 .collect(Collectors.toMap(Project::getCode, Function.identity()));
         final Map<Long, WorkflowDefinition> processDefinitionMap =
-                processDefinitionDao.queryByCodes(processDefinitionCodes).stream()
+                workflowDefinitionDao.queryByCodes(processDefinitionCodes).stream()
                         .collect(Collectors.toMap(WorkflowDefinition::getCode, Function.identity()));
         final Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes).stream()
                 .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));

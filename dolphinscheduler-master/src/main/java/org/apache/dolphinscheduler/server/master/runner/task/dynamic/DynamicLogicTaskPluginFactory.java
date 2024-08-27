@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.runner.task.dynamic;
 
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -36,13 +36,13 @@ import org.springframework.stereotype.Component;
 public class DynamicLogicTaskPluginFactory implements ILogicTaskPluginFactory<DynamicLogicTask> {
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private ProcessDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper processDefineMapper;
 
     @Autowired
     private CommandMapper commandMapper;
@@ -55,7 +55,7 @@ public class DynamicLogicTaskPluginFactory implements ILogicTaskPluginFactory<Dy
 
     @Override
     public DynamicLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
-        return new DynamicLogicTask(taskExecutionContext, processInstanceDao, taskInstanceDao, subWorkflowService,
+        return new DynamicLogicTask(taskExecutionContext, workflowInstanceDao, taskInstanceDao, subWorkflowService,
                 processService,
                 processDefineMapper, commandMapper);
 

@@ -22,18 +22,18 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
+import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import java.text.MessageFormat;
@@ -68,27 +68,27 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     @Autowired
     private WorkflowTaskLineageDao workflowTaskLineageDao;
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Override
-    public List<WorkFlowRelationDetail> queryWorkFlowLineageByName(long projectCode, String processDefinitionName) {
+    public List<WorkFlowRelationDetail> queryWorkFlowLineageByName(long projectCode, String workflowDefinitionName) {
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        return workflowTaskLineageDao.queryWorkFlowLineageByName(projectCode, processDefinitionName);
+        return workflowTaskLineageDao.queryWorkFlowLineageByName(projectCode, workflowDefinitionName);
     }
 
     @Override
-    public WorkFlowLineage queryWorkFlowLineageByCode(long projectCode, long processDefinitionCode) {
+    public WorkFlowLineage queryWorkFlowLineageByCode(long projectCode, long workflowDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
         List<WorkflowTaskLineage> upstreamWorkflowTaskLineageList =
-                workflowTaskLineageDao.queryByWorkflowDefinitionCode(processDefinitionCode);
+                workflowTaskLineageDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskLineage> downstreamWorkflowTaskLineageList =
-                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, processDefinitionCode,
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode,
                         Constants.DEPENDENT_ALL_TASK);
         List<WorkflowTaskLineage> totalWorkflowTaskLineageList =
                 Stream.of(upstreamWorkflowTaskLineageList, downstreamWorkflowTaskLineageList)
@@ -99,10 +99,10 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         List<WorkFlowRelationDetail> workFlowRelationDetailList =
                 getWorkflowRelationDetails(totalWorkflowTaskLineageList.stream()
                         .flatMap(pl -> {
-                            List<Long> processDefinitionCodes = new ArrayList<>();
-                            processDefinitionCodes.add(pl.getWorkflowDefinitionCode());
-                            processDefinitionCodes.add(pl.getDeptWorkflowDefinitionCode());
-                            return processDefinitionCodes.stream();
+                            List<Long> workflowDefinitionCodes = new ArrayList<>();
+                            workflowDefinitionCodes.add(pl.getWorkflowDefinitionCode());
+                            workflowDefinitionCodes.add(pl.getDeptWorkflowDefinitionCode());
+                            return workflowDefinitionCodes.stream();
                         }).distinct().collect(Collectors.toList()));
 
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
@@ -122,10 +122,10 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         List<WorkFlowRelationDetail> workFlowRelationDetailList =
                 getWorkflowRelationDetails(workflowTaskLineageList.stream()
                         .flatMap(pl -> {
-                            List<Long> processDefinitionCodes = new ArrayList<>();
-                            processDefinitionCodes.add(pl.getWorkflowDefinitionCode());
-                            processDefinitionCodes.add(pl.getDeptWorkflowDefinitionCode());
-                            return processDefinitionCodes.stream();
+                            List<Long> workflowDefinitionCodes = new ArrayList<>();
+                            workflowDefinitionCodes.add(pl.getWorkflowDefinitionCode());
+                            workflowDefinitionCodes.add(pl.getDeptWorkflowDefinitionCode());
+                            return workflowDefinitionCodes.stream();
                         }).distinct().collect(Collectors.toList()));
 
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
@@ -164,18 +164,18 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
      * and return tasks dependence with string format.
      *
      * @param projectCode           Project code want to query tasks dependence
-     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param workflowDefinitionCode Process definition code want to query tasks dependence
      * @param taskCode              Task code want to query tasks dependence
      * @return Optional of formatter message
      */
     @Override
-    public Optional<String> taskDependentMsg(long projectCode, long processDefinitionCode, long taskCode) {
+    public Optional<String> taskDependentMsg(long projectCode, long workflowDefinitionCode, long taskCode) {
         long queryTaskCode = 0;
         if (taskCode != 0) {
             queryTaskCode = taskCode;
         }
         List<WorkflowTaskLineage> dependentProcessList =
-                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, processDefinitionCode, queryTaskCode);
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, queryTaskCode);
         if (CollectionUtils.isEmpty(dependentProcessList)) {
             return Optional.empty();
         }
@@ -184,7 +184,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
 
         for (WorkflowTaskLineage workflowTaskLineage : dependentProcessList) {
             WorkflowDefinition workflowDefinition =
-                    processDefinitionMapper.queryByCode(workflowTaskLineage.getDeptWorkflowDefinitionCode());
+                    workflowDefinitionMapper.queryByCode(workflowTaskLineage.getDeptWorkflowDefinitionCode());
             String taskName = "";
             if (workflowTaskLineage.getTaskDefinitionCode() != 0) {
                 TaskDefinition taskDefinition =
@@ -209,59 +209,62 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     /**
      * Query downstream tasks depend on a process definition or a task
      *
-     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param workflowDefinitionCode Process definition code want to query tasks dependence
      * @return downstream dependent process definition list
      */
     @Override
-    public List<DependentProcessDefinition> queryDownstreamDependentProcessDefinitions(Long processDefinitionCode) {
-        List<DependentProcessDefinition> dependentProcessDefinitionList = new ArrayList<>();
+    public List<DependentWorkflowDefinition> queryDownstreamDependentWorkflowDefinitions(Long workflowDefinitionCode) {
+        List<DependentWorkflowDefinition> dependentWorkflowDefinitionList = new ArrayList<>();
         List<WorkflowTaskLineage> workflowTaskLineageList =
-                workflowTaskLineageDao.queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, processDefinitionCode,
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE,
+                        workflowDefinitionCode,
                         Constants.DEPENDENT_ALL_TASK);
         if (workflowTaskLineageList.isEmpty()) {
-            return dependentProcessDefinitionList;
+            return dependentWorkflowDefinitionList;
         }
 
         List<WorkflowDefinition> workflowDefinitionList =
-                processDefinitionMapper.queryByCodes(workflowTaskLineageList.stream()
-                        .map(WorkflowTaskLineage::getDeptWorkflowDefinitionCode).distinct().collect(Collectors.toList()));
+                workflowDefinitionMapper.queryByCodes(workflowTaskLineageList.stream()
+                        .map(WorkflowTaskLineage::getDeptWorkflowDefinitionCode).distinct()
+                        .collect(Collectors.toList()));
         List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.queryByCodeList(workflowTaskLineageList.stream()
                 .map(WorkflowTaskLineage::getDeptTaskDefinitionCode).distinct().collect(Collectors.toList()));
         for (TaskDefinition taskDefinition : taskDefinitionList) {
-            DependentProcessDefinition dependentProcessDefinition = new DependentProcessDefinition();
+            DependentWorkflowDefinition dependentWorkflowDefinition = new DependentWorkflowDefinition();
             workflowTaskLineageList.stream()
                     .filter(processLineage -> processLineage.getDeptTaskDefinitionCode() == taskDefinition.getCode())
                     .findFirst()
                     .ifPresent(processLineage -> {
-                        dependentProcessDefinition
+                        dependentWorkflowDefinition
                                 .setProcessDefinitionCode(processLineage.getDeptWorkflowDefinitionCode());
-                        dependentProcessDefinition.setTaskDefinitionCode(taskDefinition.getCode());
-                        dependentProcessDefinition.setTaskParams(taskDefinition.getTaskParams());
-                        dependentProcessDefinition.setWorkerGroup(taskDefinition.getWorkerGroup());
+                        dependentWorkflowDefinition.setTaskDefinitionCode(taskDefinition.getCode());
+                        dependentWorkflowDefinition.setTaskParams(taskDefinition.getTaskParams());
+                        dependentWorkflowDefinition.setWorkerGroup(taskDefinition.getWorkerGroup());
                     });
             workflowDefinitionList.stream()
-                    .filter(processDefinition -> processDefinition.getCode() == dependentProcessDefinition
+                    .filter(processDefinition -> processDefinition.getCode() == dependentWorkflowDefinition
                             .getProcessDefinitionCode())
                     .findFirst()
                     .ifPresent(processDefinition -> {
-                        dependentProcessDefinition.setProcessDefinitionVersion(processDefinition.getVersion());
+                        dependentWorkflowDefinition.setProcessDefinitionVersion(processDefinition.getVersion());
                     });
         }
 
-        return dependentProcessDefinitionList;
+        return dependentWorkflowDefinitionList;
     }
 
     @Override
-    public List<DependentLineageTask> queryDependentProcessDefinitions(long projectCode, long processDefinitionCode,
-                                                                       Long taskCode) {
+    public List<DependentLineageTask> queryDependentWorkflowDefinitions(long projectCode, long workflowDefinitionCode,
+                                                                        Long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        List<WorkflowTaskLineage> workflowTaskLineageList = workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode,
-                processDefinitionCode, taskCode == null ? 0 : taskCode);
+        List<WorkflowTaskLineage> workflowTaskLineageList =
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode,
+                        workflowDefinitionCode, taskCode == null ? 0 : taskCode);
         List<WorkflowDefinition> workflowDefinitionList =
-                processDefinitionMapper.queryByCodes(workflowTaskLineageList.stream()
+                workflowDefinitionMapper.queryByCodes(workflowTaskLineageList.stream()
                         .map(WorkflowTaskLineage::getWorkflowDefinitionCode).distinct().collect(Collectors.toList()));
         List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.queryByCodeList(workflowTaskLineageList.stream()
                 .map(WorkflowTaskLineage::getTaskDefinitionCode).filter(code -> code != 0).distinct()
@@ -291,17 +294,17 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     }
 
     @Override
-    public int createProcessLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
+    public int createWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
         return workflowTaskLineageDao.batchInsert(workflowTaskLineages);
     }
 
     @Override
-    public int updateProcessLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
+    public int updateWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
         return workflowTaskLineageDao.updateWorkflowTaskLineage(workflowTaskLineages);
     }
 
     @Override
-    public int deleteProcessLineage(List<Long> processDefinitionCodes) {
-        return workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(processDefinitionCodes);
+    public int deleteWorkflowLineage(List<Long> workflowDefinitionCodes) {
+        return workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(workflowDefinitionCodes);
     }
 }

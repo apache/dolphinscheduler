@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.service.command;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 /**
  * Command Service

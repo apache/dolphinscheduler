@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
+import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -43,14 +43,15 @@ import org.springframework.test.web.servlet.MvcResult;
 public class WorkflowTaskRelationControllerTest extends AbstractControllerTest {
 
     @MockBean(name = "processTaskRelationServiceImpl")
-    private ProcessTaskRelationService processTaskRelationService;
+    private WorkflowTaskRelationService workflowTaskRelationService;
 
     @Test
     public void testQueryDownstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(
-                processTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+                workflowTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(),
+                        Mockito.anyLong()))
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc
@@ -70,7 +71,7 @@ public class WorkflowTaskRelationControllerTest extends AbstractControllerTest {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(
-                processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+                workflowTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -57,7 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class WorkflowInstanceV2Controller extends BaseController {
 
     @Autowired
-    private ProcessInstanceService processInstanceService;
+    private WorkflowInstanceService workflowInstanceService;
 
     @Autowired
     private ExecutorService execService;
@@ -71,11 +71,11 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_WORKFLOW_INSTANCE_LIST_NOTES")
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    @ApiException(Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
     public Result queryWorkflowInstanceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestBody WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
         checkPageParams(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-        return processInstanceService.queryProcessInstanceList(loginUser, workflowInstanceQueryRequest);
+        return workflowInstanceService.queryWorkflowInstanceList(loginUser, workflowInstanceQueryRequest);
     }
 
     /**
@@ -91,10 +91,10 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @GetMapping(value = "/{workflowInstanceId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
+    @ApiException(Status.QUERY_WORKFLOW_INSTANCE_BY_ID_ERROR)
     public Result queryWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
-        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, workflowInstanceId);
+        Map<String, Object> result = workflowInstanceService.queryWorkflowInstanceById(loginUser, workflowInstanceId);
         return returnDataList(result);
     }
 
@@ -114,7 +114,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ApiException(Status.DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR)
     public Result<Void> deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
-        processInstanceService.deleteProcessInstanceById(loginUser, workflowInstanceId);
+        workflowInstanceService.deleteWorkflowInstanceById(loginUser, workflowInstanceId);
         return Result.success();
     }
 
@@ -133,7 +133,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{workflowInstanceId}/execute/{executeType}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.EXECUTE_PROCESS_INSTANCE_ERROR)
+    @ApiException(Status.EXECUTE_WORKFLOW_INSTANCE_ERROR)
     public Result<Void> execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("workflowInstanceId") Integer workflowInstanceId,
                                 @PathVariable("executeType") ExecuteType executeType) {

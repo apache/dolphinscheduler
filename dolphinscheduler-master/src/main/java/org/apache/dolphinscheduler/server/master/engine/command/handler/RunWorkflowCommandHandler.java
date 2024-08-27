@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -51,14 +51,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * Used to handle the {@link CommandType#START_PROCESS} which will start the workflow definition.
+ * Used to handle the {@link CommandType#START_WORKFLOW} which will start the workflow definition.
  * <p> You can specify the start nodes at {@link RunWorkflowCommandParam}
  */
 @Component
 public class RunWorkflowCommandHandler extends AbstractCommandHandler {
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -79,12 +79,12 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
     protected void assembleWorkflowInstance(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
         final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
         final Command command = workflowExecuteContextBuilder.getCommand();
-        final WorkflowInstance workflowInstance = processInstanceDao.queryById(command.getProcessInstanceId());
+        final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(command.getProcessInstanceId());
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstance.setCommandParam(command.getCommandParam());
         workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
-        processInstanceDao.upsertProcessInstance(workflowInstance);
+        workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
 
@@ -141,6 +141,6 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
 
     @Override
     public CommandType commandType() {
-        return CommandType.START_PROCESS;
+        return CommandType.START_WORKFLOW;
     }
 }

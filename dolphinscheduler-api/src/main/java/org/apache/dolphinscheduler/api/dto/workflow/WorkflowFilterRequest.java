@@ -48,7 +48,7 @@ public class WorkflowFilterRequest extends PageQueryDto {
     @Schema(example = "ONLINE / OFFLINE")
     private String scheduleReleaseState;
 
-    public WorkflowDefinition convert2ProcessDefinition() {
+    public WorkflowDefinition convert2WorkflowDefinition() {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         if (this.workflowName != null) {
             workflowDefinition.setName(this.workflowName);

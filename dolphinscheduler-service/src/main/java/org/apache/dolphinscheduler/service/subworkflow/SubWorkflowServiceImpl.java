@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.service.subworkflow;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.ArrayList;
@@ -43,10 +43,10 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     private RelationSubWorkflowMapper relationSubWorkflowMapper;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Override
     public List<WorkflowInstance> getAllDynamicSubWorkflow(long processInstanceId, long taskCode) {
@@ -55,7 +55,7 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
         List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(Collectors.toList());
 
-        List<WorkflowInstance> allSubWorkflowInstance = processInstanceDao.queryByIds(allSubProcessInstanceId);
+        List<WorkflowInstance> allSubWorkflowInstance = workflowInstanceDao.queryByIds(allSubProcessInstanceId);
         allSubWorkflowInstance.sort(Comparator.comparing(WorkflowInstance::getId));
         return allSubWorkflowInstance;
     }
@@ -102,7 +102,7 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
         List<Property> outputParamList =
                 new ArrayList<>(JSONUtils.toList(workflowInstance.getVarPool(), Property.class));
 
-        WorkflowDefinitionLog processDefinition = processDefinitionLogMapper
+        WorkflowDefinitionLog processDefinition = workflowDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
                         workflowInstance.getProcessDefinitionVersion());
         List<Property> globalParamList = JSONUtils.toList(processDefinition.getGlobalParams(), Property.class);

@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Repository;
 public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMapper> implements TaskInstanceDao {
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     public TaskInstanceDaoImpl(@NonNull TaskInstanceMapper taskInstanceMapper) {
         super(taskInstanceMapper);
@@ -144,14 +144,14 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     }
 
     @Override
-    public TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer processInstanceId, Long taskCode) {
-        return mybatisMapper.queryByInstanceIdAndCode(processInstanceId, taskCode);
+    public TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer workflowInstanceId, Long taskCode) {
+        return mybatisMapper.queryByInstanceIdAndCode(workflowInstanceId, taskCode);
     }
 
     @Override
-    public List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer processInstanceId) {
-        WorkflowInstance workflowInstance = processInstanceMapper.selectById(processInstanceId);
-        return mybatisMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
+    public List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer workflowInstanceId) {
+        WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
+        return mybatisMapper.findValidTaskListByProcessId(workflowInstanceId, Flag.NO,
                 workflowInstance.getTestFlag());
     }
 
@@ -185,16 +185,16 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     }
 
     @Override
-    public List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
-                                                                                 Set<Long> taskCodes,
-                                                                                 int testFlag) {
-        return mybatisMapper.findLastTaskInstances(processInstanceId, taskCodes, testFlag);
+    public List<TaskInstance> queryLastTaskInstanceListIntervalInWorkflowInstance(Integer workflowInstanceId,
+                                                                                  Set<Long> taskCodes,
+                                                                                  int testFlag) {
+        return mybatisMapper.findLastTaskInstances(workflowInstanceId, taskCodes, testFlag);
     }
 
     @Override
-    public TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId, long depTaskCode,
-                                                                       int testFlag) {
-        return mybatisMapper.findLastTaskInstance(processInstanceId, depTaskCode, testFlag);
+    public TaskInstance queryLastTaskInstanceIntervalInWorkflowInstance(Integer workflowInstanceId, long depTaskCode,
+                                                                        int testFlag) {
+        return mybatisMapper.findLastTaskInstance(workflowInstanceId, depTaskCode, testFlag);
     }
 
     @Override

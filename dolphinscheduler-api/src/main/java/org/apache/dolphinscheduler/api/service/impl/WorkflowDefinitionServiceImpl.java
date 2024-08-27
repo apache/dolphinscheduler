@@ -30,8 +30,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
-import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_DEFINE_NOT_EXIST;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_DEFINITION_NOT_EXIST;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.COPY_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
@@ -51,13 +51,13 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
-import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
-import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
-import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
+import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
+import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
+import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -66,11 +66,11 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -81,34 +81,34 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -172,9 +172,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
-/**
- * process definition service impl
- */
 @Service
 @Slf4j
 public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements WorkflowDefinitionService {
@@ -191,19 +188,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private UserMapper userMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
-    private ProcessDefinitionDao processDefinitionDao;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
-    private ProcessDefinitionLogDao processDefinitionLogDao;
+    private WorkflowDefinitionLogDao workflowDefinitionLogDao;
     @Lazy
     @Autowired
-    private ProcessInstanceService processInstanceService;
+    private WorkflowInstanceService workflowInstanceService;
 
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
@@ -218,10 +215,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
@@ -250,11 +247,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private MetricsCleanUpService metricsCleanUpService;
 
     /**
-     * create process definition
+     * create workflow definition
      *
      * @param loginUser          login user
      * @param projectCode        project code
-     * @param name               process definition name
+     * @param name               workflow definition name
      * @param description        description
      * @param globalParams       global params
      * @param locations          locations for nodes
@@ -288,19 +285,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.warn("Parameter description is too long.");
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
-        // check whether the new process define name exist
-        WorkflowDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
+        // check whether the new workflow definition name exist
+        WorkflowDefinition definition = workflowDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (definition != null) {
-            log.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+            log.warn("workflow definition with the same name {} already exists, workflowDefinitionCode:{}.",
                     definition.getName(), definition.getCode());
-            throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, name);
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
         }
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
-        long processDefinitionCode = CodeGenerateUtils.genCode();
+        long workflowDefinitionCode = CodeGenerateUtils.genCode();
         WorkflowDefinition workflowDefinition =
-                new WorkflowDefinition(projectCode, name, processDefinitionCode, description,
+                new WorkflowDefinition(projectCode, name, workflowDefinitionCode, description,
                         globalParams, locations, timeout, loginUser.getId());
         workflowDefinition.setExecutionType(executionType);
 
@@ -320,30 +317,30 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
 
-        // check whether the new process define name exist
+        // check whether the new workflow definition name exist
         WorkflowDefinition definition =
-                processDefinitionMapper.verifyByDefineName(project.getCode(), workflowDefinition.getName());
+                workflowDefinitionMapper.verifyByDefineName(project.getCode(), workflowDefinition.getName());
         if (definition != null) {
-            throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, workflowDefinition.getName());
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, workflowDefinition.getName());
         }
 
     }
 
     private void syncObj2Log(User user, WorkflowDefinition workflowDefinition) {
-        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
-        processDefinitionLog.setOperator(user.getId());
-        int result = processDefinitionLogMapper.insert(processDefinitionLog);
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
+        workflowDefinitionLog.setOperator(user.getId());
+        int result = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
         if (result <= 0) {
-            throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_LOG_ERROR);
+            throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_LOG_ERROR);
         }
     }
 
     /**
-     * create single process definition
+     * create single workflow definition
      *
      * @param loginUser             login user
      * @param workflowCreateRequest the new workflow object will be created
-     * @return New ProcessDefinition object created just now
+     * @return New WorkflowDefinition object created just now
      */
     @Override
     @Transactional
@@ -352,17 +349,17 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2ProcessDefinition();
         this.createWorkflowValid(loginUser, workflowDefinition);
 
-        long processDefinitionCode;
+        long workflowDefinitionCode;
         try {
-            processDefinitionCode = CodeGenerateUtils.genCode();
+            workflowDefinitionCode = CodeGenerateUtils.genCode();
         } catch (CodeGenerateException e) {
             throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
         }
 
-        workflowDefinition.setCode(processDefinitionCode);
+        workflowDefinition.setCode(workflowDefinitionCode);
         workflowDefinition.setUserId(loginUser.getId());
 
-        int create = processDefinitionMapper.insert(workflowDefinition);
+        int create = workflowDefinitionMapper.insert(workflowDefinition);
         if (create <= 0) {
             throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_ERROR);
         }
@@ -384,23 +381,26 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("Save task definition error.");
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
-        int insertVersion = processService.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
+        int insertVersion =
+                processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion == 0) {
-            log.error("Save process definition error, processCode:{}.", workflowDefinition.getCode());
+            log.error("Save workflow definition error, workflowDefinitionCode:{}.", workflowDefinition.getCode());
             throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_ERROR);
         } else {
-            log.info("Save process definition complete, processCode:{}, processVersion:{}.",
+            log.info("Save workflow definition complete, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getCode(), insertVersion);
         }
         int insertResult = processService.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
                 workflowDefinition.getCode(),
                 insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
         if (insertResult != Constants.EXIT_CODE_SUCCESS) {
-            log.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
+            log.error(
+                    "Save workflow task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+            throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_ERROR);
         } else {
-            log.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+            log.info(
+                    "Save workflow task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
         }
 
@@ -423,22 +423,22 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return;
         }
 
-        int insertProcessLineageResult = workflowLineageService.updateProcessLineage(workflowTaskLineageList);
-        if (insertProcessLineageResult <= 0) {
+        int insertWorkflowLineageResult = workflowLineageService.updateWorkflowLineage(workflowTaskLineageList);
+        if (insertWorkflowLineageResult <= 0) {
             log.error(
-                    "Save process lineage error, projectCode: {}, processDefinitionCode: {}, processDefinitionVersion: {}",
+                    "Save workflow lineage error, projectCode: {}, workflowDefinitionCode: {}, workflowDefinitionVersion: {}",
                     projectCode, workflowDefinitionCode, workflowDefinitionVersion);
-            throw new ServiceException(Status.CREATE_PROCESS_LINEAGE_ERROR);
+            throw new ServiceException(Status.CREATE_WORKFLOW_LINEAGE_ERROR);
         } else {
             log.info(
-                    "Save process lineage complete, projectCode: {}, processDefinitionCode: {}, processDefinitionVersion: {}",
+                    "Save workflow lineage complete, projectCode: {}, workflowDefinitionCode: {}, workflowDefinitionVersion: {}",
                     projectCode, workflowDefinitionCode, workflowDefinitionVersion);
         }
     }
 
     private List<WorkflowTaskLineage> generateWorkflowLineageList(List<TaskDefinitionLog> taskDefinitionLogList,
-                                                                  long processDefinitionCode,
-                                                                  int processDefinitionVersion) {
+                                                                  long workflowDefinitionCode,
+                                                                  int workflowDefinitionVersion) {
         List<WorkflowTaskLineage> workflowTaskLineageList = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
             if (!TaskTypeUtils.isDependentTask(taskDefinitionLog.getTaskType())) {
@@ -450,8 +450,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     .getDependence().getDependTaskList()) {
                 for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
                     WorkflowTaskLineage workflowTaskLineage = new WorkflowTaskLineage();
-                    workflowTaskLineage.setWorkflowDefinitionCode(processDefinitionCode);
-                    workflowTaskLineage.setWorkflowDefinitionVersion(processDefinitionVersion);
+                    workflowTaskLineage.setWorkflowDefinitionCode(workflowDefinitionCode);
+                    workflowTaskLineage.setWorkflowDefinitionVersion(workflowDefinitionVersion);
                     workflowTaskLineage.setTaskDefinitionCode(taskDefinitionLog.getCode());
                     workflowTaskLineage.setTaskDefinitionVersion(taskDefinitionLog.getVersion());
                     workflowTaskLineage.setDeptProjectCode(taskDefinitionLog.getProjectCode());
@@ -477,7 +477,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     log.error(
                             "Generate task definition list failed, the given task definition parameter is invalided, taskName: {}, taskDefinition: {}",
                             taskDefinitionLog.getName(), taskDefinitionLog);
-                    throw new ServiceException(Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
+                    throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 }
             }
             return taskDefinitionLogs;
@@ -500,7 +500,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 throw new ServiceException(Status.DATA_IS_NOT_VALID);
             }
             List<WorkflowTaskRelation> workflowTaskRelations = taskRelationList.stream()
-                    .map(processTaskRelationLog -> JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog),
+                    .map(workflowTaskRelationLog -> JSONUtils.parseObject(
+                            JSONUtils.toJsonString(workflowTaskRelationLog),
                             WorkflowTaskRelation.class))
                     .collect(Collectors.toList());
             List<TaskNode> taskNodeList = processService.transformTask(workflowTaskRelations, taskDefinitionLogs);
@@ -516,16 +517,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 }
             }
             if (graphHasCycle(taskNodeList)) {
-                log.error("Process DAG has cycle.");
-                throw new ServiceException(Status.PROCESS_NODE_HAS_CYCLE);
+                log.error("workflow DAG has cycle.");
+                throw new ServiceException(Status.WORKFLOW_NODE_HAS_CYCLE);
             }
 
             // check whether the task relation json is normal
-            for (WorkflowTaskRelationLog processTaskRelationLog : taskRelationList) {
-                if (processTaskRelationLog.getPostTaskCode() == 0) {
-                    log.error("The post_task_code or post_task_version of processTaskRelationLog can not be zero, " +
-                            "processTaskRelationLogId:{}.", processTaskRelationLog.getId());
-                    throw new ServiceException(Status.CHECK_PROCESS_TASK_RELATION_ERROR);
+            for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
+                if (workflowTaskRelationLog.getPostTaskCode() == 0) {
+                    log.error("The post_task_code or post_task_version of workflowTaskRelationLog can not be zero, " +
+                            "workflowTaskRelationLogId:{}.", workflowTaskRelationLog.getId());
+                    throw new ServiceException(Status.CHECK_WORKFLOW_TASK_RELATION_ERROR);
                 }
             }
             return taskRelationList;
@@ -539,7 +540,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * query process definition list
+     * query workflow definition list
      *
      * @param loginUser   login user
      * @param projectCode project code
@@ -554,7 +555,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<WorkflowDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<WorkflowDefinition> resourceList = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList = resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, dagDataList);
         putMsg(result, Status.SUCCESS);
@@ -562,7 +563,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * query process definition simple list
+     * query workflow definition simple list
      *
      * @param loginUser   login user
      * @param projectCode project code
@@ -577,15 +578,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<WorkflowDefinition> workflowDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
         ArrayNode arrayNode = JSONUtils.createArrayNode();
         for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-            ObjectNode processDefinitionNode = JSONUtils.createObjectNode();
-            processDefinitionNode.put("id", workflowDefinition.getId());
-            processDefinitionNode.put("code", workflowDefinition.getCode());
-            processDefinitionNode.put("name", workflowDefinition.getName());
-            processDefinitionNode.put("projectCode", workflowDefinition.getProjectCode());
-            arrayNode.add(processDefinitionNode);
+            ObjectNode workflowDefinitionNode = JSONUtils.createObjectNode();
+            workflowDefinitionNode.put("id", workflowDefinition.getId());
+            workflowDefinitionNode.put("code", workflowDefinition.getCode());
+            workflowDefinitionNode.put("name", workflowDefinition.getName());
+            workflowDefinitionNode.put("projectCode", workflowDefinition.getProjectCode());
+            arrayNode.add(workflowDefinitionNode);
         }
         result.put(Constants.DATA_LIST, arrayNode);
         putMsg(result, Status.SUCCESS);
@@ -593,7 +594,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * query process definition list paging
+     * query workflow definition list paging
      *
      * @param loginUser   login user
      * @param projectCode project code
@@ -601,7 +602,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @param userId      user id
      * @param pageNo      page number
      * @param pageSize    page size
-     * @return process definition page
+     * @return workflow definition page
      */
     @Override
     public PageInfo<WorkflowDefinition> queryWorkflowDefinitionListPaging(@NonNull User loginUser,
@@ -615,18 +616,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_DEFINITION);
 
-        PageListingResult<WorkflowDefinition> processDefinitionsPageListingResult =
-                processDefinitionDao.listingProcessDefinition(
+        PageListingResult<WorkflowDefinition> workflowDefinitionPageListingResult =
+                workflowDefinitionDao.listingWorkflowDefinition(
                         pageNo, pageSize, searchVal, userId, projectCode);
-        List<WorkflowDefinition> workflowDefinitions = processDefinitionsPageListingResult.getRecords();
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionPageListingResult.getRecords();
 
-        List<Long> processDefinitionCodes =
+        List<Long> workflowDefinitionCodes =
                 workflowDefinitions.stream().map(WorkflowDefinition::getCode).collect(Collectors.toList());
-        Map<Long, Schedule> scheduleMap = schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes)
-                .stream()
-                .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
-        List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
-                processDefinitionCodes);
+        Map<Long, Schedule> scheduleMap =
+                schedulerService.queryScheduleByWorkflowDefinitionCodes(workflowDefinitionCodes)
+                        .stream()
+                        .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+                workflowDefinitionCodes);
         for (WorkflowDefinition pd : workflowDefinitions) {
             userWithCodes.stream()
                     .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode()
@@ -641,23 +643,23 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         PageInfo<WorkflowDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) processDefinitionsPageListingResult.getTotalCount());
+        pageInfo.setTotal((int) workflowDefinitionPageListingResult.getTotalCount());
         pageInfo.setTotalList(workflowDefinitions);
 
         return pageInfo;
     }
 
     /**
-     * Filter resource process definitions
+     * Filter resource workflow definitions
      *
      * @param loginUser             login user
      * @param workflowFilterRequest workflow filter requests
-     * @return List process definition
+     * @return List workflow definition
      */
     @Override
     public PageInfo<WorkflowDefinition> filterWorkflowDefinition(User loginUser,
                                                                  WorkflowFilterRequest workflowFilterRequest) {
-        WorkflowDefinition workflowDefinition = workflowFilterRequest.convert2ProcessDefinition();
+        WorkflowDefinition workflowDefinition = workflowFilterRequest.convert2WorkflowDefinition();
         if (workflowFilterRequest.getProjectName() != null) {
             Project project = projectMapper.queryByName(workflowFilterRequest.getProjectName());
             // check user access for project
@@ -667,33 +669,33 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         Page<WorkflowDefinition> page =
                 new Page<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
-        IPage<WorkflowDefinition> processDefinitionIPage =
-                processDefinitionMapper.filterProcessDefinition(page, workflowDefinition);
+        IPage<WorkflowDefinition> workflowDefinitionIPage =
+                workflowDefinitionMapper.filterProcessDefinition(page, workflowDefinition);
 
-        List<WorkflowDefinition> records = processDefinitionIPage.getRecords();
+        List<WorkflowDefinition> records = workflowDefinitionIPage.getRecords();
         for (WorkflowDefinition pd : records) {
-            WorkflowDefinitionLog processDefinitionLog =
-                    processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(processDefinitionLog.getOperator());
+            WorkflowDefinitionLog workflowDefinitionLog =
+                    workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
+            User user = userMapper.selectById(workflowDefinitionLog.getOperator());
             pd.setModifyBy(user.getUserName());
         }
 
-        processDefinitionIPage.setRecords(records);
+        workflowDefinitionIPage.setRecords(records);
         PageInfo<WorkflowDefinition> pageInfo =
                 new PageInfo<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
-        pageInfo.setTotal((int) processDefinitionIPage.getTotal());
-        pageInfo.setTotalList(processDefinitionIPage.getRecords());
+        pageInfo.setTotal((int) workflowDefinitionIPage.getTotal());
+        pageInfo.setTotalList(workflowDefinitionIPage.getRecords());
 
         return pageInfo;
     }
 
     /**
-     * query detail of process definition
+     * query detail of workflow definition
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @param code        process definition code
-     * @return process definition detail
+     * @param code        workflow definition code
+     * @return workflow definition detail
      */
     @Override
     public Map<String, Object> queryWorkflowDefinitionByCode(User loginUser, long projectCode, long code) {
@@ -705,10 +707,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, processCode:{}.", code);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
+            log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
         } else {
             DagData dagData = processService.genDagData(workflowDefinition);
             result.put(Constants.DATA_LIST, dagData);
@@ -718,17 +720,17 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * query detail of process definition
+     * query detail of workflow definition
      *
      * @param loginUser login user
-     * @param code      process definition code
-     * @return process definition detail
+     * @param code      workflow definition code
+     * @return workflow definition detail
      */
     @Override
     public WorkflowDefinition getWorkflowDefinition(User loginUser, long code) {
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (workflowDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
         }
 
         Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
@@ -741,9 +743,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Override
     public Optional<WorkflowDefinition> queryWorkflowDefinition(long workflowDefinitionCode,
                                                                 int workflowDefinitionVersion) {
-        WorkflowDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null || workflowDefinition.getVersion() != workflowDefinitionVersion) {
-            workflowDefinition = processDefinitionLogDao.queryByDefinitionCodeAndVersion(workflowDefinitionCode,
+            workflowDefinition = workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(workflowDefinitionCode,
                     workflowDefinitionVersion);
         }
         return Optional.ofNullable(workflowDefinition);
@@ -753,7 +755,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public WorkflowDefinition queryWorkflowDefinitionThrowExceptionIfNotFound(long workflowDefinitionCode,
                                                                               int workflowDefinitionVersion) {
         return queryWorkflowDefinition(workflowDefinitionCode, workflowDefinitionVersion)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
                         String.valueOf(workflowDefinitionCode)));
     }
 
@@ -766,11 +768,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByDefineName(projectCode, name);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, name);
 
         if (workflowDefinition == null) {
-            log.error("Process definition does not exist, projectCode:{}.", projectCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, name);
+            log.error("workflow definition does not exist, projectCode:{}.", projectCode);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, name);
         } else {
             DagData dagData = processService.genDagData(workflowDefinition);
             result.put(Constants.DATA_LIST, dagData);
@@ -780,12 +782,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * update  process definition
+     * update workflow definition
      *
      * @param loginUser          login user
      * @param projectCode        project code
-     * @param name               process definition name
-     * @param code               process definition code
+     * @param name               workflow definition name
+     * @param code               workflow definition code
      * @param description        description
      * @param globalParams       global params
      * @param locations          locations for nodes
@@ -823,27 +825,27 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
-        // check process definition exists
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        // check workflow definition exists
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, processCode:{}.", code);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
+            log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
             return result;
         }
         if (workflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
             // online can not permit edit
-            log.warn("Process definition is not allowed to be modified due to {}, processDefinitionCode:{}.",
+            log.warn("workflow definition is not allowed to be modified due to {}, workflowDefinitionCode:{}.",
                     ReleaseState.ONLINE.getDescp(), workflowDefinition.getCode());
-            putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, workflowDefinition.getName());
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_ALLOWED_EDIT, workflowDefinition.getName());
             return result;
         }
         if (!name.equals(workflowDefinition.getName())) {
-            // check whether the new process define name exist
-            WorkflowDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
+            // check whether the new workflow define name exist
+            WorkflowDefinition definition = workflowDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
-                log.warn("Process definition with the same name already exists, processDefinitionCode:{}.",
+                log.warn("workflow definition with the same name already exists, workflowDefinitionCode:{}.",
                         definition.getCode());
-                putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
+                putMsg(result, Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
                 return result;
             }
         }
@@ -861,23 +863,23 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * <p>
      * This function avoid delete task already dependencies by other tasks by accident.
      *
-     * @param workflowDefinition ProcessDefinition you change task definition and task relation
-     * @param taskRelationList  All the latest task relation list from process definition
+     * @param workflowDefinition WorkflowDefinition you change task definition and task relation
+     * @param taskRelationList  All the latest task relation list from workflow definition
      */
     private void taskUsedInOtherTaskValid(WorkflowDefinition workflowDefinition,
                                           List<WorkflowTaskRelationLog> taskRelationList) {
         List<WorkflowTaskRelation> oldWorkflowTaskRelationList =
-                processTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
-        Set<WorkflowTaskRelationLog> oldProcessTaskRelationSet =
+                workflowTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
+        Set<WorkflowTaskRelationLog> oldWorkflowTaskRelationSet =
                 oldWorkflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toSet());
         StringBuilder sb = new StringBuilder();
-        for (WorkflowTaskRelationLog oldProcessTaskRelation : oldProcessTaskRelationSet) {
+        for (WorkflowTaskRelationLog oldWorkflowTaskRelation : oldWorkflowTaskRelationSet) {
             boolean oldTaskExists = taskRelationList.stream()
-                    .anyMatch(relation -> oldProcessTaskRelation.getPostTaskCode() == relation.getPostTaskCode());
+                    .anyMatch(relation -> oldWorkflowTaskRelation.getPostTaskCode() == relation.getPostTaskCode());
             if (!oldTaskExists) {
                 Optional<String> taskDepMsg = workflowLineageService.taskDependentMsg(
-                        workflowDefinition.getProjectCode(), oldProcessTaskRelation.getProcessDefinitionCode(),
-                        oldProcessTaskRelation.getPostTaskCode());
+                        workflowDefinition.getProjectCode(), oldWorkflowTaskRelation.getProcessDefinitionCode(),
+                        oldWorkflowTaskRelation.getPostTaskCode());
                 taskDepMsg.ifPresent(sb::append);
             }
             if (sb.length() != 0) {
@@ -899,20 +901,20 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.info("The task has not changed, so skip");
         }
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
-            log.error("Update task definitions error, projectCode:{}, processCode:{}.",
+            log.error("Update task definitions error, projectCode:{}, workflowDefinitionCode:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode());
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         boolean isChange = false;
         if (workflowDefinition.equals(workflowDefinitionDeepCopy) && saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
-            List<WorkflowTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper
+            List<WorkflowTaskRelationLog> workflowTaskRelationLogList = workflowTaskRelationLogMapper
                     .queryByProcessCodeAndVersion(workflowDefinition.getCode(), workflowDefinition.getVersion());
-            if (taskRelationList.size() == processTaskRelationLogList.size()) {
+            if (taskRelationList.size() == workflowTaskRelationLogList.size()) {
                 Set<WorkflowTaskRelationLog> taskRelationSet = new HashSet<>(taskRelationList);
-                Set<WorkflowTaskRelationLog> processTaskRelationLogSet = new HashSet<>(processTaskRelationLogList);
-                if (taskRelationSet.size() == processTaskRelationLogSet.size()) {
-                    taskRelationSet.removeAll(processTaskRelationLogSet);
+                Set<WorkflowTaskRelationLog> workflowTaskRelationLogSet = new HashSet<>(workflowTaskRelationLogList);
+                if (taskRelationSet.size() == workflowTaskRelationLogSet.size()) {
+                    taskRelationSet.removeAll(workflowTaskRelationLogSet);
                     if (!taskRelationSet.isEmpty()) {
                         isChange = true;
                     }
@@ -926,17 +928,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             isChange = true;
         }
         if (isChange) {
-            log.info("Process definition needs to be updated, projectCode:{}, processCode:{}, processVersion:{}.",
+            log.info(
+                    "workflow definition needs to be updated, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode(), workflowDefinition.getVersion());
             workflowDefinition.setUpdateTime(new Date());
             int insertVersion =
-                    processService.saveProcessDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
+                    processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
             if (insertVersion <= 0) {
-                log.error("Update process definition error, processCode:{}.", workflowDefinition.getCode());
+                log.error("Update workflow definition error, workflowDefinitionCode:{}.", workflowDefinition.getCode());
                 putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
             } else {
-                log.info("Update process definition complete, processCode:{}, processVersion:{}.",
+                log.info(
+                        "Update workflow definition complete, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                         workflowDefinition.getCode(), insertVersion);
             }
 
@@ -945,12 +949,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     workflowDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
             if (insertResult == Constants.EXIT_CODE_SUCCESS) {
                 log.info(
-                        "Update process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+                        "Update workflow task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                         workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
                 putMsg(result, Status.SUCCESS);
                 result.put(Constants.DATA_LIST, workflowDefinition);
             } else {
-                log.error("Update process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
+                log.error(
+                        "Update workflow task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                         workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
                 putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
@@ -960,7 +965,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     insertVersion, taskDefinitionLogs);
         } else {
             log.info(
-                    "Process definition does not need to be updated because there is no change, projectCode:{}, processCode:{}, processVersion:{}.",
+                    "workflow definition does not need to be updated because there is no change, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode(), workflowDefinition.getVersion());
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, workflowDefinition);
@@ -969,12 +974,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * verify process definition name unique
+     * verify workflow definition name unique
      *
      * @param loginUser   login user
      * @param projectCode project code
      * @param name        name
-     * @return true if process definition name not exists, otherwise false
+     * @return true if workflow definition name not exists, otherwise false
      */
     @Override
     public Map<String, Object> verifyWorkflowDefinitionName(User loginUser, long projectCode, String name,
@@ -987,7 +992,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
         WorkflowDefinition workflowDefinition =
-                processDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
+                workflowDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
         if (workflowDefinition == null) {
             putMsg(result, Status.SUCCESS);
             return result;
@@ -996,9 +1001,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        log.warn("Process definition with the same name {} already exists, processDefinitionCode:{}.",
+        log.warn("workflow definition with the same name {} already exists, workflowDefinitionCode:{}.",
                 workflowDefinition.getName(), workflowDefinition.getCode());
-        putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
+        putMsg(result, Status.WORKFLOW_DEFINITION_NAME_EXIST, name.trim());
         return result;
     }
 
@@ -1007,14 +1012,14 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> batchDeleteWorkflowDefinitionByCodes(User loginUser, long projectCode, String codes) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(codes)) {
-            log.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
-            putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
+            log.error("Parameter workflowDefinitionCodes is empty, projectCode is {}.", projectCode);
+            putMsg(result, Status.WORKFLOW_DEFINITION_CODES_IS_EMPTY);
             return result;
         }
 
         Set<Long> definitionCodes = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(definitionCodes);
         Set<Long> queryCodes =
                 workflowDefinitionList.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
         // definitionCodes - queryCodes
@@ -1022,19 +1027,20 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
 
         if (CollectionUtils.isNotEmpty(diffCode)) {
-            log.error("Process definition does not exist, processCodes:{}.",
+            log.error("workflow definition does not exist, workflowDefinitionCodes:{}.",
                     diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA)));
             throw new ServiceException(Status.BATCH_DELETE_WORKFLOW_DEFINE_BY_CODES_ERROR,
-                    diffCode.stream().map(code -> code + "[process definition not exist]")
+                    diffCode.stream().map(code -> code + "[workflow definition not exist]")
                             .collect(Collectors.joining(Constants.COMMA)));
         }
 
-        for (WorkflowDefinition process : workflowDefinitionList) {
+        for (WorkflowDefinition workflowDefinition : workflowDefinitionList) {
             try {
-                this.deleteWorkflowDefinitionByCode(loginUser, process.getCode());
-                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(process.getCode());
+                this.deleteWorkflowDefinitionByCode(loginUser, workflowDefinition.getCode());
+                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(workflowDefinition.getCode());
             } catch (Exception e) {
-                throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
+                throw new ServiceException(Status.DELETE_WORKFLOW_DEFINE_ERROR, workflowDefinition.getName(),
+                        e.getMessage());
             }
         }
         putMsg(result, Status.SUCCESS);
@@ -1042,53 +1048,53 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * Process definition want to delete whether used in other task, should throw exception when have be used.
+     * workflow definition want to delete whether used in other task, should throw exception when have be used.
      * <p>
-     * This function avoid delete process definition already dependencies by other tasks by accident.
+     * This function avoid delete workflow definition already dependencies by other tasks by accident.
      *
-     * @param workflowDefinition ProcessDefinition you change task definition and task relation
+     * @param workflowDefinition WorkflowDefinition you change task definition and task relation
      */
-    private void processDefinitionUsedInOtherTaskValid(WorkflowDefinition workflowDefinition) {
-        // check process definition is already online
+    private void workflowDefinitionUsedInOtherTaskValid(WorkflowDefinition workflowDefinition) {
+        // check workflow definition is already online
         if (workflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            throw new ServiceException(Status.PROCESS_DEFINE_STATE_ONLINE, workflowDefinition.getName());
+            throw new ServiceException(Status.WORKFLOW_DEFINE_STATE_ONLINE, workflowDefinition.getName());
         }
 
-        // check process instances is already running
-        List<WorkflowInstance> workflowInstances = processInstanceService
-                .queryByProcessDefineCodeAndStatus(workflowDefinition.getCode(),
+        // check workflow instances is already running
+        List<WorkflowInstance> workflowInstances = workflowInstanceService
+                .queryByWorkflowDefinitionCodeAndStatus(workflowDefinition.getCode(),
                         org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
+            throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
 
-        // check process used by other task, including subprocess and dependent task type
+        // check workflow used by other task, including sub workflow and dependent task type
         Optional<String> taskDepMsg = workflowLineageService.taskDependentMsg(workflowDefinition.getProjectCode(),
                 workflowDefinition.getCode(), 0);
 
         if (taskDepMsg.isPresent()) {
-            String errorMeg = "Process definition cannot be deleted because it has dependent, " + taskDepMsg.get();
+            String errorMeg = "workflow definition cannot be deleted because it has dependent, " + taskDepMsg.get();
             log.error(errorMeg);
             throw new ServiceException(errorMeg);
         }
     }
 
     public void deleteWorkflowDefinitionByCode(User loginUser, long code) {
-        WorkflowDefinition workflowDefinition = processDefinitionDao.queryByCode(code)
-                .orElseThrow(() -> new ServiceException(PROCESS_DEFINE_NOT_EXIST, String.valueOf(code)));
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code)
+                .orElseThrow(() -> new ServiceException(WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code)));
 
         Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION_DELETE);
 
-        // Determine if the login user is the owner of the process definition
+        // Determine if the login user is the owner of the workflow definition
         if (loginUser.getId() != workflowDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        processDefinitionUsedInOtherTaskValid(workflowDefinition);
+        workflowDefinitionUsedInOtherTaskValid(workflowDefinition);
 
-        // get the timing according to the process definition
+        // get the timing according to the workflow definition
         Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(code);
         if (scheduleObj != null) {
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
@@ -1103,30 +1109,30 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // delete workflow instance, will delete workflow instance, sub workflow instance, task instance, alert
-        processInstanceService.deleteProcessInstanceByWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstanceService.deleteWorkflowInstanceByWorkflowDefinitionCode(workflowDefinition.getCode());
         // delete task definition
         taskDefinitionService.deleteTaskByWorkflowDefinitionCode(workflowDefinition.getCode(),
                 workflowDefinition.getVersion());
         // delete task definition log
         taskDefinitionLogService.deleteTaskByWorkflowDefinitionCode(workflowDefinition.getCode());
         // delete workflow definition log
-        processDefinitionLogDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowDefinitionLogDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
 
         // we delete the workflow definition at last to avoid using transaction here.
         // If delete error, we can call this interface again.
-        processDefinitionDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowDefinitionDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
 
     /**
-     * batch export process definition by codes
+     * batch export workflow definition by codes
      */
     @Override
     public void batchExportWorkflowDefinitionByCodes(User loginUser, long projectCode, String codes,
                                                      HttpServletResponse response) {
         if (StringUtils.isEmpty(codes)) {
-            log.warn("Process definition codes to be exported is empty.");
+            log.warn("workflow definition codes to be exported is empty.");
             return;
         }
         Project project = projectMapper.queryByCode(projectCode);
@@ -1138,28 +1144,29 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(workflowDefinitionList)) {
-            log.error("Process definitions to be exported do not exist, processDefinitionCodes:{}.", defineCodeSet);
+            log.error("workflow definitions to be exported do not exist, workflowDefinitionCodes:{}.", defineCodeSet);
             return;
         }
-        // check processDefinition exist in project
+        // check workflowDefinition exist in project
         List<WorkflowDefinition> workflowDefinitionListInProject = workflowDefinitionList.stream()
                 .filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
         List<DagDataSchedule> dagDataSchedules =
-                workflowDefinitionListInProject.stream().map(this::exportProcessDagData).collect(Collectors.toList());
+                workflowDefinitionListInProject.stream().map(this::exportWorkflowDagData).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(dagDataSchedules)) {
-            log.info("Start download process definition file, processDefinitionCodes:{}.", defineCodeSet);
-            downloadProcessDefinitionFile(response, dagDataSchedules);
+            log.info("Start download workflow definition file, workflowDefinitionCodes:{}.", defineCodeSet);
+            downloadWorkflowDefinitionFile(response, dagDataSchedules);
         } else {
-            log.error("There is no exported process dag data.");
+            log.error("There is no exported workflow dag data.");
         }
     }
 
     /**
-     * download the process definition file
+     * download the workflow definition file
      */
-    protected void downloadProcessDefinitionFile(HttpServletResponse response, List<DagDataSchedule> dagDataSchedules) {
+    protected void downloadWorkflowDefinitionFile(HttpServletResponse response,
+                                                  List<DagDataSchedule> dagDataSchedules) {
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         BufferedOutputStream buff = null;
         ServletOutputStream out = null;
@@ -1170,7 +1177,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             buff.flush();
             buff.close();
         } catch (IOException e) {
-            log.warn("Export process definition fail", e);
+            log.warn("Export workflow definition fail", e);
         } finally {
             if (null != buff) {
                 try {
@@ -1190,12 +1197,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * get export process dag data
+     * get export workflow dag data
      *
-     * @param workflowDefinition process definition
+     * @param workflowDefinition workflow definition
      * @return DagDataSchedule
      */
-    public DagDataSchedule exportProcessDagData(WorkflowDefinition workflowDefinition) {
+    public DagDataSchedule exportWorkflowDagData(WorkflowDefinition workflowDefinition) {
         Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(workflowDefinition.getCode());
         DagDataSchedule dagDataSchedule = new DagDataSchedule(processService.genDagData(workflowDefinition));
         if (scheduleObj != null) {
@@ -1206,12 +1213,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * import process definition
+     * import workflow definition
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @param file        process metadata json file
-     * @return import process
+     * @param file        workflow metadata json file
+     * @return import workflow
      */
     @Override
     @Transactional
@@ -1226,7 +1233,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         // check file content
         if (CollectionUtils.isEmpty(dagDataScheduleList)) {
-            log.warn("Process definition file content is empty.");
+            log.warn("workflow definition file content is empty.");
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
             return result;
         }
@@ -1247,16 +1254,17 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
-        int index = processDefinitionName.lastIndexOf(".");
+        String workflowDefinitionName =
+                file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
+        int index = workflowDefinitionName.lastIndexOf(".");
         if (index > 0) {
-            processDefinitionName = processDefinitionName.substring(0, index);
+            workflowDefinitionName = workflowDefinitionName.substring(0, index);
         }
-        processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+        workflowDefinitionName = getNewName(workflowDefinitionName, IMPORT_SUFFIX);
 
         WorkflowDefinition workflowDefinition;
         List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
-        List<WorkflowTaskRelationLog> processTaskRelationList = new ArrayList<>();
+        List<WorkflowTaskRelationLog> workflowTaskRelationLogList = new ArrayList<>();
 
         // for Zip Bomb Attack
         final int THRESHOLD_ENTRIES = 10000;
@@ -1271,9 +1279,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         try (
                 ZipInputStream zIn = new ZipInputStream(file.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
-            // build process definition
+            // build workflow definition
             workflowDefinition = new WorkflowDefinition(projectCode,
-                    processDefinitionName,
+                    workflowDefinitionName,
                     CodeGenerateUtils.genCode(),
                     "",
                     "[]", null,
@@ -1369,7 +1377,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 }
             }
         } catch (Exception e) {
-            log.error("Import process definition error.", e);
+            log.error("Import workflow definition error.", e);
             putMsg(result, Status.IMPORT_WORKFLOW_DEFINE_ERROR);
             return result;
         }
@@ -1379,29 +1387,29 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             List<String> upstreams = taskNameToUpstream.get(entry.getKey());
             if (CollectionUtils.isEmpty(upstreams)
                     || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
-                WorkflowTaskRelationLog processTaskRelation = buildNormalTaskRelation(0, entry.getValue());
-                processTaskRelationList.add(processTaskRelation);
+                WorkflowTaskRelationLog workflowTaskRelationLog = buildNormalTaskRelation(0, entry.getValue());
+                workflowTaskRelationLogList.add(workflowTaskRelationLog);
                 continue;
             }
             for (String upstream : upstreams) {
-                WorkflowTaskRelationLog processTaskRelation =
+                WorkflowTaskRelationLog workflowTaskRelationLog =
                         buildNormalTaskRelation(taskNameToCode.get(upstream), entry.getValue());
-                processTaskRelationList.add(processTaskRelation);
+                workflowTaskRelationLogList.add(workflowTaskRelationLog);
             }
         }
 
-        return createDagDefine(loginUser, processTaskRelationList, workflowDefinition, taskDefinitionList);
+        return createDagDefine(loginUser, workflowTaskRelationLogList, workflowDefinition, taskDefinitionList);
     }
 
     private WorkflowTaskRelationLog buildNormalTaskRelation(long preTaskCode, long postTaskCode) {
-        WorkflowTaskRelationLog processTaskRelation = new WorkflowTaskRelationLog();
-        processTaskRelation.setPreTaskCode(preTaskCode);
-        processTaskRelation.setPreTaskVersion(0);
-        processTaskRelation.setPostTaskCode(postTaskCode);
-        processTaskRelation.setPostTaskVersion(0);
-        processTaskRelation.setConditionType(ConditionType.NONE);
-        processTaskRelation.setName("");
-        return processTaskRelation;
+        WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog();
+        workflowTaskRelationLog.setPreTaskCode(preTaskCode);
+        workflowTaskRelationLog.setPreTaskVersion(0);
+        workflowTaskRelationLog.setPostTaskCode(postTaskCode);
+        workflowTaskRelationLog.setPostTaskVersion(0);
+        workflowTaskRelationLog.setConditionType(ConditionType.NONE);
+        workflowTaskRelationLog.setName("");
+        return workflowTaskRelationLog;
     }
 
     private DataSource queryDatasourceByNameAndUser(String datasourceName, User loginUser) {
@@ -1457,19 +1465,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         WorkflowDefinition workflowDefinition = dagDataSchedule.getProcessDefinition();
 
-        // generate import processDefinitionName
-        String processDefinitionName = recursionProcessDefinitionName(projectCode, workflowDefinition.getName(), 1);
-        String importProcessDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+        // generate import workflowDefinitionName
+        String workflowDefinitionName = recursionWorkflowDefinitionName(projectCode, workflowDefinition.getName(), 1);
+        String importWorkflowDefinitionName = getNewName(workflowDefinitionName, IMPORT_SUFFIX);
         // unique check
         Map<String, Object> checkResult =
-                verifyWorkflowDefinitionName(loginUser, projectCode, importProcessDefinitionName, 0);
+                verifyWorkflowDefinitionName(loginUser, projectCode, importWorkflowDefinitionName, 0);
         if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
             putMsg(result, Status.SUCCESS);
         } else {
             result.putAll(checkResult);
             return false;
         }
-        workflowDefinition.setName(importProcessDefinitionName);
+        workflowDefinition.setName(importWorkflowDefinitionName);
         workflowDefinition.setId(null);
         workflowDefinition.setProjectCode(projectCode);
         workflowDefinition.setUserId(loginUser.getId());
@@ -1477,7 +1485,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             workflowDefinition.setCode(CodeGenerateUtils.genCode());
         } catch (CodeGenerateException e) {
             log.error(
-                    "Save process definition error because generate process definition code error, projectCode:{}.",
+                    "Save workflow definition error because generate workflow definition code error, projectCode:{}.",
                     projectCode, e);
             putMsg(result, Status.CREATE_WORKFLOW_DEFINITION_ERROR);
             return false;
@@ -1501,7 +1509,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
                 taskDefinitionLog.setCode(code);
             } catch (CodeGenerateException e) {
-                log.error("Generate task definition code error, projectCode:{}, processDefinitionCode:{}",
+                log.error("Generate task definition code error, projectCode:{}, workflowDefinitionCode:{}",
                         projectCode, workflowDefinition.getCode(), e);
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
@@ -1511,7 +1519,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
-            log.error("Save task definition error, projectCode:{}, processDefinitionCode:{}", projectCode,
+            log.error("Save task definition error, projectCode:{}, workflowDefinitionCode:{}", projectCode,
                     workflowDefinition.getCode());
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
@@ -1520,16 +1528,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<WorkflowTaskRelation> taskRelationList = dagDataSchedule.getProcessTaskRelationList();
         List<WorkflowTaskRelationLog> taskRelationLogList = new ArrayList<>();
         for (WorkflowTaskRelation workflowTaskRelation : taskRelationList) {
-            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
-            if (taskCodeMap.containsKey(processTaskRelationLog.getPreTaskCode())) {
-                processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
+            WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
+            if (taskCodeMap.containsKey(workflowTaskRelationLog.getPreTaskCode())) {
+                workflowTaskRelationLog.setPreTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPreTaskCode()));
             }
-            if (taskCodeMap.containsKey(processTaskRelationLog.getPostTaskCode())) {
-                processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+            if (taskCodeMap.containsKey(workflowTaskRelationLog.getPostTaskCode())) {
+                workflowTaskRelationLog.setPostTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPostTaskCode()));
             }
-            processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
-            processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
-            taskRelationLogList.add(processTaskRelationLog);
+            workflowTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
+            workflowTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
+            taskRelationLogList.add(workflowTaskRelationLog);
         }
         if (StringUtils.isNotEmpty(workflowDefinition.getLocations())
                 && JSONUtils.checkJsonValid(workflowDefinition.getLocations())) {
@@ -1555,14 +1563,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(createDagResult, Status.SUCCESS);
         } else {
             result.putAll(createDagResult);
-            log.error("Import process definition error, projectCode:{}, processDefinitionCode:{}.", projectCode,
+            log.error("Import workflow definition error, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                     workflowDefinition.getCode());
             throw new ServiceException(Status.IMPORT_WORKFLOW_DEFINE_ERROR);
         }
 
         Schedule schedule = dagDataSchedule.getSchedule();
         if (null != schedule) {
-            WorkflowDefinition newWorkflowDefinition = processDefinitionMapper.queryByCode(workflowDefinition.getCode());
+            WorkflowDefinition newWorkflowDefinition =
+                    workflowDefinitionMapper.queryByCode(workflowDefinition.getCode());
             schedule.setProcessDefinitionCode(newWorkflowDefinition.getCode());
             schedule.setId(null);
             schedule.setUserId(loginUser.getId());
@@ -1571,7 +1580,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
                 log.error(
-                        "Import process definition error due to save schedule fail, projectCode:{}, processDefinitionCode:{}.",
+                        "Import workflow definition error due to save schedule fail, projectCode:{}, workflowDefinitionCode:{}.",
                         projectCode, workflowDefinition.getCode());
                 putMsg(result, Status.IMPORT_WORKFLOW_DEFINE_ERROR);
                 throw new ServiceException(Status.IMPORT_WORKFLOW_DEFINE_ERROR);
@@ -1579,7 +1588,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         result.put(Constants.DATA_LIST, workflowDefinition);
-        log.info("Import process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
+        log.info("Import workflow definition complete, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                 workflowDefinition.getCode());
         return true;
     }
@@ -1589,8 +1598,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     private boolean checkImportanceParams(DagDataSchedule dagDataSchedule, Map<String, Object> result) {
         if (dagDataSchedule.getProcessDefinition() == null) {
-            log.warn("Process definition is null.");
-            putMsg(result, Status.DATA_IS_NULL, "ProcessDefinition");
+            log.warn("workflow definition is null.");
+            putMsg(result, Status.DATA_IS_NULL, "WorkflowDefinition");
             return false;
         }
         if (CollectionUtils.isEmpty(dagDataSchedule.getTaskDefinitionList())) {
@@ -1599,33 +1608,33 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return false;
         }
         if (CollectionUtils.isEmpty(dagDataSchedule.getProcessTaskRelationList())) {
-            log.warn("Process task relation list is null.");
-            putMsg(result, Status.DATA_IS_NULL, "ProcessTaskRelationList");
+            log.warn("workflow task relation list is null.");
+            putMsg(result, Status.DATA_IS_NULL, "WorkflowTaskRelationList");
             return false;
         }
         return true;
     }
 
-    private String recursionProcessDefinitionName(long projectCode, String processDefinitionName, int num) {
+    private String recursionWorkflowDefinitionName(long projectCode, String workflowDefinitionName, int num) {
         WorkflowDefinition workflowDefinition =
-                processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
+                workflowDefinitionMapper.queryByDefineName(projectCode, workflowDefinitionName);
         if (workflowDefinition != null) {
             if (num > 1) {
-                String str = processDefinitionName.substring(0, processDefinitionName.length() - 3);
-                processDefinitionName = str + "(" + num + ")";
+                String str = workflowDefinitionName.substring(0, workflowDefinitionName.length() - 3);
+                workflowDefinitionName = str + "(" + num + ")";
             } else {
-                processDefinitionName = workflowDefinition.getName() + "(" + num + ")";
+                workflowDefinitionName = workflowDefinition.getName() + "(" + num + ")";
             }
         } else {
-            return processDefinitionName;
+            return workflowDefinitionName;
         }
-        return recursionProcessDefinitionName(projectCode, processDefinitionName, num + 1);
+        return recursionWorkflowDefinitionName(projectCode, workflowDefinitionName, num + 1);
     }
 
     /**
-     * check the process task relation json
+     * check the workflow task relation json
      *
-     * @param workflowTaskRelationJson process task relation json
+     * @param workflowTaskRelationJson workflow task relation json
      * @return check result code
      */
     @Override
@@ -1634,7 +1643,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Map<String, Object> result = new HashMap<>();
         try {
             if (workflowTaskRelationJson == null) {
-                log.error("Process task relation data is null.");
+                log.error("workflow task relation data is null.");
                 putMsg(result, Status.DATA_IS_NOT_VALID, workflowTaskRelationJson);
                 return result;
             }
@@ -1646,21 +1655,21 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
             if (CollectionUtils.isEmpty(taskNodes)) {
                 log.error("Task node data is empty.");
-                putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
+                putMsg(result, Status.WORKFLOW_DAG_IS_EMPTY);
                 return result;
             }
 
             // check has cycle
             if (graphHasCycle(taskNodes)) {
-                log.error("Process DAG has cycle.");
-                putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
+                log.error("workflow DAG has cycle.");
+                putMsg(result, Status.WORKFLOW_NODE_HAS_CYCLE);
                 return result;
             }
 
-            // check whether the process definition json is normal
+            // check whether the workflow definition json is normal
             for (TaskNode taskNode : taskNodes) {
                 if (!checkTaskParameters(taskNode.getType(), taskNode.getParams())) {
-                    putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskNode.getName());
+                    putMsg(result, Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskNode.getName());
                     return result;
                 }
 
@@ -1677,11 +1686,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * get task node details based on process definition
+     * get task node details based on workflow definition
      *
      * @param loginUser   loginUser
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code        workflow definition code
      * @return task node list
      */
     @Override
@@ -1692,10 +1701,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, processDefinitionCode:{}.", code);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
+            log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
             return result;
         }
         DagData dagData = processService.genDagData(workflowDefinition);
@@ -1706,7 +1715,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * get task node details map based on process definition
+     * get task node details map based on workflow definition
      *
      * @param loginUser   loginUser
      * @param projectCode project code
@@ -1724,25 +1733,25 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(workflowDefinitionList)) {
-            log.error("Process definitions do not exist, codes:{}.", defineCodeSet);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
+            log.error("workflow definitions do not exist, codes:{}.", defineCodeSet);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, codes);
             return result;
         }
         HashMap<Long, Project> userProjects = new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
         projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
                 .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
 
-        // check processDefinition exist in project
+        // check workflowDefinition exist in project
         List<WorkflowDefinition> workflowDefinitionListInProject = workflowDefinitionList.stream()
                 .filter(o -> userProjects.containsKey(o.getProjectCode())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(workflowDefinitionListInProject)) {
             Set<Long> codesInProject = workflowDefinitionListInProject.stream()
                     .map(WorkflowDefinition::getCode).collect(Collectors.toSet());
-            log.error("Process definitions do not exist in project, projectCode:{}, processDefinitionsCodes:{}.",
+            log.error("workflow definitions do not exist in project, projectCode:{}, workflowDefinitionsCodes:{}.",
                     workflowDefinitionListInProject.get(0).getProjectCode(), codesInProject);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, codes);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, codes);
             return result;
         }
         Map<Long, List<TaskDefinition>> taskNodeMap = new HashMap<>();
@@ -1759,11 +1768,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * query process definition all by project code
+     * query workflow definition all by project code
      *
      * @param loginUser   loginUser
      * @param projectCode project code
-     * @return process definitions in the project
+     * @return workflow definitions in the project
      */
     @Override
     public Map<String, Object> queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode) {
@@ -1774,7 +1783,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<WorkflowDefinition> workflowDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList =
                 workflowDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, dagDataList);
@@ -1783,27 +1792,27 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * query process definition list by project code
+     * query workflow definition list by project code
      *
      * @param projectCode project code
-     * @return process definition list in the project
+     * @return workflow definition list in the project
      */
     @Override
     public Map<String, Object> queryWorkflowDefinitionListByProjectCode(long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        List<DependentSimplifyDefinition> processDefinitions =
-                processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
-        result.put(Constants.DATA_LIST, processDefinitions);
+        List<DependentSimplifyDefinition> workflowDefinitions =
+                workflowDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
+        result.put(Constants.DATA_LIST, workflowDefinitions);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
     /**
-     * query process definition list by process definition code
+     * query workflow definition list by workflow definition code
      *
      * @param projectCode           project code
-     * @param workflowDefinitionCode process definition code
-     * @return task definition list in the process definition
+     * @param workflowDefinitionCode workflow definition code
+     * @return task definition list in the workflow definition
      */
     @Override
     public Map<String, Object> queryTaskDefinitionListByWorkflowDefinitionCode(long projectCode,
@@ -1812,12 +1821,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         Set<Long> definitionCodesSet = new HashSet<>();
         definitionCodesSet.add(workflowDefinitionCode);
-        List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper
+        List<DependentSimplifyDefinition> workflowDefinitions = workflowDefinitionMapper
                 .queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
 
         // query task definition log
         List<TaskDefinitionLog> taskDefinitionLogsList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
-                processDefinitions.get(0).getCode(), processDefinitions.get(0).getVersion());
+                workflowDefinitions.get(0).getCode(), workflowDefinitions.get(0).getVersion());
 
         List<DependentSimplifyDefinition> taskDefinitionList = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogsList) {
@@ -1837,7 +1846,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * Encapsulates the TreeView structure
      *
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code        workflow definition code
      * @param limit       limit
      * @return tree view json data
      */
@@ -1850,10 +1859,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (null == workflowDefinition || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, code:{}.", code);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
+            log.error("workflow definition does not exist, code:{}.", code);
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
             return result;
         }
         DAG<Long, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(workflowDefinition);
@@ -1863,10 +1872,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // nodes that are waiting to run
         Map<Long, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
 
-        // List of process instances
-        List<WorkflowInstance> workflowInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
-        workflowInstanceList.forEach(processInstance -> processInstance
-                .setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
+        // List of workflow instances
+        List<WorkflowInstance> workflowInstanceList =
+                workflowInstanceService.queryByWorkflowDefinitionCode(code, limit);
+        workflowInstanceList.forEach(workflowInstance -> workflowInstance
+                .setDuration(
+                        DateUtils.format2Duration(workflowInstance.getStartTime(), workflowInstance.getEndTime())));
         List<TaskDefinitionLog> taskDefinitionList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
                 workflowDefinition.getCode(), workflowDefinition.getVersion());
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
@@ -1884,7 +1895,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         parentTreeViewDto.setName("DAG");
         parentTreeViewDto.setType("");
         parentTreeViewDto.setCode(0L);
-        // Specify the process definition, because it is a TreeView for a process definition
+        // Specify the workflow definition, because it is a TreeView for a workflow definition
         for (int i = limit - 1; i >= 0; i--) {
             WorkflowInstance workflowInstance = workflowInstanceList.get(i);
             Date endTime = workflowInstance.getEndTime() == null ? new Date() : workflowInstance.getEndTime();
@@ -1927,19 +1938,20 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
                         Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
 
-                        long subProcessCode = 0L;
-                        // if process is sub process, the return sub id, or sub id=0
+                        long subWorkflowCode = 0L;
+                        // if workflow is sub workflow, the return sub id, or sub id=0
                         if (TaskTypeUtils.isSubWorkflowTask(taskInstance.getTaskType())) {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
-                            subProcessCode = Long.parseLong(JSONUtils.parseObject(
-                                    taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_CODE).asText());
+                            subWorkflowCode = Long.parseLong(JSONUtils.parseObject(
+                                    taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE)
+                                    .asText());
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(),
                                 taskInstance.getTaskCode(),
                                 taskInstance.getTaskType(), taskInstance.getState().name(),
                                 taskInstance.getStartTime(), taskInstance.getEndTime(),
                                 taskInstance.getHost(),
-                                DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessCode));
+                                DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subWorkflowCode));
                     }
                 }
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
@@ -1998,11 +2010,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * batch copy process definition
+     * batch copy workflow definition
      *
      * @param loginUser         loginUser
      * @param projectCode       projectCode
-     * @param codes             processDefinitionCodes
+     * @param codes             workflowDefinitionCodes
      * @param targetProjectCode targetProjectCode
      */
     @Override
@@ -2015,19 +2027,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<String> failedProcessList = new ArrayList<>();
-        doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, true);
-        checkBatchOperateResult(projectCode, targetProjectCode, result, failedProcessList, true);
+        List<String> failedWorkflowList = new ArrayList<>();
+        doBatchOperateWorkflowDefinition(loginUser, targetProjectCode, failedWorkflowList, codes, result, true);
+        checkBatchOperateResult(projectCode, targetProjectCode, result, failedWorkflowList, true);
         return result;
     }
 
     /**
-     * batch move process definition
+     * batch move workflow definition
      * Will be deleted
      *
      * @param loginUser         loginUser
      * @param projectCode       projectCode
-     * @param codes             processDefinitionCodes
+     * @param codes             workflowDefinitionCodes
      * @param targetProjectCode targetProjectCode
      */
     @Override
@@ -2046,15 +2058,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        List<String> failedProcessList = new ArrayList<>();
-        doBatchOperateProcessDefinition(loginUser, targetProjectCode, failedProcessList, codes, result, false);
-        checkBatchOperateResult(projectCode, targetProjectCode, result, failedProcessList, false);
+        List<String> failedWorkflowList = new ArrayList<>();
+        doBatchOperateWorkflowDefinition(loginUser, targetProjectCode, failedWorkflowList, codes, result, false);
+        checkBatchOperateResult(projectCode, targetProjectCode, result, failedWorkflowList, false);
         return result;
     }
 
     private Map<String, Object> checkParams(User loginUser,
                                             long projectCode,
-                                            String processDefinitionCodes,
+                                            String workflowDefinitionCodes,
                                             long targetProjectCode, String perm) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
@@ -2063,9 +2075,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        if (StringUtils.isEmpty(processDefinitionCodes)) {
-            log.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
-            putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY, processDefinitionCodes);
+        if (StringUtils.isEmpty(workflowDefinitionCodes)) {
+            log.error("Parameter workflowDefinitionCodes is empty, projectCode is {}.", projectCode);
+            putMsg(result, Status.WORKFLOW_DEFINITION_CODES_IS_EMPTY, workflowDefinitionCodes);
             return result;
         }
 
@@ -2081,29 +2093,29 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         return result;
     }
 
-    protected void doBatchOperateProcessDefinition(User loginUser,
-                                                   long targetProjectCode,
-                                                   List<String> failedProcessList,
-                                                   String processDefinitionCodes,
-                                                   Map<String, Object> result,
-                                                   boolean isCopy) {
-        Set<Long> definitionCodes = Arrays.stream(processDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong)
+    protected void doBatchOperateWorkflowDefinition(User loginUser,
+                                                    long targetProjectCode,
+                                                    List<String> failedWorkflowList,
+                                                    String workflowDefinitionCodes,
+                                                    Map<String, Object> result,
+                                                    boolean isCopy) {
+        Set<Long> definitionCodes = Arrays.stream(workflowDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = processDefinitionMapper.queryByCodes(definitionCodes);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(definitionCodes);
         Set<Long> queryCodes =
                 workflowDefinitionList.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
         // definitionCodes - queryCodes
         Set<Long> diffCode =
                 definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
-        diffCode.forEach(code -> failedProcessList.add(code + "[null]"));
+        diffCode.forEach(code -> failedWorkflowList.add(code + "[null]"));
         for (WorkflowDefinition workflowDefinition : workflowDefinitionList) {
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    processTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
+                    workflowTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
             List<WorkflowTaskRelationLog> taskRelationList =
                     workflowTaskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
             workflowDefinition.setProjectCode(targetProjectCode);
             if (isCopy) {
-                log.info("Copy process definition...");
+                log.info("Copy workflow definition...");
                 List<TaskDefinitionLog> taskDefinitionLogs =
                         taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
@@ -2121,20 +2133,21 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     taskDefinitionLog.setVersion(0);
                     taskDefinitionLog.setName(taskDefinitionLog.getName());
                 }
-                for (WorkflowTaskRelationLog processTaskRelationLog : taskRelationList) {
-                    if (processTaskRelationLog.getPreTaskCode() > 0) {
-                        processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
+                for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
+                    if (workflowTaskRelationLog.getPreTaskCode() > 0) {
+                        workflowTaskRelationLog
+                                .setPreTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPreTaskCode()));
                     }
-                    if (processTaskRelationLog.getPostTaskCode() > 0) {
-                        processTaskRelationLog
-                                .setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+                    if (workflowTaskRelationLog.getPostTaskCode() > 0) {
+                        workflowTaskRelationLog
+                                .setPostTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPostTaskCode()));
                     }
                 }
-                final long oldProcessDefinitionCode = workflowDefinition.getCode();
+                final long oldWorkflowDefinitionCode = workflowDefinition.getCode();
                 try {
                     workflowDefinition.setCode(CodeGenerateUtils.genCode());
                 } catch (CodeGenerateException e) {
-                    log.error("Generate process definition code error, projectCode:{}.", targetProjectCode, e);
+                    log.error("Generate workflow definition code error, projectCode:{}.", targetProjectCode, e);
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                     throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                 }
@@ -2155,7 +2168,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     workflowDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
                 }
                 // copy timing configuration
-                Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
+                Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldWorkflowDefinitionCode);
                 if (scheduleObj != null) {
                     scheduleObj.setId(null);
                     scheduleObj.setUserId(loginUser.getId());
@@ -2165,7 +2178,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     scheduleObj.setUpdateTime(date);
                     int insertResult = scheduleMapper.insert(scheduleObj);
                     if (insertResult != 1) {
-                        log.error("Schedule create error, processDefinitionCode:{}.", workflowDefinition.getCode());
+                        log.error("Schedule create error, workflowDefinitionCode:{}.", workflowDefinition.getCode());
                         putMsg(result, Status.CREATE_SCHEDULE_ERROR);
                         throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
                     }
@@ -2173,33 +2186,33 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 try {
                     result.putAll(createDagDefine(loginUser, taskRelationList, workflowDefinition, taskDefinitionLogs));
                 } catch (Exception e) {
-                    log.error("Copy process definition error, processDefinitionCode from {} to {}.",
-                            oldProcessDefinitionCode, workflowDefinition.getCode(), e);
+                    log.error("Copy workflow definition error, workflowDefinitionCode from {} to {}.",
+                            oldWorkflowDefinitionCode, workflowDefinition.getCode(), e);
                     putMsg(result, Status.COPY_WORKFLOW_DEFINITION_ERROR);
                     throw new ServiceException(Status.COPY_WORKFLOW_DEFINITION_ERROR);
                 }
             } else {
-                log.info("Move process definition...");
+                log.info("Move workflow definition...");
                 try {
                     result.putAll(updateDagDefine(loginUser, taskRelationList, workflowDefinition, null,
                             Lists.newArrayList()));
                 } catch (Exception e) {
-                    log.error("Move process definition error, processDefinitionCode:{}.",
+                    log.error("Move workflow definition error, workflowDefinitionCode:{}.",
                             workflowDefinition.getCode(), e);
                     putMsg(result, Status.MOVE_WORKFLOW_DEFINITION_ERROR);
                     throw new ServiceException(Status.MOVE_WORKFLOW_DEFINITION_ERROR);
                 }
             }
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                failedProcessList.add(workflowDefinition.getCode() + "[" + workflowDefinition.getName() + "]");
+                failedWorkflowList.add(workflowDefinition.getCode() + "[" + workflowDefinition.getName() + "]");
             }
         }
     }
 
     /**
-     * get new Task name or Process name when copy or import operate
+     * get new task name or workflow name when copy or import operate
      *
-     * @param originalName Task or Process original name
+     * @param originalName task or workflow original name
      * @param suffix       "_copy_" or "_import_"
      * @return new name
      */
@@ -2220,13 +2233,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * switch the defined process definition version
+     * switch the defined workflow definition version
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code        workflow definition code
      * @param version     the version user want to switch
-     * @return switch process definition version result code
+     * @return switch workflow definition version result code
      */
     @Override
     @Transactional
@@ -2240,37 +2253,37 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {
             log.error(
-                    "Switch process definition error because it does not exist, projectCode:{}, processDefinitionCode:{}.",
+                    "Switch workflow definition error because it does not exist, projectCode:{}, workflowDefinitionCode:{}.",
                     projectCode, code);
-            putMsg(result, Status.SWITCH_WORKFLOW_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_ERROR, code);
+            putMsg(result, Status.SWITCH_WORKFLOW_DEFINITION_VERSION_NOT_EXIST_WORKFLOW_DEFINITION_ERROR, code);
             return result;
         }
 
-        WorkflowDefinitionLog processDefinitionLog =
-                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
-        if (Objects.isNull(processDefinitionLog)) {
+        WorkflowDefinitionLog workflowDefinitionLog =
+                workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
+        if (Objects.isNull(workflowDefinitionLog)) {
             log.error(
-                    "Switch process definition error because version does not exist, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    "Switch workflow definition error because version does not exist, projectCode:{}, workflowDefinitionCode:{}, version:{}.",
                     projectCode, code, version);
             putMsg(result, Status.SWITCH_WORKFLOW_DEFINITION_VERSION_NOT_EXIST_WORKFLOW_DEFINITION_VERSION_ERROR,
                     workflowDefinition.getCode(), version);
             return result;
         }
-        int switchVersion = processService.switchVersion(workflowDefinition, processDefinitionLog);
+        int switchVersion = processService.switchVersion(workflowDefinition, workflowDefinitionLog);
         if (switchVersion <= 0) {
             log.error(
-                    "Switch process definition version error, projectCode:{}, processDefinitionCode:{}, version:{}.",
+                    "Switch workflow definition version error, projectCode:{}, workflowDefinitionCode:{}, version:{}.",
                     projectCode, code, version);
             putMsg(result, Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
             throw new ServiceException(Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
         }
 
-        List<WorkflowTaskRelation> workflowTaskRelationList = processTaskRelationMapper
-                .queryProcessTaskRelationsByProcessDefinitionCode(processDefinitionLog.getCode(),
-                        processDefinitionLog.getVersion());
+        List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationMapper
+                .queryProcessTaskRelationsByProcessDefinitionCode(workflowDefinitionLog.getCode(),
+                        workflowDefinitionLog.getVersion());
         List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(workflowTaskRelationList);
         List<TaskDefinitionLog> taskDefinitionLogList =
                 taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList.stream()
@@ -2280,10 +2293,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
                             return Stream.of(taskDefinitionLog);
                         }).collect(Collectors.toList()));
-        saveWorkflowLineage(processDefinitionLog.getProjectCode(), processDefinitionLog.getCode(),
-                processDefinitionLog.getVersion(), taskDefinitionLogList);
+        saveWorkflowLineage(workflowDefinitionLog.getProjectCode(), workflowDefinitionLog.getCode(),
+                workflowDefinitionLog.getVersion(), taskDefinitionLogList);
 
-        log.info("Switch process definition version complete, projectCode:{}, processDefinitionCode:{}, version:{}.",
+        log.info("Switch workflow definition version complete, projectCode:{}, workflowDefinitionCode:{}, version:{}.",
                 projectCode, code, version);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -2314,40 +2327,42 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @param srcProjectCode    srcProjectCode
      * @param targetProjectCode targetProjectCode
      * @param result            result
-     * @param failedProcessList failedProcessList
+     * @param failedWorkflowList failedWorkflowList
      * @param isCopy            isCopy
      */
     private void checkBatchOperateResult(long srcProjectCode, long targetProjectCode,
-                                         Map<String, Object> result, List<String> failedProcessList, boolean isCopy) {
-        if (!failedProcessList.isEmpty()) {
-            String failedProcess = String.join(",", failedProcessList);
+                                         Map<String, Object> result, List<String> failedWorkflowList, boolean isCopy) {
+        if (!failedWorkflowList.isEmpty()) {
+            String failedWorkflow = String.join(",", failedWorkflowList);
             if (isCopy) {
                 log.error(
-                        "Copy process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
-                        srcProjectCode, targetProjectCode, failedProcess);
-                putMsg(result, Status.COPY_WORKFLOW_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
+                        "Copy workflow definition error, srcProjectCode:{}, targetProjectCode:{}, failedWorkflowList:{}.",
+                        srcProjectCode, targetProjectCode, failedWorkflow);
+                putMsg(result, Status.COPY_WORKFLOW_DEFINITION_ERROR, srcProjectCode, targetProjectCode,
+                        failedWorkflow);
             } else {
                 log.error(
-                        "Move process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
-                        srcProjectCode, targetProjectCode, failedProcess);
-                putMsg(result, Status.MOVE_WORKFLOW_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
+                        "Move workflow definition error, srcProjectCode:{}, targetProjectCode:{}, failedWorkflowList:{}.",
+                        srcProjectCode, targetProjectCode, failedWorkflow);
+                putMsg(result, Status.MOVE_WORKFLOW_DEFINITION_ERROR, srcProjectCode, targetProjectCode,
+                        failedWorkflow);
             }
         } else {
-            log.info("Batch {} process definition complete, srcProjectCode:{}, targetProjectCode:{}.",
+            log.info("Batch {} workflow definition complete, srcProjectCode:{}, targetProjectCode:{}.",
                     isCopy ? "copy" : "move", srcProjectCode, targetProjectCode);
             putMsg(result, Status.SUCCESS);
         }
     }
 
     /**
-     * query the pagination versions info by one certain process definition code
+     * query the pagination versions info by one certain workflow definition code
      *
      * @param loginUser   login user info to check auth
      * @param projectCode project code
      * @param pageNo      page number
      * @param pageSize    page size
-     * @param code        process definition code
-     * @return the pagination process definition versions info of the certain process definition
+     * @param code        workflow definition code
+     * @return the pagination workflow definition versions info of the certain workflow definition
      */
     @Override
     public Result queryWorkflowDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize,
@@ -2364,23 +2379,23 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         PageInfo<WorkflowDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<WorkflowDefinitionLog> page = new Page<>(pageNo, pageSize);
-        IPage<WorkflowDefinitionLog> processDefinitionVersionsPaging =
-                processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, code, projectCode);
-        List<WorkflowDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
+        IPage<WorkflowDefinitionLog> workflowDefinitionLogIPage =
+                workflowDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, code, projectCode);
+        List<WorkflowDefinitionLog> workflowDefinitionLogs = workflowDefinitionLogIPage.getRecords();
 
-        pageInfo.setTotalList(processDefinitionLogs);
-        pageInfo.setTotal((int) processDefinitionVersionsPaging.getTotal());
+        pageInfo.setTotalList(workflowDefinitionLogs);
+        pageInfo.setTotal((int) workflowDefinitionLogIPage.getTotal());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
     /**
-     * delete one certain process definition by version number and process definition code
+     * delete one certain workflow definition by version number and workflow definition code
      *
      * @param loginUser   login user info to check auth
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code        workflow definition code
      * @param version     version number
      */
     @Override
@@ -2391,35 +2406,35 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                 int version) {
         projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, code);
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, code);
         }
         if (workflowDefinition.getVersion() == version) {
             log.warn("This version: {} of workflow: {} is the main version cannot delete by version", code, version);
             throw new ServiceException(Status.MAIN_TABLE_USING_VERSION);
         }
-        // check whether there exist running workflow instance under the process definition
-        List<WorkflowInstance> workflowInstances = processInstanceService.queryByWorkflowCodeVersionStatus(
+        // check whether there exist running workflow instance under the workflow definition
+        List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowCodeVersionStatus(
                 code,
                 version,
                 WorkflowExecutionStatus.getNotTerminalStatus());
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
+            throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
 
-        int deleteLog = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
-        int deleteRelationLog = processTaskRelationLogMapper.deleteByCode(code, version);
+        int deleteLog = workflowDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
+        int deleteRelationLog = workflowTaskRelationLogMapper.deleteByCode(code, version);
         if (deleteLog == 0 || deleteRelationLog == 0) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR);
         }
         log.info("Delete version: {} of workflow: {}, projectCode: {}", version, code, projectCode);
 
-        // delete process lineage
-        int deleteProcessLineageResult = workflowLineageService.deleteProcessLineage(Collections.singletonList(code));
-        if (deleteProcessLineageResult <= 0) {
-            log.error("Delete process lineage by process definition code error, processDefinitionCode: {}", code);
-            throw new ServiceException(Status.DELETE_PROCESS_LINEAGE_ERROR);
+        // delete workflow lineage
+        int deleteWorkflowLineageResult = workflowLineageService.deleteWorkflowLineage(Collections.singletonList(code));
+        if (deleteWorkflowLineageResult <= 0) {
+            log.error("Delete workflow lineage by workflow definition code error, workflowDefinitionCode: {}", code);
+            throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
         }
     }
 
@@ -2427,7 +2442,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                      WorkflowDefinition newWorkflowDefinition) {
         // online can not permit edit
         if (oldWorkflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, oldWorkflowDefinition.getName());
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_ALLOWED_EDIT, oldWorkflowDefinition.getName());
         }
 
         Project project = projectMapper.queryByCode(oldWorkflowDefinition.getProjectCode());
@@ -2438,12 +2453,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
 
-        // check whether the new process define name exist
+        // check whether the new workflow define name exist
         if (!oldWorkflowDefinition.getName().equals(newWorkflowDefinition.getName())) {
-            WorkflowDefinition definition = processDefinitionMapper
+            WorkflowDefinition definition = workflowDefinitionMapper
                     .verifyByDefineName(newWorkflowDefinition.getProjectCode(), newWorkflowDefinition.getName());
             if (definition != null) {
-                throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, newWorkflowDefinition.getName());
+                throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, newWorkflowDefinition.getName());
             }
         }
     }
@@ -2454,25 +2469,26 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @param loginUser             login user
      * @param workflowCode          workflow resource code want to update
      * @param workflowUpdateRequest workflow update resource object
-     * @return Process definition
+     * @return workflow definition
      */
     @Override
     @Transactional
     public WorkflowDefinition updateSingleWorkflowDefinition(User loginUser,
                                                              long workflowCode,
                                                              WorkflowUpdateRequest workflowUpdateRequest) {
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(workflowCode);
-        // check process definition exists
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowCode);
+        // check workflow definition exists
         if (workflowDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowCode);
         }
 
-        WorkflowDefinition workflowDefinitionUpdate = workflowUpdateRequest.mergeIntoProcessDefinition(workflowDefinition);
+        WorkflowDefinition workflowDefinitionUpdate =
+                workflowUpdateRequest.mergeIntoProcessDefinition(workflowDefinition);
         this.updateWorkflowValid(loginUser, workflowDefinition, workflowDefinitionUpdate);
 
-        int insertVersion = this.saveProcessDefine(loginUser, workflowDefinitionUpdate);
+        int insertVersion = this.saveWorkflowDefine(loginUser, workflowDefinitionUpdate);
         if (insertVersion == 0) {
-            log.error("Update process definition error, projectCode:{}, processDefinitionName:{}.",
+            log.error("Update workflow definition error, projectCode:{}, workflowDefinitionName:{}.",
                     workflowDefinitionUpdate.getCode(),
                     workflowDefinitionUpdate.getName());
             throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
@@ -2480,41 +2496,43 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         int insertRelationVersion = this.saveTaskRelation(loginUser, workflowDefinitionUpdate, insertVersion);
         if (insertRelationVersion != Constants.EXIT_CODE_SUCCESS) {
-            log.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
+            log.error(
+                    "Save workflow task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+            throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_ERROR);
         }
-        log.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
+        log.info(
+                "Save workflow task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                 workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
         workflowDefinitionUpdate.setVersion(insertVersion);
         return workflowDefinitionUpdate;
     }
 
-    public int saveProcessDefine(User loginUser, WorkflowDefinition workflowDefinition) {
-        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
-        Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(workflowDefinition.getCode());
+    public int saveWorkflowDefine(User loginUser, WorkflowDefinition workflowDefinition) {
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
+        Integer version = workflowDefinitionLogMapper.queryMaxVersionForDefinition(workflowDefinition.getCode());
         int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
-        processDefinitionLog.setVersion(insertVersion);
+        workflowDefinitionLog.setVersion(insertVersion);
         workflowDefinition.setVersion(insertVersion);
 
-        processDefinitionLog.setOperator(loginUser.getId());
+        workflowDefinitionLog.setOperator(loginUser.getId());
         workflowDefinition.setUserId(loginUser.getId());
-        processDefinitionLog.setOperateTime(workflowDefinition.getUpdateTime());
+        workflowDefinitionLog.setOperateTime(workflowDefinition.getUpdateTime());
         workflowDefinition.setUpdateTime(workflowDefinition.getUpdateTime());
-        processDefinitionLog.setId(null);
-        int result = processDefinitionMapper.updateById(workflowDefinition);
+        workflowDefinitionLog.setId(null);
+        int result = workflowDefinitionMapper.updateById(workflowDefinition);
 
-        int insertLog = processDefinitionLogMapper.insert(processDefinitionLog);
-        processDefinitionLog.setId(workflowDefinition.getId());
+        int insertLog = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
+        workflowDefinitionLog.setId(workflowDefinition.getId());
         return (insertLog & result) > 0 ? insertVersion : 0;
     }
 
     public int saveTaskRelation(User loginUser, WorkflowDefinition workflowDefinition,
-                                int processDefinitionVersion) {
+                                int workflowDefinitionVersion) {
         long projectCode = workflowDefinition.getProjectCode();
-        long processDefinitionCode = workflowDefinition.getCode();
+        long workflowDefinitionCode = workflowDefinition.getCode();
         List<WorkflowTaskRelation> taskRelations =
-                processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
+                workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
         List<WorkflowTaskRelationLog> taskRelationList =
                 taskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
 
@@ -2534,45 +2552,45 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinitionLog -> taskDefinitionLog));
         }
         Date now = new Date();
-        for (WorkflowTaskRelationLog processTaskRelationLog : taskRelationList) {
-            processTaskRelationLog.setProjectCode(projectCode);
-            processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
-            processTaskRelationLog.setProcessDefinitionVersion(processDefinitionVersion);
+        for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
+            workflowTaskRelationLog.setProjectCode(projectCode);
+            workflowTaskRelationLog.setProcessDefinitionCode(workflowDefinitionCode);
+            workflowTaskRelationLog.setProcessDefinitionVersion(workflowDefinitionVersion);
             if (taskDefinitionLogMap != null) {
                 TaskDefinitionLog preTaskDefinitionLog =
-                        taskDefinitionLogMap.get(processTaskRelationLog.getPreTaskCode());
+                        taskDefinitionLogMap.get(workflowTaskRelationLog.getPreTaskCode());
                 if (preTaskDefinitionLog != null) {
-                    processTaskRelationLog.setPreTaskVersion(preTaskDefinitionLog.getVersion());
+                    workflowTaskRelationLog.setPreTaskVersion(preTaskDefinitionLog.getVersion());
                 }
                 TaskDefinitionLog postTaskDefinitionLog =
-                        taskDefinitionLogMap.get(processTaskRelationLog.getPostTaskCode());
+                        taskDefinitionLogMap.get(workflowTaskRelationLog.getPostTaskCode());
                 if (postTaskDefinitionLog != null) {
-                    processTaskRelationLog.setPostTaskVersion(postTaskDefinitionLog.getVersion());
+                    workflowTaskRelationLog.setPostTaskVersion(postTaskDefinitionLog.getVersion());
                 }
             }
-            processTaskRelationLog.setCreateTime(now);
-            processTaskRelationLog.setUpdateTime(now);
-            processTaskRelationLog.setOperator(loginUser.getId());
-            processTaskRelationLog.setOperateTime(now);
+            workflowTaskRelationLog.setCreateTime(now);
+            workflowTaskRelationLog.setUpdateTime(now);
+            workflowTaskRelationLog.setOperator(loginUser.getId());
+            workflowTaskRelationLog.setOperateTime(now);
         }
         if (!taskRelations.isEmpty()) {
-            Set<Integer> processTaskRelationSet =
+            Set<Integer> workflowTaskRelationSet =
                     taskRelations.stream().map(WorkflowTaskRelation::hashCode).collect(toSet());
             Set<Integer> taskRelationSet =
                     taskRelationList.stream().map(WorkflowTaskRelationLog::hashCode).collect(toSet());
-            boolean isSame = CollectionUtils.isEqualCollection(processTaskRelationSet,
+            boolean isSame = CollectionUtils.isEqualCollection(workflowTaskRelationSet,
                     taskRelationSet);
             if (isSame) {
-                log.info("process task relations is non-existent, projectCode:{}, processCode:{}.",
+                log.info("workflow task relations is non-existent, projectCode:{}, workflowDefinitionCode:{}.",
                         workflowDefinition.getProjectCode(), workflowDefinition.getCode());
                 return Constants.EXIT_CODE_SUCCESS;
             }
-            processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
+            workflowTaskRelationMapper.deleteByCode(projectCode, workflowDefinitionCode);
         }
         List<WorkflowTaskRelation> workflowTaskRelations =
                 taskRelationList.stream().map(WorkflowTaskRelation::new).collect(Collectors.toList());
-        int insert = processTaskRelationMapper.batchInsert(workflowTaskRelations);
-        int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
+        int insert = workflowTaskRelationMapper.batchInsert(workflowTaskRelations);
+        int resultLog = workflowTaskRelationLogMapper.batchInsert(taskRelationList);
         return (insert & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
     }
 
@@ -2581,8 +2599,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public void onlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
 
-        WorkflowDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
 
         if (ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             // do nothing if the workflow is already online
@@ -2593,7 +2611,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         checkAllSubWorkflowDefinitionIsOnline(workflowDefinition.getCode());
 
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinitionDao.updateById(workflowDefinition);
+        workflowDefinitionDao.updateById(workflowDefinition);
     }
 
     @Transactional
@@ -2601,8 +2619,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public void offlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
 
-        WorkflowDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
 
         if (ReleaseState.OFFLINE.equals(workflowDefinition.getReleaseState())) {
             // do nothing if the workflow is already offline
@@ -2610,17 +2628,17 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
-        processDefinitionDao.updateById(workflowDefinition);
+        workflowDefinitionDao.updateById(workflowDefinition);
 
         schedulerService.offlineSchedulerByWorkflowCode(workflowDefinitionCode);
     }
 
     /**
-     * view process variables
+     * view workflow variables
      *
      * @param loginUser   login user
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code        workflow definition code
      * @return variables data
      */
     @Override
@@ -2635,12 +2653,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
 
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
+            log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                     code);
-            putMsg(result, PROCESS_DEFINE_NOT_EXIST, code);
+            putMsg(result, WORKFLOW_DEFINITION_NOT_EXIST, code);
             return result;
         }
 
@@ -2672,7 +2690,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         Set<Long> taskCodeSet = new TreeSet<>();
 
-        processTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode())
+        workflowTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode())
                 .forEach(processTaskRelation -> {
                     if (processTaskRelation.getPreTaskCode() > 0) {
                         taskCodeSet.add(processTaskRelation.getPreTaskCode());
@@ -2702,9 +2720,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private void checkWorkflowDefinitionIsValidated(Long workflowDefinitionCode) {
         // todo: build dag check if the dag is validated
         List<WorkflowTaskRelation> workflowTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
+                workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
         if (CollectionUtils.isEmpty(workflowTaskRelations)) {
-            throw new ServiceException(Status.PROCESS_DAG_IS_EMPTY);
+            throw new ServiceException(Status.WORKFLOW_DAG_IS_EMPTY);
         }
         // todo : check Workflow is validate
     }
@@ -2716,8 +2734,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return;
         }
         for (Long subWorkflowDefinitionCode : allSubWorkflowDefinitionCodes) {
-            WorkflowDefinition subWorkflowDefinition = processDefinitionDao.queryByCode(subWorkflowDefinitionCode)
-                    .orElseThrow(() -> new ServiceException(PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
+            WorkflowDefinition subWorkflowDefinition = workflowDefinitionDao.queryByCode(subWorkflowDefinitionCode)
+                    .orElseThrow(() -> new ServiceException(WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
             if (!ReleaseState.ONLINE.equals(subWorkflowDefinition.getReleaseState())) {
                 throw new ServiceException(
                         "SubWorkflowDefinition " + subWorkflowDefinition.getName() + " is not online");

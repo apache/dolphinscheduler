@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.engine.graph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

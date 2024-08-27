@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
 import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
@@ -45,14 +45,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * This handler used to handle {@link CommandType#RECOVER_TOLERANCE_FAULT_PROCESS}.
+ * This handler used to handle {@link CommandType#RECOVER_TOLERANCE_FAULT_WORKFLOW}.
  * <p> Will do failover of the workflow instance and recover it to the origin state.
  */
 @Component
 public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -142,7 +142,7 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
 
     @Override
     public CommandType commandType() {
-        return CommandType.RECOVER_TOLERANCE_FAULT_PROCESS;
+        return CommandType.RECOVER_TOLERANCE_FAULT_WORKFLOW;
     }
 
 }

@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
@@ -38,7 +38,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -78,7 +78,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         workflowTaskRelation.setPreTaskCode(0L);
         workflowTaskRelation.setUpdateTime(new Date());
         workflowTaskRelation.setCreateTime(new Date());
-        processTaskRelationMapper.insert(workflowTaskRelation);
+        workflowTaskRelationMapper.insert(workflowTaskRelation);
         return workflowTaskRelation;
     }
 

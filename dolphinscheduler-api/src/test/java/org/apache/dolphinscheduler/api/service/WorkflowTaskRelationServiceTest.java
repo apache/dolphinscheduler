@@ -22,23 +22,23 @@ import static org.mockito.ArgumentMatchers.isA;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.impl.ProcessTaskRelationServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.WorkflowTaskRelationServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -76,7 +76,7 @@ import com.google.common.collect.Lists;
 public class WorkflowTaskRelationServiceTest {
 
     @InjectMocks
-    ProcessTaskRelationServiceImpl processTaskRelationService;
+    WorkflowTaskRelationServiceImpl processTaskRelationService;
 
     @Mock
     private ProjectMapper projectMapper;
@@ -85,19 +85,19 @@ public class WorkflowTaskRelationServiceTest {
     private ProjectServiceImpl projectService;
 
     @Mock
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Mock
     private ProcessService processService;
@@ -271,7 +271,7 @@ public class WorkflowTaskRelationServiceTest {
     }
 
     @Test
-    public void testCreateProcessTaskRelation() {
+    public void testCreateWorkflowTaskRelation() {
         long projectCode = 1L;
         long processDefinitionCode = 1L;
         long preTaskCode = 0L;
@@ -283,9 +283,9 @@ public class WorkflowTaskRelationServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
+        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
         Mockito.when(
-                processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode))
+                workflowTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode))
                 .thenReturn(Lists.newArrayList());
         Mockito.when(taskDefinitionMapper.queryByCode(postTaskCode)).thenReturn(getTaskDefinition());
 
@@ -301,8 +301,8 @@ public class WorkflowTaskRelationServiceTest {
         workflowTaskRelationList.add(workflowTaskRelation);
         processTaskRelationLogList.add(new WorkflowTaskRelationLog(workflowTaskRelation));
 
-        Mockito.when(processTaskRelationMapper.batchInsert(workflowTaskRelationList)).thenReturn(1);
-        Mockito.when(processTaskRelationLogMapper.batchInsert(processTaskRelationLogList)).thenReturn(1);
+        Mockito.when(workflowTaskRelationMapper.batchInsert(workflowTaskRelationList)).thenReturn(1);
+        Mockito.when(workflowTaskRelationLogMapper.batchInsert(processTaskRelationLogList)).thenReturn(1);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
@@ -318,9 +318,10 @@ public class WorkflowTaskRelationServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
 
-        List<WorkflowTaskRelation> workflowTaskRelationList = getProcessTaskDownstreamRelationList(projectCode, taskCode);
+        List<WorkflowTaskRelation> workflowTaskRelationList =
+                getProcessTaskDownstreamRelationList(projectCode, taskCode);
 
-        Mockito.when(processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode))
+        Mockito.when(workflowTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode))
                 .thenReturn(workflowTaskRelationList);
 
         if (CollectionUtils.isNotEmpty(workflowTaskRelationList)) {
@@ -368,7 +369,7 @@ public class WorkflowTaskRelationServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         List<WorkflowTaskRelation> workflowTaskRelationList = getProcessTaskUpstreamRelationList(projectCode, taskCode);
 
-        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
+        Mockito.when(workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
                 .thenReturn(workflowTaskRelationList);
 
         if (CollectionUtils.isNotEmpty(workflowTaskRelationList)) {
@@ -420,14 +421,14 @@ public class WorkflowTaskRelationServiceTest {
         workflowTaskRelation.setPreTaskCode(taskCode);
         workflowTaskRelation.setPostTaskCode(123L);
         workflowTaskRelationList.add(workflowTaskRelation);
-        Mockito.when(processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode))
+        Mockito.when(workflowTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode))
                 .thenReturn(workflowTaskRelationList);
         WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
-        Mockito.when(processTaskRelationMapper.deleteRelation(processTaskRelationLog)).thenReturn(1);
-        Mockito.when(processTaskRelationLogMapper.deleteRelation(processTaskRelationLog)).thenReturn(1);
+        Mockito.when(workflowTaskRelationMapper.deleteRelation(processTaskRelationLog)).thenReturn(1);
+        Mockito.when(workflowTaskRelationLogMapper.deleteRelation(processTaskRelationLog)).thenReturn(1);
         WorkflowDefinition workflowDefinition = getProcessDefinition();
-        Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(workflowDefinition);
-        Mockito.when(processService.saveProcessDefine(user, workflowDefinition, Boolean.TRUE, Boolean.TRUE))
+        Mockito.when(workflowDefinitionMapper.queryByCode(1L)).thenReturn(workflowDefinition);
+        Mockito.when(processService.saveWorkflowDefine(user, workflowDefinition, Boolean.TRUE, Boolean.TRUE))
                 .thenReturn(1);
         Map<String, Object> result1 =
                 processTaskRelationService.deleteDownstreamRelation(user, projectCode, "123", taskCode);
@@ -453,10 +454,10 @@ public class WorkflowTaskRelationServiceTest {
         workflowTaskRelation.setPostTaskVersion(1);
         workflowTaskRelationList.add(workflowTaskRelation);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
-        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
+        Mockito.when(workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
                 .thenReturn(workflowTaskRelationList);
-        Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(getProcessDefinition());
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(1L)).thenReturn(workflowTaskRelationList);
+        Mockito.when(workflowDefinitionMapper.queryByCode(1L)).thenReturn(getProcessDefinition());
+        Mockito.when(workflowTaskRelationMapper.queryByProcessCode(1L)).thenReturn(workflowTaskRelationList);
         List<WorkflowTaskRelationLog> relationLogs =
                 workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
@@ -465,7 +466,7 @@ public class WorkflowTaskRelationServiceTest {
     }
 
     @Test
-    public void testDeleteTaskProcessRelation() {
+    public void testDeleteTaskWorkflowRelation() {
         long projectCode = 1L;
         long taskCode = 1L;
         long processDefinitionCode = 1L;
@@ -478,9 +479,9 @@ public class WorkflowTaskRelationServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         Mockito.when(
-                processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode))
+                workflowTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode))
                 .thenReturn(Lists.newArrayList());
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
+        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
         Mockito.when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(getTaskDefinition());
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setTaskType("CONDITIONS");
@@ -494,7 +495,7 @@ public class WorkflowTaskRelationServiceTest {
         workflowTaskRelation.setPostTaskCode(taskCode);
         workflowTaskRelation.setPostTaskVersion(1);
         workflowTaskRelationList.add(workflowTaskRelation);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(processDefinitionCode))
+        Mockito.when(workflowTaskRelationMapper.queryByProcessCode(processDefinitionCode))
                 .thenReturn(workflowTaskRelationList);
         List<WorkflowTaskRelationLog> relationLogs =
                 workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
@@ -527,7 +528,7 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
         workflowTaskRelationList.add(workflowTaskRelation);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(1L)).thenReturn(workflowTaskRelationList);
+        Mockito.when(workflowTaskRelationMapper.queryByProcessCode(1L)).thenReturn(workflowTaskRelationList);
         List<WorkflowTaskRelationLog> relationLogs =
                 workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
@@ -536,68 +537,69 @@ public class WorkflowTaskRelationServiceTest {
     }
 
     @Test
-    public void testCreateProcessTaskRelationV2() {
+    public void testCreateWorkflowTaskRelationV2() {
         TaskRelationCreateRequest taskRelationCreateRequest = new TaskRelationCreateRequest();
         taskRelationCreateRequest.setWorkflowCode(PROCESS_DEFINITION_CODE);
 
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+                () -> processTaskRelationService.createWorkflowTaskRelationV2(user, taskRelationCreateRequest));
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project without permissions
-        Mockito.when(processDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE)).thenReturn(getProcessDefinition());
+        Mockito.when(workflowDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE)).thenReturn(getProcessDefinition());
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject(PROJECT_CODE));
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, getProject(PROJECT_CODE), null);
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
+                () -> processTaskRelationService.createWorkflowTaskRelationV2(user, taskRelationCreateRequest));
         Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error insert process task relation
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, getProject(PROJECT_CODE),
                 null);
-        Mockito.when(processTaskRelationMapper.insert(isA(WorkflowTaskRelation.class))).thenReturn(0);
+        Mockito.when(workflowTaskRelationMapper.insert(isA(WorkflowTaskRelation.class))).thenReturn(0);
         Mockito.when(taskDefinitionMapper.queryByCode(isA(Long.class))).thenReturn(getTaskDefinition());
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.CREATE_PROCESS_TASK_RELATION_ERROR.getCode(),
+                () -> processTaskRelationService.createWorkflowTaskRelationV2(user, taskRelationCreateRequest));
+        Assertions.assertEquals(Status.CREATE_WORKFLOW_TASK_RELATION_ERROR.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error insert process task relation log
-        Mockito.when(processTaskRelationMapper.insert(isA(WorkflowTaskRelation.class))).thenReturn(1);
-        Mockito.when(processTaskRelationLogMapper.insert(isA(WorkflowTaskRelationLog.class))).thenReturn(0);
+        Mockito.when(workflowTaskRelationMapper.insert(isA(WorkflowTaskRelation.class))).thenReturn(1);
+        Mockito.when(workflowTaskRelationLogMapper.insert(isA(WorkflowTaskRelationLog.class))).thenReturn(0);
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR.getCode(),
+                () -> processTaskRelationService.createWorkflowTaskRelationV2(user, taskRelationCreateRequest));
+        Assertions.assertEquals(Status.CREATE_WORKFLOW_TASK_RELATION_LOG_ERROR.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
-        Mockito.when(processTaskRelationLogMapper.insert(isA(WorkflowTaskRelationLog.class))).thenReturn(1);
+        Mockito.when(workflowTaskRelationLogMapper.insert(isA(WorkflowTaskRelationLog.class))).thenReturn(1);
         Assertions.assertDoesNotThrow(
-                () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
+                () -> processTaskRelationService.createWorkflowTaskRelationV2(user, taskRelationCreateRequest));
     }
 
     @Test
-    public void testDeleteTaskProcessRelationV2() {
+    public void testDeleteTaskWorkflowRelationV2() {
         TaskRelationCreateRequest taskRelationCreateRequest = new TaskRelationCreateRequest();
         taskRelationCreateRequest.setWorkflowCode(PROCESS_DEFINITION_CODE);
 
         // error task relation size
         Mockito.when(
-                processTaskRelationMapper.filterProcessTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
+                workflowTaskRelationMapper.filterProcessTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
                 .thenReturn(getMultiProcessTaskRelations());
         exception = Assertions.assertThrows(ServiceException.class, () -> processTaskRelationService
-                .deleteTaskProcessRelationV2(user, UPSTREAM_TASK_CODE, DOWNSTREAM_TASK_CODE));
-        Assertions.assertEquals(Status.PROCESS_TASK_RELATION_NOT_EXPECT.getCode(),
+                .deleteTaskWorkflowRelationV2(user, UPSTREAM_TASK_CODE, DOWNSTREAM_TASK_CODE));
+        Assertions.assertEquals(Status.WORKFLOW_TASK_RELATION_NOT_EXPECT.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
         Mockito.when(
-                processTaskRelationMapper.filterProcessTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
+                workflowTaskRelationMapper.filterProcessTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
                 .thenReturn(getOneProcessTaskRelation());
-        Assertions.assertDoesNotThrow(() -> processTaskRelationService.deleteTaskProcessRelationV2(user,
+        Assertions.assertDoesNotThrow(() -> processTaskRelationService.deleteTaskWorkflowRelationV2(user,
                 UPSTREAM_TASK_CODE, DOWNSTREAM_TASK_CODE));
     }
 

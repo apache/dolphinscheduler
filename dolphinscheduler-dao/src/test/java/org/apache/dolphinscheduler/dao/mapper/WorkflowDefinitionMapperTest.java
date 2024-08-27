@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
 public class WorkflowDefinitionMapperTest extends BaseDaoTest {
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -71,7 +71,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         workflowDefinition.setUserId(101);
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
         return workflowDefinition;
     }
 
@@ -84,7 +84,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         WorkflowDefinition workflowDefinition = insertOne("def 1");
         // update
         workflowDefinition.setUpdateTime(new Date());
-        int update = processDefinitionMapper.updateById(workflowDefinition);
+        int update = workflowDefinitionMapper.updateById(workflowDefinition);
         Assertions.assertEquals(1, update);
     }
 
@@ -94,7 +94,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void testDelete() {
         WorkflowDefinition workflowDefinition = insertOne("def 1");
-        int delete = processDefinitionMapper.deleteById(workflowDefinition.getId());
+        int delete = workflowDefinitionMapper.deleteById(workflowDefinition.getId());
         Assertions.assertEquals(1, delete);
     }
 
@@ -105,7 +105,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
     public void testQuery() {
         insertOne("def 1");
         // query
-        List<WorkflowDefinition> dataSources = processDefinitionMapper.selectList(null);
+        List<WorkflowDefinition> dataSources = workflowDefinitionMapper.selectList(null);
         Assertions.assertNotEquals(0, dataSources.size());
     }
 
@@ -143,8 +143,8 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUserId(user.getId());
-        processDefinitionMapper.insert(workflowDefinition);
-        WorkflowDefinition definition = processDefinitionMapper.verifyByDefineName(10L, "xxx");
+        workflowDefinitionMapper.insert(workflowDefinition);
+        WorkflowDefinition definition = workflowDefinitionMapper.verifyByDefineName(10L, "xxx");
         Assertions.assertEquals(null, definition);
     }
 
@@ -186,9 +186,9 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUserId(user.getId());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
-        WorkflowDefinition workflowDefinition1 = processDefinitionMapper.queryByDefineName(project.getCode(), "def 1");
+        WorkflowDefinition workflowDefinition1 = workflowDefinitionMapper.queryByDefineName(project.getCode(), "def 1");
         Assertions.assertNotEquals(null, workflowDefinition1);
     }
 
@@ -230,8 +230,8 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUserId(user.getId());
-        processDefinitionMapper.insert(workflowDefinition);
-        WorkflowDefinition definition = processDefinitionMapper.queryByDefineId(333);
+        workflowDefinitionMapper.insert(workflowDefinition);
+        WorkflowDefinition definition = workflowDefinitionMapper.queryByDefineId(333);
         Assertions.assertEquals(null, definition);
     }
 
@@ -243,7 +243,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         insertOne("def 1");
         Page<WorkflowDefinition> page = new Page(1, 3);
         IPage<WorkflowDefinition> processDefinitionIPage =
-                processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L);
+                workflowDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L);
         Assertions.assertNotEquals(0, processDefinitionIPage.getTotal());
     }
 
@@ -253,7 +253,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void testQueryAllDefinitionList() {
         insertOne("def 1");
-        List<WorkflowDefinition> workflowDefinitionIPage = processDefinitionMapper.queryAllDefinitionList(1010L);
+        List<WorkflowDefinition> workflowDefinitionIPage = workflowDefinitionMapper.queryAllDefinitionList(1010L);
         Assertions.assertNotEquals(0, workflowDefinitionIPage.size());
     }
 
@@ -270,7 +270,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         array[0] = workflowDefinition.getId();
         array[1] = workflowDefinition1.getId();
 
-        List<WorkflowDefinition> workflowDefinitions = processDefinitionMapper.queryDefinitionListByIdList(array);
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryDefinitionListByIdList(array);
         Assertions.assertEquals(2, workflowDefinitions.size());
 
     }
@@ -293,9 +293,9 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
 
         WorkflowDefinition workflowDefinition = insertOne("def 1");
         workflowDefinition.setUserId(user.getId());
-        processDefinitionMapper.updateById(workflowDefinition);
+        workflowDefinitionMapper.updateById(workflowDefinition);
 
-        List<WorkflowDefinitionCountDto> processDefinitions = processDefinitionMapper
+        List<WorkflowDefinitionCountDto> processDefinitions = workflowDefinitionMapper
                 .countDefinitionByProjectCodes(Lists.newArrayList(workflowDefinition.getProjectCode()));
         Assertions.assertNotEquals(0, processDefinitions.size());
     }
@@ -303,7 +303,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void listProjectIds() {
         insertOne("def 1");
-        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
+        List<Integer> projectIds = workflowDefinitionMapper.listProjectIds();
         Assertions.assertNotNull(projectIds);
     }
 

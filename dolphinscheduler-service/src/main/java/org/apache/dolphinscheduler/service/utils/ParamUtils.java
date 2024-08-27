@@ -64,7 +64,8 @@ public class ParamUtils {
      * @param fatherParams fatherParams
      * @return sub workflow parameters
      */
-    public static String getSubWorkFlowParam(WorkflowInstanceRelation instanceMap, WorkflowInstance parentWorkflowInstance,
+    public static String getSubWorkFlowParam(WorkflowInstanceRelation instanceMap,
+                                             WorkflowInstance parentWorkflowInstance,
                                              Map<String, String> fatherParams) {
         // set sub work process command
         String processMapStr = JSONUtils.toJsonString(instanceMap);

@@ -109,7 +109,7 @@ public class RuleManager {
                                 DqRuleInputEntry.class));
         inputParameterValueResult.putAll(inputParameterValue);
         inputParameterValueResult
-                .putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date(), null));
+                .putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_WORKFLOW, new Date(), null));
         inputParameterValueResult.putIfAbsent(COMPARISON_TYPE, NONE_COMPARISON_TYPE);
         inputParameterValueResult.put(UNIQUE_CODE,
                 SINGLE_QUOTES + RuleParserUtils.generateUniqueCode(inputParameterValueResult) + SINGLE_QUOTES);

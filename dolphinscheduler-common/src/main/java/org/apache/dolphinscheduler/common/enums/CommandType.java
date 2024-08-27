@@ -20,9 +20,12 @@ package org.apache.dolphinscheduler.common.enums;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 // todo: rename to WorkflowTriggerType
+@Getter
 public enum CommandType {
 
     /**
@@ -44,25 +47,25 @@ public enum CommandType {
     /**
      * Start the workflow definition, will generate a new workflow instance and start from the StartNodeList, if StartNodeList is empty will start from the beginning tasks.
      */
-    START_PROCESS(0, "start a new process"),
+    START_WORKFLOW(0, "start a new workflow"),
     /**
      * todo: remove this command, this command doesn't used?
      */
-    START_CURRENT_TASK_PROCESS(1, "start a new process from current nodes"),
+    START_CURRENT_TASK_WORKFLOW(1, "start a new process from current nodes"),
     /**
      * Recover the workflow instance from tolerance fault, these may happened when the master is crashed.
      * Will recover the workflow instance from the last running task node.
      */
-    RECOVER_TOLERANCE_FAULT_PROCESS(2, "recover tolerance fault process"),
+    RECOVER_TOLERANCE_FAULT_WORKFLOW(2, "recover fault tolerance workflow instance"),
     /**
      * Recover the workflow instance from pause status, will start from the paused and unTriggered task instance.
      */
-    RECOVER_SUSPENDED_PROCESS(3, "Recover suspended workflow instance"),
+    RECOVER_SUSPENDED_WORKFLOW(3, "Recover suspended workflow instance"),
     /**
      * Recover the workflow instance from failure task nodes, will start from the failed task nodes.
      * In fact this command has the same logic with RECOVER_SUSPENDED_PROCESS.
      */
-    START_FAILURE_TASK_PROCESS(4, "Recover workflow instance from failure tasks"),
+    START_FAILURE_TASK_WORKFLOW(4, "Recover workflow instance from failure tasks"),
     /**
      * Backfill the workflow, will use complementScheduleDateList to generate the workflow instance.
      */
@@ -108,14 +111,6 @@ public enum CommandType {
     @EnumValue
     private final int code;
     private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 
     private static final Map<Integer, CommandType> COMMAND_TYPE_MAP = new HashMap<>();
 

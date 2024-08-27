@@ -21,11 +21,11 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 
 import java.util.Date;
 import java.util.List;
@@ -40,13 +40,13 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
     private WorkflowTaskLineageMapper workflowTaskLineageMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     /**
      * insert
@@ -64,7 +64,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
         workflowTaskRelation.setPreTaskVersion(1);
         workflowTaskRelation.setUpdateTime(new Date());
         workflowTaskRelation.setCreateTime(new Date());
-        processTaskRelationMapper.insert(workflowTaskRelation);
+        workflowTaskRelationMapper.insert(workflowTaskRelation);
     }
 
     /**
@@ -80,7 +80,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
         workflowDefinition.setUserId(101);
         workflowDefinition.setUpdateTime(new Date());
         workflowDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
     }
 
     private void insertOneProcessLineage() {
@@ -120,7 +120,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
     @Test
     public void testQueryWorkFlowLineageByName() {
         insertOneProcessDefinition();
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(1L);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(1L);
         insertOneSchedule(workflowDefinition.getId());
         List<WorkFlowRelationDetail> workFlowLineages = workflowTaskLineageMapper
                 .queryWorkFlowLineageByName(workflowDefinition.getProjectCode(), workflowDefinition.getName());
@@ -130,7 +130,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
     @Test
     public void testQueryWorkFlowLineage() {
         insertOneProcessDefinition();
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(1L);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(1L);
         insertOneProcessTaskRelation();
         insertOneProcessLineage();
         List<WorkflowTaskLineage> workflowTaskLineages =
@@ -141,7 +141,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
     @Test
     public void testQueryWorkFlowLineageByCode() {
         insertOneProcessDefinition();
-        WorkflowDefinition workflowDefinition = processDefinitionMapper.queryByCode(1L);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(1L);
         insertOneSchedule(workflowDefinition.getId());
         List<WorkFlowRelationDetail> workFlowLineages = workflowTaskLineageMapper
                 .queryWorkFlowLineageByCode(workflowDefinition.getCode());

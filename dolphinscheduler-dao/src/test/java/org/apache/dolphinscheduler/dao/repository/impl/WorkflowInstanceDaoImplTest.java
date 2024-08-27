@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class WorkflowInstanceDaoImplTest extends BaseDaoTest {
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Test
     void queryByWorkflowCodeVersionStatus_EMPTY_INSTANCE() {
@@ -43,7 +43,7 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
         int workflowDefinitionVersion = 1;
         int[] status = WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState();
 
-        assertTrue(isEmpty(processInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
+        assertTrue(isEmpty(workflowInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
                 workflowDefinitionVersion, status)));
     }
 
@@ -53,20 +53,20 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
         int workflowDefinitionVersion = 1;
         int[] status = WorkflowExecutionStatus.getNotTerminalStatus();
 
-        assertTrue(isEmpty(processInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
+        assertTrue(isEmpty(workflowInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
                 workflowDefinitionVersion, status)));
 
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.RUNNING_EXECUTION));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.READY_PAUSE));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.READY_STOP));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.SERIAL_WAIT));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.WAIT_TO_RUN));
-        assertEquals(5, processInstanceDao
+        assertEquals(5, workflowInstanceDao
                 .queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion, status).size());
     }
 
@@ -74,9 +74,9 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
     void updateWorkflowInstanceState_success() {
         WorkflowInstance workflowInstance = createWorkflowInstance(
                 1L, 1, WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstanceDao.insert(workflowInstance);
+        workflowInstanceDao.insert(workflowInstance);
 
-        assertDoesNotThrow(() -> processInstanceDao.updateWorkflowInstanceState(
+        assertDoesNotThrow(() -> workflowInstanceDao.updateWorkflowInstanceState(
                 workflowInstance.getId(),
                 WorkflowExecutionStatus.RUNNING_EXECUTION,
                 WorkflowExecutionStatus.SUCCESS));
@@ -86,10 +86,10 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
     void updateWorkflowInstanceState_failed() {
         WorkflowInstance workflowInstance = createWorkflowInstance(
                 1L, 1, WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstanceDao.insert(workflowInstance);
+        workflowInstanceDao.insert(workflowInstance);
 
         UnsupportedOperationException unsupportedOperationException = assertThrows(UnsupportedOperationException.class,
-                () -> processInstanceDao.updateWorkflowInstanceState(
+                () -> workflowInstanceDao.updateWorkflowInstanceState(
                         workflowInstance.getId(),
                         WorkflowExecutionStatus.READY_STOP,
                         WorkflowExecutionStatus.STOP));
@@ -105,15 +105,15 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
         int workflowDefinitionVersion = 1;
         int[] status = WorkflowExecutionStatus.getNotTerminalStatus();
 
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.PAUSE));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.STOP));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.FAILURE));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
+        workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.SUCCESS));
-        assertTrue(isEmpty(processInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
+        assertTrue(isEmpty(workflowInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
                 workflowDefinitionVersion, status)));
     }
 

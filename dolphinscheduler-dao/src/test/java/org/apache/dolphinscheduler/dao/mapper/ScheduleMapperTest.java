@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.util.Date;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
     private ProjectMapper projectMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * insert
@@ -128,7 +128,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         workflowDefinition.setLocations("");
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
@@ -166,7 +166,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         workflowDefinition.setLocations("");
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
@@ -204,7 +204,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         workflowDefinition.setLocations("");
         workflowDefinition.setCreateTime(new Date());
         workflowDefinition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(workflowDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
