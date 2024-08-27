@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,14 +49,13 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowRepository IWorkflowRepository;
 
     @Override
     public DependentLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(workflowInstanceId);
-        if (workflowExecuteRunnable == null) {
+        final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        final IWorkflowExecutionRunnable workflowExecutionRunnable = IWorkflowRepository.get(workflowInstanceId);
+        if (workflowExecutionRunnable == null) {
             throw new LogicTaskInitializeException("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);
         }
         return new DependentLogicTask(
@@ -66,7 +65,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
                 taskDefinitionDao,
                 taskInstanceDao,
                 processInstanceDao,
-                workflowExecuteRunnable);
+                workflowExecutionRunnable);
     }
 
     @Override

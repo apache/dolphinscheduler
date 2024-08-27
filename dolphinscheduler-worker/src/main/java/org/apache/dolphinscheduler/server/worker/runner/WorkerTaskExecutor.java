@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -118,8 +118,8 @@ public abstract class WorkerTaskExecutor implements Runnable {
         WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+        workerMessageSender.sendMessageWithRetry(
+                taskExecutionContext, ITaskExecutionEvent.TaskInstanceExecutionEventType.FAILED);
         log.info("Get a exception when execute the task, will send the task status: {} to master: {}",
                 TaskExecutionStatus.FAILURE.name(), taskExecutionContext.getHost());
 
@@ -156,7 +156,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                        ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.SUCCESS);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
@@ -203,7 +203,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
     protected void beforeExecute() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING);
+                ITaskExecutionEvent.TaskInstanceExecutionEventType.RUNNING);
         log.info("Send task status {} master: {}", TaskExecutionStatus.RUNNING_EXECUTION.name(),
                 taskExecutionContext.getHost());
 
@@ -287,8 +287,28 @@ public abstract class WorkerTaskExecutor implements Runnable {
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+        switch (taskExecutionContext.getCurrentExecutionStatus()) {
+            case SUCCESS:
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.SUCCESS);
+                break;
+            case FAILURE:
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.FAILED);
+                break;
+            case PAUSE:
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.PAUSED);
+                break;
+            case KILL:
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.KILLED);
+                break;
+            default:
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.FAILED);
+                break;
+        }
         log.info("Send task execute status: {} to master : {}", taskExecutionContext.getCurrentExecutionStatus().name(),
                 taskExecutionContext.getHost());
     }

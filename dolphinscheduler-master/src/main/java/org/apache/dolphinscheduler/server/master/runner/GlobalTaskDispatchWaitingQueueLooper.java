@@ -17,18 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
+import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +40,6 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     @Autowired
     private TaskDispatchFactory taskDispatchFactory;
-
-    @Autowired
-    private TaskEventService taskEventService;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -74,32 +66,24 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     }
 
     void doDispatch() {
-        final TaskExecuteRunnable taskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
-        TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
-        if (taskInstance == null) {
-            // This case shouldn't happen, but if it does, log an error and continue
-            log.error("The TaskInstance is null, drop it(This case shouldn't happen)");
-            return;
-        }
+        final ITaskExecutionRunnable taskExecutionRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         try {
-            TaskExecutionStatus status = taskInstance.getState();
+            final TaskExecutionStatus status = taskInstance.getState();
             if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
                 log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
                 return;
             }
-            taskDispatchFactory.getTaskDispatcher(taskInstance).dispatchTask(taskExecuteRunnable);
-        } catch (WorkerGroupNotFoundException workerGroupNotFoundException) {
-            // If the worker group not found then the task will not be dispatched anymore
-            log.error("Dispatch Task: {} failed, will send task failed event", taskInstance.getName(),
-                    workerGroupNotFoundException);
-            addDispatchFailedEvent(taskExecuteRunnable);
+            final TaskDispatcher taskDispatcher = taskDispatchFactory.getTaskDispatcher(taskInstance);
+            taskDispatcher.dispatchTask(taskExecutionRunnable);
         } catch (Exception e) {
             // If dispatch failed, will put the task back to the queue
             // The task will be dispatched after waiting time.
             // the waiting time will increase multiple of times, but will not exceed 60 seconds
             long waitingTimeMills = Math.max(
-                    taskExecuteRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecuteRunnable, waitingTimeMills);
+                    taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
+            globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
+                    waitingTimeMills);
             log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
         }
     }
@@ -114,30 +98,4 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
         }
     }
 
-    private void addDispatchSuccessEvent(TaskExecuteRunnable taskExecuteRunnable) {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
-        TaskEvent taskEvent = TaskEvent.newDispatchEvent(
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId(),
-                taskExecutionContext.getHost());
-        taskEventService.addEvent(taskEvent);
-    }
-
-    private void addDispatchFailedEvent(TaskExecuteRunnable taskExecuteRunnable) {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
-        TaskEvent taskEvent = TaskEvent.builder()
-                .processInstanceId(taskExecutionContext.getProcessInstanceId())
-                .taskInstanceId(taskExecutionContext.getTaskInstanceId())
-                .state(TaskExecutionStatus.FAILURE)
-                .logPath(taskExecutionContext.getLogPath())
-                .executePath(taskExecutionContext.getExecutePath())
-                .appIds(taskExecutionContext.getAppIds())
-                .processId(taskExecutionContext.getProcessId())
-                .varPool(taskExecutionContext.getVarPool())
-                .startTime(DateUtils.timeStampToDate(taskExecutionContext.getStartTime()))
-                .endTime(new Date())
-                .event(TaskEventType.RESULT)
-                .build();
-        taskEventService.addEvent(taskEvent);
-    }
 }
