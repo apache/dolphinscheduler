@@ -136,7 +136,7 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
         }
 
         Property property = new Property();
-        property.setProp(String.format("%s(%s)", OUTPUT_KEY, taskInstance.getName()));
+        property.setProp(String.format("%s.%s", OUTPUT_KEY, taskInstance.getName()));
         property.setDirect(Direct.OUT);
         property.setType(DataType.VARCHAR);
         property.setValue(JSONUtils.toJsonString(dynamicOutputs));

@@ -48,7 +48,7 @@ The task definition is shown in the following figure:
 
 The output parameters of the dynamic node refer to the output parameters of the sub-workflow. The output parameters of all sub-workflows will be collected into a list as the output parameters of the dynamic node.
 
-When the downstream task is referenced, it can be referenced by `${dynamic.out(TaskName)}`.
+When the downstream task is referenced, it can be referenced by `${dynamic.out.TaskName}`.
 
 The value is a json, as shown below
 
