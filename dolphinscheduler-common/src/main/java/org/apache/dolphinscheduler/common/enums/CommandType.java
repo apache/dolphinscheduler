@@ -72,7 +72,7 @@ public enum CommandType {
     COMPLEMENT_DATA(5, "complement data"),
     /**
      * Start workflow from scheduler, will generate a new workflow instance and start from the beginning tasks.
-     * This command is same with START_WORKFLOW but with different trigger source.
+     * This command is same with START_PROCESS but with different trigger source.
      */
     SCHEDULER(6, "start a new workflow from scheduler"),
     /**
