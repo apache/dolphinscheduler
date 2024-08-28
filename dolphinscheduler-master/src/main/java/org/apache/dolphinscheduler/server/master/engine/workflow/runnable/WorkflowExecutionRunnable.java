@@ -21,10 +21,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
