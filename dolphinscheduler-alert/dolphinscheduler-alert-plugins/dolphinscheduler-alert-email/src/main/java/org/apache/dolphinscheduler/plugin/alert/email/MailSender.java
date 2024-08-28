@@ -48,6 +48,7 @@ import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -395,7 +396,7 @@ public final class MailSender {
      * @param mimeMessage the message
      * @param session connectSession
      */
-    private void sendMail(MimeMessage mimeMessage, Session session) throws MessagingException, AlertEmailException {
+    private void sendMail(MimeMessage mimeMessage, Session session) throws MessagingException {
         Transport transport = session.getTransport(new SMTPProvider());
         transport.addTransportListener(new TransportAdapter() {
             @Override
@@ -407,8 +408,7 @@ public final class MailSender {
                 try {
                     transport.sendMessage(mimeMessage, validUnsentAddresses);
                 } catch (MessagingException e) {
-                    log.error("send mail with validAddresses failed:{}", e.getMessage());
-                    throw new AlertEmailException("send mail with validAddresses failed", e);
+                    log.error("send mail with validAddresses failed: {}, reason:", validUnsentAddresses, e);
                 }
             }
         });
