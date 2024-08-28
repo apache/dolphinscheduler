@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
@@ -47,13 +47,13 @@ public class WorkflowManualTrigger
             AbstractWorkflowTrigger<WorkflowManualTriggerRequest, WorkflowManualTriggerResponse> {
 
     @Override
-    protected ProcessInstance constructWorkflowInstance(final WorkflowManualTriggerRequest workflowManualTriggerRequest) {
+    protected WorkflowInstance constructWorkflowInstance(final WorkflowManualTriggerRequest workflowManualTriggerRequest) {
         final CommandType commandType = CommandType.START_PROCESS;
         final Long workflowCode = workflowManualTriggerRequest.getWorkflowDefinitionCode();
         final Integer workflowVersion = workflowManualTriggerRequest.getWorkflowDefinitionVersion();
-        final ProcessDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
+        final WorkflowDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
 
-        final ProcessInstance workflowInstance = new ProcessInstance();
+        final WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
         workflowInstance.setProcessDefinitionVersion(workflowDefinition.getVersion());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
@@ -87,7 +87,7 @@ public class WorkflowManualTrigger
 
     @Override
     protected Command constructTriggerCommand(final WorkflowManualTriggerRequest workflowManualTriggerRequest,
-                                              final ProcessInstance workflowInstance) {
+                                              final WorkflowInstance workflowInstance) {
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(workflowManualTriggerRequest.getStartParamList())
                 .startNodes(workflowManualTriggerRequest.getStartNodes())
@@ -104,7 +104,7 @@ public class WorkflowManualTrigger
     }
 
     @Override
-    protected WorkflowManualTriggerResponse onTriggerSuccess(ProcessInstance workflowInstance) {
+    protected WorkflowManualTriggerResponse onTriggerSuccess(WorkflowInstance workflowInstance) {
         return WorkflowManualTriggerResponse.success(workflowInstance.getId());
     }
 
