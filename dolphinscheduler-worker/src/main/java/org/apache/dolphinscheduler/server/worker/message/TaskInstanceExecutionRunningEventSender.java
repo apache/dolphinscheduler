@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.ITaskExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskExecutionRunningEvent;
@@ -33,12 +33,10 @@ public class TaskInstanceExecutionRunningEventSender
             TaskInstanceExecutionEventSender<TaskExecutionRunningEvent> {
 
     @Override
-    public void sendEvent(TaskExecutionRunningEvent taskInstanceExecutionRunningEvent) {
-        ITaskExecutionEventListener iTaskExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstanceExecutionRunningEvent.getWorkflowInstanceHost(),
-                                ITaskExecutionEventListener.class);
-        iTaskExecutionEventListener.onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);
+    public void sendEvent(final TaskExecutionRunningEvent taskInstanceExecutionRunningEvent) {
+        Clients.withService(ITaskExecutionEventListener.class)
+                .withHost(taskInstanceExecutionRunningEvent.getWorkflowInstanceHost())
+                .onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);
     }
 
     @Override

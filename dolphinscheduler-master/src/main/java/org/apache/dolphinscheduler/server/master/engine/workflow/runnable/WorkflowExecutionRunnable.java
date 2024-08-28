@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import static com.google.common.base.Preconditions.checkArgument;
+
+import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
@@ -37,56 +37,23 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Getter
     private final IWorkflowExecuteContext workflowExecuteContext;
 
-    private final ProcessInstance workflowInstance;
-
-    @Getter
-    private final IWorkflowExecutionGraph workflowExecutionGraph;
-
-    @Getter
-    private final WorkflowEventBus workflowEventBus;
-
     @Getter
     private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
 
     public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder) {
         final ApplicationContext applicationContext = workflowExecutionRunnableBuilder.getApplicationContext();
         this.workflowExecuteContext = workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder().build();
-        this.workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        this.workflowExecutionGraph = workflowExecuteContext.getWorkflowExecutionGraph();
-        this.workflowEventBus = workflowExecuteContext.getWorkflowEventBus();
         this.workflowInstanceLifecycleListeners = workflowExecuteContext.getWorkflowInstanceLifecycleListeners();
     }
 
     @Override
-    public int getId() {
-        return workflowInstance.getId();
+    public void pause() {
+        getWorkflowEventBus().publish(WorkflowPauseLifecycleEvent.of(this));
     }
 
     @Override
-    public String getName() {
-        return workflowInstance.getName();
-    }
-
-    @Override
-    public boolean isWorkflowReadyPause() {
-        final WorkflowExecutionStatus workflowExecutionStatus = workflowInstance.getState();
-        return workflowExecutionStatus == WorkflowExecutionStatus.READY_PAUSE;
-    }
-
-    @Override
-    public boolean isWorkflowReadyStop() {
-        final WorkflowExecutionStatus workflowExecutionStatus = workflowInstance.getState();
-        return workflowExecutionStatus == WorkflowExecutionStatus.READY_STOP;
-    }
-
-    @Override
-    public ProcessInstance getWorkflowInstance() {
-        return workflowExecuteContext.getWorkflowInstance();
-    }
-
-    @Override
-    public WorkflowExecutionStatus getState() {
-        return workflowInstance.getState();
+    public void stop() {
+        getWorkflowEventBus().publish(WorkflowStopLifecycleEvent.of(this));
     }
 
     @Override
@@ -96,6 +63,7 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
 
     @Override
     public void registerWorkflowInstanceLifecycleListener(IWorkflowLifecycleListener listener) {
+        checkArgument(listener != null, "listener cannot be null");
         workflowInstanceLifecycleListeners.add(listener);
     }
 

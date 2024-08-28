@@ -77,11 +77,6 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
             return this;
         }
 
-        public WorkflowExecuteContextBuilder withWorkflowInstanceLifecycleListeners(List<IWorkflowLifecycleListener> workflowLifecycleListeners) {
-            this.workflowInstanceLifecycleListeners = workflowLifecycleListeners;
-            return this;
-        }
-
         public WorkflowExecuteContext build() {
             return new WorkflowExecuteContext(
                     command,

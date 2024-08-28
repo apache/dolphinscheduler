@@ -2107,22 +2107,6 @@ CREATE TABLE `t_ds_fav_task`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
 
--- ----------------------------
--- Table structure for t_ds_trigger_relation
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_trigger_relation`;
-CREATE TABLE `t_ds_trigger_relation` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',
-    `trigger_code` bigint(20) NOT NULL,
-    `job_id` bigint(20) NOT NULL,
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `t_ds_trigger_relation_trigger_code_IDX` (`trigger_code`),
-    UNIQUE KEY `t_ds_trigger_relation_UN` (`trigger_type`,`job_id`,`trigger_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
 
 DROP TABLE IF EXISTS `t_ds_relation_sub_workflow`;
 CREATE TABLE `t_ds_relation_sub_workflow` (

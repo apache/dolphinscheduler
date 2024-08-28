@@ -31,34 +31,75 @@ public interface IWorkflowExecutionRunnable {
     /**
      * Get the id of the WorkflowExecutionRunnable.
      */
-    int getId();
+    default int getId() {
+        return getWorkflowInstance().getId();
+    }
 
     /**
      * Get the name of the WorkflowExecutionRunnable.
      */
-    String getName();
+    default String getName() {
+        return getWorkflowInstance().getName();
+    }
 
+    /**
+     * Pause the WorkflowExecutionRunnable.
+     */
+    void pause();
+
+    /**
+     * Whether the workflow is ready to pause.
+     */
+    default boolean isWorkflowReadyPause() {
+        final WorkflowExecutionStatus workflowExecutionStatus = getWorkflowInstance().getState();
+        return workflowExecutionStatus == WorkflowExecutionStatus.READY_PAUSE;
+    }
+
+    /**
+     * Stop the WorkflowExecutionRunnable.
+     */
+    void stop();
+
+    /**
+     * Whether the workflow is ready to stop.
+     */
+    default boolean isWorkflowReadyStop() {
+        final WorkflowExecutionStatus workflowExecutionStatus = getWorkflowInstance().getState();
+        return workflowExecutionStatus == WorkflowExecutionStatus.READY_STOP;
+    }
+
+    /**
+     * Get the WorkflowExecuteContext belongs to the WorkflowExecutionRunnable.
+     */
     IWorkflowExecuteContext getWorkflowExecuteContext();
 
     /**
      * Get the WorkflowInstance belongs to the WorkflowExecutionRunnable.
      */
-    ProcessInstance getWorkflowInstance();
+    default ProcessInstance getWorkflowInstance() {
+        return getWorkflowExecuteContext().getWorkflowInstance();
+    }
 
     /**
      * Get the state of the WorkflowExecutionRunnable.
      */
-    WorkflowExecutionStatus getState();
+    default WorkflowExecutionStatus getState() {
+        return getWorkflowInstance().getState();
+    }
 
     /**
      * Get the WorkflowEventBus belongs to the Workflow instance.
      */
-    WorkflowEventBus getWorkflowEventBus();
+    default WorkflowEventBus getWorkflowEventBus() {
+        return getWorkflowExecuteContext().getWorkflowEventBus();
+    }
 
     /**
      * Get the WorkflowExecutionGraph belongs to the Workflow instance.
      */
-    IWorkflowExecutionGraph getWorkflowExecutionGraph();
+    default IWorkflowExecutionGraph getWorkflowExecutionGraph() {
+        return getWorkflowExecuteContext().getWorkflowExecutionGraph();
+    }
 
     /**
      * Get the WorkflowInstanceLifecycleListeners belongs to the Workflow instance.
@@ -66,12 +107,8 @@ public interface IWorkflowExecutionRunnable {
     List<IWorkflowLifecycleListener> getWorkflowLifecycleListeners();
 
     /**
-     * Whether the workflow is ready to pause.
+     * Register a WorkflowInstanceLifecycleListener to the Workflow instance.
      */
-    boolean isWorkflowReadyPause();
-
-    boolean isWorkflowReadyStop();
-
     void registerWorkflowInstanceLifecycleListener(IWorkflowLifecycleListener listener);
 
 }

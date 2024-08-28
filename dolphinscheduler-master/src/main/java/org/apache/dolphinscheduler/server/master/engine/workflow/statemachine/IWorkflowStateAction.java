@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
  * Represents the action to be taken when a workflow is in a certain state and receive a target event.
  * <p> Each {@link WorkflowExecutionStatus} should have a corresponding {@link IWorkflowStateAction} implementation.
  *
+ * @see WorkflowSubmittedStateAction
  * @see WorkflowRunningStateAction
  * @see WorkflowReadyPauseStateAction
  * @see WorkflowPausedStateAction
