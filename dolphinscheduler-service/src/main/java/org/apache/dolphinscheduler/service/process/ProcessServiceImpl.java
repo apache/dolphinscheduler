@@ -105,7 +105,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -261,9 +261,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private CommandService commandService;
 
-    @Autowired
-    private TriggerRelationService triggerRelationService;
-
     /**
      * find process instance detail by id
      *
@@ -362,9 +359,10 @@ public class ProcessServiceImpl implements ProcessService {
             if (StringUtils.isEmpty(taskInstance.getHost()) || StringUtils.isEmpty(taskLogPath)) {
                 continue;
             }
-            ILogService iLogService =
-                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
-            iLogService.removeTaskInstanceLog(taskLogPath);
+            Clients
+                    .withService(ILogService.class)
+                    .withHost(taskInstance.getHost())
+                    .removeTaskInstanceLog(taskLogPath);
         }
     }
 

@@ -18,14 +18,8 @@
 package org.apache.dolphinscheduler.server.master.engine.command.handler;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.engine.workflow.listener.WorkflowSuccessLifecycleListener;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,21 +28,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BackfillWorkflowCommandHandler extends RunWorkflowCommandHandler {
-
-    @Autowired
-    private ProcessInstanceDao processInstanceDao;
-
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private MasterConfig masterConfig;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    private WorkflowSuccessLifecycleListener workflowSuccessLifecycleListener;
 
     @Override
     public CommandType commandType() {

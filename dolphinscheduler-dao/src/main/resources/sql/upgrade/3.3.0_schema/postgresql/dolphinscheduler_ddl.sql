@@ -123,3 +123,5 @@ d//
 
 select drop_column_t_ds_alert_plugin_instance();
 DROP FUNCTION IF EXISTS drop_column_t_ds_alert_plugin_instance();
+
+DROP TABLE IF EXISTS t_ds_trigger_relation;

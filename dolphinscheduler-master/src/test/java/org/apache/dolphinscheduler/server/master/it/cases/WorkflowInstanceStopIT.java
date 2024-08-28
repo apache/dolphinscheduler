@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
@@ -68,14 +68,24 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .pollInterval(Duration.ofMillis(100))
                 .atMost(Duration.ofMinutes(1))
-                .untilAsserted(() -> Assertions.assertThat(repository.queryWorkflowInstance(workflow)).hasSize(1));
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(
+                                    taskInstance -> {
+                                        assertThat(taskInstance.getState())
+                                                .isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                                    });
+                });
 
-        final Integer workflowInstanceId = repository.queryWorkflowInstance(workflow).get(0).getId();
         Assertions
                 .assertThat(workflowOperator.stopWorkflowInstance(workflowInstanceId))
                 .matches(WorkflowInstanceStopResponse::isSuccess);
@@ -84,13 +94,10 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(
-                                    workflowInstance -> {
-                                        assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
-                                    });
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.STOP);
                     Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(
                                     taskInstance -> {
                                         assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
@@ -110,27 +117,36 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .pollInterval(Duration.ofMillis(100))
                 .atMost(Duration.ofMinutes(1))
-                .untilAsserted(() -> Assertions.assertThat(repository.queryWorkflowInstance(workflow)).hasSize(1));
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(
+                                    taskInstance -> {
+                                        assertThat(taskInstance.getState())
+                                                .isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                                    });
+                });
 
-        final Integer workflowInstanceId = repository.queryWorkflowInstance(workflow).get(0).getId();
         assertThat(workflowOperator.stopWorkflowInstance(workflowInstanceId).isSuccess());
-
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .satisfies(
                                     workflowInstance -> {
                                         assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
                                     });
                     Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(
                                     taskInstance -> {
                                         assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
@@ -150,29 +166,29 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
-                .untilAsserted(() -> Assertions.assertThat(repository.queryWorkflowInstance(workflow)).hasSize(1));
+                .untilAsserted(() -> Assertions
+                        .assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION)
+
+                );
 
         // make sure the task has been dispatched to the executor
         ThreadUtils.sleep(2_000);
-
-        final Integer workflowInstanceId = repository.queryWorkflowInstance(workflow).get(0).getId();
         assertThat(workflowOperator.stopWorkflowInstance(workflowInstanceId).isSuccess());
 
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(
-                                    workflowInstance -> {
-                                        assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
-                                    });
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.STOP);
+
                     Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(3)
                             .anySatisfy(
                                     taskInstance -> {

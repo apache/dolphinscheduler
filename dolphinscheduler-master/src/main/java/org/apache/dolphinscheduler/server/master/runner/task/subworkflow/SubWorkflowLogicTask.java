@@ -25,14 +25,14 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceController;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
@@ -99,8 +99,8 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
                         taskExecutionContext.getTaskInstanceId());
 
         try {
-            WorkflowInstancePauseResponse pauseResponse = SingletonJdkDynamicRpcClientProxyFactory
-                    .withService(IWorkflowInstanceController.class)
+            WorkflowInstancePauseResponse pauseResponse = Clients
+                    .withService(IWorkflowControlClient.class)
                     .withHost(subProcessInstance.getHost())
                     .pauseWorkflowInstance(new WorkflowInstancePauseRequest(subProcessInstance.getId()));
             if (pauseResponse.isSuccess()) {
@@ -128,8 +128,8 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             return;
         }
         try {
-            WorkflowInstanceStopResponse stopResponse = SingletonJdkDynamicRpcClientProxyFactory
-                    .withService(IWorkflowInstanceController.class)
+            WorkflowInstanceStopResponse stopResponse = Clients
+                    .withService(IWorkflowControlClient.class)
                     .withHost(subProcessInstance.getHost())
                     .stopWorkflowInstance(new WorkflowInstanceStopRequest(subProcessInstance.getId()));
             if (stopResponse.isSuccess()) {

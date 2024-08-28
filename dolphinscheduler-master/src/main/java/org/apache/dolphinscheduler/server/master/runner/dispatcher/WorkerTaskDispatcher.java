@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
@@ -51,7 +51,7 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
         final String taskName = taskExecutionContext.getTaskName();
         final String workerAddress = taskExecutionContext.getHost();
         try {
-            final TaskInstanceDispatchResponse taskInstanceDispatchResponse = SingletonJdkDynamicRpcClientProxyFactory
+            final TaskInstanceDispatchResponse taskInstanceDispatchResponse = Clients
                     .withService(ITaskInstanceOperator.class)
                     .withHost(workerAddress)
                     .dispatchTask(new TaskInstanceDispatchRequest(ITaskExecutionRunnable.getTaskExecutionContext()));

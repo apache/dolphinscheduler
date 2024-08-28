@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
-import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 
 import java.util.List;
 
@@ -46,9 +45,6 @@ public class WorkflowExecutionRunnableFactory {
     @Autowired
     private CommandDao commandDao;
 
-    @Autowired
-    private List<IWorkflowLifecycleListener> workflowLifecycleListeners;
-
     /**
      * Generate WorkflowExecutionRunnable from command.
      * <p> We use transaction here to make sure that the command will be handled only once. Since in some case if the
@@ -57,9 +53,7 @@ public class WorkflowExecutionRunnableFactory {
     @Transactional
     public IWorkflowExecutionRunnable createWorkflowExecuteRunnable(Command command) {
         deleteCommandOrThrow(command);
-        final IWorkflowExecutionRunnable workflowExecutionRunnable = doCreateWorkflowExecutionRunnable(command);
-        workflowLifecycleListeners.forEach(workflowExecutionRunnable::registerWorkflowInstanceLifecycleListener);
-        return workflowExecutionRunnable;
+        return doCreateWorkflowExecutionRunnable(command);
     }
 
     /**

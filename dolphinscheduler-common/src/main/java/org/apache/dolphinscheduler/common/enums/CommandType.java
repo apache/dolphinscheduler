@@ -22,6 +22,7 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+// todo: rename to WorkflowTriggerType
 public enum CommandType {
 
     /**

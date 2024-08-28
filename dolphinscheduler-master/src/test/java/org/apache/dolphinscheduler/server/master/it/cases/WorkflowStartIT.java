@@ -78,7 +78,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -109,7 +109,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -154,7 +154,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -190,7 +190,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -221,7 +221,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(3))
@@ -274,7 +274,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -313,7 +313,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -344,7 +344,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -382,7 +382,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -421,7 +421,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -491,7 +491,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))

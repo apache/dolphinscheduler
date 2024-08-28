@@ -167,9 +167,6 @@ public class ProcessServiceTest {
     @Mock
     TaskPluginManager taskPluginManager;
 
-    @Mock
-    private TriggerRelationService triggerRelationService;
-
     @Test
     public void testGetUserById() {
         User user = new User();

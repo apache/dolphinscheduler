@@ -22,10 +22,10 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceController;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,8 +81,8 @@ public class StopWorkflowInstanceExecutorDelegate
 
     void stopInMaster(ProcessInstance workflowInstance) {
         try {
-            final WorkflowInstanceStopResponse stopResponse = SingletonJdkDynamicRpcClientProxyFactory
-                    .withService(IWorkflowInstanceController.class)
+            final WorkflowInstanceStopResponse stopResponse = Clients
+                    .withService(IWorkflowControlClient.class)
                     .withHost(workflowInstance.getHost())
                     .stopWorkflowInstance(new WorkflowInstanceStopRequest(workflowInstance.getId()));
 

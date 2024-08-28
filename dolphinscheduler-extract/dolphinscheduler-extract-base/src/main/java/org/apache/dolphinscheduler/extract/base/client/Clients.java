@@ -22,15 +22,21 @@ import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/**
+ * The factory class for creating a dynamic proxy client.
+ * <pre>
+ *     final IService proxyClient = Clients
+ *            .withService(IService.class)
+ *            .withHost(serverAddress);
+ * </pre>
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SingletonJdkDynamicRpcClientProxyFactory {
+public class Clients {
 
-    private static final JdkDynamicRpcClientProxyFactory INSTANCE = new JdkDynamicRpcClientProxyFactory(
-            NettyRemotingClientFactory.buildNettyRemotingClient(new NettyClientConfig()));
-
-    public static <T> T getProxyClient(String serverAddress, Class<T> clazz) {
-        return INSTANCE.getProxyClient(serverAddress, clazz);
-    }
+    private static final JdkDynamicRpcClientProxyFactory jdkDynamicRpcClientProxyFactory =
+            new JdkDynamicRpcClientProxyFactory(
+                    NettyRemotingClientFactory.buildNettyRemotingClient(
+                            new NettyClientConfig()));
 
     public static <T> JdkDynamicRpcClientProxyBuilder<T> withService(Class<T> serviceClazz) {
         return new JdkDynamicRpcClientProxyBuilder<>(serviceClazz);
@@ -45,7 +51,7 @@ public class SingletonJdkDynamicRpcClientProxyFactory {
         }
 
         public T withHost(String serviceHost) {
-            return getProxyClient(serviceHost, serviceClazz);
+            return jdkDynamicRpcClientProxyFactory.getProxyClient(serviceHost, serviceClazz);
         }
     }
 

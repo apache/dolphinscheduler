@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.ITaskExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskExecutionDispatchEvent;
@@ -73,7 +73,7 @@ public class TaskExecutionEventListenerImpl implements ITaskExecutionEventListen
         // instance state.
         // The logic task doesn't need to send ack
         if (!TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskDefinition().getTaskType())) {
-            SingletonJdkDynamicRpcClientProxyFactory
+            Clients
                     .withService(ITaskInstanceExecutionEventAckListener.class)
                     .withHost(taskExecutionDispatchEvent.getTaskInstanceHost())
                     .handleTaskInstanceDispatchedEventAck(
@@ -99,7 +99,7 @@ public class TaskExecutionEventListenerImpl implements ITaskExecutionEventListen
         // instance state.
         // The logic task doesn't need to send ack
         if (!TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskDefinition().getTaskType())) {
-            SingletonJdkDynamicRpcClientProxyFactory
+            Clients
                     .withService(ITaskInstanceExecutionEventAckListener.class)
                     .withHost(taskExecutionRunningEvent.getTaskInstanceHost())
                     .handleTaskInstanceExecutionRunningEventAck(
@@ -122,7 +122,7 @@ public class TaskExecutionEventListenerImpl implements ITaskExecutionEventListen
         // So once the master failover and we take over the task instance success, then we should fetch the latest task
         // instance state.
         if (!TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskDefinition().getTaskType())) {
-            SingletonJdkDynamicRpcClientProxyFactory
+            Clients
                     .withService(ITaskInstanceExecutionEventAckListener.class)
                     .withHost(taskExecutionSuccessEvent.getTaskInstanceHost())
                     .handleTaskExecutionSuccessEventAck(
@@ -143,7 +143,7 @@ public class TaskExecutionEventListenerImpl implements ITaskExecutionEventListen
         // So once the master failover and we take over the task instance success, then we should fetch the latest task
         // instance state.
         if (!TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskDefinition().getTaskType())) {
-            SingletonJdkDynamicRpcClientProxyFactory
+            Clients
                     .withService(ITaskInstanceExecutionEventAckListener.class)
                     .withHost(taskExecutionFailedEvent.getTaskInstanceHost())
                     .handleTaskExecutionFailedEventAck(
@@ -164,7 +164,7 @@ public class TaskExecutionEventListenerImpl implements ITaskExecutionEventListen
         // So once the master failover and we take over the task instance success, then we should fetch the latest task
         // instance state.
         if (!TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskDefinition().getTaskType())) {
-            SingletonJdkDynamicRpcClientProxyFactory
+            Clients
                     .withService(ITaskInstanceExecutionEventAckListener.class)
                     .withHost(taskExecutionKilledEvent.getTaskInstanceHost())
                     .handleTaskExecutionKilledEventAck(
@@ -182,7 +182,7 @@ public class TaskExecutionEventListenerImpl implements ITaskExecutionEventListen
         // So once the master failover and we take over the task instance success, then we should fetch the latest task
         // instance state.
         if (!TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskDefinition().getTaskType())) {
-            SingletonJdkDynamicRpcClientProxyFactory
+            Clients
                     .withService(ITaskInstanceExecutionEventAckListener.class)
                     .withHost(taskExecutionPausedEvent.getTaskInstanceHost())
                     .handleTaskExecutionPausedEventAck(

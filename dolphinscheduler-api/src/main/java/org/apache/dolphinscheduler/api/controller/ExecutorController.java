@@ -64,6 +64,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Lists;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -129,27 +131,27 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
     @OperatorLog(auditType = AuditType.PROCESS_START)
-    public Result<Long> triggerWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
-                                                  @RequestParam(value = "scheduleTime") String scheduleTime,
-                                                  @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
-                                                  @RequestParam(value = "startNodeList", required = false) String startNodeList,
-                                                  @RequestParam(value = "taskDependType", required = false, defaultValue = "TASK_POST") TaskDependType taskDependType,
-                                                  @RequestParam(value = "execType", required = false, defaultValue = "START_PROCESS") CommandType execType,
-                                                  @RequestParam(value = "warningType") WarningType warningType,
-                                                  @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
-                                                  @RequestParam(value = "runMode", required = false) RunMode runMode,
-                                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
-                                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                                  @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
-                                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                                  @RequestParam(value = "startParams", required = false) String startParams,
-                                                  @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
-                                                  @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
-                                                  @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
-                                                  @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
-                                                  @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
-                                                  @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
+    public Result<List<Integer>> triggerWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
+                                                           @RequestParam(value = "scheduleTime") String scheduleTime,
+                                                           @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
+                                                           @RequestParam(value = "startNodeList", required = false) String startNodeList,
+                                                           @RequestParam(value = "taskDependType", required = false, defaultValue = "TASK_POST") TaskDependType taskDependType,
+                                                           @RequestParam(value = "execType", required = false, defaultValue = "START_PROCESS") CommandType execType,
+                                                           @RequestParam(value = "warningType") WarningType warningType,
+                                                           @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
+                                                           @RequestParam(value = "runMode", required = false) RunMode runMode,
+                                                           @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
+                                                           @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                           @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
+                                                           @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                                           @RequestParam(value = "startParams", required = false) String startParams,
+                                                           @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
+                                                           @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
+                                                           @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
+                                                           @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
+                                                           @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
+                                                           @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
 
         switch (execType) {
             case START_PROCESS:
@@ -170,7 +172,8 @@ public class ExecutorController extends BaseController {
                         .dryRun(Flag.of(dryRun))
                         .testFlag(Flag.of(testFlag))
                         .build();
-                return Result.success(execService.triggerWorkflowDefinition(workflowTriggerRequest));
+                return Result
+                        .success(Lists.newArrayList(execService.triggerWorkflowDefinition(workflowTriggerRequest)));
             case COMPLEMENT_DATA:
                 final WorkflowBackFillRequest workflowBackFillRequest = WorkflowBackFillRequest.builder()
                         .loginUser(loginUser)
@@ -250,35 +253,35 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_START_PROCESS_INSTANCE_ERROR)
     @OperatorLog(auditType = AuditType.PROCESS_BATCH_START)
-    public Result<List<Long>> batchTriggerWorkflowDefinitions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                              @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
-                                                              @RequestParam(value = "scheduleTime") String scheduleTime,
-                                                              @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
-                                                              @RequestParam(value = "startNodeList", required = false) String startNodeList,
-                                                              @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
-                                                              @RequestParam(value = "execType", required = false) CommandType execType,
-                                                              @RequestParam(value = "warningType") WarningType warningType,
-                                                              @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
-                                                              @RequestParam(value = "runMode", required = false) RunMode runMode,
-                                                              @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
-                                                              @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                                              @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
-                                                              @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                                              @RequestParam(value = "startParams", required = false) String startParams,
-                                                              @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
-                                                              @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
-                                                              @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
-                                                              @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
-                                                              @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
-                                                              @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
+    public Result<List<Integer>> batchTriggerWorkflowDefinitions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
+                                                                 @RequestParam(value = "scheduleTime") String scheduleTime,
+                                                                 @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
+                                                                 @RequestParam(value = "startNodeList", required = false) String startNodeList,
+                                                                 @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
+                                                                 @RequestParam(value = "execType", required = false) CommandType execType,
+                                                                 @RequestParam(value = "warningType") WarningType warningType,
+                                                                 @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
+                                                                 @RequestParam(value = "runMode", required = false) RunMode runMode,
+                                                                 @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
+                                                                 @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                                 @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
+                                                                 @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                                                 @RequestParam(value = "startParams", required = false) String startParams,
+                                                                 @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
+                                                                 @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
+                                                                 @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
+                                                                 @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
+                                                                 @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
+                                                                 @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
 
         List<Long> workflowDefinitionCodes = Arrays.stream(processDefinitionCodes.split(Constants.COMMA))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
 
-        List<Long> result = new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
         for (Long workflowDefinitionCode : workflowDefinitionCodes) {
-            Result<Long> triggerCodeResult = triggerWorkflowDefinition(loginUser,
+            Result<List<Integer>> workflowInstanceIds = triggerWorkflowDefinition(loginUser,
                     workflowDefinitionCode,
                     scheduleTime,
                     failureStrategy,
@@ -299,7 +302,7 @@ public class ExecutorController extends BaseController {
                     complementDependentMode,
                     allLevelDependent,
                     executionOrder);
-            result.add(triggerCodeResult.getData());
+            result.addAll(workflowInstanceIds.getData());
         }
         return Result.success(result);
     }

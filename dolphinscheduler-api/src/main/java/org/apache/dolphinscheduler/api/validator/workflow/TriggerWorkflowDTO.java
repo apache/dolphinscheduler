@@ -73,6 +73,4 @@ public class TriggerWorkflowDTO {
 
     private Flag testFlag;
 
-    private Long triggerCode;
-
 }

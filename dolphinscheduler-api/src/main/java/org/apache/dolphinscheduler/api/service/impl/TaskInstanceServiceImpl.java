@@ -45,7 +45,7 @@ import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.worker.IStreamingTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
@@ -277,11 +277,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
-        IStreamingTaskInstanceOperator streamingTaskInstanceOperator =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstance.getHost(), IStreamingTaskInstanceOperator.class);
-        TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse =
-                streamingTaskInstanceOperator.triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
+        final TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse = Clients
+                .withService(IStreamingTaskInstanceOperator.class)
+                .withHost(taskInstance.getHost())
+                .triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
         log.info("StreamingTaskInstance trigger savepoint response: {}", taskInstanceTriggerSavepointResponse);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -310,10 +309,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
 
         // todo: we only support streaming task for now
-        ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
-        TaskInstanceKillResponse taskInstanceKillResponse =
-                iTaskInstanceOperator.killTask(new TaskInstanceKillRequest(taskInstanceId));
+        final TaskInstanceKillResponse taskInstanceKillResponse = Clients
+                .withService(ITaskInstanceOperator.class)
+                .withHost(taskInstance.getHost())
+                .killTask(new TaskInstanceKillRequest(taskInstanceId));
         log.info("TaskInstance kill response: {}", taskInstanceKillResponse);
 
         putMsg(result, Status.SUCCESS);
@@ -369,10 +368,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
                 try {
                     // Remove task instance log failed will not affect the deletion of task instance
-                    ILogService iLogService =
-                            SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(),
-                                    ILogService.class);
-                    iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+                    Clients
+                            .withService(ILogService.class)
+                            .withHost(taskInstance.getHost())
+                            .removeTaskInstanceLog(taskInstance.getLogPath());
                 } catch (Exception ex) {
                     log.error("Remove task instance log error", ex);
                 }

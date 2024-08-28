@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionSta
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
@@ -256,7 +256,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
                     .taskInstanceId(taskExecutionRunnable.getTaskInstance().getId())
                     .workflowHost(masterConfig.getMasterAddress())
                     .build();
-            final TakeOverTaskResponse takeOverTaskResponse = SingletonJdkDynamicRpcClientProxyFactory
+            final TakeOverTaskResponse takeOverTaskResponse = Clients
                     .withService(ITaskInstanceOperator.class)
                     .withHost(taskExecutionRunnable.getTaskInstance().getHost())
                     .takeOverTask(takeOverTaskRequest);

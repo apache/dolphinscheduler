@@ -15,26 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.process;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
-import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
-/**
- *  Trigger relation operator to db，because operator command process instance
- */
-@Component
-public interface TriggerRelationService {
-
-    void saveTriggerToDb(ApiTriggerType type, Long triggerCode, Integer jobId);
-
-    List<TriggerRelation> queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId);
-
-    int saveCommandTrigger(Integer commandId, Integer processInstanceId);
-
-    int saveProcessInstanceTrigger(Integer commandId, Integer processInstanceId);
+public interface UserDao extends IDao<User> {
 }

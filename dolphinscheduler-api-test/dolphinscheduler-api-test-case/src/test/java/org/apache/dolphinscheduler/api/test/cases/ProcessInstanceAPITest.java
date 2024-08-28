@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
@@ -44,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +53,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
@@ -105,7 +106,7 @@ public class ProcessInstanceAPITest {
 
     @Test
     @Order(1)
-    public void testQueryProcessInstancesByTriggerCode() {
+    public void testQueryProcessInstancesByWorkflowInstanceId() {
         try {
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
@@ -145,6 +146,10 @@ public class ProcessInstanceAPITest {
             HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode,
                     processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             assertTrue(startProcessInstanceResponse.getBody().getSuccess());
+            final List<Integer> workflowInstanceIds = (List<Integer>) startProcessInstanceResponse.getBody().getData();
+
+            assertEquals(1, workflowInstanceIds.size());
+            processInstanceId = workflowInstanceIds.get(0);
 
             // make sure process instance has completed and successfully persisted into db
             Awaitility.await()
@@ -152,10 +157,11 @@ public class ProcessInstanceAPITest {
                     .untilAsserted(() -> {
                         // query workflow instance by trigger code
                         HttpResponse queryProcessInstanceListResponse =
-                                processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
+                                processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
                         assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
-                        assertTrue(queryProcessInstanceListResponse.getBody().getData().toString()
-                                .contains("test_import"));
+                        final Map<String, Object> workflowInstance =
+                                (Map<String, Object>) queryProcessInstanceListResponse.getBody().getData();
+                        assertEquals("SUCCESS", workflowInstance.get("state"));
                     });
         } catch (Exception e) {
             log.error("failed", e);
@@ -174,7 +180,6 @@ public class ProcessInstanceAPITest {
 
     @Test
     @Order(3)
-    @Disabled
     public void testQueryTaskListByProcessId() {
         HttpResponse queryTaskListByProcessIdResponse =
                 processInstancePage.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
@@ -184,7 +189,6 @@ public class ProcessInstanceAPITest {
 
     @Test
     @Order(4)
-    @Disabled
     public void testQueryProcessInstanceById() {
         HttpResponse queryProcessInstanceByIdResponse =
                 processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
@@ -194,7 +198,6 @@ public class ProcessInstanceAPITest {
 
     @Test
     @Order(5)
-    @Disabled
     public void testDeleteProcessInstanceById() {
         HttpResponse deleteProcessInstanceByIdResponse =
                 processInstancePage.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
