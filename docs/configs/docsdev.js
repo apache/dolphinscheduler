@@ -226,8 +226,8 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
                             },
                             {
-                                title: 'SSH',
-                                link: '/en-us/docs/dev/user_doc/guide/task/ssh.html',
+                                title: 'Remote Shell',
+                                link: '/en-cn/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
@@ -952,10 +952,6 @@ export default {
                             {
                                 title: 'Apache Linkis',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
-                            },
-                            {
-                                title: 'SSH',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/ssh.html',
                             },
                             {
                                 title: 'Vertica',
