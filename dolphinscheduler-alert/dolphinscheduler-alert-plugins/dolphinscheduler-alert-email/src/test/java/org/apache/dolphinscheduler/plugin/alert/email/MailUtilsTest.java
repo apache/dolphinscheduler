@@ -162,4 +162,14 @@ public class MailUtilsTest {
         AlertResult alertResult = mailSender.sendMails("gaojing", content);
         Assertions.assertFalse(alertResult.isSuccess());
     }
+
+    @Test
+    public void testReceiversWithInvalidAddress() {
+        String content = list2String();
+        emailConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE_ATTACHMENT.getDescp());
+        emailConfig.put(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS, "347801120@qq.com,xxx@qq.com");
+        mailSender = new MailSender(emailConfig);
+        AlertResult alertResult = mailSender.sendMails("gaojing", content);
+        Assertions.assertFalse(alertResult.isSuccess());
+    }
 }
