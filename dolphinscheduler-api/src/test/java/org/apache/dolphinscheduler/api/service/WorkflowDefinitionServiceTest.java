@@ -569,7 +569,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Throwable exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.batchDeleteWorkflowDefinitionByCodes(user, projectCode, twoCodes));
         String formatter = MessageFormat.format(Status.BATCH_DELETE_WORKFLOW_DEFINE_BY_CODES_ERROR.getMsg(),
-                "12[process definition not exist]");
+                "12[workflow definition not exist]");
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // return the right data
