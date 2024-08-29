@@ -65,7 +65,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         if (backfillWorkflowDTO.getBackfillParams().getRunMode() == RunMode.RUN_MODE_SERIAL) {
             return doSerialBackfillWorkflow(backfillWorkflowDTO);
         } else {
-            return doParallemBackfillWorkflow(backfillWorkflowDTO);
+            return doParallelBackfillWorkflow(backfillWorkflowDTO);
         }
     }
 
@@ -84,7 +84,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         return Lists.newArrayList(workflowInstanceId);
     }
 
-    private List<Integer> doParallemBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
+    private List<Integer> doParallelBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
         Integer expectedParallelismNumber = backfillParams.getExpectedParallelismNumber();
 
