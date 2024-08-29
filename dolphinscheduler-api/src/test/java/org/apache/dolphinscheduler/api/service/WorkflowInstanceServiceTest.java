@@ -226,7 +226,7 @@ public class WorkflowInstanceServiceTest {
                 Mockito.any(Project.class),
                 Mockito.any());
         when(processDefineMapper.selectById(Mockito.anyInt())).thenReturn(getProcessDefinition());
-        when(workflowInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), Mockito.any(),
+        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(Mockito.any(Page.class), Mockito.any(),
                 Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(),
                 eq("192.168.xx.xx"), Mockito.any(), Mockito.any())).thenReturn(pageReturn);
@@ -250,7 +250,7 @@ public class WorkflowInstanceServiceTest {
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(workflowInstanceMapper.queryProcessInstanceListPaging(
+        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(
                 Mockito.any(Page.class),
                 eq(project.getCode()),
                 eq(1L),
@@ -270,7 +270,7 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         // data parameter empty
-        when(workflowInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
+        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
                 eq(1L), eq(""), eq(""), Mockito.any(),
                 eq("192.168.xx.xx"), eq(null), eq(null))).thenReturn(pageReturn);
         successRes = processInstanceService.queryWorkflowInstanceList(loginUser, projectCode, 1, "",
@@ -289,7 +289,7 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorExistRes.getCode());
 
         // executor name empty
-        when(workflowInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
+        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
                 eq(1L), eq(""), eq("admin"), Mockito.any(),
                 eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         Result executorEmptyRes =

@@ -93,7 +93,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     public WorkflowInstance queryLastSchedulerWorkflowInterval(Long workflowDefinitionCode, Long taskDefinitionCode,
                                                                DateInterval dateInterval,
                                                                int testFlag) {
-        return mybatisMapper.queryLastSchedulerProcess(
+        return mybatisMapper.queryLastSchedulerWorkflow(
                 workflowDefinitionCode,
                 taskDefinitionCode,
                 dateInterval.getStartTime(),
@@ -113,7 +113,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     public WorkflowInstance queryLastManualWorkflowInterval(Long definitionCode, Long taskCode,
                                                             DateInterval dateInterval,
                                                             int testFlag) {
-        return mybatisMapper.queryLastManualProcess(definitionCode,
+        return mybatisMapper.queryLastManualWorkflow(definitionCode,
                 taskCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime(),
@@ -128,7 +128,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      */
     @Override
     public WorkflowInstance queryFirstScheduleWorkflowInstance(Long definitionCode) {
-        return mybatisMapper.queryFirstScheduleProcessInstance(definitionCode);
+        return mybatisMapper.queryFirstScheduleWorkflowInstance(definitionCode);
     }
 
     /**
@@ -139,7 +139,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      */
     @Override
     public WorkflowInstance queryFirstStartWorkflowInstance(Long definitionCode) {
-        return mybatisMapper.queryFirstStartProcessInstance(definitionCode);
+        return mybatisMapper.queryFirstStartWorkflowInstance(definitionCode);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     @Override
     public List<String> queryNeedFailoverMasters() {
         return mybatisMapper
-                .queryNeedFailoverProcessInstanceHost(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+                .queryNeedFailoverWorkflowInstanceHost(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     @Override

@@ -670,7 +670,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Page<WorkflowDefinition> page =
                 new Page<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
         IPage<WorkflowDefinition> workflowDefinitionIPage =
-                workflowDefinitionMapper.filterProcessDefinition(page, workflowDefinition);
+                workflowDefinitionMapper.filterWorkflowDefinition(page, workflowDefinition);
 
         List<WorkflowDefinition> records = workflowDefinitionIPage.getRecords();
         for (WorkflowDefinition pd : records) {
@@ -1801,7 +1801,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> queryWorkflowDefinitionListByProjectCode(long projectCode) {
         Map<String, Object> result = new HashMap<>();
         List<DependentSimplifyDefinition> workflowDefinitions =
-                workflowDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, null);
+                workflowDefinitionMapper.queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, null);
         result.put(Constants.DATA_LIST, workflowDefinitions);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -1822,7 +1822,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Set<Long> definitionCodesSet = new HashSet<>();
         definitionCodesSet.add(workflowDefinitionCode);
         List<DependentSimplifyDefinition> workflowDefinitions = workflowDefinitionMapper
-                .queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
+                .queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, definitionCodesSet);
 
         // query task definition log
         List<TaskDefinitionLog> taskDefinitionLogsList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
@@ -2380,7 +2380,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         PageInfo<WorkflowDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<WorkflowDefinitionLog> page = new Page<>(pageNo, pageSize);
         IPage<WorkflowDefinitionLog> workflowDefinitionLogIPage =
-                workflowDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, code, projectCode);
+                workflowDefinitionLogMapper.queryWorkflowDefinitionVersionsPaging(page, code, projectCode);
         List<WorkflowDefinitionLog> workflowDefinitionLogs = workflowDefinitionLogIPage.getRecords();
 
         pageInfo.setTotalList(workflowDefinitionLogs);
@@ -2423,7 +2423,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
 
-        int deleteLog = workflowDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(code, version);
+        int deleteLog = workflowDefinitionLogMapper.deleteByWorkflowDefinitionCodeAndVersion(code, version);
         int deleteRelationLog = workflowTaskRelationLogMapper.deleteByCode(code, version);
         if (deleteLog == 0 || deleteRelationLog == 0) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR);

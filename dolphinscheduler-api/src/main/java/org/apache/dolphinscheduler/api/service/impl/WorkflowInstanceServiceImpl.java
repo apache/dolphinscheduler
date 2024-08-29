@@ -212,7 +212,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
 
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryTopNProcessInstance(size, start, end,
+        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryTopNWorkflowInstance(size, start, end,
                 WorkflowExecutionStatus.SUCCESS, projectCode);
         result.put(DATA_LIST, workflowInstances);
         putMsg(result, Status.SUCCESS);
@@ -328,7 +328,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Page<WorkflowInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<WorkflowInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryProcessInstanceListPaging(
+        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListPaging(
                 page,
                 projectCode,
                 workflowDefinitionCode,
@@ -392,7 +392,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         PageInfo<WorkflowInstance> pageInfo =
                 new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
 
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryProcessInstanceListV2Paging(
+        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListV2Paging(
                 page,
                 workflowInstance.getProjectCode(),
                 workflowInstance.getWorkflowDefinitionCode(),
@@ -987,7 +987,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
      */
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
-        return workflowInstanceMapper.queryByProcessDefineCodeAndStatus(workflowDefinitionCode, states);
+        return workflowInstanceMapper.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
     }
 
     @Override
@@ -1006,7 +1006,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
      */
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
-        return workflowInstanceMapper.queryByProcessDefineCode(workflowDefinitionCode, size);
+        return workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
     }
 
     /**
@@ -1039,7 +1039,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode) {
         while (true) {
             List<WorkflowInstance> workflowInstances =
-                    workflowInstanceMapper.queryByProcessDefineCode(workflowDefinitionCode, 100);
+                    workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, 100);
             if (CollectionUtils.isEmpty(workflowInstances)) {
                 break;
             }
