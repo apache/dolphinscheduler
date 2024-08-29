@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.controller.AccessTokenController;
-import org.apache.dolphinscheduler.api.controller.ProcessDefinitionController;
+import org.apache.dolphinscheduler.api.controller.WorkflowDefinitionController;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -45,11 +45,11 @@ public class ApiExceptionHandlerTest {
     @Test
     public void exceptionHandlerRuntime() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
-        ProcessDefinitionController controller = new ProcessDefinitionController();
+        WorkflowDefinitionController controller = new WorkflowDefinitionController();
         Method method =
-                controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
+                controller.getClass().getMethod("queryAllWorkflowDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assertions.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.QUERY_WORKFLOW_DEFINITION_LIST.getCode(), result.getCode().intValue());
     }
 }

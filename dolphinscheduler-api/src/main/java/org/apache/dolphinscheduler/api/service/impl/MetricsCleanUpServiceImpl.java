@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowMetricService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -49,10 +49,9 @@ public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
 
     private void cleanUpWorkflowMetrics(Server server, Long workflowDefinitionCode) {
         try {
-            IWorkflowInstanceService iWorkflowInstanceService =
-                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(
-                            String.format("%s:%s", server.getHost(), server.getPort()), IWorkflowInstanceService.class);
-            iWorkflowInstanceService.clearWorkflowMetrics(workflowDefinitionCode);
+            Clients.withService(IWorkflowMetricService.class)
+                    .withHost(server.getHost() + ":" + server.getPort())
+                    .clearWorkflowMetrics(workflowDefinitionCode);
         } catch (Exception e) {
             log.error(
                     "Fail to clean up workflow related metrics on {} when deleting workflow definition {}, error message {}",

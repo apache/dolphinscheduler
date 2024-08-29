@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +40,7 @@ import org.mockito.quality.Strictness;
 class StopWorkflowInstanceExecuteFunctionTest {
 
     @Mock
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @InjectMocks
     private StopWorkflowInstanceExecutorDelegate stopWorkflowInstanceExecutorDelegate;
@@ -53,7 +53,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
             "SERIAL_WAIT",
             "WAIT_TO_RUN"})
     void exceptionIfWorkflowInstanceCannotStop_canStop(WorkflowExecutionStatus workflowExecutionStatus) {
-        ProcessInstance workflowInstance = new ProcessInstance();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
         workflowInstance.setState(workflowExecutionStatus);
         assertDoesNotThrow(
@@ -68,7 +68,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
             "SERIAL_WAIT",
             "WAIT_TO_RUN"}, mode = EnumSource.Mode.EXCLUDE)
     void exceptionIfWorkflowInstanceCannotStop_canNotStop(WorkflowExecutionStatus workflowExecutionStatus) {
-        ProcessInstance workflowInstance = new ProcessInstance();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
         workflowInstance.setState(workflowExecutionStatus);
         ServiceException serviceException = assertThrows(ServiceException.class,
@@ -84,7 +84,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
             "SERIAL_WAIT",
             "WAIT_TO_RUN"})
     void ifWorkflowInstanceCanDirectStopInDB_canDirectStopInDB(WorkflowExecutionStatus workflowExecutionStatus) {
-        ProcessInstance workflowInstance = new ProcessInstance();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
         workflowInstance.setState(workflowExecutionStatus);
         Assertions
@@ -96,7 +96,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
             "SERIAL_WAIT",
             "WAIT_TO_RUN"}, mode = EnumSource.Mode.EXCLUDE)
     void ifWorkflowInstanceCanDirectStopInDB_canNotDirectStopInDB(WorkflowExecutionStatus workflowExecutionStatus) {
-        ProcessInstance workflowInstance = new ProcessInstance();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
         workflowInstance.setState(workflowExecutionStatus);
         Assertions.assertFalse(

@@ -17,55 +17,62 @@
 
 package org.apache.dolphinscheduler.api.executor.workflow;
 
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.service.process.TriggerRelationService;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerResponse;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
-import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-public class TriggerWorkflowExecutorDelegate implements IExecutorDelegate<TriggerWorkflowDTO, Void> {
+public class TriggerWorkflowExecutorDelegate implements IExecutorDelegate<TriggerWorkflowDTO, Integer> {
 
     @Autowired
-    private CommandDao commandDao;
-
-    @Autowired
-    private TriggerRelationService triggerRelationService;
+    private RegistryClient registryClient;
 
     @Override
-    public Void execute(TriggerWorkflowDTO triggerWorkflowDTO) {
-        final RunWorkflowCommandParam runWorkflowCommandParam =
-                RunWorkflowCommandParam.builder()
-                        .commandParams(triggerWorkflowDTO.getStartParamList())
-                        .startNodes(triggerWorkflowDTO.getStartNodes())
-                        .timeZone(DateUtils.getTimezone())
-                        .build();
-        final Command command = Command.builder()
-                .commandType(triggerWorkflowDTO.getExecType())
-                .processDefinitionCode(triggerWorkflowDTO.getWorkflowDefinition().getCode())
-                .processDefinitionVersion(triggerWorkflowDTO.getWorkflowDefinition().getVersion())
-                .executorId(triggerWorkflowDTO.getLoginUser().getId())
-                .commandParam(JSONUtils.toJsonString(runWorkflowCommandParam))
-                .taskDependType(triggerWorkflowDTO.getTaskDependType())
+    public Integer execute(final TriggerWorkflowDTO triggerWorkflowDTO) {
+        final Server masterServer = registryClient.getRandomServer(RegistryNodeType.MASTER).orElse(null);
+        if (masterServer == null) {
+            throw new ServiceException("no master server available");
+        }
+        final WorkflowManualTriggerResponse workflowManualTriggerResponse = Clients
+                .withService(IWorkflowControlClient.class)
+                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
+                .manualTriggerWorkflow(transform2WorkflowTriggerRequest(triggerWorkflowDTO));
+        if (!workflowManualTriggerResponse.isSuccess()) {
+            throw new ServiceException("Trigger workflow failed: " + workflowManualTriggerResponse.getMessage());
+        }
+        return workflowManualTriggerResponse.getWorkflowInstanceId();
+
+    }
+
+    private WorkflowManualTriggerRequest transform2WorkflowTriggerRequest(TriggerWorkflowDTO triggerWorkflowDTO) {
+        return WorkflowManualTriggerRequest.builder()
+                .userId(triggerWorkflowDTO.getLoginUser().getId())
+                .workflowDefinitionCode(triggerWorkflowDTO.getWorkflowDefinition().getCode())
+                .workflowDefinitionVersion(triggerWorkflowDTO.getWorkflowDefinition().getVersion())
+                .startNodes(triggerWorkflowDTO.getStartNodes())
                 .failureStrategy(triggerWorkflowDTO.getFailureStrategy())
+                .taskDependType(triggerWorkflowDTO.getTaskDependType())
                 .warningType(triggerWorkflowDTO.getWarningType())
                 .warningGroupId(triggerWorkflowDTO.getWarningGroupId())
-                .startTime(new Date())
-                .processInstancePriority(triggerWorkflowDTO.getWorkflowInstancePriority())
-                .updateTime(new Date())
+                .workflowInstancePriority(triggerWorkflowDTO.getWorkflowInstancePriority())
                 .workerGroup(triggerWorkflowDTO.getWorkerGroup())
                 .tenantCode(triggerWorkflowDTO.getTenantCode())
-                .dryRun(triggerWorkflowDTO.getDryRun().getCode())
-                .testFlag(triggerWorkflowDTO.getTestFlag().getCode())
+                .environmentCode(triggerWorkflowDTO.getEnvironmentCode())
+                .startParamList(triggerWorkflowDTO.getStartParamList())
+                .dryRun(triggerWorkflowDTO.getDryRun())
+                .testFlag(triggerWorkflowDTO.getTestFlag())
                 .build();
-        commandDao.insert(command);
-        return null;
     }
 }

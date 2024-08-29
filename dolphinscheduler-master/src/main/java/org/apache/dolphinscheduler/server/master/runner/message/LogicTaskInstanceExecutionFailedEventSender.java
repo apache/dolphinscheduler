@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.message;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.ITaskExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskExecutionFailedEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -31,7 +31,7 @@ public class LogicTaskInstanceExecutionFailedEventSender
 
     @Override
     public void sendMessage(final TaskExecutionFailedEvent message) {
-        SingletonJdkDynamicRpcClientProxyFactory
+        Clients
                 .withService(ITaskExecutionEventListener.class)
                 .withHost(message.getWorkflowInstanceHost())
                 .onTaskInstanceExecutionFailed(message);

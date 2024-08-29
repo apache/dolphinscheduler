@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.microbench.rpc;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
@@ -56,8 +56,9 @@ public class RpcBenchMarkTest extends AbstractBaseBenchmark {
         springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
         springServerMethodInvokerDiscovery.postProcessAfterInitialization(new IServiceImpl(), "iServiceImpl");
         springServerMethodInvokerDiscovery.start();
-        iService =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient("localhost:12345", IService.class);
+        iService = Clients
+                .withService(IService.class)
+                .withHost("localhost:12345");
     }
 
     @Benchmark

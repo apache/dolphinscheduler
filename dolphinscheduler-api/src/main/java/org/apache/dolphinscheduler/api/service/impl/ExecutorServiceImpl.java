@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_WORKFLOW_ID_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
@@ -35,11 +35,9 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
-import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowRequestTransformer;
@@ -58,30 +56,27 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -113,32 +108,17 @@ import com.google.common.base.Splitter;
 public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorService {
 
     @Autowired
-    private ProjectMapper projectMapper;
-
-    @Autowired
     private ProjectService projectService;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-
-    @Autowired
-    ProcessDefinitionMapper processDefineMapper;
-
-    @Autowired
-    private MonitorService monitorService;
-
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Lazy()
     @Autowired
     private ProcessService processService;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
-
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private CommandService commandService;
@@ -150,7 +130,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
@@ -159,13 +139,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private WorkerGroupService workerGroupService;
 
     @Autowired
-    private TriggerRelationService triggerRelationService;
-
-    @Autowired
     private TenantMapper tenantMapper;
 
     @Autowired
-    private ProcessLineageService processLineageService;
+    private WorkflowLineageService workflowLineageService;
 
     @Autowired
     private TriggerWorkflowRequestTransformer triggerWorkflowRequestTransformer;
@@ -184,80 +161,77 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Override
     @Transactional
-    public Long triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest) {
-        final TriggerWorkflowDTO triggerWorkflowDTO =
-                triggerWorkflowRequestTransformer.transform(workflowTriggerRequest);
+    public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
+        final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
         triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
-        executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
-        return triggerWorkflowDTO.getTriggerCode();
+        return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
     }
 
     @Override
     @Transactional
-    public Long backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
+    public List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
         final BackfillWorkflowDTO backfillWorkflowDTO =
                 backfillWorkflowRequestTransformer.transform(workflowBackFillRequest);
         backfillWorkflowDTOValidator.validate(backfillWorkflowDTO);
-        executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
-        return backfillWorkflowDTO.getTriggerCode();
+        return executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
     }
 
     /**
-     * check whether the process definition can be executed
+     * check whether the workflow definition can be executed
      *
      * @param projectCode       project code
-     * @param processDefinition process definition
+     * @param workflowDefinition workflow definition
      */
     @Override
-    public void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
-                                            long processDefineCode, Integer version) {
-        // check process definition exists
-        if (projectCode != processDefinition.getProjectCode()) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getCode());
+    public void checkWorkflowDefinitionValid(long projectCode, WorkflowDefinition workflowDefinition,
+                                             long workflowDefinitionCode, Integer version) {
+        // check workflow definition exists
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinition.getCode());
         }
-        // check process definition online
-        if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getCode(),
-                    processDefinition.getVersion());
+        // check workflow definition online
+        if (workflowDefinition.getReleaseState() != ReleaseState.ONLINE) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_RELEASE, workflowDefinition.getCode(),
+                    workflowDefinition.getVersion());
         }
-        // check sub process definition online
-        if (!checkSubProcessDefinitionValid(processDefinition)) {
-            throw new ServiceException(Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
+        // check sub workflow definition online
+        if (!checkSubWorkflowDefinitionValid(workflowDefinition)) {
+            throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
         }
     }
 
     /**
-     * check whether the current process has subprocesses and validate all subprocesses
+     * check whether the current workflow has sub workflows and validate all sub workflows
      *
-     * @param processDefinition
+     * @param workflowDefinition
      * @return check result
      */
     @Override
-    public boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition) {
-        // query all subprocesses under the current process
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryDownstreamByProcessDefinitionCode(processDefinition.getCode());
-        if (processTaskRelations.isEmpty()) {
+    public boolean checkSubWorkflowDefinitionValid(WorkflowDefinition workflowDefinition) {
+        // query all sub workflows under the current workflow
+        List<WorkflowTaskRelation> workflowTaskRelations =
+                workflowTaskRelationMapper.queryDownstreamByProcessDefinitionCode(workflowDefinition.getCode());
+        if (workflowTaskRelations.isEmpty()) {
             return true;
         }
         Set<Long> relationCodes =
-                processTaskRelations.stream().map(ProcessTaskRelation::getPostTaskCode).collect(Collectors.toSet());
+                workflowTaskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toSet());
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
 
-        // find out the process definition code
-        Set<Long> processDefinitionCodeSet = new HashSet<>();
+        // find out the workflow definition code
+        Set<Long> workflowDefinitionCodeSet = new HashSet<>();
         taskDefinitions.stream()
                 .filter(task -> TaskTypeUtils.isSubWorkflowTask(task.getTaskType())).forEach(
-                        taskDefinition -> processDefinitionCodeSet.add(Long.valueOf(
+                        taskDefinition -> workflowDefinitionCodeSet.add(Long.valueOf(
                                 JSONUtils.getNodeString(taskDefinition.getTaskParams(),
-                                        CMD_PARAM_SUB_PROCESS_DEFINE_CODE))));
-        if (processDefinitionCodeSet.isEmpty()) {
+                                        CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE))));
+        if (workflowDefinitionCodeSet.isEmpty()) {
             return true;
         }
 
         // check sub releaseState
-        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryByCodes(processDefinitionCodeSet);
-        return processDefinitions.stream()
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryByCodes(workflowDefinitionCodeSet);
+        return workflowDefinitions.stream()
                 .filter(definition -> definition.getReleaseState().equals(ReleaseState.OFFLINE))
                 .collect(Collectors.toSet())
                 .isEmpty();
@@ -282,9 +256,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkNotNull(workflowInstanceId, "workflowInstanceId cannot be null");
         checkNotNull(executeType, "executeType cannot be null");
 
-        ProcessInstance workflowInstance = processInstanceDao
+        WorkflowInstance workflowInstance = workflowInstanceDao
                 .queryOptionalById(workflowInstanceId)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId));
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
         // check user access for project
         projectService.checkProjectAndAuthThrowException(
@@ -330,11 +304,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * do action to execute task in process instance
+     * do action to execute task in workflow instance
      *
      * @param loginUser         login user
      * @param projectCode       project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param startNodeList     start node list
      * @param taskDependType    task depend type
      * @return execute result code
@@ -342,7 +316,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public WorkflowExecuteResponse executeTask(User loginUser,
                                                long projectCode,
-                                               Integer processInstanceId,
+                                               Integer workflowInstanceId,
                                                String startNodeList,
                                                TaskDependType taskDependType) {
 
@@ -352,22 +326,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
 
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+        WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
-        if (!processInstance.getState().isFinished()) {
-            log.error("Can not execute task for process instance which is not finished, processInstanceId:{}.",
-                    processInstanceId);
+        if (!workflowInstance.getState().isFinished()) {
+            log.error("Can not execute task for workflow instance which is not finished, workflowInstanceId:{}.",
+                    workflowInstanceId);
             putMsg(response, Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED);
             return response;
         }
 
-        ProcessDefinition processDefinition =
-                processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+        WorkflowDefinition workflowDefinition =
+                processService.findProcessDefinition(workflowInstance.getProcessDefinitionCode(),
+                        workflowInstance.getProcessDefinitionVersion());
+        workflowDefinition.setReleaseState(ReleaseState.ONLINE);
+        this.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowInstance.getProcessDefinitionCode(),
+                workflowInstance.getProcessDefinitionVersion());
 
         // get the startParams user specified at the first starting while repeat running is needed
 
@@ -387,28 +361,28 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // To add startParams only when repeat running is needed
         Map<String, Object> cmdParam = new HashMap<>();
-        cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstanceId);
+        cmdParam.put(CMD_PARAM_RECOVER_WORKFLOW_ID_STRING, workflowInstanceId);
         // Add StartNodeList
         cmdParam.put(CMD_PARAM_START_NODES, startNodeList);
 
         Command command = new Command();
         command.setCommandType(CommandType.EXECUTE_TASK);
-        command.setProcessDefinitionCode(processDefinition.getCode());
+        command.setProcessDefinitionCode(workflowDefinition.getCode());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
-        command.setProcessDefinitionVersion(processDefinition.getVersion());
-        command.setProcessInstanceId(processInstanceId);
-        command.setTestFlag(processInstance.getTestFlag());
+        command.setProcessDefinitionVersion(workflowDefinition.getVersion());
+        command.setProcessInstanceId(workflowInstanceId);
+        command.setTestFlag(workflowInstance.getTestFlag());
 
         // Add taskDependType
         command.setTaskDependType(taskDependType);
 
         if (!commandService.verifyIsNeedCreateCommand(command)) {
             log.warn(
-                    "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
-                    processDefinition.getCode(), processDefinition.getVersion(), processInstanceId);
-            putMsg(response, Status.PROCESS_INSTANCE_EXECUTING_COMMAND,
-                    String.valueOf(processDefinition.getCode()));
+                    "workflow instance is executing the command, workflowDefinitionCode:{}, workflowDefinitionVersion:{}, workflowInstanceId:{}.",
+                    workflowDefinition.getCode(), workflowDefinition.getVersion(), workflowInstanceId);
+            putMsg(response, Status.WORKFLOW_INSTANCE_EXECUTING_COMMAND,
+                    String.valueOf(workflowDefinition.getCode()));
             return response;
         }
 
@@ -416,17 +390,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         int create = commandService.createCommand(command);
 
         if (create > 0) {
-            log.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
+            log.info("Create {} command complete, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
-                    processDefinition.getVersion());
+                    workflowDefinition.getVersion());
             putMsg(response, Status.SUCCESS);
         } else {
             log.error(
-                    "Execute process instance failed because create {} command error, processDefinitionCode:{}, processDefinitionVersion:{}， processInstanceId:{}.",
+                    "Execute workflow instance failed because create {} command error, workflowDefinitionCode:{}, workflowDefinitionVersion:{}， workflowInstanceId:{}.",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
-                    processDefinition.getVersion(),
-                    processInstanceId);
-            putMsg(response, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
+                    workflowDefinition.getVersion(),
+                    workflowInstanceId);
+            putMsg(response, Status.EXECUTE_WORKFLOW_INSTANCE_ERROR);
         }
 
         return response;
@@ -436,10 +410,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public Map<String, Object> forceStartTaskInstance(User loginUser, int queueId) {
         Map<String, Object> result = new HashMap<>();
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
-        // check process instance exist
-        processInstanceDao.queryOptionalById(taskGroupQueue.getProcessId())
+        // check workflow instance exist
+        workflowInstanceDao.queryOptionalById(taskGroupQueue.getProcessId())
                 .orElseThrow(
-                        () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId()));
+                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId()));
 
         if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
             throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);
@@ -467,20 +441,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         int createCount = commandService.createCommand(command);
 
         if (createCount > 0) {
-            log.info("Create {} command complete, processDefinitionCode:{}",
+            log.info("Create {} command complete, workflowDefinitionCode:{}",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode());
         } else {
-            log.error("Create {} command error, processDefinitionCode:{}",
+            log.error("Create {} command error, workflowDefinitionCode:{}",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode());
         }
 
         if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
             log.info(
-                    "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, processDefinitionCode:{}.",
+                    "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, workflowDefinitionCode:{}.",
                     command.getProcessDefinitionCode());
         } else {
             log.info(
-                    "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, processDefinitionCode:{}.",
+                    "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, workflowDefinitionCode:{}.",
                     command.getProcessDefinitionCode());
             createComplementDependentCommand(schedules, command, allLevelDependent);
         }
@@ -495,7 +469,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                               boolean allLevelDependent,
                                               ExecutionOrder executionOrder) throws CronParseException {
         int createCount = 0;
-        int dependentProcessDefinitionCreateCount = 0;
+        int dependentWorkflowDefinitionCreateCount = 0;
         runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
         Map<String, String> scheduleParam = JSONUtils.toMap(scheduleTimeParam);
@@ -543,14 +517,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         switch (runMode) {
             case RUN_MODE_SERIAL: {
-                log.info("RunMode of {} command is serial run, processDefinitionCode:{}.",
+                log.info("RunMode of {} command is serial run, workflowDefinitionCode:{}.",
                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
                 createCount = createComplementCommand(triggerCode, command, cmdParam, listDate, schedules,
                         complementDependentMode, allLevelDependent);
                 break;
             }
             case RUN_MODE_PARALLEL: {
-                log.info("RunMode of {} command is parallel run, processDefinitionCode:{}.",
+                log.info("RunMode of {} command is parallel run, workflowDefinitionCode:{}.",
                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
 
                 int queueNum = 0;
@@ -580,7 +554,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         log.info("Create complement command count:{}, Create dependent complement command count:{}", createCount,
-                dependentProcessDefinitionCreateCount);
+                dependentWorkflowDefinitionCreateCount);
         return createCount;
     }
 
@@ -588,108 +562,109 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * create complement dependent command
      */
     public int createComplementDependentCommand(List<Schedule> schedules, Command command, boolean allLevelDependent) {
-        int dependentProcessDefinitionCreateCount = 0;
+        int dependentWorkflowDefinitionCreateCount = 0;
         Command dependentCommand;
 
         try {
             dependentCommand = (Command) BeanUtils.cloneBean(command);
         } catch (Exception e) {
             log.error("Copy dependent command error.", e);
-            return dependentProcessDefinitionCreateCount;
+            return dependentWorkflowDefinitionCreateCount;
         }
 
-        List<DependentProcessDefinition> dependentProcessDefinitionList =
+        List<DependentWorkflowDefinition> dependentWorkflowDefinitionList =
                 getComplementDependentDefinitionList(dependentCommand.getProcessDefinitionCode(),
                         CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup(),
                         allLevelDependent);
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
-        for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
+        for (DependentWorkflowDefinition dependentWorkflowDefinition : dependentWorkflowDefinitionList) {
             // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
             // and causing duplicate when clone it.
             dependentCommand.setId(null);
-            dependentCommand.setProcessDefinitionCode(dependentProcessDefinition.getProcessDefinitionCode());
-            dependentCommand.setProcessDefinitionVersion(dependentProcessDefinition.getProcessDefinitionVersion());
-            dependentCommand.setWorkerGroup(dependentProcessDefinition.getWorkerGroup());
+            dependentCommand.setProcessDefinitionCode(dependentWorkflowDefinition.getProcessDefinitionCode());
+            dependentCommand.setProcessDefinitionVersion(dependentWorkflowDefinition.getProcessDefinitionVersion());
+            dependentCommand.setWorkerGroup(dependentWorkflowDefinition.getWorkerGroup());
             Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
-            cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentProcessDefinition.getTaskDefinitionCode()));
+            cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentWorkflowDefinition.getTaskDefinitionCode()));
             dependentCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
             log.info("Creating complement dependent command, commandInfo:{}.", command);
-            dependentProcessDefinitionCreateCount += commandService.createCommand(dependentCommand);
+            dependentWorkflowDefinitionCreateCount += commandService.createCommand(dependentCommand);
         }
 
-        return dependentProcessDefinitionCreateCount;
+        return dependentWorkflowDefinitionCreateCount;
     }
 
     /**
-     * get complement dependent online process definition list
+     * get complement dependent online workflow definition list
      */
-    private List<DependentProcessDefinition> getComplementDependentDefinitionList(long processDefinitionCode,
-                                                                                  CycleEnum processDefinitionCycle,
-                                                                                  String workerGroup,
-                                                                                  boolean allLevelDependent) {
-        List<DependentProcessDefinition> dependentProcessDefinitionList =
-                checkDependentProcessDefinitionValid(
-                        processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode),
-                        processDefinitionCycle, workerGroup,
-                        processDefinitionCode);
+    private List<DependentWorkflowDefinition> getComplementDependentDefinitionList(long workflowDefinitionCode,
+                                                                                   CycleEnum workflowDefinitionCycle,
+                                                                                   String workerGroup,
+                                                                                   boolean allLevelDependent) {
+        List<DependentWorkflowDefinition> dependentWorkflowDefinitionList =
+                checkDependentWorkflowDefinitionValid(
+                        workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowDefinitionCode),
+                        workflowDefinitionCycle, workerGroup,
+                        workflowDefinitionCode);
 
-        if (dependentProcessDefinitionList.isEmpty()) {
-            return dependentProcessDefinitionList;
+        if (dependentWorkflowDefinitionList.isEmpty()) {
+            return dependentWorkflowDefinitionList;
         }
 
         if (allLevelDependent) {
-            List<DependentProcessDefinition> childList = new ArrayList<>(dependentProcessDefinitionList);
+            List<DependentWorkflowDefinition> childList = new ArrayList<>(dependentWorkflowDefinitionList);
             while (true) {
-                List<DependentProcessDefinition> childDependentList = childList
+                List<DependentWorkflowDefinition> childDependentList = childList
                         .stream()
-                        .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
-                                processLineageService.queryDownstreamDependentProcessDefinitions(
-                                        dependentProcessDefinition.getProcessDefinitionCode()),
-                                processDefinitionCycle,
+                        .flatMap(dependentWorkflowDefinition -> checkDependentWorkflowDefinitionValid(
+                                workflowLineageService.queryDownstreamDependentWorkflowDefinitions(
+                                        dependentWorkflowDefinition.getProcessDefinitionCode()),
+                                workflowDefinitionCycle,
                                 workerGroup,
-                                dependentProcessDefinition.getProcessDefinitionCode()).stream())
+                                dependentWorkflowDefinition.getProcessDefinitionCode()).stream())
                         .collect(Collectors.toList());
                 if (childDependentList.isEmpty()) {
                     break;
                 }
-                dependentProcessDefinitionList.addAll(childDependentList);
+                dependentWorkflowDefinitionList.addAll(childDependentList);
                 childList = new ArrayList<>(childDependentList);
             }
         }
-        return dependentProcessDefinitionList;
+        return dependentWorkflowDefinitionList;
     }
 
     /**
      * Check whether the dependency cycle of the dependent node is consistent with the schedule cycle of
-     * the dependent process definition and if there is no worker group in the schedule, use the complement selection's
+     * the dependent workflow definition and if there is no worker group in the schedule, use the complement selection's
      * worker group
      */
-    private List<DependentProcessDefinition> checkDependentProcessDefinitionValid(
-                                                                                  List<DependentProcessDefinition> dependentProcessDefinitionList,
-                                                                                  CycleEnum processDefinitionCycle,
-                                                                                  String workerGroup,
-                                                                                  long upstreamProcessDefinitionCode) {
-        List<DependentProcessDefinition> validDependentProcessDefinitionList = new ArrayList<>();
+    private List<DependentWorkflowDefinition> checkDependentWorkflowDefinitionValid(
+                                                                                    List<DependentWorkflowDefinition> dependentWorkflowDefinitionList,
+                                                                                    CycleEnum workflowDefinitionCycle,
+                                                                                    String workerGroup,
+                                                                                    long upstreamWorkflowDefinitionCode) {
+        List<DependentWorkflowDefinition> validDependentWorkflowDefinitionList = new ArrayList<>();
 
-        List<Long> processDefinitionCodeList =
-                dependentProcessDefinitionList.stream().map(DependentProcessDefinition::getProcessDefinitionCode)
+        List<Long> workflowDefinitionCodeList =
+                dependentWorkflowDefinitionList.stream().map(DependentWorkflowDefinition::getProcessDefinitionCode)
                         .collect(Collectors.toList());
 
         Map<Long, String> processDefinitionWorkerGroupMap =
-                workerGroupService.queryWorkerGroupByProcessDefinitionCodes(processDefinitionCodeList);
+                workerGroupService.queryWorkerGroupByWorkflowDefinitionCodes(workflowDefinitionCodeList);
 
-        for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
-            if (dependentProcessDefinition.getDependentCycle(upstreamProcessDefinitionCode) == processDefinitionCycle) {
+        for (DependentWorkflowDefinition dependentWorkflowDefinition : dependentWorkflowDefinitionList) {
+            if (dependentWorkflowDefinition
+                    .getDependentCycle(upstreamWorkflowDefinitionCode) == workflowDefinitionCycle) {
                 if (processDefinitionWorkerGroupMap
-                        .get(dependentProcessDefinition.getProcessDefinitionCode()) == null) {
-                    dependentProcessDefinition.setWorkerGroup(workerGroup);
+                        .get(dependentWorkflowDefinition.getProcessDefinitionCode()) == null) {
+                    dependentWorkflowDefinition.setWorkerGroup(workerGroup);
                 }
 
-                validDependentProcessDefinitionList.add(dependentProcessDefinition);
+                validDependentWorkflowDefinitionList.add(dependentWorkflowDefinition);
             }
         }
 
-        return validDependentProcessDefinitionList;
+        return validDependentWorkflowDefinitionList;
     }
 
     /**

@@ -26,13 +26,14 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBusCoordinator;
+import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnableFactory;
@@ -154,7 +155,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     }
 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final ProcessInstance workflowInstance =
+        final WorkflowInstance workflowInstance =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
             log.info("The workflow {} state is: {} will not be trigger now",
@@ -177,6 +178,12 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     }
 
     private Void bootstrapError(Command command, Throwable throwable) {
+        if (throwable instanceof CommandDuplicateHandleException) {
+            log.warn("Handle command failed, the command: {} has been handled by other master",
+                    command,
+                    throwable);
+            return null;
+        }
         log.error("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
         commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
         return null;

@@ -2107,22 +2107,6 @@ CREATE TABLE `t_ds_fav_task`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
 
--- ----------------------------
--- Table structure for t_ds_trigger_relation
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_trigger_relation`;
-CREATE TABLE `t_ds_trigger_relation` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',
-    `trigger_code` bigint(20) NOT NULL,
-    `job_id` bigint(20) NOT NULL,
-    `create_time` datetime DEFAULT NULL,
-    `update_time` datetime DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `t_ds_trigger_relation_trigger_code_IDX` (`trigger_code`),
-    UNIQUE KEY `t_ds_trigger_relation_UN` (`trigger_type`,`job_id`,`trigger_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
 
 DROP TABLE IF EXISTS `t_ds_relation_sub_workflow`;
 CREATE TABLE `t_ds_relation_sub_workflow` (
@@ -2142,19 +2126,19 @@ CREATE TABLE `t_ds_relation_sub_workflow` (
 DROP TABLE IF EXISTS `t_ds_process_task_lineage`;
 CREATE TABLE `t_ds_process_task_lineage` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `process_definition_code` bigint NOT NULL DEFAULT 0,
-    `process_definition_version` int NOT NULL DEFAULT 0,
+    `workflow_definition_code` bigint NOT NULL DEFAULT 0,
+    `workflow_definition_version` int NOT NULL DEFAULT 0,
     `task_definition_code` bigint NOT NULL DEFAULT 0,
     `task_definition_version` int NOT NULL DEFAULT 0,
     `dept_project_code` bigint NOT NULL DEFAULT 0 COMMENT 'dependent project code',
-    `dept_process_definition_code` bigint NOT NULL DEFAULT 0 COMMENT 'dependent process definition code',
+    `dept_workflow_definition_code` bigint NOT NULL DEFAULT 0 COMMENT 'dependent workflow definition code',
     `dept_task_definition_code` bigint NOT NULL DEFAULT 0 COMMENT 'dependent task definition code',
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
     PRIMARY KEY (`id`),
-    KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`),
+    KEY `idx_process_code_version` (`workflow_definition_code`,`workflow_definition_version`),
     KEY `idx_task_code_version` (`task_definition_code`,`task_definition_version`),
-    KEY `idx_dept_code` (`dept_project_code`,`dept_process_definition_code`,`dept_task_definition_code`)
+    KEY `idx_dept_code` (`dept_project_code`,`dept_workflow_definition_code`,`dept_task_definition_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 DROP TABLE IF EXISTS `t_ds_jdbc_registry_data`;

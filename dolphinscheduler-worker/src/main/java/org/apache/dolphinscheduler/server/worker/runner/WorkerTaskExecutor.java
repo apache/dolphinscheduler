@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
@@ -265,9 +265,10 @@ public abstract class WorkerTaskExecutor implements Runnable {
                 task.getExitStatus() == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode()
                         : WarningType.FAILURE.getCode());
         try {
-            IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory
-                    .getProxyClient(alertServerAddress.getAddress(), IAlertOperator.class);
-            AlertSendResponse alertSendResponse = alertOperator.sendAlert(alertSendRequest);
+            final AlertSendResponse alertSendResponse = Clients
+                    .withService(IAlertOperator.class)
+                    .withHost(alertServerAddress.getAddress())
+                    .sendAlert(alertSendRequest);
             log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
         } catch (Exception e) {
             log.error("Send alert: {} to: {} failed", alertSendRequest, alertServerAddress, e);
