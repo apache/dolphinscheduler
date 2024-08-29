@@ -343,7 +343,7 @@ public class PythonGateway {
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
-        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(workflowCode);
+        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(workflowCode);
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {

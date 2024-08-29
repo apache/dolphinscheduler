@@ -149,13 +149,13 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // executorServiceTest
         // error process definition already exists schedule
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, null);
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+        Mockito.when(scheduleMapper.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
         Assertions.assertEquals(Status.SCHEDULE_ALREADY_EXISTS.getCode(), ((ServiceException) exception).getCode());
 
         // error environment do not exists
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(scheduleMapper.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
         Mockito.when(environmentMapper.queryByEnvironmentCode(environmentCode)).thenReturn(null);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
@@ -206,7 +206,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleMapper.insert(isA(Schedule.class))).thenReturn(1);
         Schedule scheduleCreated = schedulerService.createSchedulesV2(user, scheduleCreateRequest);
         Assertions.assertEquals(scheduleCreateRequest.getProcessDefinitionCode(),
-                scheduleCreated.getProcessDefinitionCode());
+                scheduleCreated.getWorkflowDefinitionCode());
         Assertions.assertEquals(scheduleCreateRequest.getEnvironmentCode(), scheduleCreated.getEnvironmentCode());
         Assertions.assertEquals(stringToDate(scheduleCreateRequest.getStartTime()), scheduleCreated.getStartTime());
         Assertions.assertEquals(stringToDate(scheduleCreateRequest.getEndTime()), scheduleCreated.getEndTime());
@@ -413,7 +413,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private Schedule getSchedule() {
         Schedule schedule = new Schedule();
         schedule.setId(scheduleId);
-        schedule.setProcessDefinitionCode(processDefinitionCode);
+        schedule.setWorkflowDefinitionCode(processDefinitionCode);
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUserId(userId);
         return schedule;

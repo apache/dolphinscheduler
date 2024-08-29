@@ -422,8 +422,8 @@ public class WorkflowInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         when(processService.findWorkflowInstanceDetailById(workflowInstance.getId()))
                 .thenReturn(Optional.of(workflowInstance));
-        when(processService.findProcessDefinition(workflowInstance.getProcessDefinitionCode(),
-                workflowInstance.getProcessDefinitionVersion())).thenReturn(workflowDefinition);
+        when(processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion())).thenReturn(workflowDefinition);
         Map<String, Object> successRes = processInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
@@ -437,8 +437,8 @@ public class WorkflowInstanceServiceTest {
                 processInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
 
-        when(processService.findProcessDefinition(workflowInstance.getProcessDefinitionCode(),
-                workflowInstance.getProcessDefinitionVersion())).thenReturn(null);;
+        when(processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion())).thenReturn(null);;
         workerExistRes = processInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST, workerExistRes.get(Constants.STATUS));
     }
@@ -510,7 +510,7 @@ public class WorkflowInstanceServiceTest {
         // task not sub process
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setTaskType("HTTP");
-        taskInstance.setProcessInstanceId(1);
+        taskInstance.setWorkflowInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -530,10 +530,10 @@ public class WorkflowInstanceServiceTest {
         // sub process not exist
         TaskInstance subTask = getTaskInstance();
         subTask.setTaskType("SUB_PROCESS");
-        subTask.setProcessInstanceId(1);
+        subTask.setWorkflowInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(taskInstanceDao.queryById(subTask.getId())).thenReturn(subTask);
-        when(processService.findSubWorkflowInstance(subTask.getProcessInstanceId(), subTask.getId())).thenReturn(null);
+        when(processService.findSubWorkflowInstance(subTask.getWorkflowInstanceId(), subTask.getId())).thenReturn(null);
         Map<String, Object> subprocessNotExistRes =
                 processInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, subprocessNotExistRes.get(Constants.STATUS));
@@ -541,7 +541,7 @@ public class WorkflowInstanceServiceTest {
         // sub process exist
         WorkflowInstance workflowInstance = getProcessInstance();
         putMsg(result, Status.SUCCESS, projectCode);
-        when(processService.findSubWorkflowInstance(taskInstance.getProcessInstanceId(), taskInstance.getId()))
+        when(processService.findSubWorkflowInstance(taskInstance.getWorkflowInstanceId(), taskInstance.getId()))
                 .thenReturn(workflowInstance);
         Map<String, Object> subprocessExistRes =
                 processInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
@@ -591,8 +591,8 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
         workflowInstance.setTimeout(3000);
         workflowInstance.setCommandType(CommandType.STOP);
-        workflowInstance.setProcessDefinitionCode(46L);
-        workflowInstance.setProcessDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
         WorkflowDefinition workflowDefinition = getProcessDefinition();
         workflowDefinition.setId(1);
         workflowDefinition.setUserId(1);
@@ -659,7 +659,7 @@ public class WorkflowInstanceServiceTest {
 
         // not sub process
         WorkflowInstance workflowInstance = getProcessInstance();
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.ofNullable(workflowInstance));
         Map<String, Object> notSubProcessRes =
@@ -668,7 +668,7 @@ public class WorkflowInstanceServiceTest {
                 notSubProcessRes.get(Constants.STATUS));
 
         // sub process
-        workflowInstance.setIsSubProcess(Flag.YES);
+        workflowInstance.setIsSubWorkflow(Flag.YES);
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findParentWorkflowInstance(1)).thenReturn(null);
         Map<String, Object> subProcessNullRes =
@@ -699,7 +699,7 @@ public class WorkflowInstanceServiceTest {
 
         // not sub process
         WorkflowInstance workflowInstance = getProcessInstance();
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.ofNullable(workflowInstance));
@@ -712,8 +712,8 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
         workflowInstance.setTimeout(3000);
         workflowInstance.setCommandType(CommandType.STOP);
-        workflowInstance.setProcessDefinitionCode(46L);
-        workflowInstance.setProcessDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
         WorkflowDefinition workflowDefinition = getProcessDefinition();
         workflowDefinition.setId(1);
         workflowDefinition.setUserId(1);
@@ -757,8 +757,8 @@ public class WorkflowInstanceServiceTest {
         taskInstance.setStartTime(new Date());
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                workflowInstance.getProcessDefinitionCode(),
-                workflowInstance.getProcessDefinitionVersion())).thenReturn(new WorkflowDefinitionLog());
+                workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion())).thenReturn(new WorkflowDefinitionLog());
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
         DAG<Long, TaskNode, TaskNodeRelation> graph = new DAG<>();
         for (long i = 1; i <= 7; ++i) {
@@ -813,8 +813,8 @@ public class WorkflowInstanceServiceTest {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(1);
         workflowInstance.setName("test_process_instance");
-        workflowInstance.setProcessDefinitionCode(46L);
-        workflowInstance.setProcessDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
         workflowInstance.setStartTime(new Date());
         workflowInstance.setEndTime(new Date());
         return workflowInstance;

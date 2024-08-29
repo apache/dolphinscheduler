@@ -87,7 +87,7 @@ public class ScheduleCreateRequest {
     public Schedule convert2Schedule() {
         Schedule schedule = new Schedule();
 
-        schedule.setProcessDefinitionCode(this.processDefinitionCode);
+        schedule.setWorkflowDefinitionCode(this.processDefinitionCode);
         schedule.setCrontab(this.crontab);
         schedule.setStartTime(stringToDate(this.startTime));
         schedule.setEndTime(stringToDate(this.endTime));
@@ -111,7 +111,7 @@ public class ScheduleCreateRequest {
 
         Priority newPriority =
                 this.processInstancePriority == null ? Priority.MEDIUM : Priority.valueOf(this.processInstancePriority);
-        schedule.setProcessInstancePriority(newPriority);
+        schedule.setWorkflowInstancePriority(newPriority);
 
         Date date = new Date();
         schedule.setCreateTime(date);

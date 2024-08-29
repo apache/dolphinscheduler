@@ -179,17 +179,17 @@ public class ProcessServiceTest {
     public void testFormatTaskAppId() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(333);
-        taskInstance.setProcessInstanceId(222);
-        when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(null);
+        taskInstance.setWorkflowInstanceId(222);
+        when(processService.findProcessInstanceById(taskInstance.getWorkflowInstanceId())).thenReturn(null);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setId(111);
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(222);
-        workflowInstance.setProcessDefinitionVersion(1);
-        workflowInstance.setProcessDefinitionCode(1L);
-        when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId()))
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(1L);
+        when(processService.findProcessInstanceById(taskInstance.getWorkflowInstanceId()))
                 .thenReturn(workflowInstance);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
     }
@@ -213,7 +213,7 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
-        when(workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode,
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(parentProcessDefineCode,
                 parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
@@ -411,9 +411,9 @@ public class ProcessServiceTest {
 
         WorkflowTaskRelationLog processTaskRelation = new WorkflowTaskRelationLog();
         processTaskRelation.setName("def 1");
-        processTaskRelation.setProcessDefinitionVersion(1);
+        processTaskRelation.setWorkflowDefinitionVersion(1);
         processTaskRelation.setProjectCode(1L);
-        processTaskRelation.setProcessDefinitionCode(1L);
+        processTaskRelation.setWorkflowDefinitionCode(1L);
         processTaskRelation.setPostTaskCode(3L);
         processTaskRelation.setPreTaskCode(2L);
         processTaskRelation.setUpdateTime(new Date());
@@ -447,7 +447,7 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(td2);
 
         when(taskDefinitionLogDao.queryTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
-        when(workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(list);
 
         DAG<Long, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
@@ -458,7 +458,7 @@ public class ProcessServiceTest {
     @Test
     public void testChangeOutParam() {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setProcessInstanceId(62);
+        taskInstance.setWorkflowInstanceId(62);
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(62);
         taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");

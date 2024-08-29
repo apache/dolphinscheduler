@@ -55,7 +55,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         Date start = startTime;
         Date end = endTime;
-        workflowInstance.setProcessDefinitionCode(1L);
+        workflowInstance.setWorkflowDefinitionCode(1L);
         workflowInstance.setStartTime(start);
         workflowInstance.setEndTime(end);
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
@@ -74,7 +74,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         Date start = new Date(2019 - 1900, 1 - 1, 1, 0, 10, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 1, 1, 0, 0);
-        workflowInstance.setProcessDefinitionCode(1L);
+        workflowInstance.setWorkflowDefinitionCode(1L);
         workflowInstance.setProjectCode(1L);
         workflowInstance.setStartTime(start);
         workflowInstance.setEndTime(end);
@@ -172,9 +172,9 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
 
         WorkflowInstance workflowInstance = insertOne();
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
-        workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.setStartTime(new Date());
 
         workflowInstanceMapper.updateById(workflowInstance);
@@ -184,7 +184,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         IPage<WorkflowInstance> processInstanceIPage = workflowInstanceMapper.queryProcessInstanceListPaging(
                 page,
                 workflowDefinition.getProjectCode(),
-                workflowInstance.getProcessDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getName(),
                 "",
                 stateArray,
@@ -244,11 +244,11 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance1 = insertOne();
 
         List<WorkflowInstance> workflowInstances =
-                workflowInstanceMapper.queryByProcessDefineCode(workflowInstance.getProcessDefinitionCode(), 1);
+                workflowInstanceMapper.queryByProcessDefineCode(workflowInstance.getWorkflowDefinitionCode(), 1);
         Assertions.assertEquals(1, workflowInstances.size());
 
         workflowInstances =
-                workflowInstanceMapper.queryByProcessDefineCode(workflowInstance.getProcessDefinitionCode(), 2);
+                workflowInstanceMapper.queryByProcessDefineCode(workflowInstance.getWorkflowDefinitionCode(), 2);
         Assertions.assertEquals(2, workflowInstances.size());
 
         workflowInstanceMapper.deleteById(workflowInstance.getId());
@@ -265,7 +265,7 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         workflowInstanceMapper.updateById(workflowInstance);
 
         WorkflowInstance workflowInstance1 =
-                workflowInstanceMapper.queryLastSchedulerProcess(workflowInstance.getProcessDefinitionCode(), 0L, null,
+                workflowInstanceMapper.queryLastSchedulerProcess(workflowInstance.getWorkflowDefinitionCode(), 0L, null,
                         null,
                         workflowInstance.getTestFlag());
         Assertions.assertNotEquals(null, workflowInstance1);
@@ -283,14 +283,14 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
         WorkflowInstance workflowInstance1 =
-                workflowInstanceMapper.queryLastManualProcess(workflowInstance.getProcessDefinitionCode(), null, start,
+                workflowInstanceMapper.queryLastManualProcess(workflowInstance.getWorkflowDefinitionCode(), null, start,
                         end,
                         workflowInstance.getTestFlag());
         Assertions.assertEquals(workflowInstance1.getId(), workflowInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
         workflowInstance1 =
-                workflowInstanceMapper.queryLastManualProcess(workflowInstance.getProcessDefinitionCode(), null, start,
+                workflowInstanceMapper.queryLastManualProcess(workflowInstance.getWorkflowDefinitionCode(), null, start,
                         end,
                         workflowInstance.getTestFlag());
         Assertions.assertNull(workflowInstance1);

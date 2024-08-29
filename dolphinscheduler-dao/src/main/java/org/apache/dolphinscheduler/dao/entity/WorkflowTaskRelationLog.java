@@ -19,22 +19,16 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * process task relation log
- */
-@TableName("t_ds_process_task_relation_log")
+@Data
+@TableName("t_ds_workflow_task_relation_log")
 public class WorkflowTaskRelationLog extends WorkflowTaskRelation {
 
-    /**
-     * operator user id
-     */
     private int operator;
 
-    /**
-     * operate time
-     */
     private Date operateTime;
 
     public WorkflowTaskRelationLog() {
@@ -44,8 +38,8 @@ public class WorkflowTaskRelationLog extends WorkflowTaskRelation {
     public WorkflowTaskRelationLog(WorkflowTaskRelation workflowTaskRelation) {
         super();
         this.setName(workflowTaskRelation.getName());
-        this.setProcessDefinitionCode(workflowTaskRelation.getProcessDefinitionCode());
-        this.setProcessDefinitionVersion(workflowTaskRelation.getProcessDefinitionVersion());
+        this.setWorkflowDefinitionCode(workflowTaskRelation.getWorkflowDefinitionCode());
+        this.setWorkflowDefinitionVersion(workflowTaskRelation.getWorkflowDefinitionVersion());
         this.setProjectCode(workflowTaskRelation.getProjectCode());
         this.setPreTaskCode(workflowTaskRelation.getPreTaskCode());
         this.setPreTaskVersion(workflowTaskRelation.getPreTaskVersion());
@@ -55,22 +49,6 @@ public class WorkflowTaskRelationLog extends WorkflowTaskRelation {
         this.setConditionParams(workflowTaskRelation.getConditionParams());
         this.setCreateTime(workflowTaskRelation.getCreateTime());
         this.setUpdateTime(workflowTaskRelation.getUpdateTime());
-    }
-
-    public int getOperator() {
-        return operator;
-    }
-
-    public void setOperator(int operator) {
-        this.operator = operator;
-    }
-
-    public Date getOperateTime() {
-        return operateTime;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
     }
 
     @Override

@@ -103,8 +103,8 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
                 new ArrayList<>(JSONUtils.toList(workflowInstance.getVarPool(), Property.class));
 
         WorkflowDefinitionLog processDefinition = workflowDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
-                        workflowInstance.getProcessDefinitionVersion());
+                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
         List<Property> globalParamList = JSONUtils.toList(processDefinition.getGlobalParams(), Property.class);
 
         Set<String> ouputParamSet = outputParamList.stream().map(Property::getProp).collect(Collectors.toSet());

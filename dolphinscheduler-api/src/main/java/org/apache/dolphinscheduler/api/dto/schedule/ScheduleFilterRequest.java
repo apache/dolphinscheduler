@@ -51,7 +51,7 @@ public class ScheduleFilterRequest extends PageQueryDto {
             schedule.setProjectName(this.projectName);
         }
         if (this.processDefinitionName != null) {
-            schedule.setProcessDefinitionName(this.processDefinitionName);
+            schedule.setWorkflowDefinitionName(this.processDefinitionName);
         }
         if (this.releaseState != null) {
             schedule.setReleaseState(ReleaseState.valueOf(this.releaseState));

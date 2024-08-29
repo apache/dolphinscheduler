@@ -38,10 +38,10 @@ public class LogicFakeTaskPluginFactory implements ILogicTaskPluginFactory<Logic
     @Override
     public LogicFakeTask createLogicTask(final TaskExecutionContext taskExecutionContext) {
         final IWorkflowExecutionRunnable workflowExecutionRunnable =
-                IWorkflowRepository.get(taskExecutionContext.getProcessInstanceId());
+                IWorkflowRepository.get(taskExecutionContext.getWorkflowInstanceId());
         if (workflowExecutionRunnable == null) {
             throw new IllegalStateException(
-                    "Cannot find the WorkflowExecuteRunnable: " + taskExecutionContext.getProcessInstanceId());
+                    "Cannot find the WorkflowExecuteRunnable: " + taskExecutionContext.getWorkflowInstanceId());
         }
         return new LogicFakeTask(workflowExecutionRunnable, taskExecutionContext);
     }

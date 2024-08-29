@@ -613,7 +613,7 @@ public class WorkflowDefinitionController extends BaseController {
         return returnDataList(result);
     }
 
-    @Operation(summary = "deleteByCode", description = "DELETE_WORKFLOW_DEFINITION_BY_ID_NOTES")
+    @Operation(summary = "deleteByWorkflowDefinitionCode", description = "DELETE_WORKFLOW_DEFINITION_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "code", description = "WORKFLOW_DEFINITION_CODE", schema = @Schema(implementation = int.class, example = "100"))
     })

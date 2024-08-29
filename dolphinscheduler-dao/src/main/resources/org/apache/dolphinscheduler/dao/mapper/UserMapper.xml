@@ -151,8 +151,8 @@
             u.user_name as modifier_name,
             u2.id as creator_id,
             u2.user_name as creator_name
-        from t_ds_process_definition_log dl
-        inner join t_ds_process_definition pd
+        from t_ds_workflow_definition_log dl
+        inner join t_ds_workflow_definition pd
         on pd.code = dl.code
         and pd.version = dl.version
         inner join t_ds_user u

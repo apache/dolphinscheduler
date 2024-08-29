@@ -15,8 +15,8 @@
  * limitations under the License.
 */
 
-DROP TABLE IF EXISTS `t_ds_process_task_lineage`;
-CREATE TABLE `t_ds_process_task_lineage` (
+DROP TABLE IF EXISTS `t_ds_workflow_task_lineage`;
+CREATE TABLE `t_ds_workflow_task_lineage` (
      `id` int NOT NULL AUTO_INCREMENT,
      `workflow_definition_code` bigint NOT NULL DEFAULT 0,
      `workflow_definition_version` int NOT NULL DEFAULT 0,
@@ -28,7 +28,7 @@ CREATE TABLE `t_ds_process_task_lineage` (
      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
      `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
      PRIMARY KEY (`id`),
-     KEY `idx_process_code_version` (`workflow_definition_code`,`workflow_definition_version`),
+     KEY `idx_workflow_code_version` (`workflow_definition_code`,`workflow_definition_version`),
      KEY `idx_task_code_version` (`task_definition_code`,`task_definition_version`),
      KEY `idx_dept_code` (`dept_project_code`,`dept_workflow_definition_code`,`dept_task_definition_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -126,3 +126,49 @@ CALL drop_column_t_ds_alert_plugin_instance;
 DROP PROCEDURE drop_column_t_ds_alert_plugin_instance;
 
 DROP TABLE IF EXISTS `t_ds_trigger_relation`;
+
+-- Rename tables and fields from process to workflow
+ALTER TABLE t_ds_alert change process_definition_code workflow_definition_code bigint(20);
+ALTER TABLE t_ds_alert change process_instance_id workflow_instance_id int(11);
+
+ALTER TABLE t_ds_command change process_definition_code workflow_definition_code bigint(20);
+ALTER TABLE t_ds_command change process_instance_priority workflow_instance_priority int(11);
+ALTER TABLE t_ds_command change process_instance_id workflow_instance_id int(11);
+ALTER TABLE t_ds_command change process_definition_version workflow_definition_version int(11);
+
+ALTER TABLE t_ds_error_command change process_definition_code workflow_definition_code bigint(20);
+ALTER TABLE t_ds_error_command change process_instance_priority workflow_instance_priority int(11);
+ALTER TABLE t_ds_error_command change process_instance_id workflow_instance_id int(11);
+ALTER TABLE t_ds_error_command change process_definition_version workflow_definition_version int(11);
+
+ALTER TABLE t_ds_process_task_relation change process_definition_version workflow_definition_version int(11);
+ALTER TABLE t_ds_process_task_relation change process_definition_code workflow_definition_code bigint(20);
+
+ALTER TABLE t_ds_process_task_relation_log change process_definition_version workflow_definition_version int(11);
+ALTER TABLE t_ds_process_task_relation_log change process_definition_code workflow_definition_code bigint(20);
+
+ALTER TABLE t_ds_process_instance change process_definition_code workflow_definition_code bigint(20);
+ALTER TABLE t_ds_process_instance change process_definition_version workflow_definition_version int(11);
+ALTER TABLE t_ds_process_instance change is_sub_process is_sub_workflow int(11);
+ALTER TABLE t_ds_process_instance change process_instance_priority workflow_instance_priority int(11);
+ALTER TABLE t_ds_process_instance change next_process_instance_id next_workflow_instance_id int(11);
+
+ALTER TABLE t_ds_schedules change process_definition_code workflow_definition_code bigint(20);
+ALTER TABLE t_ds_schedules change process_instance_priority workflow_instance_priority int(11);
+
+ALTER TABLE t_ds_task_instance change process_instance_id workflow_instance_id int(11);
+ALTER TABLE t_ds_task_instance change process_instance_name workflow_instance_name varchar(255);
+
+ALTER TABLE t_ds_dq_execute_result change process_definition_id workflow_definition_id int(11);
+ALTER TABLE t_ds_dq_execute_result change process_instance_id workflow_instance_id int(11);
+
+ALTER TABLE t_ds_dq_task_statistics_value change process_definition_id workflow_definition_id int(11);
+
+ALTER TABLE t_ds_task_group_queue change process_id workflow_instance_id int(11);
+
+RENAME TABLE t_ds_process_definition TO t_ds_workflow_definition;
+RENAME TABLE t_ds_process_definition_log TO t_ds_workflow_definition_log;
+RENAME TABLE t_ds_process_task_relation TO t_ds_workflow_task_relation;
+RENAME TABLE t_ds_process_task_relation_log TO t_ds_workflow_task_relation_log;
+RENAME TABLE t_ds_process_instance TO t_ds_workflow_instance;
+RENAME TABLE t_ds_relation_process_instance TO t_ds_relation_workflow_instance;

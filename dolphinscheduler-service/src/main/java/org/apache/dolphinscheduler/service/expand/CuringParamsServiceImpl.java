@@ -249,7 +249,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 String val = property.getValue();
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
-                    val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
+                    val = timeFunctionExtension(taskInstance.getWorkflowInstanceId(), timeZone, val);
                 } else {
                     // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to
                     // `{"var1": 1, "var2": 1}`
@@ -287,10 +287,10 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
         params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getName());
         params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskCode()));
-        params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getProcessInstanceId()));
+        params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getWorkflowInstanceId()));
         // todo: set workflow definitionName and projectName
         params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, null);
-        params.put(PARAMETER_WORKFLOW_DEFINITION_CODE, Long.toString(workflowInstance.getProcessDefinitionCode()));
+        params.put(PARAMETER_WORKFLOW_DEFINITION_CODE, Long.toString(workflowInstance.getWorkflowDefinitionCode()));
         params.put(PARAMETER_PROJECT_NAME, null);
         params.put(PARAMETER_PROJECT_CODE, Long.toString(workflowInstance.getProjectCode()));
         return params;

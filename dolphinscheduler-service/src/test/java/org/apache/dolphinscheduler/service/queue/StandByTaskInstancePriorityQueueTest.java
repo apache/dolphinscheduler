@@ -113,7 +113,7 @@ public class StandByTaskInstancePriorityQueueTest {
         queue.put(taskInstanceMediumPriority);
         Assertions.assertTrue(queue.contains(taskInstanceMediumPriority));
         TaskInstance taskInstance2 = createTaskInstance("medium2", Priority.MEDIUM, 1);
-        taskInstance2.setProcessInstanceId(2);
+        taskInstance2.setWorkflowInstanceId(2);
         Assertions.assertFalse(queue.contains(taskInstance2));
     }
 

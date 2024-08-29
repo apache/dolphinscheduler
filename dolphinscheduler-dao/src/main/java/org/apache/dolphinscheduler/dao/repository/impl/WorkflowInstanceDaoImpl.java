@@ -147,10 +147,10 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
         WorkflowInstance workflowInstance = null;
         WorkflowInstanceRelation workflowInstanceRelation =
                 workflowInstanceRelationMapper.queryByParentId(workflowInstanceId, taskInstanceId);
-        if (workflowInstanceRelation == null || workflowInstanceRelation.getProcessInstanceId() == 0) {
+        if (workflowInstanceRelation == null || workflowInstanceRelation.getWorkflowInstanceId() == 0) {
             return workflowInstance;
         }
-        workflowInstance = queryById(workflowInstanceRelation.getProcessInstanceId());
+        workflowInstance = queryById(workflowInstanceRelation.getWorkflowInstanceId());
         return workflowInstance;
     }
 

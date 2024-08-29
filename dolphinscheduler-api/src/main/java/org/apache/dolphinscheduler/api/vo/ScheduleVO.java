@@ -153,9 +153,9 @@ public class ScheduleVO {
         this.setUpdateTime(schedule.getUpdateTime());
         this.setTimezoneId(schedule.getTimezoneId());
         this.setReleaseState(schedule.getReleaseState());
-        this.setProcessInstancePriority(schedule.getProcessInstancePriority());
-        this.setProcessDefinitionName(schedule.getProcessDefinitionName());
-        this.setProcessDefinitionCode(schedule.getProcessDefinitionCode());
+        this.setProcessInstancePriority(schedule.getWorkflowInstancePriority());
+        this.setProcessDefinitionName(schedule.getWorkflowDefinitionName());
+        this.setProcessDefinitionCode(schedule.getWorkflowDefinitionCode());
         this.setFailureStrategy(schedule.getFailureStrategy());
         this.setEnvironmentCode(schedule.getEnvironmentCode());
         this.setStartTime(DateUtils.dateToString(schedule.getStartTime(), ZoneId.systemDefault().getId()));

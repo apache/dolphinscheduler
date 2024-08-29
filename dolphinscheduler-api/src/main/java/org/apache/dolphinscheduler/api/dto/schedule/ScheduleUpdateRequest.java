@@ -123,7 +123,7 @@ public class ScheduleUpdateRequest {
             scheduleDeepCopy.setWarningGroupId(this.warningGroupId);
         }
         if (this.processInstancePriority != null) {
-            scheduleDeepCopy.setProcessInstancePriority(Priority.valueOf(this.processInstancePriority));
+            scheduleDeepCopy.setWorkflowInstancePriority(Priority.valueOf(this.processInstancePriority));
         }
         if (this.workerGroup != null) {
             scheduleDeepCopy.setWorkerGroup(this.workerGroup);

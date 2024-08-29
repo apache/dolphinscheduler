@@ -210,7 +210,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public boolean checkSubWorkflowDefinitionValid(WorkflowDefinition workflowDefinition) {
         // query all sub workflows under the current workflow
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryDownstreamByProcessDefinitionCode(workflowDefinition.getCode());
+                workflowTaskRelationMapper.queryDownstreamByWorkflowDefinitionCode(workflowDefinition.getCode());
         if (workflowTaskRelations.isEmpty()) {
             return true;
         }
@@ -337,11 +337,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         WorkflowDefinition workflowDefinition =
-                processService.findProcessDefinition(workflowInstance.getProcessDefinitionCode(),
-                        workflowInstance.getProcessDefinitionVersion());
+                processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
-        this.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowInstance.getProcessDefinitionCode(),
-                workflowInstance.getProcessDefinitionVersion());
+        this.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion());
 
         // get the startParams user specified at the first starting while repeat running is needed
 
@@ -367,11 +367,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         Command command = new Command();
         command.setCommandType(CommandType.EXECUTE_TASK);
-        command.setProcessDefinitionCode(workflowDefinition.getCode());
+        command.setWorkflowDefinitionCode(workflowDefinition.getCode());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
-        command.setProcessDefinitionVersion(workflowDefinition.getVersion());
-        command.setProcessInstanceId(workflowInstanceId);
+        command.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
+        command.setWorkflowInstanceId(workflowInstanceId);
         command.setTestFlag(workflowInstance.getTestFlag());
 
         // Add taskDependType
@@ -391,13 +391,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         if (create > 0) {
             log.info("Create {} command complete, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
+                    command.getCommandType().getDescp(), command.getWorkflowDefinitionCode(),
                     workflowDefinition.getVersion());
             putMsg(response, Status.SUCCESS);
         } else {
             log.error(
                     "Execute workflow instance failed because create {} command error, workflowDefinitionCode:{}, workflowDefinitionVersion:{}， workflowInstanceId:{}.",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
+                    command.getCommandType().getDescp(), command.getWorkflowDefinitionCode(),
                     workflowDefinition.getVersion(),
                     workflowInstanceId);
             putMsg(response, Status.EXECUTE_WORKFLOW_INSTANCE_ERROR);
@@ -411,9 +411,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> result = new HashMap<>();
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check workflow instance exist
-        workflowInstanceDao.queryOptionalById(taskGroupQueue.getProcessId())
+        workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
                 .orElseThrow(
-                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId()));
+                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                                taskGroupQueue.getWorkflowInstanceId()));
 
         if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
             throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);
@@ -442,20 +443,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         if (createCount > 0) {
             log.info("Create {} command complete, workflowDefinitionCode:{}",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
         } else {
             log.error("Create {} command error, workflowDefinitionCode:{}",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
         }
 
         if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
             log.info(
                     "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, workflowDefinitionCode:{}.",
-                    command.getProcessDefinitionCode());
+                    command.getWorkflowDefinitionCode());
         } else {
             log.info(
                     "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, workflowDefinitionCode:{}.",
-                    command.getProcessDefinitionCode());
+                    command.getWorkflowDefinitionCode());
             createComplementDependentCommand(schedules, command, allLevelDependent);
         }
 
@@ -479,7 +480,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
-                command.getProcessDefinitionCode());
+                command.getWorkflowDefinitionCode());
 
         List<ZonedDateTime> listDate = new ArrayList<>();
         if (scheduleParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE) && scheduleParam.containsKey(
@@ -518,14 +519,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         switch (runMode) {
             case RUN_MODE_SERIAL: {
                 log.info("RunMode of {} command is serial run, workflowDefinitionCode:{}.",
-                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                        command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
                 createCount = createComplementCommand(triggerCode, command, cmdParam, listDate, schedules,
                         complementDependentMode, allLevelDependent);
                 break;
             }
             case RUN_MODE_PARALLEL: {
                 log.info("RunMode of {} command is parallel run, workflowDefinitionCode:{}.",
-                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                        command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
 
                 int queueNum = 0;
                 if (CollectionUtils.isNotEmpty(listDate)) {
@@ -573,7 +574,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         List<DependentWorkflowDefinition> dependentWorkflowDefinitionList =
-                getComplementDependentDefinitionList(dependentCommand.getProcessDefinitionCode(),
+                getComplementDependentDefinitionList(dependentCommand.getWorkflowDefinitionCode(),
                         CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup(),
                         allLevelDependent);
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
@@ -581,8 +582,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
             // and causing duplicate when clone it.
             dependentCommand.setId(null);
-            dependentCommand.setProcessDefinitionCode(dependentWorkflowDefinition.getProcessDefinitionCode());
-            dependentCommand.setProcessDefinitionVersion(dependentWorkflowDefinition.getProcessDefinitionVersion());
+            dependentCommand.setWorkflowDefinitionCode(dependentWorkflowDefinition.getProcessDefinitionCode());
+            dependentCommand.setWorkflowDefinitionVersion(dependentWorkflowDefinition.getProcessDefinitionVersion());
             dependentCommand.setWorkerGroup(dependentWorkflowDefinition.getWorkerGroup());
             Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
             cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentWorkflowDefinition.getTaskDefinitionCode()));

@@ -132,7 +132,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
         }
         updateWorkflowDefiniteVersion(loginUser, result, workflowDefinition);
         List<WorkflowTaskRelation> workflowTaskRelationList =
-                workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
+                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskRelation> workflowTaskRelations = Lists.newArrayList(workflowTaskRelationList);
         if (!workflowTaskRelations.isEmpty()) {
             Map<Long, WorkflowTaskRelation> preTaskCodeMap =
@@ -190,8 +190,8 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
     private void updateVersions(WorkflowTaskRelation workflowTaskRelation) {
         // workflow
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowTaskRelation.getProcessDefinitionCode());
-        workflowTaskRelation.setProcessDefinitionVersion(workflowDefinition.getVersion());
+                workflowDefinitionMapper.queryByCode(workflowTaskRelation.getWorkflowDefinitionCode());
+        workflowTaskRelation.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
 
         // tasks
         TaskDefinition preTaskDefinition = taskDefinitionMapper.queryByCode(workflowTaskRelation.getPreTaskCode());
@@ -213,10 +213,10 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
                                                              TaskRelationCreateRequest taskRelationCreateRequest) {
         WorkflowTaskRelation workflowTaskRelation = taskRelationCreateRequest.convert2ProcessTaskRelation();
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowTaskRelation.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(workflowTaskRelation.getWorkflowDefinitionCode());
         if (workflowDefinition == null) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
-                    String.valueOf(workflowTaskRelation.getProcessDefinitionCode()));
+                    String.valueOf(workflowTaskRelation.getWorkflowDefinitionCode()));
         }
         if (workflowTaskRelation.getProjectCode() == 0) {
             workflowTaskRelation.setProjectCode(workflowDefinition.getProjectCode());
@@ -241,8 +241,8 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
         Date now = new Date();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(workflowDefinition.getProjectCode());
-        workflowTaskRelation.setProcessDefinitionCode(workflowDefinition.getCode());
-        workflowTaskRelation.setProcessDefinitionVersion(workflowDefinition.getVersion());
+        workflowTaskRelation.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowTaskRelation.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
         workflowTaskRelation.setPostTaskCode(taskDefinition.getCode());
         workflowTaskRelation.setPostTaskVersion(taskDefinition.getVersion());
         workflowTaskRelation.setConditionType(ConditionType.NONE);
@@ -307,7 +307,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
             return result;
         }
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
+                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
         if (CollectionUtils.isEmpty(workflowTaskRelationList)) {
             log.error("workflow task relations are empty, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
@@ -369,7 +369,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
                 new Page<>(new TaskRelationFilterRequest(preTaskCode, postTaskCode).getPageNo(),
                         new TaskRelationFilterRequest(preTaskCode, postTaskCode).getPageSize());
         IPage<WorkflowTaskRelation> workflowTaskRelationIPage =
-                workflowTaskRelationMapper.filterProcessTaskRelation(page, workflowTaskRelation);
+                workflowTaskRelationMapper.filterWorkflowTaskRelation(page, workflowTaskRelation);
 
         List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationIPage.getRecords();
         if (workflowTaskRelations.size() != 1) {
@@ -408,13 +408,13 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
         Page<WorkflowTaskRelation> page = new Page<>(taskRelationUpdateUpstreamRequest.getPageNo(),
                 taskRelationUpdateUpstreamRequest.getPageSize());
         IPage<WorkflowTaskRelation> workflowTaskRelationExistsIPage =
-                workflowTaskRelationMapper.filterProcessTaskRelation(page, workflowTaskRelation);
+                workflowTaskRelationMapper.filterWorkflowTaskRelation(page, workflowTaskRelation);
         List<WorkflowTaskRelation> workflowTaskRelationExists = workflowTaskRelationExistsIPage.getRecords();
 
         WorkflowDefinition workflowDefinition = null;
         if (CollectionUtils.isNotEmpty(workflowTaskRelationExists)) {
             workflowDefinition =
-                    workflowDefinitionMapper.queryByCode(workflowTaskRelationExists.get(0).getProcessDefinitionCode());
+                    workflowDefinitionMapper.queryByCode(workflowTaskRelationExists.get(0).getWorkflowDefinitionCode());
         } else if (taskRelationUpdateUpstreamRequest.getWorkflowCode() != 0L) {
             workflowDefinition =
                     workflowDefinitionMapper.queryByCode(taskRelationUpdateUpstreamRequest.getWorkflowCode());
@@ -487,7 +487,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
         log.info(
                 "Save workflow task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                 workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-        workflowTaskRelations.get(0).setProcessDefinitionVersion(insertVersion);
+        workflowTaskRelations.get(0).setWorkflowDefinitionVersion(insertVersion);
         return workflowTaskRelations;
     }
 
@@ -496,7 +496,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
         long projectCode = workflowDefinition.getProjectCode();
         long workflowDefinitionCode = workflowDefinition.getCode();
         List<WorkflowTaskRelation> taskRelations =
-                workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
+                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskRelationLog> taskRelationList =
                 taskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
 
@@ -518,8 +518,8 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
         Date now = new Date();
         for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
             workflowTaskRelationLog.setProjectCode(projectCode);
-            workflowTaskRelationLog.setProcessDefinitionCode(workflowDefinitionCode);
-            workflowTaskRelationLog.setProcessDefinitionVersion(workflowDefinitionVersion);
+            workflowTaskRelationLog.setWorkflowDefinitionCode(workflowDefinitionCode);
+            workflowTaskRelationLog.setWorkflowDefinitionVersion(workflowDefinitionVersion);
             if (taskDefinitionLogMap != null) {
                 TaskDefinitionLog preTaskDefinitionLog =
                         taskDefinitionLogMap.get(workflowTaskRelationLog.getPreTaskCode());
@@ -547,7 +547,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
             if (isSame) {
                 return Constants.EXIT_CODE_SUCCESS;
             }
-            workflowTaskRelationMapper.deleteByCode(projectCode, workflowDefinitionCode);
+            workflowTaskRelationMapper.deleteByWorkflowDefinitionCode(projectCode, workflowDefinitionCode);
         }
         List<WorkflowTaskRelation> workflowTaskRelations =
                 taskRelationList.stream().map(WorkflowTaskRelation::new).collect(Collectors.toList());
@@ -648,16 +648,16 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
             return result;
         }
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(upstreamList.get(0).getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(upstreamList.get(0).getWorkflowDefinitionCode());
         if (workflowDefinition == null) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.",
-                    upstreamList.get(0).getProcessDefinitionCode());
+                    upstreamList.get(0).getWorkflowDefinitionCode());
             putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST,
-                    String.valueOf(upstreamList.get(0).getProcessDefinitionCode()));
+                    String.valueOf(upstreamList.get(0).getWorkflowDefinitionCode()));
             return result;
         }
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
+                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
         List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
         List<WorkflowTaskRelation> workflowTaskRelationWaitRemove = Lists.newArrayList();
         for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelationList) {
@@ -719,16 +719,16 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
             return result;
         }
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(downstreamList.get(0).getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(downstreamList.get(0).getWorkflowDefinitionCode());
         if (workflowDefinition == null) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.",
-                    downstreamList.get(0).getProcessDefinitionCode());
+                    downstreamList.get(0).getWorkflowDefinitionCode());
             putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST,
-                    String.valueOf(downstreamList.get(0).getProcessDefinitionCode()));
+                    String.valueOf(downstreamList.get(0).getWorkflowDefinitionCode()));
             return result;
         }
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryByProcessCode(workflowDefinition.getCode());
+                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
         List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
         workflowTaskRelationList
                 .removeIf(workflowTaskRelation -> postTaskCodeList.contains(workflowTaskRelation.getPostTaskCode())
@@ -840,7 +840,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
             return result;
         }
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
+                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
         if (CollectionUtils.isEmpty(workflowTaskRelationList)) {
             log.error("workflow task relations are empty, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
@@ -897,7 +897,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
     @Override
     public List<WorkflowTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode,
                                                                     int workflowDefinitionVersion) {
-        return workflowTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(workflowDefinitionCode,
+        return workflowTaskRelationMapper.queryWorkflowTaskRelationsByWorkflowDefinitionCode(workflowDefinitionCode,
                 workflowDefinitionVersion);
     }
 

@@ -260,7 +260,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // @Test
     // public void testNoComplement() {
     //
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(zeroSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
@@ -287,7 +287,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // @Test
     // public void testComplementWithStartNodeList() {
     //
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(zeroSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
@@ -310,7 +310,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     //
     // @Test
     // public void testComplementWithOldStartNodeList() {
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(zeroSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = new HashMap<>();
@@ -345,7 +345,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // schedule.setCreateTime(new Date());
     // schedule.setUpdateTime(new Date());
     // List<Schedule> schedules = Lists.newArrayList(schedule);
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(
     // processDefinitionCode))
     // .thenReturn(schedules);
     //
@@ -399,7 +399,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // @Test
     // public void testDateError() {
     //
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(zeroSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
@@ -425,7 +425,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // @Test
     // public void testSerial() {
     //
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(zeroSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
@@ -451,7 +451,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // @Test
     // public void testParallelWithOutSchedule() {
     //
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(zeroSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
@@ -478,7 +478,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // @Test
     // public void testParallelWithSchedule() {
     //
-    // Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+    // Mockito.when(processService.queryReleaseSchedulerListByWorkflowDefinitionCode(processDefinitionCode))
     // .thenReturn(oneSchedulerList());
     // Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
     // Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,

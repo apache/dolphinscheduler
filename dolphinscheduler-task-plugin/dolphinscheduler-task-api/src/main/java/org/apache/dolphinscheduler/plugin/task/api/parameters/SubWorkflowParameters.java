@@ -17,21 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-public class SubProcessParameters extends AbstractParameters {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-    private long processDefinitionCode;
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class SubWorkflowParameters extends AbstractParameters {
 
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public long getProcessDefinitionCode() {
-        return this.processDefinitionCode;
-    }
+    private long workflowDefinitionCode;
 
     @Override
     public boolean checkParameters() {
-        return this.processDefinitionCode > 0;
+        return this.workflowDefinitionCode > 0;
     }
 
 }

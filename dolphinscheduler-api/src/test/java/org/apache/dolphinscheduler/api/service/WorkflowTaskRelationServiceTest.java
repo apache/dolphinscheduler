@@ -207,18 +207,18 @@ public class WorkflowTaskRelationServiceTest {
         workflowTaskRelationUpstream0.setPreTaskVersion(1);
         workflowTaskRelationUpstream0.setProjectCode(projectCode);
         workflowTaskRelationUpstream0.setPreTaskCode(123);
-        workflowTaskRelationUpstream0.setProcessDefinitionCode(123);
+        workflowTaskRelationUpstream0.setWorkflowDefinitionCode(123);
         WorkflowTaskRelation workflowTaskRelationUpstream1 = new WorkflowTaskRelation();
         workflowTaskRelationUpstream1.setPostTaskCode(taskCode);
         workflowTaskRelationUpstream1.setPreTaskVersion(1);
         workflowTaskRelationUpstream1.setPreTaskCode(123);
-        workflowTaskRelationUpstream1.setProcessDefinitionCode(124);
+        workflowTaskRelationUpstream1.setWorkflowDefinitionCode(124);
         workflowTaskRelationUpstream1.setProjectCode(projectCode);
         WorkflowTaskRelation workflowTaskRelationUpstream2 = new WorkflowTaskRelation();
         workflowTaskRelationUpstream2.setPostTaskCode(taskCode);
         workflowTaskRelationUpstream2.setPreTaskVersion(2);
         workflowTaskRelationUpstream2.setPreTaskCode(123);
-        workflowTaskRelationUpstream2.setProcessDefinitionCode(125);
+        workflowTaskRelationUpstream2.setWorkflowDefinitionCode(125);
         workflowTaskRelationUpstream2.setProjectCode(projectCode);
         List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
         workflowTaskRelationList.add(workflowTaskRelationUpstream0);
@@ -293,7 +293,7 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelationLog> processTaskRelationLogList = Lists.newArrayList();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(processDefinitionCode);
+        workflowTaskRelation.setWorkflowDefinitionCode(processDefinitionCode);
         workflowTaskRelation.setPreTaskCode(0L);
         workflowTaskRelation.setPreTaskVersion(0);
         workflowTaskRelation.setPostTaskCode(postTaskCode);
@@ -417,7 +417,7 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setWorkflowDefinitionCode(1L);
         workflowTaskRelation.setPreTaskCode(taskCode);
         workflowTaskRelation.setPostTaskCode(123L);
         workflowTaskRelationList.add(workflowTaskRelation);
@@ -447,7 +447,7 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setWorkflowDefinitionCode(1L);
         workflowTaskRelation.setPreTaskCode(0L);
         workflowTaskRelation.setPreTaskVersion(0);
         workflowTaskRelation.setPostTaskCode(taskCode);
@@ -457,7 +457,7 @@ public class WorkflowTaskRelationServiceTest {
         Mockito.when(workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
                 .thenReturn(workflowTaskRelationList);
         Mockito.when(workflowDefinitionMapper.queryByCode(1L)).thenReturn(getProcessDefinition());
-        Mockito.when(workflowTaskRelationMapper.queryByProcessCode(1L)).thenReturn(workflowTaskRelationList);
+        Mockito.when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(1L)).thenReturn(workflowTaskRelationList);
         List<WorkflowTaskRelationLog> relationLogs =
                 workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
@@ -489,13 +489,13 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setWorkflowDefinitionCode(1L);
         workflowTaskRelation.setPreTaskCode(0L);
         workflowTaskRelation.setPreTaskVersion(0);
         workflowTaskRelation.setPostTaskCode(taskCode);
         workflowTaskRelation.setPostTaskVersion(1);
         workflowTaskRelationList.add(workflowTaskRelation);
-        Mockito.when(workflowTaskRelationMapper.queryByProcessCode(processDefinitionCode))
+        Mockito.when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
                 .thenReturn(workflowTaskRelationList);
         List<WorkflowTaskRelationLog> relationLogs =
                 workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
@@ -519,8 +519,8 @@ public class WorkflowTaskRelationServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(processDefinitionCode);
-        workflowTaskRelation.setProcessDefinitionVersion(1);
+        workflowTaskRelation.setWorkflowDefinitionCode(processDefinitionCode);
+        workflowTaskRelation.setWorkflowDefinitionVersion(1);
         workflowTaskRelation.setPreTaskCode(preTaskCode);
         workflowTaskRelation.setPostTaskCode(postTaskCode);
         WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
@@ -528,7 +528,7 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelation> workflowTaskRelationList = new ArrayList<>();
         workflowTaskRelationList.add(workflowTaskRelation);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
-        Mockito.when(workflowTaskRelationMapper.queryByProcessCode(1L)).thenReturn(workflowTaskRelationList);
+        Mockito.when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(1L)).thenReturn(workflowTaskRelationList);
         List<WorkflowTaskRelationLog> relationLogs =
                 workflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
@@ -588,7 +588,7 @@ public class WorkflowTaskRelationServiceTest {
 
         // error task relation size
         Mockito.when(
-                workflowTaskRelationMapper.filterProcessTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
+                workflowTaskRelationMapper.filterWorkflowTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
                 .thenReturn(getMultiProcessTaskRelations());
         exception = Assertions.assertThrows(ServiceException.class, () -> processTaskRelationService
                 .deleteTaskWorkflowRelationV2(user, UPSTREAM_TASK_CODE, DOWNSTREAM_TASK_CODE));
@@ -597,7 +597,7 @@ public class WorkflowTaskRelationServiceTest {
 
         // success
         Mockito.when(
-                workflowTaskRelationMapper.filterProcessTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
+                workflowTaskRelationMapper.filterWorkflowTaskRelation(isA(Page.class), isA(WorkflowTaskRelation.class)))
                 .thenReturn(getOneProcessTaskRelation());
         Assertions.assertDoesNotThrow(() -> processTaskRelationService.deleteTaskWorkflowRelationV2(user,
                 UPSTREAM_TASK_CODE, DOWNSTREAM_TASK_CODE));
@@ -606,7 +606,7 @@ public class WorkflowTaskRelationServiceTest {
     private IPage<WorkflowTaskRelation> getOneProcessTaskRelation() {
         IPage<WorkflowTaskRelation> processTaskRelationIPage = new Page<>();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
-        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation.setPreTaskCode(UPSTREAM_TASK_CODE);
         workflowTaskRelation.setPostTaskCode(DOWNSTREAM_TASK_CODE);
         processTaskRelationIPage.setRecords(Collections.singletonList(workflowTaskRelation));
@@ -618,13 +618,13 @@ public class WorkflowTaskRelationServiceTest {
         List<WorkflowTaskRelation> workflowTaskRelations = new ArrayList<>();
 
         WorkflowTaskRelation workflowTaskRelation0 = new WorkflowTaskRelation();
-        workflowTaskRelation0.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation0.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation0.setPreTaskCode(UPSTREAM_TASK_CODE);
         workflowTaskRelation0.setPostTaskCode(DOWNSTREAM_TASK_CODE);
         workflowTaskRelations.add(workflowTaskRelation0);
 
         WorkflowTaskRelation workflowTaskRelation1 = new WorkflowTaskRelation();
-        workflowTaskRelation1.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation1.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation1.setPreTaskCode(UPSTREAM_TASK_CODE);
         workflowTaskRelation1.setPostTaskCode(DOWNSTREAM_TASK_CODE);
         workflowTaskRelations.add(workflowTaskRelation1);

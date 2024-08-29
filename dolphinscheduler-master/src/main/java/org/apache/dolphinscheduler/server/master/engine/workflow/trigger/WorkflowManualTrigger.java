@@ -54,8 +54,8 @@ public class WorkflowManualTrigger
         final WorkflowDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
 
         final WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
-        workflowInstance.setProcessDefinitionVersion(workflowDefinition.getVersion());
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
         workflowInstance.setCommandType(commandType);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, commandType.name());
@@ -72,9 +72,9 @@ public class WorkflowManualTrigger
         workflowInstance.setExecutorId(workflowManualTriggerRequest.getUserId());
         workflowInstance.setExecutorName(getExecutorUser(workflowManualTriggerRequest.getUserId()).getUserName());
         workflowInstance.setTenantCode(workflowManualTriggerRequest.getTenantCode());
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.addHistoryCmd(commandType);
-        workflowInstance.setProcessInstancePriority(workflowManualTriggerRequest.getWorkflowInstancePriority());
+        workflowInstance.setWorkflowInstancePriority(workflowManualTriggerRequest.getWorkflowInstancePriority());
         workflowInstance.setWorkerGroup(
                 WorkerGroupUtils.getWorkerGroupOrDefault(workflowManualTriggerRequest.getWorkerGroup()));
         workflowInstance.setEnvironmentCode(
@@ -95,10 +95,10 @@ public class WorkflowManualTrigger
                 .build();
         return Command.builder()
                 .commandType(CommandType.START_PROCESS)
-                .processDefinitionCode(workflowManualTriggerRequest.getWorkflowDefinitionCode())
-                .processDefinitionVersion(workflowManualTriggerRequest.getWorkflowDefinitionVersion())
-                .processInstanceId(workflowInstance.getId())
-                .processInstancePriority(workflowInstance.getProcessInstancePriority())
+                .workflowDefinitionCode(workflowManualTriggerRequest.getWorkflowDefinitionCode())
+                .workflowDefinitionVersion(workflowManualTriggerRequest.getWorkflowDefinitionVersion())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .commandParam(JSONUtils.toJsonString(runWorkflowCommandParam))
                 .build();
     }

@@ -73,8 +73,9 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
             return Lists.newArrayList();
         }
 
-        List<WorkflowTaskRelationLog> processTaskRelations = workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                workflowDefinition.getCode(), workflowDefinition.getVersion());
+        List<WorkflowTaskRelationLog> processTaskRelations =
+                workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(
+                        workflowDefinition.getCode(), workflowDefinition.getVersion());
         Set<TaskDefinition> taskDefinitionSet = processTaskRelations
                 .stream()
                 .filter(p -> p.getPostTaskCode() > 0)

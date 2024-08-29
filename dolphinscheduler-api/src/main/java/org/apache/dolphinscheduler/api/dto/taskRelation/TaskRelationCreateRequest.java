@@ -46,7 +46,7 @@ public class TaskRelationCreateRequest {
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
 
         workflowTaskRelation.setProjectCode(this.projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(this.workflowCode);
+        workflowTaskRelation.setWorkflowDefinitionCode(this.workflowCode);
         workflowTaskRelation.setPreTaskCode(this.preTaskCode);
         workflowTaskRelation.setPostTaskCode(this.postTaskCode);
 

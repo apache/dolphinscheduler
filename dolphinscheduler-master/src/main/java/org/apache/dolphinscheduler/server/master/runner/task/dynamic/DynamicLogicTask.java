@@ -96,7 +96,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         this.processDefineMapper = processDefineMapper;
         this.commandMapper = commandMapper;
 
-        this.workflowInstance = workflowInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
+        this.workflowInstance = workflowInstanceDao.queryById(taskExecutionContext.getWorkflowInstanceId());
         this.taskInstance = taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
     }
 
@@ -160,7 +160,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
             WorkflowInstance subWorkflowInstance = createSubProcessInstance(command);
             subWorkflowInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
             workflowInstanceDao.insert(subWorkflowInstance);
-            command.setProcessInstanceId(subWorkflowInstance.getId());
+            command.setWorkflowInstanceId(subWorkflowInstance.getId());
             workflowInstanceList.add(subWorkflowInstance);
         }
 
@@ -184,7 +184,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         WorkflowInstance subWorkflowInstance;
         try {
             subWorkflowInstance = processService.constructProcessInstance(command, workflowInstance.getHost());
-            subWorkflowInstance.setIsSubProcess(Flag.YES);
+            subWorkflowInstance.setIsSubWorkflow(Flag.YES);
             subWorkflowInstance.setVarPool(taskExecutionContext.getVarPool());
         } catch (Exception e) {
             log.error("create sub process instance error", e);
