@@ -103,7 +103,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * updateProcessInstance data source
+     * updateWorkflowInstance data source
      *
      * @param loginUser login user
      * @param id        datasource id

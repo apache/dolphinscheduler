@@ -22,14 +22,14 @@ import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRIN
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class WorkflowV2ControllerTest {
     @InjectMocks
     private WorkflowV2Controller workflowV2Controller;
     @Mock
-    private ProcessDefinitionService processDefinitionService;
+    private WorkflowDefinitionService workflowDefinitionService;
     @Mock
     private TenantMapper tenantMapper;
 
@@ -89,9 +89,9 @@ public class WorkflowV2ControllerTest {
         workflowCreateRequest.setWarningGroupId(warningGroupId);
         workflowCreateRequest.setExecutionType(executionType);
 
-        Mockito.when(processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest))
+        Mockito.when(workflowDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest))
                 .thenReturn(this.getProcessDefinition(name));
-        Result<ProcessDefinition> resourceResponse = workflowV2Controller.createWorkflow(user, workflowCreateRequest);
+        Result<WorkflowDefinition> resourceResponse = workflowV2Controller.createWorkflow(user, workflowCreateRequest);
         Assertions.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
     }
 
@@ -100,9 +100,9 @@ public class WorkflowV2ControllerTest {
         WorkflowUpdateRequest workflowUpdateRequest = new WorkflowUpdateRequest();
         workflowUpdateRequest.setName(newName);
 
-        Mockito.when(processDefinitionService.updateSingleProcessDefinition(user, 1L, workflowUpdateRequest))
+        Mockito.when(workflowDefinitionService.updateSingleWorkflowDefinition(user, 1L, workflowUpdateRequest))
                 .thenReturn(this.getProcessDefinition(newName));
-        Result<ProcessDefinition> resourceResponse =
+        Result<WorkflowDefinition> resourceResponse =
                 workflowV2Controller.updateWorkflow(user, 1L, workflowUpdateRequest);
 
         Assertions.assertEquals(this.getProcessDefinition(newName), resourceResponse.getData());
@@ -110,9 +110,9 @@ public class WorkflowV2ControllerTest {
 
     @Test
     public void testGetWorkflow() {
-        Mockito.when(processDefinitionService.getProcessDefinition(user, 1L))
+        Mockito.when(workflowDefinitionService.getWorkflowDefinition(user, 1L))
                 .thenReturn(this.getProcessDefinition(name));
-        Result<ProcessDefinition> resourceResponse = workflowV2Controller.getWorkflow(user, 1L);
+        Result<WorkflowDefinition> resourceResponse = workflowV2Controller.getWorkflow(user, 1L);
         Assertions.assertEquals(this.getProcessDefinition(name), resourceResponse.getData());
     }
 
@@ -121,44 +121,44 @@ public class WorkflowV2ControllerTest {
         WorkflowFilterRequest workflowFilterRequest = new WorkflowFilterRequest();
         workflowFilterRequest.setWorkflowName(name);
 
-        Mockito.when(processDefinitionService.filterProcessDefinition(user, workflowFilterRequest))
+        Mockito.when(workflowDefinitionService.filterWorkflowDefinition(user, workflowFilterRequest))
                 .thenReturn(this.getProcessDefinitionPage(name));
-        Result<PageInfo<ProcessDefinition>> pageResourceResponse =
+        Result<PageInfo<WorkflowDefinition>> pageResourceResponse =
                 workflowV2Controller.filterWorkflows(user, workflowFilterRequest);
 
-        PageInfo<ProcessDefinition> processDefinitionPage = pageResourceResponse.getData();
+        PageInfo<WorkflowDefinition> processDefinitionPage = pageResourceResponse.getData();
         Assertions.assertIterableEquals(this.getProcessDefinitionPage(name).getTotalList(),
                 processDefinitionPage.getTotalList());
     }
 
-    private ProcessDefinition getProcessDefinition(String pdName) {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(1);
-        processDefinition.setName(pdName);
-        processDefinition.setDescription(description);
-        processDefinition.setReleaseState(ReleaseState.valueOf(releaseState));
-        processDefinition.setProjectCode(projectCode);
-        processDefinition.setExecutionType(ProcessExecutionTypeEnum.valueOf(executionType));
-        processDefinition.setWarningGroupId(warningGroupId);
-        processDefinition.setGlobalParams(EMPTY_STRING);
-        return processDefinition;
+    private WorkflowDefinition getProcessDefinition(String pdName) {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setId(1);
+        workflowDefinition.setName(pdName);
+        workflowDefinition.setDescription(description);
+        workflowDefinition.setReleaseState(ReleaseState.valueOf(releaseState));
+        workflowDefinition.setProjectCode(projectCode);
+        workflowDefinition.setExecutionType(WorkflowExecutionTypeEnum.valueOf(executionType));
+        workflowDefinition.setWarningGroupId(warningGroupId);
+        workflowDefinition.setGlobalParams(EMPTY_STRING);
+        return workflowDefinition;
     }
 
-    private PageInfo<ProcessDefinition> getProcessDefinitionPage(String pdName) {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(1);
-        processDefinition.setName(pdName);
-        processDefinition.setDescription(description);
-        processDefinition.setReleaseState(ReleaseState.valueOf(releaseState));
-        processDefinition.setProjectCode(projectCode);
-        processDefinition.setExecutionType(ProcessExecutionTypeEnum.valueOf(executionType));
-        processDefinition.setWarningGroupId(warningGroupId);
-        processDefinition.setGlobalParams(EMPTY_STRING);
+    private PageInfo<WorkflowDefinition> getProcessDefinitionPage(String pdName) {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setId(1);
+        workflowDefinition.setName(pdName);
+        workflowDefinition.setDescription(description);
+        workflowDefinition.setReleaseState(ReleaseState.valueOf(releaseState));
+        workflowDefinition.setProjectCode(projectCode);
+        workflowDefinition.setExecutionType(WorkflowExecutionTypeEnum.valueOf(executionType));
+        workflowDefinition.setWarningGroupId(warningGroupId);
+        workflowDefinition.setGlobalParams(EMPTY_STRING);
 
-        PageInfo<ProcessDefinition> pageInfoProcessDefinitions = new PageInfo<ProcessDefinition>();
-        List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
-        processDefinitions.add(processDefinition);
-        pageInfoProcessDefinitions.setTotalList(processDefinitions);
+        PageInfo<WorkflowDefinition> pageInfoProcessDefinitions = new PageInfo<WorkflowDefinition>();
+        List<WorkflowDefinition> workflowDefinitions = new ArrayList<WorkflowDefinition>();
+        workflowDefinitions.add(workflowDefinition);
+        pageInfoProcessDefinitions.setTotalList(workflowDefinitions);
         return pageInfoProcessDefinitions;
     }
 }

@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
@@ -53,7 +53,7 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
 
     public void notifyWorkflowLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
-        final ProcessInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         if (Flag.YES == workflowInstance.getIsSubProcess()) {
             // The sub workflow does not need to generate the backfill command
             // Since the parent workflow will trigger the task to generate the sub workflow instance.
@@ -74,7 +74,7 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     }
 
     private void generateNextBackfillCommand(final BackfillWorkflowCommandParam commandParam,
-                                             final ProcessInstance workflowInstance) {
+                                             final WorkflowInstance workflowInstance) {
         // Generate next backfill command
         final List<String> backfillTimeList = commandParam.getBackfillTimeList();
         backfillTimeList.remove(DateUtils.dateToString(workflowInstance.getScheduleTime()));

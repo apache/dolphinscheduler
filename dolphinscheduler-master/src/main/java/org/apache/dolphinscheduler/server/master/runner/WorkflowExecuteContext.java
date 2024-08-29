@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
@@ -38,9 +38,9 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
     private final Command command;
 
-    private final ProcessDefinition workflowDefinition;
+    private final WorkflowDefinition workflowDefinition;
 
-    private final ProcessInstance workflowInstance;
+    private final WorkflowInstance workflowInstance;
 
     private final IWorkflowGraph workflowGraph;
 
@@ -60,9 +60,9 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
         private Command command;
 
-        private ProcessDefinition workflowDefinition;
+        private WorkflowDefinition workflowDefinition;
 
-        private ProcessInstance workflowInstance;
+        private WorkflowInstance workflowInstance;
 
         private IWorkflowGraph workflowGraph;
 

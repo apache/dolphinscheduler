@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.it;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.List;
 
@@ -37,14 +37,14 @@ public class WorkflowITContext {
 
     private Project project;
 
-    private ProcessDefinition workflow;
+    private WorkflowDefinition workflow;
 
-    private ProcessInstance workflowInstance;
+    private WorkflowInstance workflowInstance;
 
     private List<TaskInstance> taskInstances;
 
     private List<TaskDefinition> tasks;
 
-    private List<ProcessTaskRelation> taskRelations;
+    private List<WorkflowTaskRelation> taskRelations;
 
 }

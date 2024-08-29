@@ -21,8 +21,8 @@ import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
@@ -56,7 +56,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_runningWorkflow_withSubmittedTasks() {
         final String yaml = "/it/failover/running_workflowInstance_with_one_submitted_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -92,7 +92,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_runningWorkflow_withDispatchTasks() {
         final String yaml = "/it/failover/running_workflowInstance_with_one_dispatched_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -132,7 +132,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_runningWorkflow_withRunningTasks() {
         final String yaml = "/it/failover/running_workflowInstance_with_one_running_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -172,7 +172,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_runningWorkflow_withSuccessTasks() {
         final String yaml = "/it/failover/running_workflowInstance_with_one_success_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -206,7 +206,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_runningWorkflow_withFailedTasks() {
         final String yaml = "/it/failover/running_workflowInstance_with_one_failed_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -241,7 +241,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyPauseWorkflow_withSubmittedTasks() {
         final String yaml = "/it/failover/readyPause_workflowInstance_with_one_submitted_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -276,7 +276,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyPauseWorkflow_withDispatchedTasks() {
         final String yaml = "/it/failover/readyPause_workflowInstance_with_one_dispatched_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -316,7 +316,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyPauseWorkflow_withSuccessTasks() {
         final String yaml = "/it/failover/readyPause_workflowInstance_with_one_success_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -351,7 +351,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyPauseWorkflow_withFailedTasks() {
         final String yaml = "/it/failover/readyPause_workflowInstance_with_one_failed_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -386,7 +386,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyPauseWorkflow_withPausedTasks() {
         final String yaml = "/it/failover/readyPause_workflowInstance_with_one_paused_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -421,7 +421,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyStopWorkflow_withSubmittedTasks() {
         final String yaml = "/it/failover/readyStop_workflowInstance_with_one_submitted_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -456,7 +456,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyStopWorkflow_withDispatchedTasks() {
         final String yaml = "/it/failover/readyStop_workflowInstance_with_one_dispatched_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -496,7 +496,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyStopWorkflow_withSuccessTasks() {
         final String yaml = "/it/failover/readyStop_workflowInstance_with_one_success_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -531,7 +531,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyStopWorkflow_withFailedTasks() {
         final String yaml = "/it/failover/readyStop_workflowInstance_with_one_failed_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
@@ -566,7 +566,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
     public void testGlobalFailover_readyStopWorkflow_withKilledTasks() {
         final String yaml = "/it/failover/readyStop_workflowInstance_with_one_killed_fake_task.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 

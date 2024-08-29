@@ -21,10 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -94,32 +94,32 @@ public class TaskExecutionContextBuilder {
     /**
      * build processInstance related info
      *
-     * @param processInstance processInstance
+     * @param workflowInstance processInstance
      * @return TaskExecutionContextBuilder
      */
-    public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(ProcessInstance processInstance) {
-        taskExecutionContext.setProcessInstanceId(processInstance.getId());
-        taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(processInstance.getScheduleTime()));
-        taskExecutionContext.setGlobalParams(processInstance.getGlobalParams());
-        taskExecutionContext.setExecutorId(processInstance.getExecutorId());
-        taskExecutionContext.setCmdTypeIfComplement(processInstance.getCmdTypeIfComplement().getCode());
-        taskExecutionContext.setTenantCode(processInstance.getTenantCode());
-        taskExecutionContext.setProcessDefineCode(processInstance.getProcessDefinitionCode());
-        taskExecutionContext.setProcessDefineVersion(processInstance.getProcessDefinitionVersion());
-        taskExecutionContext.setProjectCode(processInstance.getProjectCode());
+    public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(WorkflowInstance workflowInstance) {
+        taskExecutionContext.setProcessInstanceId(workflowInstance.getId());
+        taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(workflowInstance.getScheduleTime()));
+        taskExecutionContext.setGlobalParams(workflowInstance.getGlobalParams());
+        taskExecutionContext.setExecutorId(workflowInstance.getExecutorId());
+        taskExecutionContext.setCmdTypeIfComplement(workflowInstance.getCmdTypeIfComplement().getCode());
+        taskExecutionContext.setTenantCode(workflowInstance.getTenantCode());
+        taskExecutionContext.setProcessDefineCode(workflowInstance.getProcessDefinitionCode());
+        taskExecutionContext.setProcessDefineVersion(workflowInstance.getProcessDefinitionVersion());
+        taskExecutionContext.setProjectCode(workflowInstance.getProjectCode());
         return this;
     }
 
     /**
      * build processDefinition related info
      *
-     * @param processDefinition processDefinition
+     * @param workflowDefinition processDefinition
      * @return TaskExecutionContextBuilder
      */
-    public TaskExecutionContextBuilder buildProcessDefinitionRelatedInfo(ProcessDefinition processDefinition) {
-        taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
-        taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
-        taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
+    public TaskExecutionContextBuilder buildProcessDefinitionRelatedInfo(WorkflowDefinition workflowDefinition) {
+        taskExecutionContext.setProcessDefineCode(workflowDefinition.getCode());
+        taskExecutionContext.setProcessDefineVersion(workflowDefinition.getVersion());
+        taskExecutionContext.setProjectCode(workflowDefinition.getProjectCode());
         return this;
     }
 

@@ -28,10 +28,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -67,12 +67,12 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
 
     @Test
     void testTaskExecutionRunnableStatusIsNotSubmitted() throws Exception {
-        ProcessInstance processInstance = new ProcessInstance();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
         final ITaskExecutionRunnable defaultTaskExecuteRunnable =
-                createTaskExecuteRunnable(taskInstance, processInstance);
+                createTaskExecuteRunnable(taskInstance, workflowInstance);
 
         TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
         when(taskDispatchFactory.getTaskDispatcher(taskInstance)).thenReturn(taskDispatcher);
@@ -87,12 +87,12 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
 
     @Test
     void testTaskExecutionRunnableStatusIsSubmitted() throws Exception {
-        ProcessInstance processInstance = new ProcessInstance();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
         final ITaskExecutionRunnable defaultTaskExecuteRunnable =
-                createTaskExecuteRunnable(taskInstance, processInstance);
+                createTaskExecuteRunnable(taskInstance, workflowInstance);
 
         TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
         when(taskDispatchFactory.getTaskDispatcher(taskInstance)).thenReturn(taskDispatcher);
@@ -109,17 +109,17 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     }
 
     private ITaskExecutionRunnable createTaskExecuteRunnable(final TaskInstance taskInstance,
-                                                             final ProcessInstance processInstance) {
+                                                             final WorkflowInstance workflowInstance) {
 
         final ApplicationContext applicationContext = mock(ApplicationContext.class);
         when(applicationContext.getBean(TaskExecutionContextFactory.class))
                 .thenReturn(mock(TaskExecutionContextFactory.class));
         final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder = TaskExecutionRunnableBuilder.builder()
                 .applicationContext(applicationContext)
-                .workflowInstance(processInstance)
+                .workflowInstance(workflowInstance)
                 .taskInstance(taskInstance)
                 .workflowExecutionGraph(new WorkflowExecutionGraph())
-                .workflowDefinition(new ProcessDefinition())
+                .workflowDefinition(new WorkflowDefinition())
                 .taskDefinition(new TaskDefinition())
                 .workflowEventBus(new WorkflowEventBus())
                 .build();

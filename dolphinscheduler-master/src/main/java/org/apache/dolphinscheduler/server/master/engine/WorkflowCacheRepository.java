@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine;
 
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import java.util.Collection;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class WorkflowCacheRepository implements IWorkflowRepository {
 
     @PostConstruct
     public void registerMetrics() {
-        ProcessInstanceMetrics.registerProcessInstanceRunningGauge(workflowExecutionRunnableMap::size);
+        WorkflowInstanceMetrics.registerWorkflowInstanceRunningGauge(workflowExecutionRunnableMap::size);
     }
 
     @Override

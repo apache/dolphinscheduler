@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
 
@@ -40,7 +40,7 @@ public class WorkflowExecutionRunnableFactory {
     private List<ICommandHandler> commandHandlers;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private CommandDao commandDao;

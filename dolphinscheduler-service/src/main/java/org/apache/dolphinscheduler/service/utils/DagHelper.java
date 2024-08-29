@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -519,7 +519,7 @@ public class DagHelper {
      * @return Process dag
      */
     public static ProcessDag getProcessDag(List<TaskNode> taskNodeList,
-                                           List<ProcessTaskRelation> processTaskRelations) {
+                                           List<WorkflowTaskRelation> workflowTaskRelations) {
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
 
         taskNodeList.forEach(taskNode -> {
@@ -527,11 +527,11 @@ public class DagHelper {
         });
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            long preTaskCode = processTaskRelation.getPreTaskCode();
-            long postTaskCode = processTaskRelation.getPostTaskCode();
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelations) {
+            long preTaskCode = workflowTaskRelation.getPreTaskCode();
+            long postTaskCode = workflowTaskRelation.getPostTaskCode();
 
-            if (processTaskRelation.getPreTaskCode() != 0
+            if (workflowTaskRelation.getPreTaskCode() != 0
                     && taskNodeMap.containsKey(preTaskCode) && taskNodeMap.containsKey(postTaskCode)) {
                 TaskNode preNode = taskNodeMap.get(preTaskCode);
                 TaskNode postNode = taskNodeMap.get(postTaskCode);

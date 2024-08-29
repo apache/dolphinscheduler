@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
@@ -39,11 +39,11 @@ public class StopWorkflowInstanceExecutorDelegate
             IExecutorDelegate<StopWorkflowInstanceExecutorDelegate.StopWorkflowInstanceOperation, Void> {
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Override
     public Void execute(StopWorkflowInstanceOperation workflowInstanceControlRequest) {
-        final ProcessInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
+        final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
         exceptionIfWorkflowInstanceCannotStop(workflowInstance);
 
         if (ifWorkflowInstanceCanDirectStopInDB(workflowInstance)) {
@@ -54,7 +54,7 @@ public class StopWorkflowInstanceExecutorDelegate
         return null;
     }
 
-    void exceptionIfWorkflowInstanceCannotStop(ProcessInstance workflowInstance) {
+    void exceptionIfWorkflowInstanceCannotStop(WorkflowInstance workflowInstance) {
         final WorkflowExecutionStatus workflowInstanceState = workflowInstance.getState();
         if (workflowInstanceState.canStop()) {
             return;
@@ -64,11 +64,11 @@ public class StopWorkflowInstanceExecutorDelegate
                         + ", can not stop");
     }
 
-    boolean ifWorkflowInstanceCanDirectStopInDB(ProcessInstance workflowInstance) {
+    boolean ifWorkflowInstanceCanDirectStopInDB(WorkflowInstance workflowInstance) {
         return workflowInstance.getState().canDirectStopInDB();
     }
 
-    void directStopInDB(ProcessInstance workflowInstance) {
+    void directStopInDB(WorkflowInstance workflowInstance) {
         workflowInstanceDao.updateWorkflowInstanceState(
                 workflowInstance.getId(),
                 workflowInstance.getState(),
@@ -79,7 +79,7 @@ public class StopWorkflowInstanceExecutorDelegate
                 WorkflowExecutionStatus.STOP.name());
     }
 
-    void stopInMaster(ProcessInstance workflowInstance) {
+    void stopInMaster(WorkflowInstance workflowInstance) {
         try {
             final WorkflowInstanceStopResponse stopResponse = Clients
                     .withService(IWorkflowControlClient.class)
@@ -104,7 +104,7 @@ public class StopWorkflowInstanceExecutorDelegate
 
         private final StopWorkflowInstanceExecutorDelegate stopWorkflowInstanceExecutorDelegate;
 
-        private ProcessInstance workflowInstance;
+        private WorkflowInstance workflowInstance;
 
         private User executeUser;
 
@@ -112,7 +112,7 @@ public class StopWorkflowInstanceExecutorDelegate
             this.stopWorkflowInstanceExecutorDelegate = stopWorkflowInstanceExecutorDelegate;
         }
 
-        public StopWorkflowInstanceExecutorDelegate.StopWorkflowInstanceOperation onWorkflowInstance(ProcessInstance workflowInstance) {
+        public StopWorkflowInstanceExecutorDelegate.StopWorkflowInstanceOperation onWorkflowInstance(WorkflowInstance workflowInstance) {
             this.workflowInstance = workflowInstance;
             return this;
         }

@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
@@ -113,7 +113,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             throw new ServiceException("no master server available");
         }
 
-        final ProcessDefinition workflowDefinition = backfillWorkflowDTO.getWorkflowDefinition();
+        final WorkflowDefinition workflowDefinition = backfillWorkflowDTO.getWorkflowDefinition();
         final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
                 .userId(backfillWorkflowDTO.getLoginUser().getId())
                 .backfillTimeList(backfillTimeList)

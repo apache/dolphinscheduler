@@ -22,7 +22,7 @@ import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -62,7 +62,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     public void testStopWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -111,7 +111,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     public void testStopWorkflow_with_oneFailedTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -160,7 +160,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     public void testStopWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/stop/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
