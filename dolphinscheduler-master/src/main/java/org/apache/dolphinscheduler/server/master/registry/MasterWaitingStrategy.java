@@ -109,7 +109,7 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     private void clearMasterResource() {
         log.warn("Master clear workflow event queue due to lost registry connection");
         IWorkflowRepository.clear();
-        log.warn("Master clear process instance cache due to lost registry connection");
+        log.warn("Master clear workflow instance cache due to lost registry connection");
 
     }
 

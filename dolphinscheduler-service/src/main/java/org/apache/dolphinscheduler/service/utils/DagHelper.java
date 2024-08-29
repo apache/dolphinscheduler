@@ -96,7 +96,7 @@ public class DagHelper {
         List<Long> startNodeList = startNodeNameList;
 
         if (taskDependType != TaskDependType.TASK_POST && CollectionUtils.isEmpty(startNodeList)) {
-            log.error("start node list is empty! cannot continue run the process ");
+            log.error("start node list is empty! cannot continue run the workflow ");
             return destFlowNodeList;
         }
 
@@ -214,7 +214,7 @@ public class DagHelper {
      * @param startNodeNameList    startNodeNameList
      * @param recoveryNodeCodeList recoveryNodeCodeList
      * @param depNodeType          depNodeType
-     * @return process dag
+     * @return workflow dag
      * @throws Exception if error throws Exception
      */
     public static WorkflowDag generateFlowDag(List<TaskNode> totalTaskNodeList,
@@ -343,7 +343,7 @@ public class DagHelper {
     }
 
     /**
-     * parse condition task find the branch process
+     * parse condition task find the branch workflow
      * set skip flag for another one.
      */
     public static List<Long> parseConditionTask(Long nodeCode,
@@ -382,7 +382,7 @@ public class DagHelper {
     }
 
     /**
-     * parse condition task find the branch process
+     * parse condition task find the branch workflow
      * set skip flag for another one.
      *
      * @param nodeCode
@@ -461,7 +461,7 @@ public class DagHelper {
 
     /***
      * build dag graph
-     * @param workflowDag processDag
+     * @param workflowDag workflowDag
      * @return dag
      */
     public static DAG<Long, TaskNode, TaskNodeRelation> buildDagGraph(WorkflowDag workflowDag) {
@@ -485,10 +485,10 @@ public class DagHelper {
     }
 
     /**
-     * get process dag
+     * get workflow dag
      *
      * @param taskNodeList task node list
-     * @return Process dag
+     * @return workflow dag
      */
     public static WorkflowDag getWorkflowDag(List<TaskNode> taskNodeList) {
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
@@ -516,7 +516,7 @@ public class DagHelper {
      * get workflow dag
      *
      * @param taskNodeList task node list
-     * @return Process dag
+     * @return workflow dag
      */
     public static WorkflowDag getWorkflowDag(List<TaskNode> taskNodeList,
                                              List<WorkflowTaskRelation> workflowTaskRelations) {
