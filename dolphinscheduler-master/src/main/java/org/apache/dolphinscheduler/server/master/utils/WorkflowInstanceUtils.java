@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
@@ -40,7 +40,7 @@ public class WorkflowInstanceUtils {
         final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
         final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecuteContext.getWorkflowExecutionGraph();
         final IWorkflowGraph workflowGraph = workflowExecuteContext.getWorkflowGraph();
-        final ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final WorkflowEventBus workflowEventBus = workflowExecuteContext.getWorkflowEventBus();
 
         final List<String> startNodes = workflowExecutionGraph
@@ -92,14 +92,14 @@ public class WorkflowInstanceUtils {
                 .append(centeredTitle).append("\n")
                 .append(Strings.repeat("*", horizontalLineLength)).append("\n")
                 .append("Task Name:              ").append(taskInstance.getName()).append("\n")
-                .append("Workflow Instance Name: ").append(taskInstance.getProcessInstance().getName()).append("\n")
+                .append("Workflow Instance Name: ").append(taskInstance.getWorkflowInstance().getName()).append("\n")
                 .append("Task Execute Type:      ").append(taskInstance.getTaskExecuteType().getDesc()).append("\n")
                 .append("Execute State:          ").append(taskInstance.getState().getDesc()).append("\n")
                 .append("Host:                   ").append(taskInstance.getHost()).append("\n")
                 .append("Task Type:              ").append(taskInstance.getTaskType()).append("\n")
                 .append("Priority:               ").append(taskInstance.getTaskInstancePriority().getDescp())
                 .append("\n")
-                .append("Tenant:                 ").append(taskInstance.getProcessInstance().getTenantCode())
+                .append("Tenant:                 ").append(taskInstance.getWorkflowInstance().getTenantCode())
                 .append("\n")
                 .append("First Submit Time:      ").append(taskInstance.getFirstSubmitTime()).append("\n")
                 .append("Submit Time:            ").append(taskInstance.getSubmitTime()).append("\n")

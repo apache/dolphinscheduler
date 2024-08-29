@@ -232,9 +232,9 @@ public class TaskDefinitionController extends BaseController {
      */
     @Operation(summary = "releaseTaskDefinition", description = "RELEASE_TASK_DEFINITION_NOTES")
     @Parameters({
-            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "projectCode", description = "WORKFLOW_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
-            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, schema = @Schema(implementation = ReleaseState.class))
+            @Parameter(name = "releaseState", description = "RELEASE_WORKFLOW_DEFINITION_NOTES", required = true, schema = @Schema(implementation = ReleaseState.class))
     })
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)

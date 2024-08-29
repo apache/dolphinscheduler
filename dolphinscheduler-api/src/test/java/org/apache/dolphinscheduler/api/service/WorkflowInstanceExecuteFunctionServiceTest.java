@@ -243,7 +243,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
     // doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
     // Mockito.when(monitorService.listServer(RegistryNodeType.MASTER)).thenReturn(getMasterServersList());
-    // Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
+    // Mockito.when(processService.findWorkflowInstanceDetailById(processInstanceId))
     // .thenReturn(Optional.ofNullable(processInstance));
     // Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(this.processDefinition);
     // Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
@@ -356,12 +356,12 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // dependentProcessDefinition.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
     // dependentProcessDefinition.setTaskParams(
     // "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":2,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
-    // Mockito.when(processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode))
+    // Mockito.when(processLineageService.queryDownstreamDependentWorkflowDefinitions(processDefinitionCode))
     // .thenReturn(Lists.newArrayList(dependentProcessDefinition));
     //
     // Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
     // processDefinitionWorkerGroupMap.put(1L, WorkerGroupUtils.getDefaultWorkerGroup());
-    // Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
+    // Mockito.when(workerGroupService.queryWorkerGroupByWorkflowDefinitionCodes(Lists.newArrayList(1L)))
     // .thenReturn(processDefinitionWorkerGroupMap);
     //
     // Command command = new Command();
@@ -386,7 +386,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // childDependent.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
     // childDependent.setTaskParams(
     // "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
-    // Mockito.when(processLineageService.queryDownstreamDependentProcessDefinitions(
+    // Mockito.when(processLineageService.queryDownstreamDependentWorkflowDefinitions(
     // dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent))
     // .thenReturn(Lists.newArrayList());
     // int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);
@@ -662,7 +662,7 @@ public class WorkflowInstanceExecuteFunctionServiceTest {
     // TaskDependType taskDependType = TaskDependType.TASK_ONLY;
     //
     // ProcessInstance processInstanceMock = Mockito.mock(ProcessInstance.class, RETURNS_DEEP_STUBS);
-    // Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
+    // Mockito.when(processService.findWorkflowInstanceDetailById(processInstanceId))
     // .thenReturn(Optional.ofNullable(processInstanceMock));
     //
     // ProcessDefinition processDefinition = new ProcessDefinition();

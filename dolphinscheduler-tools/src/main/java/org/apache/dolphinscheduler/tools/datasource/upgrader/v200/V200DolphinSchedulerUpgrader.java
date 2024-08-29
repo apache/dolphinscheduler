@@ -24,10 +24,10 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.tools.datasource.dao.JsonSplitDao;
@@ -93,25 +93,25 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
             projectDao.updateProjectCode(connection, projectIdCodeMap);
 
             // execute process definition code
-            List<ProcessDefinition> processDefinitions =
+            List<WorkflowDefinition> workflowDefinitions =
                     processDefinitionDao.queryProcessDefinition(connection);
-            processDefinitionDao.updateProcessDefinitionCode(connection, processDefinitions,
+            processDefinitionDao.updateProcessDefinitionCode(connection, workflowDefinitions,
                     projectIdCodeMap);
 
             // execute schedule
             Map<Integer, Long> allSchedule = scheduleDao.queryAllSchedule(connection);
-            Map<Integer, Long> processIdCodeMap = processDefinitions.stream()
-                    .collect(Collectors.toMap(ProcessDefinition::getId, ProcessDefinition::getCode));
+            Map<Integer, Long> processIdCodeMap = workflowDefinitions.stream()
+                    .collect(Collectors.toMap(WorkflowDefinition::getId, WorkflowDefinition::getCode));
             scheduleDao.updateScheduleCode(connection, allSchedule, processIdCodeMap);
 
             // json split
             Map<Integer, String> processDefinitionJsonMap =
                     processDefinitionDao.queryAllProcessDefinition(connection);
-            List<ProcessDefinitionLog> processDefinitionLogs = new ArrayList<>();
-            List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+            List<WorkflowDefinitionLog> processDefinitionLogs = new ArrayList<>();
+            List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
             List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
             Map<Integer, Map<Long, Map<String, Long>>> processTaskMap = new HashMap<>();
-            splitProcessDefinitionJson(processDefinitions, processDefinitionJsonMap, processDefinitionLogs,
+            splitProcessDefinitionJson(workflowDefinitions, processDefinitionJsonMap, processDefinitionLogs,
                     processTaskRelationLogs, taskDefinitionLogs, processTaskMap);
             convertDependence(taskDefinitionLogs, projectIdCodeMap, processTaskMap);
 
@@ -124,24 +124,24 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
         }
     }
 
-    private void splitProcessDefinitionJson(List<ProcessDefinition> processDefinitions,
+    private void splitProcessDefinitionJson(List<WorkflowDefinition> workflowDefinitions,
                                             Map<Integer, String> processDefinitionJsonMap,
-                                            List<ProcessDefinitionLog> processDefinitionLogs,
-                                            List<ProcessTaskRelationLog> processTaskRelationLogs,
+                                            List<WorkflowDefinitionLog> processDefinitionLogs,
+                                            List<WorkflowTaskRelationLog> processTaskRelationLogs,
                                             List<TaskDefinitionLog> taskDefinitionLogs,
                                             Map<Integer, Map<Long, Map<String, Long>>> processTaskMap) throws Exception {
-        Map<Integer, ProcessDefinition> processDefinitionMap = processDefinitions.stream()
-                .collect(Collectors.toMap(ProcessDefinition::getId, processDefinition -> processDefinition));
+        Map<Integer, WorkflowDefinition> processDefinitionMap = workflowDefinitions.stream()
+                .collect(Collectors.toMap(WorkflowDefinition::getId, processDefinition -> processDefinition));
         Date now = new Date();
         for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()) {
             if (entry.getValue() == null) {
                 throw new Exception("processDefinitionJson is null");
             }
             ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
-            ProcessDefinition processDefinition = processDefinitionMap.get(entry.getKey());
-            if (processDefinition != null) {
-                processDefinition.setTimeout(jsonObject.get("timeout").asInt());
-                processDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
+            WorkflowDefinition workflowDefinition = processDefinitionMap.get(entry.getKey());
+            if (workflowDefinition != null) {
+                workflowDefinition.setTimeout(jsonObject.get("timeout").asInt());
+                workflowDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
             } else {
                 throw new Exception("It can't find processDefinition, please check !");
             }
@@ -205,8 +205,8 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
                 long taskCode = CodeGenerateUtils.genCode();
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
-                taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());
-                taskDefinitionLog.setUserId(processDefinition.getUserId());
+                taskDefinitionLog.setProjectCode(workflowDefinition.getProjectCode());
+                taskDefinitionLog.setUserId(workflowDefinition.getUserId());
                 taskDefinitionLog.setEnvironmentCode(-1);
                 taskDefinitionLog.setDelayTime(0);
                 taskDefinitionLog.setOperator(1);
@@ -221,14 +221,14 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
             }
             convertConditions(taskDefinitionLogList, taskNameCodeMap);
             taskDefinitionLogs.addAll(taskDefinitionLogList);
-            processDefinition.setLocations(convertLocations(processDefinition.getLocations(), taskIdCodeMap));
-            ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+            workflowDefinition.setLocations(convertLocations(workflowDefinition.getLocations(), taskIdCodeMap));
+            WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
             processDefinitionLog.setOperator(1);
             processDefinitionLog.setOperateTime(now);
             processDefinitionLog.setUpdateTime(now);
             processDefinitionLogs.add(processDefinitionLog);
-            handleProcessTaskRelation(taskNamePreMap, taskNameCodeMap, processDefinition, processTaskRelationLogs);
-            processCodeTaskNameCodeMap.put(processDefinition.getCode(), taskNameCodeMap);
+            handleProcessTaskRelation(taskNamePreMap, taskNameCodeMap, workflowDefinition, processTaskRelationLogs);
+            processCodeTaskNameCodeMap.put(workflowDefinition.getCode(), taskNameCodeMap);
             processTaskMap.put(entry.getKey(), processCodeTaskNameCodeMap);
         }
     }
@@ -348,14 +348,14 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
 
     private void handleProcessTaskRelation(Map<String, List<String>> taskNamePreMap,
                                            Map<String, Long> taskNameCodeMap,
-                                           ProcessDefinition processDefinition,
-                                           List<ProcessTaskRelationLog> processTaskRelationLogs) {
+                                           WorkflowDefinition workflowDefinition,
+                                           List<WorkflowTaskRelationLog> processTaskRelationLogs) {
         Date now = new Date();
         for (Map.Entry<String, List<String>> entry : taskNamePreMap.entrySet()) {
             List<String> entryValue = entry.getValue();
             if (CollectionUtils.isNotEmpty(entryValue)) {
                 for (String preTaskName : entryValue) {
-                    ProcessTaskRelationLog processTaskRelationLog = setProcessTaskRelationLog(processDefinition, now);
+                    WorkflowTaskRelationLog processTaskRelationLog = setProcessTaskRelationLog(workflowDefinition, now);
                     processTaskRelationLog.setPreTaskCode(taskNameCodeMap.get(preTaskName));
                     processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
                     processTaskRelationLog.setPostTaskCode(taskNameCodeMap.get(entry.getKey()));
@@ -363,7 +363,7 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
                     processTaskRelationLogs.add(processTaskRelationLog);
                 }
             } else {
-                ProcessTaskRelationLog processTaskRelationLog = setProcessTaskRelationLog(processDefinition, now);
+                WorkflowTaskRelationLog processTaskRelationLog = setProcessTaskRelationLog(workflowDefinition, now);
                 processTaskRelationLog.setPreTaskCode(0);
                 processTaskRelationLog.setPreTaskVersion(0);
                 processTaskRelationLog.setPostTaskCode(taskNameCodeMap.get(entry.getKey()));
@@ -373,11 +373,11 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
         }
     }
 
-    private ProcessTaskRelationLog setProcessTaskRelationLog(ProcessDefinition processDefinition, Date now) {
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
-        processTaskRelationLog.setProjectCode(processDefinition.getProjectCode());
-        processTaskRelationLog.setProcessDefinitionCode(processDefinition.getCode());
-        processTaskRelationLog.setProcessDefinitionVersion(processDefinition.getVersion());
+    private WorkflowTaskRelationLog setProcessTaskRelationLog(WorkflowDefinition workflowDefinition, Date now) {
+        WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
+        processTaskRelationLog.setProjectCode(workflowDefinition.getProjectCode());
+        processTaskRelationLog.setProcessDefinitionCode(workflowDefinition.getCode());
+        processTaskRelationLog.setProcessDefinitionVersion(workflowDefinition.getVersion());
         processTaskRelationLog.setConditionType(ConditionType.NONE);
         processTaskRelationLog.setConditionParams("{}");
         processTaskRelationLog.setOperator(1);

@@ -134,13 +134,13 @@ public class TaskInstance implements Serializable {
      * process instance
      */
     @TableField(exist = false)
-    private ProcessInstance processInstance;
+    private WorkflowInstance workflowInstance;
 
     /**
      * process definition
      */
     @TableField(exist = false)
-    private ProcessDefinition processDefine;
+    private WorkflowDefinition processDefine;
 
     /**
      * task definition

@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.master.command.ScheduleWorkflowCommandParam;
@@ -44,13 +44,13 @@ public class WorkflowScheduleTrigger
             AbstractWorkflowTrigger<WorkflowScheduleTriggerRequest, WorkflowScheduleTriggerResponse> {
 
     @Override
-    protected ProcessInstance constructWorkflowInstance(WorkflowScheduleTriggerRequest scheduleTriggerRequest) {
+    protected WorkflowInstance constructWorkflowInstance(WorkflowScheduleTriggerRequest scheduleTriggerRequest) {
         final CommandType commandType = CommandType.SCHEDULER;
         final Long workflowCode = scheduleTriggerRequest.getWorkflowCode();
         final Integer workflowVersion = scheduleTriggerRequest.getWorkflowVersion();
-        final ProcessDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
+        final WorkflowDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
 
-        final ProcessInstance workflowInstance = new ProcessInstance();
+        final WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
         workflowInstance.setProcessDefinitionVersion(workflowDefinition.getVersion());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
@@ -85,7 +85,7 @@ public class WorkflowScheduleTrigger
 
     @Override
     protected Command constructTriggerCommand(final WorkflowScheduleTriggerRequest scheduleTriggerRequest,
-                                              final ProcessInstance workflowInstance) {
+                                              final WorkflowInstance workflowInstance) {
         final ScheduleWorkflowCommandParam scheduleWorkflowCommandParam = ScheduleWorkflowCommandParam.builder()
                 .timeZone(scheduleTriggerRequest.getTimezoneId())
                 .build();
@@ -100,7 +100,7 @@ public class WorkflowScheduleTrigger
     }
 
     @Override
-    protected WorkflowScheduleTriggerResponse onTriggerSuccess(ProcessInstance workflowInstance) {
+    protected WorkflowScheduleTriggerResponse onTriggerSuccess(WorkflowInstance workflowInstance) {
         return WorkflowScheduleTriggerResponse.success(workflowInstance.getId());
     }
 }

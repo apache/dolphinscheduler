@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -69,7 +69,7 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
     protected void assembleWorkflowInstance(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
         final Command command = workflowExecuteContextBuilder.getCommand();
         final int workflowInstanceId = command.getProcessInstanceId();
-        final ProcessInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
+        final WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
         workflowInstance.setVarPool(null);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
@@ -94,7 +94,7 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
     }
 
     private void markAllTaskInstanceInvalid(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final ProcessInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
         final List<TaskInstance> taskInstances = getValidTaskInstance(workflowInstance);
         taskInstanceDao.markTaskInstanceInvalid(taskInstances);
     }

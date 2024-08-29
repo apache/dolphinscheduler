@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
@@ -68,7 +68,7 @@ public class WorkflowSchedulingIT extends AbstractMasterIntegrationTest {
     public void testSchedulingWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/scheduling/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final Schedule schedule = Schedule.builder()
                 .processDefinitionCode(workflow.getCode())
