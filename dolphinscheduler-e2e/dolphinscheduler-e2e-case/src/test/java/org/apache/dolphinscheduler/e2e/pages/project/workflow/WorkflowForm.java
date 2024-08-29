@@ -82,7 +82,7 @@ public final class WorkflowForm {
         switch (type) {
             case SHELL:
                 return (T) new ShellTaskForm(this);
-            case SUB_WORKFLOW:
+            case SUB_PROCESS:
                 return (T) new SubWorkflowTaskForm(this);
             case SWITCH:
                 return (T) new SwitchTaskForm(this);
@@ -127,7 +127,7 @@ public final class WorkflowForm {
 
     public enum TaskType {
         SHELL,
-        SUB_WORKFLOW,
+        SUB_PROCESS,
         SWITCH,
         HTTP,
         JAVA,
