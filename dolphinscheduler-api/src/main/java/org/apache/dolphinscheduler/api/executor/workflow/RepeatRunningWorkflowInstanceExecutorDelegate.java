@@ -18,13 +18,15 @@
 package org.apache.dolphinscheduler.api.executor.workflow;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.CommandDao;
-
-import java.util.Date;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRepeatRunningRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRepeatRunningResponse;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,7 +37,7 @@ public class RepeatRunningWorkflowInstanceExecutorDelegate
             IExecutorDelegate<RepeatRunningWorkflowInstanceExecutorDelegate.RepeatRunningWorkflowInstanceOperation, Void> {
 
     @Autowired
-    private CommandDao commandDao;
+    private RegistryClient registryClient;
 
     @Override
     public Void execute(RepeatRunningWorkflowInstanceOperation workflowInstanceControlRequest) {
@@ -45,16 +47,25 @@ public class RepeatRunningWorkflowInstanceExecutorDelegate
                     String.format("The workflow instance: %s status is %s, cannot repeat running",
                             workflowInstance.getName(), workflowInstance.getState()));
         }
-        Command command = Command.builder()
-                .commandType(CommandType.REPEAT_RUNNING)
-                .processInstanceId(workflowInstance.getId())
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .executorId(workflowInstanceControlRequest.executeUser.getId())
-                .startTime(new Date())
-                .updateTime(new Date())
+
+        final Server masterServer = registryClient.getRandomServer(RegistryNodeType.MASTER).orElse(null);
+        if (masterServer == null) {
+            throw new ServiceException("no master server available");
+        }
+        final WorkflowInstanceRepeatRunningRequest repeatRunningRequest = WorkflowInstanceRepeatRunningRequest.builder()
+                .workflowInstanceId(workflowInstance.getId())
+                .userId(workflowInstanceControlRequest.executeUser.getId())
                 .build();
-        commandDao.insert(command);
+
+        final WorkflowInstanceRepeatRunningResponse repeatRunningResponse = Clients
+                .withService(IWorkflowControlClient.class)
+                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
+                .repeatTriggerWorkflowInstance(repeatRunningRequest);
+        if (!repeatRunningResponse.isSuccess()) {
+            throw new ServiceException(
+                    "Repeat running workflow instance failed: " + repeatRunningResponse.getMessage());
+        }
+
         return null;
     }
 
