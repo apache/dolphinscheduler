@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 
@@ -47,7 +47,7 @@ public class ProxyProcessDefinitionController {
                                                String tenantCode,
                                                String taskRelationJson,
                                                String taskDefinitionJson,
-                                               ProcessExecutionTypeEnum executionType) {
+                                               WorkflowExecutionTypeEnum executionType) {
         ProxyResult proxyResult = new ProxyResult();
         String url =
                 "http://" + DomainName + ":" + ServerPort + "/dolphinscheduler/projects/" + projectCode

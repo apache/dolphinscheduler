@@ -113,7 +113,7 @@ public interface ResourcesService {
 
     /**
      * Get resource by given resource type and file name.
-     * Useful in Python API create task which need processDefinition information.
+     * Useful in Python API create task which need workflowDefinition information.
      *
      * @param userName user who query resource
      * @param fileName file name of the resource

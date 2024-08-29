@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -155,7 +155,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     }
 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final ProcessInstance workflowInstance =
+        final WorkflowInstance workflowInstance =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
             log.info("The workflow {} state is: {} will not be trigger now",

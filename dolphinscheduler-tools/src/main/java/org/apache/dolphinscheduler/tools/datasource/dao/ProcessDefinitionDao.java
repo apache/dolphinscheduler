@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -88,64 +88,64 @@ public class ProcessDefinitionDao {
         }
     }
 
-    public List<ProcessDefinition> queryProcessDefinition(Connection conn) {
-        List<ProcessDefinition> processDefinitions = new ArrayList<>();
+    public List<WorkflowDefinition> queryProcessDefinition(Connection conn) {
+        List<WorkflowDefinition> workflowDefinitions = new ArrayList<>();
         String sql =
                 "SELECT id,code,project_code,user_id,locations,name,description,release_state,flag,create_time FROM t_ds_process_definition";
         try (
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                ProcessDefinition processDefinition = new ProcessDefinition();
-                processDefinition.setId(rs.getInt(1));
+                WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+                workflowDefinition.setId(rs.getInt(1));
                 long code = rs.getLong(2);
                 if (code == 0L) {
                     code = CodeGenerateUtils.genCode();
                 }
-                processDefinition.setCode(code);
-                processDefinition.setVersion(Constants.VERSION_FIRST);
-                processDefinition.setProjectCode(rs.getLong(3));
-                processDefinition.setUserId(rs.getInt(4));
-                processDefinition.setLocations(rs.getString(5));
-                processDefinition.setName(rs.getString(6));
-                processDefinition.setDescription(rs.getString(7));
-                processDefinition.setReleaseState(ReleaseState.getEnum(rs.getInt(8)));
-                processDefinition.setFlag(rs.getInt(9) == 1 ? Flag.YES : Flag.NO);
-                processDefinition.setCreateTime(rs.getDate(10));
-                processDefinitions.add(processDefinition);
+                workflowDefinition.setCode(code);
+                workflowDefinition.setVersion(Constants.VERSION_FIRST);
+                workflowDefinition.setProjectCode(rs.getLong(3));
+                workflowDefinition.setUserId(rs.getInt(4));
+                workflowDefinition.setLocations(rs.getString(5));
+                workflowDefinition.setName(rs.getString(6));
+                workflowDefinition.setDescription(rs.getString(7));
+                workflowDefinition.setReleaseState(ReleaseState.getEnum(rs.getInt(8)));
+                workflowDefinition.setFlag(rs.getInt(9) == 1 ? Flag.YES : Flag.NO);
+                workflowDefinition.setCreateTime(rs.getDate(10));
+                workflowDefinitions.add(workflowDefinition);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
-        return processDefinitions;
+        return workflowDefinitions;
     }
 
     /**
      * updateProcessDefinitionCode
      *
      * @param conn jdbc connection
-     * @param processDefinitions processDefinitions
+     * @param workflowDefinitions processDefinitions
      * @param projectIdCodeMap projectIdCodeMap
      */
-    public void updateProcessDefinitionCode(Connection conn, List<ProcessDefinition> processDefinitions,
+    public void updateProcessDefinitionCode(Connection conn, List<WorkflowDefinition> workflowDefinitions,
                                             Map<Integer, Long> projectIdCodeMap) {
         String sql = "UPDATE t_ds_process_definition SET code=?, project_code=?, version=? where id=?";
         try {
-            for (ProcessDefinition processDefinition : processDefinitions) {
+            for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setLong(1, processDefinition.getCode());
-                    long projectCode = processDefinition.getProjectCode();
+                    pstmt.setLong(1, workflowDefinition.getCode());
+                    long projectCode = workflowDefinition.getProjectCode();
                     if (String.valueOf(projectCode).length() <= 10) {
                         Integer projectId = Integer.parseInt(String.valueOf(projectCode));
                         if (projectIdCodeMap.containsKey(projectId)) {
                             projectCode = projectIdCodeMap.get(projectId);
-                            processDefinition.setProjectCode(projectCode);
+                            workflowDefinition.setProjectCode(projectCode);
                         }
                     }
                     pstmt.setLong(2, projectCode);
-                    pstmt.setInt(3, processDefinition.getVersion());
-                    pstmt.setInt(4, processDefinition.getId());
+                    pstmt.setInt(3, workflowDefinition.getVersion());
+                    pstmt.setInt(4, workflowDefinition.getId());
                     pstmt.executeUpdate();
                 }
             }

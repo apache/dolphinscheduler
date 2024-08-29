@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
 public class RunWorkflowCommandHandler extends AbstractCommandHandler {
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -77,16 +77,14 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
      */
     @Override
     protected void assembleWorkflowInstance(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final ProcessDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
+        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
         final Command command = workflowExecuteContextBuilder.getCommand();
-        final ProcessInstance workflowInstance = processInstanceDao.queryById(command.getProcessInstanceId());
-
+        final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(command.getProcessInstanceId());
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstance.setCommandParam(command.getCommandParam());
         workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
-        processInstanceDao.upsertProcessInstance(workflowInstance);
-
+        workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
 
@@ -125,7 +123,7 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
      * <p> If there are duplicate keys, the command params will override the workflow params.
      */
     private String mergeCommandParamsWithWorkflowParams(final Command command,
-                                                        final ProcessDefinition workflowDefinition) {
+                                                        final WorkflowDefinition workflowDefinition) {
         final List<Property> commandParams =
                 Optional.ofNullable(JSONUtils.parseObject(command.getCommandParam(), ICommandParam.class))
                         .map(ICommandParam::getCommandParams)

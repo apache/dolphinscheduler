@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowTriggerRequest, TriggerWorkflowDTO> {
 
     @Autowired
-    private ProcessDefinitionDao processDefinitionDao;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Override
     public TriggerWorkflowDTO transform(WorkflowTriggerRequest workflowTriggerRequest) {
@@ -57,7 +57,7 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
                 .testFlag(workflowTriggerRequest.getTestFlag())
                 .build();
 
-        ProcessDefinition workflowDefinition = processDefinitionDao
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao
                 .queryByCode(workflowTriggerRequest.getWorkflowDefinitionCode())
                 .orElseThrow(() -> new ServiceException(
                         "Cannot find the workflow: " + workflowTriggerRequest.getWorkflowDefinitionCode()));

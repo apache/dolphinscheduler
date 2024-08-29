@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
@@ -68,7 +68,7 @@ public class WorkflowEventBusCoordinator implements AutoCloseable {
      */
     private int calculateWorkflowEventBusFireWorkerSlot(IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
-        final ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final Integer workflowInstanceId = workflowInstance.getId();
         return workflowInstanceId % workflowEventBusFireWorkers.getWorkerSize();
     }

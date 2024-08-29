@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
@@ -48,14 +48,14 @@ public class WorkflowBackfillTrigger
             AbstractWorkflowTrigger<WorkflowBackfillTriggerRequest, WorkflowBackfillTriggerResponse> {
 
     @Override
-    protected ProcessInstance constructWorkflowInstance(WorkflowBackfillTriggerRequest backfillTriggerRequest) {
+    protected WorkflowInstance constructWorkflowInstance(WorkflowBackfillTriggerRequest backfillTriggerRequest) {
         final CommandType commandType = CommandType.COMPLEMENT_DATA;
         final Long workflowCode = backfillTriggerRequest.getWorkflowCode();
         final Integer workflowVersion = backfillTriggerRequest.getWorkflowVersion();
         final List<String> backfillTimeList = backfillTriggerRequest.getBackfillTimeList();
-        final ProcessDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
+        final WorkflowDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
 
-        final ProcessInstance workflowInstance = new ProcessInstance();
+        final WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
         workflowInstance.setProcessDefinitionVersion(workflowDefinition.getVersion());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
@@ -90,7 +90,7 @@ public class WorkflowBackfillTrigger
 
     @Override
     protected Command constructTriggerCommand(WorkflowBackfillTriggerRequest backfillTriggerRequest,
-                                              ProcessInstance workflowInstance) {
+                                              WorkflowInstance workflowInstance) {
         final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
                 .commandParams(backfillTriggerRequest.getStartParamList())
                 .startNodes(backfillTriggerRequest.getStartNodes())
@@ -108,7 +108,7 @@ public class WorkflowBackfillTrigger
     }
 
     @Override
-    protected WorkflowBackfillTriggerResponse onTriggerSuccess(ProcessInstance workflowInstance) {
+    protected WorkflowBackfillTriggerResponse onTriggerSuccess(WorkflowInstance workflowInstance) {
         return WorkflowBackfillTriggerResponse.success(workflowInstance.getId());
     }
 }

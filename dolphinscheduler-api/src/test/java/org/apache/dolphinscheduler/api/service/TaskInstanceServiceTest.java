@@ -37,15 +37,15 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -100,7 +100,7 @@ public class TaskInstanceServiceTest {
     @Mock
     TaskInstanceDao taskInstanceDao;
     @Mock
-    ProcessInstanceDao workflowInstanceDao;
+    WorkflowInstanceDao workflowInstanceDao;
 
     @Test
     public void queryTaskListPaging() {
@@ -155,7 +155,7 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
         Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
-        ProcessInstance processInstance = getProcessInstance();
+        WorkflowInstance workflowInstance = getProcessInstance();
         TaskInstance taskInstance = getTaskInstance();
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         Page<TaskInstance> pageReturn = new Page<>(1, 10);
@@ -179,9 +179,9 @@ public class TaskInstanceServiceTest {
                 Mockito.any(),
                 Mockito.any()))
                         .thenReturn(pageReturn);
-        when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
-        when(processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId()))
-                .thenReturn(Optional.of(processInstance));
+        when(usersService.queryUser(workflowInstance.getExecutorId())).thenReturn(loginUser);
+        when(processService.findWorkflowInstanceDetailById(taskInstance.getProcessInstanceId()))
+                .thenReturn(Optional.of(workflowInstance));
 
         Result successRes = taskInstanceService.queryTaskListPaging(loginUser,
                 projectCode,
@@ -307,14 +307,14 @@ public class TaskInstanceServiceTest {
      *
      * @return process instance
      */
-    private ProcessInstance getProcessInstance() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        processInstance.setName("test_process_instance");
-        processInstance.setStartTime(new Date());
-        processInstance.setEndTime(new Date());
-        processInstance.setExecutorId(-1);
-        return processInstance;
+    private WorkflowInstance getProcessInstance() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setName("test_process_instance");
+        workflowInstance.setStartTime(new Date());
+        workflowInstance.setEndTime(new Date());
+        workflowInstance.setExecutorId(-1);
+        return workflowInstance;
     }
 
     /**
@@ -372,7 +372,7 @@ public class TaskInstanceServiceTest {
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
         when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())).thenReturn(Optional.empty());
 
-        assertThrowsServiceException(Status.PROCESS_INSTANCE_NOT_EXIST,
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
     }
 
@@ -381,15 +381,15 @@ public class TaskInstanceServiceTest {
         User user = getAdminUser();
         long projectCode = 1L;
         TaskInstance task = getTaskInstance();
-        ProcessInstance processInstance = getProcessInstance();
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, projectCode, FORCED_SUCCESS);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
         when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId()))
-                .thenReturn(Optional.of(processInstance));
+                .thenReturn(Optional.of(workflowInstance));
 
         assertThrowsServiceException(
-                "The workflow instance is not finished: " + processInstance.getState()
+                "The workflow instance is not finished: " + workflowInstance.getState()
                         + " cannot force start task instance",
                 () -> taskInstanceService.forceTaskSuccess(user, projectCode, task.getId()));
     }
@@ -398,12 +398,12 @@ public class TaskInstanceServiceTest {
     public void testForceTaskSuccess_withTaskInstanceNotFinished() {
         User user = getAdminUser();
         TaskInstance task = getTaskInstance();
-        ProcessInstance processInstance = getProcessInstance();
-        processInstance.setState(WorkflowExecutionStatus.FAILURE);
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setState(WorkflowExecutionStatus.FAILURE);
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
         when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId()))
-                .thenReturn(Optional.of(processInstance));
+                .thenReturn(Optional.of(workflowInstance));
 
         assertThrowsServiceException(
                 Status.TASK_INSTANCE_STATE_OPERATION_ERROR,

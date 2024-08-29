@@ -24,10 +24,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
@@ -177,8 +177,8 @@ class GlobalTaskDispatchWaitingQueueTest {
     }
 
     private ITaskExecutionRunnable createTaskExecuteRunnable() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setProcessInstancePriority(Priority.MEDIUM);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setProcessInstancePriority(Priority.MEDIUM);
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(RandomUtils.nextInt());
@@ -190,10 +190,10 @@ class GlobalTaskDispatchWaitingQueueTest {
                 .thenReturn(mock(TaskExecutionContextFactory.class));
         final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder = TaskExecutionRunnableBuilder.builder()
                 .applicationContext(applicationContext)
-                .workflowInstance(processInstance)
+                .workflowInstance(workflowInstance)
                 .taskInstance(taskInstance)
                 .workflowExecutionGraph(new WorkflowExecutionGraph())
-                .workflowDefinition(new ProcessDefinition())
+                .workflowDefinition(new WorkflowDefinition())
                 .taskDefinition(new TaskDefinition())
                 .workflowEventBus(new WorkflowEventBus())
                 .build();

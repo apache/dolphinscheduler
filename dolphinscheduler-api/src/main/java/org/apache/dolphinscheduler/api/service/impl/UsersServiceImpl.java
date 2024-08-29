@@ -421,7 +421,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         user.setUpdateTime(new Date());
         user.setTenantId(tenantId);
-        // updateProcessInstance user
+        // updateWorkflowInstance user
         if (userMapper.updateById(user) <= 0) {
             throw new ServiceException(Status.UPDATE_USER_ERROR);
         }

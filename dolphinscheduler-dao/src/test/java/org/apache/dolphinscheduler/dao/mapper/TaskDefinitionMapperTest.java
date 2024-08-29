@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
@@ -38,7 +38,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -69,17 +69,17 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
      *
      * @return ProcessDefinition
      */
-    private ProcessTaskRelation insertTaskRelation(long postTaskCode) {
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setName("def 1");
-        processTaskRelation.setProjectCode(1L);
-        processTaskRelation.setProcessDefinitionCode(1L);
-        processTaskRelation.setPostTaskCode(postTaskCode);
-        processTaskRelation.setPreTaskCode(0L);
-        processTaskRelation.setUpdateTime(new Date());
-        processTaskRelation.setCreateTime(new Date());
-        processTaskRelationMapper.insert(processTaskRelation);
-        return processTaskRelation;
+    private WorkflowTaskRelation insertTaskRelation(long postTaskCode) {
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        workflowTaskRelation.setName("def 1");
+        workflowTaskRelation.setProjectCode(1L);
+        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setPostTaskCode(postTaskCode);
+        workflowTaskRelation.setPreTaskCode(0L);
+        workflowTaskRelation.setUpdateTime(new Date());
+        workflowTaskRelation.setCreateTime(new Date());
+        workflowTaskRelationMapper.insert(workflowTaskRelation);
+        return workflowTaskRelation;
     }
 
     @Test
@@ -91,9 +91,9 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByDefinitionName() {
         TaskDefinition taskDefinition = insertOne();
-        ProcessTaskRelation processTaskRelation = insertTaskRelation(taskDefinition.getCode());
+        WorkflowTaskRelation workflowTaskRelation = insertTaskRelation(taskDefinition.getCode());
         TaskDefinition result = taskDefinitionMapper.queryByName(taskDefinition.getProjectCode(),
-                processTaskRelation.getProcessDefinitionCode(), taskDefinition.getName());
+                workflowTaskRelation.getProcessDefinitionCode(), taskDefinition.getName());
 
         Assertions.assertNotNull(result);
     }

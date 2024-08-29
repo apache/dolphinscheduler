@@ -143,7 +143,7 @@
         from t_ds_user
         where state = 1
     </select>
-    <select id="queryUserWithProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode">
+    <select id="queryUserWithProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode">
         select
             dl.code as process_definition_code,
             pd.version as process_definition_version,

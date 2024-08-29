@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
@@ -76,7 +76,7 @@ public interface IWorkflowExecutionRunnable {
     /**
      * Get the WorkflowInstance belongs to the WorkflowExecutionRunnable.
      */
-    default ProcessInstance getWorkflowInstance() {
+    default WorkflowInstance getWorkflowInstance() {
         return getWorkflowExecuteContext().getWorkflowInstance();
     }
 

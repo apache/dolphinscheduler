@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.statemachine;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
@@ -52,7 +52,7 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
     protected SuccessorFlowAdjuster successorFlowAdjuster;
 
     @Autowired
-    protected ProcessInstanceDao workflowInstanceDao;
+    protected WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     protected WorkflowCacheRepository workflowCacheRepository;
@@ -104,7 +104,7 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                   final WorkflowExecutionStatus workflowExecutionStatus) {
-        final ProcessInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         workflowInstance.setEndTime(new Date());
         workflowInstance.setState(workflowExecutionStatus);
         transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
@@ -118,7 +118,7 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      */
     protected void transformWorkflowInstanceState(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                                   final WorkflowExecutionStatus targetState) {
-        final ProcessInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         WorkflowExecutionStatus originState = workflowInstance.getState();
         try {
             workflowInstance.setState(targetState);

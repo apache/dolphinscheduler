@@ -18,14 +18,14 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,10 +38,10 @@ public abstract class AbstractWorkflowTrigger<TriggerRequest, TriggerResponse>
             IWorkflowTrigger<TriggerRequest, TriggerResponse> {
 
     @Autowired
-    private ProcessDefinitionLogDao workflowDefinitionDao;
+    private WorkflowDefinitionLogDao workflowDefinitionDao;
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private UserDao userDao;
@@ -52,7 +52,7 @@ public abstract class AbstractWorkflowTrigger<TriggerRequest, TriggerResponse>
     @Override
     @Transactional
     public TriggerResponse triggerWorkflow(final TriggerRequest triggerRequest) {
-        final ProcessInstance workflowInstance = constructWorkflowInstance(triggerRequest);
+        final WorkflowInstance workflowInstance = constructWorkflowInstance(triggerRequest);
         workflowInstanceDao.insert(workflowInstance);
 
         final Command command = constructTriggerCommand(triggerRequest, workflowInstance);
@@ -61,15 +61,15 @@ public abstract class AbstractWorkflowTrigger<TriggerRequest, TriggerResponse>
         return onTriggerSuccess(workflowInstance);
     }
 
-    protected abstract ProcessInstance constructWorkflowInstance(final TriggerRequest triggerRequest);
+    protected abstract WorkflowInstance constructWorkflowInstance(final TriggerRequest triggerRequest);
 
     protected abstract Command constructTriggerCommand(final TriggerRequest triggerRequest,
-                                                       final ProcessInstance workflowInstance);
+                                                       final WorkflowInstance workflowInstance);
 
-    protected abstract TriggerResponse onTriggerSuccess(final ProcessInstance workflowInstance);
+    protected abstract TriggerResponse onTriggerSuccess(final WorkflowInstance workflowInstance);
 
-    protected ProcessDefinition getProcessDefinition(final Long workflowCode, final Integer workflowVersion) {
-        final ProcessDefinitionLog workflow = workflowDefinitionDao.queryByDefinitionCodeAndVersion(
+    protected WorkflowDefinition getProcessDefinition(final Long workflowCode, final Integer workflowVersion) {
+        final WorkflowDefinitionLog workflow = workflowDefinitionDao.queryByDefinitionCodeAndVersion(
                 workflowCode, workflowVersion);
         if (workflow == null) {
             throw new IllegalStateException(

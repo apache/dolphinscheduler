@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.dao.entity.event;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ListenerEventType;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Date;
@@ -147,7 +147,7 @@ public class ProcessDefinitionUpdatedListenerEvent implements AbstractListenerEv
     /**
      * execution type
      */
-    private ProcessExecutionTypeEnum executionType;
+    private WorkflowExecutionTypeEnum executionType;
 
     /**
      * task definitions
@@ -157,31 +157,31 @@ public class ProcessDefinitionUpdatedListenerEvent implements AbstractListenerEv
     /**
      *
      */
-    List<ProcessTaskRelationLog> taskRelationList;
+    List<WorkflowTaskRelationLog> taskRelationList;
 
-    public ProcessDefinitionUpdatedListenerEvent(ProcessDefinition processDefinition) {
-        this.setId(processDefinition.getId());
-        this.setCode(processDefinition.getCode());
-        this.setName(processDefinition.getName());
-        this.setVersion(processDefinition.getVersion());
-        this.setReleaseState(processDefinition.getReleaseState());
-        this.setProjectCode(processDefinition.getProjectCode());
-        this.setDescription(processDefinition.getDescription());
-        this.setGlobalParams(processDefinition.getGlobalParams());
-        this.setGlobalParamList(processDefinition.getGlobalParamList());
-        this.setGlobalParamMap(processDefinition.getGlobalParamMap());
-        this.setCreateTime(processDefinition.getCreateTime());
-        this.setUpdateTime(processDefinition.getUpdateTime());
-        this.setFlag(processDefinition.getFlag());
-        this.setUserId(processDefinition.getUserId());
-        this.setUserName(processDefinition.getUserName());
-        this.setProjectName(processDefinition.getProjectName());
-        this.setLocations(processDefinition.getLocations());
-        this.setScheduleReleaseState(processDefinition.getScheduleReleaseState());
-        this.setTimeout(processDefinition.getTimeout());
-        this.setModifyBy(processDefinition.getModifyBy());
-        this.setWarningGroupId(processDefinition.getWarningGroupId());
-        this.setExecutionType(processDefinition.getExecutionType());
+    public ProcessDefinitionUpdatedListenerEvent(WorkflowDefinition workflowDefinition) {
+        this.setId(workflowDefinition.getId());
+        this.setCode(workflowDefinition.getCode());
+        this.setName(workflowDefinition.getName());
+        this.setVersion(workflowDefinition.getVersion());
+        this.setReleaseState(workflowDefinition.getReleaseState());
+        this.setProjectCode(workflowDefinition.getProjectCode());
+        this.setDescription(workflowDefinition.getDescription());
+        this.setGlobalParams(workflowDefinition.getGlobalParams());
+        this.setGlobalParamList(workflowDefinition.getGlobalParamList());
+        this.setGlobalParamMap(workflowDefinition.getGlobalParamMap());
+        this.setCreateTime(workflowDefinition.getCreateTime());
+        this.setUpdateTime(workflowDefinition.getUpdateTime());
+        this.setFlag(workflowDefinition.getFlag());
+        this.setUserId(workflowDefinition.getUserId());
+        this.setUserName(workflowDefinition.getUserName());
+        this.setProjectName(workflowDefinition.getProjectName());
+        this.setLocations(workflowDefinition.getLocations());
+        this.setScheduleReleaseState(workflowDefinition.getScheduleReleaseState());
+        this.setTimeout(workflowDefinition.getTimeout());
+        this.setModifyBy(workflowDefinition.getModifyBy());
+        this.setWarningGroupId(workflowDefinition.getWarningGroupId());
+        this.setExecutionType(workflowDefinition.getExecutionType());
     }
     @Override
     public ListenerEventType getEventType() {

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINITION_LIST;
 
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
@@ -88,7 +88,7 @@ public class TaskDefinitionV2Controller extends BaseController {
     @Operation(summary = "get", description = "FILTER_TASK_DEFINITION_NOTES")
     @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
+    @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
     public Result<PageInfo<TaskDefinition>> filterTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestBody TaskFilterRequest taskFilterRequest) {
         PageInfo<TaskDefinition> taskDefinitions =

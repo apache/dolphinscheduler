@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.failover;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -56,7 +56,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
     private TaskFailover taskFailover;
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
@@ -90,7 +90,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
 
         registryClient.getLock(RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath());
         try {
-            final List<ProcessInstance> needFailoverWorkflows = getFailoverWorkflowsForMaster(masterFailoverEvent);
+            final List<WorkflowInstance> needFailoverWorkflows = getFailoverWorkflowsForMaster(masterFailoverEvent);
             needFailoverWorkflows.forEach(workflowFailover::failoverWorkflow);
 
             failoverTimeCost.stop();
@@ -103,9 +103,9 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         }
     }
 
-    private List<ProcessInstance> getFailoverWorkflowsForMaster(final MasterFailoverEvent masterFailoverEvent) {
+    private List<WorkflowInstance> getFailoverWorkflowsForMaster(final MasterFailoverEvent masterFailoverEvent) {
         // todo: use page query
-        final List<ProcessInstance> workflowInstances = workflowInstanceDao.queryNeedFailoverWorkflowInstances(
+        final List<WorkflowInstance> workflowInstances = workflowInstanceDao.queryNeedFailoverWorkflowInstances(
                 masterFailoverEvent.getMasterAddress());
         return workflowInstances.stream()
                 .filter(workflowInstance -> {

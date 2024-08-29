@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.it;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
@@ -67,7 +67,7 @@ public class WorkflowOperator {
     }
 
     public void backfillWorkflow(final WorkflowBackfillDTO workflowBackfillDTO) {
-        final ProcessDefinition workflowDefinition = workflowBackfillDTO.getWorkflow();
+        final WorkflowDefinition workflowDefinition = workflowBackfillDTO.getWorkflow();
 
         final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
                 .userId(workflowDefinition.getUserId())
@@ -106,7 +106,7 @@ public class WorkflowOperator {
     @AllArgsConstructor
     public static class WorkflowTriggerDTO {
 
-        private final ProcessDefinition workflowDefinition;
+        private final WorkflowDefinition workflowDefinition;
 
         private final RunWorkflowCommandParam runWorkflowCommandParam;
     }
@@ -116,7 +116,7 @@ public class WorkflowOperator {
     @AllArgsConstructor
     public static class WorkflowSchedulingDTO {
 
-        private ProcessDefinition workflow;
+        private WorkflowDefinition workflow;
         private Project project;
         private Schedule schedule;
     }
@@ -126,7 +126,7 @@ public class WorkflowOperator {
     @AllArgsConstructor
     public static class WorkflowBackfillDTO {
 
-        private ProcessDefinition workflow;
+        private WorkflowDefinition workflow;
         private BackfillWorkflowCommandParam backfillWorkflowCommandParam;
     }
 

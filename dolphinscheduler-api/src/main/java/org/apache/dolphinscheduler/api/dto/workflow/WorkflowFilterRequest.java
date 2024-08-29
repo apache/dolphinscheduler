@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.dto.workflow;
 
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import lombok.Data;
 
@@ -48,14 +48,14 @@ public class WorkflowFilterRequest extends PageQueryDto {
     @Schema(example = "ONLINE / OFFLINE")
     private String scheduleReleaseState;
 
-    public ProcessDefinition convert2ProcessDefinition() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
+    public WorkflowDefinition convert2WorkflowDefinition() {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         if (this.workflowName != null) {
-            processDefinition.setName(this.workflowName);
+            workflowDefinition.setName(this.workflowName);
         }
         if (this.releaseState != null) {
-            processDefinition.setReleaseState(ReleaseState.valueOf(this.releaseState));
+            workflowDefinition.setReleaseState(ReleaseState.valueOf(this.releaseState));
         }
-        return processDefinition;
+        return workflowDefinition;
     }
 }

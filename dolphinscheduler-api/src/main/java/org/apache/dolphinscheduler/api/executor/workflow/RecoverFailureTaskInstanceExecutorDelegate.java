@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 
 import java.util.Date;
@@ -41,7 +41,7 @@ public class RecoverFailureTaskInstanceExecutorDelegate
 
     @Override
     public Void execute(RecoverFailureTaskInstanceOperation recoverFailureTaskInstanceOperation) {
-        ProcessInstance workflowInstance = recoverFailureTaskInstanceOperation.getWorkflowInstance();
+        WorkflowInstance workflowInstance = recoverFailureTaskInstanceOperation.getWorkflowInstance();
         if (!workflowInstance.getState().isFailure()) {
             throw new ServiceException(
                     String.format("The workflow instance: %s status is %s, can not be recovered",
@@ -66,7 +66,7 @@ public class RecoverFailureTaskInstanceExecutorDelegate
 
         private final RecoverFailureTaskInstanceExecutorDelegate recoverFailureTaskInstanceExecutorDelegate;
 
-        private ProcessInstance workflowInstance;
+        private WorkflowInstance workflowInstance;
 
         private User executeUser;
 
@@ -74,7 +74,7 @@ public class RecoverFailureTaskInstanceExecutorDelegate
             this.recoverFailureTaskInstanceExecutorDelegate = recoverFailureTaskInstanceExecutorDelegate;
         }
 
-        public RecoverFailureTaskInstanceOperation onWorkflowInstance(ProcessInstance workflowInstance) {
+        public RecoverFailureTaskInstanceOperation onWorkflowInstance(WorkflowInstance workflowInstance) {
             this.workflowInstance = workflowInstance;
             return this;
         }

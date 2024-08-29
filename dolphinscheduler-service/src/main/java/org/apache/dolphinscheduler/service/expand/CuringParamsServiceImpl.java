@@ -35,9 +35,9 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -178,17 +178,17 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      *
      * @param taskInstance
      * @param parameters
-     * @param processInstance
+     * @param workflowInstance
      * @return
      */
     @Override
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters,
-                                                         @NonNull ProcessInstance processInstance) {
+                                                         @NonNull WorkflowInstance workflowInstance) {
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
         // assign value to definedParams here
-        Map<String, Property> globalParams = setGlobalParamsMap(processInstance);
+        Map<String, Property> globalParams = setGlobalParamsMap(workflowInstance);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
@@ -200,11 +200,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
-        ICommandParam commandParam = JSONUtils.parseObject(processInstance.getCommandParam(), ICommandParam.class);
+        ICommandParam commandParam = JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
         String timeZone = commandParam.getTimeZone();
 
         // built-in params
-        Map<String, String> builtInParams = setBuiltInParamsMap(taskInstance, processInstance, timeZone);
+        Map<String, String> builtInParams = setBuiltInParamsMap(taskInstance, workflowInstance, timeZone);
 
         // project-level params
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
@@ -260,7 +260,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         }
 
         // put schedule time param to params map
-        Map<String, Property> paramsMap = preBuildBusinessParams(processInstance);
+        Map<String, Property> paramsMap = preBuildBusinessParams(workflowInstance);
         if (MapUtils.isNotEmpty(paramsMap)) {
             prepareParamsMap.putAll(paramsMap);
         }
@@ -274,7 +274,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * @param timeZone
      */
     private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
-                                                    ProcessInstance workflowInstance,
+                                                    WorkflowInstance workflowInstance,
                                                     String timeZone) {
         CommandType commandType = workflowInstance.getCmdTypeIfComplement();
         Date scheduleTime = workflowInstance.getScheduleTime();
@@ -296,11 +296,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         return params;
     }
 
-    private Map<String, Property> setGlobalParamsMap(ProcessInstance processInstance) {
+    private Map<String, Property> setGlobalParamsMap(WorkflowInstance workflowInstance) {
         Map<String, Property> globalParamsMap = new HashMap<>(16);
 
         // global params string
-        String globalParamsStr = processInstance.getGlobalParams();
+        String globalParamsStr = workflowInstance.getGlobalParams();
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap
@@ -311,11 +311,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     }
 
     @Override
-    public Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance) {
+    public Map<String, Property> preBuildBusinessParams(WorkflowInstance workflowInstance) {
         Map<String, Property> paramsMap = new HashMap<>();
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-        if (processInstance.getScheduleTime() != null) {
-            Date date = processInstance.getScheduleTime();
+        if (workflowInstance.getScheduleTime() != null) {
+            Date date = workflowInstance.getScheduleTime();
             String dateTime = DateUtils.format(date, DateConstants.PARAMETER_FORMAT_TIME, null);
             Property p = new Property();
             p.setValue(dateTime);

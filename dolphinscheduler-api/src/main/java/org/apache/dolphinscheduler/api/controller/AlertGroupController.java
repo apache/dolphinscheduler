@@ -164,7 +164,7 @@ public class AlertGroupController extends BaseController {
     }
 
     /**
-     * updateProcessInstance alert group
+     * updateWorkflowInstance alert group
      *
      * @param loginUser login user
      * @param id alert group id

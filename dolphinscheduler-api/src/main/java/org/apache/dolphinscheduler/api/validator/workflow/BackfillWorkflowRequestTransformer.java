@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -53,7 +53,7 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
     private ProjectDao projectDao;
 
     @Autowired
-    private ProcessDefinitionDao processDefinitionDao;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Override
     public BackfillWorkflowDTO transform(WorkflowBackFillRequest workflowBackFillRequest) {
@@ -81,7 +81,7 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
                 .backfillParams(backfillParams)
                 .build();
 
-        ProcessDefinition workflowDefinition = processDefinitionDao
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao
                 .queryByCode(workflowBackFillRequest.getWorkflowDefinitionCode())
                 .orElseThrow(() -> new ServiceException(
                         "Cannot find the workflow: " + workflowBackFillRequest.getWorkflowDefinitionCode()));

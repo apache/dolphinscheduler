@@ -49,7 +49,7 @@ public class TaskInstanceUtils {
         target.setLogPath(source.getLogPath());
         target.setRetryTimes(source.getRetryTimes());
         target.setAlertFlag(source.getAlertFlag());
-        target.setProcessInstance(source.getProcessInstance());
+        target.setWorkflowInstance(source.getWorkflowInstance());
         target.setProcessDefine(source.getProcessDefine());
         target.setTaskDefine(source.getTaskDefine());
         target.setPid(source.getPid());

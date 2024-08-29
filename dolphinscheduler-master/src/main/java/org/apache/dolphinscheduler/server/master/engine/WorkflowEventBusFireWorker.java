@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
@@ -57,7 +57,7 @@ public class WorkflowEventBusFireWorker {
 
     public void registerWorkflowEventBus(IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
-        final ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final Integer workflowInstanceId = workflowInstance.getId();
         final String workflowInstanceName = workflowInstance.getName();
         checkState(!registeredWorkflowExecuteRunnableMap.containsKey(workflowInstanceId),
@@ -68,7 +68,7 @@ public class WorkflowEventBusFireWorker {
 
     public void unRegisterWorkflowEventBus(IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
-        final ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final Integer workflowInstanceId = workflowInstance.getId();
         registeredWorkflowExecuteRunnableMap.remove(workflowInstanceId, workflowExecutionRunnable);
     }

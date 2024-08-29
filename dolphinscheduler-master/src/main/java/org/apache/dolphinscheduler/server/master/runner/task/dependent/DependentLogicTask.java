@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
@@ -44,28 +44,28 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
     public static final String TASK_TYPE = "DEPENDENT";
 
     private final ProjectDao projectDao;
-    private final ProcessDefinitionDao processDefinitionDao;
+    private final WorkflowDefinitionDao workflowDefinitionDao;
     private final TaskDefinitionDao taskDefinitionDao;
     private final TaskInstanceDao taskInstanceDao;
-    private final ProcessInstanceDao processInstanceDao;
+    private final WorkflowInstanceDao workflowInstanceDao;
 
     private final IWorkflowExecutionRunnable workflowExecutionRunnable;
 
     public DependentLogicTask(TaskExecutionContext taskExecutionContext,
                               ProjectDao projectDao,
-                              ProcessDefinitionDao processDefinitionDao,
+                              WorkflowDefinitionDao workflowDefinitionDao,
                               TaskDefinitionDao taskDefinitionDao,
                               TaskInstanceDao taskInstanceDao,
-                              ProcessInstanceDao processInstanceDao,
+                              WorkflowInstanceDao workflowInstanceDao,
                               IWorkflowExecutionRunnable workflowExecutionRunnable) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<DependentParameters>() {
                 }));
         this.projectDao = projectDao;
-        this.processDefinitionDao = processDefinitionDao;
+        this.workflowDefinitionDao = workflowDefinitionDao;
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
-        this.processInstanceDao = processInstanceDao;
+        this.workflowInstanceDao = workflowInstanceDao;
         this.workflowExecutionRunnable = workflowExecutionRunnable;
 
     }
@@ -75,10 +75,10 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
         return new DependentAsyncTaskExecuteFunction(taskExecutionContext,
                 taskParameters,
                 projectDao,
-                processDefinitionDao,
+                workflowDefinitionDao,
                 taskDefinitionDao,
                 taskInstanceDao,
-                processInstanceDao);
+                workflowInstanceDao);
     }
 
     @Override

@@ -36,8 +36,8 @@ import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -97,7 +97,7 @@ public class TaskExecutionContextFactory {
 
     public TaskExecutionContext createTaskExecutionContext(TaskExecutionContextCreateRequest request) {
         TaskInstance taskInstance = request.getTaskInstance();
-        ProcessInstance workflowInstance = request.getWorkflowInstance();
+        WorkflowInstance workflowInstance = request.getWorkflowInstance();
 
         ResourceParametersHelper resources = TaskPluginManager.getTaskChannel(taskInstance.getTaskType())
                 .parseParameters(taskInstance.getTaskParams())

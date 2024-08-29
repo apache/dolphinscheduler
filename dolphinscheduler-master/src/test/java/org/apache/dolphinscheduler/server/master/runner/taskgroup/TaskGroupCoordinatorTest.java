@@ -29,10 +29,10 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
@@ -71,7 +71,7 @@ class TaskGroupCoordinatorTest {
     private TaskInstanceDao taskInstanceDao;
 
     @Mock
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Test
     void start() throws InterruptedException {

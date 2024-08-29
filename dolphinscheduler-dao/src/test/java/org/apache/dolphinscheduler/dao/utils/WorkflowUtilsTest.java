@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import java.util.Date;
 
@@ -30,24 +30,24 @@ class WorkflowUtilsTest {
 
     @Test
     public void testGetWorkflowInstanceDuration() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        processInstance.setState(null);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setState(null);
         Date start = DateUtils.stringToDate("2020-01-20 11:00:00");
         Date end = DateUtils.stringToDate("2020-01-21 12:10:10");
-        processInstance.setStartTime(start);
-        processInstance.setEndTime(end);
+        workflowInstance.setStartTime(start);
+        workflowInstance.setEndTime(end);
 
-        String noStateDuration = WorkflowUtils.getWorkflowInstanceDuration(processInstance);
+        String noStateDuration = WorkflowUtils.getWorkflowInstanceDuration(workflowInstance);
         System.currentTimeMillis();
         Assertions.assertNotEquals("1d 1h 10m 10s", noStateDuration);
 
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        String notFinishDuration = WorkflowUtils.getWorkflowInstanceDuration(processInstance);
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        String notFinishDuration = WorkflowUtils.getWorkflowInstanceDuration(workflowInstance);
         Assertions.assertNotEquals("1d 1h 10m 10s", notFinishDuration);
 
-        processInstance.setState(WorkflowExecutionStatus.SUCCESS);
-        String successDuration = WorkflowUtils.getWorkflowInstanceDuration(processInstance);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        String successDuration = WorkflowUtils.getWorkflowInstanceDuration(workflowInstance);
         Assertions.assertEquals("1d 1h 10m 10s", successDuration);
     }
 }

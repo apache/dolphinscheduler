@@ -68,7 +68,7 @@ public interface AlertGroupService {
     AlertGroup createAlertGroup(User loginUser, String groupName, String desc, String alertInstanceIds);
 
     /**
-     * updateProcessInstance alert group
+     * updateWorkflowInstance alert group
      *
      * @param loginUser login user
      * @param id alert group id

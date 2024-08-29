@@ -138,7 +138,7 @@ public class Command {
                    Date scheduleTime,
                    String workerGroup,
                    Long environmentCode,
-                   Priority processInstancePriority,
+                   Priority workflowInstancePriority,
                    int dryRun,
                    int processInstanceId,
                    int processDefinitionVersion,
@@ -156,7 +156,7 @@ public class Command {
         this.updateTime = new Date();
         this.workerGroup = workerGroup;
         this.environmentCode = environmentCode;
-        this.processInstancePriority = processInstancePriority;
+        this.processInstancePriority = workflowInstancePriority;
         this.dryRun = dryRun;
         this.processInstanceId = processInstanceId;
         this.processDefinitionVersion = processDefinitionVersion;

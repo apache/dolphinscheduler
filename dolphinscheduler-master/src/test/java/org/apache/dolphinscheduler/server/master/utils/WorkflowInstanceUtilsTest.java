@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -37,11 +37,11 @@ public class WorkflowInstanceUtilsTest {
 
     @Test
     public void testLogWorkflowInstanceInDetails() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setName("test_workflow");
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setName("test_workflow");
 
-        ProcessInstance workflowInstance = new ProcessInstance();
-        workflowInstance.setProcessDefinition(processDefinition);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setWorkflowDefinition(workflowDefinition);
         workflowInstance.setName("test_workflow_20230801");
         workflowInstance.setCommandType(CommandType.REPEAT_RUNNING);
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
@@ -80,13 +80,13 @@ public class WorkflowInstanceUtilsTest {
 
     @Test
     public void testLogTaskInstanceInDetails() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setName("test_process");
-        processInstance.setTenantCode("default");
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setName("test_process");
+        workflowInstance.setTenantCode("default");
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setName("test_task");
-        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setWorkflowInstance(workflowInstance);
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setTaskExecuteType(TaskExecuteType.BATCH);
         taskInstance.setHost("127.0.0.1");

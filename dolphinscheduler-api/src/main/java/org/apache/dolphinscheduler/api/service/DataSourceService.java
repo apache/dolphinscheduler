@@ -42,7 +42,7 @@ public interface DataSourceService {
     DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
     /**
-     * updateProcessInstance datasource
+     * updateWorkflowInstance datasource
      *
      * @param loginUser login user
      * @param dataSourceParam data source params
@@ -51,7 +51,7 @@ public interface DataSourceService {
     DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
-     * updateProcessInstance datasource
+     * updateWorkflowInstance datasource
      *
      * @param id datasource id
      * @return data source detail

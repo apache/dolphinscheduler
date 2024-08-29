@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
@@ -57,7 +57,7 @@ import com.google.common.collect.Lists;
 public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
 
     @Autowired
-    private ProcessInstanceDao workflowInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -89,7 +89,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
                                             final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
         final Command command = workflowExecuteContextBuilder.getCommand();
         final int workflowInstanceId = command.getProcessInstanceId();
-        final ProcessInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
+        final WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
         workflowInstance.setVarPool(null);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
@@ -150,7 +150,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
      */
     private List<TaskInstance> dealWithHistoryTaskInstances(
                                                             final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final ProcessInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
         final Map<String, TaskInstance> taskInstanceMap = super.getValidTaskInstance(workflowInstance)
                 .stream()
                 .collect(Collectors.toMap(TaskInstance::getName, Function.identity()));
