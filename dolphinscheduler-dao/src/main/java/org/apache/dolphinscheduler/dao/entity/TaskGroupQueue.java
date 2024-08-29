@@ -57,7 +57,7 @@ public class TaskGroupQueue implements Serializable {
 
     private int groupId;
 
-    private int workflowInstanceId;
+    private Integer workflowInstanceId;
 
     private int priority;
 

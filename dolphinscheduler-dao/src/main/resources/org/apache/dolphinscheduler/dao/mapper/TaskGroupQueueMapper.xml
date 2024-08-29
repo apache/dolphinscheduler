@@ -23,7 +23,7 @@
         <result property="taskId" column="task_id" jdbcType="INTEGER"/>
         <result property="taskName" column="task_name" jdbcType="VARCHAR"/>
         <result property="groupId" column="group_id" jdbcType="INTEGER"/>
-        <result property="workflow_instance_id" column="workflow_instance_id" jdbcType="INTEGER"/>
+        <result property="workflowInstanceId" column="workflow_instance_id" jdbcType="INTEGER"/>
         <result property="priority" column="priority" jdbcType="INTEGER"/>
         <result property="status" column="status" jdbcType="INTEGER"/>
         <result property="forceStart" column="force_start" jdbcType="INTEGER"/>
