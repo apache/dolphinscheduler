@@ -227,7 +227,7 @@ export default {
                             },
                             {
                                 title: 'Remote Shell',
-                                link: '/en-cn/docs/dev/user_doc/guide/task/remoteshell.html',
+                                link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
@@ -265,10 +265,6 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/vertica.html',
-                            },
-                            {
-                                title: 'Remote Shell',
-                                link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
