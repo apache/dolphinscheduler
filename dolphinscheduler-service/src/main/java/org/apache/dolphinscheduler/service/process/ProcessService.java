@@ -26,12 +26,9 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -50,66 +47,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.transaction.annotation.Transactional;
-
 public interface ProcessService {
 
-    WorkflowInstance constructProcessInstance(Command command,
-                                              String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
+    WorkflowInstance constructWorkflowInstance(Command command,
+                                               String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
-    Optional<WorkflowInstance> findWorkflowInstanceDetailById(int processId);
+    Optional<WorkflowInstance> findWorkflowInstanceDetailById(int workflowInstanceId);
 
-    WorkflowInstance findProcessInstanceById(int processId);
+    WorkflowInstance findWorkflowInstanceById(int workflowInstanceId);
 
-    WorkflowDefinition findProcessDefinition(Long processDefinitionCode, int processDefinitionVersion);
+    WorkflowDefinition findWorkflowDefinition(Long workflowDefinitionCode, int workflowDefinitionVersion);
 
-    WorkflowDefinition findProcessDefinitionByCode(Long processDefinitionCode);
+    WorkflowDefinition findWorkflowDefinitionByCode(Long workflowDefinitionCode);
 
-    int deleteWorkProcessInstanceById(int processInstanceId);
+    int deleteWorkflowInstanceById(int workflowInstanceId);
 
-    int deleteAllSubWorkProcessByParentId(int processInstanceId);
+    int deleteAllSubWorkflowByParentId(int workflowInstanceId);
 
-    void removeTaskLogFile(Integer processInstanceId);
+    void removeTaskLogFile(Integer workflowInstanceId);
 
     List<Long> findAllSubWorkflowDefinitionCode(long workflowDefinitionCode);
 
-    String getTenantForProcess(String tenantCode, int userId);
+    String getTenantForWorkflow(String tenantCode, int userId);
 
-    Environment findEnvironmentByCode(Long environmentCode);
+    int deleteWorkflowMapByParentId(int parentWorkflowId);
 
-    void setSubProcessParam(WorkflowInstance subWorkflowInstance);
+    WorkflowInstance findSubWorkflowInstance(Integer parentWorkflowInstanceId, Integer parentTaskId);
 
-    @Transactional
-    boolean submitTask(WorkflowInstance workflowInstance, TaskInstance taskInstance);
-
-    void createSubWorkProcess(WorkflowInstance parentWorkflowInstance, TaskInstance task);
-
-    void packageTaskInstance(TaskInstance taskInstance, WorkflowInstance workflowInstance);
-
-    void updateTaskDefinitionResources(TaskDefinition taskDefinition);
-
-    int deleteWorkProcessMapByParentId(int parentWorkProcessId);
-
-    WorkflowInstance findSubWorkflowInstance(Integer parentProcessId, Integer parentTaskId);
-
-    WorkflowInstance findParentWorkflowInstance(Integer subProcessId);
+    WorkflowInstance findParentWorkflowInstance(Integer subWorkflowInstanceId);
 
     void changeOutParam(TaskInstance taskInstance);
 
     Schedule querySchedule(int id);
 
-    List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode);
-
-    List<WorkflowInstance> queryNeedFailoverProcessInstances(String host);
-
-    List<String> queryNeedFailoverProcessInstanceHost();
-
-    @Transactional
-    void processNeedFailoverProcessInstances(WorkflowInstance workflowInstance);
+    List<Schedule> queryReleaseSchedulerListByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     DataSource findDataSourceById(int id);
-
-    ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId);
 
     <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType);
 
@@ -117,9 +90,9 @@ public interface ProcessService {
 
     String formatTaskAppId(TaskInstance taskInstance);
 
-    int switchVersion(WorkflowDefinition workflowDefinition, WorkflowDefinitionLog processDefinitionLog);
+    int switchVersion(WorkflowDefinition workflowDefinition, WorkflowDefinitionLog workflowDefinitionLog);
 
-    int switchProcessTaskRelationVersion(WorkflowDefinition workflowDefinition);
+    int switchWorkflowTaskRelationVersion(WorkflowDefinition workflowDefinition);
 
     int switchTaskDefinitionVersion(long taskCode, int taskVersion);
 
@@ -128,9 +101,9 @@ public interface ProcessService {
     int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine);
 
     int saveWorkflowDefine(User operator, WorkflowDefinition workflowDefinition, Boolean syncDefine,
-                           Boolean isFromProcessDefine);
+                           Boolean isFromWorkflowDefinition);
 
-    int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
+    int saveTaskRelation(User operator, long projectCode, long workflowDefinitionCode, int workflowDefinitionVersion,
                          List<WorkflowTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs,
                          Boolean syncDefine);
 
@@ -140,20 +113,10 @@ public interface ProcessService {
 
     DagData genDagData(WorkflowDefinition workflowDefinition);
 
-    List<WorkflowTaskRelation> findRelationByCode(long processDefinitionCode, int processDefinitionVersion);
+    List<WorkflowTaskRelation> findRelationByCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 
     List<TaskNode> transformTask(List<WorkflowTaskRelation> taskRelationList,
                                  List<TaskDefinitionLog> taskDefinitionLogs);
-
-    DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId);
-
-    int updateDqExecuteResultUserId(int taskInstanceId);
-
-    int updateDqExecuteResultState(DqExecuteResult dqExecuteResult);
-
-    int deleteDqExecuteResultByTaskInstanceId(int taskInstanceId);
-
-    int deleteTaskStatisticsValueByTaskInstanceId(int taskInstanceId);
 
     DqRule getDqRule(int ruleId);
 
@@ -166,15 +129,13 @@ public interface ProcessService {
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
                                             String taskName,
                                             Integer groupId,
-                                            Integer processId,
+                                            Integer workflowInstanceId,
                                             Integer priority,
                                             TaskGroupQueueStatus status);
 
-    WorkflowInstance loadNextProcess4Serial(long code, int state, int id);
+    String findConfigYamlByName(String clusterName);
 
-    public String findConfigYamlByName(String clusterName);
-
-    void forceProcessInstanceSuccessByTaskInstanceId(TaskInstance taskInstance);
+    void forceWorkflowInstanceSuccessByTaskInstanceId(TaskInstance taskInstance);
 
     void setGlobalParamIfCommanded(WorkflowDefinition workflowDefinition, Map<String, String> cmdParam);
 }

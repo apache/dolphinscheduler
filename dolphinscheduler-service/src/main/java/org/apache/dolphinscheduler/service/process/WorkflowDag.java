@@ -22,7 +22,10 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.List;
 
-public class ProcessDag {
+import lombok.Data;
+
+@Data
+public class WorkflowDag {
 
     /**
      * DAG edge list
@@ -34,49 +37,9 @@ public class ProcessDag {
      */
     private List<TaskNode> nodes;
 
-    /**
-     * getter method
-     *
-     * @return the edges
-     * @see ProcessDag#edges
-     */
-    public List<TaskNodeRelation> getEdges() {
-        return edges;
-    }
-
-    /**
-     * setter method
-     *
-     * @param edges the edges to set
-     * @see ProcessDag#edges
-     */
-    public void setEdges(List<TaskNodeRelation> edges) {
-        this.edges = edges;
-    }
-
-    /**
-     * getter method
-     *
-     * @return the nodes
-     * @see ProcessDag#nodes
-     */
-    public List<TaskNode> getNodes() {
-        return nodes;
-    }
-
-    /**
-     * setter method
-     *
-     * @param nodes the nodes to set
-     * @see ProcessDag#nodes
-     */
-    public void setNodes(List<TaskNode> nodes) {
-        this.nodes = nodes;
-    }
-
     @Override
     public String toString() {
-        return "ProcessDag{"
+        return "WorkflowDag{"
                 + "edges=" + edges
                 + ", nodes=" + nodes
                 + '}';

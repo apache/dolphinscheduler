@@ -41,10 +41,10 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
     /**
      * query workflow instance detail info by id
      *
-     * @param processId processId
+     * @param id id
      * @return workflow instance
      */
-    WorkflowInstance queryDetailById(@Param("processId") int processId);
+    WorkflowInstance queryDetailById(@Param("id") int id);
 
     /**
      * query workflow instance by host and stateArray

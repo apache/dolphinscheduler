@@ -183,7 +183,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     public WorkflowInstance createSubProcessInstance(Command command) throws MasterTaskExecuteException {
         WorkflowInstance subWorkflowInstance;
         try {
-            subWorkflowInstance = processService.constructProcessInstance(command, workflowInstance.getHost());
+            subWorkflowInstance = processService.constructWorkflowInstance(command, workflowInstance.getHost());
             subWorkflowInstance.setIsSubWorkflow(Flag.YES);
             subWorkflowInstance.setVarPool(taskExecutionContext.getVarPool());
         } catch (Exception e) {

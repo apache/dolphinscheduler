@@ -241,7 +241,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
         WorkflowDefinition workflowDefinition =
-                processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+                processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                         workflowInstance.getWorkflowDefinitionVersion());
 
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
@@ -502,7 +502,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Long subWorkflowCode = allSubWorkflows.get(0).getWorkflowDefinitionCode();
         int subWorkflowVersion = allSubWorkflows.get(0).getWorkflowDefinitionVersion();
         WorkflowDefinition subWorkflowDefinition =
-                processService.findProcessDefinition(subWorkflowCode, subWorkflowVersion);
+                processService.findWorkflowDefinition(subWorkflowCode, subWorkflowVersion);
         if (subWorkflowDefinition == null) {
             putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);

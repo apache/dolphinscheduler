@@ -323,14 +323,14 @@ public final class Constants {
     public static final int EXIT_CODE_FAILURE = -1;
 
     /**
-     * process or task definition failure
+     * workflow or task definition failure
      */
     public static final int DEFINITION_FAILURE = -1;
 
     public static final int OPPOSITE_VALUE = -1;
 
     /**
-     * process or task definition first version
+     * workflow or task definition first version
      */
     public static final int VERSION_FIRST = 1;
 

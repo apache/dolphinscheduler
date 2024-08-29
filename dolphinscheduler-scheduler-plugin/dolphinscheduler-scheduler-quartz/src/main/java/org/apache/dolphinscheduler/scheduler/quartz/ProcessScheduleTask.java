@@ -74,7 +74,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         }
 
         WorkflowDefinition workflowDefinition =
-                processService.findProcessDefinitionByCode(schedule.getWorkflowDefinitionCode());
+                processService.findWorkflowDefinitionByCode(schedule.getWorkflowDefinitionCode());
         // release state : online/offline
         ReleaseState releaseState = workflowDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {

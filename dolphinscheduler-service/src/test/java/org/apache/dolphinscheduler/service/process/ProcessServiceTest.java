@@ -39,31 +39,16 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -102,52 +87,27 @@ public class ProcessServiceTest {
 
     @InjectMocks
     private ProcessServiceImpl processService;
-    @Mock
-    private CommandMapper commandMapper;
-    @Mock
-    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
-    @Mock
-    private ErrorCommandMapper errorCommandMapper;
-    @Mock
-    private WorkflowDefinitionMapper processDefineMapper;
-    @Mock
-    private WorkflowInstanceMapper workflowInstanceMapper;
-    @Mock
-    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
-    private TaskInstanceDao taskInstanceDao;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
+
+    @Mock
+    private WorkflowDefinitionMapper processDefineMapper;
 
     @Mock
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
-    private TaskDefinitionDao taskDefinitionDao;
-
-    @Mock
     private UserMapper userMapper;
-    @Mock
-    private TenantMapper tenantMapper;
 
-    @Mock
-    private TaskInstanceMapper taskInstanceMapper;
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
-    @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
-    @Mock
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
-    @Mock
-    private WorkflowDefinitionLogMapper processDefineLogMapper;
-    @Mock
-    private TaskGroupMapper taskGroupMapper;
-    @Mock
-    private DataSourceMapper dataSourceMapper;
-    @Mock
-    private TaskGroupQueueMapper taskGroupQueueMapper;
 
     @Mock
-    private DqExecuteResultMapper dqExecuteResultMapper;
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private TaskGroupQueueMapper taskGroupQueueMapper;
 
     @Mock
     private DqRuleMapper dqRuleMapper;
@@ -159,13 +119,7 @@ public class ProcessServiceTest {
     private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
     @Mock
-    private DqComparisonTypeMapper dqComparisonTypeMapper;
-
-    @Mock
     CuringParamsService curingGlobalParamsService;
-
-    @Mock
-    TaskPluginManager taskPluginManager;
 
     @Test
     public void testGetUserById() {
@@ -180,7 +134,7 @@ public class ProcessServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(333);
         taskInstance.setWorkflowInstanceId(222);
-        when(processService.findProcessInstanceById(taskInstance.getWorkflowInstanceId())).thenReturn(null);
+        when(processService.findWorkflowInstanceById(taskInstance.getWorkflowInstanceId())).thenReturn(null);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
@@ -189,7 +143,7 @@ public class ProcessServiceTest {
         workflowInstance.setId(222);
         workflowInstance.setWorkflowDefinitionVersion(1);
         workflowInstance.setWorkflowDefinitionCode(1L);
-        when(processService.findProcessInstanceById(taskInstance.getWorkflowInstanceId()))
+        when(processService.findWorkflowInstanceById(taskInstance.getWorkflowInstanceId()))
                 .thenReturn(workflowInstance);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
     }

@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChann
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.service.process.ProcessDag;
+import org.apache.dolphinscheduler.service.process.WorkflowDag;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -217,10 +217,10 @@ public class DagHelper {
      * @return process dag
      * @throws Exception if error throws Exception
      */
-    public static ProcessDag generateFlowDag(List<TaskNode> totalTaskNodeList,
-                                             List<Long> startNodeNameList,
-                                             List<Long> recoveryNodeCodeList,
-                                             TaskDependType depNodeType) throws Exception {
+    public static WorkflowDag generateFlowDag(List<TaskNode> totalTaskNodeList,
+                                              List<Long> startNodeNameList,
+                                              List<Long> recoveryNodeCodeList,
+                                              TaskDependType depNodeType) throws Exception {
 
         List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(totalTaskNodeList, startNodeNameList,
                 recoveryNodeCodeList, depNodeType);
@@ -228,10 +228,10 @@ public class DagHelper {
             return null;
         }
         List<TaskNodeRelation> taskNodeRelations = generateRelationListByFlowNodes(destTaskNodeList);
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(destTaskNodeList);
-        return processDag;
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(destTaskNodeList);
+        return workflowDag;
     }
 
     /**
@@ -461,23 +461,23 @@ public class DagHelper {
 
     /***
      * build dag graph
-     * @param processDag processDag
+     * @param workflowDag processDag
      * @return dag
      */
-    public static DAG<Long, TaskNode, TaskNodeRelation> buildDagGraph(ProcessDag processDag) {
+    public static DAG<Long, TaskNode, TaskNodeRelation> buildDagGraph(WorkflowDag workflowDag) {
 
         DAG<Long, TaskNode, TaskNodeRelation> dag = new DAG<>();
 
         // add vertex
-        if (CollectionUtils.isNotEmpty(processDag.getNodes())) {
-            for (TaskNode node : processDag.getNodes()) {
+        if (CollectionUtils.isNotEmpty(workflowDag.getNodes())) {
+            for (TaskNode node : workflowDag.getNodes()) {
                 dag.addNode(node.getCode(), node);
             }
         }
 
         // add edge
-        if (CollectionUtils.isNotEmpty(processDag.getEdges())) {
-            for (TaskNodeRelation edge : processDag.getEdges()) {
+        if (CollectionUtils.isNotEmpty(workflowDag.getEdges())) {
+            for (TaskNodeRelation edge : workflowDag.getEdges()) {
                 dag.addEdge(edge.getStartNode(), edge.getEndNode());
             }
         }
@@ -490,7 +490,7 @@ public class DagHelper {
      * @param taskNodeList task node list
      * @return Process dag
      */
-    public static ProcessDag getProcessDag(List<TaskNode> taskNodeList) {
+    public static WorkflowDag getWorkflowDag(List<TaskNode> taskNodeList) {
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
 
         // Traverse node information and build relationships
@@ -506,20 +506,20 @@ public class DagHelper {
             }
         }
 
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodeList);
-        return processDag;
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(taskNodeList);
+        return workflowDag;
     }
 
     /**
-     * get process dag
+     * get workflow dag
      *
      * @param taskNodeList task node list
      * @return Process dag
      */
-    public static ProcessDag getProcessDag(List<TaskNode> taskNodeList,
-                                           List<WorkflowTaskRelation> workflowTaskRelations) {
+    public static WorkflowDag getWorkflowDag(List<TaskNode> taskNodeList,
+                                             List<WorkflowTaskRelation> workflowTaskRelations) {
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
 
         taskNodeList.forEach(taskNode -> {
@@ -539,10 +539,10 @@ public class DagHelper {
                         .add(new TaskNodeRelation(preNode.getCode(), postNode.getCode()));
             }
         }
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodeList);
-        return processDag;
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(taskNodeList);
+        return workflowDag;
     }
 
     /**

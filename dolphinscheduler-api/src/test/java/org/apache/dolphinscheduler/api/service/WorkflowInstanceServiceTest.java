@@ -422,7 +422,7 @@ public class WorkflowInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         when(processService.findWorkflowInstanceDetailById(workflowInstance.getId()))
                 .thenReturn(Optional.of(workflowInstance));
-        when(processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+        when(processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getWorkflowDefinitionVersion())).thenReturn(workflowDefinition);
         Map<String, Object> successRes = processInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -437,7 +437,7 @@ public class WorkflowInstanceServiceTest {
                 processInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
 
-        when(processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+        when(processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getWorkflowDefinitionVersion())).thenReturn(null);;
         workerExistRes = processInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST, workerExistRes.get(Constants.STATUS));
@@ -600,7 +600,7 @@ public class WorkflowInstanceServiceTest {
         Tenant tenant = getTenant();
         when(processDefineMapper.queryByCode(46L)).thenReturn(workflowDefinition);
         when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
-        when(processService.getTenantForProcess(Mockito.anyString(), Mockito.anyInt()))
+        when(processService.getTenantForWorkflow(Mockito.anyString(), Mockito.anyInt()))
                 .thenReturn(tenant.getTenantCode());
         when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
         when(processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.FALSE))
@@ -725,10 +725,10 @@ public class WorkflowInstanceServiceTest {
 
         workflowDefinition.setProjectCode(projectCode);
         when(processService.findWorkflowInstanceDetailById(Mockito.anyInt())).thenReturn(Optional.of(workflowInstance));
-        when(processService.deleteWorkProcessInstanceById(1)).thenReturn(1);
+        when(processService.deleteWorkflowInstanceById(1)).thenReturn(1);
         processInstanceService.deleteWorkflowInstanceById(loginUser, 1);
 
-        when(processService.deleteWorkProcessInstanceById(1)).thenReturn(0);
+        when(processService.deleteWorkflowInstanceById(1)).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> processInstanceService.deleteWorkflowInstanceById(loginUser, 1));
     }
 

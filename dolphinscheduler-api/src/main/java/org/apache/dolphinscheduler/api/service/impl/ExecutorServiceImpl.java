@@ -337,7 +337,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         WorkflowDefinition workflowDefinition =
-                processService.findProcessDefinition(workflowInstance.getWorkflowDefinitionCode(),
+                processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                         workflowInstance.getWorkflowDefinitionVersion());
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
         this.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowInstance.getWorkflowDefinitionCode(),
@@ -479,7 +479,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             executionOrder = ExecutionOrder.DESC_ORDER;
         }
 
-        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+        List<Schedule> schedules = processService.queryReleaseSchedulerListByWorkflowDefinitionCode(
                 command.getWorkflowDefinitionCode());
 
         List<ZonedDateTime> listDate = new ArrayList<>();

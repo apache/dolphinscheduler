@@ -42,12 +42,12 @@ public interface CuringParamsService {
 
     /**
      * time function extension
-     * @param processInstanceId
+     * @param workflowInstanceId
      * @param timezone
      * @param placeholderName
      * @return
      */
-    String timeFunctionExtension(Integer processInstanceId, String timezone, String placeholderName);
+    String timeFunctionExtension(Integer workflowInstanceId, String timezone, String placeholderName);
 
     /**
      * convert parameter placeholders
@@ -59,7 +59,7 @@ public interface CuringParamsService {
 
     /**
      * curing global params
-     * @param processInstanceId
+     * @param workflowInstanceId
      * @param globalParamMap
      * @param globalParamList
      * @param commandType
@@ -67,7 +67,7 @@ public interface CuringParamsService {
      * @param timezone
      * @return
      */
-    String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap,
+    String curingGlobalParams(Integer workflowInstanceId, Map<String, String> globalParamMap,
                               List<Property> globalParamList, CommandType commandType, Date scheduleTime,
                               String timezone);
 

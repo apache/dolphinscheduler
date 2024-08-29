@@ -32,7 +32,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where id = #{processId}
+        where id = #{id}
     </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select

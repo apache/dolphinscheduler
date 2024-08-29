@@ -92,14 +92,15 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     }
 
     @Override
-    public String timeFunctionExtension(Integer processInstanceId, String timezone, String placeholderName) {
-        return timePlaceholderResolverExpandService.timeFunctionExtension(processInstanceId, timezone, placeholderName);
+    public String timeFunctionExtension(Integer workflowInstanceId, String timezone, String placeholderName) {
+        return timePlaceholderResolverExpandService.timeFunctionExtension(workflowInstanceId, timezone,
+                placeholderName);
     }
 
     /**
      * here it is judged whether external expansion calculation is required and the calculation result is obtained
      *
-     * @param processInstanceId
+     * @param workflowInstanceId
      * @param globalParamMap
      * @param globalParamList
      * @param commandType
@@ -108,7 +109,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * @return
      */
     @Override
-    public String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap,
+    public String curingGlobalParams(Integer workflowInstanceId, Map<String, String> globalParamMap,
                                      List<Property> globalParamList, CommandType commandType, Date scheduleTime,
                                      String timezone) {
         if (globalParamList == null || globalParamList.isEmpty()) {
@@ -134,7 +135,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 String str = val;
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
-                    str = timeFunctionExtension(processInstanceId, timezone, val);
+                    str = timeFunctionExtension(workflowInstanceId, timezone, val);
                 }
                 resolveMap.put(entry.getKey(), str);
             }
