@@ -103,8 +103,8 @@ if __name__ == "__main__":
             "Environment variable `GH_ACCESS_TOKEN` and `GH_REPO_MILESTONE` must provider"
         )
 
-    try:
-        print(args.func(ENV_ACCESS_TOKEN, ENV_MILESTONE))
-    except Exception as e:
-        print(f"Please run 'python release.py -h' to get help, reason: {e}")
+    if not hasattr(args, "func"):
+        arg_parser.print_help()
         exit(1)
+
+    print(args.func(ENV_ACCESS_TOKEN, ENV_MILESTONE))
