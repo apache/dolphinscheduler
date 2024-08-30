@@ -25,7 +25,7 @@ class Changelog:
 
     Each pull requests will only once in final result. If pull requests have more than one label we need,
     will classify to high priority label type, currently priority is
-    `feature > bug > improvement > document > chore`. pr will into feature section if it with both `feature`,
+    `dsip > feature > bug > improvement > document > chore`. pr will into feature section if it with both `feature`,
     `improvement`, `document` label.
 
     :param prs: pull requests list.
