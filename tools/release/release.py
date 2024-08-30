@@ -92,7 +92,7 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
-    # args = arg_parser.parse_args(["cherry-pick"])
+    # args = arg_parser.parse_args(["changelog"])
     args = arg_parser.parse_args()
 
     ENV_ACCESS_TOKEN = os.environ.get("GH_ACCESS_TOKEN", None)
@@ -102,5 +102,9 @@ if __name__ == "__main__":
         raise RuntimeError(
             "Environment variable `GH_ACCESS_TOKEN` and `GH_REPO_MILESTONE` must provider"
         )
+
+    if not hasattr(args, "func"):
+        arg_parser.print_help()
+        exit(1)
 
     print(args.func(ENV_ACCESS_TOKEN, ENV_MILESTONE))
