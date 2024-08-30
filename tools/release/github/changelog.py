@@ -119,7 +119,7 @@ class Changelog:
                 self.others.append(pr)
 
     def _is_dsip(self, pr: Dict) -> bool:
-        """Belong to feature pull requests."""
+        """Belong to dsip pull requests."""
         return any(
             [
                 label[self.key_name].lower() == self.label_dsip
