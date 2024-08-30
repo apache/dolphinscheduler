@@ -81,3 +81,4 @@ The alert plugin may have some dirty data. After the upgrade, clear it manually 
 ```sql
 delete from t_ds_alertgroup where group_name = 'global alert group' and description = 'global alert group';
 ```
+

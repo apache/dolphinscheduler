@@ -82,3 +82,4 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 ```sql
 delete from t_ds_alertgroup where group_name = 'global alert group' and description = 'global alert group';
 ```
+
