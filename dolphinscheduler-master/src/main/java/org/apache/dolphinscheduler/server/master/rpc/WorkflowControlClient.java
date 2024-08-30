@@ -22,6 +22,12 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowB
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverSuspendTasksRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverSuspendTasksResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRepeatRunningRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRepeatRunningResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
@@ -31,6 +37,9 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowS
 import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowBackfillTrigger;
+import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowInstanceRecoverFailureTaskTrigger;
+import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowInstanceRecoverSuspendTaskTrigger;
+import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowInstanceRepeatTrigger;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowManualTrigger;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowScheduleTrigger;
 
@@ -53,6 +62,15 @@ public class WorkflowControlClient implements IWorkflowControlClient {
 
     @Autowired
     private WorkflowScheduleTrigger workflowScheduleTrigger;
+
+    @Autowired
+    private WorkflowInstanceRepeatTrigger workflowInstanceRepeatTrigger;
+
+    @Autowired
+    private WorkflowInstanceRecoverFailureTaskTrigger workflowInstanceRecoverFailureTaskTrigger;
+
+    @Autowired
+    private WorkflowInstanceRecoverSuspendTaskTrigger workflowInstanceRecoverSuspendTaskTrigger;
 
     @Autowired
     private WorkflowCacheRepository workflowRepository;
@@ -78,13 +96,51 @@ public class WorkflowControlClient implements IWorkflowControlClient {
     }
 
     @Override
-    public WorkflowScheduleTriggerResponse scheduleTriggerWorkflow(WorkflowScheduleTriggerRequest workflowScheduleTriggerRequest) {
+    public WorkflowScheduleTriggerResponse scheduleTriggerWorkflow(final WorkflowScheduleTriggerRequest workflowScheduleTriggerRequest) {
         try {
             return workflowScheduleTrigger.triggerWorkflow(workflowScheduleTriggerRequest);
         } catch (Exception ex) {
             log.error("Handle workflowScheduleTriggerRequest: {} failed", workflowScheduleTriggerRequest, ex);
             return WorkflowScheduleTriggerResponse
                     .fail("Schedule trigger workflow failed: " + ExceptionUtils.getMessage(ex));
+        }
+    }
+
+    @Override
+    public WorkflowInstanceRepeatRunningResponse repeatTriggerWorkflowInstance(final WorkflowInstanceRepeatRunningRequest workflowInstanceRepeatRunningRequest) {
+        try {
+            return workflowInstanceRepeatTrigger.triggerWorkflow(workflowInstanceRepeatRunningRequest);
+        } catch (Exception ex) {
+            log.error("Handle workflowInstanceRepeatRunningRequest: {} failed", workflowInstanceRepeatRunningRequest,
+                    ex);
+            return WorkflowInstanceRepeatRunningResponse
+                    .fail("Repeat trigger workflow instance failed: " + ExceptionUtils.getMessage(ex));
+        }
+    }
+
+    @Override
+    public WorkflowInstanceRecoverFailureTasksResponse triggerFromFailureTasks(final WorkflowInstanceRecoverFailureTasksRequest workflowInstanceRecoverFailureTasksRequest) {
+        try {
+            return workflowInstanceRecoverFailureTaskTrigger
+                    .triggerWorkflow(workflowInstanceRecoverFailureTasksRequest);
+        } catch (Exception ex) {
+            log.error("Handle workflowInstanceRecoverFailureTaskRequest: {} failed",
+                    workflowInstanceRecoverFailureTasksRequest, ex);
+            return WorkflowInstanceRecoverFailureTasksResponse
+                    .fail("Recover failure task failed: " + ExceptionUtils.getMessage(ex));
+        }
+    }
+
+    @Override
+    public WorkflowInstanceRecoverSuspendTasksResponse triggerFromSuspendTasks(WorkflowInstanceRecoverSuspendTasksRequest workflowInstanceRecoverSuspendTasksRequest) {
+        try {
+            return workflowInstanceRecoverSuspendTaskTrigger
+                    .triggerWorkflow(workflowInstanceRecoverSuspendTasksRequest);
+        } catch (Exception ex) {
+            log.error("Handle workflowInstanceRecoverSuspendTaskRequest: {} failed",
+                    workflowInstanceRecoverSuspendTasksRequest, ex);
+            return WorkflowInstanceRecoverSuspendTasksResponse
+                    .fail("Recover suspend task failed: " + ExceptionUtils.getMessage(ex));
         }
     }
 

@@ -18,13 +18,15 @@
 package org.apache.dolphinscheduler.api.executor.workflow;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.CommandDao;
-
-import java.util.Date;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksResponse;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import lombok.Getter;
 
@@ -37,7 +39,7 @@ public class RecoverFailureTaskInstanceExecutorDelegate
             IExecutorDelegate<RecoverFailureTaskInstanceExecutorDelegate.RecoverFailureTaskInstanceOperation, Void> {
 
     @Autowired
-    private CommandDao commandDao;
+    private RegistryClient registryClient;
 
     @Override
     public Void execute(RecoverFailureTaskInstanceOperation recoverFailureTaskInstanceOperation) {
@@ -48,16 +50,23 @@ public class RecoverFailureTaskInstanceExecutorDelegate
                             workflowInstance.getName(), workflowInstance.getState()));
         }
 
-        Command command = Command.builder()
-                .commandType(CommandType.START_FAILURE_TASK_PROCESS)
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .processInstanceId(workflowInstance.getId())
-                .executorId(recoverFailureTaskInstanceOperation.getExecuteUser().getId())
-                .startTime(new Date())
-                .updateTime(new Date())
-                .build();
-        commandDao.insert(command);
+        final Server masterServer = registryClient.getRandomServer(RegistryNodeType.MASTER).orElse(null);
+        if (masterServer == null) {
+            throw new ServiceException("no master server available");
+        }
+        final WorkflowInstanceRecoverFailureTasksRequest recoverFailureTaskRequest =
+                WorkflowInstanceRecoverFailureTasksRequest.builder()
+                        .workflowInstanceId(workflowInstance.getId())
+                        .userId(recoverFailureTaskInstanceOperation.executeUser.getId())
+                        .build();
+
+        final WorkflowInstanceRecoverFailureTasksResponse recoverFailureTaskResponse = Clients
+                .withService(IWorkflowControlClient.class)
+                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
+                .triggerFromFailureTasks(recoverFailureTaskRequest);
+        if (!recoverFailureTaskResponse.isSuccess()) {
+            throw new ServiceException("Recover workflow instance failed: " + recoverFailureTaskResponse.getMessage());
+        }
         return null;
     }
 

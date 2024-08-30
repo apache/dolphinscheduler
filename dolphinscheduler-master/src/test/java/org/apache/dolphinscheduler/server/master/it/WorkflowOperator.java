@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowB
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRepeatRunningRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
@@ -87,6 +89,23 @@ public class WorkflowOperator {
         final Project project = workflowSchedulingDTO.getProject();
         final Schedule schedule = workflowSchedulingDTO.getSchedule();
         schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
+    }
+
+    public void repeatRunningWorkflowInstance(final Integer workflowInstanceId) {
+        final WorkflowInstanceRepeatRunningRequest repeatRunningRequest = WorkflowInstanceRepeatRunningRequest.builder()
+                .workflowInstanceId(workflowInstanceId)
+                .userId(1)
+                .build();
+        workflowInstanceController.repeatTriggerWorkflowInstance(repeatRunningRequest);
+    }
+
+    public void recoverFailureTasks(final Integer workflowInstanceId) {
+        final WorkflowInstanceRecoverFailureTasksRequest recoverFailureTasksRequest =
+                WorkflowInstanceRecoverFailureTasksRequest.builder()
+                        .workflowInstanceId(workflowInstanceId)
+                        .userId(1)
+                        .build();
+        workflowInstanceController.triggerFromFailureTasks(recoverFailureTasksRequest);
     }
 
     public WorkflowInstancePauseResponse pauseWorkflowInstance(Integer workflowInstanceId) {
