@@ -83,26 +83,19 @@ public class DolphinSchedulerManager {
     public void upgradeDolphinScheduler() throws IOException {
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
-        if (schemaList == null || schemaList.size() == 0) {
+        if (schemaList == null || schemaList.isEmpty()) {
             log.info("There is no schema to upgrade!");
         } else {
             String version;
-            // Gets the version of the current system
-            if (databaseDialect.tableExists("t_escheduler_version")) {
-                version = upgradeDao.getCurrentVersion("t_escheduler_version");
-            } else if (databaseDialect.tableExists("t_ds_version")) {
+            // Get the version of the current system
+            if (databaseDialect.tableExists("t_ds_version")) {
                 version = upgradeDao.getCurrentVersion("t_ds_version");
-            } else if (databaseDialect.columnExists("t_escheduler_queue", "create_time")) {
-                version = "1.0.1";
-            } else if (databaseDialect.tableExists("t_escheduler_queue")) {
-                version = "1.0.0";
             } else {
                 log.error("Unable to determine current software version, so cannot upgrade");
                 throw new RuntimeException("Unable to determine current software version, so cannot upgrade");
             }
             // The target version of the upgrade
-            String schemaVersion = "";
-            String currentVersion = version;
+            String schemaVersion;
             for (String schemaDir : schemaList) {
                 schemaVersion = schemaDir.split("_")[0];
                 if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
@@ -112,11 +105,6 @@ public class DolphinSchedulerManager {
                     DolphinSchedulerVersion.getVersion(schemaVersion).ifPresent(v -> upgraderMap.get(v).doUpgrade());
                     version = schemaVersion;
                 }
-            }
-            // todo: do we need to do this in all version > 2.0.6?
-            if (SchemaUtils.isAGreatVersion("2.0.6", currentVersion)
-                    && SchemaUtils.isAGreatVersion(SchemaUtils.getSoftVersion(), currentVersion)) {
-                upgradeDao.upgradeDolphinSchedulerResourceFileSize();
             }
         }
 
