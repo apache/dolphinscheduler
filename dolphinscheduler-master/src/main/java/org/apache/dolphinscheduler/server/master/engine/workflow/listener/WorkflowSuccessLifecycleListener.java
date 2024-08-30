@@ -21,14 +21,16 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowBackfillTrigger;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -44,11 +46,14 @@ import org.springframework.stereotype.Component;
 public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListener {
 
     @Autowired
+    private WorkflowBackfillTrigger workflowBackfillTrigger;
+
+    @Autowired
     private CommandDao commandDao;
 
     public void notifyWorkflowLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
-        final ProcessInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         if (Flag.YES == workflowInstance.getIsSubProcess()) {
             // The sub workflow does not need to generate the backfill command
             // Since the parent workflow will trigger the task to generate the sub workflow instance.
@@ -69,37 +74,37 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     }
 
     private void generateNextBackfillCommand(final BackfillWorkflowCommandParam commandParam,
-                                             final ProcessInstance workflowInstance) {
+                                             final WorkflowInstance workflowInstance) {
         // Generate next backfill command
         final List<String> backfillTimeList = commandParam.getBackfillTimeList();
         backfillTimeList.remove(DateUtils.dateToString(workflowInstance.getScheduleTime()));
         if (CollectionUtils.isEmpty(backfillTimeList)) {
             return;
         }
-        final BackfillWorkflowCommandParam nextCommandParam = BackfillWorkflowCommandParam.builder()
+        final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
+                .userId(workflowInstance.getExecutorId())
                 .backfillTimeList(backfillTimeList)
-                .commandParams(commandParam.getCommandParams())
-                .timeZone(commandParam.getTimeZone())
-                .build();
-
-        final Command command = Command.builder()
-                .commandType(CommandType.COMPLEMENT_DATA)
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .executorId(workflowInstance.getExecutorId())
+                .workflowCode(workflowInstance.getProcessDefinitionCode())
+                .workflowVersion(workflowInstance.getProcessDefinitionVersion())
+                .startNodes(commandParam.getStartNodes())
                 .failureStrategy(workflowInstance.getFailureStrategy())
                 .taskDependType(workflowInstance.getTaskDependType())
-                .commandParam(JSONUtils.toJsonString(nextCommandParam))
-                .scheduleTime(DateUtils.stringToDate(backfillTimeList.get(0)))
+                .execType(CommandType.COMPLEMENT_DATA)
                 .warningType(workflowInstance.getWarningType())
                 .warningGroupId(workflowInstance.getWarningGroupId())
+                .workflowInstancePriority(workflowInstance.getProcessInstancePriority())
                 .workerGroup(workflowInstance.getWorkerGroup())
                 .tenantCode(workflowInstance.getTenantCode())
                 .environmentCode(workflowInstance.getEnvironmentCode())
-                .processInstancePriority(workflowInstance.getProcessInstancePriority())
+                .startParamList(commandParam.getCommandParams())
+                .dryRun(Flag.of(workflowInstance.getDryRun()))
+                .testFlag(Flag.of(workflowInstance.getTestFlag()))
                 .build();
-
-        commandDao.insert(command);
+        final WorkflowBackfillTriggerResponse backfillTriggerResponse =
+                workflowBackfillTrigger.triggerWorkflow(backfillTriggerRequest);
+        if (!backfillTriggerResponse.isSuccess()) {
+            log.warn("Backfill workflow failed: {}", backfillTriggerResponse.getMessage());
+        }
     }
 
     @Override

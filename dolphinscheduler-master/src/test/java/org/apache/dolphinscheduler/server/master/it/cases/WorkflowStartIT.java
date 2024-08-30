@@ -22,8 +22,8 @@ import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -72,13 +72,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -103,13 +103,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_usingWorkflowParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -139,7 +139,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_usingCommandParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
@@ -154,7 +154,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -184,13 +184,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_oneFailedTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -215,13 +215,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_oneFailedTaskWithRetry() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(3))
@@ -268,13 +268,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoSerialSuccessTask() {
         String yaml = "/it/start/workflow_with_two_serial_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -307,13 +307,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoSerialFailedTask() {
         final String yaml = "/it/start/workflow_with_two_serial_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -338,13 +338,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -376,13 +376,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoParallelFailedTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -415,13 +415,13 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -482,7 +482,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflowFromStartNodes_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final ProcessDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflow();
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .startNodes(Lists.newArrayList(6L))
@@ -491,7 +491,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
-        workflowOperator.triggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))

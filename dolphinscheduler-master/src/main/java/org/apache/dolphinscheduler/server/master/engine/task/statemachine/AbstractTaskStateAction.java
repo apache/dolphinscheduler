@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus.DISPATCH;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
@@ -206,7 +206,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void mergeTaskVarPoolToWorkflow(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                               final ITaskExecutionRunnable taskExecutionRunnable) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        final ProcessInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         final String finalVarPool = VarPoolUtils.mergeVarPoolJsonString(
                 Lists.newArrayList(workflowInstance.getVarPool(), taskInstance.getVarPool()));
         workflowInstance.setVarPool(finalVarPool);
@@ -256,7 +256,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
                     .taskInstanceId(taskExecutionRunnable.getTaskInstance().getId())
                     .workflowHost(masterConfig.getMasterAddress())
                     .build();
-            final TakeOverTaskResponse takeOverTaskResponse = SingletonJdkDynamicRpcClientProxyFactory
+            final TakeOverTaskResponse takeOverTaskResponse = Clients
                     .withService(ITaskInstanceOperator.class)
                     .withHost(taskExecutionRunnable.getTaskInstance().getHost())
                     .takeOverTask(takeOverTaskRequest);

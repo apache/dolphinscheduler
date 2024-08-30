@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -177,6 +177,6 @@ public interface UserMapper extends BaseMapper<User> {
      * @param processDefinitionCodes processDefinitionCodes
      * @return user with process definition code
      */
-    List<UserWithProcessDefinitionCode> queryUserWithProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
+    List<UserWithWorkflowDefinitionCode> queryUserWithProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
 
 }

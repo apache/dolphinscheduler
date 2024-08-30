@@ -27,42 +27,42 @@ public class DagData {
     /**
      * processDefinition
      */
-    private ProcessDefinition processDefinition;
+    private WorkflowDefinition workflowDefinition;
 
     /**
      * processTaskRelationList
      */
-    private List<ProcessTaskRelation> processTaskRelationList;
+    private List<WorkflowTaskRelation> workflowTaskRelationList;
 
     /**
      * processTaskRelationList
      */
     private List<TaskDefinition> taskDefinitionList;
 
-    public DagData(ProcessDefinition processDefinition, List<ProcessTaskRelation> processTaskRelationList,
+    public DagData(WorkflowDefinition workflowDefinition, List<WorkflowTaskRelation> workflowTaskRelationList,
                    List<TaskDefinition> taskDefinitionList) {
-        this.processDefinition = processDefinition;
-        this.processTaskRelationList = processTaskRelationList;
+        this.workflowDefinition = workflowDefinition;
+        this.workflowTaskRelationList = workflowTaskRelationList;
         this.taskDefinitionList = taskDefinitionList;
     }
 
     public DagData() {
     }
 
-    public ProcessDefinition getProcessDefinition() {
-        return processDefinition;
+    public WorkflowDefinition getProcessDefinition() {
+        return workflowDefinition;
     }
 
-    public void setProcessDefinition(ProcessDefinition processDefinition) {
-        this.processDefinition = processDefinition;
+    public void setProcessDefinition(WorkflowDefinition workflowDefinition) {
+        this.workflowDefinition = workflowDefinition;
     }
 
-    public List<ProcessTaskRelation> getProcessTaskRelationList() {
-        return processTaskRelationList;
+    public List<WorkflowTaskRelation> getProcessTaskRelationList() {
+        return workflowTaskRelationList;
     }
 
-    public void setProcessTaskRelationList(List<ProcessTaskRelation> processTaskRelationList) {
-        this.processTaskRelationList = processTaskRelationList;
+    public void setProcessTaskRelationList(List<WorkflowTaskRelation> workflowTaskRelationList) {
+        this.workflowTaskRelationList = workflowTaskRelationList;
     }
 
     public List<TaskDefinition> getTaskDefinitionList() {

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -38,7 +38,7 @@ public class JsonSplitDao {
      * @param conn jdbc connection
      * @param processDefinitionLogs processDefinitionLogs
      */
-    public void executeJsonSplitProcessDefinition(Connection conn, List<ProcessDefinitionLog> processDefinitionLogs) {
+    public void executeJsonSplitProcessDefinition(Connection conn, List<WorkflowDefinitionLog> processDefinitionLogs) {
         String updateSql =
                 "UPDATE t_ds_process_definition SET global_params=?,timeout=?,locations=?,update_time=? where id=?";
         String insertLogSql =
@@ -48,7 +48,7 @@ public class JsonSplitDao {
             PreparedStatement processUpdate = conn.prepareStatement(updateSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
             int i = 0;
-            for (ProcessDefinitionLog processDefinitionLog : processDefinitionLogs) {
+            for (WorkflowDefinitionLog processDefinitionLog : processDefinitionLogs) {
                 processUpdate.setString(1, processDefinitionLog.getGlobalParams());
                 processUpdate.setInt(2, processDefinitionLog.getTimeout());
                 processUpdate.setString(3, processDefinitionLog.getLocations());
@@ -98,7 +98,7 @@ public class JsonSplitDao {
      * @param processTaskRelationLogs processTaskRelationLogs
      */
     public void executeJsonSplitProcessTaskRelation(Connection conn,
-                                                    List<ProcessTaskRelationLog> processTaskRelationLogs) {
+                                                    List<WorkflowTaskRelationLog> processTaskRelationLogs) {
         String insertSql =
                 "insert into t_ds_process_task_relation (project_code,process_definition_code,process_definition_version,pre_task_code,pre_task_version,"
                         + "post_task_code,post_task_version,condition_type,condition_params,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?)";
@@ -110,7 +110,7 @@ public class JsonSplitDao {
             PreparedStatement insert = conn.prepareStatement(insertSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
             int i = 0;
-            for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogs) {
+            for (WorkflowTaskRelationLog processTaskRelationLog : processTaskRelationLogs) {
                 insert.setLong(1, processTaskRelationLog.getProjectCode());
                 insert.setLong(2, processTaskRelationLog.getProcessDefinitionCode());
                 insert.setInt(3, processTaskRelationLog.getProcessDefinitionVersion());

@@ -22,47 +22,49 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ExecutorService {
 
     /**
-     * Trigger the workflow and return the trigger code.
+     * Trigger the workflow and return the workflow instance id.
      */
-    Long triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest);
+    Integer triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest);
 
     /**
-     * Backfill the workflow and return the trigger code.
+     * Backfill the workflow and return the workflow instance ids.
      */
-    Long backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest);
+    List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest);
 
     /**
-     * check whether the process definition can be executed
+     * check whether the workflow definition can be executed
      *
      * @param projectCode       project code
-     * @param processDefinition process definition
-     * @param processDefineCode process definition code
-     * @param version           process definition version
+     * @param workflowDefinition workflow definition
+     * @param workflowDefinitionCode workflow definition code
+     * @param version           workflow definition version
      */
-    void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition, long processDefineCode,
-                                     Integer version);
+    void checkWorkflowDefinitionValid(long projectCode, WorkflowDefinition workflowDefinition,
+                                      long workflowDefinitionCode,
+                                      Integer version);
 
     /**
-     * do action to execute task in process instance
+     * do action to execute task in workflow instance
      *
      * @param loginUser         login user
      * @param projectCode       project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param startNodeList     start node list
      * @param taskDependType    task depend type
      * @return execute result code
      */
     WorkflowExecuteResponse executeTask(User loginUser,
                                         long projectCode,
-                                        Integer processInstanceId,
+                                        Integer workflowInstanceId,
                                         String startNodeList,
                                         TaskDependType taskDependType);
 
@@ -72,12 +74,12 @@ public interface ExecutorService {
     void controlWorkflowInstance(User loginUser, Integer workflowInstanceId, ExecuteType executeType);
 
     /**
-     * check if the current process has subprocesses and all subprocesses are valid
+     * check if the current workflow has sub workflows and all sub workflows are valid
      *
-     * @param processDefinition
+     * @param workflowDefinition
      * @return check result
      */
-    boolean checkSubProcessDefinitionValid(ProcessDefinition processDefinition);
+    boolean checkSubWorkflowDefinitionValid(WorkflowDefinition workflowDefinition);
 
     /**
      * force start Task Instance
@@ -97,8 +99,8 @@ public interface ExecutorService {
      * @param workerGroup     worker group name
      * @param tenantCode      tenant code
      * @param environmentCode environment code
-     * @param startParams     the global param values which pass to new process instance
-     * @return execute process instance code
+     * @param startParams     the global param values which pass to new workflow instance
+     * @return execute workflow instance code
      */
     void execStreamTaskInstance(User loginUser, long projectCode,
                                 long taskDefinitionCode, int taskDefinitionVersion,

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.engine.graph;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -41,17 +41,17 @@ public class WorkflowGraphFactory {
     @Autowired
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
-    public IWorkflowGraph createWorkflowGraph(ProcessDefinition workflowDefinition) {
+    public IWorkflowGraph createWorkflowGraph(WorkflowDefinition workflowDefinition) {
 
-        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(
+        List<WorkflowTaskRelation> workflowTaskRelations = processService.findRelationByCode(
                 workflowDefinition.getCode(),
                 workflowDefinition.getVersion());
 
-        List<TaskDefinition> taskDefinitions = taskDefinitionLogDao.queryTaskDefineLogList(processTaskRelations)
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations)
                 .stream()
                 .map(TaskDefinition.class::cast)
                 .collect(Collectors.toList());
-        return new WorkflowGraph(processTaskRelations, taskDefinitions);
+        return new WorkflowGraph(workflowTaskRelations, taskDefinitions);
     }
 
 }

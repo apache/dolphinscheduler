@@ -17,20 +17,25 @@
 
 package org.apache.dolphinscheduler.api.executor.workflow;
 
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +48,7 @@ import com.google.common.collect.Lists;
 
 @Slf4j
 @Component
-public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<BackfillWorkflowDTO, Void> {
+public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<BackfillWorkflowDTO, List<Integer>> {
 
     @Autowired
     private CommandDao commandDao;
@@ -51,18 +56,20 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private RegistryClient registryClient;
+
     @Override
-    public Void execute(final BackfillWorkflowDTO backfillWorkflowDTO) {
+    public List<Integer> execute(final BackfillWorkflowDTO backfillWorkflowDTO) {
         // todo: directly call the master api to do backfill
         if (backfillWorkflowDTO.getBackfillParams().getRunMode() == RunMode.RUN_MODE_SERIAL) {
-            doSerialBackfillWorkflow(backfillWorkflowDTO);
+            return doSerialBackfillWorkflow(backfillWorkflowDTO);
         } else {
-            doParallemBackfillWorkflow(backfillWorkflowDTO);
+            return doParallelBackfillWorkflow(backfillWorkflowDTO);
         }
-        return null;
     }
 
-    private void doSerialBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
+    private List<Integer> doSerialBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
         final List<ZonedDateTime> backfillTimeList = backfillParams.getBackfillDateList();
         if (backfillParams.getExecutionOrder() == ExecutionOrder.DESC_ORDER) {
@@ -71,17 +78,13 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             Collections.sort(backfillTimeList);
         }
 
-        final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
-                .commandParams(backfillWorkflowDTO.getStartParamList())
-                .startNodes(backfillWorkflowDTO.getStartNodes())
-                .backfillTimeList(backfillTimeList.stream().map(DateUtils::dateToString).collect(Collectors.toList()))
-                .timeZone(DateUtils.getTimezone())
-                .build();
-
-        doCreateCommand(backfillWorkflowDTO, backfillWorkflowCommandParam);
+        final Integer workflowInstanceId = doBackfillWorkflow(
+                backfillWorkflowDTO,
+                backfillTimeList.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
+        return Lists.newArrayList(workflowInstanceId);
     }
 
-    private void doParallemBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
+    private List<Integer> doParallelBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
         Integer expectedParallelismNumber = backfillParams.getExpectedParallelismNumber();
 
@@ -93,47 +96,60 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         }
 
         log.info("In parallel mode, current expectedParallelismNumber:{}", expectedParallelismNumber);
+        final List<Integer> workflowInstanceIdList = Lists.newArrayList();
         for (List<ZonedDateTime> stringDate : Lists.partition(listDate, expectedParallelismNumber)) {
-            final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
-                    .commandParams(backfillWorkflowDTO.getStartParamList())
-                    .startNodes(backfillWorkflowDTO.getStartNodes())
-                    .backfillTimeList(stringDate.stream().map(DateUtils::dateToString).collect(Collectors.toList()))
-                    .timeZone(DateUtils.getTimezone())
-                    .build();
-            doCreateCommand(backfillWorkflowDTO, backfillWorkflowCommandParam);
+            final Integer workflowInstanceId = doBackfillWorkflow(
+                    backfillWorkflowDTO,
+                    stringDate.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
+            workflowInstanceIdList.add(workflowInstanceId);
         }
+        return workflowInstanceIdList;
     }
 
-    private void doCreateCommand(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                 final BackfillWorkflowCommandParam backfillWorkflowCommandParam) {
-        List<String> backfillTimeList = backfillWorkflowCommandParam.getBackfillTimeList();
-        final Command command = Command.builder()
-                .commandType(backfillWorkflowDTO.getExecType())
-                .processDefinitionCode(backfillWorkflowDTO.getWorkflowDefinition().getCode())
-                .processDefinitionVersion(backfillWorkflowDTO.getWorkflowDefinition().getVersion())
-                .executorId(backfillWorkflowDTO.getLoginUser().getId())
-                .scheduleTime(DateUtils.stringToDate(backfillTimeList.get(0)))
-                .commandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam))
-                .taskDependType(backfillWorkflowDTO.getTaskDependType())
+    private Integer doBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
+                                       final List<String> backfillTimeList) {
+        final Server masterServer = registryClient.getRandomServer(RegistryNodeType.MASTER).orElse(null);
+        if (masterServer == null) {
+            throw new ServiceException("no master server available");
+        }
+
+        final WorkflowDefinition workflowDefinition = backfillWorkflowDTO.getWorkflowDefinition();
+        final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
+                .userId(backfillWorkflowDTO.getLoginUser().getId())
+                .backfillTimeList(backfillTimeList)
+                .workflowCode(workflowDefinition.getCode())
+                .workflowVersion(workflowDefinition.getVersion())
+                .startNodes(backfillWorkflowDTO.getStartNodes())
                 .failureStrategy(backfillWorkflowDTO.getFailureStrategy())
+                .taskDependType(backfillWorkflowDTO.getTaskDependType())
+                .execType(backfillWorkflowDTO.getExecType())
                 .warningType(backfillWorkflowDTO.getWarningType())
                 .warningGroupId(backfillWorkflowDTO.getWarningGroupId())
-                .startTime(new Date())
-                .processInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
-                .updateTime(new Date())
+                .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
                 .workerGroup(backfillWorkflowDTO.getWorkerGroup())
                 .tenantCode(backfillWorkflowDTO.getTenantCode())
-                .dryRun(backfillWorkflowDTO.getDryRun().getCode())
-                .testFlag(backfillWorkflowDTO.getTestFlag().getCode())
+                .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
+                .startParamList(backfillWorkflowDTO.getStartParamList())
+                .dryRun(backfillWorkflowDTO.getDryRun())
+                .testFlag(backfillWorkflowDTO.getTestFlag())
                 .build();
-        commandDao.insert(command);
+
+        final WorkflowBackfillTriggerResponse backfillTriggerResponse = Clients
+                .withService(IWorkflowControlClient.class)
+                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
+                .backfillTriggerWorkflow(backfillTriggerRequest);
+        if (!backfillTriggerResponse.isSuccess()) {
+            throw new ServiceException("Backfill workflow failed: " + backfillTriggerResponse.getMessage());
+        }
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
         if (backfillParams.getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
-            doBackfillDependentWorkflow(backfillWorkflowCommandParam, command);
+            doBackfillDependentWorkflow(backfillWorkflowDTO, backfillTimeList);
         }
+        return backfillTriggerResponse.getWorkflowInstanceId();
     }
 
-    private void doBackfillDependentWorkflow(final BackfillWorkflowCommandParam backfillWorkflowCommandParam,
-                                             final Command backfillCommand) {
+    private void doBackfillDependentWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
+                                             final List<String> backfillTimeList) {
+        // todo:
     }
 }

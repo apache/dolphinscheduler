@@ -25,9 +25,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.List;
 import java.util.Map;
 
-/**
- * project service
- **/
 public interface ProjectService {
 
     /**
@@ -131,7 +128,7 @@ public interface ProjectService {
     Result deleteProject(User loginUser, Long projectCode);
 
     /**
-     * updateProcessInstance project
+     * updateWorkflowInstance project
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -184,7 +181,7 @@ public interface ProjectService {
     Map<String, Object> queryProjectCreatedByUser(User loginUser);
 
     /**
-     * query all project list that have one or more process definitions.
+     * query all project list that have one or more workflow definitions.
      * @param loginUser
      * @return project list
      */

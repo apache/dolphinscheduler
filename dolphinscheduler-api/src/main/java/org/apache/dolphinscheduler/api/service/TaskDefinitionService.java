@@ -36,12 +36,12 @@ public interface TaskDefinitionService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processCode process code
+     * @param workflowDefinitionCode workflow definition code
      * @param taskName task name
      */
     Map<String, Object> queryTaskDefinitionByName(User loginUser,
                                                   long projectCode,
-                                                  long processCode,
+                                                  long workflowDefinitionCode,
                                                   String taskName);
 
     /**

@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
@@ -59,7 +59,7 @@ import com.google.common.primitives.Bytes;
 @Slf4j
 public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService {
 
-    private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
+    private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]: %s%s";
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -77,9 +77,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * view log
      *
      * @param loginUser   login user
-     * @param taskInstId task instance id
+     * @param taskInstId  task instance id
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return log string data
      */
     @Override
@@ -107,7 +107,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * get log size
      *
-     * @param loginUser   login user
+     * @param loginUser  login user
      * @param taskInstId task instance id
      * @return log byte array
      */
@@ -179,9 +179,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * query log
      *
-     * @param taskInstance  task instance
-     * @param skipLineNum skip line number
-     * @param limit       limit
+     * @param taskInstance task instance
+     * @param skipLineNum  skip line number
+     * @param limit        limit
      * @return log string data
      */
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
@@ -202,8 +202,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             sb.append(head);
         }
 
-        ILogService iLogService =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
         try {
             TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest.builder()
                     .taskInstanceId(taskInstance.getId())
@@ -211,7 +209,10 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                     .skipLineNum(skipLineNum)
                     .limit(limit)
                     .build();
-            TaskInstanceLogPageQueryResponse response = iLogService.pageQueryTaskInstanceLog(request);
+            final TaskInstanceLogPageQueryResponse response = Clients
+                    .withService(ILogService.class)
+                    .withHost(taskInstance.getHost())
+                    .pageQueryTaskInstanceLog(request);
             String logContent = response.getLogContent();
             if (logContent != null) {
                 sb.append(logContent);
@@ -239,12 +240,14 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
         byte[] logBytes;
 
-        ILogService iLogService =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
         try {
-            TaskInstanceLogFileDownloadRequest request =
-                    new TaskInstanceLogFileDownloadRequest(taskInstance.getId(), logPath);
-            TaskInstanceLogFileDownloadResponse response = iLogService.getTaskInstanceWholeLogFileBytes(request);
+            final TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
+                    taskInstance.getId(),
+                    logPath);
+            final TaskInstanceLogFileDownloadResponse response = Clients
+                    .withService(ILogService.class)
+                    .withHost(taskInstance.getHost())
+                    .getTaskInstanceWholeLogFileBytes(request);
             logBytes = response.getLogBytes();
             return Bytes.concat(head, logBytes);
         } catch (Exception ex) {
