@@ -78,6 +78,8 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 #### 升级后的注意事项
 
 在历史版本中可能告警插件会有一些脏数据，升级后请参考一下 SQL 手动清理。
+
 ```sql
 delete from t_ds_alertgroup where group_name = 'global alert group' and description = 'global alert group';
 ```
+

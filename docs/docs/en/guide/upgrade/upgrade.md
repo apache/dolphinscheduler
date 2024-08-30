@@ -77,6 +77,8 @@ After version 3.3.X and later, we only support upgrading from 3.0.0. For version
 #### Precautions after the upgrade
 
 The alert plugin may have some dirty data. After the upgrade, clear it manually by referring to SQL.
+
 ```sql
 delete from t_ds_alertgroup where group_name = 'global alert group' and description = 'global alert group';
 ```
+
