@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.tools.datasource.upgrader;
 
 import java.util.Optional;
 
+import lombok.Getter;
+
+@Getter
 public enum DolphinSchedulerVersion {
 
     V1_3_0("1.3.0"),
@@ -30,10 +33,6 @@ public enum DolphinSchedulerVersion {
 
     DolphinSchedulerVersion(String versionName) {
         this.versionName = versionName;
-    }
-
-    public String getVersionName() {
-        return versionName;
     }
 
     public static Optional<DolphinSchedulerVersion> getVersion(String versionName) {
