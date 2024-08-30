@@ -92,7 +92,7 @@ def build_argparse() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     arg_parser = build_argparse()
-    # args = arg_parser.parse_args(["cherry-pick"])
+    # args = arg_parser.parse_args(["changelog"])
     args = arg_parser.parse_args()
 
     ENV_ACCESS_TOKEN = os.environ.get("GH_ACCESS_TOKEN", None)
@@ -103,4 +103,8 @@ if __name__ == "__main__":
             "Environment variable `GH_ACCESS_TOKEN` and `GH_REPO_MILESTONE` must provider"
         )
 
-    print(args.func(ENV_ACCESS_TOKEN, ENV_MILESTONE))
+    try:
+        print(args.func(ENV_ACCESS_TOKEN, ENV_MILESTONE))
+    except Exception as e:
+        print(f"Please run 'python release.py -h' to get help, reason: {e}")
+        exit(1)
