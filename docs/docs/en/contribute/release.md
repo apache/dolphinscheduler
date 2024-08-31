@@ -386,7 +386,7 @@ Decompress `apache-dolphinscheduler-<VERSION>-bin.tar.gz` to check the following
 
 You should create a release note in GitHub by [new release note](https://github.com/apache/dolphinscheduler/releases/new).
 It should be done before vote mail because we need the release note in the mail. You could use command
-`python release.py changelog` in directory `tools/release` to creat the changelog.
+`python release.py changelog` in directory `tools/release` to creat the changelog.([Usage](https://github.com/apache/dolphinscheduler/blob/dev/tools/release/README.md)
 
 > NOTE: Or if you prefer to create manually, you can use command `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
 > (some log maybe not correct, you should filter them by yourself) and classify them and paste them to GitHub release note page
