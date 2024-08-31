@@ -200,7 +200,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setCreateTime(now);
         scheduleObj.setUpdateTime(now);
         scheduleObj.setUserId(loginUser.getId());
-        scheduleObj.setUserName(loginUser.getUserName());
+        scheduleObj.setModifyUserId(loginUser.getId());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(workflowInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
@@ -285,7 +285,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         schedule.setUserId(loginUser.getId());
         // give more detail when return schedule object
-        schedule.setUserName(loginUser.getUserName());
         schedule.setProcessDefinitionName(workflowDefinition.getName());
 
         this.scheduleParamCheck(scheduleCreateRequest.getScheduleParam());
@@ -357,7 +356,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         updateSchedule(result, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
-                failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
+                failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode, loginUser);
         return result;
     }
 
@@ -671,7 +670,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         updateSchedule(result, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
-                failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
+                failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode, loginUser);
         return result;
     }
 
@@ -746,7 +745,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 String scheduleExpression, WarningType warningType, int warningGroupId,
                                 FailureStrategy failureStrategy, Priority workflowInstancePriority, String workerGroup,
                                 String tenantCode,
-                                long environmentCode) {
+                                long environmentCode, User loginUser) {
         if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE,
                 Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
             log.warn("Schedule can not be updated due to schedule is {}, scheduleId:{}.",
@@ -803,6 +802,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(workflowInstancePriority);
+        schedule.setModifyUserId(loginUser.getId());
         scheduleMapper.updateById(schedule);
 
         workflowDefinition.setWarningGroupId(warningGroupId);
