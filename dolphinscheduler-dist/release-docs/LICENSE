@@ -713,6 +713,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     azure-core-management 1.10.1: https://mvnrepository.com/artifact/com.azure/azure-core-management/1.10.1, MIT
     azure-storage-blob 12.21.0: https://mvnrepository.com/artifact/com.azure/azure-storage-blob/12.21.0, MIT
     azure-storage-internal-avro 12.6.0: https://mvnrepository.com/artifact/com.azure/azure-storage-internal-avro/12.6.0, MIT
+    cos_api 5.6.231 https://mvnrepository.com/artifact/com.qcloud/cos_api/5.6.231, MIT
 
 ========================================================================
 MPL 1.1 licenses

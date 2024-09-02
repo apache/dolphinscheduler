@@ -124,6 +124,9 @@ public final class Constants {
     public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
     public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
 
+    public static final String TENCENT_CLOUD_COS_BUCKET_NAME = "resource.tencent.cloud.cos.bucket.name";
+    public static final String TENCENT_CLOUD_COS_REGION = "resource.tencent.cloud.cos.region";
+
     /**
      * fetch applicationId way
      */
