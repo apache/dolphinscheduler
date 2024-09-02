@@ -328,7 +328,7 @@ public class TaskGroupController extends BaseController {
         Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(
                 loginUser,
                 taskName,
-            workflowInstanceName,
+                workflowInstanceName,
                 status,
                 groupId,
                 pageNo,

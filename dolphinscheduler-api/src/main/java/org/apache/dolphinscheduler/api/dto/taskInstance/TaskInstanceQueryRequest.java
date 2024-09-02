@@ -22,11 +22,11 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.EqualsAndHashCode;
 
 /**
  * task instance request

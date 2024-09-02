@@ -107,7 +107,8 @@ public class ScheduleCreateRequest {
         schedule.setWarningType(newWarningType);
 
         Priority newPriority =
-                this.workflowInstancePriority == null ? Priority.MEDIUM : Priority.valueOf(this.workflowInstancePriority);
+                this.workflowInstancePriority == null ? Priority.MEDIUM
+                        : Priority.valueOf(this.workflowInstancePriority);
         schedule.setWorkflowInstancePriority(newPriority);
 
         Date date = new Date();

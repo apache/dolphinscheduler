@@ -207,7 +207,7 @@ public class WorkflowDefinitionController extends BaseController {
                                                @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode) {
         Map<String, Object> result =
                 workflowDefinitionService.verifyWorkflowDefinitionName(loginUser, projectCode, name,
-                    workflowDefinitionCode);
+                        workflowDefinitionCode);
         return returnDataList(result);
     }
 

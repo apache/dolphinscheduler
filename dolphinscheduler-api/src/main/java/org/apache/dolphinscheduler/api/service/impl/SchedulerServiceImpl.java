@@ -271,7 +271,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleExists =
                 scheduleMapper.queryByWorkflowDefinitionCode(scheduleCreateRequest.getWorkflowDefinitionCode());
         if (scheduleExists != null) {
-            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, scheduleCreateRequest.getWorkflowDefinitionCode(),
+            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS,
+                    scheduleCreateRequest.getWorkflowDefinitionCode(),
                     scheduleExists.getId());
         }
 

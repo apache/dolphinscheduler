@@ -23,8 +23,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_INSTANCE_STA
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
+import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;

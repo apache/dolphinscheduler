@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class DagData {

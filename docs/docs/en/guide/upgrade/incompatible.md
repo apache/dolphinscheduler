@@ -31,4 +31,5 @@ This document records the incompatible updates between each version. You need to
 * Remove the `udf-manage` function from the `resource center` ([#16209])
 * Remove the `Pigeon` from the `Task Plugin` ([#16218])
 * Uniformly name `process` in code as `workflow` ([#16515])
-* 
+* Deprecated upgrade code of 1.x and 2.x in 3.3.0-release ([#16543])
+

@@ -93,7 +93,7 @@ public class WorkflowTaskRelationController extends BaseController {
             putMsg(result, DATA_IS_NOT_VALID, "workflowDefinitionCode");
         } else {
             result = workflowTaskRelationService.createWorkflowTaskRelation(loginUser, projectCode,
-                workflowDefinitionCode,
+                    workflowDefinitionCode,
                     preTaskCode, postTaskCode);
         }
         return returnDataList(result);
@@ -122,7 +122,7 @@ public class WorkflowTaskRelationController extends BaseController {
                                              @RequestParam(name = "workflowDefinitionCode") long workflowDefinitionCode,
                                              @PathVariable("taskCode") long taskCode) {
         return returnDataList(workflowTaskRelationService.deleteTaskWorkflowRelation(loginUser, projectCode,
-            workflowDefinitionCode, taskCode));
+                workflowDefinitionCode, taskCode));
     }
 
     /**

@@ -121,9 +121,9 @@ public class TaskInstanceController extends BaseController {
         return taskInstanceService.queryTaskListPaging(
                 loginUser,
                 projectCode,
-            workflowInstanceId,
-            workflowInstanceName,
-            workflowDefinitionName,
+                workflowInstanceId,
+                workflowInstanceName,
+                workflowDefinitionName,
                 taskName,
                 taskCode,
                 executorName,

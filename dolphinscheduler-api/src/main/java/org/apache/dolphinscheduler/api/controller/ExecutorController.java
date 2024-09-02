@@ -289,7 +289,7 @@ public class ExecutorController extends BaseController {
                     warningType,
                     warningGroupId,
                     runMode,
-                workflowInstancePriority,
+                    workflowInstancePriority,
                     workerGroup,
                     tenantCode,
                     environmentCode,
@@ -443,7 +443,7 @@ public class ExecutorController extends BaseController {
                               @RequestParam("taskDependType") TaskDependType taskDependType) {
         log.info("Start to execute task in workflow instance, projectCode:{}, workflowInstanceId:{}.",
                 projectCode,
-            workflowInstanceId);
+                workflowInstanceId);
         return execService.executeTask(loginUser, projectCode, workflowInstanceId, startNodeList, taskDependType);
     }
 

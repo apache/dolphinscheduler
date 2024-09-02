@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-import lombok.Data;
-
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class DefineUserDto {

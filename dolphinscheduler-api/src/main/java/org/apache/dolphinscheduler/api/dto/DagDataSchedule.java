@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

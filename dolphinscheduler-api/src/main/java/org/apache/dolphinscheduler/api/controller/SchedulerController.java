@@ -121,12 +121,12 @@ public class SchedulerController extends BaseController {
         Map<String, Object> result = schedulerService.insertSchedule(
                 loginUser,
                 projectCode,
-            workflowDefinitionCode,
+                workflowDefinitionCode,
                 schedule,
                 warningType,
                 warningGroupId,
                 failureStrategy,
-            workflowInstancePriority,
+                workflowInstancePriority,
                 workerGroup,
                 tenantCode,
                 environmentCode);

@@ -120,7 +120,8 @@ public class WorkflowInstanceController extends BaseController {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return workflowInstanceService.queryWorkflowInstanceList(loginUser, projectCode, workflowDefinitionCode, startTime,
+        return workflowInstanceService.queryWorkflowInstanceList(loginUser, projectCode, workflowDefinitionCode,
+                startTime,
                 endTime,
                 searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
     }
