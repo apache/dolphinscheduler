@@ -19,6 +19,11 @@ package org.apache.dolphinscheduler.plugin.task.api.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * task timeout strategy
  */
@@ -50,13 +55,11 @@ public enum TaskTimeoutStrategy {
         return descp;
     }
 
+    private static final Map<Integer, TaskTimeoutStrategy> code2Strategy = Arrays.stream(values()).collect(Collectors.toMap(x -> x.code, x -> x));
+
+
     public static TaskTimeoutStrategy of(int status) {
-        for (TaskTimeoutStrategy es : values()) {
-            if (es.getCode() == status) {
-                return es;
-            }
-        }
-        throw new IllegalArgumentException("invalid status : " + status);
+        return Objects.requireNonNull(code2Strategy.get(status), String.format("invalid status : %s", status));
     }
 
 }
