@@ -64,7 +64,8 @@ export function useTable() {
     startDate: ref(),
     endDate: ref(),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
-    workflowDefinitionCode: router.currentRoute.value.query.workflowDefinitionCode
+    workflowDefinitionCode: router.currentRoute.value.query
+      .workflowDefinitionCode
       ? ref(Number(router.currentRoute.value.query.workflowDefinitionCode))
       : ref(),
     loadingRef: ref(false)

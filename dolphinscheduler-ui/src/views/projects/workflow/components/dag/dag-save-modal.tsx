@@ -157,7 +157,8 @@ export default defineComponent({
             value: param.value,
             direct: param.direct,
             type: param.type
-        }))
+          })
+        )
       }
     }
 
