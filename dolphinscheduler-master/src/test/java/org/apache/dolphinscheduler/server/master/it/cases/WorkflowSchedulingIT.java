@@ -68,7 +68,7 @@ public class WorkflowSchedulingIT extends AbstractMasterIntegrationTest {
     public void testSchedulingWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/scheduling/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final Schedule schedule = Schedule.builder()
                 .processDefinitionCode(workflow.getCode())
@@ -89,7 +89,7 @@ public class WorkflowSchedulingIT extends AbstractMasterIntegrationTest {
 
         WorkflowOperator.WorkflowSchedulingDTO workflowSchedulingDTO = WorkflowOperator.WorkflowSchedulingDTO.builder()
                 .project(context.getProject())
-                .workflow(context.getWorkflow())
+                .workflow(context.getWorkflows().get(0))
                 .schedule(schedule)
                 .build();
 

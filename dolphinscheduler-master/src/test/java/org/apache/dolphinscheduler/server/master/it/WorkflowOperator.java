@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowB
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstancePauseResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverSuspendTasksRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverSuspendTasksResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRepeatRunningRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
@@ -112,6 +114,15 @@ public class WorkflowOperator {
         final WorkflowInstancePauseRequest workflowInstancePauseRequest =
                 new WorkflowInstancePauseRequest(workflowInstanceId);
         return workflowInstanceController.pauseWorkflowInstance(workflowInstancePauseRequest);
+    }
+
+    public WorkflowInstanceRecoverSuspendTasksResponse recoverSuspendWorkflowInstance(Integer workflowInstanceId) {
+        final WorkflowInstanceRecoverSuspendTasksRequest workflowInstancePauseRequest =
+                WorkflowInstanceRecoverSuspendTasksRequest.builder()
+                        .workflowInstanceId(workflowInstanceId)
+                        .userId(1)
+                        .build();
+        return workflowInstanceController.triggerFromSuspendTasks(workflowInstancePauseRequest);
     }
 
     public WorkflowInstanceStopResponse stopWorkflowInstance(Integer workflowInstanceId) {

@@ -62,7 +62,7 @@ public class WorkflowBackfillIT extends AbstractMasterIntegrationTest {
     public void testSerialBackfillWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/backfill/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
                 .backfillTimeList(
