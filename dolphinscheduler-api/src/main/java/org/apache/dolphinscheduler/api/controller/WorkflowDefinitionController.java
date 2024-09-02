@@ -82,7 +82,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "WORKFLOW_DEFINITION_TAG")
 @RestController
-@RequestMapping("projects/{projectCode}/process-definition")
+@RequestMapping("projects/{projectCode}/workflow-definition")
 @Slf4j
 public class WorkflowDefinitionController extends BaseController {
 
@@ -204,10 +204,10 @@ public class WorkflowDefinitionController extends BaseController {
     public Result verifyWorkflowDefinitionName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                @RequestParam(value = "name", required = true) String name,
-                                               @RequestParam(value = "code", required = false, defaultValue = "0") long processDefinitionCode) {
+                                               @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode) {
         Map<String, Object> result =
                 workflowDefinitionService.verifyWorkflowDefinitionName(loginUser, projectCode, name,
-                        processDefinitionCode);
+                    workflowDefinitionCode);
         return returnDataList(result);
     }
 
@@ -581,7 +581,7 @@ public class WorkflowDefinitionController extends BaseController {
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
-    @GetMapping(value = "/query-process-definition-list")
+    @GetMapping(value = "/query-workflow-definition-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
     public Result getWorkflowListByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -600,16 +600,16 @@ public class WorkflowDefinitionController extends BaseController {
     @Operation(summary = "getTaskListByWorkflowDefinitionCode", description = "GET_TASK_LIST_BY_WORKFLOW_CODE_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
     })
     @GetMapping(value = "/query-task-definition-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
     public Result getTaskListByWorkflowDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                      @RequestParam(value = "processDefinitionCode") Long processDefinitionCode) {
+                                                      @RequestParam(value = "workflowDefinitionCode") Long workflowDefinitionCode) {
         Map<String, Object> result = workflowDefinitionService
-                .queryTaskDefinitionListByWorkflowDefinitionCode(projectCode, processDefinitionCode);
+                .queryTaskDefinitionListByWorkflowDefinitionCode(projectCode, workflowDefinitionCode);
         return returnDataList(result);
     }
 

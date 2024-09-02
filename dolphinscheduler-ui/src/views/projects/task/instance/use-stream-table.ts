@@ -45,7 +45,7 @@ export function useTable() {
   const { t } = useI18n()
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
-  const processInstanceId = Number(route.params.processInstanceId)
+  const workflowInstanceId = Number(route.params.workflowInstanceId)
 
   const variables = reactive({
     columns: [],
@@ -54,12 +54,12 @@ export function useTable() {
     page: 1,
     pageSize: 10,
     searchVal: null,
-    processInstanceId: processInstanceId ? processInstanceId : null,
+    workflowInstanceId: workflowInstanceId ? workflowInstanceId : null,
     host: null,
     stateType: null,
     datePickerRange: null,
     executorName: null,
-    processDefinitionName: null,
+    workflowDefinitionName: null,
     totalPage: 1,
     showModalRef: false,
     row: {},
@@ -85,7 +85,7 @@ export function useTable() {
       },
       {
         title: t('project.task.workflow_name'),
-        key: 'processDefinitionName',
+        key: 'workflowDefinitionName',
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
@@ -286,7 +286,7 @@ export function useTable() {
       pageSize: variables.pageSize,
       pageNo: variables.page,
       searchVal: variables.searchVal,
-      processInstanceId: variables.processInstanceId,
+      workflowInstanceId: variables.workflowInstanceId,
       host: variables.host,
       stateType: variables.stateType,
       startDate: variables.datePickerRange
@@ -296,7 +296,7 @@ export function useTable() {
         ? format(parseTime(variables.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: variables.executorName,
-      processDefinitionName: variables.processDefinitionName,
+      workflowDefinitionName: variables.workflowDefinitionName,
       taskExecuteType: 'STREAM' as 'BATCH' | 'STREAM'
     } as any
 

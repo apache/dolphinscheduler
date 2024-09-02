@@ -38,7 +38,7 @@ import {
   NGrid
 } from 'naive-ui'
 import { useRoute } from 'vue-router'
-import { verifyName } from '@/service/modules/process-definition'
+import { verifyName } from '@/service/modules/workflow-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
@@ -123,10 +123,10 @@ export default defineComponent({
         if (!valid) {
           const params = {
             name: formValue.value.name,
-            code: props.definition?.processDefinition.code
+            code: props.definition?.workflowDefinition.code
           } as { name: string; code?: number }
           if (
-            props.definition?.processDefinition.name !== formValue.value.name
+            props.definition?.workflowDefinition.name !== formValue.value.name
           ) {
             verifyName(params, projectCode).then(() =>
               context.emit('save', formValue.value)
@@ -142,20 +142,21 @@ export default defineComponent({
     }
 
     const updateModalData = () => {
-      const process = props.definition?.processDefinition
-      if (process) {
-        formValue.value.name = process.name
-        formValue.value.description = process.description
-        formValue.value.executionType = process.executionType || 'PARALLEL'
-        if (process.timeout && process.timeout > 0) {
+      const workflow = props.definition?.workflowDefinition
+      if (workflow) {
+        formValue.value.name = workflow.name
+        formValue.value.description = workflow.description
+        formValue.value.executionType = workflow.executionType || 'PARALLEL'
+        if (workflow.timeout && workflow.timeout > 0) {
           formValue.value.timeoutFlag = true
-          formValue.value.timeout = process.timeout
+          formValue.value.timeout = workflow.timeout
         }
-        formValue.value.globalParams = process.globalParamList.map((param) => ({
-          key: param.prop,
-          value: param.value,
-          direct: param.direct,
-          type: param.type
+        formValue.value.globalParams = workflow.globalParamList.map(
+          (param) => ({
+            key: param.prop,
+            value: param.value,
+            direct: param.direct,
+            type: param.type
         }))
       }
     }
@@ -165,7 +166,7 @@ export default defineComponent({
     onMounted(() => updateModalData())
 
     watch(
-      () => props.definition?.processDefinition,
+      () => props.definition?.workflowDefinition,
       () => updateModalData()
     )
 
@@ -210,7 +211,7 @@ export default defineComponent({
           )}
           {!props.instance && (
             <NFormItem
-              label={t('project.dag.process_execute_type')}
+              label={t('project.dag.workflow_execute_type')}
               path='executionType'
             >
               <NSelect

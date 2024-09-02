@@ -132,7 +132,7 @@ public class StatisticsV2Controller extends BaseController {
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow count in project code
      */
-    @Operation(summary = "countDefinitionV2ByUserId", description = "COUNT_PROCESS_DEFINITION_V2_BY_USERID_NOTES")
+    @Operation(summary = "countDefinitionV2ByUserId", description = "COUNT_WORKFLOW_DEFINITION_V2_BY_USERID_NOTES")
     @GetMapping(value = "/workflows/users/count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_WORKFLOW_DEFINITION_USER_ERROR)
@@ -149,7 +149,7 @@ public class StatisticsV2Controller extends BaseController {
      * @param userId    userId
      * @return workflow count in project code
      */
-    @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
+    @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_WORKFLOW_DEFINITION_V2_BY_USER_NOTES")
     @GetMapping(value = "/workflows/users/{userId}/count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_WORKFLOW_DEFINITION_USER_ERROR)
@@ -167,7 +167,7 @@ public class StatisticsV2Controller extends BaseController {
      * @param releaseState releaseState
      * @return workflow count in project code
      */
-    @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
+    @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_WORKFLOW_DEFINITION_V2_BY_USER_NOTES")
     @GetMapping(value = "/workflows/users/{userId}/{releaseState}/count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_WORKFLOW_DEFINITION_USER_ERROR)

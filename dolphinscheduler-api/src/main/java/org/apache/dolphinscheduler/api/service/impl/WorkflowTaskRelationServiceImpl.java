@@ -211,7 +211,7 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
     @Transactional
     public WorkflowTaskRelation createWorkflowTaskRelationV2(User loginUser,
                                                              TaskRelationCreateRequest taskRelationCreateRequest) {
-        WorkflowTaskRelation workflowTaskRelation = taskRelationCreateRequest.convert2ProcessTaskRelation();
+        WorkflowTaskRelation workflowTaskRelation = taskRelationCreateRequest.convert2WorkflowTaskRelation();
         WorkflowDefinition workflowDefinition =
                 workflowDefinitionMapper.queryByCode(workflowTaskRelation.getWorkflowDefinitionCode());
         if (workflowDefinition == null) {

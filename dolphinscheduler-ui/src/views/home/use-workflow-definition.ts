@@ -15,12 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+import { useAsyncState } from '@vueuse/core'
+import { countDefinitionByUser } from '@/service/modules/projects-analysis'
+import type { WorkflowDefinitionRes } from '@/service/modules/projects-analysis/types'
+import type { DefinitionChartData } from './types'
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+export function useWorkflowDefinition() {
+  const getWorkflowDefinition = () => {
+    const { state } = useAsyncState(
+      countDefinitionByUser({}).then(
+        (res: WorkflowDefinitionRes): DefinitionChartData => {
+          const xAxisData = res.userList.map((item) => item.userName)
+          const seriesData = res.userList.map((item) => item.count)
 
-/**
- * ProcessInstanceDto
- */
-public class WorkflowInstanceDto extends WorkflowInstance {
+          return { xAxisData, seriesData }
+        }
+      ),
+      { xAxisData: [], seriesData: [] }
+    )
+    return state
+  }
+
+  return { getWorkflowDefinition }
 }

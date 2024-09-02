@@ -16,7 +16,7 @@
  */
 
 interface ITimingSearch {
-  processDefinitionCode: number
+  workflowDefinitionCode: number
 }
 
 export { ITimingSearch }

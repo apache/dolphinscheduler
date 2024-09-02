@@ -339,7 +339,7 @@ public class UserMapperTest extends BaseDaoTest {
         List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
                 null);
         UserWithWorkflowDefinitionCode userWithCode = userWithCodes.stream()
-                .filter(code -> code.getProcessDefinitionCode() == processDefinitionCode)
+                .filter(code -> code.getWorkflowDefinitionCode() == processDefinitionCode)
                 .findAny().orElse(null);
         assert userWithCode != null;
         Assertions.assertEquals(userWithCode.getCreatorId(), user.getId());

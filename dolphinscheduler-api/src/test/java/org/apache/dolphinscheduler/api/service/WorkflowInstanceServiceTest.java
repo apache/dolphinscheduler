@@ -529,7 +529,7 @@ public class WorkflowInstanceServiceTest {
         when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         // sub process not exist
         TaskInstance subTask = getTaskInstance();
-        subTask.setTaskType("SUB_PROCESS");
+        subTask.setTaskType("SUB_WORKFLOW");
         subTask.setWorkflowInstanceId(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(taskInstanceDao.queryById(subTask.getId())).thenReturn(subTask);

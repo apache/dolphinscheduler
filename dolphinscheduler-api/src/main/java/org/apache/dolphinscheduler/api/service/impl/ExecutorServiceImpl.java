@@ -582,8 +582,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
             // and causing duplicate when clone it.
             dependentCommand.setId(null);
-            dependentCommand.setWorkflowDefinitionCode(dependentWorkflowDefinition.getProcessDefinitionCode());
-            dependentCommand.setWorkflowDefinitionVersion(dependentWorkflowDefinition.getProcessDefinitionVersion());
+            dependentCommand.setWorkflowDefinitionCode(dependentWorkflowDefinition.getWorkflowDefinitionCode());
+            dependentCommand.setWorkflowDefinitionVersion(dependentWorkflowDefinition.getWorkflowDefinitionVersion());
             dependentCommand.setWorkerGroup(dependentWorkflowDefinition.getWorkerGroup());
             Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
             cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentWorkflowDefinition.getTaskDefinitionCode()));
@@ -619,10 +619,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         .stream()
                         .flatMap(dependentWorkflowDefinition -> checkDependentWorkflowDefinitionValid(
                                 workflowLineageService.queryDownstreamDependentWorkflowDefinitions(
-                                        dependentWorkflowDefinition.getProcessDefinitionCode()),
+                                        dependentWorkflowDefinition.getWorkflowDefinitionCode()),
                                 workflowDefinitionCycle,
                                 workerGroup,
-                                dependentWorkflowDefinition.getProcessDefinitionCode()).stream())
+                                dependentWorkflowDefinition.getWorkflowDefinitionCode()).stream())
                         .collect(Collectors.toList());
                 if (childDependentList.isEmpty()) {
                     break;
@@ -647,17 +647,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         List<DependentWorkflowDefinition> validDependentWorkflowDefinitionList = new ArrayList<>();
 
         List<Long> workflowDefinitionCodeList =
-                dependentWorkflowDefinitionList.stream().map(DependentWorkflowDefinition::getProcessDefinitionCode)
+                dependentWorkflowDefinitionList.stream().map(DependentWorkflowDefinition::getWorkflowDefinitionCode)
                         .collect(Collectors.toList());
 
-        Map<Long, String> processDefinitionWorkerGroupMap =
+        Map<Long, String> workflowDefinitionWorkerGroupMap =
                 workerGroupService.queryWorkerGroupByWorkflowDefinitionCodes(workflowDefinitionCodeList);
 
         for (DependentWorkflowDefinition dependentWorkflowDefinition : dependentWorkflowDefinitionList) {
             if (dependentWorkflowDefinition
                     .getDependentCycle(upstreamWorkflowDefinitionCode) == workflowDefinitionCycle) {
-                if (processDefinitionWorkerGroupMap
-                        .get(dependentWorkflowDefinition.getProcessDefinitionCode()) == null) {
+                if (workflowDefinitionWorkerGroupMap
+                        .get(dependentWorkflowDefinition.getWorkflowDefinitionCode()) == null) {
                     dependentWorkflowDefinition.setWorkerGroup(workerGroup);
                 }
 

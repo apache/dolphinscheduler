@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 
-/**
- * DagDataSchedule
- */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class DagDataSchedule extends DagData {
 
-    /**
-     * schedule
-     */
     private Schedule schedule;
 
     public DagDataSchedule() {
@@ -35,16 +34,9 @@ public class DagDataSchedule extends DagData {
 
     public DagDataSchedule(DagData dagData) {
         super();
-        this.setProcessDefinition(dagData.getProcessDefinition());
+        this.setWorkflowDefinition(dagData.getWorkflowDefinition());
         this.setTaskDefinitionList(dagData.getTaskDefinitionList());
-        this.setProcessTaskRelationList(dagData.getProcessTaskRelationList());
+        this.setWorkflowTaskRelationList(dagData.getWorkflowTaskRelationList());
     }
 
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-    }
 }

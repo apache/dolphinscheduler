@@ -37,7 +37,7 @@ task:
     - 'DATA_FACTORY'
     - 'ALIYUN_SERVERLESS_SPARK'
   logic:
-    - 'SUB_PROCESS'
+    - 'SUB_WORKFLOW'
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'

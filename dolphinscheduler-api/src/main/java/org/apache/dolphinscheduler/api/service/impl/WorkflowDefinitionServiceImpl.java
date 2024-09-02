@@ -346,7 +346,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Transactional
     public WorkflowDefinition createSingleWorkflowDefinition(User loginUser,
                                                              WorkflowCreateRequest workflowCreateRequest) {
-        WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2ProcessDefinition();
+        WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2WorkflowDefinition();
         this.createWorkflowValid(loginUser, workflowDefinition);
 
         long workflowDefinitionCode;
@@ -627,12 +627,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 schedulerService.queryScheduleByWorkflowDefinitionCodes(workflowDefinitionCodes)
                         .stream()
                         .collect(Collectors.toMap(Schedule::getWorkflowDefinitionCode, Function.identity()));
-        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithWorkflowDefinitionCode(
                 workflowDefinitionCodes);
         for (WorkflowDefinition pd : workflowDefinitions) {
             userWithCodes.stream()
-                    .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode()
-                            && userWithCode.getProcessDefinitionVersion() == pd.getVersion())
+                    .filter(userWithCode -> userWithCode.getWorkflowDefinitionCode() == pd.getCode()
+                            && userWithCode.getWorkflowDefinitionVersion() == pd.getVersion())
                     .findAny().ifPresent(userWithCode -> {
                         pd.setModifyBy(userWithCode.getModifierName());
                         pd.setUserName(userWithCode.getCreatorName());
@@ -1463,7 +1463,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (!checkImportanceParams(dagDataSchedule, result)) {
             return false;
         }
-        WorkflowDefinition workflowDefinition = dagDataSchedule.getProcessDefinition();
+        WorkflowDefinition workflowDefinition = dagDataSchedule.getWorkflowDefinition();
 
         // generate import workflowDefinitionName
         String workflowDefinitionName = recursionWorkflowDefinitionName(projectCode, workflowDefinition.getName(), 1);
@@ -1525,7 +1525,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
         }
 
-        List<WorkflowTaskRelation> taskRelationList = dagDataSchedule.getProcessTaskRelationList();
+        List<WorkflowTaskRelation> taskRelationList = dagDataSchedule.getWorkflowTaskRelationList();
         List<WorkflowTaskRelationLog> taskRelationLogList = new ArrayList<>();
         for (WorkflowTaskRelation workflowTaskRelation : taskRelationList) {
             WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
@@ -1597,7 +1597,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * check importance params
      */
     private boolean checkImportanceParams(DagDataSchedule dagDataSchedule, Map<String, Object> result) {
-        if (dagDataSchedule.getProcessDefinition() == null) {
+        if (dagDataSchedule.getWorkflowDefinition() == null) {
             log.warn("workflow definition is null.");
             putMsg(result, Status.DATA_IS_NULL, "WorkflowDefinition");
             return false;
@@ -1607,7 +1607,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.DATA_IS_NULL, "TaskDefinitionList");
             return false;
         }
-        if (CollectionUtils.isEmpty(dagDataSchedule.getProcessTaskRelationList())) {
+        if (CollectionUtils.isEmpty(dagDataSchedule.getWorkflowTaskRelationList())) {
             log.warn("workflow task relation list is null.");
             putMsg(result, Status.DATA_IS_NULL, "WorkflowTaskRelationList");
             return false;
@@ -2483,7 +2483,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         WorkflowDefinition workflowDefinitionUpdate =
-                workflowUpdateRequest.mergeIntoProcessDefinition(workflowDefinition);
+                workflowUpdateRequest.mergeIntoWorkflowDefinition(workflowDefinition);
         this.updateWorkflowValid(loginUser, workflowDefinition, workflowDefinitionUpdate);
 
         int insertVersion = this.saveWorkflowDefine(loginUser, workflowDefinitionUpdate);

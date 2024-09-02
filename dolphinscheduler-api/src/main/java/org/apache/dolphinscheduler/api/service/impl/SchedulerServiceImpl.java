@@ -259,19 +259,19 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     public Schedule createSchedulesV2(User loginUser,
                                       ScheduleCreateRequest scheduleCreateRequest) {
-        this.projectPermCheckByWorkflowCode(loginUser, scheduleCreateRequest.getProcessDefinitionCode());
+        this.projectPermCheckByWorkflowCode(loginUser, scheduleCreateRequest.getWorkflowDefinitionCode());
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(scheduleCreateRequest.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(scheduleCreateRequest.getWorkflowDefinitionCode());
 
         // check workflow define release state
         executorService.checkWorkflowDefinitionValid(workflowDefinition.getProjectCode(), workflowDefinition,
                 workflowDefinition.getCode(), workflowDefinition.getVersion());
 
         Schedule scheduleExists =
-                scheduleMapper.queryByWorkflowDefinitionCode(scheduleCreateRequest.getProcessDefinitionCode());
+                scheduleMapper.queryByWorkflowDefinitionCode(scheduleCreateRequest.getWorkflowDefinitionCode());
         if (scheduleExists != null) {
-            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, scheduleCreateRequest.getProcessDefinitionCode(),
+            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, scheduleCreateRequest.getWorkflowDefinitionCode(),
                     scheduleExists.getId());
         }
 

@@ -55,7 +55,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "WORKFLOW_TASK_RELATION_TAG")
 @RestController
-@RequestMapping("projects/{projectCode}/process-task-relation")
+@RequestMapping("projects/{projectCode}/workflow-task-relation")
 public class WorkflowTaskRelationController extends BaseController {
 
     @Autowired
@@ -66,7 +66,7 @@ public class WorkflowTaskRelationController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode processDefinitionCode
+     * @param workflowDefinitionCode workflowDefinitionCode
      * @param preTaskCode preTaskCode
      * @param postTaskCode postTaskCode
      * @return create result code
@@ -74,26 +74,26 @@ public class WorkflowTaskRelationController extends BaseController {
     @Operation(summary = "save", description = "CREATE_WORKFLOW_TASK_RELATION_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_WORKFLOW_TASK_RELATION_ERROR)
-    public Result createProcessTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                            @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
-                                            @RequestParam(name = "preTaskCode", required = true) long preTaskCode,
-                                            @RequestParam(name = "postTaskCode", required = true) long postTaskCode) {
+    public Result createWorkflowTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                             @RequestParam(name = "workflowDefinitionCode", required = true) long workflowDefinitionCode,
+                                             @RequestParam(name = "preTaskCode", required = true) long preTaskCode,
+                                             @RequestParam(name = "postTaskCode", required = true) long postTaskCode) {
         Map<String, Object> result = new HashMap<>();
         if (postTaskCode == 0L) {
             putMsg(result, DATA_IS_NOT_VALID, "postTaskCode");
-        } else if (processDefinitionCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+        } else if (workflowDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "workflowDefinitionCode");
         } else {
             result = workflowTaskRelationService.createWorkflowTaskRelation(loginUser, projectCode,
-                    processDefinitionCode,
+                workflowDefinitionCode,
                     preTaskCode, postTaskCode);
         }
         return returnDataList(result);
@@ -104,25 +104,25 @@ public class WorkflowTaskRelationController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param taskCode the post task code
      * @return delete result code
      */
     @Operation(summary = "deleteRelation", description = "DELETE_WORKFLOW_TASK_RELATION_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @DeleteMapping(value = "/{taskCode}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_WORKFLOW_RELATION_ERROR)
-    public Result deleteTaskProcessRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                            @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
-                                            @PathVariable("taskCode") long taskCode) {
+    public Result deleteTaskWorkflowRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                             @RequestParam(name = "workflowDefinitionCode") long workflowDefinitionCode,
+                                             @PathVariable("taskCode") long taskCode) {
         return returnDataList(workflowTaskRelationService.deleteTaskWorkflowRelation(loginUser, projectCode,
-                processDefinitionCode, taskCode));
+            workflowDefinitionCode, taskCode));
     }
 
     /**
@@ -226,7 +226,7 @@ public class WorkflowTaskRelationController extends BaseController {
      *
      * @param loginUser             login user
      * @param projectCode           project code
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param preTaskCode pre task code
      * @param postTaskCode post task code
      * @return delete result code
@@ -234,19 +234,19 @@ public class WorkflowTaskRelationController extends BaseController {
     @Operation(summary = "deleteEdge", description = "DELETE_EDGE_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "preTaskCode", description = "PRE_TASK_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "postTaskCode", description = "POST_TASK_CODE", required = true, schema = @Schema(implementation = long.class))
     })
-    @DeleteMapping(value = "/{processDefinitionCode}/{preTaskCode}/{postTaskCode}")
+    @DeleteMapping(value = "/{workflowDefinitionCode}/{preTaskCode}/{postTaskCode}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_EDGE_ERROR)
     public Result deleteEdge(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                             @PathVariable long processDefinitionCode,
+                             @PathVariable long workflowDefinitionCode,
                              @PathVariable long preTaskCode,
                              @PathVariable long postTaskCode) {
-        return returnDataList(workflowTaskRelationService.deleteEdge(loginUser, projectCode, processDefinitionCode,
+        return returnDataList(workflowTaskRelationService.deleteEdge(loginUser, projectCode, workflowDefinitionCode,
                 preTaskCode, postTaskCode));
     }
 

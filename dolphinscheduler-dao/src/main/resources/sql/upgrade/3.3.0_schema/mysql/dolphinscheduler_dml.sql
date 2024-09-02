@@ -14,3 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+UPDATE t_ds_task_definition SET task_type = 'SUB_WORKFLOW' WHERE task_type = 'SUB_PROCESS';
+UPDATE t_ds_task_definition_log SET task_type = 'SUB_WORKFLOW' WHERE task_type = 'SUB_PROCESS';

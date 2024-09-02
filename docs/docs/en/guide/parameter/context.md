@@ -106,11 +106,11 @@ Save the subprocess_example1 workflow and set the global parameters var1.
 
 ![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
 
-Create a sub_process task in a new workflow, and use the subprocess_example1 workflow as the sub-node.
+Create a sub_workflow task in a new workflow, and use the subprocess_example1 workflow as the sub-node.
 
 ![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
 
-Create a shell task as a downstream task of the sub_process task, and write the following script:
+Create a shell task as a downstream task of the sub_workflow task, and write the following script:
 
 ![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
 

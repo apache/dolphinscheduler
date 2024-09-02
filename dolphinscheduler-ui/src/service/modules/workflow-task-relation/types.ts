@@ -15,12 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+interface ProjectCodeReq {
+  projectCode: string
+}
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+interface WorkflowDefinitionCodeReq {
+  workflowDefinitionCode: string
+}
 
-/**
- * ProcessDefinitionDto
- */
-public class WorkflowDefinitionDto extends WorkflowDefinition {
+interface PreTaskCodesReq {
+  preTaskCodes: string
+}
+
+interface PostTaskCodesReq {
+  postTaskCodes: string
+}
+
+interface TaskCodeReq {
+  taskCode: string
+}
+
+interface SaveReq extends WorkflowDefinitionCodeReq, ProjectCodeReq {
+  postTaskCode: string
+  preTaskCode: string
+}
+
+export {
+  ProjectCodeReq,
+  WorkflowDefinitionCodeReq,
+  PreTaskCodesReq,
+  PostTaskCodesReq,
+  TaskCodeReq,
+  SaveReq
 }

@@ -274,12 +274,12 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(userMapper.queryUserWithProcessDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
                         UserWithWorkflowDefinitionCode.builder()
-                                .processDefinitionCode(processDefinitionCode1)
-                                .processDefinitionVersion(1)
+                                .workflowDefinitionCode(processDefinitionCode1)
+                                .workflowDefinitionVersion(1)
                                 .modifierName(user1).build(),
                         UserWithWorkflowDefinitionCode.builder()
-                                .processDefinitionCode(processDefinitionCode2)
-                                .processDefinitionVersion(1)
+                                .workflowDefinitionCode(processDefinitionCode2)
+                                .workflowDefinitionVersion(1)
                                 .modifierName(user2).build()));
         Schedule schedule1 = new Schedule();
         schedule1.setWorkflowDefinitionCode(processDefinitionCode1);

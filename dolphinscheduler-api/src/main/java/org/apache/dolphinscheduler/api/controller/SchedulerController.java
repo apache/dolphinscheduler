@@ -71,7 +71,7 @@ public class SchedulerController extends BaseController {
     public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
-    public static final String DEFAULT_PROCESS_INSTANCE_PRIORITY = "MEDIUM";
+    public static final String DEFAULT_WORKFLOW_INSTANCE_PRIORITY = "MEDIUM";
 
     @Autowired
     private SchedulerService schedulerService;
@@ -81,19 +81,19 @@ public class SchedulerController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param schedule scheduler
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
-     * @param processInstancePriority process instance priority
+     * @param workflowInstancePriority workflow instance priority
      * @param workerGroup worker group
      * @param tenantCode tenant code
      * @return create result code
      */
     @Operation(summary = "createSchedule", description = "CREATE_SCHEDULE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
             @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','timezoneId':'America/Phoenix','crontab':'0 0 3/6 * * ? *'}")),
             @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
@@ -101,7 +101,7 @@ public class SchedulerController extends BaseController {
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "workflowInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -109,7 +109,7 @@ public class SchedulerController extends BaseController {
     @OperatorLog(auditType = AuditType.SCHEDULE_CREATE)
     public Result createSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                 @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
+                                 @RequestParam(value = "workflowDefinitionCode") long workflowDefinitionCode,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
                                  @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
@@ -117,16 +117,16 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
+                                 @RequestParam(value = "workflowInstancePriority", required = false, defaultValue = DEFAULT_WORKFLOW_INSTANCE_PRIORITY) Priority workflowInstancePriority) {
         Map<String, Object> result = schedulerService.insertSchedule(
                 loginUser,
                 projectCode,
-                processDefinitionCode,
+            workflowDefinitionCode,
                 schedule,
                 warningType,
                 warningGroupId,
                 failureStrategy,
-                processInstancePriority,
+            workflowInstancePriority,
                 workerGroup,
                 tenantCode,
                 environmentCode);
@@ -146,7 +146,7 @@ public class SchedulerController extends BaseController {
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
      * @param tenantCode tenant code
-     * @param processInstancePriority process instance priority
+     * @param workflowInstancePriority workflow instance priority
      * @return update result code
      */
     @Operation(summary = "updateSchedule", description = "UPDATE_SCHEDULE_NOTES")
@@ -158,7 +158,7 @@ public class SchedulerController extends BaseController {
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
-            @Parameter(name = "processInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "workflowInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class)),
     })
     @PutMapping("/{id}")
@@ -175,10 +175,10 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
+                                 @RequestParam(value = "workflowInstancePriority", required = false, defaultValue = DEFAULT_WORKFLOW_INSTANCE_PRIORITY) Priority workflowInstancePriority) {
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectCode, id, schedule,
-                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, tenantCode,
+                warningType, warningGroupId, failureStrategy, workflowInstancePriority, workerGroup, tenantCode,
                 environmentCode);
         return returnDataList(result);
     }
@@ -216,7 +216,7 @@ public class SchedulerController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param pageNo page number
      * @param pageSize page size
      * @param searchVal search value
@@ -224,7 +224,7 @@ public class SchedulerController extends BaseController {
      */
     @Operation(summary = "queryScheduleListPaging", description = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionId", description = "WORKFLOW_DEFINITION_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", schema = @Schema(implementation = int.class, example = "20"))
@@ -233,13 +233,13 @@ public class SchedulerController extends BaseController {
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     public Result queryScheduleListPaging(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                          @RequestParam(value = "processDefinitionCode", required = false, defaultValue = "0") long processDefinitionCode,
+                                          @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode,
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize) {
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo,
+        return schedulerService.querySchedule(loginUser, projectCode, workflowDefinitionCode, searchVal, pageNo,
                 pageSize);
 
     }
@@ -304,49 +304,49 @@ public class SchedulerController extends BaseController {
     }
 
     /**
-     * update process definition schedule
+     * update workflow definition schedule
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param schedule scheduler
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
-     * @param processInstancePriority process instance priority
+     * @param workflowInstancePriority workflow instance priority
      * @return update result code
      */
-    @Operation(summary = "updateScheduleByWorkflowDefinitionCode", description = "UPDATE_SCHEDULE_BY_PROCESS_DEFINITION_CODE_NOTES")
+    @Operation(summary = "updateScheduleByWorkflowDefinitionCode", description = "UPDATE_SCHEDULE_BY_WORKFLOW_DEFINITION_CODE_NOTES")
     @Parameters({
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "12345678")),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "12345678")),
             @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
             @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
-            @Parameter(name = "processInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
+            @Parameter(name = "workflowInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", schema = @Schema(implementation = Priority.class)),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class)),
     })
     @PutMapping("/update/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
     @OperatorLog(auditType = AuditType.SCHEDULE_UPDATE)
-    public Result updateScheduleByProcessDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                        @PathVariable(value = "code") long processDefinitionCode,
-                                                        @RequestParam(value = "schedule") String schedule,
-                                                        @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
-                                                        @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
-                                                        @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
-                                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                                        @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
-                                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") long environmentCode,
-                                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
+    public Result updateScheduleByWorkflowDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                         @PathVariable(value = "code") long workflowDefinitionCode,
+                                                         @RequestParam(value = "schedule") String schedule,
+                                                         @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
+                                                         @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
+                                                         @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
+                                                         @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                         @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
+                                                         @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") long environmentCode,
+                                                         @RequestParam(value = "workflowInstancePriority", required = false) Priority workflowInstancePriority) {
         Map<String, Object> result = schedulerService.updateScheduleByWorkflowDefinitionCode(loginUser, projectCode,
-                processDefinitionCode, schedule,
-                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, tenantCode,
+                workflowDefinitionCode, schedule,
+                warningType, warningGroupId, failureStrategy, workflowInstancePriority, workerGroup, tenantCode,
                 environmentCode);
         return returnDataList(result);
     }

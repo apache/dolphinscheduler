@@ -40,8 +40,8 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
 
-    @FindBy(className = "btn-create-process")
-    private WebElement buttonCreateProcess;
+    @FindBy(className = "btn-create-workflow")
+    private WebElement buttonCreateWorkflow;
 
     @FindBys({
             @FindBy(className = "btn-selected"),
@@ -78,13 +78,13 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowForm createWorkflow() {
-        buttonCreateProcess().click();
+        buttonCreateWorkflow().click();
 
         return new WorkflowForm(driver);
     }
 
     public WorkflowForm createSubWorkflowWorkflow() {
-        buttonCreateProcess().click();
+        buttonCreateWorkflow().click();
         subProcessList().click();
 
         return new WorkflowForm(driver);

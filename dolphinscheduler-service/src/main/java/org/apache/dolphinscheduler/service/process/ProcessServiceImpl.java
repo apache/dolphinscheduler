@@ -573,7 +573,7 @@ public class ProcessServiceImpl implements ProcessService {
             });
         }
         // reset command parameter if sub workflow
-        if (cmdParam.containsKey(CommandKeyConstants.CMD_PARAM_SUB_PROCESS)) {
+        if (cmdParam.containsKey(CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW)) {
             workflowInstance.setCommandParam(command.getCommandParam());
         }
         if (Boolean.FALSE.equals(checkCmdParam(command, cmdParam))) {

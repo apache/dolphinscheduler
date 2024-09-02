@@ -20,7 +20,7 @@ import { NGrid, NGi } from 'naive-ui'
 import { startOfToday, getTime } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import { useTaskState } from './use-task-state'
-import { useProcessState } from './use-process-state'
+import { useWorkflowState } from './use-workflow-state'
 import StateCard from './components/state-card'
 import DefinitionCard from './components/definition-card'
 
@@ -30,22 +30,23 @@ export default defineComponent({
     const { t, locale } = useI18n()
     const dateRef = ref([getTime(startOfToday()), Date.now()])
     const taskStateRef = ref()
-    const processStateRef = ref()
+    const workflowStateRef = ref()
     const { getTaskState, taskVariables } = useTaskState()
-    const { getProcessState, processVariables } = useProcessState()
+    const { getWorkflowState, workflowVariables: workflowVariables } =
+      useWorkflowState()
 
     const initData = () => {
       taskStateRef.value = getTaskState(dateRef.value) || taskStateRef.value
-      processStateRef.value =
-        getProcessState(dateRef.value) || processStateRef.value
+      workflowStateRef.value =
+        getWorkflowState(dateRef.value) || workflowStateRef.value
     }
 
     const handleTaskDate = (val: any) => {
       taskStateRef.value = getTaskState(val)
     }
 
-    const handleProcessDate = (val: any) => {
-      processStateRef.value = getProcessState(val)
+    const handleWorkflowDate = (val: any) => {
+      workflowStateRef.value = getWorkflowState(val)
     }
 
     onMounted(() => {
@@ -61,11 +62,11 @@ export default defineComponent({
       t,
       dateRef,
       handleTaskDate,
-      handleProcessDate,
+      handleWorkflowDate: handleWorkflowDate,
       taskStateRef,
-      processStateRef,
+      workflowStateRef: workflowStateRef,
       ...toRefs(taskVariables),
-      ...toRefs(processVariables)
+      ...toRefs(workflowVariables)
     }
   },
   render() {
@@ -73,9 +74,9 @@ export default defineComponent({
       t,
       dateRef,
       handleTaskDate,
-      handleProcessDate,
+      handleWorkflowDate,
       taskLoadingRef,
-      processLoadingRef
+      workflowLoadingRef
     } = this
 
     return (
@@ -93,18 +94,18 @@ export default defineComponent({
           </NGi>
           <NGi>
             <StateCard
-              title={t('home.process_state_statistics')}
+              title={t('home.workflow_state_statistics')}
               date={dateRef}
-              tableData={this.processStateRef?.value.table}
-              chartData={this.processStateRef?.value.chart}
-              onUpdateDatePickerValue={handleProcessDate}
-              loadingRef={processLoadingRef}
+              tableData={this.workflowStateRef?.value.table}
+              chartData={this.workflowStateRef?.value.chart}
+              onUpdateDatePickerValue={handleWorkflowDate}
+              loadingRef={workflowLoadingRef}
             />
           </NGi>
         </NGrid>
         <NGrid cols={1} style='margin-top: 12px;'>
           <NGi>
-            <DefinitionCard title={t('home.process_definition_statistics')} />
+            <DefinitionCard title={t('home.workflow_definition_statistics')} />
           </NGi>
         </NGrid>
       </div>

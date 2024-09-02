@@ -67,7 +67,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "WORKFLOW_INSTANCE_TAG")
 @RestController
-@RequestMapping("/projects/{projectCode}/process-instances")
+@RequestMapping("/projects/{projectCode}/workflow-instances")
 @Slf4j
 public class WorkflowInstanceController extends BaseController {
 
@@ -81,7 +81,7 @@ public class WorkflowInstanceController extends BaseController {
      * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
-     * @param processDefineCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param searchVal search value
      * @param stateType state type
      * @param host host
@@ -92,7 +92,7 @@ public class WorkflowInstanceController extends BaseController {
      */
     @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_WORKFLOW_INSTANCE_LIST_NOTES")
     @Parameters({
-            @Parameter(name = "processDefineCode", description = "WORKFLOW_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "100")),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema = @Schema(implementation = WorkflowExecutionStatus.class)),
@@ -107,7 +107,7 @@ public class WorkflowInstanceController extends BaseController {
     @ApiException(Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
     public Result queryWorkflowInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                            @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
+                                            @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode,
                                             @RequestParam(value = "searchVal", required = false) String searchVal,
                                             @RequestParam(value = "executorName", required = false) String executorName,
                                             @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
@@ -120,7 +120,7 @@ public class WorkflowInstanceController extends BaseController {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return workflowInstanceService.queryWorkflowInstanceList(loginUser, projectCode, processDefineCode, startTime,
+        return workflowInstanceService.queryWorkflowInstanceList(loginUser, projectCode, workflowDefinitionCode, startTime,
                 endTime,
                 searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
     }
@@ -153,7 +153,7 @@ public class WorkflowInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param taskRelationJson process task relation json
+     * @param taskRelationJson workflow task relation json
      * @param taskDefinitionJson taskDefinitionJson
      * @param id workflow instance id
      * @param scheduleTime schedule time
@@ -168,9 +168,9 @@ public class WorkflowInstanceController extends BaseController {
             @Parameter(name = "id", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "syncDefine", description = "SYNC_DEFINE", required = true, schema = @Schema(implementation = boolean.class, example = "false")),
-            @Parameter(name = "globalParams", description = "PROCESS_GLOBAL_PARAMS", schema = @Schema(implementation = String.class, example = "[]")),
+            @Parameter(name = "globalParams", description = "WORKFLOW_GLOBAL_PARAMS", schema = @Schema(implementation = String.class, example = "[]")),
             @Parameter(name = "locations", description = "WORKFLOW_INSTANCE_LOCATIONS", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "timeout", description = "PROCESS_TIMEOUT", schema = @Schema(implementation = int.class, example = "0")),
+            @Parameter(name = "timeout", description = "WORKFLOW_TIMEOUT", schema = @Schema(implementation = int.class, example = "0")),
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -223,7 +223,7 @@ public class WorkflowInstanceController extends BaseController {
      * @param endTime end time
      * @return list of workflow instance
      */
-    @Operation(summary = "queryTopNLongestRunningWorkflowInstance", description = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
+    @Operation(summary = "queryTopNLongestRunningWorkflowInstance", description = "QUERY_TOPN_LONGEST_RUNNING_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
             @Parameter(name = "size", description = "WORKFLOW_INSTANCE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
             @Parameter(name = "startTime", description = "WORKFLOW_INSTANCE_START_TIME", required = true, schema = @Schema(implementation = String.class)),
@@ -381,13 +381,13 @@ public class WorkflowInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceIds workflow instance id
+     * @param workflowInstanceIds workflow instance id
      * @return delete result code
      */
     @Operation(summary = "batchDeleteWorkflowInstanceByIds", description = "BATCH_DELETE_WORKFLOW_INSTANCE_BY_IDS_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = int.class)),
-            @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "workflowInstanceIds", description = "WORKFLOW_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
@@ -395,21 +395,21 @@ public class WorkflowInstanceController extends BaseController {
     @OperatorLog(auditType = AuditType.WORKFLOW_INSTANCE_BATCH_DELETE)
     public Result batchDeleteWorkflowInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @PathVariable long projectCode,
-                                                   @RequestParam("processInstanceIds") String processInstanceIds) {
+                                                   @RequestParam("workflowInstanceIds") String workflowInstanceIds) {
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
-        if (!StringUtils.isEmpty(processInstanceIds)) {
-            String[] processInstanceIdArray = processInstanceIds.split(Constants.COMMA);
+        if (!StringUtils.isEmpty(workflowInstanceIds)) {
+            String[] workflowInstanceIdArray = workflowInstanceIds.split(Constants.COMMA);
 
-            for (String strProcessInstanceId : processInstanceIdArray) {
-                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+            for (String strWorkflowInstanceId : workflowInstanceIdArray) {
+                int workflowInstanceId = Integer.parseInt(strWorkflowInstanceId);
                 try {
-                    workflowInstanceService.deleteWorkflowInstanceById(loginUser, processInstanceId);
+                    workflowInstanceService.deleteWorkflowInstanceById(loginUser, workflowInstanceId);
                 } catch (Exception e) {
-                    log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
+                    log.error("Delete workflow instance: {} error", strWorkflowInstanceId, e);
                     deleteFailedIdList
-                            .add(MessageFormat.format(Status.WORKFLOW_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(Status.WORKFLOW_INSTANCE_ERROR.getMsg(), strWorkflowInstanceId));
                 }
             }
         }

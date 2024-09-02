@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_INSTANCE_STA
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.constants.Constants.PROCESS_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
@@ -375,7 +375,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Override
     public Result queryWorkflowInstanceList(User loginUser, WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
         Result result = new Result();
-        WorkflowInstance workflowInstance = workflowInstanceQueryRequest.convert2ProcessInstance();
+        WorkflowInstance workflowInstance = workflowInstanceQueryRequest.convert2WorkflowInstance();
         String projectName = workflowInstanceQueryRequest.getProjectName();
         if (!StringUtils.isBlank(projectName)) {
             Project project = projectMapper.queryByName(projectName);
@@ -461,7 +461,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
                         workflowInstance.getTestFlag());
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put(PROCESS_INSTANCE_STATE, workflowInstance.getState().toString());
+        resultMap.put(WORKFLOW_INSTANCE_STATE, workflowInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
         result.put(DATA_LIST, resultMap);
 
@@ -489,11 +489,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
         List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
-                .queryAllSubProcessInstance((long) taskInstance.getWorkflowInstanceId(),
+                .queryAllSubWorkflowInstance((long) taskInstance.getWorkflowInstanceId(),
                         taskInstance.getTaskCode());
-        List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
+        List<Long> allSubWorkflowInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
-        List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubProcessInstanceId);
+        List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubWorkflowInstanceId);
 
         if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
             putMsg(result, Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
@@ -514,7 +514,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         int index = 1;
         for (WorkflowInstance workflowInstance : allSubWorkflows) {
             DynamicSubWorkflowDto dynamicSubWorkflowDto = new DynamicSubWorkflowDto();
-            dynamicSubWorkflowDto.setProcessInstanceId(workflowInstance.getId());
+            dynamicSubWorkflowDto.setWorkflowInstanceId(workflowInstance.getId());
             dynamicSubWorkflowDto.setIndex(index);
             dynamicSubWorkflowDto.setState(workflowInstance.getState());
             dynamicSubWorkflowDto.setName(subWorkflowDefinition.getName());
@@ -577,7 +577,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put(Constants.SUBPROCESS_INSTANCE_ID, subWorkflowInstance.getId());
+        dataMap.put(Constants.SUBWORKFLOW_INSTANCE_ID, subWorkflowInstance.getId());
         result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;

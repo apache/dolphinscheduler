@@ -17,26 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import lombok.Data;
+
 import java.util.List;
 
-/**
- * DagData
- */
+@Data
 public class DagData {
 
-    /**
-     * processDefinition
-     */
     private WorkflowDefinition workflowDefinition;
 
-    /**
-     * processTaskRelationList
-     */
     private List<WorkflowTaskRelation> workflowTaskRelationList;
 
-    /**
-     * processTaskRelationList
-     */
     private List<TaskDefinition> taskDefinitionList;
 
     public DagData(WorkflowDefinition workflowDefinition, List<WorkflowTaskRelation> workflowTaskRelationList,
@@ -47,29 +38,5 @@ public class DagData {
     }
 
     public DagData() {
-    }
-
-    public WorkflowDefinition getProcessDefinition() {
-        return workflowDefinition;
-    }
-
-    public void setProcessDefinition(WorkflowDefinition workflowDefinition) {
-        this.workflowDefinition = workflowDefinition;
-    }
-
-    public List<WorkflowTaskRelation> getProcessTaskRelationList() {
-        return workflowTaskRelationList;
-    }
-
-    public void setProcessTaskRelationList(List<WorkflowTaskRelation> workflowTaskRelationList) {
-        this.workflowTaskRelationList = workflowTaskRelationList;
-    }
-
-    public List<TaskDefinition> getTaskDefinitionList() {
-        return taskDefinitionList;
-    }
-
-    public void setTaskDefinitionList(List<TaskDefinition> taskDefinitionList) {
-        this.taskDefinitionList = taskDefinitionList;
     }
 }

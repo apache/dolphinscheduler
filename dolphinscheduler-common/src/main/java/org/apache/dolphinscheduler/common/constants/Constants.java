@@ -353,8 +353,8 @@ public final class Constants {
     public static final char N = 'N';
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
-    public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
-    public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
+    public static final String SUBWORKFLOW_INSTANCE_ID = "subWorkflowInstanceId";
+    public static final String WORKFLOW_INSTANCE_STATE = "workflowInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
     public static final String CONDITION_RESULT = "conditionResult";
     public static final String SWITCH_RESULT = "switchResult";

@@ -21,7 +21,7 @@ dynamic-task:
   cloud:
     - {name: EMR,icon: shell-icon.png,hover: shell-hover.png}
   logic:
-    - {name: SUB_PROCESS,icon: shell-icon.png,hover: shell-hover.png}
+    - {name: SUB_WORKFLOW,icon: shell-icon.png,hover: shell-hover.png}
   dataIntegration:
     - {name: SEATUNNEL,icon: shell-icon.png,hover: shell-hover.png}
   dataQuality:

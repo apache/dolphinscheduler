@@ -125,7 +125,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Schedule schedule = this.getSchedule();
 
         ScheduleCreateRequest scheduleCreateRequest = new ScheduleCreateRequest();
-        scheduleCreateRequest.setProcessDefinitionCode(processDefinitionCode);
+        scheduleCreateRequest.setWorkflowDefinitionCode(processDefinitionCode);
         scheduleCreateRequest.setEnvironmentCode(environmentCode);
         scheduleCreateRequest.setTenantCode(Constants.DEFAULT);
 
@@ -205,7 +205,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         scheduleCreateRequest.setCrontab(crontab);
         Mockito.when(scheduleMapper.insert(isA(Schedule.class))).thenReturn(1);
         Schedule scheduleCreated = schedulerService.createSchedulesV2(user, scheduleCreateRequest);
-        Assertions.assertEquals(scheduleCreateRequest.getProcessDefinitionCode(),
+        Assertions.assertEquals(scheduleCreateRequest.getWorkflowDefinitionCode(),
                 scheduleCreated.getWorkflowDefinitionCode());
         Assertions.assertEquals(scheduleCreateRequest.getEnvironmentCode(), scheduleCreated.getEnvironmentCode());
         Assertions.assertEquals(stringToDate(scheduleCreateRequest.getStartTime()), scheduleCreated.getStartTime());

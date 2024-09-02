@@ -299,7 +299,7 @@ public class TaskGroupController extends BaseController {
      *
      * @param groupId     ID for task group
      * @param taskName    Task Name
-     * @param processName Process instance name
+     * @param workflowInstanceName workflow instance name
      * @param status      Task queue status
      * @param loginUser   login user
      * @param pageNo      page number
@@ -310,7 +310,7 @@ public class TaskGroupController extends BaseController {
     @Parameters({
             @Parameter(name = "groupId", description = "GROUP_ID", required = false, schema = @Schema(implementation = int.class, example = "1", defaultValue = "-1")),
             @Parameter(name = "taskInstanceName", description = "TASK_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "taskName")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "processName")),
+            @Parameter(name = "workflowInstanceName", description = "WORKFLOW_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "workflowInstanceName")),
             @Parameter(name = "status", description = "TASK_GROUP_STATUS", required = false, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
@@ -321,14 +321,14 @@ public class TaskGroupController extends BaseController {
     public Result queryTaskGroupQueues(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
                                        @RequestParam(value = "taskInstanceName", required = false) String taskName,
-                                       @RequestParam(value = "processInstanceName", required = false) String processName,
+                                       @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
                                        @RequestParam(value = "status", required = false) Integer status,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam("pageSize") Integer pageSize) {
         Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(
                 loginUser,
                 taskName,
-                processName,
+            workflowInstanceName,
                 status,
                 groupId,
                 pageNo,
