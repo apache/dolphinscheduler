@@ -89,20 +89,20 @@ jobs:
     strategy:
       matrix:
         case:
-          - name: Tenant
+          - name: TenantAPITest
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
-          - name: WorkerGroup
+          - name: WorkerGroupAPITest
             class: org.apache.dolphinscheduler.api.test.cases.WorkerGroupAPITest
-          - name: Project
+          - name: ProjectAPITest
             class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
-          - name: Workflow
-            class: org.apache.dolphinscheduler.api.test.cases.ProcessDefinitionAPITest
-          - name: Scheduler
+          - name: WorkflowDefinitionAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.WorkflowDefinitionAPITest
+          - name: SchedulerAPITest
             class: org.apache.dolphinscheduler.api.test.cases.SchedulerAPITest
-          - name: Executor
+          - name: ExecutorAPITest
             class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
-          - name: ProcessInstance
-            class: org.apache.dolphinscheduler.api.test.cases.ProcessInstanceAPITest
+          - name: WorkflowInstanceAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.WorkflowInstanceAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
