@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecut
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionRunningEventAck;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.runner.TaskCoordinator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,12 +41,16 @@ public class TaskInstanceExecutionEventAckListenerImpl implements ITaskInstanceE
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    @Autowired
+    private TaskCoordinator taskCoordinator;
+
     @Override
     public void handleTaskInstanceDispatchedEventAck(TaskInstanceExecutionDispatchedEventAck taskInstanceExecutionDispatchedEventAck) {
         try {
             final int taskInstanceId = taskInstanceExecutionDispatchedEventAck.getTaskInstanceId();
             LogUtils.setTaskInstanceIdMDC(taskInstanceId);
             log.info("Receive TaskInstanceDispatchedEventAck: {}", taskInstanceExecutionDispatchedEventAck);
+            taskCoordinator.onDispatchedEventAck(taskInstanceId);
             if (taskInstanceExecutionDispatchedEventAck.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.DISPATCH);
             } else {

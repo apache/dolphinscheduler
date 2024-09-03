@@ -39,10 +39,6 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorFactoryBuilder;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -75,6 +71,8 @@ public class TaskInstanceOperationFunctionTest {
 
     private WorkerRegistryClient workerRegistryClient = Mockito.mock(WorkerRegistryClient.class);
 
+    private TaskCoordinator taskCoordinator = Mockito.mock(TaskCoordinator.class);
+
     @Test
     public void testTaskInstanceOperationFunctionManager() {
         TaskInstanceKillOperationFunction taskInstanceKillOperationFunction = new TaskInstanceKillOperationFunction(
@@ -98,8 +96,7 @@ public class TaskInstanceOperationFunctionTest {
         TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction =
                 new TaskInstanceDispatchOperationFunction(
                         workerConfig,
-                        workerTaskExecutorFactoryBuilder,
-                        workerTaskExecutorThreadPool);
+                        taskCoordinator);
 
         TaskInstanceOperationFunctionManager taskInstanceOperationFunctionManager =
                 new TaskInstanceOperationFunctionManager(
@@ -192,8 +189,7 @@ public class TaskInstanceOperationFunctionTest {
         TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction =
                 new TaskInstanceDispatchOperationFunction(
                         workerConfig,
-                        workerTaskExecutorFactoryBuilder,
-                        workerTaskExecutorThreadPool);
+                        taskCoordinator);
 
         try (MockedStatic<LogUtils> logUtilsMockedStatic = Mockito.mockStatic(LogUtils.class)) {
             logUtilsMockedStatic
@@ -206,6 +202,8 @@ public class TaskInstanceOperationFunctionTest {
             logUtilsMockedStatic.verify(times(1), () -> LogUtils.removeWorkflowAndTaskInstanceIdMDC());
 
             given(workerTaskExecutorThreadPool.submitWorkerTaskExecutor(any())).willReturn(true);
+            Mockito.reset(taskCoordinator);
+            given(taskCoordinator.register(any())).willReturn(true);
             taskInstanceDispatchResponse = taskInstanceDispatchOperationFunction.operate(
                     new TaskInstanceDispatchRequest(taskExecutionContext));
             Assertions.assertEquals(taskInstanceDispatchResponse.isDispatchSuccess(), true);

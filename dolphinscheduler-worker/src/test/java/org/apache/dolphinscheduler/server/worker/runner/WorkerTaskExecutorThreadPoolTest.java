@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -30,10 +33,19 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.google.common.truth.Truth;
 
 class WorkerTaskExecutorThreadPoolTest {
+
+    private WorkerMessageSender workerMessageSender = Mockito.mock(WorkerMessageSender.class);
+
+    private WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder =
+            Mockito.mock(WorkerTaskExecutorFactoryBuilder.class);
+
+    private WorkerTaskExecutorFactory<MockWorkerTaskExecutor> defaultWorkerTaskExecutorFactory =
+            Mockito.mock(WorkerTaskExecutorFactory.class);
 
     @BeforeEach
     public void setUp() {
@@ -46,13 +58,27 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig);
+
+        Mockito.reset(workerTaskExecutorFactoryBuilder);
+        Mockito.doReturn(defaultWorkerTaskExecutorFactory).when(workerTaskExecutorFactoryBuilder)
+                .createWorkerTaskExecutorFactory(any());
+
+        final TaskCoordinator taskCoordinator = new TaskCoordinator(
+                workerConfig,
+                workerTaskExecutorThreadPool,
+                workerTaskExecutorFactoryBuilder,
+                workerMessageSender);
+
         // submit totalTaskCount task, the thread pool size is execThreadCount, reject policy is CONTINUE
         // after submit execThreadCount task, the thread pool is overload
         for (int i = 1; i <= totalTaskCount; i++) {
+            Mockito.reset(defaultWorkerTaskExecutorFactory);
+            TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder().taskInstanceId(i).build();
             MockWorkerTaskExecutor mockWorkerTaskExecutor =
-                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L));
-            workerTaskExecutorThreadPool.submitWorkerTaskExecutor(mockWorkerTaskExecutor);
+                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L), taskExecutionContext);
+            given(defaultWorkerTaskExecutorFactory.createWorkerTaskExecutor()).willReturn(mockWorkerTaskExecutor);
+            taskCoordinator.register(taskExecutionContext);
             if (i >= execThreadCount) {
                 Truth.assertThat(workerTaskExecutorThreadPool.isOverload()).isTrue();
             } else {
@@ -67,12 +93,14 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig);
         // submit totalTaskCount task, the thread pool size is execThreadCount, reject policy is CONTINUE
         // all task will be submitted success
         for (int i = 1; i <= totalTaskCount; i++) {
+            TaskExecutionContext taskExecutionContext =
+                    TaskExecutionContext.builder().taskInstanceId((int) System.nanoTime()).build();
             MockWorkerTaskExecutor mockWorkerTaskExecutor =
-                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L));
+                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L), taskExecutionContext);
             Truth.assertThat(workerTaskExecutorThreadPool.submitWorkerTaskExecutor(mockWorkerTaskExecutor)).isTrue();
         }
     }
@@ -83,17 +111,32 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.REJECT);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig);
+
+        Mockito.reset(workerTaskExecutorFactoryBuilder);
+        Mockito.doReturn(defaultWorkerTaskExecutorFactory).when(workerTaskExecutorFactoryBuilder)
+                .createWorkerTaskExecutorFactory(any());
+
+        final TaskCoordinator taskCoordinator = new TaskCoordinator(
+                workerConfig,
+                workerTaskExecutorThreadPool,
+                workerTaskExecutorFactoryBuilder,
+                workerMessageSender);
+
         // submit totalTaskCount task, the thread pool size is execThreadCount, reject policy is REJECT
         // only the front execThreadCount task will be submitted success
         for (int i = 1; i <= totalTaskCount; i++) {
+            Mockito.reset(defaultWorkerTaskExecutorFactory);
+            TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder().taskInstanceId(i).build();
             MockWorkerTaskExecutor mockWorkerTaskExecutor =
-                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L));
-            boolean submitResult = workerTaskExecutorThreadPool.submitWorkerTaskExecutor(mockWorkerTaskExecutor);
+                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L), taskExecutionContext);
+            given(defaultWorkerTaskExecutorFactory.createWorkerTaskExecutor()).willReturn(mockWorkerTaskExecutor);
+
+            boolean registerResult = taskCoordinator.register(taskExecutionContext);
             if (i <= execThreadCount) {
-                Assertions.assertTrue(submitResult, "The " + i + " task should submit success");
+                Assertions.assertTrue(registerResult, "The " + i + " task should submit success");
             } else {
-                Assertions.assertFalse(submitResult, "The " + i + " task should submit failed");
+                Assertions.assertFalse(registerResult, "The " + i + " task should submit failed");
             }
         }
     }
@@ -104,13 +147,27 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig);
+
+        Mockito.reset(workerTaskExecutorFactoryBuilder);
+        Mockito.doReturn(defaultWorkerTaskExecutorFactory).when(workerTaskExecutorFactoryBuilder)
+                .createWorkerTaskExecutorFactory(any());
+
+        final TaskCoordinator taskCoordinator = new TaskCoordinator(
+                workerConfig,
+                workerTaskExecutorThreadPool,
+                workerTaskExecutorFactoryBuilder,
+                workerMessageSender);
 
         Truth.assertThat(workerTaskExecutorThreadPool.getWaitingTaskExecutorSize()).isEqualTo(0);
         for (int i = 1; i <= totalTaskCount; i++) {
+            Mockito.reset(defaultWorkerTaskExecutorFactory);
+            TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder().taskInstanceId(i).build();
             MockWorkerTaskExecutor mockWorkerTaskExecutor =
-                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L));
-            workerTaskExecutorThreadPool.submitWorkerTaskExecutor(mockWorkerTaskExecutor);
+                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L), taskExecutionContext);
+            given(defaultWorkerTaskExecutorFactory.createWorkerTaskExecutor()).willReturn(mockWorkerTaskExecutor);
+
+            taskCoordinator.register(taskExecutionContext);
             if (i <= execThreadCount) {
                 Truth.assertThat(workerTaskExecutorThreadPool.getWaitingTaskExecutorSize()).isEqualTo(0);
             } else {
@@ -126,13 +183,27 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig);
+
+        Mockito.reset(workerTaskExecutorFactoryBuilder);
+        Mockito.doReturn(defaultWorkerTaskExecutorFactory).when(workerTaskExecutorFactoryBuilder)
+                .createWorkerTaskExecutorFactory(any());
+
+        final TaskCoordinator taskCoordinator = new TaskCoordinator(
+                workerConfig,
+                workerTaskExecutorThreadPool,
+                workerTaskExecutorFactoryBuilder,
+                workerMessageSender);
 
         Truth.assertThat(workerTaskExecutorThreadPool.getRunningTaskExecutorSize()).isEqualTo(0);
         for (int i = 1; i <= totalTaskCount; i++) {
+            Mockito.reset(defaultWorkerTaskExecutorFactory);
+            TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder().taskInstanceId(i).build();
             MockWorkerTaskExecutor mockWorkerTaskExecutor =
-                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L));
-            workerTaskExecutorThreadPool.submitWorkerTaskExecutor(mockWorkerTaskExecutor);
+                    new MockWorkerTaskExecutor(() -> ThreadUtils.sleep(10_000L), taskExecutionContext);
+            given(defaultWorkerTaskExecutorFactory.createWorkerTaskExecutor()).willReturn(mockWorkerTaskExecutor);
+
+            taskCoordinator.register(taskExecutionContext);
             if (i <= execThreadCount) {
                 Truth.assertThat(workerTaskExecutorThreadPool.getRunningTaskExecutorSize()).isEqualTo(i);
             } else {
@@ -145,8 +216,8 @@ class WorkerTaskExecutorThreadPoolTest {
 
         private final Runnable runnable;
 
-        protected MockWorkerTaskExecutor(Runnable runnable) {
-            super(TaskExecutionContext.builder().taskInstanceId((int) System.nanoTime()).build(),
+        protected MockWorkerTaskExecutor(Runnable runnable, TaskExecutionContext taskExecutionContext) {
+            super(taskExecutionContext,
                     new WorkerConfig(),
                     new WorkerMessageSender(),
                     null,
