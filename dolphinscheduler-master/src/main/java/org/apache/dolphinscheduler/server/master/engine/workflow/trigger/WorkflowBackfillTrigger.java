@@ -98,7 +98,7 @@ public class WorkflowBackfillTrigger
                 .backfillTimeList(backfillTriggerRequest.getBackfillTimeList())
                 .build();
         return Command.builder()
-                .commandType(backfillTriggerRequest.getExecType())
+                .commandType(CommandType.COMPLEMENT_DATA)
                 .processDefinitionCode(backfillTriggerRequest.getWorkflowCode())
                 .processDefinitionVersion(backfillTriggerRequest.getWorkflowVersion())
                 .processInstanceId(workflowInstance.getId())
