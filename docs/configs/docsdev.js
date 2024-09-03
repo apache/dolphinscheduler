@@ -146,10 +146,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
                             },
                             {
-                                title: 'Pigeon',
-                                link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
-                            },
-                            {
                                 title: 'Conditions',
                                 link: '/en-us/docs/dev/user_doc/guide/task/conditions.html',
                             },
@@ -230,8 +226,8 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
                             },
                             {
-                                title: 'SSH',
-                                link: '/en-us/docs/dev/user_doc/guide/task/ssh.html',
+                                title: 'Remote Shell',
+                                link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
@@ -269,10 +265,6 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/vertica.html',
-                            },
-                            {
-                                title: 'Remote Shell',
-                                link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
@@ -431,10 +423,6 @@ export default {
                             {
                                 title: 'File Manage',
                                 link: '/en-us/docs/dev/user_doc/guide/resource/file-manage.html'
-                            },
-                            {
-                                title: 'UDF Manage',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/udf-manage.html'
                             },
                             {
                                 title: 'Task Group Manage',
@@ -882,10 +870,6 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
                             },
                             {
-                                title: 'Pigeon',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/pigeon.html',
-                            },
-                            {
                                 title: 'Conditions',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/conditions.html',
                             },
@@ -964,10 +948,6 @@ export default {
                             {
                                 title: 'Apache Linkis',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
-                            },
-                            {
-                                title: 'SSH',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/ssh.html',
                             },
                             {
                                 title: 'Vertica',
@@ -1152,10 +1132,6 @@ export default {
                             {
                                 title: '文件管理',
                                 link: '/zh-cn/docs/dev/user_doc/guide/resource/file-manage.html'
-                            },
-                            {
-                                title: 'UDF 管理',
-                                link: '/zh-cn/docs/dev/user_doc/guide/resource/udf-manage.html'
                             },
                             {
                                 title: '任务组管理',

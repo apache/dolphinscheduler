@@ -17,16 +17,28 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryData;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.apache.dolphinscheduler.plugin.registry.jdbc.client.JdbcRegistryClient;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.server.ConnectionStateListener;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServer;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.server.JdbcRegistryDataChangeListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
+import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
-import java.sql.SQLException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -39,37 +51,28 @@ import lombok.extern.slf4j.Slf4j;
 public final class JdbcRegistry implements Registry {
 
     private final JdbcRegistryProperties jdbcRegistryProperties;
-    private final EphemeralDateManager ephemeralDateManager;
-    private final SubscribeDataManager subscribeDataManager;
-    private final RegistryLockManager registryLockManager;
-    private final JdbcOperator jdbcOperator;
+    private final JdbcRegistryClient jdbcRegistryClient;
 
-    JdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties,
-                 JdbcOperator jdbcOperator) {
-        this.jdbcOperator = jdbcOperator;
-        jdbcOperator.clearExpireLock();
-        jdbcOperator.clearExpireEphemeralDate();
+    private final IJdbcRegistryServer jdbcRegistryServer;
+
+    JdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties, IJdbcRegistryServer jdbcRegistryServer) {
         this.jdbcRegistryProperties = jdbcRegistryProperties;
-        this.ephemeralDateManager = new EphemeralDateManager(jdbcRegistryProperties, jdbcOperator);
-        this.subscribeDataManager = new SubscribeDataManager(jdbcRegistryProperties, jdbcOperator);
-        this.registryLockManager = new RegistryLockManager(jdbcRegistryProperties, jdbcOperator);
+        this.jdbcRegistryServer = jdbcRegistryServer;
+        this.jdbcRegistryClient = new JdbcRegistryClient(jdbcRegistryProperties, jdbcRegistryServer);
         log.info("Initialize Jdbc Registry...");
     }
 
     @Override
     public void start() {
         log.info("Starting Jdbc Registry...");
-        // start a jdbc connect check
-        ephemeralDateManager.start();
-        subscribeDataManager.start();
-        registryLockManager.start();
+        jdbcRegistryServer.start();
+        jdbcRegistryClient.start();
         log.info("Started Jdbc Registry...");
     }
 
     @Override
     public boolean isConnected() {
-        jdbcOperator.healthCheck();
-        return true;
+        return jdbcRegistryClient.isConnectivity();
     }
 
     @Override
@@ -81,11 +84,11 @@ public final class JdbcRegistry implements Registry {
                 throw new RegistryException(
                         String.format("Cannot connect to jdbc registry in %s s", timeout.getSeconds()));
             }
-            if (ephemeralDateManager.getConnectionState() == ConnectionState.CONNECTED) {
+            if (jdbcRegistryClient.isConnectivity()) {
                 return;
             }
             try {
-                Thread.sleep(jdbcRegistryProperties.getTermRefreshInterval().toMillis());
+                Thread.sleep(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RegistryException("Cannot connect to jdbc registry due to interrupted exception", e);
@@ -95,30 +98,85 @@ public final class JdbcRegistry implements Registry {
 
     @Override
     public void subscribe(String path, SubscribeListener listener) {
-        // new a schedule thread to query the path, if the path
-        subscribeDataManager.addListener(path, listener);
-    }
+        checkNotNull(path);
+        checkNotNull(listener);
+        jdbcRegistryClient.subscribeJdbcRegistryDataChange(new JdbcRegistryDataChangeListener() {
 
-    @Override
-    public void unsubscribe(String path) {
-        subscribeDataManager.removeListener(path);
+            @Override
+            public void onJdbcRegistryDataChanged(String key, String value) {
+                if (!key.startsWith(path)) {
+                    return;
+                }
+                Event event = Event.builder()
+                        .key(key)
+                        .path(path)
+                        .data(value)
+                        .type(Event.Type.UPDATE)
+                        .build();
+                listener.notify(event);
+            }
+
+            @Override
+            public void onJdbcRegistryDataDeleted(String key) {
+                if (!key.startsWith(path)) {
+                    return;
+                }
+                Event event = Event.builder()
+                        .key(key)
+                        .path(key)
+                        .type(Event.Type.REMOVE)
+                        .build();
+                listener.notify(event);
+            }
+
+            @Override
+            public void onJdbcRegistryDataAdded(String key, String value) {
+                if (!key.startsWith(path)) {
+                    return;
+                }
+                Event event = Event.builder()
+                        .key(key)
+                        .path(key)
+                        .data(value)
+                        .type(Event.Type.ADD)
+                        .build();
+                listener.notify(event);
+            }
+        });
     }
 
     @Override
     public void addConnectionStateListener(ConnectionListener listener) {
-        // check the current connection
-        ephemeralDateManager.addConnectionListener(listener);
+        checkNotNull(listener);
+        jdbcRegistryClient.subscribeConnectionStateChange(new ConnectionStateListener() {
+
+            @Override
+            public void onConnected() {
+                listener.onUpdate(ConnectionState.CONNECTED);
+            }
+
+            @Override
+            public void onDisConnected() {
+                listener.onUpdate(ConnectionState.DISCONNECTED);
+            }
+
+            @Override
+            public void onReconnected() {
+                listener.onUpdate(ConnectionState.RECONNECTED);
+            }
+        });
     }
 
     @Override
     public String get(String key) {
         try {
             // get the key value
-            JdbcRegistryData data = jdbcOperator.getData(key);
-            if (data == null) {
+            // Directly get from the db?
+            Optional<JdbcRegistryDataDTO> jdbcRegistryDataOptional = jdbcRegistryClient.getJdbcRegistryDataByKey(key);
+            if (!jdbcRegistryDataOptional.isPresent()) {
                 throw new RegistryException("key: " + key + " not exist");
             }
-            return data.getDataValue();
+            return jdbcRegistryDataOptional.get().getDataValue();
         } catch (RegistryException registryException) {
             throw registryException;
         } catch (Exception e) {
@@ -129,12 +187,8 @@ public final class JdbcRegistry implements Registry {
     @Override
     public void put(String key, String value, boolean deleteOnDisconnect) {
         try {
-            if (deleteOnDisconnect) {
-                // when put a ephemeralData will new a scheduler thread to update it
-                ephemeralDateManager.insertOrUpdateEphemeralData(key, value);
-            } else {
-                jdbcOperator.insertOrUpdatePersistentData(key, value);
-            }
+            DataType dataType = deleteOnDisconnect ? DataType.EPHEMERAL : DataType.PERSISTENT;
+            jdbcRegistryClient.putJdbcRegistryData(key, value, dataType);
         } catch (Exception ex) {
             throw new RegistryException(String.format("put key:%s, value:%s error", key, value), ex);
         }
@@ -143,7 +197,7 @@ public final class JdbcRegistry implements Registry {
     @Override
     public void delete(String key) {
         try {
-            jdbcOperator.deleteDataByKey(key);
+            jdbcRegistryClient.deleteJdbcRegistryDataByKey(key);
         } catch (Exception e) {
             throw new RegistryException(String.format("Delete key: %s error", key), e);
         }
@@ -152,8 +206,15 @@ public final class JdbcRegistry implements Registry {
     @Override
     public Collection<String> children(String key) {
         try {
-            return jdbcOperator.getChildren(key);
-        } catch (SQLException e) {
+            List<JdbcRegistryDataDTO> children = jdbcRegistryClient.listJdbcRegistryDataChildren(key);
+            return children
+                    .stream()
+                    .map(JdbcRegistryDataDTO::getDataKey)
+                    .filter(fullPath -> fullPath.length() > key.length())
+                    .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
             throw new RegistryException(String.format("Get key: %s children error", key), e);
         }
     }
@@ -161,7 +222,7 @@ public final class JdbcRegistry implements Registry {
     @Override
     public boolean exists(String key) {
         try {
-            return jdbcOperator.existKey(key);
+            return jdbcRegistryClient.existJdbcRegistryDataKey(key);
         } catch (Exception e) {
             throw new RegistryException(String.format("Check key: %s exist error", key), e);
         }
@@ -170,7 +231,7 @@ public final class JdbcRegistry implements Registry {
     @Override
     public boolean acquireLock(String key) {
         try {
-            registryLockManager.acquireLock(key);
+            jdbcRegistryClient.acquireJdbcRegistryLock(key);
             return true;
         } catch (RegistryException e) {
             throw e;
@@ -182,7 +243,7 @@ public final class JdbcRegistry implements Registry {
     @Override
     public boolean acquireLock(String key, long timeout) {
         try {
-            return registryLockManager.acquireLock(key, timeout);
+            return jdbcRegistryClient.acquireJdbcRegistryLock(key, timeout);
         } catch (RegistryException e) {
             throw e;
         } catch (Exception e) {
@@ -192,7 +253,7 @@ public final class JdbcRegistry implements Registry {
 
     @Override
     public boolean releaseLock(String key) {
-        registryLockManager.releaseLock(key);
+        jdbcRegistryClient.releaseJdbcRegistryLock(key);
         return true;
     }
 
@@ -200,10 +261,7 @@ public final class JdbcRegistry implements Registry {
     public void close() {
         log.info("Closing Jdbc Registry...");
         // remove the current Ephemeral node, if can connect to jdbc
-        try (
-                EphemeralDateManager closed1 = ephemeralDateManager;
-                SubscribeDataManager close2 = subscribeDataManager;
-                RegistryLockManager close3 = registryLockManager) {
+        try (JdbcRegistryClient closed1 = jdbcRegistryClient) {
         } catch (Exception e) {
             log.error("Close Jdbc Registry error", e);
         }

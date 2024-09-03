@@ -33,7 +33,6 @@ type TaskType =
   | 'DEPENDENT'
   | 'HTTP'
   | 'DATAX'
-  | 'PIGEON'
   | 'SQOOP'
   | 'CONDITIONS'
   | 'DATA_QUALITY'
@@ -59,6 +58,7 @@ type TaskType =
   | 'LINKIS'
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
+  | 'ALIYUN_SERVERLESS_SPARK'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

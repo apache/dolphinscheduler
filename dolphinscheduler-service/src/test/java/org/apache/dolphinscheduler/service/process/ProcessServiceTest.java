@@ -17,35 +17,28 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
@@ -54,11 +47,6 @@ import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -66,10 +54,15 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
@@ -79,8 +72,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.service.exceptions.CronParseException;
-import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
@@ -114,15 +105,15 @@ public class ProcessServiceTest {
     @Mock
     private CommandMapper commandMapper;
     @Mock
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
     @Mock
     private ErrorCommandMapper errorCommandMapper;
     @Mock
-    private ProcessDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper processDefineMapper;
     @Mock
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
     @Mock
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     private TaskInstanceDao taskInstanceDao;
@@ -145,9 +136,9 @@ public class ProcessServiceTest {
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
     @Mock
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
     @Mock
-    private ProcessDefinitionLogMapper processDefineLogMapper;
+    private WorkflowDefinitionLogMapper processDefineLogMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
     @Mock
@@ -176,270 +167,6 @@ public class ProcessServiceTest {
     @Mock
     TaskPluginManager taskPluginManager;
 
-    @Mock
-    private TriggerRelationService triggerRelationService;
-    @Test
-    public void testHandleCommand() throws CronParseException, CodeGenerateUtils.CodeGenerateException {
-        // cannot construct process instance, return null;
-        String host = "127.0.0.1";
-        Command command = new Command();
-        command.setProcessDefinitionCode(222);
-        command.setCommandType(CommandType.REPEAT_RUNNING);
-        command.setCommandParam("{\""
-                + CMD_PARAM_RECOVER_PROCESS_ID_STRING
-                + "\":\"111\",\""
-                + CMD_PARAM_SUB_PROCESS_DEFINE_CODE
-                + "\":\"222\"}");
-        try {
-            Assertions.assertNull(processService.handleCommand(host, command));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            // assert throw illegalArgumentException here since the definition is null
-            Assertions.assertTrue(true);
-        }
-
-        int definitionVersion = 1;
-        long definitionCode = 123;
-        int processInstanceId = 222;
-        // there is not enough thread for this command
-        Command command1 = new Command();
-        command1.setId(1);
-        command1.setProcessDefinitionCode(definitionCode);
-        command1.setProcessDefinitionVersion(definitionVersion);
-        command1.setCommandParam("{\"ProcessInstanceId\":222}");
-        command1.setCommandType(CommandType.START_PROCESS);
-        when(commandMapper.deleteById(1)).thenReturn(1);
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(definitionVersion);
-        processDefinition.setCode(definitionCode);
-        processDefinition
-                .setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
-        processDefinition.setExecutionType(ProcessExecutionTypeEnum.PARALLEL);
-
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(222);
-        processInstance.setProcessDefinitionCode(11L);
-        processInstance.setHost("127.0.0.1:5678");
-        processInstance.setProcessDefinitionVersion(1);
-        processInstance.setId(processInstanceId);
-        processInstance.setProcessDefinitionCode(definitionCode);
-        processInstance.setProcessDefinitionVersion(definitionVersion);
-
-        when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode()))
-                .thenReturn(processDefinition);
-        when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
-        when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
-                .thenReturn(1);
-        Assertions.assertNotNull(processService.handleCommand(host, command1));
-
-        Command command2 = new Command();
-        command2.setId(2);
-        command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
-        command2.setProcessDefinitionCode(definitionCode);
-        command2.setProcessDefinitionVersion(definitionVersion);
-        command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
-        command2.setProcessInstanceId(processInstanceId);
-        when(commandMapper.deleteById(2)).thenReturn(1);
-        Assertions.assertNotNull(processService.handleCommand(host, command2));
-
-        Command command3 = new Command();
-        command3.setId(3);
-        command3.setProcessDefinitionCode(definitionCode);
-        command3.setProcessDefinitionVersion(definitionVersion);
-        command3.setProcessInstanceId(processInstanceId);
-        command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
-        command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        when(commandMapper.deleteById(3)).thenReturn(1);
-        Assertions.assertNotNull(processService.handleCommand(host, command3));
-
-        Command command4 = new Command();
-        command4.setId(4);
-        command4.setProcessDefinitionCode(definitionCode);
-        command4.setProcessDefinitionVersion(definitionVersion);
-        command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
-        command4.setCommandType(CommandType.REPEAT_RUNNING);
-        command4.setProcessInstanceId(processInstanceId);
-        when(commandMapper.deleteById(4)).thenReturn(1);
-        Assertions.assertNotNull(processService.handleCommand(host, command4));
-
-        Command command5 = new Command();
-        command5.setId(5);
-        command5.setProcessDefinitionCode(definitionCode);
-        command5.setProcessDefinitionVersion(definitionVersion);
-        HashMap<String, String> startParams = new HashMap<>();
-        startParams.put("startParam1", "testStartParam1");
-        HashMap<String, String> commandParams = new HashMap<>();
-        commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
-        command5.setCommandParam(JSONUtils.toJsonString(commandParams));
-        command5.setCommandType(CommandType.START_PROCESS);
-        command5.setDryRun(Constants.DRY_RUN_FLAG_NO);
-        when(commandMapper.deleteById(5)).thenReturn(1);
-        when(curingGlobalParamsService.curingGlobalParams(null,
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                CommandType.START_PROCESS,
-                processInstance.getScheduleTime(), null)).thenReturn("\"testStartParam1\"");
-        ProcessInstance processInstance1 = processService.handleCommand(host, command5);
-        Assertions.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
-
-        ProcessDefinition processDefinition1 = new ProcessDefinition();
-        processDefinition1.setId(123);
-        processDefinition1.setName("test");
-        processDefinition1.setVersion(1);
-        processDefinition1.setCode(11L);
-        processDefinition1.setVersion(1);
-        processDefinition1.setExecutionType(ProcessExecutionTypeEnum.SERIAL_WAIT);
-        List<ProcessInstance> lists = new ArrayList<>();
-        ProcessInstance processInstance11 = new ProcessInstance();
-        processInstance11.setId(222);
-        processInstance11.setProcessDefinitionCode(11L);
-        processInstance11.setProcessDefinitionVersion(1);
-        processInstance11.setHost("127.0.0.1:5678");
-        lists.add(processInstance11);
-
-        ProcessInstance processInstance2 = new ProcessInstance();
-        processInstance2.setId(223);
-        processInstance2.setProcessDefinitionCode(11L);
-        processInstance2.setProcessDefinitionVersion(1);
-        when(processInstanceMapper.queryDetailById(223)).thenReturn(processInstance2);
-        when(processDefineMapper.queryByCode(11L)).thenReturn(processDefinition1);
-        when(commandMapper.deleteById(1)).thenReturn(1);
-        Assertions.assertNotNull(processService.handleCommand(host, command1));
-
-        Command command6 = new Command();
-        command6.setId(6);
-        command6.setProcessDefinitionCode(11L);
-        command6.setCommandParam("{\"ProcessInstanceId\":223}");
-        command6.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
-        command6.setProcessDefinitionVersion(1);
-        when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1,
-                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 223)).thenReturn(lists);
-        when(processInstanceMapper.updateNextProcessIdById(223, 222)).thenReturn(true);
-        when(commandMapper.deleteById(6)).thenReturn(1);
-        ProcessInstance processInstance6 = processService.handleCommand(host, command6);
-        Assertions.assertNotNull(processInstance6);
-
-        processDefinition1.setExecutionType(ProcessExecutionTypeEnum.SERIAL_DISCARD);
-        when(processDefineMapper.queryByCode(11L)).thenReturn(processDefinition1);
-        ProcessInstance processInstance7 = new ProcessInstance();
-        processInstance7.setId(224);
-        processInstance7.setProcessDefinitionCode(11L);
-        processInstance7.setProcessDefinitionVersion(1);
-        when(processInstanceMapper.queryDetailById(224)).thenReturn(processInstance7);
-
-        Command command7 = new Command();
-        command7.setId(7);
-        command7.setProcessDefinitionCode(11L);
-        command7.setCommandParam("{\"ProcessInstanceId\":224}");
-        command7.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
-        command7.setProcessDefinitionVersion(1);
-        when(commandMapper.deleteById(7)).thenReturn(1);
-        when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(11L, 1,
-                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 224)).thenReturn(null);
-        ProcessInstance processInstance8 = processService.handleCommand(host, command7);
-        Assertions.assertNotNull(processInstance8);
-
-        ProcessDefinition processDefinition2 = new ProcessDefinition();
-        processDefinition2.setId(123);
-        processDefinition2.setName("test");
-        processDefinition2.setVersion(1);
-        processDefinition2.setCode(12L);
-        processDefinition2.setExecutionType(ProcessExecutionTypeEnum.SERIAL_PRIORITY);
-        when(processDefineMapper.queryByCode(12L)).thenReturn(processDefinition2);
-        ProcessInstance processInstance9 = new ProcessInstance();
-        processInstance9.setId(225);
-        processInstance9.setProcessDefinitionCode(11L);
-        processInstance9.setProcessDefinitionVersion(1);
-        Command command9 = new Command();
-        command9.setId(9);
-        command9.setProcessDefinitionCode(12L);
-        command9.setCommandParam("{\"ProcessInstanceId\":225}");
-        command9.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
-        command9.setProcessDefinitionVersion(1);
-        when(processInstanceMapper.queryDetailById(225)).thenReturn(processInstance9);
-        when(processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(12L, 1,
-                org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE, 0)).thenReturn(lists);
-        when(processInstanceMapper.updateById(processInstance)).thenReturn(1);
-        when(commandMapper.deleteById(9)).thenReturn(1);
-        ProcessInstance processInstance10 = processService.handleCommand(host, command9);
-        Assertions.assertNotNull(processInstance10);
-
-        // build command same as processService.processNeedFailoverProcessInstances(processInstance);
-        Command command12 = new Command();
-        command12.setId(12);
-        command12.setProcessDefinitionCode(definitionCode);
-        command12.setProcessDefinitionVersion(definitionVersion);
-        command12.setProcessInstanceId(processInstanceId);
-        command12.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
-        HashMap<String, String> startParams12 = new HashMap<>();
-        startParams12.put("startParam11", "testStartParam11");
-        HashMap<String, String> commandParams12 = new HashMap<>();
-        commandParams12.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams12));
-        commandParams12.put("ProcessInstanceId", "222");
-        command12.setCommandParam(JSONUtils.toJsonString(commandParams12));
-        when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        when(commandMapper.deleteById(12)).thenReturn(1);
-        when(curingGlobalParamsService.curingGlobalParams(222,
-                processDefinition.getGlobalParamMap(),
-                processDefinition.getGlobalParamList(),
-                CommandType.RECOVER_TOLERANCE_FAULT_PROCESS,
-                processInstance.getScheduleTime(), null)).thenReturn("\"testStartParam11\"");
-        ProcessInstance processInstance13 = processService.handleCommand(host, command12);
-        Assertions.assertNotNull(processInstance13);
-        Assertions.assertNotNull(processInstance13.getGlobalParams());
-        Assertions.assertTrue(processInstance13.getGlobalParams().contains("\"testStartParam11\""));
-    }
-
-    @Test
-    public void testDeleteNotExistCommand() throws CronParseException, CodeGenerateUtils.CodeGenerateException {
-        String host = "127.0.0.1";
-        int definitionVersion = 1;
-        long definitionCode = 123;
-        int processInstanceId = 222;
-
-        Command command1 = new Command();
-        command1.setId(1);
-        command1.setProcessDefinitionCode(definitionCode);
-        command1.setProcessDefinitionVersion(definitionVersion);
-        command1.setCommandParam("{\"ProcessInstanceId\":222}");
-        command1.setCommandType(CommandType.START_PROCESS);
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(definitionVersion);
-        processDefinition.setCode(definitionCode);
-        processDefinition
-                .setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
-        processDefinition.setExecutionType(ProcessExecutionTypeEnum.PARALLEL);
-
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(222);
-        processInstance.setProcessDefinitionCode(11L);
-        processInstance.setHost("127.0.0.1:5678");
-        processInstance.setProcessDefinitionVersion(1);
-        processInstance.setId(processInstanceId);
-        processInstance.setProcessDefinitionCode(definitionCode);
-        processInstance.setProcessDefinitionVersion(definitionVersion);
-
-        when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode()))
-                .thenReturn(processDefinition);
-        when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
-        when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
-                .thenReturn(1);
-
-        Assertions.assertThrows(ServiceException.class, () -> {
-            // will throw exception when command id is 0 and delete fail
-            processService.handleCommand(host, command1);
-        });
-    }
-
     @Test
     public void testGetUserById() {
         User user = new User();
@@ -456,14 +183,14 @@ public class ProcessServiceTest {
         when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(null);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(111);
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(222);
-        processInstance.setProcessDefinitionVersion(1);
-        processInstance.setProcessDefinitionCode(1L);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setId(111);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(222);
+        workflowInstance.setProcessDefinitionVersion(1);
+        workflowInstance.setProcessDefinitionCode(1L);
         when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId()))
-                .thenReturn(processInstance);
+                .thenReturn(workflowInstance);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
     }
 
@@ -473,20 +200,20 @@ public class ProcessServiceTest {
         long parentProcessDefineCode = 1L;
         int parentProcessDefineVersion = 1;
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(parentProcessDefineCode);
-        processDefinition.setVersion(parentProcessDefineVersion);
-        when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(processDefinition);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(parentProcessDefineCode);
+        workflowDefinition.setVersion(parentProcessDefineVersion);
+        when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(workflowDefinition);
 
         long postTaskCode = 2L;
         int postTaskVersion = 2;
 
-        List<ProcessTaskRelationLog> relationLogList = new ArrayList<>();
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        List<WorkflowTaskRelationLog> relationLogList = new ArrayList<>();
+        WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
-        when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode,
+        when(workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode,
                 parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
@@ -500,17 +227,17 @@ public class ProcessServiceTest {
 
     @Test
     public void testSwitchVersion() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setProjectCode(1L);
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(1);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setProjectCode(1L);
+        workflowDefinition.setId(123);
+        workflowDefinition.setName("test");
+        workflowDefinition.setVersion(1);
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
-        Assertions.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
+        Assertions.assertEquals(0, processService.switchVersion(workflowDefinition, processDefinitionLog));
     }
 
     @Test
@@ -613,13 +340,13 @@ public class ProcessServiceTest {
 
     @Test
     public void testSetGlobalParamIfCommanded() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         String globalParams =
                 "[{\"prop\":\"global_param\",\"value\":\"4\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"O_ERRCODE\",\"value\":\"\",\"direct\":\"OUT\",\"type\":\"VARCHAR\"}]";
-        processDefinition.setGlobalParams(globalParams);
-        Map<String, String> globalParamMap = processDefinition.getGlobalParamMap();
+        workflowDefinition.setGlobalParams(globalParams);
+        Map<String, String> globalParamMap = workflowDefinition.getGlobalParamMap();
         Assertions.assertTrue(globalParamMap.size() == 2);
-        Assertions.assertTrue(processDefinition.getGlobalParamList().size() == 2);
+        Assertions.assertTrue(workflowDefinition.getGlobalParamList().size() == 2);
 
         HashMap<String, String> startParams = new HashMap<>();
         String expectValue = "6";
@@ -632,7 +359,7 @@ public class ProcessServiceTest {
                 org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR, startParams.get("global_param")));
         when(curingGlobalParamsService.parseWorkflowStartParam(commandParams)).thenReturn(mockStartParams);
 
-        processService.setGlobalParamIfCommanded(processDefinition, commandParams);
+        processService.setGlobalParamIfCommanded(workflowDefinition, commandParams);
         Assertions.assertTrue(globalParamMap.get("global_param").equals(expectValue));
         Assertions.assertTrue(globalParamMap.containsKey("O_ERRCODE"));
     }
@@ -675,14 +402,14 @@ public class ProcessServiceTest {
 
     @Test
     public void testGenDagGraph() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setId(123);
+        workflowDefinition.setName("test");
+        workflowDefinition.setVersion(1);
+        workflowDefinition.setCode(11L);
 
-        ProcessTaskRelationLog processTaskRelation = new ProcessTaskRelationLog();
+        WorkflowTaskRelationLog processTaskRelation = new WorkflowTaskRelationLog();
         processTaskRelation.setName("def 1");
         processTaskRelation.setProcessDefinitionVersion(1);
         processTaskRelation.setProjectCode(1L);
@@ -691,7 +418,7 @@ public class ProcessServiceTest {
         processTaskRelation.setPreTaskCode(2L);
         processTaskRelation.setUpdateTime(new Date());
         processTaskRelation.setCreateTime(new Date());
-        List<ProcessTaskRelationLog> list = new ArrayList<>();
+        List<WorkflowTaskRelationLog> list = new ArrayList<>();
         list.add(processTaskRelation);
 
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
@@ -720,11 +447,11 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(td2);
 
         when(taskDefinitionLogDao.queryTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
-        when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
+        when(workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(list);
 
         DAG<Long, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
-                processService.genDagGraph(processDefinition);
+                processService.genDagGraph(workflowDefinition);
         Assertions.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
     }
 
@@ -732,11 +459,11 @@ public class ProcessServiceTest {
     public void testChangeOutParam() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setProcessInstanceId(62);
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(62);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(62);
         taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskInstance.setTaskParams("{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select id from tb_test limit 1\","
-                + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
+                + "\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
                 + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
                 + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
                 + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");

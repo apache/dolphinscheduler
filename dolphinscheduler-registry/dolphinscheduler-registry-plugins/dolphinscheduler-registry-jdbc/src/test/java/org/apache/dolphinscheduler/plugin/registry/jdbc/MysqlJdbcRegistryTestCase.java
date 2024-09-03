@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
+
 import java.time.Duration;
 import java.util.stream.Stream;
 
@@ -34,6 +33,9 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @ActiveProfiles("mysql")
 class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
@@ -58,42 +60,14 @@ class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
         System.clearProperty("spring.datasource.url");
         System.setProperty("spring.datasource.url", jdbcUrl);
 
-        try (
-                Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");
-                Statement statement = connection.createStatement();) {
-            statement.execute(
-                    "CREATE TABLE `t_ds_jdbc_registry_data`\n" +
-                            "(\n" +
-                            "    `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
-                            "    `data_key`         varchar(256) NOT NULL COMMENT 'key, like zookeeper node path',\n" +
-                            "    `data_value`       text         NOT NULL COMMENT 'data, like zookeeper node value',\n"
-                            +
-                            "    `data_type`        tinyint(4) NOT NULL COMMENT '1: ephemeral node, 2: persistent node',\n"
-                            +
-                            "    `last_term`        bigint       NOT NULL COMMENT 'last term time',\n" +
-                            "    `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last update time',\n"
-                            +
-                            "    `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',\n"
-                            +
-                            "    PRIMARY KEY (`id`),\n" +
-                            "    unique (`data_key`)\n" +
-                            ") ENGINE = InnoDB\n" +
-                            "  DEFAULT CHARSET = utf8;");
-            statement.execute(
-                    "CREATE TABLE `t_ds_jdbc_registry_lock`\n" +
-                            "(\n" +
-                            "    `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
-                            "    `lock_key`         varchar(256) NOT NULL COMMENT 'lock path',\n" +
-                            "    `lock_owner`       varchar(256) NOT NULL COMMENT 'the lock owner, ip_processId',\n" +
-                            "    `last_term`        bigint       NOT NULL COMMENT 'last term time',\n" +
-                            "    `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last update time',\n"
-                            +
-                            "    `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',\n"
-                            +
-                            "    PRIMARY KEY (`id`),\n" +
-                            "    unique (`lock_key`)\n" +
-                            ") ENGINE = InnoDB\n" +
-                            "  DEFAULT CHARSET = utf8;");
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername("root");
+        config.setPassword("root");
+
+        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+            SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, "mysql_registry_init.sql");
+            sqlScriptRunner.execute();
         }
     }
 

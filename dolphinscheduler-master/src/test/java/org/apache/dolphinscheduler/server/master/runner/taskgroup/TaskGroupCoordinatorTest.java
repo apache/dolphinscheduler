@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.taskgroup;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,16 +26,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 
 import java.util.List;
 
@@ -70,7 +71,7 @@ class TaskGroupCoordinatorTest {
     private TaskInstanceDao taskInstanceDao;
 
     @Mock
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Test
     void start() throws InterruptedException {
@@ -158,13 +159,11 @@ class TaskGroupCoordinatorTest {
         // TaskInstance is NULL
         IllegalArgumentException illegalArgumentException =
                 assertThrows(IllegalArgumentException.class, () -> taskGroupCoordinator.releaseTaskGroupSlot(null));
-        assertEquals("The current TaskInstance does not use task group", illegalArgumentException.getMessage());
+        assertEquals("The TaskInstance is null", illegalArgumentException.getMessage());
 
         // TaskGroupId is NULL
         TaskInstance taskInstance = new TaskInstance();
-        illegalArgumentException = assertThrows(IllegalArgumentException.class,
-                () -> taskGroupCoordinator.releaseTaskGroupSlot(taskInstance));
-        assertEquals("The current TaskInstance does not use task group", illegalArgumentException.getMessage());
+        assertDoesNotThrow(() -> taskGroupCoordinator.releaseTaskGroupSlot(taskInstance));
 
         // Release TaskGroupQueue
         taskInstance.setId(1);
@@ -174,9 +173,7 @@ class TaskGroupCoordinatorTest {
         when(taskGroupQueueDao.queryByTaskInstanceId(taskInstance.getId())).thenReturn(taskGroupQueues);
         taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
 
-        assertEquals(Flag.NO.getCode(), taskGroupQueue.getInQueue());
-        assertEquals(TaskGroupQueueStatus.RELEASE, taskGroupQueue.getStatus());
-        verify(taskGroupQueueDao, Mockito.times(1)).updateById(taskGroupQueue);
+        verify(taskGroupQueueDao, Mockito.times(1)).deleteById(taskGroupQueue);
 
     }
 }

@@ -19,10 +19,15 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage.NavBarItem;
 
 import java.util.List;
+
+import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -31,13 +36,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import lombok.Getter;
 
 @Getter
 public final class ProjectPage extends NavBarPage implements NavBarItem {
+
     @FindBy(className = "btn-create-project")
     private WebElement buttonCreateProject;
 
@@ -64,17 +66,24 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         buttonCreateProject().click();
         createProjectForm().inputProjectName().sendKeys(project);
         createProjectForm().buttonSubmit().click();
+        return this;
+    }
 
+    public ProjectPage createProjectUntilSuccess(String project) {
+        create(project);
+        await().untilAsserted(() -> assertThat(projectList())
+                .as("project list should contain newly-created project")
+                .anyMatch(it -> it.getText().contains(project)));
         return this;
     }
 
     public ProjectPage delete(String project) {
         projectList()
-            .stream()
-            .filter(it -> it.getText().contains(project))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
-            .findElement(By.className("delete")).click();
+                .stream()
+                .filter(it -> it.getText().contains(project))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
+                .findElement(By.className("delete")).click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -83,17 +92,18 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     public ProjectDetailPage goTo(String project) {
         projectList().stream()
-                     .filter(it -> it.getText().contains(project))
-                     .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
-                     .findFirst()
-                     .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
-                     .click();
+                .filter(it -> it.getText().contains(project))
+                .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
+                .click();
 
         return new ProjectDetailPage(driver);
     }
 
     @Getter
     public class CreateProjectForm {
+
         CreateProjectForm() {
             PageFactory.initElements(driver, this);
         }

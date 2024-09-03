@@ -1056,8 +1056,6 @@ VALUES (-1, 'default', 'default tenant', '1', '2018-03-27 15:48:50', '2018-10-24
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
@@ -1094,8 +1092,6 @@ CREATE TABLE t_ds_alert_plugin_instance (
 	create_time timestamp NULL,
 	update_time timestamp NULL,
 	instance_name varchar(255) NULL,
-	instance_type int NOT NULL default '0',
-	warning_type int NOT NULL default '3',
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
@@ -2102,21 +2098,6 @@ CREATE TABLE t_ds_fav_task
     PRIMARY KEY (id)
 );
 
--- ----------------------------
--- Table structure for t_ds_trigger_relation
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_trigger_relation;
-CREATE TABLE t_ds_trigger_relation (
-    id        serial      NOT NULL,
-    trigger_type int NOT NULL,
-    trigger_code bigint NOT NULL,
-    job_id bigint NOT NULL,
-    create_time timestamp DEFAULT NULL,
-    update_time timestamp DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
-);
-
 DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
 CREATE TABLE t_ds_relation_sub_workflow (
     id        serial      NOT NULL,
@@ -2129,23 +2110,73 @@ CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (pare
 CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
---
--- Table structure for table t_ds_alert
---
-
-DROP TABLE IF EXISTS t_ds_listener_event;
-CREATE TABLE t_ds_listener_event(
-    id          int         NOT NULL,
-    content     text,
-    sign        varchar(64) NOT NULL DEFAULT '',
-    post_status int         NOT NULL DEFAULT '0',
-    event_type  int         NOT NULL,
-    log         text,
-    create_time timestamp            DEFAULT NULL,
-    update_time timestamp            DEFAULT NULL,
+-- ----------------------------
+-- Table structure for t_ds_process_task_lineage
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_process_task_lineage;
+CREATE TABLE t_ds_process_task_lineage (
+    id int NOT NULL,
+    workflow_definition_code bigint NOT NULL DEFAULT 0,
+    workflow_definition_version int NOT NULL DEFAULT 0,
+    task_definition_code bigint NOT NULL DEFAULT 0,
+    task_definition_version int NOT NULL DEFAULT 0,
+    dept_project_code bigint NOT NULL DEFAULT 0,
+    dept_workflow_definition_code bigint NOT NULL DEFAULT 0,
+    dept_task_definition_code bigint NOT NULL DEFAULT 0,
+    create_time timestamp NOT NULL DEFAULT current_timestamp,
+    update_time timestamp NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (id)
 );
-comment on column t_ds_listener_event.sign is 'sign=sha1(content)';
 
-create index idx_listener_event_post_status on t_ds_listener_event (post_status);
-create index idx_listener_event_sign on t_ds_listener_event (sign);
+create index idx_process_code_version on t_ds_process_task_lineage (workflow_definition_code,workflow_definition_version);
+create index idx_task_code_version on t_ds_process_task_lineage (task_definition_code,task_definition_version);
+create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_workflow_definition_code,dept_task_definition_code);
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_data;
+create table t_ds_jdbc_registry_data
+(
+    id               bigserial not null,
+    data_key         varchar   not null,
+    data_value       text      not null,
+    data_type        varchar   not null,
+    client_id        bigint    not null,
+    create_time      timestamp not null default current_timestamp,
+    last_update_time timestamp not null default current_timestamp,
+    primary key (id)
+);
+create unique index uk_t_ds_jdbc_registry_dataKey on t_ds_jdbc_registry_data (data_key);
+
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_lock;
+create table t_ds_jdbc_registry_lock
+(
+    id          bigserial not null,
+    lock_key    varchar   not null,
+    lock_owner  varchar   not null,
+    client_id   bigint    not null,
+    create_time timestamp not null default current_timestamp,
+    primary key (id)
+);
+create unique index uk_t_ds_jdbc_registry_lockKey on t_ds_jdbc_registry_lock (lock_key);
+
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_client_heartbeat;
+create table t_ds_jdbc_registry_client_heartbeat
+(
+    id                  bigint    not null,
+    client_name         varchar   not null,
+    last_heartbeat_time bigint    not null,
+    connection_config   text      not null,
+    create_time         timestamp not null default current_timestamp,
+    primary key (id)
+);
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_data_change_event;
+create table t_ds_jdbc_registry_data_change_event
+(
+    id                 bigserial not null,
+    event_type         varchar   not null,
+    jdbc_registry_data text      not null,
+    create_time        timestamp not null default current_timestamp,
+    primary key (id)
+);

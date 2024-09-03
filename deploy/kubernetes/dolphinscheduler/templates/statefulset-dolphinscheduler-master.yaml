@@ -23,6 +23,7 @@ metadata:
     {{- include "dolphinscheduler.master.labels" . | nindent 4 }}
 spec:
   podManagementPolicy: {{ .Values.master.podManagementPolicy }}
+  updateStrategy: {{- include "dolphinscheduler.tplvalues.render" (dict "value" .Values.master.updateStrategy "context" $ ) | nindent 4 }}
   replicas: {{ .Values.master.replicas }}
   selector:
     matchLabels:

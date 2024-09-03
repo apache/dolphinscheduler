@@ -34,14 +34,18 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @AllArgsConstructor
 public class ExecutorPage {
 
     private String sessionId;
 
-    public HttpResponse startProcessInstance(User loginUser, long projectCode, long processDefinitionCode, String scheduleTime, FailureStrategy failureStrategy, WarningType warningType) {
+    public HttpResponse startProcessInstance(User loginUser,
+                                             long projectCode,
+                                             long processDefinitionCode,
+                                             String scheduleTime,
+                                             FailureStrategy failureStrategy,
+                                             WarningType warningType) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("processDefinitionCode", processDefinitionCode);
@@ -81,19 +85,8 @@ public class ExecutorPage {
         return requestClient.post(url, headers, params);
     }
 
-    public HttpResponse startCheckProcessDefinition(User loginUser, long projectCode, long processDefinitionCode) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("loginUser", loginUser);
-        params.put("processDefinitionCode", processDefinitionCode);
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.SESSION_ID_KEY, sessionId);
-
-        RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/start-check", projectCode);
-        return requestClient.post(url, headers, params);
-    }
-
-    public HttpResponse executeTask(User loginUser, long projectCode, int processInstanceId, String startNodeList, TaskDependType taskDependType) {
+    public HttpResponse executeTask(User loginUser, long projectCode, int processInstanceId, String startNodeList,
+                                    TaskDependType taskDependType) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("processInstanceId", processInstanceId);

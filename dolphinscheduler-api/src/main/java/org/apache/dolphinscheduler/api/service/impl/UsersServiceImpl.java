@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
@@ -47,7 +46,6 @@ import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
@@ -98,9 +96,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private DataSourceUserMapper datasourceUserMapper;
-
-    @Autowired
-    private UDFUserMapper udfUserMapper;
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
@@ -426,7 +421,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         user.setUpdateTime(new Date());
         user.setTenantId(tenantId);
-        // updateProcessInstance user
+        // updateWorkflowInstance user
         if (userMapper.updateById(user) <= 0) {
             throw new ServiceException(Status.UPDATE_USER_ERROR);
         }
@@ -492,9 +487,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     /**
      * revoke the project permission for specified user by id
-     * @param loginUser     Login user
-     * @param userId        User id
-     * @param projectIds   project id array
+     *
+     * @param loginUser  Login user
+     * @param userId     User id
+     * @param projectIds project id array
      * @return
      */
     @Override
@@ -537,8 +533,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant project with read permission
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser  login user
+     * @param userId     user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -748,62 +744,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
-     * grant udf function
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional
-    public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
-        udfUserMapper.deleteByUserId(userId);
-
-        if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
-            log.warn("Parameter udfIds is empty.");
-            return result;
-        }
-
-        String[] resourcesIdArr = udfIds.split(",");
-
-        for (String udfId : resourcesIdArr) {
-            Date now = new Date();
-            UDFUser udfUser = new UDFUser();
-            udfUser.setUserId(userId);
-            udfUser.setUdfId(Integer.parseInt(udfId));
-            udfUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            udfUser.setCreateTime(now);
-            udfUser.setUpdateTime(now);
-            udfUserMapper.insert(udfUser);
-        }
-
-        log.info("User is granted permission for UDF, userName:{}.", user.getUserName());
-
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
      * grant namespace
      *
      * @param loginUser    login user
@@ -872,6 +812,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can grant datasource.");
             return result;
         }
         User user = userMapper.selectById(userId);

@@ -49,7 +49,7 @@ public class TaskInstanceUtils {
         target.setLogPath(source.getLogPath());
         target.setRetryTimes(source.getRetryTimes());
         target.setAlertFlag(source.getAlertFlag());
-        target.setProcessInstance(source.getProcessInstance());
+        target.setWorkflowInstance(source.getWorkflowInstance());
         target.setProcessDefine(source.getProcessDefine());
         target.setTaskDefine(source.getTaskDefine());
         target.setPid(source.getPid());
@@ -62,7 +62,6 @@ public class TaskInstanceUtils {
         target.setMaxRetryTimes(source.getMaxRetryTimes());
         target.setRetryInterval(source.getRetryInterval());
         target.setTaskInstancePriority(source.getTaskInstancePriority());
-        target.setDependentResult(source.getDependentResult());
         target.setWorkerGroup(source.getWorkerGroup());
         target.setEnvironmentCode(source.getEnvironmentCode());
         target.setEnvironmentConfig(source.getEnvironmentConfig());

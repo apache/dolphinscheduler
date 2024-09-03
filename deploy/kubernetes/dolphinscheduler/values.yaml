@@ -424,6 +424,11 @@ master:
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  # -- Update strategy
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  #
+  updateStrategy:
+    type: RollingUpdate
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
@@ -562,6 +567,11 @@ worker:
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  # -- Update strategy
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  #
+  updateStrategy:
+    type: RollingUpdate
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
@@ -678,7 +688,7 @@ worker:
     # -- tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: true
     # -- If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
-    DEFAULT_TENANT_ENABLED: false
+    WORKER_TENANT_CONFIG_DEFAULT_TENANT_ENABLED: false
 
   keda:
     # -- Enable or disable the Keda component

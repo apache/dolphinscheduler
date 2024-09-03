@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.ENVIRONMENT_CODE;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.FILE_NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.FULL_NAME;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.FUNC_NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PRIORITY;
@@ -34,7 +33,6 @@ import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PROCESS_INSTANCE_IDS;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.QUEUE_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.TYPE;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.UDF_FUNC_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.USER_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.VERSION;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_DEFINITION_CODE;
@@ -46,8 +44,6 @@ import static org.apache.dolphinscheduler.common.enums.AuditModelType.ENVIRONMEN
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.FILE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.FOLDER;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.K8S_NAMESPACE;
-import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROCESS;
-import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROCESS_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROJECT;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.SCHEDULE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK;
@@ -55,9 +51,10 @@ import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK_GROUP
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TENANT;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TOKEN;
-import static org.apache.dolphinscheduler.common.enums.AuditModelType.UDF_FUNCTION;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.USER;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKFLOW;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKFLOW_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.YARN_QUEUE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_DELETE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_RERUN;
@@ -86,7 +83,6 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.ClusterAuditOperatorI
 import org.apache.dolphinscheduler.api.audit.operator.impl.DatasourceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.EnvironmentAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.K8SNamespaceAuditOperatorImpl;
-import org.apache.dolphinscheduler.api.audit.operator.impl.ProcessAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ProcessInstanceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ProjectAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ResourceAuditOperatorImpl;
@@ -96,9 +92,9 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.TaskGroupAuditOperato
 import org.apache.dolphinscheduler.api.audit.operator.impl.TaskInstancesAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TenantAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TokenAuditOperatorImpl;
-import org.apache.dolphinscheduler.api.audit.operator.impl.UdfFunctionAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.UserAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.WorkerGroupAuditOperatorImpl;
+import org.apache.dolphinscheduler.api.audit.operator.impl.WorkflowAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.YarnQueueAuditOperatorImpl;
 import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
@@ -112,33 +108,33 @@ public enum AuditType {
     PROJECT_UPDATE(PROJECT, UPDATE, ProjectAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
     PROJECT_DELETE(PROJECT, DELETE, ProjectAuditOperatorImpl.class, new String[]{CODE}, new String[]{}),
 
-    PROCESS_CREATE(PROCESS, CREATE, ProcessAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
-    PROCESS_UPDATE(PROCESS, UPDATE, ProcessAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
-    PROCESS_SWITCH_VERSION(PROCESS, SWITCH_VERSION, ProcessAuditOperatorImpl.class, new String[]{CODE, VERSION},
+    WORKFLOW_CREATE(WORKFLOW, CREATE, WorkflowAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
+    WORKFLOW_UPDATE(WORKFLOW, UPDATE, WorkflowAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
+    WORKFLOW_SWITCH_VERSION(WORKFLOW, SWITCH_VERSION, WorkflowAuditOperatorImpl.class, new String[]{CODE, VERSION},
             new String[]{}),
-    PROCESS_DELETE_VERSION(PROCESS, DELETE_VERSION, ProcessAuditOperatorImpl.class, new String[]{CODE, VERSION},
+    WORKFLOW_DELETE_VERSION(WORKFLOW, DELETE_VERSION, WorkflowAuditOperatorImpl.class, new String[]{CODE, VERSION},
             new String[]{}),
-    PROCESS_RELEASE(PROCESS, RELEASE, ProcessAuditOperatorImpl.class, new String[]{WORKFLOW_DEFINITION_CODE},
+    WORKFLOW_RELEASE(WORKFLOW, RELEASE, WorkflowAuditOperatorImpl.class, new String[]{WORKFLOW_DEFINITION_CODE},
             new String[]{}),
-    PROCESS_COPY(PROCESS, COPY, ProcessAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
-    PROCESS_EXPORT(PROCESS, EXPORT, ProcessAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
-    PROCESS_DELETE(PROCESS, DELETE, ProcessAuditOperatorImpl.class, new String[]{CODE}, new String[]{}),
-    PROCESS_BATCH_DELETE(PROCESS, BATCH_DELETE, ProcessAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
-    PROCESS_START(PROCESS, START, ProcessAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODE},
+    WORKFLOW_COPY(WORKFLOW, COPY, WorkflowAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
+    WORKFLOW_EXPORT(WORKFLOW, EXPORT, WorkflowAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
+    WORKFLOW_DELETE(WORKFLOW, DELETE, WorkflowAuditOperatorImpl.class, new String[]{CODE}, new String[]{}),
+    WORKFLOW_BATCH_DELETE(WORKFLOW, BATCH_DELETE, WorkflowAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
+    WORKFLOW_START(WORKFLOW, START, WorkflowAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODE},
             new String[]{}),
-    PROCESS_BATCH_START(PROCESS, BATCH_START, ProcessAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODES},
+    WORKFLOW_BATCH_START(WORKFLOW, BATCH_START, WorkflowAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODES},
             new String[]{}),
-    PROCESS_BATCH_RERUN(PROCESS, BATCH_RERUN, ProcessInstanceAuditOperatorImpl.class,
+    WORKFLOW_BATCH_RERUN(WORKFLOW, BATCH_RERUN, ProcessInstanceAuditOperatorImpl.class,
             new String[]{PROCESS_INSTANCE_IDS},
             new String[]{}),
-    PROCESS_EXECUTE(PROCESS, EXECUTE, ProcessInstanceAuditOperatorImpl.class, new String[]{PROCESS_INSTANCE_ID},
+    WORKFLOW_EXECUTE(WORKFLOW, EXECUTE, ProcessInstanceAuditOperatorImpl.class, new String[]{PROCESS_INSTANCE_ID},
             new String[]{}),
-    PROCESS_IMPORT(PROCESS, IMPORT, ProcessAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
-    PROCESS_INSTANCE_UPDATE(PROCESS_INSTANCE, UPDATE, ProcessInstanceAuditOperatorImpl.class, new String[]{ID},
+    WORKFLOW_IMPORT(WORKFLOW, IMPORT, WorkflowAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
+    WORKFLOW_INSTANCE_UPDATE(WORKFLOW_INSTANCE, UPDATE, ProcessInstanceAuditOperatorImpl.class, new String[]{ID},
             new String[]{}),
-    PROCESS_INSTANCE_DELETE(PROCESS_INSTANCE, DELETE, ProcessInstanceAuditOperatorImpl.class, new String[]{ID},
+    WORKFLOW_INSTANCE_DELETE(WORKFLOW_INSTANCE, DELETE, ProcessInstanceAuditOperatorImpl.class, new String[]{ID},
             new String[]{}),
-    PROCESS_INSTANCE_BATCH_DELETE(PROCESS_INSTANCE, BATCH_DELETE, ProcessInstanceAuditOperatorImpl.class,
+    WORKFLOW_INSTANCE_BATCH_DELETE(WORKFLOW_INSTANCE, BATCH_DELETE, ProcessInstanceAuditOperatorImpl.class,
             new String[]{PROCESS_INSTANCE_IDS}, new String[]{}),
 
     TASK_CREATE(TASK, CREATE, TaskAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
@@ -162,13 +158,6 @@ public enum AuditType {
     FILE_CREATE(FILE, CREATE, ResourceAuditOperatorImpl.class, new String[]{TYPE, FILE_NAME, ALIAS}, new String[]{}),
     FILE_UPDATE(FILE, UPDATE, ResourceAuditOperatorImpl.class, new String[]{TYPE, FILE_NAME, ALIAS}, new String[]{}),
     FILE_DELETE(FILE, DELETE, ResourceAuditOperatorImpl.class, new String[]{FULL_NAME}, new String[]{}),
-
-    UDF_FUNCTION_CREATE(UDF_FUNCTION, CREATE, UdfFunctionAuditOperatorImpl.class, new String[]{FUNC_NAME},
-            new String[]{}),
-    UDF_FUNCTION_UPDATE(UDF_FUNCTION, UPDATE, UdfFunctionAuditOperatorImpl.class, new String[]{FUNC_NAME},
-            new String[]{}),
-    UDF_FUNCTION_DELETE(UDF_FUNCTION, DELETE, UdfFunctionAuditOperatorImpl.class, new String[]{UDF_FUNC_ID},
-            new String[]{}),
 
     TASK_GROUP_CREATE(TASK_GROUP, CREATE, TaskGroupAuditOperatorImpl.class, new String[]{NAME}, new String[]{}),
     TASK_GROUP_UPDATE(TASK_GROUP, UPDATE, TaskGroupAuditOperatorImpl.class, new String[]{}, new String[]{ID}),

@@ -84,21 +84,13 @@ registry:
 
 master:
   listen-port: 5678
-  # master prepare execute thread number to limit handle commands in parallel
-  pre-exec-threads: 10
-  # master execute thread number to limit process instances in parallel
-  exec-threads: 100
-  # master dispatch task number per batch, if all the tasks dispatch failed in a batch, will sleep 1s.
-  dispatch-task-number: 3
-  # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
-  host-selector: lower_weight
-  # master heartbeat interval
+  # The number of workflow event bus fire worker used to fire the workflow event, default is 2*CPU core + 1.
+  #  workflow-event-bus-fire-thread-count: 10
+  # The number of threads used to execute sync logic task e.g. Switch/Condition, default is CPU core.
+  #  master-sync-task-executor-thread-pool-size: 10
+  # The number of threads used to execute async logic task e.g. Dependent/SubWorkflow default is CPU core.
+  #  master-async-task-executor-thread-pool-size: 10
   max-heartbeat-interval: 10s
-  # master commit task retry times
-  task-commit-retry-times: 5
-  # master commit task interval
-  task-commit-interval: 1s
-  state-wheel-interval: 5s
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true
@@ -110,15 +102,9 @@ master:
     max-system-memory-usage-percentage-thresholds: 0.7
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
     max-disk-usage-percentage-thresholds: 0.7
-  # failover interval, the unit is minute
-  failover-interval: 10m
-  # kill yarn / k8s application when failover taskInstance, default true
-  kill-application-when-task-failover: true
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
-    strategy: waiting
-    # The max waiting time to reconnect to registry if you set the strategy to waiting
-    max-waiting-time: 100s
+    strategy: stop
   worker-group-refresh-interval: 10s
   command-fetch-strategy:
     type: ID_SLOT_BASED
@@ -127,6 +113,14 @@ master:
       id-step: 1
       # master fetch command num
       fetch-size: 10
+  worker-load-balancer-configuration-properties:
+    # RANDOM, ROUND_ROBIN, FIXED_WEIGHTED_ROUND_ROBIN, DYNAMIC_WEIGHTED_ROUND_ROBIN
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # dynamic-weight-config-properties only used in DYNAMIC_WEIGHTED_ROUND_ROBIN, the weight of memory-usage, cpu-usage, task-thread-pool-usage should sum to 100.
+    dynamic-weight-config-properties:
+      memory-usage-weight: 30
+      cpu-usage-weight: 30
+      task-thread-pool-usage-weight: 40
 
 server:
   port: 5679

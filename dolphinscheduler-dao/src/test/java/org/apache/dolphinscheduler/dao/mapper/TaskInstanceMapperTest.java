@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -45,10 +45,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     private TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     /**
      * insert
@@ -65,18 +65,18 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
      *
      * @return ProcessInstance
      */
-    private ProcessInstance insertProcessInstance() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        processInstance.setName("taskName");
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstance.setStartTime(new Date());
-        processInstance.setEndTime(new Date());
-        processInstance.setProcessDefinitionCode(1L);
-        processInstance.setProjectCode(1L);
-        processInstance.setTestFlag(0);
-        processInstanceMapper.insert(processInstance);
-        return processInstance;
+    private WorkflowInstance insertProcessInstance() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setName("taskName");
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        workflowInstance.setStartTime(new Date());
+        workflowInstance.setEndTime(new Date());
+        workflowInstance.setProcessDefinitionCode(1L);
+        workflowInstance.setProjectCode(1L);
+        workflowInstance.setTestFlag(0);
+        workflowInstanceMapper.insert(workflowInstance);
+        return workflowInstance;
     }
 
     /**
@@ -102,10 +102,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testUpdate() {
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance taskInstance = insertTaskInstance(processInstance.getId());
+        TaskInstance taskInstance = insertTaskInstance(workflowInstance.getId());
         // update
         int update = taskInstanceMapper.updateById(taskInstance);
         Assertions.assertEquals(1, update);
@@ -118,10 +118,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testDelete() {
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance taskInstance = insertTaskInstance(processInstance.getId());
+        TaskInstance taskInstance = insertTaskInstance(workflowInstance.getId());
 
         int delete = taskInstanceMapper.deleteById(taskInstance.getId());
         Assertions.assertEquals(1, delete);
@@ -133,10 +133,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance taskInstance = insertTaskInstance(processInstance.getId());
+        TaskInstance taskInstance = insertTaskInstance(workflowInstance.getId());
         // query
         List<TaskInstance> taskInstances = taskInstanceMapper.selectList(null);
         taskInstanceMapper.deleteById(taskInstance.getId());
@@ -149,26 +149,26 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testFindValidTaskListByProcessId() {
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance task = insertTaskInstance(processInstance.getId());
-        TaskInstance task2 = insertTaskInstance(processInstance.getId());
-        task.setProcessInstanceId(processInstance.getId());
-        task2.setProcessInstanceId(processInstance.getId());
+        TaskInstance task = insertTaskInstance(workflowInstance.getId());
+        TaskInstance task2 = insertTaskInstance(workflowInstance.getId());
+        task.setProcessInstanceId(workflowInstance.getId());
+        task2.setProcessInstanceId(workflowInstance.getId());
         taskInstanceMapper.updateById(task);
         taskInstanceMapper.updateById(task2);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.findValidTaskListByProcessId(
                 task.getProcessInstanceId(),
                 Flag.YES,
-                processInstance.getTestFlag());
+                workflowInstance.getTestFlag());
 
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
                 Flag.NO,
-                processInstance.getTestFlag());
+                workflowInstance.getTestFlag());
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
         Assertions.assertNotEquals(0, taskInstances.size());
@@ -181,10 +181,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByInstanceIdAndCode() {
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance task = insertTaskInstance(processInstance.getId());
+        TaskInstance task = insertTaskInstance(workflowInstance.getId());
         task.setHost("111.111.11.11");
         taskInstanceMapper.updateById(task);
 
@@ -201,10 +201,10 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByProcessInstanceIdsAndTaskCodes() {
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance task = insertTaskInstance(processInstance.getId());
+        TaskInstance task = insertTaskInstance(workflowInstance.getId());
         task.setHost("111.111.11.11");
         taskInstanceMapper.updateById(task);
 
@@ -240,18 +240,18 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryTaskInstanceListPaging() {
-        ProcessDefinition definition = new ProcessDefinition();
+        WorkflowDefinition definition = new WorkflowDefinition();
         definition.setCode(1L);
         definition.setProjectCode(1111L);
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(definition);
+        workflowDefinitionMapper.insert(definition);
 
         // insert ProcessInstance
-        ProcessInstance processInstance = insertProcessInstance();
+        WorkflowInstance workflowInstance = insertProcessInstance();
 
         // insert taskInstance
-        TaskInstance task = insertTaskInstance(processInstance.getId());
+        TaskInstance task = insertTaskInstance(workflowInstance.getId());
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
@@ -267,9 +267,9 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 "",
                 TaskExecuteType.BATCH,
                 null, null);
-        processInstanceMapper.deleteById(processInstance.getId());
+        workflowInstanceMapper.deleteById(workflowInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
-        processDefinitionMapper.deleteById(definition.getId());
+        workflowDefinitionMapper.deleteById(definition.getId());
         Assertions.assertEquals(0, taskInstanceIPage.getTotal());
 
     }

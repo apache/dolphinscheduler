@@ -29,8 +29,6 @@ interface IRecord {
   createTime?: string
   id: number
   instanceName: string
-  instanceType: string
-  warningType: string
   pluginDefineId: number
   pluginInstanceParams?: string
   updateTime?: string

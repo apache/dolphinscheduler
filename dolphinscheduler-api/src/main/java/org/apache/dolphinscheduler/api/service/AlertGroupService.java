@@ -37,14 +37,6 @@ public interface AlertGroupService {
     List<AlertGroup> queryAllAlertGroup(User loginUser);
 
     /**
-     * query normal alert group list
-     *
-     * @param loginUser
-     * @return alert group list which is is not 2
-     */
-    List<AlertGroup> queryNormalAlertGroups(User loginUser);
-
-    /**
      * query alert group by id
      *
      * @param loginUser login user
@@ -76,7 +68,7 @@ public interface AlertGroupService {
     AlertGroup createAlertGroup(User loginUser, String groupName, String desc, String alertInstanceIds);
 
     /**
-     * updateProcessInstance alert group
+     * updateWorkflowInstance alert group
      *
      * @param loginUser login user
      * @param id alert group id

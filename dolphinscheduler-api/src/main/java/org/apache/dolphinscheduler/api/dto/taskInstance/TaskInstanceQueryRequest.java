@@ -35,7 +35,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 public class TaskInstanceQueryRequest extends PageQueryDto {
 
-    @Schema(name = "processInstanceId", example = "PROCESS_INSTANCE_ID", defaultValue = "0")
+    @Schema(name = "processInstanceId", example = "WORKFLOW_INSTANCE_ID", defaultValue = "0")
     Integer processInstanceId;
 
     @Schema(name = "processInstanceName", example = "PROCESS-INSTANCE-NAME")

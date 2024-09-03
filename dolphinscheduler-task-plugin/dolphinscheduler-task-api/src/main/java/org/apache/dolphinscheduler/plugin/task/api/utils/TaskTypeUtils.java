@@ -16,12 +16,17 @@
  */
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.apache.dolphinscheduler.plugin.task.api.ILogicTaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.DynamicLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 
@@ -41,7 +46,7 @@ public class TaskTypeUtils {
     }
 
     public boolean isDependentTask(String taskType) {
-        return SubWorkflowLogicTaskChannelFactory.NAME.equals(taskType);
+        return DependentLogicTaskChannelFactory.NAME.equals(taskType);
     }
 
     public boolean isDynamicTask(String taskType) {
@@ -49,6 +54,7 @@ public class TaskTypeUtils {
     }
 
     public boolean isLogicTask(String taskType) {
+        checkArgument(StringUtils.isNotEmpty(taskType), "taskType cannot be empty");
         return TaskPluginManager.getTaskChannel(taskType) instanceof ILogicTaskChannel;
     }
 

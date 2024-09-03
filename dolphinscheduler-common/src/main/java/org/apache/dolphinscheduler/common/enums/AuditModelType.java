@@ -30,18 +30,15 @@ import lombok.Getter;
 public enum AuditModelType {
 
     PROJECT("Project", null),
-    PROCESS("Process", PROJECT),
-    PROCESS_INSTANCE("ProcessInstance", PROCESS),
-    TASK("Task", PROCESS),
+    WORKFLOW("Workflow", PROJECT),
+    WORKFLOW_INSTANCE("WorkflowInstance", WORKFLOW),
+    TASK("Task", WORKFLOW),
     TASK_INSTANCE("TaskInstance", TASK),
-    SCHEDULE("Schedule", PROCESS),
+    SCHEDULE("Schedule", WORKFLOW),
 
     RESOURCE("Resource", null),
     FOLDER("Folder", RESOURCE),
     FILE("File", FOLDER),
-    UDF_FOLDER("UDFFolder", RESOURCE),
-    UDF_FILE("UDFFile", UDF_FOLDER),
-    UDF_FUNCTION("UDFFunction", RESOURCE),
     TASK_GROUP("TaskGroup", RESOURCE),
 
     DATASOURCE("Datasource", null),

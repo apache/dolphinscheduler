@@ -22,11 +22,10 @@ import org.apache.commons.lang3.SystemUtils;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-public final class Constants {
+import lombok.experimental.UtilityClass;
 
-    private Constants() {
-        throw new UnsupportedOperationException("Construct Constants");
-    }
+@UtilityClass
+public final class Constants {
 
     public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
 
@@ -44,8 +43,6 @@ public final class Constants {
     public static final String FOLDER_SEPARATOR = "/";
 
     public static final String RESOURCE_TYPE_FILE = "resources";
-
-    public static final String RESOURCE_TYPE_UDF = "udfs";
 
     public static final String EMPTY_STRING = "";
 
@@ -484,11 +481,9 @@ public final class Constants {
 
     public static final String TOTAL = "total";
 
-    /**
-     * workflow
-     */
-    public static final String WORKFLOW_LIST = "workFlowList";
-    public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
+    public static final long DEFAULT_PROJECT_CODE = 0;
+
+    public static final long DEPENDENT_ALL_TASK = 0;
 
     /**
      * session user
@@ -506,7 +501,9 @@ public final class Constants {
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
-    public static final String UDF = "UDF";
+
+    public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
+
     public static final String CLASS = "class";
 
     /**

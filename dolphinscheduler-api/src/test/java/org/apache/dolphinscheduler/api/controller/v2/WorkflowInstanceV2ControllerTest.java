@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQuer
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
     private WorkflowInstanceV2Controller workflowInstanceV2Controller;
 
     @Mock
-    private ProcessInstanceService processInstanceService;
+    private WorkflowInstanceService workflowInstanceService;
 
     @Mock
     private ExecutorService execService;
@@ -64,13 +64,13 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
         workflowInstanceQueryRequest.setPageSize(10);
 
         Result result = new Result();
-        PageInfo<ProcessInstance> pageInfo =
+        PageInfo<WorkflowInstance> pageInfo =
                 new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-        pageInfo.setTotalList(Collections.singletonList(new ProcessInstance()));
+        pageInfo.setTotalList(Collections.singletonList(new WorkflowInstance()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processInstanceService.queryProcessInstanceList(any(),
+        Mockito.when(workflowInstanceService.queryWorkflowInstanceList(any(),
                 any(WorkflowInstanceQueryRequest.class))).thenReturn(result);
 
         Result result1 =
@@ -83,10 +83,10 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
         User loginUser = getLoginUser();
 
         Map<String, Object> result = new HashMap<>();
-        result.put(DATA_LIST, new ProcessInstance());
+        result.put(DATA_LIST, new WorkflowInstance());
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processInstanceService.queryProcessInstanceById(any(), eq(1))).thenReturn(result);
+        Mockito.when(workflowInstanceService.queryWorkflowInstanceById(any(), eq(1))).thenReturn(result);
         Result result1 = workflowInstanceV2Controller.queryWorkflowInstanceById(loginUser, 1);
         Assertions.assertTrue(result1.isSuccess());
     }
@@ -95,7 +95,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
     public void testDeleteWorkflowInstanceById() {
         User loginUser = getLoginUser();
 
-        Mockito.doNothing().when(processInstanceService).deleteProcessInstanceById(any(), eq(1));
+        Mockito.doNothing().when(workflowInstanceService).deleteWorkflowInstanceById(any(), eq(1));
         Result result = workflowInstanceV2Controller.deleteWorkflowInstance(loginUser, 1);
         Assertions.assertTrue(result.isSuccess());
     }
@@ -104,10 +104,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
     public void testExecuteWorkflowInstance() {
         User loginUser = getLoginUser();
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-
-        Mockito.when(execService.execute(any(), eq(1), any(ExecuteType.class))).thenReturn(result);
+        Mockito.doNothing().when(execService).controlWorkflowInstance(any(), eq(1), any(ExecuteType.class));
 
         Result result1 = workflowInstanceV2Controller.execute(loginUser, 1, ExecuteType.STOP);
         Assertions.assertTrue(result1.isSuccess());

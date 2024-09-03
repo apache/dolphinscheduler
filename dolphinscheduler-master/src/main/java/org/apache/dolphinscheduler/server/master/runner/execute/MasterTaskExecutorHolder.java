@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,6 +41,10 @@ public class MasterTaskExecutorHolder {
 
     public void removeMasterTaskExecutor(Integer taskInstanceId) {
         SUBMITTED_MASTER_TASK_MAP.remove(taskInstanceId);
+    }
+
+    public Collection<MasterTaskExecutor> getAllMasterTaskExecutor() {
+        return SUBMITTED_MASTER_TASK_MAP.values();
     }
 
 }

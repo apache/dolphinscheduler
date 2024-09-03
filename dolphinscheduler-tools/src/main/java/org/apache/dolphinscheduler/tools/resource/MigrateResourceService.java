@@ -19,9 +19,7 @@ package org.apache.dolphinscheduler.tools.resource;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -55,9 +53,6 @@ public class MigrateResourceService {
     private TenantMapper tenantMapper;
 
     @Autowired
-    private UdfFuncMapper udfFuncMapper;
-
-    @Autowired
     private DataSource dataSource;
 
     private static final String MIGRATE_BASE_DIR = ".migrate";
@@ -69,11 +64,10 @@ public class MigrateResourceService {
         }
 
         String resMigrateBasePath = createMigrateDirByType(targetTenantCode, ResourceType.FILE);
-        String udfMigrateBasePath = createMigrateDirByType(targetTenantCode, ResourceType.UDF);
-        if (StringUtils.isEmpty(resMigrateBasePath) || StringUtils.isEmpty(udfMigrateBasePath)) {
+        if (StringUtils.isEmpty(resMigrateBasePath)) {
             return;
         }
-        // migrate all unmanaged resources and udfs once
+        // migrate all unmanaged resources once
         List<Map<String, Object>> resources = getAllResources();
         for (Map<String, Object> item : resources) {
             String oriFullName = (String) item.get("full_name");
@@ -84,16 +78,6 @@ public class MigrateResourceService {
                 if (ResourceType.FILE.getCode() == type) {
                     storageOperator.copy(oriFullName,
                             String.format(FORMAT_S_S, resMigrateBasePath, oriFullName), true, true);
-                } else if (ResourceType.UDF.getCode() == type) {
-                    String fullName = String.format(FORMAT_S_S, udfMigrateBasePath, oriFullName);
-                    storageOperator.copy(oriFullName, fullName, true, true);
-
-                    // change relative udfs resourceName
-                    List<UdfFunc> udfs = udfFuncMapper.listUdfByResourceId(new Integer[]{id});
-                    udfs.forEach(udf -> {
-                        udf.setResourceName(fullName);
-                        udfFuncMapper.updateById(udf);
-                    });
                 }
             } catch (Exception e) {
                 logger.error("Migrate resource: {} failed: {}", item, e);

@@ -194,14 +194,6 @@ export function formatParams(data: INodeData): {
       taskParams.title = data.title
       taskParams.groupId = data.groupId
     }
-    if (data.type === 'HIVE') {
-      if (data.udfs) taskParams.udfs = data.udfs.join(',')
-      taskParams.connParams = data.connParams
-    }
-
-    if (data.type === 'KYUUBI') {
-      if (data.udfs) taskParams.udfs = data.udfs.join(',')
-    }
   }
 
   if (data.taskType === 'PROCEDURE') {
@@ -344,6 +336,20 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
   }
 
+  if (data.taskType === 'ALIYUN_SERVERLESS_SPARK') {
+    taskParams.workspaceId = data.workspaceId
+    taskParams.resourceQueueId = data.resourceQueueId
+    taskParams.codeType = data.codeType
+    taskParams.jobName = data.jobName
+    taskParams.engineReleaseVersion = data.engineReleaseVersion
+    taskParams.entryPoint = data.entryPoint
+    taskParams.entryPointArguments = data.entryPointArguments
+    taskParams.sparkSubmitParameters = data.sparkSubmitParameters
+    taskParams.isProduction = data.isProduction
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+  }
+
   if (data.taskType === 'K8S') {
     taskParams.namespace = data.namespace
     taskParams.minCpuCores = data.minCpuCores
@@ -414,7 +420,7 @@ export function formatParams(data: INodeData): {
     taskParams.scriptParams = data.scriptParams
     taskParams.pythonPath = data.pythonPath
     taskParams.isCreateEnvironment = data.isCreateEnvironment
-    taskParams.pythonCommand = data.pythonCommand
+    taskParams.pythonLauncher = data.pythonLauncher
     taskParams.pythonEnvTool = data.pythonEnvTool
     taskParams.requirements = data.requirements
     taskParams.condaPythonVersion = data.condaPythonVersion
@@ -438,10 +444,6 @@ export function formatParams(data: INodeData): {
     taskParams.json = data.json
     taskParams.deployMode = data.deployMode
     taskParams.others = data.others
-  }
-
-  if (data.taskType === 'PIGEON') {
-    taskParams.targetJobName = data.targetJobName
   }
 
   if (data.taskType === 'HIVECLI') {
@@ -742,9 +744,6 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.conditionResult?.failedNode?.length) {
     params.failedBranch = data.taskParams.conditionResult.failedNode[0]
-  }
-  if (data.taskParams?.udfs) {
-    params.udfs = data.taskParams.udfs?.split(',')
   }
   if (data.taskParams?.customConfig !== void 0) {
     params.customConfig = data.taskParams.customConfig === 1 ? true : false

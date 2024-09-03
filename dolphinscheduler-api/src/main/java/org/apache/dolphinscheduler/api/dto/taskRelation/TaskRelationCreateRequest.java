@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.taskRelation;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.Date;
 
@@ -42,17 +42,17 @@ public class TaskRelationCreateRequest {
     @Schema(example = "54321", required = true)
     private long postTaskCode;
 
-    public ProcessTaskRelation convert2ProcessTaskRelation() {
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+    public WorkflowTaskRelation convert2ProcessTaskRelation() {
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
 
-        processTaskRelation.setProjectCode(this.projectCode);
-        processTaskRelation.setProcessDefinitionCode(this.workflowCode);
-        processTaskRelation.setPreTaskCode(this.preTaskCode);
-        processTaskRelation.setPostTaskCode(this.postTaskCode);
+        workflowTaskRelation.setProjectCode(this.projectCode);
+        workflowTaskRelation.setProcessDefinitionCode(this.workflowCode);
+        workflowTaskRelation.setPreTaskCode(this.preTaskCode);
+        workflowTaskRelation.setPostTaskCode(this.postTaskCode);
 
         Date date = new Date();
-        processTaskRelation.setCreateTime(date);
-        processTaskRelation.setUpdateTime(date);
-        return processTaskRelation;
+        workflowTaskRelation.setCreateTime(date);
+        workflowTaskRelation.setUpdateTime(date);
+        return workflowTaskRelation;
     }
 }
