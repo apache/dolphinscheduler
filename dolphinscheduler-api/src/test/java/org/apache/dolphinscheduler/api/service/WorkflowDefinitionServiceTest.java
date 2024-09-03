@@ -271,7 +271,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 Mockito.eq(projectCode))).thenReturn(pageListingResult);
         String user1 = "user1";
         String user2 = "user2";
-        when(userMapper.queryUserWithProcessDefinitionCode(processDefinitionCodes))
+        when(userMapper.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
                         UserWithWorkflowDefinitionCode.builder()
                                 .workflowDefinitionCode(processDefinitionCode1)

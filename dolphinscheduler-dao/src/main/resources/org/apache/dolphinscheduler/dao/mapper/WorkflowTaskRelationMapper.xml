@@ -56,7 +56,7 @@
     <delete id="deleteByWorkflowDefinitionCode">
         delete from t_ds_workflow_task_relation
         WHERE project_code = #{projectCode}
-        and workflow_definition_code = #{workflowDefinitionCode}
+          and workflow_definition_code = #{workflowDefinitionCode}
     </delete>
     <insert id="batchInsert">
         insert into t_ds_workflow_task_relation (name, workflow_definition_version, project_code, workflow_definition_code,
@@ -191,10 +191,11 @@
         where id = #{workflowTaskRelation.id}
     </update>
 
-    <delete id="deleteByWorkflowDefinitionCode">
+    <delete id="deleteByWorkflowDefinitionCodeAndVersion">
         delete
         from t_ds_workflow_task_relation
-        where workflow_definition_code = #{workflowDefinitionCode} and workflow_definition_version = #{workflowDefinitionVersion}
+        where workflow_definition_code = #{workflowDefinitionCode}
+        and workflow_definition_version = #{workflowDefinitionVersion}
     </delete>
 
     <select id="queryWorkflowTaskRelationByTaskCodeAndTaskVersion" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation">

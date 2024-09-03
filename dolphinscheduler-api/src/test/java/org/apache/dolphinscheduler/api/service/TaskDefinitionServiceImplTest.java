@@ -100,7 +100,7 @@ public class TaskDefinitionServiceImplTest {
     private ProcessService processService;
 
     @Mock
-    private WorkflowDefinitionLogMapper processDefineLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
@@ -119,9 +119,6 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
-
-    @Mock
-    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     private static final String TASK_PARAMETER =
             "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";;
@@ -289,12 +286,12 @@ public class TaskDefinitionServiceImplTest {
         TaskDefinitionLog taskDefinitionLog = getTaskDefinitionLog();
         ArrayList<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         taskDefinitionLogs.add(taskDefinitionLog);
-        Integer version = 1;
+        int version = 1;
         when(workflowDefinitionMapper.queryByCode(isA(long.class))).thenReturn(workflowDefinition);
 
         // saveWorkflowDefine
-        when(processDefineLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
-        when(processDefineLogMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
+        when(workflowDefinitionLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
+        when(workflowDefinitionLogMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
         when(workflowDefinitionMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
         int insertVersion =
                 processServiceImpl.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);

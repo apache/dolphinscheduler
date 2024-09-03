@@ -66,10 +66,10 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
     }
 
     @Override
-    public List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(processDefinitionCode);
+    public List<TaskDefinition> getTaskDefinitionListByDefinition(long workflowDefinitionCode) {
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
         if (workflowDefinition == null) {
-            log.error("Cannot find process definition, code: {}", processDefinitionCode);
+            log.error("Cannot find process definition, code: {}", workflowDefinitionCode);
             return Lists.newArrayList();
         }
 

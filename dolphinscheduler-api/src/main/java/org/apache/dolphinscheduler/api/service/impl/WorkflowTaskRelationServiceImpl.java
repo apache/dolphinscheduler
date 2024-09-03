@@ -903,7 +903,8 @@ public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements 
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion) {
-        workflowTaskRelationMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode, workflowDefinitionVersion);
+        workflowTaskRelationMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode,
+                workflowDefinitionVersion);
     }
 
     /**

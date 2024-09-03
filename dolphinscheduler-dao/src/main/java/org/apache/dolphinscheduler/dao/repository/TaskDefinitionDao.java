@@ -31,10 +31,10 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
     /**
      * Get list of task definition by process definition code
      *
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode process definition code
      * @return list of task definition
      */
-    List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode);
+    List<TaskDefinition> getTaskDefinitionListByDefinition(long workflowDefinitionCode);
 
     /**
      * Query task definition by code and version

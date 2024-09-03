@@ -46,8 +46,11 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
@@ -92,7 +95,16 @@ public class ProcessServiceTest {
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Mock
-    private WorkflowDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
+
+    @Mock
+    private WorkflowInstanceMapper workflowInstanceMapper;
+
+    @Mock
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
+
+    @Mock
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private TaskDefinitionLogDao taskDefinitionLogDao;
@@ -157,7 +169,7 @@ public class ProcessServiceTest {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(parentProcessDefineCode);
         workflowDefinition.setVersion(parentProcessDefineVersion);
-        when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(workflowDefinition);
+        when(workflowDefinitionMapper.selectById(parentProcessDefineId)).thenReturn(workflowDefinition);
 
         long postTaskCode = 2L;
         int postTaskVersion = 2;
@@ -172,7 +184,7 @@ public class ProcessServiceTest {
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
-        taskDefinitionLog1.setTaskParams("{\"processDefinitionCode\": 123L}");
+        taskDefinitionLog1.setTaskParams("{\"workflowDefinitionCode\": 123L}");
         taskDefinitionLogs.add(taskDefinitionLog1);
         when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 

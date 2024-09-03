@@ -336,7 +336,7 @@ public class UserMapperTest extends BaseDaoTest {
         insertProcessDefinition(user.getId());
         WorkflowDefinitionLog log = insertProcessDefinitionLog(user.getId());
         long processDefinitionCode = log.getCode();
-        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithWorkflowDefinitionCode(
                 null);
         UserWithWorkflowDefinitionCode userWithCode = userWithCodes.stream()
                 .filter(code -> code.getWorkflowDefinitionCode() == processDefinitionCode)
