@@ -73,7 +73,7 @@ public class ExecutorAPITest {
 
     private static long processDefinitionCode;
 
-    private static long triggerCode;
+    private static List<Integer> workflowInstanceIds;
 
     @BeforeAll
     public static void setup() {
@@ -138,19 +138,11 @@ public class ExecutorAPITest {
                     processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
 
-            triggerCode = (long) startProcessInstanceResponse.getBody().getData();
+            workflowInstanceIds = (List<Integer>) startProcessInstanceResponse.getBody().getData();
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
         }
-    }
-
-    @Test
-    @Order(2)
-    public void testStartCheckProcessDefinition() {
-        HttpResponse testStartCheckProcessDefinitionResponse =
-                executorPage.startCheckProcessDefinition(loginUser, projectCode, processDefinitionCode);
-        Assertions.assertTrue(testStartCheckProcessDefinitionResponse.getBody().getSuccess());
     }
 
 }

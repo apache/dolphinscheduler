@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,12 @@ public class MasterTaskExecutorThreadPoolManager {
     @Autowired
     private MasterAsyncTaskExecutorThreadPool masterAsyncTaskExecutorThreadPool;
 
-    public boolean submitMasterTaskExecutor(MasterTaskExecutor masterTaskExecutor) {
+    @Autowired
+    private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
+
+    public boolean submitMasterTaskExecutor(final MasterTaskExecutor masterTaskExecutor) {
+        MasterTaskExecutorHolder.putMasterTaskExecuteRunnable(masterTaskExecutor);
+        sendDispatchedEvent(masterTaskExecutor);
         if (masterTaskExecutor instanceof SyncMasterTaskExecutor) {
             return masterSyncTaskExecutorThreadPool
                     .submitMasterTaskExecutor((SyncMasterTaskExecutor) masterTaskExecutor);
@@ -44,7 +51,7 @@ public class MasterTaskExecutorThreadPoolManager {
         throw new IllegalArgumentException("Unknown type of MasterTaskExecutor: " + masterTaskExecutor);
     }
 
-    public boolean removeMasterTaskExecutor(MasterTaskExecutor masterTaskExecutor) {
+    public boolean removeMasterTaskExecutor(final MasterTaskExecutor masterTaskExecutor) {
         if (masterTaskExecutor instanceof SyncMasterTaskExecutor) {
             return masterSyncTaskExecutorThreadPool
                     .removeMasterTaskExecutor((SyncMasterTaskExecutor) masterTaskExecutor);
@@ -54,6 +61,11 @@ public class MasterTaskExecutorThreadPoolManager {
                     .removeMasterTaskExecutor((AsyncMasterTaskExecutor) masterTaskExecutor);
         }
         throw new IllegalArgumentException("Unknown type of MasterTaskExecutor: " + masterTaskExecutor);
+    }
+
+    private void sendDispatchedEvent(final MasterTaskExecutor masterTaskExecutor) {
+        logicTaskInstanceExecutionEventSenderManager.dispatchEventSender()
+                .sendMessage(masterTaskExecutor.getTaskExecutionContext());
     }
 
 }

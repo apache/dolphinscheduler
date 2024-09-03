@@ -27,7 +27,7 @@ public class TaskInstanceOperationFunctionManager {
     private TaskInstanceKillOperationFunction taskInstanceKillOperationFunction;
 
     @Autowired
-    private UpdateWorkflowHostOperationFunction updateWorkflowHostOperationFunction;
+    private TakeOverTaskOperationFunction takeOverTaskOperationFunction;
 
     @Autowired
     private TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction;
@@ -37,11 +37,11 @@ public class TaskInstanceOperationFunctionManager {
 
     public TaskInstanceOperationFunctionManager(
                                                 TaskInstanceKillOperationFunction taskInstanceKillOperationFunction,
-                                                UpdateWorkflowHostOperationFunction updateWorkflowHostOperationFunction,
+                                                TakeOverTaskOperationFunction takeOverTaskOperationFunction,
                                                 TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction,
                                                 TaskInstancePauseOperationFunction taskInstancePauseOperationFunction) {
         this.taskInstanceKillOperationFunction = taskInstanceKillOperationFunction;
-        this.updateWorkflowHostOperationFunction = updateWorkflowHostOperationFunction;
+        this.takeOverTaskOperationFunction = takeOverTaskOperationFunction;
         this.taskInstanceDispatchOperationFunction = taskInstanceDispatchOperationFunction;
         this.taskInstancePauseOperationFunction = taskInstancePauseOperationFunction;
     }
@@ -50,8 +50,8 @@ public class TaskInstanceOperationFunctionManager {
         return taskInstanceKillOperationFunction;
     }
 
-    public UpdateWorkflowHostOperationFunction getUpdateWorkflowHostOperationFunction() {
-        return updateWorkflowHostOperationFunction;
+    public TakeOverTaskOperationFunction getUpdateWorkflowHostOperationFunction() {
+        return takeOverTaskOperationFunction;
     }
 
     public TaskInstanceDispatchOperationFunction getTaskInstanceDispatchOperationFunction() {

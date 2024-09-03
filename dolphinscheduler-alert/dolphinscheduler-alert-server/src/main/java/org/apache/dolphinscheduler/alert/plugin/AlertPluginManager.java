@@ -54,10 +54,10 @@ public final class AlertPluginManager {
     private final Map<Integer, AlertChannel> alertPluginMap = new HashMap<>();
 
     public void start() {
-        log.info("AlertPluginManager start ...");
+        log.info("AlertPluginManager start...");
         checkAlertPluginExist();
         installAlertPlugin();
-        log.info("AlertPluginManager started ...");
+        log.info("AlertPluginManager started...");
     }
 
     public Optional<AlertChannel> getAlertChannel(int id) {
@@ -70,7 +70,7 @@ public final class AlertPluginManager {
 
     private void checkAlertPluginExist() {
         if (!pluginDao.checkPluginDefineTableExist()) {
-            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            log.error("Plugin Define Table t_ds_plugin_define Not Exist. Please Create it First!");
             System.exit(1);
         }
     }
@@ -84,11 +84,7 @@ public final class AlertPluginManager {
             String name = entry.getKey();
             AlertChannelFactory factory = entry.getValue();
 
-            log.info("Registering alert plugin: {} - {}", name, factory.getClass().getSimpleName());
-
             final AlertChannel alertChannel = factory.create();
-
-            log.info("Registered alert plugin: {} - {}", name, factory.getClass().getSimpleName());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
 
@@ -99,6 +95,8 @@ public final class AlertPluginManager {
             final int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
 
             alertPluginMap.put(id, alertChannel);
+
+            log.info("Success register alert plugin: {}", name);
         }
     }
 

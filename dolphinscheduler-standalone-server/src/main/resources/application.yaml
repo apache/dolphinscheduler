@@ -150,17 +150,8 @@ casdoor:
 
 master:
   listen-port: 5678
-  # master prepare execute thread number to limit handle commands in parallel
-  pre-exec-threads: 10
-  # master execute thread number to limit process instances in parallel
-  exec-threads: 10
   # master heartbeat interval
   max-heartbeat-interval: 10s
-  # master commit task retry times
-  task-commit-retry-times: 5
-  # master commit task interval
-  task-commit-interval: 1s
-  state-wheel-interval: 5s
   server-load-protection:
     enabled: true
     # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
@@ -179,10 +170,6 @@ master:
       memory-usage-weight: 30
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 40
-  # failover interval
-  failover-interval: 10m
-  # kill yarn/k8s application when failover taskInstance, default true
-  kill-application-when-task-failover: true
   worker-group-refresh-interval: 10s
   command-fetch-strategy:
     type: ID_SLOT_BASED

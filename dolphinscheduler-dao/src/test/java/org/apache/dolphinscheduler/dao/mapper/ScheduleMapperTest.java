@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.util.Date;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
     private ProjectMapper projectMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * insert
@@ -121,23 +121,23 @@ public class ScheduleMapperTest extends BaseDaoTest {
         project.setCreateTime(new Date());
         projectMapper.insert(project);
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setProjectCode(project.getCode());
-        processDefinition.setUserId(user.getId());
-        processDefinition.setLocations("");
-        processDefinition.setCreateTime(new Date());
-        processDefinition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setProjectCode(project.getCode());
+        workflowDefinition.setUserId(user.getId());
+        workflowDefinition.setLocations("");
+        workflowDefinition.setCreateTime(new Date());
+        workflowDefinition.setUpdateTime(new Date());
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionCode(processDefinition.getCode());
+        schedule.setProcessDefinitionCode(workflowDefinition.getCode());
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
-                processDefinition.getCode(), "");
+                workflowDefinition.getCode(), "");
         Assertions.assertNotEquals(0, scheduleIPage.getSize());
     }
 
@@ -159,23 +159,23 @@ public class ScheduleMapperTest extends BaseDaoTest {
         project.setCreateTime(new Date());
         projectMapper.insert(project);
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setProjectCode(project.getCode());
-        processDefinition.setUserId(user.getId());
-        processDefinition.setLocations("");
-        processDefinition.setCreateTime(new Date());
-        processDefinition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setProjectCode(project.getCode());
+        workflowDefinition.setUserId(user.getId());
+        workflowDefinition.setLocations("");
+        workflowDefinition.setCreateTime(new Date());
+        workflowDefinition.setUpdateTime(new Date());
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionCode(processDefinition.getCode());
+        schedule.setProcessDefinitionCode(workflowDefinition.getCode());
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, project.getCode(),
-                processDefinition.getCode(), "");
+                workflowDefinition.getCode(), "");
         Assertions.assertNotEquals(0, scheduleIPage.getSize());
     }
 
@@ -197,18 +197,18 @@ public class ScheduleMapperTest extends BaseDaoTest {
         project.setCreateTime(new Date());
         projectMapper.insert(project);
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setProjectCode(project.getCode());
-        processDefinition.setUserId(user.getId());
-        processDefinition.setLocations("");
-        processDefinition.setCreateTime(new Date());
-        processDefinition.setUpdateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setProjectCode(project.getCode());
+        workflowDefinition.setUserId(user.getId());
+        workflowDefinition.setLocations("");
+        workflowDefinition.setCreateTime(new Date());
+        workflowDefinition.setUpdateTime(new Date());
+        workflowDefinitionMapper.insert(workflowDefinition);
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionCode(processDefinition.getCode());
+        schedule.setProcessDefinitionCode(workflowDefinition.getCode());
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);

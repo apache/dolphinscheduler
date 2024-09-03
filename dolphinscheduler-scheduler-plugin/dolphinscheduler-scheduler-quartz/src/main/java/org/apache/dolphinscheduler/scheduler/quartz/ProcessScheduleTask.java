@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.service.command.CommandService;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerRequest;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -46,7 +47,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
     private ProcessService processService;
 
     @Autowired
-    private CommandService commandService;
+    private IWorkflowControlClient workflowInstanceController;
 
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
@@ -72,34 +73,35 @@ public class ProcessScheduleTask extends QuartzJobBean {
             return;
         }
 
-        ProcessDefinition processDefinition =
+        WorkflowDefinition workflowDefinition =
                 processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
         // release state : online/offline
-        ReleaseState releaseState = processDefinition.getReleaseState();
+        ReleaseState releaseState = workflowDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
             log.warn(
                     "process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}",
-                    projectId, processDefinition.getId());
+                    projectId, workflowDefinition.getId());
             return;
         }
 
-        Command command = new Command();
-        command.setCommandType(CommandType.SCHEDULER);
-        command.setExecutorId(schedule.getUserId());
-        command.setFailureStrategy(schedule.getFailureStrategy());
-        command.setProcessDefinitionCode(schedule.getProcessDefinitionCode());
-        command.setScheduleTime(scheduledFireTime);
-        command.setStartTime(fireTime);
-        command.setWarningGroupId(schedule.getWarningGroupId());
-        String workerGroup = WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup());
-        command.setWorkerGroup(workerGroup);
-        command.setTenantCode(schedule.getTenantCode());
-        command.setEnvironmentCode(schedule.getEnvironmentCode());
-        command.setWarningType(schedule.getWarningType());
-        command.setProcessInstancePriority(schedule.getProcessInstancePriority());
-        command.setProcessDefinitionVersion(processDefinition.getVersion());
-
-        commandService.createCommand(command);
+        final WorkflowScheduleTriggerRequest scheduleTriggerRequest = WorkflowScheduleTriggerRequest.builder()
+                .userId(schedule.getUserId())
+                .scheduleTIme(scheduledFireTime)
+                .timezoneId(schedule.getTimezoneId())
+                .workflowCode(workflowDefinition.getCode())
+                .workflowVersion(workflowDefinition.getVersion())
+                .failureStrategy(schedule.getFailureStrategy())
+                .taskDependType(TaskDependType.TASK_POST)
+                .warningType(schedule.getWarningType())
+                .warningGroupId(schedule.getWarningGroupId())
+                .workflowInstancePriority(schedule.getProcessInstancePriority())
+                .workerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup()))
+                .tenantCode(schedule.getTenantCode())
+                .environmentCode(schedule.getEnvironmentCode())
+                .dryRun(Flag.NO)
+                .testFlag(Flag.NO)
+                .build();
+        workflowInstanceController.scheduleTriggerWorkflow(scheduleTriggerRequest);
     }
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {

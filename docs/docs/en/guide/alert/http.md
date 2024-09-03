@@ -7,25 +7,16 @@ If you need to use `Http script` for alerting, create an alert instance in the a
 | **Parameter** |                                           **Description**                                           |
 |---------------|-----------------------------------------------------------------------------------------------------|
 | URL           | The `Http` request URL needs to contain protocol, host, path and parameters if the method is `GET`. |
-| Request Type  | Select the request type from `POST` or `GET`.                                                       |
-| Headers       | The headers of the `Http` request in JSON format.                                                   |
-| Body          | The request body of the `Http` request in JSON format, when using `POST` method to alert.           |
-| Content Field | The field name to place the alert information.                                                      |
+| Request Type  | Select the request type from `POST` or `GET` or `PUT`.                                              |
+| Headers       | The headers of the `Http` request in JSON format. Not including content-type.                       |
+| Body          | The request body of the `Http` request in JSON format, when using `POST` or `PUT` method to alert.  |
+| Content Type  | The content-type of header.                                                                         |
 
-## Send Type
-
-Using `POST` and `GET` method to send `Http` request in the `Request Type`.
+> Alarm message supports variables `$msg`, which can be used in `URL`, `Headers`, and `Body`.
 
 ### GET HTTP
 
 Send alert information by `Http` GET method.
 The following shows the `GET` configuration example:
 
-![enterprise-wechat-app-msg-config](../../../../img/alert/http-get-example.png)
-
-### POST HTTP
-
-Send alert information inside `Http` body by `Http` POST method.
-The following shows the `POST` configuration example:
-
-![enterprise-wechat-app-msg-config](../../../../img/alert/http-post-example.png)
+![http-alert-msg-config](../../../../img/alert/http-alert-example.png)

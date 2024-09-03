@@ -40,8 +40,11 @@ public class ExecutorPage {
 
     private String sessionId;
 
-    public HttpResponse startProcessInstance(User loginUser, long projectCode, long processDefinitionCode,
-                                             String scheduleTime, FailureStrategy failureStrategy,
+    public HttpResponse startProcessInstance(User loginUser,
+                                             long projectCode,
+                                             long processDefinitionCode,
+                                             String scheduleTime,
+                                             FailureStrategy failureStrategy,
                                              WarningType warningType) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
@@ -79,18 +82,6 @@ public class ExecutorPage {
 
         RequestClient requestClient = new RequestClient();
         String url = String.format("/projects/%s/executors/execute", projectCode);
-        return requestClient.post(url, headers, params);
-    }
-
-    public HttpResponse startCheckProcessDefinition(User loginUser, long projectCode, long processDefinitionCode) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("loginUser", loginUser);
-        params.put("processDefinitionCode", processDefinitionCode);
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.SESSION_ID_KEY, sessionId);
-
-        RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/start-check", projectCode);
         return requestClient.post(url, headers, params);
     }
 

@@ -46,10 +46,10 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.text.MessageFormat;
@@ -95,10 +95,10 @@ public class DataAnalysisServiceTest {
     ProjectService projectService;
 
     @Mock
-    ProcessInstanceMapper processInstanceMapper;
+    WorkflowInstanceMapper workflowInstanceMapper;
 
     @Mock
-    ProcessDefinitionMapper processDefinitionMapper;
+    WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
     CommandMapper commandMapper;
@@ -310,7 +310,7 @@ public class DataAnalysisServiceTest {
         PageInfo<Command> list2 = dataAnalysisServiceImpl.listPendingCommands(user, 1L, 1, 10);
         assertThat(list2.getTotal()).isEqualTo(0);
         when(projectMapper.selectBatchIds(any())).thenReturn(Collections.singletonList(project));
-        when(processDefinitionMapper.queryDefinitionCodeListByProjectCodes(any()))
+        when(workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(any()))
                 .thenReturn(Collections.singletonList(1L));
         when(commandMapper.queryCommandPageByIds(any(), any())).thenReturn(page);
         PageInfo<Command> list3 = dataAnalysisServiceImpl.listPendingCommands(user, 1L, 1, 10);
@@ -332,7 +332,7 @@ public class DataAnalysisServiceTest {
         PageInfo<ErrorCommand> list2 = dataAnalysisServiceImpl.listErrorCommand(user, 1L, 1, 10);
         assertThat(list2.getTotal()).isEqualTo(0);
         when(projectMapper.selectBatchIds(any())).thenReturn(Collections.singletonList(project));
-        when(processDefinitionMapper.queryDefinitionCodeListByProjectCodes(any()))
+        when(workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(any()))
                 .thenReturn(Collections.singletonList(1L));
         when(errorCommandMapper.queryErrorCommandPageByIds(any(), any())).thenReturn(page);
         PageInfo<ErrorCommand> list3 = dataAnalysisServiceImpl.listErrorCommand(user, 1L, 1, 10);

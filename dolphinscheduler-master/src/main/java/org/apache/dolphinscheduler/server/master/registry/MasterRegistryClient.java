@@ -30,10 +30,6 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.service.FailoverService;
-import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
-
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,9 +43,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class MasterRegistryClient implements AutoCloseable {
-
-    @Autowired
-    private FailoverService failoverService;
 
     @Autowired
     private RegistryClient registryClient;
@@ -71,7 +64,6 @@ public class MasterRegistryClient implements AutoCloseable {
             // master registry
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConnectStrategy));
-            registryClient.subscribe(RegistryNodeType.ALL_SERVERS.getRegistryPath(), new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
         }
@@ -85,73 +77,6 @@ public class MasterRegistryClient implements AutoCloseable {
     public void close() {
         // TODO unsubscribe MasterRegistryDataListener
         deregister();
-    }
-
-    /**
-     * remove master node path
-     *
-     * @param path     node path
-     * @param nodeType node type
-     * @param failover is failover
-     */
-    public void removeMasterNodePath(String path, RegistryNodeType nodeType, boolean failover) {
-        log.info("{} node deleted : {}", nodeType, path);
-
-        if (StringUtils.isEmpty(path)) {
-            log.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
-            return;
-        }
-
-        String serverHost = registryClient.getHostByEventDataPath(path);
-        if (StringUtils.isEmpty(serverHost)) {
-            log.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
-            return;
-        }
-
-        try {
-            if (!registryClient.exists(path)) {
-                log.info("path: {} not exists", path);
-            }
-            // failover server
-            if (failover) {
-                failoverService.failoverServerWhenDown(serverHost, nodeType);
-            }
-        } catch (Exception e) {
-            log.error("{} server failover failed, host:{}", nodeType, serverHost, e);
-        }
-    }
-
-    /**
-     * remove worker node path
-     *
-     * @param path     node path
-     * @param nodeType node type
-     * @param failover is failover
-     */
-    public void removeWorkerNodePath(String path, RegistryNodeType nodeType, boolean failover) {
-        log.info("{} node deleted : {}", nodeType, path);
-        try {
-            if (StringUtils.isEmpty(path)) {
-                log.error("server down error: node empty path: {}, nodeType:{}", path, nodeType);
-                return;
-            }
-
-            String serverHost = registryClient.getHostByEventDataPath(path);
-            if (StringUtils.isEmpty(serverHost)) {
-                log.error("server down error: unknown path: {}", path);
-                return;
-            }
-            if (!registryClient.exists(path)) {
-                log.info("path: {} not exists", path);
-            }
-
-            // failover server
-            if (failover) {
-                failoverService.failoverServerWhenDown(serverHost, nodeType);
-            }
-        } catch (Exception e) {
-            log.error("{} server failover failed", nodeType, e);
-        }
     }
 
     /**

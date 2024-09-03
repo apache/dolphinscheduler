@@ -58,6 +58,7 @@
         <module>dolphinscheduler-extract</module>
         <module>dolphinscheduler-dao-plugin</module>
         <module>dolphinscheduler-authentication</module>
+        <module>dolphinscheduler-eventbus</module>
     </modules>
 
     <properties>
@@ -637,15 +638,15 @@
                         <goals>
                             <goal>instrument</goal>
                         </goals>
+                        <configuration>
+                            <excludes>com/github/dreamhead/moco/*</excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>default-restore-instrumented-classes</id>
                         <goals>
                             <goal>restore-instrumented-classes</goal>
                         </goals>
-                        <configuration>
-                            <excludes>com/github/dreamhead/moco/*</excludes>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>default-report</id>

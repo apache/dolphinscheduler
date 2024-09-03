@@ -203,6 +203,7 @@ const DetailModal = defineComponent({
                           'security.alarm_instance.select_plugin_tips'
                         )}
                         on-update:value={onChangePlugin}
+                        filterable
                       />
                     )
                   },
