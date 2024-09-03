@@ -146,7 +146,7 @@ public class WorkflowInstanceAPITest {
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
             HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
             final List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
 
@@ -160,7 +160,7 @@ public class WorkflowInstanceAPITest {
                         // query workflow instance by trigger code
                         HttpResponse queryWorkflowInstanceListResponse =
                                 workflowInstancePage.queryWorkflowInstanceById(loginUser, projectCode,
-                                    workflowInstanceId);
+                                        workflowInstanceId);
                         assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
                         final Map<String, Object> workflowInstance =
                                 (Map<String, Object>) queryWorkflowInstanceListResponse.getBody().getData();
@@ -209,7 +209,8 @@ public class WorkflowInstanceAPITest {
         HttpResponse queryWorkflowInstanceListResponse =
                 workflowInstancePage.queryWorkflowInstanceList(loginUser, projectCode, 1, 10);
         assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
-        Assertions.assertFalse(queryWorkflowInstanceListResponse.getBody().getData().toString().contains("test_import"));
+        Assertions
+                .assertFalse(queryWorkflowInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }
 
 }
