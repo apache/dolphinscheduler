@@ -673,7 +673,7 @@ CREATE TABLE t_ds_relation_workflow_instance (
   workflow_instance_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-create index idx_relation_workflow_instance_parent_workflow_task on t_ds_relation_workflow_instance (parent_workflows_instance_id, parent_task_instance_id);
+create index idx_relation_workflow_instance_parent_workflow_task on t_ds_relation_workflow_instance (parent_workflow_instance_id, parent_task_instance_id);
 create index idx_relation_workflow_instance_workflow_instance_id on t_ds_relation_workflow_instance (workflow_instance_id);
 
 
