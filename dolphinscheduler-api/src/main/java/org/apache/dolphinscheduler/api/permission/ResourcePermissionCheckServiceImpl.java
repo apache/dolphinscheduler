@@ -60,7 +60,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -90,8 +89,6 @@ public class ResourcePermissionCheckServiceImpl
 
     public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP =
             new ConcurrentHashMap<>();
-    @Autowired
-    private ProcessServiceImpl processServiceImpl;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
