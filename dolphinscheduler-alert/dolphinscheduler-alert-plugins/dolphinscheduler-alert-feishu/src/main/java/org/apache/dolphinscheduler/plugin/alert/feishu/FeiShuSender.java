@@ -119,7 +119,7 @@ public final class FeiShuSender {
             for (Map map : list) {
                 for (Entry<String, Object> entry : (Iterable<Entry<String, Object>>) map.entrySet()) {
                     String key = entry.getKey();
-                    String value = Objects.nonNull(entry.getValue().toString()) ? entry.getValue().toString() : "null";
+                    String value = Objects.nonNull(entry.getValue()) ? entry.getValue().toString() : "null";
                     contents.append(key + ":" + value);
                     contents.append("\n");
                 }
