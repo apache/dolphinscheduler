@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
@@ -52,6 +53,6 @@ public class SubWorkflowLogicTaskPluginFactory implements ILogicTaskPluginFactor
 
     @Override
     public String getTaskType() {
-        return SubWorkflowLogicTask.TASK_TYPE;
+        return SubWorkflowLogicTaskChannelFactory.NAME;
     }
 }
