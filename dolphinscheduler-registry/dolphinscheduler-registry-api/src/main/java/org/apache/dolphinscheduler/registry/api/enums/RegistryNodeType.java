@@ -29,10 +29,10 @@ public enum RegistryNodeType {
     MASTER_NODE_LOCK("MasterNodeLock", "/lock/master-node"),
     MASTER_FAILOVER_LOCK("MasterFailoverLock", "/lock/master-failover"),
     MASTER_TASK_GROUP_COORDINATOR_LOCK("TaskGroupCoordinatorLock", "/lock/master-task-group-coordinator"),
+    MASTER_SERIAL_COORDINATOR_LOCK("SerialWorkflowCoordinator", "/lock/master-serial-workflow-coordinator"),
     WORKER("Worker", "/nodes/worker"),
     ALERT_SERVER("AlertServer", "/nodes/alert-server"),
-    ALERT_LOCK("AlertNodeLock", "/lock/alert"),
-    ;
+    ALERT_LOCK("AlertNodeLock", "/lock/alert");
 
     private final String name;
 

@@ -40,17 +40,17 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
@@ -93,10 +93,10 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private ProjectService projectService;
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private CommandMapper commandMapper;
@@ -146,7 +146,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
-        List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = processInstanceMapper
+        List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = workflowInstanceMapper
                 .countWorkflowInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
         return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
@@ -163,7 +163,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = endDate == null ? null : transformDate(endDate);
 
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos =
-                processInstanceMapper.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
+                workflowInstanceMapper.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
         return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
 
@@ -171,7 +171,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
-                processDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
+                workflowDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
         return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
     }
 
@@ -181,7 +181,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (CollectionUtils.isEmpty(projectCodes)) {
             return WorkflowDefinitionCountVO.empty();
         }
-        return WorkflowDefinitionCountVO.of(processDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
+        return WorkflowDefinitionCountVO.of(workflowDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
     }
 
     @Override
@@ -257,7 +257,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         try {
             if (null == workflowCode || null == projectCode) {
                 projectCode = projectMapper.queryByName(projectName).getCode();
-                workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
+                workflowCode = workflowDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
             }
         } catch (Exception e) {
             log.warn(e.getMessage());
@@ -268,7 +268,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 : statisticsStateRequest.getStartTime();
         Date endTime = statisticsStateRequest.getEndTime() == null ? date : statisticsStateRequest.getEndTime();
 
-        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(
+        List<ExecuteStatusCount> executeStatusCounts = workflowInstanceMapper.countInstanceStateV2(
                 startTime, endTime, projectCode, workflowCode, model, projectIds);
         return new TaskCountDto(executeStatusCounts);
     }
@@ -282,13 +282,13 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      */
     @Override
     public TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
-        if (processDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowCode);
+        if (workflowDefinition == null) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowCode);
         }
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, processDefinition.getProjectCode());
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, workflowDefinition.getProjectCode());
 
-        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(null, null, null,
+        List<ExecuteStatusCount> executeStatusCounts = workflowInstanceMapper.countInstanceStateV2(null, null, null,
                 workflowCode, Constants.QUERY_ALL_ON_WORKFLOW, null);
         return new TaskCountDto(executeStatusCounts);
     }
@@ -328,7 +328,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         try {
             if (null == taskCode || null == workflowCode || null == projectCode) {
                 projectCode = projectMapper.queryByName(projectName).getCode();
-                workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
+                workflowCode = workflowDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
                 // todo The comment can be canceled after repairing the duplicate taskname of the existing workflow
                 // taskCode = relationMapper.queryTaskCodeByTaskName(workflowCode, taskName);
             }
@@ -443,11 +443,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             projectCodes = Collections.singletonList(projectCode);
         }
 
-        return processDefinitionMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
+        return workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
     }
 
     /**
-     * statistics the process definition quantities of a certain person
+     * statistics the workflow definition quantities of a certain person
      * <p>
      * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
      *
@@ -469,7 +469,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 .collect(Collectors.toList());
 
         List<WorkflowDefinitionCountDto> workflowDefinitionCountDtos =
-                processDefinitionMapper.countDefinitionByProjectCodesV2(projectCodes, userId, releaseState);
+                workflowDefinitionMapper.countDefinitionByProjectCodesV2(projectCodes, userId, releaseState);
 
         return new DefineUserDto(workflowDefinitionCountDtos);
     }

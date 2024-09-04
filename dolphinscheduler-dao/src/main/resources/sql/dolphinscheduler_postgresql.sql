@@ -2098,21 +2098,6 @@ CREATE TABLE t_ds_fav_task
     PRIMARY KEY (id)
 );
 
--- ----------------------------
--- Table structure for t_ds_trigger_relation
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_trigger_relation;
-CREATE TABLE t_ds_trigger_relation (
-    id        serial      NOT NULL,
-    trigger_type int NOT NULL,
-    trigger_code bigint NOT NULL,
-    job_id bigint NOT NULL,
-    create_time timestamp DEFAULT NULL,
-    update_time timestamp DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
-);
-
 DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
 CREATE TABLE t_ds_relation_sub_workflow (
     id        serial      NOT NULL,
@@ -2131,21 +2116,21 @@ CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_wor
 DROP TABLE IF EXISTS t_ds_process_task_lineage;
 CREATE TABLE t_ds_process_task_lineage (
     id int NOT NULL,
-    process_definition_code bigint NOT NULL DEFAULT 0,
-    process_definition_version int NOT NULL DEFAULT 0,
+    workflow_definition_code bigint NOT NULL DEFAULT 0,
+    workflow_definition_version int NOT NULL DEFAULT 0,
     task_definition_code bigint NOT NULL DEFAULT 0,
     task_definition_version int NOT NULL DEFAULT 0,
     dept_project_code bigint NOT NULL DEFAULT 0,
-    dept_process_definition_code bigint NOT NULL DEFAULT 0,
+    dept_workflow_definition_code bigint NOT NULL DEFAULT 0,
     dept_task_definition_code bigint NOT NULL DEFAULT 0,
     create_time timestamp NOT NULL DEFAULT current_timestamp,
     update_time timestamp NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (id)
 );
 
-create index idx_process_code_version on t_ds_process_task_lineage (process_definition_code,process_definition_version);
+create index idx_process_code_version on t_ds_process_task_lineage (workflow_definition_code,workflow_definition_version);
 create index idx_task_code_version on t_ds_process_task_lineage (task_definition_code,task_definition_version);
-create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_process_definition_code,dept_task_definition_code);
+create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_workflow_definition_code,dept_task_definition_code);
 
 DROP TABLE IF EXISTS t_ds_jdbc_registry_data;
 create table t_ds_jdbc_registry_data

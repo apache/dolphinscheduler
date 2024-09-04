@@ -117,10 +117,9 @@ export default defineComponent({
             <span class={styles.tab}>
               {t('project.workflow.complement_range')}:
             </span>
-            {this.commandParam && this.commandParam.complementStartDate ? (
+            {this.commandParam && this.commandParam.backfillTimeList ? (
               <span class={styles.content}>
-                {this.commandParam.complementStartDate}-
-                {this.commandParam.complementEndDate}
+                {this.commandParam.backfillTimeList.join(',')}
               </span>
             ) : (
               '-'

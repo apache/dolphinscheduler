@@ -32,15 +32,19 @@ import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanc
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTask;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class MasterTaskExecutor implements Runnable {
 
+    @Getter
     protected final TaskExecutionContext taskExecutionContext;
+    @Getter
+    protected ILogicTask logicTask;
+
     protected final LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
     protected final LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
-    protected ILogicTask logicTask;
 
     public MasterTaskExecutor(TaskExecutionContext taskExecutionContext,
                               LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
@@ -85,18 +89,11 @@ public abstract class MasterTaskExecutor implements Runnable {
         }
     }
 
-    public TaskExecutionContext getTaskExecutionContext() {
-        return taskExecutionContext;
-    }
-
-    public ILogicTask getILogicTask() {
-        return logicTask;
-    }
-
     @Override
     public void run() {
         try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                    taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
@@ -136,8 +133,7 @@ public abstract class MasterTaskExecutor implements Runnable {
 
     protected void beforeExecute() throws LogicTaskFactoryNotFoundException, LogicTaskInitializeException {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        logicTaskInstanceExecutionEventSenderManager.getMasterTaskExecuteRunningMessageSender()
-                .sendMessage(taskExecutionContext);
+        logicTaskInstanceExecutionEventSenderManager.runningEventSender().sendMessage(taskExecutionContext);
         log.info("Send task status {} to master {}", taskExecutionContext.getCurrentExecutionStatus().name(),
                 taskExecutionContext.getWorkflowInstanceHost());
 
@@ -167,8 +163,23 @@ public abstract class MasterTaskExecutor implements Runnable {
         try {
             taskExecutionContext.setEndTime(System.currentTimeMillis());
             taskExecutionContext.setVarPool(JSONUtils.toJsonString(logicTask.getTaskParameters().getVarPool()));
-            logicTaskInstanceExecutionEventSenderManager.getLogicTaskInstanceExecutionFinishEventSender()
-                    .sendMessage(taskExecutionContext);
+            switch (taskExecutionContext.getCurrentExecutionStatus()) {
+                case KILL:
+                    logicTaskInstanceExecutionEventSenderManager.killedEventSender().sendMessage(taskExecutionContext);
+                    break;
+                case PAUSE:
+                    logicTaskInstanceExecutionEventSenderManager.pausedEventSender().sendMessage(taskExecutionContext);
+                    break;
+                case FAILURE:
+                    logicTaskInstanceExecutionEventSenderManager.failedEventSender().sendMessage(taskExecutionContext);
+                    break;
+                case SUCCESS:
+                    logicTaskInstanceExecutionEventSenderManager.successEventSender().sendMessage(taskExecutionContext);
+                    break;
+                default:
+                    logicTaskInstanceExecutionEventSenderManager.failedEventSender().sendMessage(taskExecutionContext);
+                    break;
+            }
             log.info("Send task status: {} to master: {} successfully",
                     taskExecutionContext.getCurrentExecutionStatus().name(),
                     taskExecutionContext.getWorkflowInstanceHost());

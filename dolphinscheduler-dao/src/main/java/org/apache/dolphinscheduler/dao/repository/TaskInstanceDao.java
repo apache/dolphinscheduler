@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -40,37 +41,47 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * Submit a task instance to DB.
-     * @param taskInstance task instance
-     * @param processInstance process instance
+     *
+     * @param taskInstance    task instance
+     * @param workflowInstance workflow instance
      * @return task instance
      */
-    boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
+    boolean submitTaskInstanceToDB(TaskInstance taskInstance, WorkflowInstance workflowInstance);
 
     /**
-     * Query list of valid task instance by process instance id
-     * @param processInstanceId processInstanceId
-     * @param testFlag test flag
+     * Mark the task instance as invalid
+     */
+    void markTaskInstanceInvalid(List<TaskInstance> taskInstances);
+
+    /**
+     * Query list of valid task instance by workflow instance id
+     *
+     * @param workflowInstanceId workflowInstanceId
+     * @param testFlag          test flag
      * @return list of valid task instance
      */
-    List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag);
+    List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer workflowInstanceId, int testFlag);
 
     /**
-     * Query list of task instance by process instance id and task code
-     * @param processInstanceId processInstanceId
-     * @param taskCode task code
+     * Query list of task instance by workflow instance id and task code
+     *
+     * @param workflowInstanceId workflowInstanceId
+     * @param taskCode          task code
      * @return list of valid task instance
      */
-    TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer processInstanceId, Long taskCode);
+    TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer workflowInstanceId, Long taskCode);
 
     /**
-     * find previous task list by work process id
-     * @param processInstanceId processInstanceId
+     * find previous task list by work workflow id
+     *
+     * @param workflowInstanceId workflowInstanceId
      * @return task instance list
      */
-    List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer processInstanceId);
+    List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer workflowInstanceId);
 
     /**
      * find task instance by cache_key
+     *
      * @param cacheKey cache key
      * @return task instance
      */
@@ -78,6 +89,7 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * clear task instance cache by cache_key
+     *
      * @param cacheKey cache key
      * @return task instance
      */
@@ -85,27 +97,30 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     void deleteByWorkflowInstanceId(int workflowInstanceId);
 
-    List<TaskInstance> queryByWorkflowInstanceId(Integer processInstanceId);
+    List<TaskInstance> queryByWorkflowInstanceId(Integer workflowInstanceId);
 
     /**
      * find last task instance list corresponding to taskCodes in the date interval
      *
-     * @param processInstanceId Task's parent process instance id
-     * @param taskCodes taskCodes
-     * @param testFlag test flag
+     * @param workflowInstanceId Task's parent workflow instance id
+     * @param taskCodes         taskCodes
+     * @param testFlag          test flag
      * @return task instance list
      */
-    List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
-                                                                          Set<Long> taskCodes, int testFlag);
+    List<TaskInstance> queryLastTaskInstanceListIntervalInWorkflowInstance(Integer workflowInstanceId,
+                                                                           Set<Long> taskCodes, int testFlag);
 
     /**
      * find last task instance corresponding to taskCode in the date interval
      *
-     * @param processInstanceId Task's parent process instance id
+     * @param workflowInstanceId Task's parent workflow instance id
      * @param depTaskCode       taskCode
      * @param testFlag          test flag
      * @return task instance
      */
-    TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId,
-                                                                long depTaskCode, int testFlag);
+    TaskInstance queryLastTaskInstanceIntervalInWorkflowInstance(Integer workflowInstanceId,
+                                                                 long depTaskCode, int testFlag);
+
+    void updateTaskInstanceState(Integer taskInstanceId, TaskExecutionStatus originState,
+                                 TaskExecutionStatus targetState);
 }

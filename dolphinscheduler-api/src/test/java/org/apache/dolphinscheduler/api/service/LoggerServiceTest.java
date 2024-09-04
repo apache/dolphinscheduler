@@ -247,7 +247,7 @@ public class LoggerServiceTest {
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(),
                 DOWNLOAD_LOG);
         byte[] logBytes = loggerService.getLogBytes(loginUser, 1);
-        Assertions.assertEquals(43, logBytes.length - String.valueOf(nettyServerPort).length());
+        Assertions.assertEquals(42, logBytes.length - String.valueOf(nettyServerPort).length());
     }
 
     @Test

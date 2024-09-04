@@ -52,6 +52,7 @@ public class TaskInstanceKillResponse {
 
     public static TaskInstanceKillResponse success(TaskExecutionContext taskExecutionContext) {
         TaskInstanceKillResponse taskInstanceKillResponse = new TaskInstanceKillResponse();
+        taskInstanceKillResponse.setSuccess(true);
         taskInstanceKillResponse.setStatus(taskExecutionContext.getCurrentExecutionStatus());
         if (taskExecutionContext.getAppIds() != null) {
             taskInstanceKillResponse

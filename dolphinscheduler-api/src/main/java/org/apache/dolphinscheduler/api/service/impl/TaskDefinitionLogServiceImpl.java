@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -36,26 +36,26 @@ import org.springframework.stereotype.Component;
 public class TaskDefinitionLogServiceImpl implements TaskDefinitionLogService {
 
     @Autowired
-    private ProcessTaskRelationLogDao processTaskRelationLogDao;
+    private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
 
     @Autowired
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Override
     public void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        List<ProcessTaskRelationLog> processTaskRelations =
-                processTaskRelationLogDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
-        if (CollectionUtils.isEmpty(processTaskRelations)) {
+        List<WorkflowTaskRelationLog> workflowTaskRelationLogList =
+                workflowTaskRelationLogDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+        if (CollectionUtils.isEmpty(workflowTaskRelationLogList)) {
             return;
         }
         // delete task definition
         Set<Long> needToDeleteTaskDefinitionCodes = new HashSet<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            needToDeleteTaskDefinitionCodes.add(processTaskRelation.getPreTaskCode());
-            needToDeleteTaskDefinitionCodes.add(processTaskRelation.getPostTaskCode());
+        for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelationLogList) {
+            needToDeleteTaskDefinitionCodes.add(workflowTaskRelation.getPreTaskCode());
+            needToDeleteTaskDefinitionCodes.add(workflowTaskRelation.getPostTaskCode());
         }
         taskDefinitionLogDao.deleteByTaskDefinitionCodes(needToDeleteTaskDefinitionCodes);
         // delete task workflow relation
-        processTaskRelationLogDao.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
+        workflowTaskRelationLogDao.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
     }
 }

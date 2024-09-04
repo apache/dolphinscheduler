@@ -20,13 +20,21 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
+import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
@@ -38,6 +46,7 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
 
 class GlobalTaskDispatchWaitingQueueTest {
 
@@ -50,8 +59,8 @@ class GlobalTaskDispatchWaitingQueueTest {
 
     @Test
     void submitTaskExecuteRunnable() {
-        TaskExecuteRunnable taskExecuteRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable);
+        ITaskExecutionRunnable ITaskExecutionRunnable = createTaskExecuteRunnable();
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable);
         Awaitility.await()
                 .atMost(Duration.ofSeconds(1))
                 .untilAsserted(
@@ -60,9 +69,8 @@ class GlobalTaskDispatchWaitingQueueTest {
 
     @Test
     void testSubmitTaskExecuteRunnableWithDelay() {
-        TaskExecuteRunnable taskExecuteRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecuteRunnable, 3_000L);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(createTaskExecuteRunnable(), 3_000L);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(createTaskExecuteRunnable());
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).isNotNull();
         Awaitility.await()
@@ -85,20 +93,20 @@ class GlobalTaskDispatchWaitingQueueTest {
 
     @Test
     void takeTaskExecuteRunnable_withDifferentTaskInstancePriority() {
-        TaskExecuteRunnable taskExecuteRunnable1 = createTaskExecuteRunnable();
-        taskExecuteRunnable1.getTaskInstance().setId(1);
-        taskExecuteRunnable1.getTaskInstance().setTaskInstancePriority(Priority.MEDIUM);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable1);
+        ITaskExecutionRunnable taskExecutionRunnable1 = createTaskExecuteRunnable();
+        taskExecutionRunnable1.getTaskInstance().setId(1);
+        taskExecutionRunnable1.getTaskInstance().setTaskInstancePriority(Priority.MEDIUM);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecutionRunnable1);
 
-        TaskExecuteRunnable taskExecuteRunnable2 = createTaskExecuteRunnable();
-        taskExecuteRunnable2.getTaskInstance().setId(2);
-        taskExecuteRunnable2.getTaskInstance().setTaskInstancePriority(Priority.HIGH);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable2);
+        ITaskExecutionRunnable ITaskExecutionRunnable2 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable2.getTaskInstance().setId(2);
+        ITaskExecutionRunnable2.getTaskInstance().setTaskInstancePriority(Priority.HIGH);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable2);
 
-        TaskExecuteRunnable taskExecuteRunnable3 = createTaskExecuteRunnable();
-        taskExecuteRunnable3.getTaskInstance().setId(3);
-        taskExecuteRunnable3.getTaskInstance().setTaskInstancePriority(Priority.LOW);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable3);
+        ITaskExecutionRunnable ITaskExecutionRunnable3 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable3.getTaskInstance().setId(3);
+        ITaskExecutionRunnable3.getTaskInstance().setTaskInstancePriority(Priority.LOW);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
                 .isEqualTo(2);
@@ -110,20 +118,20 @@ class GlobalTaskDispatchWaitingQueueTest {
 
     @Test
     void takeTaskExecuteRunnable_withDifferentTaskGroupPriority() {
-        TaskExecuteRunnable taskExecuteRunnable1 = createTaskExecuteRunnable();
-        taskExecuteRunnable1.getTaskInstance().setId(1);
-        taskExecuteRunnable1.getTaskInstance().setTaskGroupPriority(Priority.MEDIUM.getCode());
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable1);
+        ITaskExecutionRunnable ITaskExecutionRunnable1 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable1.getTaskInstance().setId(1);
+        ITaskExecutionRunnable1.getTaskInstance().setTaskGroupPriority(Priority.MEDIUM.getCode());
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable1);
 
-        TaskExecuteRunnable taskExecuteRunnable2 = createTaskExecuteRunnable();
-        taskExecuteRunnable2.getTaskInstance().setId(2);
-        taskExecuteRunnable2.getTaskInstance().setTaskGroupPriority(Priority.HIGH.getCode());
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable2);
+        ITaskExecutionRunnable ITaskExecutionRunnable2 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable2.getTaskInstance().setId(2);
+        ITaskExecutionRunnable2.getTaskInstance().setTaskGroupPriority(Priority.HIGH.getCode());
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable2);
 
-        TaskExecuteRunnable taskExecuteRunnable3 = createTaskExecuteRunnable();
-        taskExecuteRunnable3.getTaskInstance().setId(3);
-        taskExecuteRunnable3.getTaskInstance().setTaskGroupPriority(Priority.LOW.getCode());
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable3);
+        ITaskExecutionRunnable ITaskExecutionRunnable3 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable3.getTaskInstance().setId(3);
+        ITaskExecutionRunnable3.getTaskInstance().setTaskGroupPriority(Priority.LOW.getCode());
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
                 .isEqualTo(3);
@@ -137,20 +145,20 @@ class GlobalTaskDispatchWaitingQueueTest {
     void takeTaskExecuteRunnable_withDifferentSubmitTime() {
         Date now = new Date();
 
-        TaskExecuteRunnable taskExecuteRunnable1 = createTaskExecuteRunnable();
-        taskExecuteRunnable1.getTaskInstance().setId(1);
-        taskExecuteRunnable1.getTaskInstance().setFirstSubmitTime(now);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable1);
+        ITaskExecutionRunnable ITaskExecutionRunnable1 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable1.getTaskInstance().setId(1);
+        ITaskExecutionRunnable1.getTaskInstance().setFirstSubmitTime(now);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable1);
 
-        TaskExecuteRunnable taskExecuteRunnable2 = createTaskExecuteRunnable();
-        taskExecuteRunnable2.getTaskInstance().setId(2);
-        taskExecuteRunnable2.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, 1));
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable2);
+        ITaskExecutionRunnable ITaskExecutionRunnable2 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable2.getTaskInstance().setId(2);
+        ITaskExecutionRunnable2.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, 1));
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable2);
 
-        TaskExecuteRunnable taskExecuteRunnable3 = createTaskExecuteRunnable();
-        taskExecuteRunnable3.getTaskInstance().setId(3);
-        taskExecuteRunnable3.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, -1));
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable3);
+        ITaskExecutionRunnable ITaskExecutionRunnable3 = createTaskExecuteRunnable();
+        ITaskExecutionRunnable3.getTaskInstance().setId(3);
+        ITaskExecutionRunnable3.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, -1));
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
                 .isEqualTo(3);
@@ -163,22 +171,32 @@ class GlobalTaskDispatchWaitingQueueTest {
     @Test
     void getWaitingDispatchTaskNumber() {
         Assertions.assertEquals(0, globalTaskDispatchWaitingQueue.getWaitingDispatchTaskNumber());
-        TaskExecuteRunnable taskExecuteRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable);
+        ITaskExecutionRunnable ITaskExecutionRunnable = createTaskExecuteRunnable();
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable);
         Assertions.assertEquals(1, globalTaskDispatchWaitingQueue.getWaitingDispatchTaskNumber());
     }
 
-    private TaskExecuteRunnable createTaskExecuteRunnable() {
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setProcessInstancePriority(Priority.MEDIUM);
+    private ITaskExecutionRunnable createTaskExecuteRunnable() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setProcessInstancePriority(Priority.MEDIUM);
 
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(RandomUtils.nextInt());
         taskInstance.setTaskInstancePriority(Priority.MEDIUM);
         taskInstance.setFirstSubmitTime(new Date());
 
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-
-        return new DefaultTaskExecuteRunnable(processInstance, taskInstance, taskExecutionContext,
-                new TaskExecuteRunnableOperatorManager());
+        final ApplicationContext applicationContext = mock(ApplicationContext.class);
+        when(applicationContext.getBean(TaskExecutionContextFactory.class))
+                .thenReturn(mock(TaskExecutionContextFactory.class));
+        final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder = TaskExecutionRunnableBuilder.builder()
+                .applicationContext(applicationContext)
+                .workflowInstance(workflowInstance)
+                .taskInstance(taskInstance)
+                .workflowExecutionGraph(new WorkflowExecutionGraph())
+                .workflowDefinition(new WorkflowDefinition())
+                .taskDefinition(new TaskDefinition())
+                .workflowEventBus(new WorkflowEventBus())
+                .build();
+        return new TaskExecutionRunnable(taskExecutionRunnableBuilder);
     }
 }

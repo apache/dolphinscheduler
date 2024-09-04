@@ -24,9 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.List;
 import java.util.Map;
 
-/**
- * tenant service
- */
 public interface TenantService {
 
     /**
@@ -56,7 +53,7 @@ public interface TenantService {
     PageInfo<Tenant> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
-     * updateProcessInstance tenant
+     * updateWorkflowInstance tenant
      *
      * @param loginUser  login user
      * @param id         tennat id
