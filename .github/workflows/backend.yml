@@ -132,7 +132,7 @@ jobs:
         run: |
           /bin/bash ${{ matrix.case.script }}
   schema-check:
-    name: ${{ matrix.case.name }}
+    name: ${{ matrix.case.name }}-${{ matrix.version }}
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
