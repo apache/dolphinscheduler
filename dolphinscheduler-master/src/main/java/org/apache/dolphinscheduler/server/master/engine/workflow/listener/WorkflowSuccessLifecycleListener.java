@@ -89,7 +89,6 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
                 .startNodes(commandParam.getStartNodes())
                 .failureStrategy(workflowInstance.getFailureStrategy())
                 .taskDependType(workflowInstance.getTaskDependType())
-                .execType(CommandType.COMPLEMENT_DATA)
                 .warningType(workflowInstance.getWarningType())
                 .warningGroupId(workflowInstance.getWarningGroupId())
                 .workflowInstancePriority(workflowInstance.getProcessInstancePriority())
