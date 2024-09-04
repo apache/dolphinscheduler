@@ -180,7 +180,7 @@ export default defineComponent({
         autoFocus={false}
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
-          <NFormItem label={t('project.dag.workflow_name')} path='name'>
+          <NFormItem label={t('project.node.workflow_name')} path='name'>
             <NInput
               allowInput={trim}
               v-model:value={formValue.value.name}
