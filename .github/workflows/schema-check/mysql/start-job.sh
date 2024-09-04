@@ -18,7 +18,7 @@
 set -euox pipefail
 
 DS_VERSION=$1
-DATABASE_VERSION=${VERSION//\./}
+DATABASE_VERSION=${DS_VERSION//\./}
 
 # Install Atlas and Create Dir
 mkdir -p dolphinscheduler/dev dolphinscheduler/${DS_VERSION}
