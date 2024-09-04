@@ -20,21 +20,21 @@ set -euox pipefail
 DS_VERSION=$1
 DATABASE_VERSION=$2
 
-export DATABASE="mysql"
-export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_dev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
-export SPRING_DATASOURCE_USERNAME="root"
-export SPRING_DATASOURCE_PASSWORD="mysql"
+export DATABASE="postgresql"
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver"
+export SPRING_DATASOURCE_USERNAME="postgres"
+export SPRING_DATASOURCE_PASSWORD="postgres"
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_dev"
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_${DATABASE_VERSION}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_${DATABASE_VERSION}"
 bash ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
 set +x
 atlas_result=$(atlas schema diff \
-  --from "mysql://root:mysql@127.0.0.1:3306/dolphinscheduler_${DATABASE_VERSION}" \
-  --to "mysql://root:mysql@127.0.0.1:3306/dolphinscheduler_dev")
+  --from "postgres://postgres:postgres@127.0.0.1:5432/dolphinscheduler_${DATABASE_VERSION}?search_path=public&sslmode=disable" \
+  --to "postgres://postgres:postgres@127.0.0.1:5432/dolphinscheduler_dev?search_path=public&sslmode=disable")
 if [[ ${atlas_result} != *"Schemas are synced"* ]]; then
   echo "================================================================================================"
   echo "                                !!!!! For Contributors !!!!!"

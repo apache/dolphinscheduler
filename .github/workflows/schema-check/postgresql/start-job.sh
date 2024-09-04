@@ -35,23 +35,11 @@ DATABASE_VERSION=${DS_VERSION//\./}
 #  chmod +x ds_schema_check_test/dev/tools/bin/upgrade-schema.sh ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
 #fi
 
-MYSQL_JDBC_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
-MYSQL_JDBC_JAR="mysql-connector-java-8.0.16.jar"
-wget ${MYSQL_JDBC_URL} -O ds_schema_check_test/${MYSQL_JDBC_JAR}
-for base_dir in ds_schema_check_test/dev ds_schema_check_test/${DS_VERSION}; do
-  if [[ $base_dir == *"dolphinscheduler/2"* ]]; then
-    cp ds_schema_check_test/${MYSQL_JDBC_JAR} ${base_dir}/lib
-  else
-    for d in alert-server api-server master-server worker-server tools; do
-      cp ds_schema_check_test/${MYSQL_JDBC_JAR} ${base_dir}/${d}/libs
-    done
-  fi
-done
-docker compose -f .github/workflows/schema-check/mysql/docker-compose-base.yaml up -d --wait
-docker exec -i mysql mysql -uroot -pmysql -e "create database dolphinscheduler_${DATABASE_VERSION}";
+docker compose -f .github/workflows/schema-check/postgresql/docker-compose-base.yaml up -d --wait
+docker exec -i postgres psql -U postgres -c "create database dolphinscheduler_${DATABASE_VERSION}";
 
 #Running schema check tests
-/bin/bash .github/workflows/schema-check/mysql/running-test.sh ${DS_VERSION} ${DATABASE_VERSION}
+/bin/bash .github/workflows/schema-check/postgresql/running-test.sh ${DS_VERSION} ${DATABASE_VERSION}
 
 #Cleanup
-docker compose -f .github/workflows/schema-check/mysql/docker-compose-base.yaml down -v --remove-orphans
+docker compose -f .github/workflows/schema-check/postgresql/docker-compose-base.yaml down -v --remove-orphans

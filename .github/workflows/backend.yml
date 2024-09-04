@@ -143,6 +143,8 @@ jobs:
         case:
           - name: schema-check-with-mysql
             script: .github/workflows/schema-check/mysql/start-job.sh
+          - name: schema-check-with-postgresql
+            script: .github/workflows/schema-check/postgresql/start-job.sh
     steps:
       - uses: actions/checkout@v4
         with:
@@ -155,7 +157,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: binary-package-8
-          path: ds_test/dev
+          path: ds_schema_check_test/dev
       - name: Running Schema Check
         run: |
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
