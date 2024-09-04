@@ -25,13 +25,13 @@ export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_dev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
 export SPRING_DATASOURCE_USERNAME="root"
 export SPRING_DATASOURCE_PASSWORD="mysql"
-bash dolphinscheduler/dev/tools/bin/upgrade-schema.sh
+bash ds_test/dev/tools/bin/upgrade-schema.sh
 
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_${DATABASE_VERSION}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
 if [[ $DATABASE_VERSION -lt 300 ]]; then
-  bash dolphinscheduler/${DS_VERSION}/script/create-dolphinscheduler.sh
+  bash ds_test/${DS_VERSION}/script/create-dolphinscheduler.sh
 else
-  bash dolphinscheduler/${DS_VERSION}/tools/bin/upgrade-schema.sh
+  bash ds_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
 fi
 
 atlas_result=$(atlas schema diff \
