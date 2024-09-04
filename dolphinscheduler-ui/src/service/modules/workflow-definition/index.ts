@@ -24,32 +24,32 @@ import {
   LimitReq,
   PageReq,
   ListReq,
-  ProcessDefinitionReq,
+  WorkflowDefinitionReq,
   TargetCodeReq
 } from './types'
 
 export function queryListPaging(params: PageReq & ListReq, code: number): any {
   return axios({
-    url: `/projects/${code}/process-definition`,
+    url: `/projects/${code}/workflow-definition`,
     method: 'get',
     params
   })
 }
 
-export function createProcessDefinition(
-  data: ProcessDefinitionReq,
+export function createWorkflowDefinition(
+  data: WorkflowDefinitionReq,
   projectCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition`,
+    url: `/projects/${projectCode}/workflow-definition`,
     method: 'post',
     data
   })
 }
 
-export function queryProcessDefinitionList(projectCode: number): any {
+export function queryWorkflowDefinitionList(projectCode: number): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/query-process-definition-list`,
+    url: `/projects/${projectCode}/workflow-definition/query-workflow-definition-list`,
     method: 'get'
   })
 }
@@ -59,7 +59,7 @@ export function batchCopyByCodes(
   code: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/batch-copy`,
+    url: `/projects/${code}/workflow-definition/batch-copy`,
     method: 'post',
     data
   })
@@ -67,7 +67,7 @@ export function batchCopyByCodes(
 
 export function batchDeleteByCodes(data: CodesReq, code: number): any {
   return axios({
-    url: `/projects/${code}/process-definition/batch-delete`,
+    url: `/projects/${code}/workflow-definition/batch-delete`,
     method: 'post',
     data
   })
@@ -75,7 +75,7 @@ export function batchDeleteByCodes(data: CodesReq, code: number): any {
 
 export function batchExportByCodes(data: CodesReq, code: number): any {
   return axios({
-    url: `/projects/${code}/process-definition/batch-export`,
+    url: `/projects/${code}/workflow-definition/batch-export`,
     method: 'post',
     responseType: 'blob',
     data
@@ -87,7 +87,7 @@ export function batchMoveByCodes(
   code: CodeReq
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/batch-move`,
+    url: `/projects/${code}/workflow-definition/batch-move`,
     method: 'post',
     data
   })
@@ -98,15 +98,15 @@ export function getTaskListByDefinitionCodes(
   code: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/batch-query-tasks`,
+    url: `/projects/${code}/workflow-definition/batch-query-tasks`,
     method: 'get',
     params
   })
 }
 
-export function importProcessDefinition(data: FormData, code: number): any {
+export function importWorkflowDefinition(data: FormData, code: number): any {
   return axios({
-    url: `/projects/${code}/process-definition/import`,
+    url: `/projects/${code}/workflow-definition/import`,
     method: 'post',
     data
   })
@@ -114,17 +114,17 @@ export function importProcessDefinition(data: FormData, code: number): any {
 
 export function queryList(code: CodeReq): any {
   return axios({
-    url: `/projects/${code}/process-definition/list`,
+    url: `/projects/${code}/workflow-definition/list`,
     method: 'get'
   })
 }
 
-export function queryProcessDefinitionByName(
+export function queryWorkflowDefinitionByName(
   params: NameReq,
   code: CodeReq
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/query-by-name`,
+    url: `/projects/${code}/workflow-definition/query-by-name`,
     method: 'get',
     params
   })
@@ -132,7 +132,7 @@ export function queryProcessDefinitionByName(
 
 export function querySimpleList(code: number): any {
   return axios({
-    url: `/projects/${code}/process-definition/simple-list`,
+    url: `/projects/${code}/workflow-definition/simple-list`,
     method: 'get'
   })
 }
@@ -142,37 +142,40 @@ export function verifyName(
   projectCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/verify-name`,
+    url: `/projects/${projectCode}/workflow-definition/verify-name`,
     method: 'get',
     params
   })
 }
 
-export function queryProcessDefinitionByCode(
+export function queryWorkflowDefinitionByCode(
   code: number,
   projectCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/${code}`,
+    url: `/projects/${projectCode}/workflow-definition/${code}`,
     method: 'get'
   })
 }
 
-export function updateProcessDefinition(
-  data: ProcessDefinitionReq & ReleaseStateReq,
+export function updateWorkflowDefinition(
+  data: WorkflowDefinitionReq & ReleaseStateReq,
   code: number,
   projectCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/${code}`,
+    url: `/projects/${projectCode}/workflow-definition/${code}`,
     method: 'put',
     data
   })
 }
 
-export function deleteByCode(code: number, processCode: number): any {
+export function deleteByCode(
+  code: number,
+  workflowDefinitionCode: number
+): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}`,
     method: 'delete'
   })
 }
@@ -180,10 +183,10 @@ export function deleteByCode(code: number, processCode: number): any {
 export function release(
   data: NameReq & ReleaseStateReq,
   code: number,
-  processCode: number
+  workflowDefinitionCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/release`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}/release`,
     method: 'post',
     data
   })
@@ -191,13 +194,13 @@ export function release(
 
 export function getTasksByDefinitionList(
   projectCode: number,
-  processCode: number
+  workflowDefinitionCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-definition/query-task-definition-list`,
+    url: `/projects/${projectCode}/workflow-definition/query-task-definition-list`,
     method: 'get',
     params: {
-      processDefinitionCode: processCode
+      workflowDefinitionCode: workflowDefinitionCode
     }
   })
 }
@@ -205,10 +208,10 @@ export function getTasksByDefinitionList(
 export function queryVersions(
   params: PageReq,
   code: number,
-  processCode: number
+  workflowDefinitionCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/versions`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}/versions`,
     method: 'get',
     params
   })
@@ -216,44 +219,44 @@ export function queryVersions(
 
 export function switchVersion(
   code: number,
-  processCode: number,
+  workflowDefinitionCode: number,
   version: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/versions/${version}`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}/versions/${version}`,
     method: 'get'
   })
 }
 
 export function deleteVersion(
   code: number,
-  processCode: number,
+  workflowDefinitionCode: number,
   version: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/versions/${version}`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}/versions/${version}`,
     method: 'delete'
   })
 }
 
 export function viewTree(
   code: number,
-  processCode: number,
+  workflowDefinitionCode: number,
   params: LimitReq
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/view-tree`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}/view-tree`,
     method: 'get',
     params
   })
 }
 
-export function viewProcessDefinitionVariables(
+export function viewWorkflowDefinitionVariables(
   code: number,
-  processCode: number
+  workflowDefinitionCode: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-definition/${processCode}/view-variables`,
+    url: `/projects/${code}/workflow-definition/${workflowDefinitionCode}/view-variables`,
     method: 'get'
   })
 }

@@ -52,7 +52,7 @@ class DynamicCommandUtilsTest {
         workflowInstance.setGlobalParams("{\"prop\":\"value\"}");
         workflowInstance.setExecutorId(1);
         workflowInstance.setWarningGroupId(1);
-        workflowInstance.setProcessInstancePriority(null); // update this
+        workflowInstance.setWorkflowInstancePriority(null); // update this
         workflowInstance.setWorkerGroup("worker");
         workflowInstance.setTenantCode("unit-root");
         workflowInstance.setDryRun(0);
@@ -64,14 +64,14 @@ class DynamicCommandUtilsTest {
                 subProcessDefinitionVersion, parameters);
 
         Assertions.assertEquals(CommandType.DYNAMIC_GENERATION, command.getCommandType());
-        Assertions.assertEquals(subProcessDefinitionCode, command.getProcessDefinitionCode());
-        Assertions.assertEquals(subProcessDefinitionVersion, command.getProcessDefinitionVersion());
+        Assertions.assertEquals(subProcessDefinitionCode, command.getWorkflowDefinitionCode());
+        Assertions.assertEquals(subProcessDefinitionVersion, command.getWorkflowDefinitionVersion());
         Assertions.assertEquals(TaskDependType.TASK_POST, command.getTaskDependType());
         Assertions.assertEquals(workflowInstance.getFailureStrategy(), command.getFailureStrategy());
         Assertions.assertEquals(workflowInstance.getWarningType(), command.getWarningType());
         Assertions.assertEquals(workflowInstance.getExecutorId(), command.getExecutorId());
         Assertions.assertEquals(workflowInstance.getWarningGroupId(), command.getWarningGroupId());
-        Assertions.assertEquals(workflowInstance.getProcessInstancePriority(), command.getProcessInstancePriority());
+        Assertions.assertEquals(workflowInstance.getWorkflowInstancePriority(), command.getWorkflowInstancePriority());
         Assertions.assertEquals(workflowInstance.getWorkerGroup(), command.getWorkerGroup());
         Assertions.assertEquals(workflowInstance.getDryRun(), command.getDryRun());
         Assertions.assertEquals(workflowInstance.getTenantCode(), command.getTenantCode());

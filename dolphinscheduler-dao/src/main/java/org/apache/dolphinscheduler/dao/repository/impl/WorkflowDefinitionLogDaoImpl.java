@@ -43,6 +43,6 @@ public class WorkflowDefinitionLogDaoImpl extends BaseDao<WorkflowDefinitionLog,
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        mybatisMapper.deleteByProcessDefinitionCode(workflowDefinitionCode);
+        mybatisMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
     }
 }

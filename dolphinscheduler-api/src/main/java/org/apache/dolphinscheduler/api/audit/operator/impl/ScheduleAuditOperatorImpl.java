@@ -51,7 +51,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
         int id = (int) paramsMap.get(paramNameArr[0]);
         Schedule schedule = scheduleMapper.selectById(id);
         if (schedule != null) {
-            paramsMap.put(AuditLogConstants.CODE, schedule.getProcessDefinitionCode());
+            paramsMap.put(AuditLogConstants.CODE, schedule.getWorkflowDefinitionCode());
             paramNameArr[0] = AuditLogConstants.CODE;
             auditLogList.forEach(auditLog -> auditLog.setDetail(String.valueOf(id)));
         }

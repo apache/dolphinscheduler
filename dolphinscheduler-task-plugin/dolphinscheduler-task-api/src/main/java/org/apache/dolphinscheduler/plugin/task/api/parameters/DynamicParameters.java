@@ -24,18 +24,17 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DynamicParameters extends AbstractParameters {
 
-    /**
-     * process definition id
-     */
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
     private int maxNumOfSubWorkflowInstances;
 
@@ -54,6 +53,6 @@ public class DynamicParameters extends AbstractParameters {
         } catch (Exception e) {
             return false;
         }
-        return this.processDefinitionCode != 0;
+        return this.workflowDefinitionCode != 0;
     }
 }

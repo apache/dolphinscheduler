@@ -177,7 +177,7 @@ public class PythonGateway {
         return taskDefinitionService.genTaskCodeList(genNum);
     }
 
-    public Map<String, Long> getCodeAndVersion(String projectName, String processDefinitionName,
+    public Map<String, Long> getCodeAndVersion(String projectName, String workflowDefinitionName,
                                                String taskName) throws CodeGenerateUtils.CodeGenerateException {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
@@ -189,7 +189,7 @@ public class PythonGateway {
         }
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+                workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinitionName);
         // In the case project exists, but current workflow still not created, we should also return the init
         // version of it
         if (workflowDefinition == null) {
@@ -259,14 +259,14 @@ public class PythonGateway {
 
         WorkflowDefinition workflowDefinition = getWorkflow(user, projectCode, name);
         WorkflowExecutionTypeEnum executionTypeEnum = WorkflowExecutionTypeEnum.valueOf(executionType);
-        long processDefinitionCode;
+        long workflowDefinitionCode;
         // create or update workflow
         if (workflowDefinition != null) {
-            processDefinitionCode = workflowDefinition.getCode();
+            workflowDefinitionCode = workflowDefinition.getCode();
             // make sure workflow offline which could edit
-            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowDefinitionCode);
             workflowDefinitionService.updateWorkflowDefinition(user, projectCode, name,
-                    processDefinitionCode, description, globalParams,
+                    workflowDefinitionCode, description, globalParams,
                     null, timeout, taskRelationJson, taskDefinitionJson,
                     executionTypeEnum);
         } else {
@@ -279,21 +279,21 @@ public class PythonGateway {
                 throw new ServiceException(result.get(Constants.MSG).toString());
             }
             workflowDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
-            processDefinitionCode = workflowDefinition.getCode();
+            workflowDefinitionCode = workflowDefinition.getCode();
         }
 
         // Fresh workflow schedule
         if (schedule != null) {
-            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, onlineSchedule, workerGroup,
+            createOrUpdateSchedule(user, projectCode, workflowDefinitionCode, schedule, onlineSchedule, workerGroup,
                     warningType,
                     warningGroupId);
         }
         if (ReleaseState.ONLINE.equals(ReleaseState.getEnum(releaseState))) {
-            workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+            workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowDefinitionCode);
         } else if (ReleaseState.OFFLINE.equals(ReleaseState.getEnum(releaseState))) {
-            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowDefinitionCode);
         }
-        return processDefinitionCode;
+        return workflowDefinitionCode;
     }
 
     /**
@@ -304,9 +304,9 @@ public class PythonGateway {
      * @param workflowName workflow name
      */
     private WorkflowDefinition getWorkflow(User user, long projectCode, String workflowName) {
-        Map<String, Object> verifyProcessDefinitionExists =
+        Map<String, Object> verifyWorkflowDefinitionExists =
                 workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, workflowName, 0);
-        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
+        Status verifyStatus = (Status) verifyWorkflowDefinitionExists.get(Constants.STATUS);
 
         WorkflowDefinition workflowDefinition = null;
         if (verifyStatus == Status.WORKFLOW_DEFINITION_NAME_EXIST) {
@@ -343,7 +343,7 @@ public class PythonGateway {
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
-        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(workflowCode);
+        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(workflowCode);
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
@@ -526,7 +526,7 @@ public class PythonGateway {
 
     /**
      * Get workflow object by given workflow name. It returns map contain workflow id, name, code.
-     * Useful in Python API create subProcess task which need workflow information.
+     * Useful in Python API create sub workflow task which need workflow information.
      *
      * @param userName     user who create or update schedule
      * @param projectName  project name which workflow belongs to
@@ -583,7 +583,7 @@ public class PythonGateway {
             log.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        result.put("processDefinitionCode", workflowDefinition.getCode());
+        result.put("workflowDefinitionCode", workflowDefinition.getCode());
 
         if (taskName != null) {
             TaskDefinition taskDefinition =

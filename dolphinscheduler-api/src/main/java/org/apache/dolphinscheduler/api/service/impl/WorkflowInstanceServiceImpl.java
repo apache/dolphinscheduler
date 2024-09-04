@@ -23,8 +23,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_INSTANCE_STA
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.constants.Constants.PROCESS_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
+import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
@@ -212,7 +212,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
 
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryTopNProcessInstance(size, start, end,
+        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryTopNWorkflowInstance(size, start, end,
                 WorkflowExecutionStatus.SUCCESS, projectCode);
         result.put(DATA_LIST, workflowInstances);
         putMsg(result, Status.SUCCESS);
@@ -241,8 +241,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
         WorkflowDefinition workflowDefinition =
-                processService.findProcessDefinition(workflowInstance.getProcessDefinitionCode(),
-                        workflowInstance.getProcessDefinitionVersion());
+                processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
 
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}.", projectCode);
@@ -277,7 +277,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public Map<String, Object> queryWorkflowInstanceById(User loginUser, Integer workflowInstanceId) {
         WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
 
         return queryWorkflowInstanceById(loginUser, workflowDefinition.getProjectCode(), workflowInstanceId);
     }
@@ -328,7 +328,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Page<WorkflowInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<WorkflowInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryProcessInstanceListPaging(
+        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListPaging(
                 page,
                 projectCode,
                 workflowDefinitionCode,
@@ -375,7 +375,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Override
     public Result queryWorkflowInstanceList(User loginUser, WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
         Result result = new Result();
-        WorkflowInstance workflowInstance = workflowInstanceQueryRequest.convert2ProcessInstance();
+        WorkflowInstance workflowInstance = workflowInstanceQueryRequest.convert2WorkflowInstance();
         String projectName = workflowInstanceQueryRequest.getProjectName();
         if (!StringUtils.isBlank(projectName)) {
             Project project = projectMapper.queryByName(projectName);
@@ -383,7 +383,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     ApiFuncIdentificationConstant.WORKFLOW_DEFINITION);
             WorkflowDefinition workflowDefinition =
                     workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowInstance.getName());
-            workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
+            workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
             workflowInstance.setProjectCode(project.getCode());
         }
 
@@ -392,10 +392,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         PageInfo<WorkflowInstance> pageInfo =
                 new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
 
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryProcessInstanceListV2Paging(
+        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListV2Paging(
                 page,
                 workflowInstance.getProjectCode(),
-                workflowInstance.getProcessDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getName(),
                 workflowInstanceQueryRequest.getStartTime(),
                 workflowInstanceQueryRequest.getEndTime(),
@@ -450,7 +450,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
         if (workflowDefinition != null && projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
                     workflowInstanceId);
@@ -461,7 +461,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
                         workflowInstance.getTestFlag());
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put(PROCESS_INSTANCE_STATE, workflowInstance.getState().toString());
+        resultMap.put(WORKFLOW_INSTANCE_STATE, workflowInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
         result.put(DATA_LIST, resultMap);
 
@@ -489,20 +489,20 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
         List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
-                .queryAllSubProcessInstance((long) taskInstance.getProcessInstanceId(),
+                .queryAllSubWorkflowInstance((long) taskInstance.getWorkflowInstanceId(),
                         taskInstance.getTaskCode());
-        List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
+        List<Long> allSubWorkflowInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
-        List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubProcessInstanceId);
+        List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubWorkflowInstanceId);
 
         if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
             putMsg(result, Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
             throw new ServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
         }
-        Long subWorkflowCode = allSubWorkflows.get(0).getProcessDefinitionCode();
-        int subWorkflowVersion = allSubWorkflows.get(0).getProcessDefinitionVersion();
+        Long subWorkflowCode = allSubWorkflows.get(0).getWorkflowDefinitionCode();
+        int subWorkflowVersion = allSubWorkflows.get(0).getWorkflowDefinitionVersion();
         WorkflowDefinition subWorkflowDefinition =
-                processService.findProcessDefinition(subWorkflowCode, subWorkflowVersion);
+                processService.findWorkflowDefinition(subWorkflowCode, subWorkflowVersion);
         if (subWorkflowDefinition == null) {
             putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);
@@ -514,7 +514,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         int index = 1;
         for (WorkflowInstance workflowInstance : allSubWorkflows) {
             DynamicSubWorkflowDto dynamicSubWorkflowDto = new DynamicSubWorkflowDto();
-            dynamicSubWorkflowDto.setProcessInstanceId(workflowInstance.getId());
+            dynamicSubWorkflowDto.setWorkflowInstanceId(workflowInstance.getId());
             dynamicSubWorkflowDto.setIndex(index);
             dynamicSubWorkflowDto.setState(workflowInstance.getState());
             dynamicSubWorkflowDto.setName(subWorkflowDefinition.getName());
@@ -569,7 +569,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         WorkflowInstance subWorkflowInstance = processService.findSubWorkflowInstance(
-                taskInstance.getProcessInstanceId(), taskInstance.getId());
+                taskInstance.getWorkflowInstanceId(), taskInstance.getId());
         if (subWorkflowInstance == null) {
             log.error("Sub workflow instance does not exist, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstance.getId());
@@ -577,7 +577,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put(Constants.SUBPROCESS_INSTANCE_ID, subWorkflowInstance.getId());
+        dataMap.put(Constants.SUBWORKFLOW_INSTANCE_ID, subWorkflowInstance.getId());
         result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -615,10 +615,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         // check workflow instance exists in project
         WorkflowDefinition workflowDefinition0 =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
         if (workflowDefinition0 != null && projectCode != workflowDefinition0.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getProcessDefinitionCode());
+                    workflowInstance.getWorkflowDefinitionCode());
             putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
             return result;
         }
@@ -662,7 +662,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
         List<WorkflowTaskRelationLog> taskRelationList =
                 JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
         // check workflow json is valid
@@ -705,7 +705,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
         }
-        workflowInstance.setProcessDefinitionVersion(insertVersion);
+        workflowInstance.setWorkflowDefinitionVersion(insertVersion);
         boolean update = workflowInstanceDao.updateById(workflowInstance);
         if (!update) {
             log.error(
@@ -761,7 +761,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         WorkflowInstance subInstance = processService.findWorkflowInstanceDetailById(subId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, subId));
-        if (subInstance.getIsSubProcess() == Flag.NO) {
+        if (subInstance.getIsSubWorkflow() == Flag.NO) {
             log.warn(
                     "workflow instance is not sub workflow instance type, workflowInstanceId:{}, workflowInstanceName:{}.",
                     subId, subInstance.getName());
@@ -796,7 +796,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         WorkflowDefinition workflowDefinition = workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                workflowInstance.getProcessDefinitionCode(), workflowInstance.getProcessDefinitionVersion());
+                workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
 
         Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
         // check user access for project
@@ -833,10 +833,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
         if (workflowDefinition != null && projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getProcessDefinitionCode());
+                    workflowInstance.getWorkflowDefinitionCode());
             putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
             return result;
         }
@@ -884,7 +884,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByProcessId(workflowInstance.getId(), Flag.YES,
+                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES,
                         workflowInstance.getTestFlag());
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
@@ -927,11 +927,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         WorkflowDefinition workflowDefinition = workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                workflowInstance.getProcessDefinitionCode(),
-                workflowInstance.getProcessDefinitionVersion());
+                workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion());
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getProcessDefinitionCode());
+                    workflowInstance.getWorkflowDefinitionCode());
             putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
             return result;
         }
@@ -944,12 +944,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         List<Task> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(nodeList)) {
-            List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
+            List<TaskInstance> taskInstances = taskInstanceMapper.queryByWorkflowInstanceIdsAndTaskCodes(
                     Collections.singletonList(workflowInstanceId), nodeList);
             for (Long node : nodeList) {
                 TaskInstance taskInstance = null;
                 for (TaskInstance instance : taskInstances) {
-                    if (instance.getProcessInstanceId() == workflowInstanceId && instance.getTaskCode() == node) {
+                    if (instance.getWorkflowInstanceId() == workflowInstanceId && instance.getTaskCode() == node) {
                         taskInstance = instance;
                         break;
                     }
@@ -987,7 +987,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
      */
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
-        return workflowInstanceMapper.queryByProcessDefineCodeAndStatus(workflowDefinitionCode, states);
+        return workflowInstanceMapper.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
     }
 
     @Override
@@ -1006,7 +1006,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
      */
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
-        return workflowInstanceMapper.queryByProcessDefineCode(workflowDefinitionCode, size);
+        return workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
     }
 
     /**
@@ -1039,7 +1039,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode) {
         while (true) {
             List<WorkflowInstance> workflowInstances =
-                    workflowInstanceMapper.queryByProcessDefineCode(workflowDefinitionCode, 100);
+                    workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, 100);
             if (CollectionUtils.isEmpty(workflowInstances)) {
                 break;
             }

@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -209,14 +209,14 @@ public class CuringParamsServiceTest {
         workflowDefinition.setProjectCode(3000001L);
         workflowDefinition.setCode(200001L);
 
-        workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
         taskInstance.setTaskCode(taskDefinition.getCode());
         taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
         taskInstance.setProjectCode(workflowDefinition.getProjectCode());
-        taskInstance.setProcessInstanceId(workflowInstance.getId());
+        taskInstance.setWorkflowInstanceId(workflowInstance.getId());
 
-        AbstractParameters parameters = new SubProcessParameters();
+        AbstractParameters parameters = new SubWorkflowParameters();
 
         Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
 

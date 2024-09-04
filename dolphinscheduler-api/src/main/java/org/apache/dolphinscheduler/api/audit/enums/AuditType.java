@@ -27,15 +27,14 @@ import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PRIORITY;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PROCESS_DEFINITION_CODE;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PROCESS_DEFINITION_CODES;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PROCESS_INSTANCE_ID;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PROCESS_INSTANCE_IDS;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.QUEUE_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.TYPE;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.USER_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.VERSION;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_DEFINITION_CODE;
+import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_DEFINITION_CODES;
+import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_INSTANCE_ID;
+import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_INSTANCE_IDS;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.ALARM_GROUP;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.ALARM_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.CLUSTER;
@@ -76,6 +75,7 @@ import static org.apache.dolphinscheduler.common.enums.AuditOperationType.START;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.SWITCH_VERSION;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.UPDATE;
 
+import org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants;
 import org.apache.dolphinscheduler.api.audit.operator.AuditOperator;
 import org.apache.dolphinscheduler.api.audit.operator.impl.AlertGroupAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.AlertInstanceAuditOperatorImpl;
@@ -83,7 +83,6 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.ClusterAuditOperatorI
 import org.apache.dolphinscheduler.api.audit.operator.impl.DatasourceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.EnvironmentAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.K8SNamespaceAuditOperatorImpl;
-import org.apache.dolphinscheduler.api.audit.operator.impl.ProcessInstanceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ProjectAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ResourceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ScheduleAuditOperatorImpl;
@@ -95,6 +94,7 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.TokenAuditOperatorImp
 import org.apache.dolphinscheduler.api.audit.operator.impl.UserAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.WorkerGroupAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.WorkflowAuditOperatorImpl;
+import org.apache.dolphinscheduler.api.audit.operator.impl.WorkflowInstanceAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.YarnQueueAuditOperatorImpl;
 import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
@@ -120,22 +120,24 @@ public enum AuditType {
     WORKFLOW_EXPORT(WORKFLOW, EXPORT, WorkflowAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
     WORKFLOW_DELETE(WORKFLOW, DELETE, WorkflowAuditOperatorImpl.class, new String[]{CODE}, new String[]{}),
     WORKFLOW_BATCH_DELETE(WORKFLOW, BATCH_DELETE, WorkflowAuditOperatorImpl.class, new String[]{CODES}, new String[]{}),
-    WORKFLOW_START(WORKFLOW, START, WorkflowAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODE},
+    WORKFLOW_START(WORKFLOW, START, WorkflowAuditOperatorImpl.class,
+            new String[]{AuditLogConstants.WORKFLOW_DEFINITION_CODE},
             new String[]{}),
-    WORKFLOW_BATCH_START(WORKFLOW, BATCH_START, WorkflowAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODES},
+    WORKFLOW_BATCH_START(WORKFLOW, BATCH_START, WorkflowAuditOperatorImpl.class,
+            new String[]{WORKFLOW_DEFINITION_CODES},
             new String[]{}),
-    WORKFLOW_BATCH_RERUN(WORKFLOW, BATCH_RERUN, ProcessInstanceAuditOperatorImpl.class,
-            new String[]{PROCESS_INSTANCE_IDS},
+    WORKFLOW_BATCH_RERUN(WORKFLOW, BATCH_RERUN, WorkflowInstanceAuditOperatorImpl.class,
+            new String[]{WORKFLOW_INSTANCE_IDS},
             new String[]{}),
-    WORKFLOW_EXECUTE(WORKFLOW, EXECUTE, ProcessInstanceAuditOperatorImpl.class, new String[]{PROCESS_INSTANCE_ID},
+    WORKFLOW_EXECUTE(WORKFLOW, EXECUTE, WorkflowInstanceAuditOperatorImpl.class, new String[]{WORKFLOW_INSTANCE_ID},
             new String[]{}),
     WORKFLOW_IMPORT(WORKFLOW, IMPORT, WorkflowAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
-    WORKFLOW_INSTANCE_UPDATE(WORKFLOW_INSTANCE, UPDATE, ProcessInstanceAuditOperatorImpl.class, new String[]{ID},
+    WORKFLOW_INSTANCE_UPDATE(WORKFLOW_INSTANCE, UPDATE, WorkflowInstanceAuditOperatorImpl.class, new String[]{ID},
             new String[]{}),
-    WORKFLOW_INSTANCE_DELETE(WORKFLOW_INSTANCE, DELETE, ProcessInstanceAuditOperatorImpl.class, new String[]{ID},
+    WORKFLOW_INSTANCE_DELETE(WORKFLOW_INSTANCE, DELETE, WorkflowInstanceAuditOperatorImpl.class, new String[]{ID},
             new String[]{}),
-    WORKFLOW_INSTANCE_BATCH_DELETE(WORKFLOW_INSTANCE, BATCH_DELETE, ProcessInstanceAuditOperatorImpl.class,
-            new String[]{PROCESS_INSTANCE_IDS}, new String[]{}),
+    WORKFLOW_INSTANCE_BATCH_DELETE(WORKFLOW_INSTANCE, BATCH_DELETE, WorkflowInstanceAuditOperatorImpl.class,
+            new String[]{WORKFLOW_INSTANCE_IDS}, new String[]{}),
 
     TASK_CREATE(TASK, CREATE, TaskAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
     TASK_UPDATE(TASK, UPDATE, TaskAuditOperatorImpl.class, new String[]{}, new String[]{CODE}),
@@ -147,7 +149,8 @@ public enum AuditType {
     TASK_INSTANCE_FORCE_SUCCESS(TASK_INSTANCE, FORCE_SUCCESS, TaskInstancesAuditOperatorImpl.class, new String[]{ID},
             new String[]{}),
 
-    SCHEDULE_CREATE(SCHEDULE, CREATE, ScheduleAuditOperatorImpl.class, new String[]{PROCESS_DEFINITION_CODE},
+    SCHEDULE_CREATE(SCHEDULE, CREATE, ScheduleAuditOperatorImpl.class,
+            new String[]{AuditLogConstants.WORKFLOW_DEFINITION_CODE},
             new String[]{ID}),
     SCHEDULE_UPDATE(SCHEDULE, UPDATE, ScheduleAuditOperatorImpl.class, new String[]{ID}, new String[]{}),
     SCHEDULE_ONLINE(SCHEDULE, ONLINE, ScheduleAuditOperatorImpl.class, new String[]{ID}, new String[]{}),

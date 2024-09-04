@@ -57,9 +57,9 @@ public class ProcessUtils {
                             .setExecutePath(FileUtils.getTaskInstanceWorkingDirectory(
                                     taskExecutionContext.getTenantCode(),
                                     taskExecutionContext.getProjectCode(),
-                                    taskExecutionContext.getProcessDefineCode(),
-                                    taskExecutionContext.getProcessDefineVersion(),
-                                    taskExecutionContext.getProcessInstanceId(),
+                                    taskExecutionContext.getWorkflowDefinitionCode(),
+                                    taskExecutionContext.getWorkflowDefinitionVersion(),
+                                    taskExecutionContext.getWorkflowInstanceId(),
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createDirectoryWith755(Paths.get(taskExecutionContext.getExecutePath()));

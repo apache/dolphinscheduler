@@ -98,14 +98,14 @@ public class TaskExecutionContextBuilder {
      * @return TaskExecutionContextBuilder
      */
     public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(WorkflowInstance workflowInstance) {
-        taskExecutionContext.setProcessInstanceId(workflowInstance.getId());
+        taskExecutionContext.setWorkflowInstanceId(workflowInstance.getId());
         taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(workflowInstance.getScheduleTime()));
         taskExecutionContext.setGlobalParams(workflowInstance.getGlobalParams());
         taskExecutionContext.setExecutorId(workflowInstance.getExecutorId());
         taskExecutionContext.setCmdTypeIfComplement(workflowInstance.getCmdTypeIfComplement().getCode());
         taskExecutionContext.setTenantCode(workflowInstance.getTenantCode());
-        taskExecutionContext.setProcessDefineCode(workflowInstance.getProcessDefinitionCode());
-        taskExecutionContext.setProcessDefineVersion(workflowInstance.getProcessDefinitionVersion());
+        taskExecutionContext.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        taskExecutionContext.setWorkflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion());
         taskExecutionContext.setProjectCode(workflowInstance.getProjectCode());
         return this;
     }
@@ -117,8 +117,8 @@ public class TaskExecutionContextBuilder {
      * @return TaskExecutionContextBuilder
      */
     public TaskExecutionContextBuilder buildProcessDefinitionRelatedInfo(WorkflowDefinition workflowDefinition) {
-        taskExecutionContext.setProcessDefineCode(workflowDefinition.getCode());
-        taskExecutionContext.setProcessDefineVersion(workflowDefinition.getVersion());
+        taskExecutionContext.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        taskExecutionContext.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
         taskExecutionContext.setProjectCode(workflowDefinition.getProjectCode());
         return this;
     }

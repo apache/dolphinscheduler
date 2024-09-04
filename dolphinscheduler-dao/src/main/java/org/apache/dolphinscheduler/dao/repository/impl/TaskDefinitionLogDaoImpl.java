@@ -57,7 +57,7 @@ public class TaskDefinitionLogDaoImpl extends BaseDao<TaskDefinitionLog, TaskDef
                                                                            Integer workflowDefinitionVersion) {
 
         List<WorkflowTaskRelation> workflowTaskRelationLogs = workflowTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion)
+                .queryByWorkflowCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion)
                 .stream()
                 .map(p -> (WorkflowTaskRelation) p)
                 .collect(Collectors.toList());

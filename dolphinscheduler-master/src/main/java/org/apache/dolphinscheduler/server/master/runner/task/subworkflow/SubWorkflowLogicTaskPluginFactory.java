@@ -42,7 +42,7 @@ public class SubWorkflowLogicTaskPluginFactory implements ILogicTaskPluginFactor
 
     @Override
     public SubWorkflowLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
         final IWorkflowExecutionRunnable workflowExecutionRunnable = IWorkflowRepository.get(workflowInstanceId);
         if (workflowExecutionRunnable == null) {
             throw new LogicTaskInitializeException(

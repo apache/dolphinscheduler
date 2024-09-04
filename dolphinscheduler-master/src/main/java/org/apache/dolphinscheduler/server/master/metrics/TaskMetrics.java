@@ -44,7 +44,7 @@ public class TaskMetrics {
                     state,
                     Counter.builder("ds.task.instance.count")
                             .tags("state", state)
-                            .description(String.format("Process instance %s total count", state))
+                            .description(String.format("Workflow instance %s total count", state))
                             .register(Metrics.globalRegistry));
         }
 

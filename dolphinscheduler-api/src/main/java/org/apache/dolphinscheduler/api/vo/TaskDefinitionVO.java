@@ -24,18 +24,14 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import java.util.List;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import org.springframework.beans.BeanUtils;
 
-/**
- * @author fanwanlong
- */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class TaskDefinitionVO extends TaskDefinition {
 
-    /**
-     * process task related list
-     */
     private List<WorkflowTaskRelation> workflowTaskRelationList;
 
     public TaskDefinitionVO() {

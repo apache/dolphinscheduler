@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.api.task;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 
 public class SubWorkflowLogicTaskChannel extends AbstractLogicTaskChannel {
 
     @Override
     public AbstractParameters parseParameters(String taskParams) {
-        return JSONUtils.parseObject(taskParams, SubProcessParameters.class);
+        return JSONUtils.parseObject(taskParams, SubWorkflowParameters.class);
     }
 }

@@ -30,7 +30,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("t_ds_process_task_lineage")
+@TableName("t_ds_workflow_task_lineage")
 public class WorkflowTaskLineage {
 
     @TableId(value = "id", type = IdType.AUTO)

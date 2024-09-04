@@ -55,12 +55,12 @@ const BatchTaskInstance = defineComponent({
         pageNo: variables.page,
         searchVal: variables.searchVal,
         taskCode: variables.taskCode,
-        processInstanceId: variables.processInstanceId,
+        workflowInstanceId: variables.workflowInstanceId,
         host: variables.host,
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        workflowInstanceName: variables.workflowInstanceName
       })
     }
 
@@ -84,8 +84,8 @@ const BatchTaskInstance = defineComponent({
       onSearch()
     }
 
-    const onClearSearchProcessInstanceName = () => {
-      variables.processInstanceName = null
+    const onClearSearchWorkflowInstanceName = () => {
+      variables.workflowInstanceName = null
       onSearch()
     }
 
@@ -190,7 +190,7 @@ const BatchTaskInstance = defineComponent({
       onSearch,
       onClearSearchTaskCode,
       onClearSearchTaskName,
-      onClearSearchProcessInstanceName,
+      onClearSearchWorkflowInstanceName,
       onClearSearchExecutorName,
       onClearSearchHost,
       onClearSearchStateType,
@@ -233,11 +233,11 @@ const BatchTaskInstance = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.processInstanceName, 'value']}
+              v-model={[this.workflowInstanceName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
-              onClear={this.onClearSearchProcessInstanceName}
+              onClear={this.onClearSearchWorkflowInstanceName}
             />
             <NInput
               allowInput={this.trim}
