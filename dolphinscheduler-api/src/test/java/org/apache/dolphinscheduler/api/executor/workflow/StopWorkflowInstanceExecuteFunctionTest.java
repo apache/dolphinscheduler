@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.api.executor.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -58,24 +60,24 @@ class StopWorkflowInstanceExecuteFunctionTest {
                 () -> stopWorkflowInstanceExecutorDelegate.exceptionIfWorkflowInstanceCannotStop(workflowInstance));
     }
 
-    // @ParameterizedTest
-    // @EnumSource(value = WorkflowExecutionStatus.class, names = {
-    // "RUNNING_EXECUTION",
-    // "READY_PAUSE",
-    // "READY_STOP",
-    // "SERIAL_WAIT",
-    // "WAIT_TO_RUN"}, mode = EnumSource.Mode.EXCLUDE)
-    // void exceptionIfWorkflowInstanceCannotStop_canNotStop(WorkflowExecutionStatus workflowExecutionStatus) {
-    // WorkflowInstance workflowInstance = new WorkflowInstance();
-    // workflowInstance.setName("Workflow-1");
-    // workflowInstance.setState(workflowExecutionStatus);
-    // ServiceException serviceException = assertThrows(ServiceException.class,
-    // () -> stopWorkflowInstanceExecutorDelegate.exceptionIfWorkflowInstanceCannotStop(workflowInstance));
-    // Assertions.assertEquals(
-    // "Internal Server Error: The workflow instance: Workflow-1 status is " + workflowExecutionStatus
-    // + ", can not stop",
-    // serviceException.getMessage());
-    // }
+    @ParameterizedTest
+    @EnumSource(value = WorkflowExecutionStatus.class, names = {
+            "RUNNING_EXECUTION",
+            "READY_PAUSE",
+            "READY_STOP",
+            "SERIAL_WAIT",
+            "WAIT_TO_RUN"}, mode = EnumSource.Mode.EXCLUDE)
+    void exceptionIfWorkflowInstanceCannotStop_canNotStop(WorkflowExecutionStatus workflowExecutionStatus) {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setName("Workflow-1");
+        workflowInstance.setState(workflowExecutionStatus);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> stopWorkflowInstanceExecutorDelegate.exceptionIfWorkflowInstanceCannotStop(workflowInstance));
+        Assertions.assertEquals(
+                "Internal Server Error: The workflow instance: Workflow-1 status is " + workflowExecutionStatus
+                        + ", can not stop",
+                serviceException.getMessage());
+    }
 
     @ParameterizedTest
     @EnumSource(value = WorkflowExecutionStatus.class, names = {
