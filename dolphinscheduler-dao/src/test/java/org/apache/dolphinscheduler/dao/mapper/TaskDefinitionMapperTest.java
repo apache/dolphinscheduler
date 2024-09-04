@@ -73,7 +73,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setName("def 1");
         workflowTaskRelation.setProjectCode(1L);
-        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setWorkflowDefinitionCode(1L);
         workflowTaskRelation.setPostTaskCode(postTaskCode);
         workflowTaskRelation.setPreTaskCode(0L);
         workflowTaskRelation.setUpdateTime(new Date());
@@ -93,7 +93,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         TaskDefinition taskDefinition = insertOne();
         WorkflowTaskRelation workflowTaskRelation = insertTaskRelation(taskDefinition.getCode());
         TaskDefinition result = taskDefinitionMapper.queryByName(taskDefinition.getProjectCode(),
-                workflowTaskRelation.getProcessDefinitionCode(), taskDefinition.getName());
+                workflowTaskRelation.getWorkflowDefinitionCode(), taskDefinition.getName());
 
         Assertions.assertNotNull(result);
     }

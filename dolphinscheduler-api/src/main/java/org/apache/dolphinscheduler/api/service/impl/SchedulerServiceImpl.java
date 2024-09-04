@@ -155,7 +155,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 workflowDefinition.getVersion());
 
         Schedule scheduleExists =
-                scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
+                scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (scheduleExists != null) {
             log.error("Schedule already exist, scheduleId:{}, workflowDefinitionCode:{}", scheduleExists.getId(),
                     workflowDefinitionCode);
@@ -170,8 +170,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         scheduleObj.setTenantCode(tenantCode);
         scheduleObj.setProjectName(project.getName());
-        scheduleObj.setProcessDefinitionCode(workflowDefinitionCode);
-        scheduleObj.setProcessDefinitionName(workflowDefinition.getName());
+        scheduleObj.setWorkflowDefinitionCode(workflowDefinitionCode);
+        scheduleObj.setWorkflowDefinitionName(workflowDefinition.getName());
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
@@ -202,7 +202,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setUserId(loginUser.getId());
         scheduleObj.setUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
-        scheduleObj.setProcessInstancePriority(workflowInstancePriority);
+        scheduleObj.setWorkflowInstancePriority(workflowInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
         scheduleObj.setEnvironmentCode(environmentCode);
         scheduleMapper.insert(scheduleObj);
@@ -259,19 +259,20 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     public Schedule createSchedulesV2(User loginUser,
                                       ScheduleCreateRequest scheduleCreateRequest) {
-        this.projectPermCheckByWorkflowCode(loginUser, scheduleCreateRequest.getProcessDefinitionCode());
+        this.projectPermCheckByWorkflowCode(loginUser, scheduleCreateRequest.getWorkflowDefinitionCode());
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(scheduleCreateRequest.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(scheduleCreateRequest.getWorkflowDefinitionCode());
 
         // check workflow define release state
         executorService.checkWorkflowDefinitionValid(workflowDefinition.getProjectCode(), workflowDefinition,
                 workflowDefinition.getCode(), workflowDefinition.getVersion());
 
         Schedule scheduleExists =
-                scheduleMapper.queryByProcessDefinitionCode(scheduleCreateRequest.getProcessDefinitionCode());
+                scheduleMapper.queryByWorkflowDefinitionCode(scheduleCreateRequest.getWorkflowDefinitionCode());
         if (scheduleExists != null) {
-            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, scheduleCreateRequest.getProcessDefinitionCode(),
+            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS,
+                    scheduleCreateRequest.getWorkflowDefinitionCode(),
                     scheduleExists.getId());
         }
 
@@ -286,7 +287,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setUserId(loginUser.getId());
         // give more detail when return schedule object
         schedule.setUserName(loginUser.getUserName());
-        schedule.setProcessDefinitionName(workflowDefinition.getName());
+        schedule.setWorkflowDefinitionName(workflowDefinition.getName());
 
         this.scheduleParamCheck(scheduleCreateRequest.getScheduleParam());
         int create = scheduleMapper.insert(schedule);
@@ -348,11 +349,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.",
-                    schedule.getProcessDefinitionCode());
-            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(schedule.getProcessDefinitionCode()));
+                    schedule.getWorkflowDefinitionCode());
+            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(schedule.getWorkflowDefinitionCode()));
             return result;
         }
 
@@ -389,7 +390,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleUpdateRequest.toString());
         }
         // check update params
-        this.projectPermCheckByWorkflowCode(loginUser, scheduleUpdate.getProcessDefinitionCode());
+        this.projectPermCheckByWorkflowCode(loginUser, scheduleUpdate.getWorkflowDefinitionCode());
 
         if (scheduleUpdate.getEnvironmentCode() != null) {
             Environment environment = environmentMapper.queryByEnvironmentCode(scheduleUpdate.getEnvironmentCode());
@@ -420,7 +421,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (schedule == null) {
             throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
         }
-        this.projectPermCheckByWorkflowCode(loginUser, schedule.getProcessDefinitionCode());
+        this.projectPermCheckByWorkflowCode(loginUser, schedule.getWorkflowDefinitionCode());
         return schedule;
     }
 
@@ -460,7 +461,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Page<Schedule> page = new Page<>(pageNo, pageSize);
 
         IPage<Schedule> schedulePage =
-                scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, workflowDefinitionCode,
+                scheduleMapper.queryByProjectAndWorkflowDefinitionCodePaging(page, projectCode, workflowDefinitionCode,
                         searchVal);
 
         List<ScheduleVO> scheduleList = new ArrayList<>();
@@ -480,7 +481,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (CollectionUtils.isEmpty(workflowDefinitionCodes)) {
             return Collections.emptyList();
         }
-        return scheduleMapper.querySchedulesByProcessDefinitionCodes(workflowDefinitionCodes);
+        return scheduleMapper.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodes);
     }
 
     /**
@@ -578,7 +579,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        this.projectPermCheckByWorkflowCode(loginUser, schedule.getProcessDefinitionCode());
+        this.projectPermCheckByWorkflowCode(loginUser, schedule.getWorkflowDefinitionCode());
         int delete = scheduleMapper.deleteById(scheduleId);
         if (delete <= 0) {
             throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
@@ -655,7 +656,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         // check schedule exists
-        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
+        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (schedule == null) {
             log.error("Schedule of workflow definition does not exist, workflowDefinitionCode:{}.",
                     workflowDefinitionCode);
@@ -686,7 +687,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     @Override
     public void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
-        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
+        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         doOnlineScheduler(schedule);
     }
 
@@ -699,7 +700,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return;
         }
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
         if (!ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_RELEASE, workflowDefinition.getName());
         }
@@ -722,7 +723,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     @Override
     public void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
-        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
+        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         doOfflineScheduler(schedule);
     }
 
@@ -737,7 +738,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setReleaseState(ReleaseState.OFFLINE);
         scheduleMapper.updateById(schedule);
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
         Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
         schedulerApi.deleteScheduleTask(project.getId(), schedule.getId());
     }
@@ -802,7 +803,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setWorkerGroup(workerGroup);
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);
-        schedule.setProcessInstancePriority(workflowInstancePriority);
+        schedule.setWorkflowInstancePriority(workflowInstancePriority);
         scheduleMapper.updateById(schedule);
 
         workflowDefinition.setWarningGroupId(warningGroupId);

@@ -53,7 +53,7 @@ public class LogicITaskInstanceDispatchOperationFunction
         TaskExecutionContext taskExecutionContext = taskDispatchRequest.getTaskExecutionContext();
         try {
             final int taskInstanceId = taskExecutionContext.getTaskInstanceId();
-            final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+            final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
             final String taskInstanceName = taskExecutionContext.getTaskName();
 
             taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));

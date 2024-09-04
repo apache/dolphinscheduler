@@ -92,7 +92,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
     protected void assembleWorkflowInstance(
                                             final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
         final Command command = workflowExecuteContextBuilder.getCommand();
-        final int workflowInstanceId = command.getProcessInstanceId();
+        final int workflowInstanceId = command.getWorkflowInstanceId();
         final WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
         workflowInstance.setVarPool(null);

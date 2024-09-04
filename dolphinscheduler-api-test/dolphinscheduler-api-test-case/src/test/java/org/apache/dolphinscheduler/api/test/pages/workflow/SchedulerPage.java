@@ -36,11 +36,11 @@ public class SchedulerPage {
 
     private String sessionId;
 
-    public HttpResponse createSchedule(User loginUser, long projectCode, long processDefinitionCode, String schedule) {
+    public HttpResponse createSchedule(User loginUser, long projectCode, long workflowDefinitionCode, String schedule) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("projectCode", projectCode);
-        params.put("processDefinitionCode", processDefinitionCode);
+        params.put("workflowDefinitionCode", workflowDefinitionCode);
         params.put("schedule", schedule);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);

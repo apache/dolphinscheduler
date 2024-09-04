@@ -68,7 +68,7 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
             }
             final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
             try {
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getWorkflowInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
                 LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 

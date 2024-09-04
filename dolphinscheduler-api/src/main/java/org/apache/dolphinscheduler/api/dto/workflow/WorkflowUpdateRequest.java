@@ -63,12 +63,12 @@ public class WorkflowUpdateRequest {
     private String location;
 
     /**
-     * Merge workflowUpdateRequest information into exists processDefinition object
+     * Merge workflowUpdateRequest information into exists workflowDefinition object
      *
-     * @param workflowDefinition exists processDefinition object
-     * @return process definition
+     * @param workflowDefinition exists workflowDefinition object
+     * @return workflow definition
      */
-    public WorkflowDefinition mergeIntoProcessDefinition(WorkflowDefinition workflowDefinition) {
+    public WorkflowDefinition mergeIntoWorkflowDefinition(WorkflowDefinition workflowDefinition) {
         WorkflowDefinition workflowDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(workflowDefinition), WorkflowDefinition.class);
         assert workflowDefinitionDeepCopy != null;

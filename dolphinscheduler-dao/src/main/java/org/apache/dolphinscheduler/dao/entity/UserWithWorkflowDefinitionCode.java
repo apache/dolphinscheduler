@@ -27,9 +27,9 @@ import lombok.Data;
 @Builder
 public class UserWithWorkflowDefinitionCode {
 
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
-    private int processDefinitionVersion;
+    private int workflowDefinitionVersion;
 
     private Integer modifierId;
 

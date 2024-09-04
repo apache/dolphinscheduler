@@ -58,7 +58,7 @@ public class WorkflowCreateRequest {
     @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
     private String executionType;
 
-    public WorkflowDefinition convert2ProcessDefinition() {
+    public WorkflowDefinition convert2WorkflowDefinition() {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
 
         workflowDefinition.setName(this.name);

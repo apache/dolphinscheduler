@@ -28,14 +28,14 @@ import type {
 import { ref } from 'vue'
 
 export function formatParams(data: INodeData): {
-  processDefinitionCode: string
+  workflowDefinitionCode: string
   upstreamCodes: string
   taskDefinitionJsonObj: object
 } {
   const rdbmsSourceTypes = ref(['MYSQL', 'ORACLE', 'SQLSERVER', 'HANA'])
   const taskParams: ITaskParams = {}
-  if (data.taskType === 'SUB_PROCESS' || data.taskType === 'DYNAMIC') {
-    taskParams.processDefinitionCode = data.processDefinitionCode
+  if (data.taskType === 'SUB_WORKFLOW' || data.taskType === 'DYNAMIC') {
+    taskParams.workflowDefinitionCode = data.workflowDefinitionCode
   }
 
   if (data.taskType === 'JAVA') {
@@ -496,7 +496,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DYNAMIC') {
-    taskParams.processDefinitionCode = data.processDefinitionCode
+    taskParams.workflowDefinitionCode = data.workflowDefinitionCode
     taskParams.maxNumOfSubWorkflowInstances = data.maxNumOfSubWorkflowInstances
     taskParams.degreeOfParallelism = data.degreeOfParallelism
     taskParams.filterCondition = data.filterCondition
@@ -513,7 +513,9 @@ export function formatParams(data: INodeData): {
     }
   }
   const params = {
-    processDefinitionCode: data.processName ? String(data.processName) : '',
+    workflowDefinitionCode: data.workflowDefinitionName
+      ? String(data.workflowDefinitionName)
+      : '',
     upstreamCodes: data?.preTasks?.join(','),
     taskDefinitionJsonObj: {
       code: data.code,
@@ -554,7 +556,7 @@ export function formatParams(data: INodeData): {
       taskExecuteType: data.taskExecuteType
     }
   } as {
-    processDefinitionCode: string
+    workflowDefinitionCode: string
     upstreamCodes: string
     taskDefinitionJsonObj: { timeout: number; timeoutNotifyStrategy: string }
   }

@@ -53,7 +53,7 @@ interface ListReq extends PageReq {
   userId?: number
 }
 
-interface ProcessDefinitionReq {
+interface WorkflowDefinitionReq {
   name: string
   locations: string
   taskDefinitionJson: string
@@ -85,7 +85,7 @@ export {
   LimitReq,
   PageReq,
   ListReq,
-  ProcessDefinitionReq,
+  WorkflowDefinitionReq,
   TargetCodeReq,
   SimpleListRes
 }

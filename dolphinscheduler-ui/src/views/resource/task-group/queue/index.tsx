@@ -57,7 +57,7 @@ const taskGroupQueue = defineComponent({
 
     const searchParamRef = reactive({
       groupId: ref<number | null>(),
-      processName: '',
+      workflowInstanceName: '',
       instanceName: '',
       pageSize: 10,
       pageNo: 1
@@ -74,7 +74,7 @@ const taskGroupQueue = defineComponent({
         pageNo: variables.page,
         groupId: searchParamRef.groupId,
         taskInstanceName: searchParamRef.instanceName,
-        processInstanceName: searchParamRef.processName
+        workflowInstanceName: searchParamRef.workflowInstanceName
       })
     }
 
@@ -177,7 +177,7 @@ const taskGroupQueue = defineComponent({
               placeholder={t('resource.task_group_queue.task_group_name')}
             />
             <Search
-              v-model:value={this.searchParamRef.processName}
+              v-model:value={this.searchParamRef.workflowInstanceName}
               placeholder={t(
                 'resource.task_group_queue.workflow_instance_name'
               )}

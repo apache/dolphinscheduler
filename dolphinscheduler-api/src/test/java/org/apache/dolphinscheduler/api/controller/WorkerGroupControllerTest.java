@@ -137,7 +137,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(null);
         Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
-        Mockito.when(workflowInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
+        Mockito.when(workflowInstanceMapper.updateWorkflowInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
                 .header("sessionId", sessionId))

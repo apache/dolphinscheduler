@@ -232,8 +232,8 @@ public class TaskFilesTransferUtils {
                 DateUtils.formatTimeStamp(taskExecutionContext.getEndTime(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         // get resource Folder: RESOURCE_TAG/DATE/ProcessDefineCode/ProcessDefineVersion_ProcessInstanceID
         String resourceFolder = String.format("%s/%s/%d/%d_%d", RESOURCE_TAG, date,
-                taskExecutionContext.getProcessDefineCode(), taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId());
+                taskExecutionContext.getWorkflowDefinitionCode(), taskExecutionContext.getWorkflowDefinitionVersion(),
+                taskExecutionContext.getWorkflowInstanceId());
         // get resource fileL: resourceFolder/TaskName_TaskInstanceID_FileName
         return String.format("%s/%s_%s_%s", resourceFolder, taskExecutionContext.getTaskName().replace(" ", "_"),
                 taskExecutionContext.getTaskInstanceId(), fileName);

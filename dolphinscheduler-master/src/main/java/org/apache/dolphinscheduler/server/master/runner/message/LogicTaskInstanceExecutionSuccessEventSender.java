@@ -40,7 +40,7 @@ public class LogicTaskInstanceExecutionSuccessEventSender
     @Override
     public TaskExecutionSuccessEvent buildMessage(final TaskExecutionContext taskExecutionContext) {
         return TaskExecutionSuccessEvent.builder()
-                .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .appIds(taskExecutionContext.getAppIds())
                 .processId(taskExecutionContext.getProcessId())

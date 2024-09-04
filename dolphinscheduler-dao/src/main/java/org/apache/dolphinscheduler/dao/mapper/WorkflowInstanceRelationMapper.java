@@ -32,26 +32,26 @@ public interface WorkflowInstanceRelationMapper extends BaseMapper<WorkflowInsta
 
     /**
      * query workflow instance by parentId
-     * @param parentProcessId parentProcessId
+     * @param parentWorkflowInstanceId parentWorkflowInstanceId
      * @param parentTaskId parentTaskId
      * @return workflow instance map
      */
-    WorkflowInstanceRelation queryByParentId(@Param("parentProcessId") int parentProcessId,
+    WorkflowInstanceRelation queryByParentId(@Param("parentWorkflowInstanceId") int parentWorkflowInstanceId,
                                              @Param("parentTaskId") int parentTaskId);
 
     /**
      * query by sub process id
-     * @param subProcessId subProcessId
+     * @param subWorkflowInstanceId subWorkflowInstanceId
      * @return workflow instance map
      */
-    WorkflowInstanceRelation queryBySubProcessId(@Param("subProcessId") Integer subProcessId);
+    WorkflowInstanceRelation queryBySubWorkflowId(@Param("subWorkflowInstanceId") Integer subWorkflowInstanceId);
 
     /**
      * delete by parent process id
-     * @param parentProcessId parentProcessId
+     * @param parentWorkflowInstanceId parentWorkflowInstanceId
      * @return delete result
      */
-    int deleteByParentProcessId(@Param("parentProcessId") int parentProcessId);
+    int deleteByParentWorkflowInstanceId(@Param("parentWorkflowInstanceId") int parentWorkflowInstanceId);
 
     /**
      *  query sub workflow instance  ids by parent instance id

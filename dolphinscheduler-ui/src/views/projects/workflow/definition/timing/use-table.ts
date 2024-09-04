@@ -59,7 +59,7 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false),
     loadingRef: ref(false),
-    processDefinitionCode: router.currentRoute.value.params.definitionCode
+    workflowDefinitionCode: router.currentRoute.value.params.definitionCode
       ? ref(Number(router.currentRoute.value.params.definitionCode))
       : ref(),
     dependenciesData: ref({
@@ -192,7 +192,7 @@ export function useTable() {
       },
       {
         title: t('project.workflow.workflow_name'),
-        key: 'processDefinitionName',
+        key: 'workflowDefinitionName',
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
@@ -401,7 +401,7 @@ export function useTable() {
       variables.row = row
       getDependentTaskLinks(
         variables.projectCode,
-        row.processDefinitionCode
+        row.workflowDefinitionCode
       ).then((res: any) => {
         if (res && res.length > 0) {
           variables.dependenciesData.showRef = true
@@ -419,7 +419,7 @@ export function useTable() {
               pageNo: variables.page,
               searchVal: variables.searchVal,
               projectCode: variables.projectCode,
-              processDefinitionCode: variables.processDefinitionCode
+              workflowDefinitionCode: variables.workflowDefinitionCode
             })
           })
         }
@@ -432,7 +432,7 @@ export function useTable() {
           pageNo: variables.page,
           searchVal: variables.searchVal,
           projectCode: variables.projectCode,
-          processDefinitionCode: variables.processDefinitionCode
+          workflowDefinitionCode: variables.workflowDefinitionCode
         })
       })
     }
@@ -446,7 +446,7 @@ export function useTable() {
         pageNo: variables.page,
         searchVal: variables.searchVal,
         projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
+        workflowDefinitionCode: variables.workflowDefinitionCode
       })
     })
     variables.dependenciesData.showRef = false
@@ -460,7 +460,7 @@ export function useTable() {
         pageNo: variables.page,
         searchVal: variables.searchVal,
         projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
+        workflowDefinitionCode: variables.workflowDefinitionCode
       })
     })
     variables.dependenciesData.showRef = false
@@ -474,7 +474,7 @@ export function useTable() {
     variables.row = row
     getDependentTaskLinks(
       variables.projectCode,
-      row.processDefinitionCode
+      row.workflowDefinitionCode
     ).then((res: any) => {
       if (res && res.length > 0) {
         variables.dependenciesData.showRef = true
@@ -492,7 +492,7 @@ export function useTable() {
             pageNo: variables.page,
             searchVal: variables.searchVal,
             projectCode: variables.projectCode,
-            processDefinitionCode: variables.processDefinitionCode
+            workflowDefinitionCode: variables.workflowDefinitionCode
           })
         })
       }

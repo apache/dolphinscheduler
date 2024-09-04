@@ -41,7 +41,7 @@ public class TaskExecutionDispatchEventSender
     @Override
     public TaskExecutionDispatchEvent buildEvent(TaskExecutionContext taskExecutionContext) {
         return TaskExecutionDispatchEvent.builder()
-                .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .taskInstanceHost(taskExecutionContext.getHost())

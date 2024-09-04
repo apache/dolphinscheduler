@@ -67,7 +67,7 @@ const BatchTaskInstance = defineComponent({
     }
 
     const onClearSearchWorkFlowName = () => {
-      variables.processDefinitionName = null
+      variables.workflowDefinitionName = null
       onSearch()
     }
 
@@ -206,7 +206,7 @@ const BatchTaskInstance = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.processDefinitionName, 'value']}
+              v-model={[this.workflowDefinitionName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_name')}
               clearable

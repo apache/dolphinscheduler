@@ -20,21 +20,21 @@ interface CodeReq {
   projectCode: number
 }
 
-interface ProcessInstanceListReq {
+interface WorkflowInstanceListReq {
   pageNo: number
   pageSize: number
   endDate?: string
   executorName?: string
   host?: string
-  processDefineCode?: number
-  processDefiniteCode?: string
+  workflowDefinitionCode?: number
+  workflowDefinitionVersion?: number
   searchVal?: string
   startDate?: string
   stateType?: string
 }
 
 interface BatchDeleteReq {
-  processInstanceIds: string
+  workflowInstanceIds: string
   projectName?: string
   alertGroup?: string
   createTime?: string
@@ -71,7 +71,7 @@ interface IdReq {
   id: number
 }
 
-interface ProcessInstanceReq {
+interface WorkflowInstanceReq {
   syncDefine: boolean
   flag?: string
   globalParams?: string
@@ -88,7 +88,7 @@ interface IWorkflowInstance {
   state: IWorkflowExecutionState
   commandType: string
   scheduleTime?: string
-  processDefinitionCode?: number
+  workflowDefinitionCode?: number
   startTime: string
   endTime: string
   duration?: string
@@ -105,12 +105,12 @@ interface IWorkflowInstance {
 
 export {
   CodeReq,
-  ProcessInstanceListReq,
+  WorkflowInstanceListReq,
   BatchDeleteReq,
   SubIdReq,
   TaskReq,
   LongestReq,
   IdReq,
-  ProcessInstanceReq,
+  WorkflowInstanceReq,
   IWorkflowInstance
 }

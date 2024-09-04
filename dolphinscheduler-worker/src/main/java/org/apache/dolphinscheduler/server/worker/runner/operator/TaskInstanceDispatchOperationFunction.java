@@ -69,12 +69,12 @@ public class TaskInstanceDispatchOperationFunction
             taskExecutionContext.setHost(workerConfig.getWorkerAddress());
             taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
 
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getWorkflowInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
 
             // check server status, if server is not running, return failed to reject this task
             if (!ServerLifeCycleManager.isRunning()) {
-                log.error("server is not running. reject task: {}", taskExecutionContext.getProcessInstanceId());
+                log.error("server is not running. reject task: {}", taskExecutionContext.getWorkflowInstanceId());
                 return TaskInstanceDispatchResponse.failed(taskExecutionContext.getTaskInstanceId(),
                         "server is not running");
             }

@@ -37,7 +37,7 @@ export default defineComponent({
         pageNo: variables.page,
         searchVal: variables.searchVal,
         projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
+        workflowDefinitionCode: variables.workflowDefinitionCode
       })
     }
 

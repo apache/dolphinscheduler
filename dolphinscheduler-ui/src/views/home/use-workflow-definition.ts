@@ -15,36 +15,26 @@
  * limitations under the License.
  */
 
-interface ProjectCodeReq {
-  projectCode: string
-}
+import { useAsyncState } from '@vueuse/core'
+import { countDefinitionByUser } from '@/service/modules/projects-analysis'
+import type { WorkflowDefinitionRes } from '@/service/modules/projects-analysis/types'
+import type { DefinitionChartData } from './types'
 
-interface ProcessDefinitionCodeReq {
-  processDefinitionCode: string
-}
+export function useWorkflowDefinition() {
+  const getWorkflowDefinition = () => {
+    const { state } = useAsyncState(
+      countDefinitionByUser({}).then(
+        (res: WorkflowDefinitionRes): DefinitionChartData => {
+          const xAxisData = res.userList.map((item) => item.userName)
+          const seriesData = res.userList.map((item) => item.count)
 
-interface PreTaskCodesReq {
-  preTaskCodes: string
-}
+          return { xAxisData, seriesData }
+        }
+      ),
+      { xAxisData: [], seriesData: [] }
+    )
+    return state
+  }
 
-interface PostTaskCodesReq {
-  postTaskCodes: string
-}
-
-interface TaskCodeReq {
-  taskCode: string
-}
-
-interface SaveReq extends ProcessDefinitionCodeReq, ProjectCodeReq {
-  postTaskCode: string
-  preTaskCode: string
-}
-
-export {
-  ProjectCodeReq,
-  ProcessDefinitionCodeReq,
-  PreTaskCodesReq,
-  PostTaskCodesReq,
-  TaskCodeReq,
-  SaveReq
+  return { getWorkflowDefinition }
 }

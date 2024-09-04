@@ -45,25 +45,19 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.base.Strings;
 
-/**
- * process instance
- */
 @NoArgsConstructor
 @Data
 @Builder
 @AllArgsConstructor
-@TableName("t_ds_process_instance")
+@TableName("t_ds_workflow_instance")
 public class WorkflowInstance {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private Long processDefinitionCode;
+    private Long workflowDefinitionCode;
 
-    private int processDefinitionVersion;
+    private int workflowDefinitionVersion;
 
     private Long projectCode;
 
@@ -71,15 +65,9 @@ public class WorkflowInstance {
 
     private String stateHistory;
 
-    /**
-     * state desc list from state history
-     */
     @TableField(exist = false)
     private List<StateDesc> stateDescList;
 
-    /**
-     * recovery flag for failover
-     */
     private Flag recovery;
     private Date startTime;
 
@@ -120,9 +108,6 @@ public class WorkflowInstance {
      */
     private String globalParams;
 
-    /**
-     * dagData
-     */
     @TableField(exist = false)
     private DagData dagData;
 
@@ -132,16 +117,10 @@ public class WorkflowInstance {
 
     private String tenantCode;
 
-    /**
-     * queue
-     */
     @TableField(exist = false)
     private String queue;
 
-    /**
-     * process is sub process
-     */
-    private Flag isSubProcess;
+    private Flag isSubWorkflow;
 
     /**
      * task locations for web
@@ -149,68 +128,36 @@ public class WorkflowInstance {
     @TableField(exist = false)
     private String locations;
 
-    /**
-     * history command
-     */
     private String historyCmd;
 
-    /**
-     * depend processes schedule time
-     */
     @TableField(exist = false)
     private String dependenceScheduleTimes;
 
     /**
-     * process duration
+     * workflow execution duration
      *
      * @return
      */
     @TableField(exist = false)
     private String duration;
 
-    /**
-     * process instance priority
-     */
-    private Priority processInstancePriority;
+    private Priority workflowInstancePriority;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
 
-    /**
-     * environment code
-     */
     private Long environmentCode;
 
-    /**
-     * process timeout for warning
-     */
     private int timeout;
 
-    /**
-     * varPool string
-     */
     private String varPool;
-    /**
-     * serial queue next processInstanceId
-     */
-    @Deprecated
-    private int nextProcessInstanceId;
 
-    /**
-     * dry run flag
-     */
+    @Deprecated
+    private int nextWorkflowInstanceId;
+
     private int dryRun;
 
-    /**
-     * re-start time
-     */
     private Date restartTime;
 
-    /**
-     * test flag
-     */
     private int testFlag;
 
     /**

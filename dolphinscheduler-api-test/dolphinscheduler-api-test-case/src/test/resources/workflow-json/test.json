@@ -1,5 +1,5 @@
 [ {
-  "processDefinition" : {
+  "workflowDefinition" : {
     "id" : 1,
     "code" : 9752686452032,
     "name" : "test",
@@ -23,12 +23,12 @@
     "warningGroupId" : null,
     "executionType" : "PARALLEL"
   },
-  "processTaskRelationList" : [ {
+  "workflowTaskRelationList" : [ {
     "id" : 1,
     "name" : "",
-    "processDefinitionVersion" : 1,
+    "workflowDefinitionVersion" : 1,
     "projectCode" : 9752680865600,
-    "processDefinitionCode" : 9752686452032,
+    "workflowDefinitionCode" : 9752686452032,
     "preTaskCode" : 0,
     "preTaskVersion" : 0,
     "postTaskCode" : 9752684723008,

@@ -116,11 +116,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
     List<Project> queryProjectCreatedAndAuthorizedByUserId(@Param("userId") int userId);
 
     /**
-     * query project name and user name by processInstanceId.
-     * @param processInstanceId processInstanceId
+     * query project name and user name by workflowInstanceId.
+     * @param workflowInstanceId workflowInstanceId
      * @return projectName and userName
      */
-    ProjectUser queryProjectWithUserByProcessInstanceId(@Param("processInstanceId") int processInstanceId);
+    ProjectUser queryProjectWithUserByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 
     /**
      * query all project

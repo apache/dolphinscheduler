@@ -205,7 +205,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             @Override
             public void eventReceived(Action action, Job job) {
                 try {
-                    LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                    LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
                             taskRequest.getTaskInstanceId());
                     LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                     log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
@@ -230,7 +230,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
             @Override
             public void onClose(WatcherException e) {
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
                         taskRequest.getTaskInstanceId());
                 log.error("[K8sJobExecutor-{}] fail in k8s: {}", job.getMetadata().getName(), e.getMessage());
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
@@ -266,7 +266,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
                     taskRequest.getTaskInstanceId());
             LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
             try (

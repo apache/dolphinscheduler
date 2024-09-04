@@ -182,8 +182,8 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
         if (other == null) {
             return 1;
         }
-        int workflowInstancePriorityCompareResult = workflowInstance.getProcessInstancePriority().getCode() -
-                other.getWorkflowInstance().getProcessInstancePriority().getCode();
+        int workflowInstancePriorityCompareResult = workflowInstance.getWorkflowInstancePriority().getCode() -
+                other.getWorkflowInstance().getWorkflowInstancePriority().getCode();
         if (workflowInstancePriorityCompareResult != 0) {
             return workflowInstancePriorityCompareResult;
         }

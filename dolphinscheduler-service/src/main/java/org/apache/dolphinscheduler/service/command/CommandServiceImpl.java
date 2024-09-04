@@ -89,7 +89,7 @@ public class CommandServiceImpl implements CommandService {
             return result;
         }
         // add command timezone
-        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
+        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(command.getWorkflowDefinitionCode());
         if (schedule != null) {
             Map<String, String> commandParams =
                     StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam())
@@ -179,7 +179,7 @@ public class CommandServiceImpl implements CommandService {
                 parentWorkflowInstance.getScheduleTime(),
                 task.getWorkerGroup(),
                 task.getEnvironmentCode(),
-                parentWorkflowInstance.getProcessInstancePriority(),
+                parentWorkflowInstance.getWorkflowInstancePriority(),
                 parentWorkflowInstance.getDryRun(),
                 subProcessInstanceId,
                 subWorkflowDefinition.getVersion(),

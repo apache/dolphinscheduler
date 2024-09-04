@@ -62,7 +62,7 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
         }
 
         public String workflowInstanceName() {
-            return row.findElement(By.cssSelector("td[data-col-key=processInstanceName]")).getText();
+            return row.findElement(By.cssSelector("td[data-col-key=workflowInstanceName]")).getText();
         }
 
         public int retryTimes() {

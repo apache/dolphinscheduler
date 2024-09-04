@@ -73,7 +73,7 @@ class CommandDaoImplTest extends BaseDaoTest {
     private Command generateCommand(CommandType commandType, int processDefinitionCode) {
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionCode(processDefinitionCode);
+        command.setWorkflowDefinitionCode(processDefinitionCode);
         command.setExecutorId(4);
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
@@ -81,12 +81,12 @@ class CommandDaoImplTest extends BaseDaoTest {
         command.setWarningType(WarningType.ALL);
         command.setWarningGroupId(1);
         command.setScheduleTime(DateUtils.stringToDate("2019-12-29 12:10:00"));
-        command.setProcessInstancePriority(Priority.MEDIUM);
+        command.setWorkflowInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-        command.setProcessInstanceId(0);
-        command.setProcessDefinitionVersion(0);
+        command.setWorkflowInstanceId(0);
+        command.setWorkflowDefinitionVersion(0);
         return command;
     }
 }

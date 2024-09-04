@@ -271,21 +271,21 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 Mockito.eq(projectCode))).thenReturn(pageListingResult);
         String user1 = "user1";
         String user2 = "user2";
-        when(userMapper.queryUserWithProcessDefinitionCode(processDefinitionCodes))
+        when(userMapper.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
                         UserWithWorkflowDefinitionCode.builder()
-                                .processDefinitionCode(processDefinitionCode1)
-                                .processDefinitionVersion(1)
+                                .workflowDefinitionCode(processDefinitionCode1)
+                                .workflowDefinitionVersion(1)
                                 .modifierName(user1).build(),
                         UserWithWorkflowDefinitionCode.builder()
-                                .processDefinitionCode(processDefinitionCode2)
-                                .processDefinitionVersion(1)
+                                .workflowDefinitionCode(processDefinitionCode2)
+                                .workflowDefinitionVersion(1)
                                 .modifierName(user2).build()));
         Schedule schedule1 = new Schedule();
-        schedule1.setProcessDefinitionCode(processDefinitionCode1);
+        schedule1.setWorkflowDefinitionCode(processDefinitionCode1);
         schedule1.setReleaseState(ReleaseState.ONLINE);
         Schedule schedule2 = new Schedule();
-        schedule2.setProcessDefinitionCode(processDefinitionCode2);
+        schedule2.setWorkflowDefinitionCode(processDefinitionCode2);
         schedule2.setReleaseState(ReleaseState.ONLINE);
         when(schedulerService.queryScheduleByWorkflowDefinitionCodes(processDefinitionCodes))
                 .thenReturn(Arrays.asList(schedule1, schedule2));
@@ -461,7 +461,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         }
         when(workflowDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(workflowDefinitionList);
         when(processService.saveWorkflowDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
-        when(workflowTaskRelationMapper.queryByProcessCode(processDefinitionCode))
+        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
                 .thenReturn(getProcessTaskRelation());
         putMsg(result, Status.SUCCESS);
 
@@ -519,7 +519,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // scheduler list elements > 1
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
-        when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
+        when(scheduleMapper.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleMapper.deleteById(46)).thenReturn(1);
         when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
@@ -529,7 +529,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // scheduler online
         Schedule schedule = getSchedule();
         schedule.setReleaseState(ReleaseState.ONLINE);
-        when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(schedule);
+        when(scheduleMapper.queryByWorkflowDefinitionCode(46L)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
         Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
@@ -544,7 +544,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
-        when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
+        when(scheduleMapper.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
         when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
@@ -1114,8 +1114,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         List<WorkflowTaskRelation> workflowTaskRelations = new ArrayList<>();
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(46L);
-        workflowTaskRelation.setProcessDefinitionVersion(1);
+        workflowTaskRelation.setWorkflowDefinitionCode(46L);
+        workflowTaskRelation.setWorkflowDefinitionVersion(1);
         workflowTaskRelation.setPreTaskCode(100);
         workflowTaskRelation.setPostTaskCode(200);
         workflowTaskRelations.add(workflowTaskRelation);
@@ -1131,14 +1131,14 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Date date = new Date();
         Schedule schedule = new Schedule();
         schedule.setId(46);
-        schedule.setProcessDefinitionCode(1);
+        schedule.setWorkflowDefinitionCode(1);
         schedule.setStartTime(date);
         schedule.setEndTime(date);
         schedule.setCrontab("0 0 5 * * ? *");
         schedule.setFailureStrategy(FailureStrategy.END);
         schedule.setUserId(1);
         schedule.setReleaseState(ReleaseState.OFFLINE);
-        schedule.setProcessInstancePriority(Priority.MEDIUM);
+        schedule.setWorkflowInstancePriority(Priority.MEDIUM);
         schedule.setWarningType(WarningType.NONE);
         schedule.setWarningGroupId(1);
         schedule.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());

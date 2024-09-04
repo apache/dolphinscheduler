@@ -37,83 +37,44 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("t_ds_process_task_relation")
+@TableName("t_ds_workflow_task_relation")
 public class WorkflowTaskRelation {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * name
-     */
     private String name;
 
-    /**
-     * process version
-     */
-    private int processDefinitionVersion;
+    private int workflowDefinitionVersion;
 
-    /**
-     * project code
-     */
     private long projectCode;
 
-    /**
-     * process code
-     */
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
-    /**
-     * pre task code
-     */
     private long preTaskCode;
 
-    /**
-     * pre node version
-     */
     private int preTaskVersion;
 
-    /**
-     * post task code
-     */
     private long postTaskCode;
 
-    /**
-     * post node version
-     */
     private int postTaskVersion;
 
-    /**
-     * condition type
-     */
     @Deprecated
     private ConditionType conditionType;
 
-    /**
-     * condition parameters
-     */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     @Deprecated
     private String conditionParams;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
     public WorkflowTaskRelation(String name,
-                                int processDefinitionVersion,
+                                int workflowDefinitionVersion,
                                 long projectCode,
-                                long processDefinitionCode,
+                                long workflowDefinitionCode,
                                 long preTaskCode,
                                 int preTaskVersion,
                                 long postTaskCode,
@@ -121,9 +82,9 @@ public class WorkflowTaskRelation {
                                 ConditionType conditionType,
                                 String conditionParams) {
         this.name = name;
-        this.processDefinitionVersion = processDefinitionVersion;
+        this.workflowDefinitionVersion = workflowDefinitionVersion;
         this.projectCode = projectCode;
-        this.processDefinitionCode = processDefinitionCode;
+        this.workflowDefinitionCode = workflowDefinitionCode;
         this.preTaskCode = preTaskCode;
         this.preTaskVersion = preTaskVersion;
         this.postTaskCode = postTaskCode;
@@ -138,9 +99,9 @@ public class WorkflowTaskRelation {
 
     public WorkflowTaskRelation(WorkflowTaskRelationLog processTaskRelationLog) {
         this.name = processTaskRelationLog.getName();
-        this.processDefinitionVersion = processTaskRelationLog.getProcessDefinitionVersion();
+        this.workflowDefinitionVersion = processTaskRelationLog.getWorkflowDefinitionVersion();
         this.projectCode = processTaskRelationLog.getProjectCode();
-        this.processDefinitionCode = processTaskRelationLog.getProcessDefinitionCode();
+        this.workflowDefinitionCode = processTaskRelationLog.getWorkflowDefinitionCode();
         this.preTaskCode = processTaskRelationLog.getPreTaskCode();
         this.preTaskVersion = processTaskRelationLog.getPreTaskVersion();
         this.postTaskCode = processTaskRelationLog.getPostTaskCode();

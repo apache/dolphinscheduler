@@ -36,54 +36,54 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
-public class ProcessDefinitionPage {
+public class WorkflowDefinitionPage {
 
     private String sessionId;
 
-    public CloseableHttpResponse importProcessDefinition(User loginUser, long projectCode, File file) {
+    public CloseableHttpResponse importWorkflowDefinition(User loginUser, long projectCode, File file) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/import", projectCode);
+        String url = String.format("/projects/%s/workflow-definition/import", projectCode);
         return requestClient.postWithFile(url, headers, params, file);
     }
 
-    public HttpResponse queryAllProcessDefinitionByProjectCode(User loginUser, long projectCode) {
+    public HttpResponse queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/all", projectCode);
+        String url = String.format("/projects/%s/workflow-definition/all", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessDefinitionByCode(User loginUser, long projectCode, long processDefinitionCode) {
+    public HttpResponse queryWorkflowDefinitionByCode(User loginUser, long projectCode, long workflowDefinitionCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/%s", projectCode, processDefinitionCode);
+        String url = String.format("/projects/%s/workflow-definition/%s", projectCode, workflowDefinitionCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse getProcessListByProjectCode(User loginUser, long projectCode) {
+    public HttpResponse getWorkflowListByProjectCode(User loginUser, long projectCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/query-process-definition-list", projectCode);
+        String url = String.format("/projects/%s/workflow-definition/query-workflow-definition-list", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessDefinitionByName(User loginUser, long projectCode, String name) {
+    public HttpResponse queryWorkflowDefinitionByName(User loginUser, long projectCode, String name) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("name", name);
@@ -91,23 +91,23 @@ public class ProcessDefinitionPage {
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/query-by-name", projectCode);
+        String url = String.format("/projects/%s/workflow-definition/query-by-name", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessDefinitionList(User loginUser, long projectCode) {
+    public HttpResponse queryWorkflowDefinitionList(User loginUser, long projectCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/list", projectCode);
+        String url = String.format("/projects/%s/workflow-definition/list", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse releaseProcessDefinition(User loginUser, long projectCode, long code,
-                                                 ReleaseState releaseState) {
+    public HttpResponse releaseWorkflowDefinition(User loginUser, long projectCode, long code,
+                                                  ReleaseState releaseState) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("code", code);
@@ -116,11 +116,11 @@ public class ProcessDefinitionPage {
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/%s/release", projectCode, code);
+        String url = String.format("/projects/%s/workflow-definition/%s/release", projectCode, code);
         return requestClient.post(url, headers, params);
     }
 
-    public HttpResponse deleteProcessDefinitionByCode(User loginUser, long projectCode, long code) {
+    public HttpResponse deleteWorkflowDefinitionByCode(User loginUser, long projectCode, long code) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("code", code);
@@ -128,7 +128,7 @@ public class ProcessDefinitionPage {
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-definition/%s", projectCode, code);
+        String url = String.format("/projects/%s/workflow-definition/%s", projectCode, code);
         return requestClient.delete(url, headers, params);
     }
 }

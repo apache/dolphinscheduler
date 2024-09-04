@@ -281,8 +281,8 @@ CREATE TABLE t_ds_alert
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
     project_code        bigint(20) DEFAULT NULL,
-    process_definition_code        bigint(20) DEFAULT NULL,
-    process_instance_id     int(11) DEFAULT NULL,
+    workflow_definition_code        bigint(20) DEFAULT NULL,
+    workflow_instance_id     int(11) DEFAULT NULL,
     alert_type     int(11) DEFAULT NULL,
     PRIMARY KEY (id),
     KEY            idx_sign (sign)
@@ -317,7 +317,7 @@ CREATE TABLE t_ds_command
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
     command_type               tinyint(4) DEFAULT NULL,
-    process_definition_code    bigint(20) DEFAULT NULL,
+    workflow_definition_code    bigint(20) DEFAULT NULL,
     command_param              text,
     task_depend_type           tinyint(4) DEFAULT NULL,
     failure_strategy           tinyint(4) DEFAULT '0',
@@ -327,16 +327,16 @@ CREATE TABLE t_ds_command
     start_time                 datetime DEFAULT NULL,
     executor_id                int(11) DEFAULT NULL,
     update_time                datetime DEFAULT NULL,
-    process_instance_priority  int(11) DEFAULT '2',
+    workflow_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(255),
     tenant_code                varchar(64) DEFAULT 'default',
     environment_code           bigint(20) DEFAULT '-1',
     dry_run                    int NULL DEFAULT 0,
-    process_instance_id        int(11) DEFAULT 0,
-    process_definition_version int(11) DEFAULT 0,
+    workflow_instance_id        int(11) DEFAULT 0,
+    workflow_definition_version int(11) DEFAULT 0,
     test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id),
-    KEY                        priority_id_index (process_instance_priority, id)
+    KEY                        priority_id_index (workflow_instance_priority, id)
 );
 
 -- ----------------------------
@@ -374,7 +374,7 @@ CREATE TABLE t_ds_error_command
     id                         int(11) NOT NULL,
     command_type               tinyint(4) DEFAULT NULL,
     executor_id                int(11) DEFAULT NULL,
-    process_definition_code    bigint(20) DEFAULT NULL,
+    workflow_definition_code    bigint(20) DEFAULT NULL,
     command_param              text,
     task_depend_type           tinyint(4) DEFAULT NULL,
     failure_strategy           tinyint(4) DEFAULT '0',
@@ -383,14 +383,14 @@ CREATE TABLE t_ds_error_command
     schedule_time              datetime DEFAULT NULL,
     start_time                 datetime DEFAULT NULL,
     update_time                datetime DEFAULT NULL,
-    process_instance_priority  int(11) DEFAULT '2',
+    workflow_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(255),
     tenant_code                varchar(64) DEFAULT 'default',
     environment_code           bigint(20) DEFAULT '-1',
     message                    text,
     dry_run                    int NULL DEFAULT 0,
-    process_instance_id        int(11) DEFAULT 0,
-    process_definition_version int(11) DEFAULT 0,
+    workflow_instance_id        int(11) DEFAULT 0,
+    workflow_definition_version int(11) DEFAULT 0,
     test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
@@ -400,10 +400,10 @@ CREATE TABLE t_ds_error_command
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_process_definition
+-- Table structure for t_ds_workflow_definition
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_definition CASCADE;
-CREATE TABLE t_ds_process_definition
+DROP TABLE IF EXISTS t_ds_workflow_definition CASCADE;
+CREATE TABLE t_ds_workflow_definition
 (
     id               int(11) NOT NULL AUTO_INCREMENT,
     code             bigint(20) NOT NULL,
@@ -422,19 +422,15 @@ CREATE TABLE t_ds_process_definition
     create_time      datetime NOT NULL,
     update_time      datetime     DEFAULT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY process_unique (name,project_code) USING BTREE,
+    UNIQUE KEY workflow_unique (name,project_code) USING BTREE,
     UNIQUE KEY code_unique (code)
 );
 
 -- ----------------------------
--- Records of t_ds_process_definition
+-- Table structure for t_ds_workflow_definition_log
 -- ----------------------------
-
--- ----------------------------
--- Table structure for t_ds_process_definition_log
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_definition_log CASCADE;
-CREATE TABLE t_ds_process_definition_log
+DROP TABLE IF EXISTS t_ds_workflow_definition_log CASCADE;
+CREATE TABLE t_ds_workflow_definition_log
 (
     id               int(11) NOT NULL AUTO_INCREMENT,
     code             bigint(20) NOT NULL,
@@ -535,16 +531,16 @@ CREATE TABLE t_ds_task_definition_log
 );
 
 -- ----------------------------
--- Table structure for t_ds_process_task_relation
+-- Table structure for t_ds_workflow_task_relation
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_task_relation CASCADE;
-CREATE TABLE t_ds_process_task_relation
+DROP TABLE IF EXISTS t_ds_workflow_task_relation CASCADE;
+CREATE TABLE t_ds_workflow_task_relation
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
     name                       varchar(255) DEFAULT NULL,
-    process_definition_version int(11) DEFAULT NULL,
+    workflow_definition_version int(11) DEFAULT NULL,
     project_code               bigint(20) NOT NULL,
-    process_definition_code    bigint(20) NOT NULL,
+    workflow_definition_code    bigint(20) NOT NULL,
     pre_task_code              bigint(20) NOT NULL,
     pre_task_version           int(11) NOT NULL,
     post_task_code             bigint(20) NOT NULL,
@@ -557,16 +553,16 @@ CREATE TABLE t_ds_process_task_relation
 );
 
 -- ----------------------------
--- Table structure for t_ds_process_task_relation_log
+-- Table structure for t_ds_workflow_task_relation_log
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_task_relation_log CASCADE;
-CREATE TABLE t_ds_process_task_relation_log
+DROP TABLE IF EXISTS t_ds_workflow_task_relation_log CASCADE;
+CREATE TABLE t_ds_workflow_task_relation_log
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
     name                       varchar(255) DEFAULT NULL,
-    process_definition_version int(11) DEFAULT NULL,
+    workflow_definition_version int(11) DEFAULT NULL,
     project_code               bigint(20) NOT NULL,
-    process_definition_code    bigint(20) NOT NULL,
+    workflow_definition_code    bigint(20) NOT NULL,
     pre_task_code              bigint(20) NOT NULL,
     pre_task_version           int(11) NOT NULL,
     post_task_code             bigint(20) NOT NULL,
@@ -581,15 +577,15 @@ CREATE TABLE t_ds_process_task_relation_log
 );
 
 -- ----------------------------
--- Table structure for t_ds_process_instance
+-- Table structure for t_ds_workflow_instance
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_instance CASCADE;
-CREATE TABLE t_ds_process_instance
+DROP TABLE IF EXISTS t_ds_workflow_instance CASCADE;
+CREATE TABLE t_ds_workflow_instance
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
     name                       varchar(255) DEFAULT NULL,
-    process_definition_version int(11) NOT NULL DEFAULT '1',
-    process_definition_code    bigint(20) not NULL,
+    workflow_definition_version int(11) NOT NULL DEFAULT '1',
+    workflow_definition_code    bigint(20) not NULL,
     project_code               bigint(20) DEFAULT NULL,
     state                      tinyint(4) DEFAULT NULL,
     state_history              text,
@@ -610,15 +606,15 @@ CREATE TABLE t_ds_process_instance
     global_params              text,
     flag                       tinyint(4) DEFAULT '1',
     update_time                timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_sub_process             int(11) DEFAULT '0',
+    is_sub_workflow             int(11) DEFAULT '0',
     executor_id                int(11) NOT NULL,
     executor_name              varchar(64) DEFAULT NULL,
     history_cmd                text,
-    process_instance_priority  int(11) DEFAULT '2',
+    workflow_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(64)  DEFAULT NULL,
     environment_code           bigint(20) DEFAULT '-1',
     timeout                    int(11) DEFAULT '0',
-    next_process_instance_id   int(11) DEFAULT '0',
+    next_workflow_instance_id   int(11) DEFAULT '0',
     tenant_code                varchar(64) DEFAULT 'default',
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
@@ -626,10 +622,6 @@ CREATE TABLE t_ds_process_instance
     test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
-
--- ----------------------------
--- Records of t_ds_process_instance
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_project
@@ -743,21 +735,17 @@ CREATE TABLE t_ds_relation_datasource_user
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_relation_process_instance
+-- Table structure for t_ds_relation_workflow_instance
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_process_instance CASCADE;
-CREATE TABLE t_ds_relation_process_instance
+DROP TABLE IF EXISTS t_ds_relation_workflow_instance CASCADE;
+CREATE TABLE t_ds_relation_workflow_instance
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
-    parent_process_instance_id int(11) DEFAULT NULL,
+    parent_workflow_instance_id int(11) DEFAULT NULL,
     parent_task_instance_id    int(11) DEFAULT NULL,
-    process_instance_id        int(11) DEFAULT NULL,
+    workflow_instance_id        int(11) DEFAULT NULL,
     PRIMARY KEY (id)
 );
-
--- ----------------------------
--- Records of t_ds_relation_process_instance
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_relation_project_user
@@ -848,7 +836,7 @@ DROP TABLE IF EXISTS t_ds_schedules CASCADE;
 CREATE TABLE t_ds_schedules
 (
     id                        int(11) NOT NULL AUTO_INCREMENT,
-    process_definition_code   bigint(20) NOT NULL,
+    workflow_definition_code   bigint(20) NOT NULL,
     start_time                datetime     NOT NULL,
     end_time                  datetime     NOT NULL,
     timezone_id               varchar(40) DEFAULT NULL,
@@ -858,7 +846,7 @@ CREATE TABLE t_ds_schedules
     release_state             tinyint(4) NOT NULL,
     warning_type              tinyint(4) NOT NULL,
     warning_group_id          int(11) DEFAULT NULL,
-    process_instance_priority int(11) DEFAULT '2',
+    workflow_instance_priority int(11) DEFAULT '2',
     worker_group              varchar(255) DEFAULT '',
     tenant_code                varchar(64) DEFAULT 'default',
     environment_code          bigint(20) DEFAULT '-1',
@@ -900,8 +888,8 @@ CREATE TABLE t_ds_task_instance
     task_execute_type       int(11) DEFAULT '0',
     task_code               bigint(20) NOT NULL,
     task_definition_version int(11) NOT NULL DEFAULT '1',
-    process_instance_id     int(11) DEFAULT NULL,
-    process_instance_name   varchar(255) DEFAULT NULL,
+    workflow_instance_id     int(11) DEFAULT NULL,
+    workflow_instance_name   varchar(255) DEFAULT NULL,
     project_code            bigint(20) DEFAULT NULL,
     state                   tinyint(4) DEFAULT NULL,
     submit_time             datetime     DEFAULT NULL,
@@ -1161,25 +1149,25 @@ VALUES(8, 'TargetTableTotalRows', 'SELECT COUNT(*) AS total FROM ${target_table}
 --
 DROP TABLE IF EXISTS `t_ds_dq_execute_result`;
 CREATE TABLE `t_ds_dq_execute_result` (
-                                          `id` int(11) NOT NULL AUTO_INCREMENT,
-                                          `process_definition_id` int(11) DEFAULT NULL,
-                                          `process_instance_id` int(11) DEFAULT NULL,
-                                          `task_instance_id` int(11) DEFAULT NULL,
-                                          `rule_type` int(11) DEFAULT NULL,
-                                          `rule_name` varchar(255) DEFAULT NULL,
-                                          `statistics_value` double DEFAULT NULL,
-                                          `comparison_value` double DEFAULT NULL,
-                                          `check_type` int(11) DEFAULT NULL,
-                                          `threshold` double DEFAULT NULL,
-                                          `operator` int(11) DEFAULT NULL,
-                                          `failure_strategy` int(11) DEFAULT NULL,
-                                          `state` int(11) DEFAULT NULL,
-                                          `user_id` int(11) DEFAULT NULL,
-                                          `comparison_type` int(11) DEFAULT NULL,
-                                          `error_output_path` text DEFAULT NULL,
-                                          `create_time` datetime DEFAULT NULL,
-                                          `update_time` datetime DEFAULT NULL,
-                                          PRIMARY KEY (`id`)
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `workflow_definition_id` int(11) DEFAULT NULL,
+    `workflow_instance_id` int(11) DEFAULT NULL,
+    `task_instance_id` int(11) DEFAULT NULL,
+    `rule_type` int(11) DEFAULT NULL,
+    `rule_name` varchar(255) DEFAULT NULL,
+    `statistics_value` double DEFAULT NULL,
+    `comparison_value` double DEFAULT NULL,
+    `check_type` int(11) DEFAULT NULL,
+    `threshold` double DEFAULT NULL,
+    `operator` int(11) DEFAULT NULL,
+    `failure_strategy` int(11) DEFAULT NULL,
+    `state` int(11) DEFAULT NULL,
+    `user_id` int(11) DEFAULT NULL,
+    `comparison_type` int(11) DEFAULT NULL,
+    `error_output_path` text DEFAULT NULL,
+    `create_time` datetime DEFAULT NULL,
+    `update_time` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1418,17 +1406,17 @@ VALUES(31, 'target_database', 'select', '$t(target_database)', NULL, NULL, 'Plea
 --
 DROP TABLE IF EXISTS `t_ds_dq_task_statistics_value`;
 CREATE TABLE `t_ds_dq_task_statistics_value` (
-                                                 `id` int(11) NOT NULL AUTO_INCREMENT,
-                                                 `process_definition_id` int(11) DEFAULT NULL,
-                                                 `task_instance_id` int(11) DEFAULT NULL,
-                                                 `rule_id` int(11) NOT NULL,
-                                                 `unique_code` varchar(255) NULL,
-                                                 `statistics_name` varchar(255) NULL,
-                                                 `statistics_value` double NULL,
-                                                 `data_time` datetime DEFAULT NULL,
-                                                 `create_time` datetime DEFAULT NULL,
-                                                 `update_time` datetime DEFAULT NULL,
-                                                 PRIMARY KEY (`id`)
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `workflow_definition_id` int(11) DEFAULT NULL,
+    `task_instance_id` int(11) DEFAULT NULL,
+    `rule_id` int(11) NOT NULL,
+    `unique_code` varchar(255) NULL,
+    `statistics_name` varchar(255) NULL,
+    `statistics_value` double NULL,
+    `data_time` datetime DEFAULT NULL,
+    `create_time` datetime DEFAULT NULL,
+    `update_time` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1969,6 +1957,7 @@ CREATE TABLE t_ds_environment_worker_group_relation
     PRIMARY KEY (id),
     UNIQUE KEY environment_worker_group_unique (environment_code,worker_group)
 );
+
 DROP TABLE IF EXISTS t_ds_task_group_queue;
 CREATE TABLE t_ds_task_group_queue
 (
@@ -1976,7 +1965,7 @@ CREATE TABLE t_ds_task_group_queue
    task_id      int(11) DEFAULT NULL ,
    task_name    VARCHAR(255) DEFAULT NULL ,
    group_id     int(11) DEFAULT NULL ,
-   process_id   int(11) DEFAULT NULL ,
+   workflow_instance_id   int(11) DEFAULT NULL ,
    priority     int(8) DEFAULT '0' ,
    status       int(4) DEFAULT '-1' ,
    force_start  int(4) DEFAULT '0' ,
@@ -2142,10 +2131,10 @@ CREATE TABLE t_ds_relation_sub_workflow (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for t_ds_process_task_lineage
+-- Table structure for t_ds_workflow_task_lineage
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_task_lineage;
-CREATE TABLE t_ds_process_task_lineage
+DROP TABLE IF EXISTS t_ds_workflow_task_lineage;
+CREATE TABLE t_ds_workflow_task_lineage
 (
     `id`                           int      NOT NULL AUTO_INCREMENT,
     `workflow_definition_code`      bigint(20)   NOT NULL DEFAULT 0,
@@ -2158,7 +2147,7 @@ CREATE TABLE t_ds_process_task_lineage
     `create_time`                  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time`                  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY                            `idx_process_code_version` (`workflow_definition_code`,`workflow_definition_version`),
+    KEY                            `idx_workflow_code_version` (`workflow_definition_code`,`workflow_definition_version`),
     KEY                            `idx_task_code_version` (`task_definition_code`,`task_definition_version`),
     KEY                            `idx_dept_code` (`dept_project_code`,`dept_workflow_definition_code`,`dept_task_definition_code`)
 );

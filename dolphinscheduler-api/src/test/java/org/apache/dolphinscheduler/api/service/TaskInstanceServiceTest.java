@@ -180,7 +180,7 @@ public class TaskInstanceServiceTest {
                 Mockito.any()))
                         .thenReturn(pageReturn);
         when(usersService.queryUser(workflowInstance.getExecutorId())).thenReturn(loginUser);
-        when(processService.findWorkflowInstanceDetailById(taskInstance.getProcessInstanceId()))
+        when(processService.findWorkflowInstanceDetailById(taskInstance.getWorkflowInstanceId()))
                 .thenReturn(Optional.of(workflowInstance));
 
         Result successRes = taskInstanceService.queryTaskListPaging(loginUser,
@@ -370,7 +370,7 @@ public class TaskInstanceServiceTest {
         TaskInstance task = getTaskInstance();
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
-        when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())).thenReturn(Optional.empty());
+        when(workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId())).thenReturn(Optional.empty());
 
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
@@ -385,7 +385,7 @@ public class TaskInstanceServiceTest {
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, projectCode, FORCED_SUCCESS);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
-        when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId()))
+        when(workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId()))
                 .thenReturn(Optional.of(workflowInstance));
 
         assertThrowsServiceException(
@@ -402,7 +402,7 @@ public class TaskInstanceServiceTest {
         workflowInstance.setState(WorkflowExecutionStatus.FAILURE);
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
-        when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId()))
+        when(workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId()))
                 .thenReturn(Optional.of(workflowInstance));
 
         assertThrowsServiceException(

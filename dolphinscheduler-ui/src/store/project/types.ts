@@ -22,7 +22,7 @@ type TaskExecuteType = 'STREAM' | 'BATCH'
 
 type TaskType =
   | 'SHELL'
-  | 'SUB_PROCESS'
+  | 'SUB_WORKFLOW'
   | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'

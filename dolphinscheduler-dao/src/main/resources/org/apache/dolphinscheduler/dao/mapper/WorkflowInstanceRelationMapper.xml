@@ -19,35 +19,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceRelationMapper">
     <sql id="baseSql">
-        id, parent_process_instance_id, parent_task_instance_id, process_instance_id
+        id, parent_workflow_instance_id, parent_task_instance_id, workflow_instance_id
     </sql>
-    <delete id="deleteByParentProcessId">
+    <delete id="deleteByParentWorkflowInstanceId">
         delete
-        from t_ds_relation_process_instance
-        where parent_process_instance_id=#{parentProcessId}
+        from t_ds_relation_workflow_instance
+        where parent_workflow_instance_id=#{parentWorkflowInstanceId}
     </delete>
     <select id="queryByParentId" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation">
         select
         <include refid="baseSql"/>
-        from t_ds_relation_process_instance
-        where parent_process_instance_id = #{parentProcessId}
+        from t_ds_relation_workflow_instance
+        where parent_workflow_instance_id = #{parentWorkflowInstanceId}
         and parent_task_instance_id = #{parentTaskId}
     </select>
-    <select id="queryBySubProcessId" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation">
+    <select id="queryBySubWorkflowId" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation">
         select
         <include refid="baseSql"/>
-        from t_ds_relation_process_instance
-        where process_instance_id = #{subProcessId}
+        from t_ds_relation_workflow_instance
+        where workflow_instance_id = #{subWorkflowInstanceId}
     </select>
     <select id="querySubIdListByParentId" resultType="java.lang.Integer">
-        select process_instance_id
-        from t_ds_relation_process_instance
-        where parent_process_instance_id = #{parentInstanceId}
+        select workflow_instance_id
+        from t_ds_relation_workflow_instance
+        where parent_workflow_instance_id = #{parentInstanceId}
     </select>
 
     <delete id="deleteByParentId">
         delete
-        from t_ds_relation_process_instance
-        where parent_process_instance_id = #{parentWorkflowInstanceId}
+        from t_ds_relation_workflow_instance
+        where parent_workflow_instance_id = #{parentWorkflowInstanceId}
     </delete>
 </mapper>

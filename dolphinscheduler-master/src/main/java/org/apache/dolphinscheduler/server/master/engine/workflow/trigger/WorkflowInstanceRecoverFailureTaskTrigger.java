@@ -50,9 +50,9 @@ public class WorkflowInstanceRecoverFailureTaskTrigger
                                               final WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.START_FAILURE_TASK_PROCESS)
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .processInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion())
+                .workflowInstanceId(workflowInstance.getId())
                 .executorId(workflowInstanceRecoverFailureTasksRequest.getUserId())
                 .startTime(new Date())
                 .updateTime(new Date())

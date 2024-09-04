@@ -105,11 +105,11 @@ Node_mysql 运行结果如下：
 
 ![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
 
-在新的工作流中创建 sub_process 任务，使用 subprocess_example1 工作流作为子节点。
+在新的工作流中创建 sub_workflow 任务，使用 subprocess_example1 工作流作为子节点。
 
 ![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
 
-创建一个 shell 任务作为 sub_process 任务的下游任务，并编写如下脚本：
+创建一个 shell 任务作为 sub_workflow 任务的下游任务，并编写如下脚本：
 
 ![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
 

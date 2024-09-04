@@ -28,7 +28,7 @@ import {
   deleteByCode,
   queryListPaging,
   release
-} from '@/service/modules/process-definition'
+} from '@/service/modules/workflow-definition'
 import { offline, online } from '@/service/modules/schedules'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -176,7 +176,7 @@ export function useTable() {
                   onClick: () => {
                     void router.push({
                       name: 'workflow-instance-list',
-                      query: { processDefineCode: row.code }
+                      query: { workflowDefinitionCode: row.code }
                     })
                   }
                 },

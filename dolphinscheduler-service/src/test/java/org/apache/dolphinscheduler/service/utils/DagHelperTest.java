@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChann
 import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.service.process.ProcessDag;
+import org.apache.dolphinscheduler.service.process.WorkflowDag;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,10 +82,10 @@ public class DagHelperTest {
         taskNodes.add(subNode);
         taskNodes.add(subNextNode);
 
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodes);
-        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(taskNodes);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(workflowDag);
         boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
         Assertions.assertTrue(canSubmit);
 
@@ -180,14 +180,14 @@ public class DagHelperTest {
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
                 startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(destTaskNodeList);
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(destTaskNodeList);
 
         // 1->2->3->5->7
         // 4->3->6
         // 1->2->8->5->7
-        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(workflowDag);
         TaskNode taskNode3 = dag.getNode(3L);
         Map<Long, TaskInstance> completeTaskList = new HashMap<>();
         Map<Long, TaskNode> skipNodeList = new HashMap<>();
@@ -303,14 +303,14 @@ public class DagHelperTest {
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
                 startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(destTaskNodeList);
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(destTaskNodeList);
 
         // 1->2->3->5->7
         // 4->3->6
         // 1->2->8->5->7
-        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(workflowDag);
         Map<Long, TaskInstance> completeTaskList = new HashMap<>();
         Map<Long, TaskNode> skipNodeList = new HashMap<>();
 
@@ -524,11 +524,11 @@ public class DagHelperTest {
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
                 startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(destTaskNodeList);
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(destTaskNodeList);
 
-        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(workflowDag);
         Map<Long, TaskNode> skipTaskNodeList = new HashMap<>();
         Map<Long, TaskInstance> completeTaskList = new HashMap<>();
         completeTaskList.put(0L, new TaskInstance());
@@ -652,10 +652,10 @@ public class DagHelperTest {
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
                 startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(destTaskNodeList);
-        return DagHelper.buildDagGraph(processDag);
+        WorkflowDag workflowDag = new WorkflowDag();
+        workflowDag.setEdges(taskNodeRelations);
+        workflowDag.setNodes(destTaskNodeList);
+        return DagHelper.buildDagGraph(workflowDag);
     }
 
     @Test
@@ -674,8 +674,8 @@ public class DagHelperTest {
         ProcessData processData = JSONUtils.parseObject(shellJson, ProcessData.class);
         assert processData != null;
         List<TaskNode> taskNodeList = processData.getTasks();
-        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
-        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        WorkflowDag workflowDag = DagHelper.getWorkflowDag(taskNodeList);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(workflowDag);
         Assertions.assertNotNull(dag);
     }
 

@@ -95,7 +95,7 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page,
                                                                  @Param("taskName") String taskName,
-                                                                 @Param("processName") String processName,
+                                                                 @Param("workflowName") String workflowName,
                                                                  @Param("status") Integer status,
                                                                  @Param("groupId") int groupId,
                                                                  @Param("projects") List<Project> projects);

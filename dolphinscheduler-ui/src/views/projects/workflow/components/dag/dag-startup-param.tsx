@@ -140,7 +140,7 @@ export default defineComponent({
               {t('project.workflow.workflow_priority')}:
             </span>
             <span class={styles.content}>
-              {this.startupParam?.processInstancePriority}
+              {this.startupParam?.workflowInstancePriority}
             </span>
           </li>
           <li>

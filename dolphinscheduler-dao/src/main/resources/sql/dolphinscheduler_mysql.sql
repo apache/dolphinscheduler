@@ -280,14 +280,14 @@ CREATE TABLE `t_ds_alert` (
   `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
-  `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 process is successfully, 2 process/task is failed',
+  `warning_type` tinyint(4) DEFAULT '2' COMMENT '1 workflow is successfully, 2 workflow/task is failed',
   `log` text COMMENT 'log',
   `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `project_code` bigint(20) DEFAULT NULL COMMENT 'project_code',
-  `process_definition_code` bigint(20) DEFAULT NULL COMMENT 'process_definition_code',
-  `process_instance_id` int(11) DEFAULT NULL COMMENT 'process_instance_id',
+  `workflow_definition_code` bigint(20) DEFAULT NULL COMMENT 'workflow_definition_code',
+  `workflow_instance_id` int(11) DEFAULT NULL COMMENT 'workflow_instance_id',
   `alert_type` int(11) DEFAULT NULL COMMENT 'alert_type',
   PRIMARY KEY (`id`),
   KEY `idx_status` (`alert_status`) USING BTREE,
@@ -324,27 +324,27 @@ CREATE TABLE `t_ds_alertgroup`(
 DROP TABLE IF EXISTS `t_ds_command`;
 CREATE TABLE `t_ds_command` (
   `id`                        int(11)    NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `command_type`              tinyint(4) DEFAULT NULL COMMENT 'Command type: 0 start workflow, 1 start execution from current node, 2 resume fault-tolerant workflow, 3 resume pause process, 4 start execution from failed node, 5 complement, 6 schedule, 7 rerun, 8 pause, 9 stop, 10 resume waiting thread',
-  `process_definition_code`   bigint(20) NOT NULL COMMENT 'process definition code',
-  `process_definition_version` int(11) DEFAULT '0' COMMENT 'process definition version',
-  `process_instance_id`       int(11) DEFAULT '0' COMMENT 'process instance id',
+  `command_type`              tinyint(4) DEFAULT NULL COMMENT 'Command type: 0 start workflow, 1 start execution from current node, 2 resume fault-tolerant workflow, 3 resume pause workflow, 4 start execution from failed node, 5 complement, 6 schedule, 7 rerun, 8 pause, 9 stop, 10 resume waiting thread',
+  `workflow_definition_code`   bigint(20) NOT NULL COMMENT 'workflow definition code',
+  `workflow_definition_version` int(11) DEFAULT '0' COMMENT 'workflow definition version',
+  `workflow_instance_id`       int(11) DEFAULT '0' COMMENT 'workflow instance id',
   `command_param`             text COMMENT 'json command parameters',
   `task_depend_type`          tinyint(4) DEFAULT NULL COMMENT 'Node dependency type: 0 current node, 1 forward, 2 backward',
   `failure_strategy`          tinyint(4) DEFAULT '0' COMMENT 'Failed policy: 0 end, 1 continue',
-  `warning_type`              tinyint(4) DEFAULT '0' COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',
+  `warning_type`              tinyint(4) DEFAULT '0' COMMENT 'Alarm type: 0 is not sent, 1 workflow is sent successfully, 2 workflow is sent failed, 3 workflow is sent successfully and all failures are sent',
   `warning_group_id`          int(11) DEFAULT NULL COMMENT 'warning group',
   `schedule_time`             datetime DEFAULT NULL COMMENT 'schedule time',
   `start_time`                datetime DEFAULT NULL COMMENT 'start time',
   `executor_id`               int(11) DEFAULT NULL COMMENT 'executor id',
   `update_time`               datetime DEFAULT NULL COMMENT 'update time',
-  `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
+  `workflow_instance_priority` int(11) DEFAULT '2' COMMENT 'workflow instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group`              varchar(255)  COMMENT 'worker group',
   `tenant_code`               varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code`          bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `dry_run`                   tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `test_flag`                 tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
-  KEY `priority_id_index` (`process_instance_priority`,`id`) USING BTREE
+  KEY `priority_id_index` (`workflow_instance_priority`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
@@ -380,9 +380,9 @@ CREATE TABLE `t_ds_error_command` (
   `id` int(11) NOT NULL COMMENT 'key',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `executor_id` int(11) DEFAULT NULL COMMENT 'executor id',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
-  `process_definition_version` int(11) DEFAULT '0' COMMENT 'process definition version',
-  `process_instance_id` int(11) DEFAULT '0' COMMENT 'process instance id: 0',
+  `workflow_definition_code` bigint(20) NOT NULL COMMENT 'workflow definition code',
+  `workflow_definition_version` int(11) DEFAULT '0' COMMENT 'workflow definition version',
+  `workflow_instance_id` int(11) DEFAULT '0' COMMENT 'workflow instance id: 0',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type',
   `failure_strategy` tinyint(4) DEFAULT '0' COMMENT 'failure strategy',
@@ -391,7 +391,7 @@ CREATE TABLE `t_ds_error_command` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'scheduler time',
   `start_time` datetime DEFAULT NULL COMMENT 'start time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
+  `workflow_instance_priority` int(11) DEFAULT '2' COMMENT 'workflow instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(255)  COMMENT 'worker group',
   `tenant_code`  varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
@@ -406,18 +406,18 @@ CREATE TABLE `t_ds_error_command` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_process_definition
+-- Table structure for t_ds_workflow_definition
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_definition`;
-CREATE TABLE `t_ds_process_definition` (
+DROP TABLE IF EXISTS `t_ds_workflow_definition`;
+CREATE TABLE `t_ds_workflow_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
-  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'process definition version',
+  `name` varchar(255) DEFAULT NULL COMMENT 'workflow definition name',
+  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'workflow definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
-  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
+  `release_state` tinyint(4) DEFAULT NULL COMMENT 'workflow definition release state：0:offline,1:online',
+  `user_id` int(11) DEFAULT NULL COMMENT 'workflow definition creator id',
   `global_params` text COMMENT 'global parameters',
   `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
   `locations` text COMMENT 'Node location information',
@@ -427,26 +427,22 @@ CREATE TABLE `t_ds_process_definition` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
+  UNIQUE KEY `workflow_unique` (`name`,`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
--- Records of t_ds_process_definition
+-- Table structure for t_ds_workflow_definition_log
 -- ----------------------------
-
--- ----------------------------
--- Table structure for t_ds_process_definition_log
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_definition_log`;
-CREATE TABLE `t_ds_process_definition_log` (
+DROP TABLE IF EXISTS `t_ds_workflow_definition_log`;
+CREATE TABLE `t_ds_workflow_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
-  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'process definition version',
+  `name` varchar(255) DEFAULT NULL COMMENT 'workflow definition name',
+  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'workflow definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
-  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
+  `release_state` tinyint(4) DEFAULT NULL COMMENT 'workflow definition release state：0:offline,1:online',
+  `user_id` int(11) DEFAULT NULL COMMENT 'workflow definition creator id',
   `global_params` text COMMENT 'global parameters',
   `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
   `locations` text COMMENT 'Node location information',
@@ -538,15 +534,15 @@ CREATE TABLE `t_ds_task_definition_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
--- Table structure for t_ds_process_task_relation
+-- Table structure for t_ds_workflow_task_relation
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_task_relation`;
-CREATE TABLE `t_ds_process_task_relation` (
+DROP TABLE IF EXISTS `t_ds_workflow_task_relation`;
+CREATE TABLE `t_ds_workflow_task_relation` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(255) DEFAULT NULL COMMENT 'relation name',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
-  `process_definition_version` int(11) NOT NULL COMMENT 'process version',
+  `workflow_definition_code` bigint(20) NOT NULL COMMENT 'workflow code',
+  `workflow_definition_version` int(11) NOT NULL COMMENT 'workflow version',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
   `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
@@ -556,21 +552,21 @@ CREATE TABLE `t_ds_process_task_relation` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `idx_code` (`project_code`,`process_definition_code`),
+  KEY `idx_code` (`project_code`,`workflow_definition_code`),
   KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`),
   KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
--- Table structure for t_ds_process_task_relation_log
+-- Table structure for t_ds_workflow_task_relation_log
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
-CREATE TABLE `t_ds_process_task_relation_log` (
+DROP TABLE IF EXISTS `t_ds_workflow_task_relation_log`;
+CREATE TABLE `t_ds_workflow_task_relation_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(255) DEFAULT NULL COMMENT 'relation name',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
-  `process_definition_version` int(11) NOT NULL COMMENT 'process version',
+  `workflow_definition_code` bigint(20) NOT NULL COMMENT 'workflow code',
+  `workflow_definition_version` int(11) NOT NULL COMMENT 'workflow version',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
   `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
@@ -582,60 +578,56 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`)
+  KEY `idx_workflow_code_version` (`workflow_definition_code`,`workflow_definition_version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
--- Table structure for t_ds_process_instance
+-- Table structure for t_ds_workflow_instance
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_instance`;
-CREATE TABLE `t_ds_process_instance` (
+DROP TABLE IF EXISTS `t_ds_workflow_instance`;
+CREATE TABLE `t_ds_workflow_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
-  `process_definition_version` int(11) NOT NULL DEFAULT '1' COMMENT 'process definition version',
+  `name` varchar(255) DEFAULT NULL COMMENT 'workflow instance name',
+  `workflow_definition_code` bigint(20) NOT NULL COMMENT 'workflow definition code',
+  `workflow_definition_version` int(11) NOT NULL DEFAULT '1' COMMENT 'workflow definition version',
   `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
-  `state` tinyint(4) DEFAULT NULL COMMENT 'process instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
+  `state` tinyint(4) DEFAULT NULL COMMENT 'workflow instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `state_history` text DEFAULT NULL COMMENT 'state history desc',
-  `recovery` tinyint(4) DEFAULT NULL COMMENT 'process instance failover flag：0:normal,1:failover instance',
-  `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
-  `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',
-  `run_times` int(11) DEFAULT NULL COMMENT 'process instance run times',
-  `host` varchar(135) DEFAULT NULL COMMENT 'process instance host',
+  `recovery` tinyint(4) DEFAULT NULL COMMENT 'workflow instance failover flag：0:normal,1:failover instance',
+  `start_time` datetime DEFAULT NULL COMMENT 'workflow instance start time',
+  `end_time` datetime DEFAULT NULL COMMENT 'workflow instance end time',
+  `run_times` int(11) DEFAULT NULL COMMENT 'workflow instance run times',
+  `host` varchar(135) DEFAULT NULL COMMENT 'workflow instance host',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type. 0: only current node,1:before the node,2:later nodes',
   `max_try_times` tinyint(4) DEFAULT '0' COMMENT 'max try times',
-  `failure_strategy` tinyint(4) DEFAULT '0' COMMENT 'failure strategy. 0:end the process when node failed,1:continue running the other nodes when node failed',
-  `warning_type` tinyint(4) DEFAULT '0' COMMENT 'warning type. 0:no warning,1:warning if process success,2:warning if process failed,3:warning if success',
+  `failure_strategy` tinyint(4) DEFAULT '0' COMMENT 'failure strategy. 0:end the workflow when node failed,1:continue running the other nodes when node failed',
+  `warning_type` tinyint(4) DEFAULT '0' COMMENT 'warning type. 0:no warning,1:warning if workflow success,2:warning if workflow failed,3:warning if success',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'warning group id',
   `schedule_time` datetime DEFAULT NULL COMMENT 'schedule time',
   `command_start_time` datetime DEFAULT NULL COMMENT 'command start time',
   `global_params` text COMMENT 'global parameters',
   `flag` tinyint(4) DEFAULT '1' COMMENT 'flag',
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `is_sub_process` int(11) DEFAULT '0' COMMENT 'flag, whether the process is sub process',
+  `is_sub_workflow` int(11) DEFAULT '0' COMMENT 'flag, whether the workflow is sub workflow',
   `executor_id` int(11) NOT NULL COMMENT 'executor id',
   `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name',
-  `history_cmd` text COMMENT 'history commands of process instance operation',
-  `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority. 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
+  `history_cmd` text COMMENT 'history commands of workflow instance operation',
+  `workflow_instance_priority` int(11) DEFAULT '2' COMMENT 'workflow instance priority. 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `var_pool` longtext COMMENT 'var_pool',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
-  `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
-  `restart_time` datetime DEFAULT NULL COMMENT 'process instance restart time',
+  `next_workflow_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next workflowInstanceId',
+  `restart_time` datetime DEFAULT NULL COMMENT 'workflow instance restart time',
   `test_flag`  tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
-  KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
+  KEY `workflow_instance_index` (`workflow_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Records of t_ds_process_instance
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_project
@@ -744,22 +736,18 @@ CREATE TABLE `t_ds_relation_datasource_user` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_relation_process_instance
+-- Table structure for t_ds_relation_workflow_instance
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_relation_process_instance`;
-CREATE TABLE `t_ds_relation_process_instance` (
+DROP TABLE IF EXISTS `t_ds_relation_workflow_instance`;
+CREATE TABLE `t_ds_relation_workflow_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `parent_process_instance_id` int(11) DEFAULT NULL COMMENT 'parent process instance id',
-  `parent_task_instance_id` int(11) DEFAULT NULL COMMENT 'parent process instance id',
-  `process_instance_id` int(11) DEFAULT NULL COMMENT 'child process instance id',
+  `parent_workflow_instance_id` int(11) DEFAULT NULL COMMENT 'parent workflow instance id',
+  `parent_task_instance_id` int(11) DEFAULT NULL COMMENT 'parent workflow instance id',
+  `workflow_instance_id` int(11) DEFAULT NULL COMMENT 'child workflow instance id',
   PRIMARY KEY (`id`),
-  KEY `idx_parent_process_task` (`parent_process_instance_id`,`parent_task_instance_id`) ,
-  KEY `idx_process_instance_id` (`process_instance_id`)
+  KEY `idx_parent_workflow_task` (`parent_workflow_instance_id`,`parent_task_instance_id`) ,
+  KEY `idx_workflow_instance_id` (`workflow_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Records of t_ds_relation_process_instance
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_relation_project_user
@@ -845,7 +833,7 @@ CREATE TABLE `t_ds_resources` (
 DROP TABLE IF EXISTS `t_ds_schedules`;
 CREATE TABLE `t_ds_schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
+  `workflow_definition_code` bigint(20) NOT NULL COMMENT 'workflow definition code',
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'schedule timezone id',
@@ -853,9 +841,9 @@ CREATE TABLE `t_ds_schedules` (
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',
-  `warning_type` tinyint(4) NOT NULL COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',
+  `warning_type` tinyint(4) NOT NULL COMMENT 'Alarm type: 0 is not sent, 1 workflow is sent successfully, 2 workflow is sent failed, 3 workflow is sent successfully and all failures are sent',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
+  `workflow_instance_priority` int(11) DEFAULT '2' COMMENT 'workflow instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group id',
   `tenant_code`  varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
@@ -895,8 +883,8 @@ CREATE TABLE `t_ds_task_instance` (
   `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream',
   `task_code` bigint(20) NOT NULL COMMENT 'task definition code',
   `task_definition_version` int(11) NOT NULL DEFAULT '1' COMMENT 'task definition version',
-  `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
-  `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
+  `workflow_instance_id` int(11) DEFAULT NULL COMMENT 'workflow instance id',
+  `workflow_instance_name` varchar(255) DEFAULT NULL COMMENT 'workflow instance name',
   `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
   `state` tinyint(4) DEFAULT NULL COMMENT 'Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
@@ -930,7 +918,7 @@ CREATE TABLE `t_ds_task_instance` (
   `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `test_flag`  tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
-  KEY `process_instance_id` (`process_instance_id`) USING BTREE,
+  KEY `workflow_instance_id` (`workflow_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
   KEY `idx_cache_key` (`cache_key`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
@@ -1153,8 +1141,8 @@ VALUES(8, 'TargetTableTotalRows', 'SELECT COUNT(*) AS total FROM ${target_table}
 DROP TABLE IF EXISTS `t_ds_dq_execute_result`;
 CREATE TABLE `t_ds_dq_execute_result` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `process_definition_id` int(11) DEFAULT NULL,
-    `process_instance_id` int(11) DEFAULT NULL,
+    `workflow_definition_id` int(11) DEFAULT NULL,
+    `workflow_instance_id` int(11) DEFAULT NULL,
     `task_instance_id` int(11) DEFAULT NULL,
     `rule_type` int(11) DEFAULT NULL,
     `rule_name` varchar(255) DEFAULT NULL,
@@ -1410,7 +1398,7 @@ VALUES(31, 'target_database', 'select', '$t(target_database)', NULL, NULL, 'Plea
 DROP TABLE IF EXISTS `t_ds_dq_task_statistics_value`;
 CREATE TABLE `t_ds_dq_task_statistics_value` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `process_definition_id` int(11) DEFAULT NULL,
+    `workflow_definition_id` int(11) DEFAULT NULL,
     `task_instance_id` int(11) DEFAULT NULL,
     `rule_id` int(11) NOT NULL,
     `unique_code` varchar(255) NULL,
@@ -1968,7 +1956,7 @@ CREATE TABLE `t_ds_task_group_queue` (
   `task_id` int(11) DEFAULT NULL COMMENT 'taskintanceid',
   `task_name` varchar(255) DEFAULT NULL COMMENT 'TaskInstance name',
   `group_id`  int(11) DEFAULT NULL COMMENT 'taskGroup id',
-  `process_id` int(11) DEFAULT NULL COMMENT 'processInstace id',
+  `workflow_instance_id` int(11) DEFAULT NULL COMMENT 'workflow instance id',
   `priority` int(8) DEFAULT '0' COMMENT 'priority',
   `status` tinyint(4) DEFAULT '-1' COMMENT '-1: waiting  1: running  2: finished',
   `force_start` tinyint(4) DEFAULT '0' COMMENT 'is force start 0 NO ,1 YES',
@@ -2080,17 +2068,17 @@ CREATE TABLE t_ds_alert_send_status (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_cluster`;
 CREATE TABLE `t_ds_cluster`(
-                               `id`          bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-                               `code`        bigint(20) DEFAULT NULL COMMENT 'encoding',
-                               `name`        varchar(255) NOT NULL COMMENT 'cluster name',
-                               `config`      text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
-                               `description` text NULL DEFAULT NULL COMMENT 'the details',
-                               `operator`    int(11) DEFAULT NULL COMMENT 'operator user id',
-                               `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                               `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                               PRIMARY KEY (`id`),
-                               UNIQUE KEY `cluster_name_unique` (`name`),
-                               UNIQUE KEY `cluster_code_unique` (`code`)
+   `id`          bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+   `code`        bigint(20) DEFAULT NULL COMMENT 'encoding',
+   `name`        varchar(255) NOT NULL COMMENT 'cluster name',
+   `config`      text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
+   `description` text NULL DEFAULT NULL COMMENT 'the details',
+   `operator`    int(11) DEFAULT NULL COMMENT 'operator user id',
+   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `cluster_name_unique` (`name`),
+   UNIQUE KEY `cluster_code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
@@ -2121,10 +2109,10 @@ CREATE TABLE `t_ds_relation_sub_workflow` (
 );
 
 -- ----------------------------
--- Table structure for t_ds_process_task_lineage
+-- Table structure for t_ds_workflow_task_lineage
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_task_lineage`;
-CREATE TABLE `t_ds_process_task_lineage` (
+DROP TABLE IF EXISTS `t_ds_workflow_task_lineage`;
+CREATE TABLE `t_ds_workflow_task_lineage` (
     `id` int NOT NULL AUTO_INCREMENT,
     `workflow_definition_code` bigint NOT NULL DEFAULT 0,
     `workflow_definition_version` int NOT NULL DEFAULT 0,
@@ -2136,7 +2124,7 @@ CREATE TABLE `t_ds_process_task_lineage` (
     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
     PRIMARY KEY (`id`),
-    KEY `idx_process_code_version` (`workflow_definition_code`,`workflow_definition_version`),
+    KEY `idx_workflow_code_version` (`workflow_definition_code`,`workflow_definition_version`),
     KEY `idx_task_code_version` (`task_definition_code`,`task_definition_version`),
     KEY `idx_dept_code` (`dept_project_code`,`dept_workflow_definition_code`,`dept_task_definition_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

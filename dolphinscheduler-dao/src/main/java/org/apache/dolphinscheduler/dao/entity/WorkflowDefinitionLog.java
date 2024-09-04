@@ -24,17 +24,11 @@ import lombok.Data;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
-@TableName("t_ds_process_definition_log")
+@TableName("t_ds_workflow_definition_log")
 public class WorkflowDefinitionLog extends WorkflowDefinition {
 
-    /**
-     * operator
-     */
     private int operator;
 
-    /**
-     * operateTime
-     */
     private Date operateTime;
 
     public WorkflowDefinitionLog() {

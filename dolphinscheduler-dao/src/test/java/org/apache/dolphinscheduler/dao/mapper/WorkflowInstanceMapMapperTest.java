@@ -39,9 +39,9 @@ public class WorkflowInstanceMapMapperTest extends BaseDaoTest {
     private WorkflowInstanceRelation insertOne() {
         // insertOne
         WorkflowInstanceRelation workflowInstanceRelation = new WorkflowInstanceRelation();
-        workflowInstanceRelation.setProcessInstanceId(0);
+        workflowInstanceRelation.setWorkflowInstanceId(0);
         workflowInstanceRelation.setParentTaskInstanceId(0);
-        workflowInstanceRelation.setParentProcessInstanceId(0);
+        workflowInstanceRelation.setParentWorkflowInstanceId(0);
         workflowInstanceRelationMapper.insert(workflowInstanceRelation);
         return workflowInstanceRelation;
     }
@@ -54,7 +54,7 @@ public class WorkflowInstanceMapMapperTest extends BaseDaoTest {
         // insertOne
         WorkflowInstanceRelation workflowInstanceRelation = insertOne();
         // update
-        workflowInstanceRelation.setParentProcessInstanceId(1);
+        workflowInstanceRelation.setParentWorkflowInstanceId(1);
         int update = workflowInstanceRelationMapper.updateById(workflowInstanceRelation);
         Assertions.assertEquals(1, update);
     }
@@ -87,7 +87,7 @@ public class WorkflowInstanceMapMapperTest extends BaseDaoTest {
     public void testQueryByParentId() {
         WorkflowInstanceRelation workflowInstanceRelation = insertOne();
 
-        workflowInstanceRelation.setParentProcessInstanceId(100);
+        workflowInstanceRelation.setParentWorkflowInstanceId(100);
         workflowInstanceRelationMapper.updateById(workflowInstanceRelation);
 
     }
@@ -99,10 +99,10 @@ public class WorkflowInstanceMapMapperTest extends BaseDaoTest {
     public void testDeleteByParentProcessId() {
         WorkflowInstanceRelation workflowInstanceRelation = insertOne();
 
-        workflowInstanceRelation.setParentProcessInstanceId(100);
+        workflowInstanceRelation.setParentWorkflowInstanceId(100);
         workflowInstanceRelationMapper.updateById(workflowInstanceRelation);
-        int delete = workflowInstanceRelationMapper.deleteByParentProcessId(
-                workflowInstanceRelation.getParentProcessInstanceId());
+        int delete = workflowInstanceRelationMapper.deleteByParentWorkflowInstanceId(
+                workflowInstanceRelation.getParentWorkflowInstanceId());
         Assertions.assertEquals(1, delete);
     }
 
@@ -113,14 +113,14 @@ public class WorkflowInstanceMapMapperTest extends BaseDaoTest {
     @Test
     public void querySubIdListByParentId() {
         WorkflowInstanceRelation workflowInstanceRelation = insertOne();
-        workflowInstanceRelation.setProcessInstanceId(1);
-        workflowInstanceRelation.setParentProcessInstanceId(1010);
+        workflowInstanceRelation.setWorkflowInstanceId(1);
+        workflowInstanceRelation.setParentWorkflowInstanceId(1010);
 
         workflowInstanceRelationMapper.updateById(workflowInstanceRelation);
 
         List<Integer> subIds =
                 workflowInstanceRelationMapper
-                        .querySubIdListByParentId(workflowInstanceRelation.getParentProcessInstanceId());
+                        .querySubIdListByParentId(workflowInstanceRelation.getParentWorkflowInstanceId());
 
         Assertions.assertNotEquals(0, subIds.size());
 

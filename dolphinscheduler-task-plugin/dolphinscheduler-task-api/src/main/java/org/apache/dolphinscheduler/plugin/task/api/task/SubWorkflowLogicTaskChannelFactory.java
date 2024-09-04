@@ -25,7 +25,7 @@ import com.google.auto.service.AutoService;
 @AutoService(TaskChannelFactory.class)
 public class SubWorkflowLogicTaskChannelFactory implements TaskChannelFactory {
 
-    public static final String NAME = "SUB_PROCESS";
+    public static final String NAME = "SUB_WORKFLOW";
 
     @Override
     public String getName() {

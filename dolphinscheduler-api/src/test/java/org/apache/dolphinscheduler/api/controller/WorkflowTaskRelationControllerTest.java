@@ -37,9 +37,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-/**
- * process task relation controller test
- */
 public class WorkflowTaskRelationControllerTest extends AbstractControllerTest {
 
     @MockBean
@@ -55,7 +52,7 @@ public class WorkflowTaskRelationControllerTest extends AbstractControllerTest {
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc
-                .perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/downstream", "1113", "123")
+                .perform(get("/projects/{projectCode}/workflow-task-relation/{taskCode}/downstream", "1113", "123")
                         .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -75,7 +72,7 @@ public class WorkflowTaskRelationControllerTest extends AbstractControllerTest {
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc
-                .perform(get("/projects/{projectCode}/process-task-relation/{taskCode}/upstream", "1113", "123")
+                .perform(get("/projects/{projectCode}/workflow-task-relation/{taskCode}/upstream", "1113", "123")
                         .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

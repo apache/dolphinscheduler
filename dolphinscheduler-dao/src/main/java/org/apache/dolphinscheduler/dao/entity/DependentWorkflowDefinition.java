@@ -30,35 +30,16 @@ import lombok.Data;
 @Data
 public class DependentWorkflowDefinition {
 
-    /**
-     * process definition code
-     */
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
-    /**
-     * process definition version
-     **/
-    private int processDefinitionVersion;
+    private int workflowDefinitionVersion;
 
-    /**
-     * task definition name
-     */
     private long taskDefinitionCode;
 
-    /**
-     * task definition params
-     */
     private String taskParams;
 
-    /**
-     * schedule worker group
-     */
     private String workerGroup;
 
-    /**
-     * get dependent cycle
-     * @return CycleEnum
-     */
     public CycleEnum getDependentCycle(long upstreamProcessDefinitionCode) {
         DependentParameters dependentParameters = this.getDependentParameters();
         List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependence().getDependTaskList();

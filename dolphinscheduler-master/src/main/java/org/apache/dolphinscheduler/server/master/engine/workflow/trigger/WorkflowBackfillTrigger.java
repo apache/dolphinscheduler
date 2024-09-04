@@ -56,8 +56,8 @@ public class WorkflowBackfillTrigger
         final WorkflowDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
 
         final WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
-        workflowInstance.setProcessDefinitionVersion(workflowDefinition.getVersion());
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
         workflowInstance.setCommandType(commandType);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, commandType.name());
@@ -75,9 +75,9 @@ public class WorkflowBackfillTrigger
         workflowInstance.setExecutorId(backfillTriggerRequest.getUserId());
         workflowInstance.setExecutorName(getExecutorUser(backfillTriggerRequest.getUserId()).getUserName());
         workflowInstance.setTenantCode(backfillTriggerRequest.getTenantCode());
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.addHistoryCmd(commandType);
-        workflowInstance.setProcessInstancePriority(backfillTriggerRequest.getWorkflowInstancePriority());
+        workflowInstance.setWorkflowInstancePriority(backfillTriggerRequest.getWorkflowInstancePriority());
         workflowInstance
                 .setWorkerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(backfillTriggerRequest.getWorkerGroup()));
         workflowInstance.setEnvironmentCode(
@@ -99,10 +99,10 @@ public class WorkflowBackfillTrigger
                 .build();
         return Command.builder()
                 .commandType(CommandType.COMPLEMENT_DATA)
-                .processDefinitionCode(backfillTriggerRequest.getWorkflowCode())
-                .processDefinitionVersion(backfillTriggerRequest.getWorkflowVersion())
-                .processInstanceId(workflowInstance.getId())
-                .processInstancePriority(workflowInstance.getProcessInstancePriority())
+                .workflowDefinitionCode(backfillTriggerRequest.getWorkflowCode())
+                .workflowDefinitionVersion(backfillTriggerRequest.getWorkflowVersion())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .commandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam))
                 .build();
     }

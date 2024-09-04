@@ -151,7 +151,7 @@ public class StandByTaskInstancePriorityQueue implements TaskPriorityQueue<TaskI
     // So we use processInstanceId + taskCode + version to identify a taskInstance.
     private String getTaskInstanceIdentify(TaskInstance taskInstance) {
         return String.join(
-                String.valueOf(taskInstance.getProcessInstanceId()),
+                String.valueOf(taskInstance.getWorkflowInstanceId()),
                 String.valueOf(taskInstance.getTaskCode()),
                 String.valueOf(taskInstance.getTaskDefinitionVersion()), "-");
     }

@@ -37,10 +37,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 public final class ProjectDetailPage extends NavBarPage {
 
     @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
-    private WebElement menuProcessDefinition;
+    private WebElement menuWorkflowDefinition;
 
     @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(3) > .n-menu-item-content")
-    private WebElement menuProcessInstances;
+    private WebElement menuWorkflowInstances;
 
     @FindBy(xpath = "//div[contains(@class, 'n-menu-item-content')]//div[contains(., 'Task Instance')]")
     private WebElement menuTaskInstances;
@@ -52,13 +52,13 @@ public final class ProjectDetailPage extends NavBarPage {
     @SneakyThrows
     public <T extends Tab> T goToTab(Class<T> tab) {
         if (tab == WorkflowDefinitionTab.class) {
-            menuProcessDefinition().click();
+            menuWorkflowDefinition().click();
             WebDriverWaitFactory.createWebDriverWait(driver)
                     .until(ExpectedConditions.urlContains("/workflow-definition"));
             return tab.cast(new WorkflowDefinitionTab(driver));
         }
         if (tab == WorkflowInstanceTab.class) {
-            menuProcessInstances().click();
+            menuWorkflowInstances().click();
             WebDriverWaitFactory.createWebDriverWait(driver)
                     .until(ExpectedConditions.urlContains("/workflow/instances"));
             return tab.cast(new WorkflowInstanceTab(driver));

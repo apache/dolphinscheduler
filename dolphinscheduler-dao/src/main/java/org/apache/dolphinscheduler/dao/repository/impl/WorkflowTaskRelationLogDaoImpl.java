@@ -41,7 +41,7 @@ public class WorkflowTaskRelationLogDaoImpl extends BaseDao<WorkflowTaskRelation
 
     @Override
     public List<WorkflowTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        return mybatisMapper.queryByProcessCode(workflowDefinitionCode);
+        return mybatisMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
     }
 
     @Override

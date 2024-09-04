@@ -30,7 +30,7 @@ Click the button to view task group usage information:
 
 ### Use of Task Groups
 
-**Note**: The use of task groups is applicable to tasks executed by workers, such as `switch` nodes, `condition` nodes, `sub_process` and other node types executed by the master are not controlled by the task group.
+**Note**: The use of task groups is applicable to tasks executed by workers, such as `switch` nodes, `condition` nodes, `sub_workflow` and other node types executed by the master are not controlled by the task group.
 
 Let's take the shell node as an example:
 

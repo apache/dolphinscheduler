@@ -33,7 +33,7 @@ public class SubWorkflowManualTrigger extends WorkflowManualTrigger {
     @Override
     protected WorkflowInstance constructWorkflowInstance(final WorkflowManualTriggerRequest workflowManualTriggerRequest) {
         final WorkflowInstance workflowInstance = super.constructWorkflowInstance(workflowManualTriggerRequest);
-        workflowInstance.setIsSubProcess(Flag.YES);
+        workflowInstance.setIsSubWorkflow(Flag.YES);
         return workflowInstance;
     }
 

@@ -45,9 +45,9 @@ public class Repository {
     public List<WorkflowInstance> queryWorkflowInstance(final WorkflowDefinition workflowDefinition) {
         return workflowInstanceDao.queryAll()
                 .stream()
-                .filter(workflowInstance -> workflowInstance.getProcessDefinitionCode()
+                .filter(workflowInstance -> workflowInstance.getWorkflowDefinitionCode()
                         .equals(workflowDefinition.getCode()))
-                .filter(workflowInstance -> workflowInstance.getProcessDefinitionVersion() == workflowDefinition
+                .filter(workflowInstance -> workflowInstance.getWorkflowDefinitionVersion() == workflowDefinition
                         .getVersion())
                 .sorted(Comparator.comparingInt(WorkflowInstance::getId))
                 .collect(Collectors.toList());

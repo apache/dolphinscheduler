@@ -39,8 +39,8 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         result.setId(originTaskInstance.getId());
         result.setName(originTaskInstance.getName());
         result.setTaskType(originTaskInstance.getTaskType());
-        result.setProcessInstanceId(originTaskInstance.getProcessInstanceId());
-        result.setProcessInstanceName(originTaskInstance.getProcessInstanceName());
+        result.setWorkflowInstanceId(originTaskInstance.getWorkflowInstanceId());
+        result.setWorkflowInstanceName(originTaskInstance.getWorkflowInstanceName());
         result.setProjectCode(originTaskInstance.getProjectCode());
         result.setTaskCode(originTaskInstance.getTaskCode());
         result.setTaskDefinitionVersion(originTaskInstance.getTaskDefinitionVersion());
@@ -102,8 +102,8 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
     }
 
     protected void injectMetadataFromWorkflowInstance(TaskInstance taskInstance, WorkflowInstance workflowInstance) {
-        taskInstance.setProcessInstanceId(workflowInstance.getId());
-        taskInstance.setProcessInstanceName(workflowInstance.getName());
+        taskInstance.setWorkflowInstanceId(workflowInstance.getId());
+        taskInstance.setWorkflowInstanceName(workflowInstance.getName());
         taskInstance.setProjectCode(workflowInstance.getProjectCode());
         taskInstance.setWorkerGroup(
                 WorkerGroupUtils.getWorkerGroupOrDefault(

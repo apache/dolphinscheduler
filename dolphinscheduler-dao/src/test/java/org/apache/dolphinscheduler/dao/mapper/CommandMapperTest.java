@@ -72,7 +72,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command expectedCommand = createCommand();
         Page<Command> page = new Page<>(1, 10);
         IPage<Command> commandIPage = commandMapper.queryCommandPageByIds(page,
-                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+                Lists.newArrayList(expectedCommand.getWorkflowDefinitionCode()));
         List<Command> commandList = commandIPage.getRecords();
         assertThat(commandList).isNotEmpty();
         assertThat(commandIPage.getTotal()).isEqualTo(1);
@@ -89,7 +89,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
         Assertions.assertNotNull(actualCommand);
-        Assertions.assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
+        Assertions.assertEquals(expectedCommand.getWorkflowDefinitionCode(), actualCommand.getWorkflowDefinitionCode());
     }
 
     /**
@@ -194,7 +194,7 @@ public class CommandMapperTest extends BaseDaoTest {
     void deleteByWorkflowInstanceIds() {
         Command command = createCommand();
         assertThat(commandMapper.selectList(null)).isNotEmpty();
-        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getProcessInstanceId()));
+        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getWorkflowInstanceId()));
         assertThat(commandMapper.selectList(null)).isEmpty();
     }
 
@@ -292,7 +292,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionCode(processDefinitionCode);
+        command.setWorkflowDefinitionCode(processDefinitionCode);
         command.setExecutorId(4);
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
@@ -300,12 +300,12 @@ public class CommandMapperTest extends BaseDaoTest {
         command.setWarningType(WarningType.ALL);
         command.setWarningGroupId(1);
         command.setScheduleTime(DateUtils.stringToDate("2019-12-29 12:10:00"));
-        command.setProcessInstancePriority(Priority.MEDIUM);
+        command.setWorkflowInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-        command.setProcessInstanceId(0);
-        command.setProcessDefinitionVersion(0);
+        command.setWorkflowInstanceId(0);
+        command.setWorkflowDefinitionVersion(0);
         commandMapper.insert(command);
 
         return command;

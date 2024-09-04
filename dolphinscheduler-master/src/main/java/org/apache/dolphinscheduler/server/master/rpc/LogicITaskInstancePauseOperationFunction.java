@@ -46,7 +46,7 @@ public class LogicITaskInstancePauseOperationFunction
                 return LogicTaskPauseResponse.fail("Cannot find the MasterTaskExecuteRunnable");
             }
             final TaskExecutionContext taskExecutionContext = masterTaskExecutor.getTaskExecutionContext();
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getWorkflowInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             masterTaskExecutor.pauseTask();
             return LogicTaskPauseResponse.success();

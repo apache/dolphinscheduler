@@ -92,7 +92,7 @@ public class WorkflowInstanceRecoverStopIT extends AbstractMasterIntegrationTest
                             .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .satisfies(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.NO);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.NO);
                             });
                 });
 

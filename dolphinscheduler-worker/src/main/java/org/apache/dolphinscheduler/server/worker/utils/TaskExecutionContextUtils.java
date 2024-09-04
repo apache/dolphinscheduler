@@ -45,9 +45,9 @@ public class TaskExecutionContextUtils {
         String taskInstanceWorkingDirectory = FileUtils.getTaskInstanceWorkingDirectory(
                 taskExecutionContext.getTenantCode(),
                 taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getWorkflowDefinitionCode(),
+                taskExecutionContext.getWorkflowDefinitionVersion(),
+                taskExecutionContext.getWorkflowInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         try {
             if (new File(taskInstanceWorkingDirectory).exists()) {

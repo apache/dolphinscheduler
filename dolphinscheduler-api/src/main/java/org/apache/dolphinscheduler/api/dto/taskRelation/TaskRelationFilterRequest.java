@@ -58,7 +58,7 @@ public class TaskRelationFilterRequest extends PageQueryDto {
     public WorkflowTaskRelation convert2TaskDefinition() {
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         if (this.workflowCode != 0L) {
-            workflowTaskRelation.setProcessDefinitionCode(this.workflowCode);
+            workflowTaskRelation.setWorkflowDefinitionCode(this.workflowCode);
         }
         if (this.preTaskCode != 0L) {
             workflowTaskRelation.setPreTaskCode(this.preTaskCode);

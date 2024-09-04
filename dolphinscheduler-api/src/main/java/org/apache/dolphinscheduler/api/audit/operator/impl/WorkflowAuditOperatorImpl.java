@@ -49,8 +49,8 @@ public class WorkflowAuditOperatorImpl extends BaseAuditOperator {
     protected void setObjectByParam(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
         if (paramNameArr[0].equals(AuditLogConstants.CODES)
-                || paramNameArr[0].equals(AuditLogConstants.PROCESS_DEFINITION_CODES)
-                || paramNameArr[0].equals(AuditLogConstants.PROCESS_INSTANCE_IDS)) {
+                || paramNameArr[0].equals(AuditLogConstants.WORKFLOW_DEFINITION_CODES)
+                || paramNameArr[0].equals(AuditLogConstants.WORKFLOW_INSTANCE_IDS)) {
             super.setObjectByParamArr(paramNameArr, paramsMap, auditLogList);
         } else {
             super.setObjectByParam(paramNameArr, paramsMap, auditLogList);

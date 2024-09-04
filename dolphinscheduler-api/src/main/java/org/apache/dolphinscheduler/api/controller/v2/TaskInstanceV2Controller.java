@@ -73,8 +73,8 @@ public class TaskInstanceV2Controller extends BaseController {
      */
     @Operation(summary = "queryTaskListPaging", description = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "WORKFLOW_INSTANCE_ID", schema = @Schema(implementation = int.class), example = "100"),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "workflowInstanceId", description = "WORKFLOW_INSTANCE_ID", schema = @Schema(implementation = int.class), example = "100"),
+            @Parameter(name = "workflowInstanceName", description = "WORKFLOW_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskName", description = "TASK_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskCode", description = "TASK_CODE", schema = @Schema(implementation = Long.class)),
@@ -97,8 +97,8 @@ public class TaskInstanceV2Controller extends BaseController {
 
         String searchVal = ParameterUtils.handleEscapes(taskInstanceQueryReq.getSearchVal());
         return taskInstanceService.queryTaskListPaging(loginUser, projectCode,
-                taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
-                taskInstanceQueryReq.getProcessDefinitionName(),
+                taskInstanceQueryReq.getWorkflowInstanceId(), taskInstanceQueryReq.getWorkflowInstanceName(),
+                taskInstanceQueryReq.getWorkflowDefinitionName(),
                 taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getTaskCode(),
                 taskInstanceQueryReq.getExecutorName(),
                 taskInstanceQueryReq.getStartTime(), taskInstanceQueryReq.getEndTime(), searchVal,

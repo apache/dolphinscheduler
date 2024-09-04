@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProcessInstanceAuditOperatorImpl extends BaseAuditOperator {
+public class WorkflowInstanceAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
     private WorkflowInstanceMapper workflowInstanceMapper;
@@ -50,7 +50,7 @@ public class ProcessInstanceAuditOperatorImpl extends BaseAuditOperator {
     @Override
     protected void setObjectByParam(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
-        if (paramNameArr[0].equals(AuditLogConstants.PROCESS_INSTANCE_IDS)) {
+        if (paramNameArr[0].equals(AuditLogConstants.WORKFLOW_INSTANCE_IDS)) {
             super.setObjectByParamArr(paramNameArr, paramsMap, auditLogList);
         } else {
             super.setObjectByParam(paramNameArr, paramsMap, auditLogList);

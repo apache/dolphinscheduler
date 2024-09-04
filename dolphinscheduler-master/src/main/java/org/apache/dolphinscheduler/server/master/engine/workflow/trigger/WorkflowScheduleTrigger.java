@@ -51,8 +51,8 @@ public class WorkflowScheduleTrigger
         final WorkflowDefinition workflowDefinition = getProcessDefinition(workflowCode, workflowVersion);
 
         final WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setProcessDefinitionCode(workflowDefinition.getCode());
-        workflowInstance.setProcessDefinitionVersion(workflowDefinition.getVersion());
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
         workflowInstance.setCommandType(commandType);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, commandType.name());
@@ -70,9 +70,9 @@ public class WorkflowScheduleTrigger
         workflowInstance.setExecutorId(scheduleTriggerRequest.getUserId());
         workflowInstance.setExecutorName(getExecutorUser(scheduleTriggerRequest.getUserId()).getUserName());
         workflowInstance.setTenantCode(scheduleTriggerRequest.getTenantCode());
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.addHistoryCmd(commandType);
-        workflowInstance.setProcessInstancePriority(scheduleTriggerRequest.getWorkflowInstancePriority());
+        workflowInstance.setWorkflowInstancePriority(scheduleTriggerRequest.getWorkflowInstancePriority());
         workflowInstance
                 .setWorkerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(scheduleTriggerRequest.getWorkerGroup()));
         workflowInstance.setEnvironmentCode(
@@ -91,10 +91,10 @@ public class WorkflowScheduleTrigger
                 .build();
         return Command.builder()
                 .commandType(CommandType.SCHEDULER)
-                .processDefinitionCode(scheduleTriggerRequest.getWorkflowCode())
-                .processDefinitionVersion(scheduleTriggerRequest.getWorkflowVersion())
-                .processInstanceId(workflowInstance.getId())
-                .processInstancePriority(workflowInstance.getProcessInstancePriority())
+                .workflowDefinitionCode(scheduleTriggerRequest.getWorkflowCode())
+                .workflowDefinitionVersion(scheduleTriggerRequest.getWorkflowVersion())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .commandParam(JSONUtils.toJsonString(scheduleWorkflowCommandParam))
                 .build();
     }

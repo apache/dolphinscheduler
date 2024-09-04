@@ -44,37 +44,19 @@ public class Schedule {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * process definition code
-     */
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
-    /**
-     * process definition name
-     */
     @TableField(exist = false)
-    private String processDefinitionName;
+    private String workflowDefinitionName;
 
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
 
-    /**
-     * schedule description
-     */
     @TableField(exist = false)
     private String definitionDescription;
 
-    /**
-     * schedule start time
-     */
     private Date startTime;
 
-    /**
-     * schedule end time
-     */
     private Date endTime;
 
     /**
@@ -83,75 +65,33 @@ public class Schedule {
      */
     private String timezoneId;
 
-    /**
-     * crontab expression
-     */
     private String crontab;
 
-    /**
-     * failure strategy
-     */
     private FailureStrategy failureStrategy;
 
-    /**
-     * warning type
-     */
     private WarningType warningType;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
-    /**
-     * created user id
-     */
     private int userId;
 
-    /**
-     * created user name
-     */
     @TableField(exist = false)
     private String userName;
 
-    /**
-     * release state
-     */
     private ReleaseState releaseState;
 
-    /**
-     * warning group id
-     */
     private int warningGroupId;
 
-    /**
-     * process instance priority
-     */
-    private Priority processInstancePriority;
+    private Priority workflowInstancePriority;
 
-    /**
-     *  worker group
-     */
     private String workerGroup;
 
-    /**
-     * tenant code
-     */
     private String tenantCode;
 
-    /**
-     * environment code
-     */
     private Long environmentCode;
 
-    /**
-     * environment name
-     */
     @TableField(exist = false)
     private String environmentName;
 }

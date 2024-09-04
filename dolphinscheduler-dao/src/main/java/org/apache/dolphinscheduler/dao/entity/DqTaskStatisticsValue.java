@@ -31,69 +31,42 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_dq_task_statistics_value")
 public class DqTaskStatisticsValue implements Serializable {
 
-    /**
-     * primary key
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * process defined id
-     */
-    @TableField(value = "process_definition_id")
-    private long processDefinitionId;
-    /**
-     * process definition name
-     */
+
+    @TableField(value = "workflow_definition_id")
+    private long workflowDefinitionId;
+
     @TableField(exist = false)
-    private String processDefinitionName;
-    /**
-     * task instance id
-     */
+    private String workflowDefinitionName;
+
     @TableField(value = "task_instance_id")
     private long taskInstanceId;
-    /**
-     * task name
-     */
+
     @TableField(exist = false)
     private String taskName;
-    /**
-     * rule id
-     */
+
     @TableField(value = "rule_id")
     private long ruleId;
-    /**
-     * rule type
-     */
+
     @TableField(exist = false)
     private int ruleType;
-    /**
-     * rule name
-     */
+
     @TableField(exist = false)
     private String ruleName;
-    /**
-     * statistics value
-     */
+
     @TableField(value = "statistics_value")
     private double statisticsValue;
-    /**
-     * comparison value
-     */
+
     @TableField(value = "statistics_name")
     private String statisticsName;
-    /**
-     * data time
-     */
+
     @TableField(value = "data_time")
     private Date dataTime;
-    /**
-     * create time
-     */
+
     @TableField(value = "create_time")
     private Date createTime;
-    /**
-     * update time
-     */
+
     @TableField(value = "update_time")
     private Date updateTime;
 }

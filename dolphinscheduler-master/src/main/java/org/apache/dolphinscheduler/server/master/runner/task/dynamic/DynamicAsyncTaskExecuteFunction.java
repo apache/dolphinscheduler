@@ -157,9 +157,9 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
             Map<String, String> parameters = JSONUtils.toMap(DynamicCommandUtils
                     .getDataFromCommandParam(subWorkflowInstance.getCommandParam(), CMD_DYNAMIC_START_PARAMS));
             Command command = DynamicCommandUtils.createCommand(this.workflowInstance,
-                    subWorkflowInstance.getProcessDefinitionCode(), subWorkflowInstance.getProcessDefinitionVersion(),
+                    subWorkflowInstance.getWorkflowDefinitionCode(), subWorkflowInstance.getWorkflowDefinitionVersion(),
                     parameters);
-            command.setProcessInstanceId(subWorkflowInstance.getId());
+            command.setWorkflowInstanceId(subWorkflowInstance.getId());
             commandMapper.insert(command);
             log.info("start sub process instance, sub process instance id: {}, command: {}",
                     subWorkflowInstance.getId(),

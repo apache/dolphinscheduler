@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export type { ProcessInstanceReq } from '@/service/modules/executors/types'
+export type { WorkflowInstanceReq } from '@/service/modules/executors/types'
 
 export interface IEnvironmentOption {
   label: string

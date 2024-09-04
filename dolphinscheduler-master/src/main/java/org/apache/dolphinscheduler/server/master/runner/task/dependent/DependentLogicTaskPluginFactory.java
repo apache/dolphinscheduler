@@ -53,7 +53,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
 
     @Override
     public DependentLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
         final IWorkflowExecutionRunnable workflowExecutionRunnable = IWorkflowRepository.get(workflowInstanceId);
         if (workflowExecutionRunnable == null) {
             throw new LogicTaskInitializeException("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);

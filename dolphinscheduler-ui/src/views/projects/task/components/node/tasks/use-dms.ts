@@ -51,12 +51,12 @@ export function useDms({
   if (from === 1) {
     extra = [
       Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
+      Fields.useWorkflowName({
         model,
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName
+        workflowName: data?.workflowDefinitionName
       })
     ]
   }

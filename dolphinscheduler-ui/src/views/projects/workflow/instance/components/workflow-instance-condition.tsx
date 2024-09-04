@@ -29,13 +29,13 @@ import { defineComponent, getCurrentInstance, h, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
 import { workflowExecutionStateType } from '@/common/common'
-import { queryProcessDefinitionList } from '@/service/modules/process-definition'
+import { queryWorkflowDefinitionList } from '@/service/modules/workflow-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { Router, useRouter } from 'vue-router'
 import { SelectOption } from 'naive-ui/es/select/src/interface'
 
 export default defineComponent({
-  name: 'ProcessInstanceCondition',
+  name: 'WorkflowInstanceCondition',
   emits: ['handleSearch'],
   setup(props, ctx) {
     const router: Router = useRouter()
@@ -48,27 +48,27 @@ export default defineComponent({
     const projectCode = ref(
       Number(router.currentRoute.value.params.projectCode)
     )
-    const processDefineCodeRef = router.currentRoute.value.query
-      .processDefineCode
-      ? ref(Number(router.currentRoute.value.query.processDefineCode))
+    const workflowDefinitionCodeRef = router.currentRoute.value.query
+      .workflowDefineCode
+      ? ref(Number(router.currentRoute.value.query.workflowDefineCode))
       : ref()
 
-    const processDefinitionOptions = ref<Array<SelectMixedOption>>([])
+    const workflowDefinitionOptions = ref<Array<SelectMixedOption>>([])
 
-    const initProcessList = (code: number) => {
-      queryProcessDefinitionList(code).then((result: any) => {
+    const initWorkflowList = (code: number) => {
+      queryWorkflowDefinitionList(code).then((result: any) => {
         result.map((item: { code: number; name: string }) => {
           const option: SelectMixedOption = {
             value: item.code,
             label: () => h(NEllipsis, null, item.name),
             filterLabel: item.name
           }
-          processDefinitionOptions.value.push(option)
+          workflowDefinitionOptions.value.push(option)
         })
       })
     }
 
-    initProcessList(projectCode.value)
+    initWorkflowList(projectCode.value)
 
     const handleSearch = () => {
       let startDate = ''
@@ -91,7 +91,7 @@ export default defineComponent({
         stateType: stateTypeRef.value,
         startDate,
         endDate,
-        processDefineCode: processDefineCodeRef.value
+        workflowDefinitionCode: workflowDefinitionCodeRef.value
       })
     }
 
@@ -122,7 +122,7 @@ export default defineComponent({
     }
 
     const updateValue = (value: number) => {
-      processDefineCodeRef.value = value
+      workflowDefinitionCodeRef.value = value
     }
 
     return {
@@ -136,8 +136,8 @@ export default defineComponent({
       onClearSearchExecutor,
       onClearSearchHost,
       trim,
-      processDefinitionOptions,
-      processDefineCodeRef,
+      workflowDefinitionOptions: workflowDefinitionOptions,
+      workflowDefineCodeRef: workflowDefinitionCodeRef,
       selectFilter,
       updateValue
     }
@@ -146,8 +146,8 @@ export default defineComponent({
     const { t } = useI18n()
     const options = workflowExecutionStateType(t)
     const {
-      processDefinitionOptions,
-      processDefineCodeRef,
+      workflowDefinitionOptions,
+      workflowDefineCodeRef,
       selectFilter,
       updateValue
     } = this
@@ -161,8 +161,8 @@ export default defineComponent({
           size: 'small',
           clearable: true,
           filterable: true,
-          options: unref(processDefinitionOptions),
-          value: processDefineCodeRef,
+          options: unref(workflowDefinitionOptions),
+          value: workflowDefineCodeRef,
           filter: selectFilter,
           onUpdateValue: (value: any) => {
             updateValue(value)

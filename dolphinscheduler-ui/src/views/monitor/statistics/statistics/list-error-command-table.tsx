@@ -75,13 +75,13 @@ const ListErrorCommandTable = defineComponent({
           width: 300,
           render: (row: any) => {
             return h('div', [
-              `Definition Code：${row.processDefinitionCode} `,
+              `Definition Code：${row.workflowDefinitionCode} `,
               h('br'),
-              `Definition Version：${row.processDefinitionVersion} `,
+              `Definition Version：${row.workflowDefinitionVersion} `,
               h('br'),
-              `Instance Id：${row.processInstanceId} `,
+              `Instance Id：${row.workflowInstanceId} `,
               h('br'),
-              `Instance Priority：${row.processInstancePriority} `
+              `Instance Priority：${row.workflowInstancePriority} `
             ])
           }
         },

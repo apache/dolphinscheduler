@@ -21,7 +21,7 @@ interface AuditListReq {
   endDate?: string
   moduleType?: string
   operationType?: string
-  processName?: string
+  workflowName?: string
   projectName?: string
   resourceType?: string
   startDate?: string

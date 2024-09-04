@@ -43,9 +43,6 @@ import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-/**
- * data analysis controller test
- */
 public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
@@ -95,7 +92,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         paramsMap.add("endDate", "2019-12-28 00:00:00");
         paramsMap.add("projectCode", "16");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/workflow-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

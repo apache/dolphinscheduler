@@ -26,26 +26,26 @@
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
         pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,pd.execution_type
-        from t_ds_process_definition pd
+        from t_ds_workflow_definition pd
         WHERE pd.project_code = #{projectCode}
-        and pd.name = #{processDefinitionName}
+        and pd.name = #{workflowDefinitionName}
     </select>
 
     <delete id="deleteByCode">
-        delete from t_ds_process_definition
+        delete from t_ds_workflow_definition
         where code = #{code}
     </delete>
 
     <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where code = #{code}
     </select>
     <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where 1 = 1
         <if test="codes != null and codes.size() != 0">
             and code in
@@ -59,16 +59,16 @@
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, p.id as project_id, pd.user_id, pd.description,
         pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,
         u.user_name,p.name as project_name,pd.execution_type
-        from t_ds_process_definition pd
+        from t_ds_workflow_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
         WHERE p.code = #{projectCode}
-        and pd.name = #{processDefinitionName}
+        and pd.name = #{workflowDefinitionName}
     </select>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         SELECT
         <include refid="baseSql"/>
-        FROM t_ds_process_definition
+        FROM t_ds_workflow_definition
         where project_code = #{projectCode}
         AND project_code = #{projectCode}
         <if test=" userId != 0">
@@ -81,13 +81,13 @@
         </if>
         order by update_time desc, id asc
     </select>
-    <select id="filterProcessDefinition"
+    <select id="filterWorkflowDefinition"
             parameterType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
             resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
     >
         SELECT
         <include refid="baseSql"/>
-        FROM t_ds_process_definition
+        FROM t_ds_workflow_definition
         <where>
             <if test=" pd.projectCode != 0">
                 and project_code = #{pd.projectCode}
@@ -105,14 +105,14 @@
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where project_code = #{projectCode}
         order by create_time desc
     </select>
-    <select id="queryDefinitionListByProjectCodeAndProcessDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition">
+    <select id="queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition">
         select
             code, name, version
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where 1=1
         AND project_code = #{projectCode}
         <if test="codes != null and codes.size() != 0">
@@ -125,7 +125,7 @@
     <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where id in
         <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
             #{i}
@@ -134,7 +134,7 @@
 
     <select id="countDefinitionByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
         SELECT user_id as user_id, tu.user_name as user_name, count(0) as count
-        FROM t_ds_process_definition td
+        FROM t_ds_workflow_definition td
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
         <if test="projectCodes != null and projectCodes.size() != 0">
@@ -148,7 +148,7 @@
 
     <select id="countDefinitionByProjectCodesV2" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
         SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
-        FROM t_ds_process_definition td
+        FROM t_ds_workflow_definition td
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
         <if test="projectCodes != null and projectCodes.size() != 0">
@@ -172,12 +172,12 @@
             pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout,
             pd.update_time, u.user_name,p.name AS project_name ,pd.execution_type
         FROM
-            t_ds_process_definition pd,
+            t_ds_workflow_definition pd,
             t_ds_user u,
             t_ds_project p
         WHERE
             pd.user_id = u.id AND pd.project_code = p.code
-        AND pd.id = #{processDefineId}
+        AND pd.id = #{workflowDefinitionId}
     </select>
 
     <select id="listProjectIds" resultType="java.lang.Integer">
@@ -188,18 +188,18 @@
     <select id="queryDefinitionCodeListByProjectCodes" resultType="java.lang.Long">
         select
         code
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
     </select>
 
-    <select id="queryProjectProcessDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount">
+    <select id="queryProjectWorkflowDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount">
         select
             project_code as projectCode
             ,count(*) as count
-        from t_ds_process_definition
+        from t_ds_workflow_definition
         where project_code in
         <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
             #{i}

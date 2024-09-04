@@ -32,7 +32,7 @@
 
 #### 任务组的使用
 
-注：任务组的使用适用于由 worker 执行的任务，例如【switch】节点、【condition】节点、【sub_process】等由 master 负责执行的节点类型不受任务组控制。
+注：任务组的使用适用于由 worker 执行的任务，例如【switch】节点、【condition】节点、【sub_workflow】等由 master 负责执行的节点类型不受任务组控制。
 
 我们以 shell 节点为例：
 

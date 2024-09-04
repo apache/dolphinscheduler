@@ -52,8 +52,8 @@ tasks:
     version: 1
     projectCode: 1
     userId: 1
-    taskType: SUB_PROCESS
-    taskParams: '{"localParams":[],"resourceList":[],"processDefinitionCode":1}'
+    taskType: SUB_WORKFLOW
+    taskParams: '{"localParams":[],"resourceList":[],"workflowDefinitionCode":1}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
@@ -72,8 +72,8 @@ tasks:
 
 taskRelations:
   - projectCode: 1
-    processDefinitionCode: 2
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 2
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 2
@@ -81,8 +81,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 1

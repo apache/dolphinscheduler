@@ -82,7 +82,7 @@ class MessageServiceImplTest {
 
         WorkflowInstance childInstance = null;
         WorkflowInstanceRelation instanceMap = new WorkflowInstanceRelation();
-        instanceMap.setParentProcessInstanceId(1);
+        instanceMap.setParentWorkflowInstanceId(1);
         instanceMap.setParentTaskInstanceId(10);
         Command command;
 
@@ -160,7 +160,7 @@ class MessageServiceImplTest {
     @Test
     public void testCreateCommand() {
         Command command = new Command();
-        command.setProcessDefinitionCode(123);
+        command.setWorkflowDefinitionCode(123);
         command.setCommandParam("{\"ProcessInstanceId\":222}");
         command.setCommandType(CommandType.START_PROCESS);
         int mockResult = 1;

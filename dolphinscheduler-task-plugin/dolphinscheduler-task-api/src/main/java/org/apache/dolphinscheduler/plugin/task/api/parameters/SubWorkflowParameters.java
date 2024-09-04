@@ -15,12 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * ProcessInstanceDto
- */
-public class WorkflowInstanceDto extends WorkflowInstance {
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class SubWorkflowParameters extends AbstractParameters {
+
+    private long workflowDefinitionCode;
+
+    @Override
+    public boolean checkParameters() {
+        return this.workflowDefinitionCode > 0;
+    }
+
 }

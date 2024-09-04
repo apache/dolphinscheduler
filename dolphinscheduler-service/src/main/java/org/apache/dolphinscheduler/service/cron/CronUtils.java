@@ -276,7 +276,7 @@ public class CronUtils {
                     calendar.add(Calendar.DATE, 1);
                     break;
                 default:
-                    log.error("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum);
+                    log.error("Dependent workflow definition's cycleEnum is {}, not supported!", cycleEnum);
                     break;
             }
             maxExpirationTime = calendar.getTime();

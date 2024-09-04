@@ -47,7 +47,7 @@ public class ParamsTest {
 
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);
 
-        logger.info("start process : {}", command);
+        logger.info("start workflow : {}", command);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());

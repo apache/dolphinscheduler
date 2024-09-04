@@ -86,7 +86,7 @@ public class WorkflowV2Controller extends BaseController {
      * Delete workflow by code
      *
      * @param loginUser login user
-     * @param code      process definition code
+     * @param code      workflow definition code
      * @return Result result object delete
      */
     @Operation(summary = "delete", description = "DELETE_WORKFLOWS_NOTES")
@@ -152,8 +152,8 @@ public class WorkflowV2Controller extends BaseController {
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
     public Result<PageInfo<WorkflowDefinition>> filterWorkflows(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                 @RequestBody WorkflowFilterRequest workflowFilterRequest) {
-        PageInfo<WorkflowDefinition> processDefinitions =
+        PageInfo<WorkflowDefinition> workflowDefinitions =
                 workflowDefinitionService.filterWorkflowDefinition(loginUser, workflowFilterRequest);
-        return Result.success(processDefinitions);
+        return Result.success(workflowDefinitions);
     }
 }

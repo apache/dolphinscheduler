@@ -62,7 +62,7 @@ const props = {
     default: null
   },
   definition: {
-    // The same as the structure responsed by the queryProcessDefinitionByCode api
+    // The same as the structure responsed by the queryWorkflowDefinitionByCode api
     type: Object as PropType<WorkflowDefinition>,
     default: null
   },
@@ -212,10 +212,10 @@ export default defineComponent({
         <span class={Styles['workflow-name']}>
           {route.name === 'workflow-instance-detail'
             ? props.instance?.name
-            : props.definition?.processDefinition?.name ||
+            : props.definition?.workflowDefinition?.name ||
               t('project.dag.create')}
         </span>
-        {props.definition?.processDefinition?.name && (
+        {props.definition?.workflowDefinition?.name && (
           <NTooltip
             v-slots={{
               trigger: () => (
@@ -226,7 +226,7 @@ export default defineComponent({
                     const name =
                       route.name === 'workflow-instance-detail'
                         ? props.instance?.name
-                        : props.definition?.processDefinition?.name
+                        : props.definition?.workflowDefinition?.name
                     copy(name)
                   }}
                   class={Styles['toolbar-btn']}
@@ -240,7 +240,7 @@ export default defineComponent({
             }}
           ></NTooltip>
         )}
-        {props.definition?.processDefinition?.name && (
+        {props.definition?.workflowDefinition?.name && (
           <NTooltip
             v-slots={{
               trigger: () => (
@@ -273,7 +273,7 @@ export default defineComponent({
         )}
         <div class={Styles['toolbar-left-part']}>
           {route.name !== 'workflow-instance-detail' &&
-            props.definition?.processDefinition?.releaseState === 'ONLINE' && (
+            props.definition?.workflowDefinition?.releaseState === 'ONLINE' && (
               <NTag round size='small' type='info'>
                 {t('project.dag.online')}
               </NTag>
@@ -509,7 +509,7 @@ export default defineComponent({
             secondary
             round
             disabled={
-              props.definition?.processDefinition?.releaseState === 'ONLINE' &&
+              props.definition?.workflowDefinition?.releaseState === 'ONLINE' &&
               !props.instance
             }
             onClick={() => {

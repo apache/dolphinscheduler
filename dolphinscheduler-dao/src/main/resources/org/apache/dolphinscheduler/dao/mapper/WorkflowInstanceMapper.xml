@@ -20,24 +20,24 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper">
     <sql id="baseSql">
         id
-        , name, process_definition_version, process_definition_code, project_code, state, recovery, start_time, end_time, run_times,host,
+        , name, workflow_definition_version, workflow_definition_code, project_code, state, recovery, start_time, end_time, run_times,host,
         command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
         warning_group_id, schedule_time, command_start_time, global_params, flag,
-        update_time, is_sub_process, executor_id, history_cmd,
-        process_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
-        dry_run, test_flag, next_process_instance_id, restart_time, state_history
+        update_time, is_sub_workflow, executor_id, history_cmd,
+        workflow_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
+        dry_run, test_flag, next_workflow_instance_id, restart_time, state_history
     </sql>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where id = #{processId}
+        from t_ds_workflow_instance
+        where id = #{id}
     </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
+        from t_ds_workflow_instance
         where 1=1
         <if test="host != null and host != ''">
             and host=#{host}
@@ -50,9 +50,9 @@
         </if>
         order by id asc
     </select>
-    <select id="queryNeedFailoverProcessInstanceHost" resultType="String">
+    <select id="queryNeedFailoverWorkflowInstanceHost" resultType="String">
         select distinct host
-        from t_ds_process_instance
+        from t_ds_workflow_instance
         <if test="states != null and states.length != 0">
             where state in
             <foreach collection="states" item="i" open="(" close=")" separator=",">
@@ -61,10 +61,10 @@
         </if>
     </select>
 
-    <select id="queryTopNProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryTopNWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
+        from t_ds_workflow_instance
         where state = #{status}
         <if test="projectCode != 0">
             and project_code = #{projectCode}
@@ -78,7 +78,7 @@
     <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
+        from t_ds_workflow_instance
         where 1=1
         <if test="tenantCode != ''">
             and tenant_code =#{tenantCode}
@@ -95,7 +95,7 @@
     <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
+        from t_ds_workflow_instance
         where 1=1
         <if test="workerGroupName != ''">
             and worker_group =#{workerGroupName}
@@ -109,14 +109,14 @@
         order by id asc
     </select>
 
-    <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryWorkflowInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where is_sub_process=0
+        from t_ds_workflow_instance
+        where is_sub_workflow=0
         and project_code = #{projectCode}
-        <if test="processDefinitionCode != 0">
-            and process_definition_code = #{processDefinitionCode}
+        <if test="workflowDefinitionCode != 0">
+            and workflow_definition_code = #{workflowDefinitionCode}
         </if>
         <if test="searchVal != null and searchVal != ''">
             and name like concat('%', #{searchVal}, '%')
@@ -142,7 +142,7 @@
         order by start_time desc, end_time desc
     </select>
     <update id="setFailoverByHostAndStateArray">
-        update t_ds_process_instance
+        update t_ds_workflow_instance
         set host=null
         where host =#{host}
         <if test="states != null and states.length != 0">
@@ -153,27 +153,27 @@
         </if>
     </update>
     <update id="updateWorkflowInstanceState">
-        update t_ds_process_instance
+        update t_ds_workflow_instance
         set state = #{targetState}
         where id = #{workflowInstanceId} and state = #{originState}
     </update>
 
-    <update id="updateProcessInstanceByTenantCode">
-        update t_ds_process_instance
+    <update id="updateWorkflowInstanceByTenantCode">
+        update t_ds_workflow_instance
         set tenant_code = #{destTenantCode}
         where tenant_code = #{originTenantCode}
     </update>
 
-    <update id="updateProcessInstanceByWorkerGroupName">
-        update t_ds_process_instance
+    <update id="updateWorkflowInstanceByWorkerGroupName">
+        update t_ds_workflow_instance
         set worker_group = #{destWorkerGroupName}
         where worker_group = #{originWorkerGroupName}
     </update>
 
     <select id="countWorkflowInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto">
         select state, count(0) as count
-        from t_ds_process_instance
-        where is_sub_process = 0
+        from t_ds_workflow_instance
+        where is_sub_workflow = 0
         <if test="startTime != null">
             and start_time <![CDATA[ >= ]]> #{startTime}
         </if>
@@ -189,37 +189,37 @@
         group by state
     </select>
 
-    <select id="queryByProcessDefineCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
+        from t_ds_workflow_instance
+        where workflow_definition_code=#{workflowDefinitionCode}
         order by start_time desc limit #{size}
     </select>
-    <select id="queryLastSchedulerProcess" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryLastSchedulerWorkflow" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select t1.* from (select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode} and test_flag=#{testFlag}
+        from t_ds_workflow_instance
+        where workflow_definition_code=#{workflowDefinitionCode} and test_flag=#{testFlag}
         <if test="startTime != null and endTime != null ">
             and schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>) as t1
         <if test="taskDefinitionCode != null and taskDefinitionCode != 0 and taskDefinitionCode != -1">
             inner join
             t_ds_task_instance as t2
-            on t1.id = t2.process_instance_id and t2.task_code=#{taskDefinitionCode}
+            on t1.id = t2.workflow_instance_id and t2.task_code=#{taskDefinitionCode}
         </if>
         order by end_time desc limit 1
     </select>
-    <select id="queryLastManualProcess" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryLastManualWorkflow" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select t1.*
         from
         (
             select
             <include refid="baseSql"/>
-            from t_ds_process_instance
+            from t_ds_workflow_instance
             where
-            process_definition_code=#{processDefinitionCode} and test_flag=#{testFlag}
+            workflow_definition_code=#{workflowDefinitionCode} and test_flag=#{testFlag}
             and schedule_time is null
             <if test="startTime!=null and endTime != null ">
                 and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
@@ -228,34 +228,34 @@
         <if test="taskCode != null and taskCode!=0 and taskCode!=-1">
         inner join
         t_ds_task_instance as t2
-        on t1.id = t2.process_instance_id and t2.task_code=#{taskCode}
+        on t1.id = t2.workflow_instance_id and t2.task_code=#{taskCode}
         </if>
         order by t1.end_time desc limit 1
     </select>
 
-    <select id="queryFirstScheduleProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code = #{processDefinitionCode} and schedule_time is not null
+        from t_ds_workflow_instance
+        where workflow_definition_code = #{workflowDefinitionCode} and schedule_time is not null
         order by schedule_time
         limit 1
     </select>
 
-    <select id="queryFirstStartProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryFirstStartWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code = #{processDefinitionCode} and start_time is not null
+        from t_ds_workflow_instance
+        where workflow_definition_code = #{workflowDefinitionCode} and start_time is not null
         order by start_time
         limit 1
     </select>
 
-    <select id="queryByProcessDefineCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowDefinitionCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
+        from t_ds_workflow_instance
+        where workflow_definition_code=#{workflowDefinitionCode}
         <if test="states != null and states.length != 0">
             and state in
             <foreach collection="states" item="i" open="(" close=")" separator=",">
@@ -268,9 +268,9 @@
     <select id="queryByWorkflowCodeVersionStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{workflowDefinitionCode}
-        and process_definition_version = #{workflowDefinitionVersion}
+        from t_ds_workflow_instance
+        where workflow_definition_code=#{workflowDefinitionCode}
+        and workflow_definition_version = #{workflowDefinitionVersion}
         <if test="states != null and states.length != 0">
             and state in
             <foreach collection="states" item="i" open="(" close=")" separator=",">
@@ -279,44 +279,16 @@
         </if>
     </select>
 
-    <select id="queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId"
-            resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
-        select
-        <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
-        and process_definition_version = #{processDefinitionVersion}
-        <if test="states != null and states.length != 0">
-            and state in
-            <foreach collection="states" item="i" open="(" close=")" separator=",">
-                #{i}
-            </foreach>
-        </if>
-        and next_process_instance_id=0
-        <if test="id != null">
-            and id <![CDATA[ < ]]> #{id}
-        </if>
-        order by id desc
-    </select>
-    <select id="loadNextProcess4Serial" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
-        select
-        <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode}
-        and state = #{state}
-        and id <![CDATA[ > ]]> #{id}
-        order by id asc limit 1
-    </select>
-    <select id="queryProcessInstanceListV2Paging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryWorkflowInstanceListV2Paging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         SELECT
         <include refid="baseSql"/>
-        FROM t_ds_process_instance
-        where is_sub_process=0
+        FROM t_ds_workflow_instance
+        where is_sub_workflow=0
         <if test="projectCode != 0">
             and project_code = #{projectCode}
         </if>
-        <if test="processDefinitionCode != 0">
-            and process_definition_code = #{processDefinitionCode}
+        <if test="workflowDefinitionCode != 0">
+            and workflow_definition_code = #{workflowDefinitionCode}
         </if>
         <if test="name != null and name != ''">
             and name like concat('%', #{name}, '%')
@@ -337,11 +309,11 @@
     </select>
     <select id="countInstanceStateV2" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select t.state, count(0) as count
-        from t_ds_process_instance t
-        join t_ds_process_definition d on d.code=t.process_definition_code
+        from t_ds_workflow_instance t
+        join t_ds_workflow_definition d on d.code=t.workflow_definition_code
         join t_ds_project p on p.code=d.project_code
         where 1 = 1
-        and t.is_sub_process = 0
+        and t.is_sub_workflow = 0
         <if test="projectIds != null and projectIds.size() != 0">
             and p.id in
             <foreach collection="projectIds" index="index" item="i" open="(" close=")" separator=",">
@@ -359,23 +331,12 @@
         </if>
         group by t.state
     </select>
-    <update id="updateGlobalParamsById">
-        update t_ds_process_instance
-        set global_params = #{globalParams}
-        where id = #{id}
-    </update>
-    <update id="updateNextProcessIdById">
-        update t_ds_process_instance
-        set next_process_instance_id = #{thisInstanceId}
-        where id = #{runningInstanceId}
-          and next_process_instance_id = 0
-    </update>
 
 <!-- There are some columns with the same names in both tables, we use a sub-query here to avoid ambiguity-->
     <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
         <include refid="baseSql"/>
-        from t_ds_process_instance a
+        from t_ds_workflow_instance a
         join
             (select trigger_type, job_id, trigger_code from t_ds_trigger_relation) b
         on a.id = b.job_id

@@ -24,9 +24,6 @@ import java.util.Date;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-/**
- * task relation create request
- */
 @Data
 public class TaskRelationCreateRequest {
 
@@ -42,11 +39,11 @@ public class TaskRelationCreateRequest {
     @Schema(example = "54321", required = true)
     private long postTaskCode;
 
-    public WorkflowTaskRelation convert2ProcessTaskRelation() {
+    public WorkflowTaskRelation convert2WorkflowTaskRelation() {
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
 
         workflowTaskRelation.setProjectCode(this.projectCode);
-        workflowTaskRelation.setProcessDefinitionCode(this.workflowCode);
+        workflowTaskRelation.setWorkflowDefinitionCode(this.workflowCode);
         workflowTaskRelation.setPreTaskCode(this.preTaskCode);
         workflowTaskRelation.setPostTaskCode(this.postTaskCode);
 

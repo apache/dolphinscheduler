@@ -42,8 +42,10 @@ import java.util.Date;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @DolphinScheduler(composeFiles = "docker/python-task/docker-compose.yaml")
+@DisableIfTestFails
 public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
     private static final PythonEnvironment pythonEnvironment = new PythonEnvironment();

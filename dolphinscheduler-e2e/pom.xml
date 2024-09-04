@@ -45,6 +45,7 @@
         <guava.version>31.0.1-jre</guava.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <testcontainers.version>1.19.8</testcontainers.version>
+        <junit-pioneer.version>2.2.0</junit-pioneer.version>
     </properties>
 
     <dependencies>
@@ -71,6 +72,12 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>${junit-pioneer.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

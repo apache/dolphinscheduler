@@ -57,7 +57,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
         workflowTaskRelation.setName("def 1");
 
         workflowTaskRelation.setProjectCode(1L);
-        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setWorkflowDefinitionCode(1L);
         workflowTaskRelation.setPostTaskCode(3L);
         workflowTaskRelation.setPostTaskVersion(1);
         workflowTaskRelation.setPreTaskCode(2L);
@@ -113,7 +113,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
         schedule.setWarningType(WarningType.NONE);
         schedule.setCreateTime(new Date());
         schedule.setUpdateTime(new Date());
-        schedule.setProcessDefinitionCode(id);
+        schedule.setWorkflowDefinitionCode(id);
         scheduleMapper.insert(schedule);
     }
 

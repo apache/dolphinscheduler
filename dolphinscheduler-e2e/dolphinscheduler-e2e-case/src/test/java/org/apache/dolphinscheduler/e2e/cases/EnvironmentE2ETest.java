@@ -29,12 +29,14 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DisableIfTestFails
 class EnvironmentE2ETest {
 
     private static final String environmentName = "test_environment_name";

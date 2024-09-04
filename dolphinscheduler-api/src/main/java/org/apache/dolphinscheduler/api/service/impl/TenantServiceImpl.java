@@ -251,7 +251,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_ERROR);
         }
 
-        workflowInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
+        workflowInstanceMapper.updateWorkflowInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
     }
 
     private List<WorkflowInstance> getWorkflowInstancesByTenant(Tenant tenant) {

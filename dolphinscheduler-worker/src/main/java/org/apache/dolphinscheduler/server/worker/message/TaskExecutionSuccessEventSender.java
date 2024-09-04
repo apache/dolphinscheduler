@@ -41,7 +41,7 @@ public class TaskExecutionSuccessEventSender
     @Override
     public TaskExecutionSuccessEvent buildEvent(TaskExecutionContext taskExecutionContext) {
         return TaskExecutionSuccessEvent.builder()
-                .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .appIds(taskExecutionContext.getAppIds())
                 .processId(taskExecutionContext.getProcessId())

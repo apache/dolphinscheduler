@@ -48,7 +48,7 @@ public class DefaultWorkerTaskExecutorTest {
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
                 .dryRun(Constants.DRY_RUN_FLAG_YES)
                 .taskInstanceId(0)
-                .processDefineId(0)
+                .workflowDefinitionId(0)
                 .firstSubmitTime(System.currentTimeMillis())
                 .build();
         WorkerTaskExecutor workerTaskExecutor = new DefaultWorkerTaskExecutor(
@@ -68,7 +68,7 @@ public class DefaultWorkerTaskExecutorTest {
                 .dryRun(Constants.DRY_RUN_FLAG_NO)
                 .testFlag(Constants.TEST_FLAG_YES)
                 .taskInstanceId(0)
-                .processDefineId(0)
+                .workflowDefinitionId(0)
                 .firstSubmitTime(System.currentTimeMillis())
                 .taskType("SQL")
                 .taskParams(

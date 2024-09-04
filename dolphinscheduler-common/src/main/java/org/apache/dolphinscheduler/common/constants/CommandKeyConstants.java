@@ -31,7 +31,7 @@ public class CommandKeyConstants {
 
     public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
 
-    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
+    public static final String CMD_PARAM_SUB_WORKFLOW = "processInstanceId";
 
     public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
 

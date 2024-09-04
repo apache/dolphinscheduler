@@ -419,11 +419,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     projectCode, taskCode, taskDefinitionToUpdate.getVersion());
         // update workflow task relation
         List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper
-                .queryProcessTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
+                .queryWorkflowTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
                         taskDefinition.getVersion());
         if (CollectionUtils.isNotEmpty(workflowTaskRelations)) {
             Map<Long, List<WorkflowTaskRelation>> workflowTaskRelationGroupList = workflowTaskRelations.stream()
-                    .collect(Collectors.groupingBy(WorkflowTaskRelation::getProcessDefinitionCode));
+                    .collect(Collectors.groupingBy(WorkflowTaskRelation::getWorkflowDefinitionCode));
             for (Map.Entry<Long, List<WorkflowTaskRelation>> workflowTaskRelationMap : workflowTaskRelationGroupList
                     .entrySet()) {
                 Long workflowDefinitionCode = workflowTaskRelationMap.getKey();
@@ -437,9 +437,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     } else if (taskCode == workflowTaskRelation.getPostTaskCode()) {
                         workflowTaskRelation.setPostTaskVersion(version);
                     }
-                    workflowTaskRelation.setProcessDefinitionVersion(workflowDefinitionVersion);
+                    workflowTaskRelation.setWorkflowDefinitionVersion(workflowDefinitionVersion);
                     int updateWorkflowDefinitionVersionCount =
-                            workflowTaskRelationMapper.updateProcessTaskRelationTaskVersion(workflowTaskRelation);
+                            workflowTaskRelationMapper.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation);
                     if (updateWorkflowDefinitionVersionCount != 1) {
                         log.error("batch update workflow task relation error, projectCode:{}, taskDefinitionCode:{}.",
                                 projectCode, taskCode);
@@ -527,11 +527,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (MapUtils.isNotEmpty(queryUpStreamTaskCodeMap)) {
             WorkflowTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    workflowTaskRelationMapper.queryByProcessCode(taskRelation.getProcessDefinitionCode());
+                    workflowTaskRelationMapper.queryByWorkflowDefinitionCode(taskRelation.getWorkflowDefinitionCode());
 
             // set upstream code list
             updateUpstreamTask(new HashSet<>(queryUpStreamTaskCodeMap.keySet()),
-                    taskCode, projectCode, taskRelation.getProcessDefinitionCode(), loginUser);
+                    taskCode, projectCode, taskRelation.getWorkflowDefinitionCode(), loginUser);
 
             List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
             List<WorkflowTaskRelation> relationList = Lists.newArrayList();
@@ -695,9 +695,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 log.info(
                         "Task definition has upstream tasks, start handle them after switch task, taskDefinitionCode:{}.",
                         taskCode);
-                long workflowDefinitionCode = taskRelationList.get(0).getProcessDefinitionCode();
+                long workflowDefinitionCode = taskRelationList.get(0).getWorkflowDefinitionCode();
                 List<WorkflowTaskRelation> workflowTaskRelations =
-                        workflowTaskRelationMapper.queryByProcessCode(workflowDefinitionCode);
+                        workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
                 updateDag(loginUser, workflowDefinitionCode, workflowTaskRelations,
                         Lists.newArrayList(taskDefinitionUpdate));
             } else {

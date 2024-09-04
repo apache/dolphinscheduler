@@ -395,7 +395,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .map(Project::getUserId).distinct().collect(Collectors.toList()));
         Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
         List<ProjectWorkflowDefinitionCount> projectWorkflowDefinitionCountList =
-                workflowDefinitionMapper.queryProjectProcessDefinitionCountByProjectCodes(
+                workflowDefinitionMapper.queryProjectWorkflowDefinitionCountByProjectCodes(
                         projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
         Map<Long, Integer> projectWorkflowDefinitionCountMap = projectWorkflowDefinitionCountList.stream()
                 .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,

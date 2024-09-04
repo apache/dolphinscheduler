@@ -18,7 +18,7 @@
 import { SearchOutlined } from '@vicons/antd'
 import { NButton, NSelect, NIcon, NSpace, NEllipsis } from 'naive-ui'
 import { defineComponent, h, ref, unref } from 'vue'
-import { queryProcessDefinitionList } from '@/service/modules/process-definition'
+import { queryWorkflowDefinitionList } from '@/service/modules/workflow-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { Router, useRouter } from 'vue-router'
 import { SelectOption } from 'naive-ui/es/select/src/interface'
@@ -32,31 +32,31 @@ export default defineComponent({
     const projectCode = ref(
       Number(router.currentRoute.value.params.projectCode)
     )
-    const processDefineCodeRef = router.currentRoute.value.query
-      .processDefineCode
-      ? ref(Number(router.currentRoute.value.query.processDefineCode))
+    const workflowDefinitionCodeRef = router.currentRoute.value.query
+      .workflowDefinitionCode
+      ? ref(Number(router.currentRoute.value.query.workflowDefinitionCode))
       : ref()
 
-    const processDefinitionOptions = ref<Array<SelectMixedOption>>([])
+    const workflowDefinitionOptions = ref<Array<SelectMixedOption>>([])
 
-    const initProcessList = (code: number) => {
-      queryProcessDefinitionList(code).then((result: any) => {
+    const initWorkflowList = (code: number) => {
+      queryWorkflowDefinitionList(code).then((result: any) => {
         result.map((item: { code: number; name: string }) => {
           const option: SelectMixedOption = {
             value: item.code,
             label: () => h(NEllipsis, null, item.name),
             filterLabel: item.name
           }
-          processDefinitionOptions.value.push(option)
+          workflowDefinitionOptions.value.push(option)
         })
       })
     }
 
-    initProcessList(projectCode.value)
+    initWorkflowList(projectCode.value)
 
     const handleSearch = () => {
       ctx.emit('handleSearch', {
-        processDefinitionCode: processDefineCodeRef.value
+        workflowDefinitionCode: workflowDefinitionCodeRef.value
       })
     }
 
@@ -70,21 +70,21 @@ export default defineComponent({
     }
 
     const updateValue = (value: number) => {
-      processDefineCodeRef.value = value
+      workflowDefinitionCodeRef.value = value
     }
 
     return {
       handleSearch,
-      processDefinitionOptions,
-      processDefineCodeRef,
+      workflowDefinitionOptions: workflowDefinitionOptions,
+      workflowDefinitionCodeRef: workflowDefinitionCodeRef,
       selectFilter,
       updateValue
     }
   },
   render() {
     const {
-      processDefineCodeRef,
-      processDefinitionOptions,
+      workflowDefinitionCodeRef,
+      workflowDefinitionOptions,
       selectFilter,
       updateValue
     } = this
@@ -97,8 +97,8 @@ export default defineComponent({
           size: 'small',
           clearable: true,
           filterable: true,
-          value: processDefineCodeRef,
-          options: unref(processDefinitionOptions),
+          value: workflowDefinitionCodeRef,
+          options: unref(workflowDefinitionOptions),
           filter: selectFilter,
           onUpdateValue: (value: any) => {
             updateValue(value)

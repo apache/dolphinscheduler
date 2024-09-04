@@ -52,9 +52,9 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     public void testQueryTaskListPaging() {
 
         TaskInstanceQueryRequest taskInstanceQueryReq = new TaskInstanceQueryRequest();
-        taskInstanceQueryReq.setProcessInstanceId(1);
-        taskInstanceQueryReq.setProcessInstanceName("");
-        taskInstanceQueryReq.setProcessDefinitionName("");
+        taskInstanceQueryReq.setWorkflowInstanceId(1);
+        taskInstanceQueryReq.setWorkflowInstanceName("");
+        taskInstanceQueryReq.setWorkflowDefinitionName("");
         taskInstanceQueryReq.setTaskName("");
         taskInstanceQueryReq.setExecutorName("");
         taskInstanceQueryReq.setStartTime("2022-06-01 00:00:00");
@@ -73,8 +73,8 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
-        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(taskInstanceQueryReq.getProcessInstanceId()),
-                eq(taskInstanceQueryReq.getProcessInstanceName()), eq(taskInstanceQueryReq.getProcessInstanceName()),
+        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(taskInstanceQueryReq.getWorkflowInstanceId()),
+                eq(taskInstanceQueryReq.getWorkflowInstanceName()), eq(taskInstanceQueryReq.getWorkflowInstanceName()),
                 eq(taskInstanceQueryReq.getTaskName()), Mockito.any(), eq(taskInstanceQueryReq.getExecutorName()),
                 any(), any(),
                 eq(taskInstanceQueryReq.getSearchVal()), Mockito.any(), eq(taskInstanceQueryReq.getHost()),
