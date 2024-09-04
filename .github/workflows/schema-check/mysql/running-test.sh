@@ -45,12 +45,3 @@ if [[ ${atlas_result} != *"Schemas are synced"* ]]; then
   echo "${atlas_result}"
   exit 1
 fi
-
-if [[ ${atlas_result} != *"Schemas are synced"* ]]; then
-  echo "================================================================================================"
-  echo "                                !!!!! For Contributors !!!!!"
-  echo "================================================================================================"
-  echo "Database schema not sync, please add below change in the latest version in dolphinscheduler-dao/src/main/resources/sql/upgrade directory"
-  echo "${atlas_result}"
-  exit 1
-fi
