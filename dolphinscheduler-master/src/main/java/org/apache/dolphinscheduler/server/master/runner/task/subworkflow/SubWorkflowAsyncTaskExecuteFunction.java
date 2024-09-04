@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 
 import java.time.Duration;
@@ -32,42 +31,36 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
 
     private static final Duration SUB_WORKFLOW_TASK_EXECUTE_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
 
-    private final TaskExecutionContext taskExecutionContext;
     private final WorkflowInstanceDao workflowInstanceDao;
-    private WorkflowInstance subWorkflowInstance;
 
-    private SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
+    private final SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
 
-    public SubWorkflowAsyncTaskExecuteFunction(TaskExecutionContext taskExecutionContext,
-                                               WorkflowInstanceDao workflowInstanceDao) {
-        this.taskExecutionContext = taskExecutionContext;
+    public SubWorkflowAsyncTaskExecuteFunction(final SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext,
+                                               final WorkflowInstanceDao workflowInstanceDao) {
+        this.subWorkflowLogicTaskRuntimeContext = subWorkflowLogicTaskRuntimeContext;
         this.workflowInstanceDao = workflowInstanceDao;
     }
 
     @Override
     public @NonNull AsyncTaskExecutionStatus getAsyncTaskExecutionStatus() {
+        final Integer subWorkflowInstanceId = subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId();
+        final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(subWorkflowInstanceId);
         if (subWorkflowInstance == null) {
-            createSubWorkflowInstanceIfAbsent();
+            log.info("Cannot find the SubWorkflow instance: {}, maybe it has been deleted", subWorkflowInstanceId);
+            return AsyncTaskExecutionStatus.FAILED;
         }
-        if (subWorkflowInstance == null) {
-            log.info("The sub workflow instance doesn't created");
-            return AsyncTaskExecutionStatus.RUNNING;
+        switch (subWorkflowInstance.getState()) {
+            case PAUSE:
+                return AsyncTaskExecutionStatus.PAUSE;
+            case STOP:
+                return AsyncTaskExecutionStatus.KILL;
+            case SUCCESS:
+                return AsyncTaskExecutionStatus.SUCCESS;
+            case FAILURE:
+                return AsyncTaskExecutionStatus.FAILED;
+            default:
+                return AsyncTaskExecutionStatus.RUNNING;
         }
-        subWorkflowInstance = workflowInstanceDao.queryById(subWorkflowInstance.getId());
-        if (subWorkflowInstance != null && subWorkflowInstance.getState().isFinished()) {
-            return subWorkflowInstance.getState().isSuccess() ? AsyncTaskExecutionStatus.SUCCESS
-                    : AsyncTaskExecutionStatus.FAILED;
-        }
-        return AsyncTaskExecutionStatus.RUNNING;
-    }
-
-    private void createSubWorkflowInstanceIfAbsent() {
-        // todo: we need to creat sub workflow instance here, rather than create command
-        // create command might occur duplicate sub workflow instance when failover
-        // generate the sub workflow instance
-        subWorkflowInstance = workflowInstanceDao.querySubWorkflowInstanceByParentId(
-                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-
     }
 
     @Override

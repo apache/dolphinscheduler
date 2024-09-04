@@ -251,6 +251,11 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     }
 
     @Override
+    public void pause() throws MasterTaskExecuteException {
+        // todo: support pause
+    }
+
+    @Override
     public void kill() {
         try {
             doKillSubWorkflowInstances();

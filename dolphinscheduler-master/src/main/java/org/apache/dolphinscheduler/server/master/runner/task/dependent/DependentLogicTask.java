@@ -18,21 +18,17 @@
 package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
-
-import java.util.Date;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +46,8 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
     private final WorkflowInstanceDao workflowInstanceDao;
 
     private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+
+    private DependentAsyncTaskExecuteFunction dependentAsyncTaskExecuteFunction;
 
     public DependentLogicTask(TaskExecutionContext taskExecutionContext,
                               ProjectDao projectDao,
@@ -72,34 +70,24 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
 
     @Override
     public AsyncTaskExecuteFunction getAsyncTaskExecuteFunction() {
-        return new DependentAsyncTaskExecuteFunction(taskExecutionContext,
+        dependentAsyncTaskExecuteFunction = new DependentAsyncTaskExecuteFunction(taskExecutionContext,
                 taskParameters,
                 projectDao,
                 workflowDefinitionDao,
                 taskDefinitionDao,
                 taskInstanceDao,
                 workflowInstanceDao);
+        return dependentAsyncTaskExecuteFunction;
     }
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        if (workflowExecutionRunnable == null) {
-            log.error("Cannot find the WorkflowExecuteRunnable");
-            return;
-        }
-        TaskInstance taskInstance = workflowExecutionRunnable
-                .getWorkflowExecuteContext()
-                .getWorkflowExecutionGraph()
-                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
-                .getTaskInstance();
-        if (taskInstance == null) {
-            log.error("Cannot find the TaskInstance in workflowExecuteRunnable");
-            return;
-        }
-        taskInstance.setState(TaskExecutionStatus.PAUSE);
-        taskInstance.setEndTime(new Date());
-        taskInstanceDao.upsertTaskInstance(taskInstance);
-        super.pause();
+        // todo: support pause
+    }
+
+    @Override
+    public void kill() throws MasterTaskExecuteException {
+        // todo: support kill
     }
 
 }

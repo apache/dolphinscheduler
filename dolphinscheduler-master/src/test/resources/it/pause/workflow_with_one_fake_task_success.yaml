@@ -24,17 +24,17 @@ project:
   createTime: 2024-08-12 00:00:00
   updateTime: 2021-08-12 00:00:00
 
-workflow:
-  name: workflow_with_one_fake_task_success
-  code: 1
-  version: 1
-  projectCode: 1
-  description: This is a fake workflow with single task
-  releaseState: ONLINE
-  createTime: 2024-08-12 00:00:00
-  updateTime: 2021-08-12 00:00:00
-  userId: 1
-  executionType: PARALLEL
+workflows:
+  - name: workflow_with_one_fake_task_success
+    code: 1
+    version: 1
+    projectCode: 1
+    description: This is a fake workflow with single task
+    releaseState: ONLINE
+    createTime: 2024-08-12 00:00:00
+    updateTime: 2021-08-12 00:00:00
+    userId: 1
+    executionType: PARALLEL
 
 tasks:
   - name: A
