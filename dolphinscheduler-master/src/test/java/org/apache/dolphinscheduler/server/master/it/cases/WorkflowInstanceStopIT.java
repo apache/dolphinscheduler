@@ -255,7 +255,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                             .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .satisfies(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.NO);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.NO);
                             });
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
@@ -269,7 +269,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                             .assertThat(repository.queryWorkflowInstance(subWorkflowDefinition))
                             .satisfiesExactly(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.YES);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
                             });
 
                     Assertions
