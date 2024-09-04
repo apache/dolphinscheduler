@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -118,7 +119,7 @@ public final class FeiShuSender {
             for (Map map : list) {
                 for (Entry<String, Object> entry : (Iterable<Entry<String, Object>>) map.entrySet()) {
                     String key = entry.getKey();
-                    String value = entry.getValue().toString();
+                    String value = Objects.nonNull(entry.getValue().toString()) ? entry.getValue().toString() : "null";
                     contents.append(key + ":" + value);
                     contents.append("\n");
                 }
