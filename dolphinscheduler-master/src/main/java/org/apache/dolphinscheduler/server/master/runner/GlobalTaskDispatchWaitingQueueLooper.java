@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,7 +38,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Autowired
-    private TaskDispatchFactory taskDispatchFactory;
+    private ITaskExecutorClient taskExecutorClient;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -74,8 +73,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
                 log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
                 return;
             }
-            final TaskDispatcher taskDispatcher = taskDispatchFactory.getTaskDispatcher(taskInstance);
-            taskDispatcher.dispatchTask(taskExecutionRunnable);
+            taskExecutorClient.dispatch(taskExecutionRunnable);
         } catch (Exception e) {
             // If dispatch failed, will put the task back to the queue
             // The task will be dispatched after waiting time.

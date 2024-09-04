@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRetryLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRunningLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskStartLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
@@ -65,6 +66,14 @@ public interface ITaskStateAction {
     void startedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                             final ITaskExecutionRunnable taskExecutionRunnable,
                             final TaskRunningLifecycleEvent taskRunningEvent);
+
+    /**
+     * Perform the necessary actions when the task in a certain state receive a {@link TaskRuntimeContextChangedEvent}.
+     * <p> This method is called when the master receive task runtime context changed event from executor.
+     */
+    void runtimeContextChangedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                          final ITaskExecutionRunnable taskExecutionRunnable,
+                                          final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent);
 
     /**
      * Perform the necessary actions when the task in a certain state receive a {@link TaskRetryLifecycleEvent}.

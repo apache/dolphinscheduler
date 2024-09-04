@@ -20,14 +20,11 @@ package org.apache.dolphinscheduler.server.master.rpc;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.extract.common.ILogService;
-import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
-import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 
-import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,11 +53,6 @@ public class MasterLogServiceImpl implements ILogService {
 
         String logContent = LogUtils.rollViewLogLines(lines);
         return new TaskInstanceLogPageQueryResponse(logContent);
-    }
-
-    @Override
-    public GetAppIdResponse getAppId(GetAppIdRequest getAppIdRequest) {
-        return new GetAppIdResponse(Collections.emptyList());
     }
 
     @Override

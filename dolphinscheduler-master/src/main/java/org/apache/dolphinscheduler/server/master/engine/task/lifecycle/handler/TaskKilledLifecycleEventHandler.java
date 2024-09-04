@@ -18,16 +18,25 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKilledLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskKilledLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskKilledLifecycleEvent> {
+
+    private final TaskExecutorClient taskExecutorClient;
+
+    public TaskKilledLifecycleEventHandler(final TaskExecutorClient taskExecutorClient) {
+        this.taskExecutorClient = taskExecutorClient;
+    }
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,
@@ -35,6 +44,11 @@ public class TaskKilledLifecycleEventHandler extends AbstractTaskLifecycleEventH
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskKilledLifecycleEvent taskKilledEvent) {
         taskStateAction.killedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskKilledEvent);
+        taskExecutorClient.ackTaskExecutorLifecycleEvent(
+                taskExecutionRunnable,
+                new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
+                        taskExecutionRunnable.getId(),
+                        TaskExecutorLifecycleEventType.KILLED));
     }
 
     @Override

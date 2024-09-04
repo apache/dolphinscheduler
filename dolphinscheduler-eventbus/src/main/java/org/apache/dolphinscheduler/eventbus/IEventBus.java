@@ -55,6 +55,16 @@ public interface IEventBus<T extends IEvent> {
     Optional<T> poll() throws InterruptedException;
 
     /**
+     * peek the head event from the bus. This method will not block if the event bus is empty will return empty optional.
+     */
+    Optional<T> peek();
+
+    /**
+     * Remove the head event from the bus. This method will not block if the event bus is empty will return empty optional.
+     */
+    Optional<T> remove();
+
+    /**
      * Whether the bus is empty.
      */
     boolean isEmpty();

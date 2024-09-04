@@ -31,11 +31,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -45,7 +42,6 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
@@ -55,18 +51,6 @@ import com.google.common.collect.Lists;
  * <p> The method name should be clear to describe the test scenario.
  */
 public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
-
-    @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
-    private WorkflowOperator workflowOperator;
-
-    @Autowired
-    private IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private Repository repository;
 
     @Test
     @DisplayName("Test start a workflow with one fake task(A) success")
@@ -99,7 +83,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -134,7 +118,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -189,7 +173,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -233,8 +217,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -286,7 +269,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -322,7 +305,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -366,8 +349,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -397,8 +379,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -450,8 +431,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     assertThat(latestTaskInstance.getSubmitTime())
                             .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -489,8 +469,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -520,8 +499,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -558,8 +536,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -597,8 +574,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -664,8 +640,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -706,8 +681,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -742,7 +716,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 }

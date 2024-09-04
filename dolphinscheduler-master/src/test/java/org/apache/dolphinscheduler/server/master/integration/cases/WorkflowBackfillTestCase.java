@@ -17,41 +17,29 @@
 
 package org.apache.dolphinscheduler.server.master.integration.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The integration test for scheduling a workflow from workflow definition.
  */
 public class WorkflowBackfillTestCase extends AbstractMasterIntegrationTestCase {
-
-    @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
-    private WorkflowOperator workflowOperator;
-
-    @Autowired
-    private Repository repository;
 
     @Test
     @DisplayName("Test backfill a workflow in asc order success")
@@ -78,22 +66,17 @@ public class WorkflowBackfillTestCase extends AbstractMasterIntegrationTestCase 
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     final List<WorkflowInstance> workflowInstances = repository.queryWorkflowInstance(workflow);
-                    Assertions
-                            .assertThat(workflowInstances)
-                            .hasSize(4);
-                    Assertions
-                            .assertThat(workflowInstances.get(0).getScheduleTime())
+                    assertThat(workflowInstances).hasSize(4);
+                    assertThat(workflowInstances.get(0).getScheduleTime())
                             .isEqualTo(DateUtils.parseDate("2024-08-11 00:00:00", "yyyy-MM-dd HH:mm:ss"));
-                    Assertions
-                            .assertThat(workflowInstances.get(1).getScheduleTime())
+                    assertThat(workflowInstances.get(1).getScheduleTime())
                             .isEqualTo(DateUtils.parseDate("2024-08-12 00:00:00", "yyyy-MM-dd HH:mm:ss"));
-                    Assertions
-                            .assertThat(workflowInstances.get(2).getScheduleTime())
+                    assertThat(workflowInstances.get(2).getScheduleTime())
                             .isEqualTo(DateUtils.parseDate("2024-08-13 00:00:00", "yyyy-MM-dd HH:mm:ss"));
-                    Assertions
-                            .assertThat(workflowInstances.get(3).getScheduleTime())
+                    assertThat(workflowInstances.get(3).getScheduleTime())
                             .isEqualTo(DateUtils.parseDate("2024-08-14 00:00:00", "yyyy-MM-dd HH:mm:ss"));
                 });
+        masterContainer.assertAllResourceReleased();
 
     }
 

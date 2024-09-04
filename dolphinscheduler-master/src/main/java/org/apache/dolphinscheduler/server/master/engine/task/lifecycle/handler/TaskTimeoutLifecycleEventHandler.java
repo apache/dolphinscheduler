@@ -33,15 +33,17 @@ import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskTimeoutLifecycleEvent> {
 
-    @Autowired
-    private WorkflowAlertManager workflowAlertManager;
+    private final WorkflowAlertManager workflowAlertManager;
+
+    public TaskTimeoutLifecycleEventHandler(final WorkflowAlertManager workflowAlertManager) {
+        this.workflowAlertManager = workflowAlertManager;
+    }
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,

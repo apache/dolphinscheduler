@@ -36,11 +36,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 
 import java.util.HashMap;
 
@@ -64,7 +63,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Mock
-    private TaskDispatchFactory taskDispatchFactory;
+    private ITaskExecutorClient taskExecutorClient;
 
     @Test
     void testTaskExecutionRunnableStatusIsNotSubmitted() throws Exception {
@@ -75,14 +74,13 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         final ITaskExecutionRunnable defaultTaskExecuteRunnable =
                 createTaskExecuteRunnable(taskInstance, workflowInstance);
 
-        TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
-        when(taskDispatchFactory.getTaskDispatcher(taskInstance)).thenReturn(taskDispatcher);
-        doNothing().when(taskDispatcher).dispatchTask(any());
+        doNothing().when(taskExecutorClient).dispatch(any());
 
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
         await().during(ofSeconds(1))
-                .untilAsserted(() -> verify(taskDispatchFactory, never()).getTaskDispatcher(taskInstance));
+                .untilAsserted(() -> verify(taskExecutorClient, never()).dispatch(any()));
+        globalTaskDispatchWaitingQueueLooper.close();
     }
 
     @Test
@@ -94,15 +92,12 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         final ITaskExecutionRunnable defaultTaskExecuteRunnable =
                 createTaskExecuteRunnable(taskInstance, workflowInstance);
 
-        TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
-        when(taskDispatchFactory.getTaskDispatcher(taskInstance)).thenReturn(taskDispatcher);
-        doNothing().when(taskDispatcher).dispatchTask(any());
+        doNothing().when(taskExecutorClient).dispatch(any());
 
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
         await().atMost(ofSeconds(1)).untilAsserted(() -> {
-            verify(taskDispatchFactory, atLeastOnce()).getTaskDispatcher(any(TaskInstance.class));
-            verify(taskDispatcher, atLeastOnce()).dispatchTask(any(ITaskExecutionRunnable.class));
+            verify(taskExecutorClient, atLeastOnce()).dispatch(any(ITaskExecutionRunnable.class));
         });
 
     }

@@ -153,6 +153,11 @@ casdoor:
 
 master:
   listen-port: 5678
+#   The number of workflow event bus fire worker used to fire the workflow event, default is 2*CPU core + 1.
+  workflow-event-bus-fire-thread-count: 10
+  logic-task-config:
+#   The number of threads used to execute logic task.
+    task-executor-thread-count: 10
   # master heartbeat interval
   max-heartbeat-interval: 10s
   server-load-protection:
@@ -185,8 +190,6 @@ master:
 worker:
   # worker listener port
   listen-port: 1234
-  # worker execute thread number to limit task instances in parallel
-  exec-threads: 10
   # worker heartbeat interval
   max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
@@ -201,7 +204,9 @@ worker:
     max-system-memory-usage-percentage-thresholds: 0.9
     # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
     max-disk-usage-percentage-thresholds: 0.9
-  task-execute-threads-full-policy: REJECT
+  physical-task-config:
+    # The number of threads in the Physical task engine that used to execute tasks
+    task-executor-thread-size: 100
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     auto-create-tenant-enabled: true
@@ -319,4 +324,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
-    password: root
+    password: root@123

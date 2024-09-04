@@ -18,9 +18,14 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.server.master.integration.MasterContainer;
+import org.apache.dolphinscheduler.server.master.integration.Repository;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -36,4 +41,15 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractMasterIntegrationTestCase {
 
+    @Autowired
+    protected WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
+
+    @Autowired
+    protected WorkflowOperator workflowOperator;
+
+    @Autowired
+    protected Repository repository;
+
+    @Autowired
+    protected MasterContainer masterContainer;
 }

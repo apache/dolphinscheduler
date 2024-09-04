@@ -1,0 +1,57 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.dolphinscheduler.task.executor.worker;
+
+import org.apache.commons.lang3.RandomUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class TaskExecutorWorkers {
+
+    private final List<TaskExecutorWorker> taskExecutorWorkers;
+
+    public TaskExecutorWorkers(final int workerSize) {
+        this.taskExecutorWorkers = new ArrayList<>();
+        for (int i = 0; i < workerSize; i++) {
+            taskExecutorWorkers.add(new TaskExecutorWorker(i));
+        }
+    }
+
+    public List<TaskExecutorWorker> getTaskExecutorWorkers() {
+        return taskExecutorWorkers;
+    }
+
+    public TaskExecutorWorker getTaskExecutorWorkerById(final int workerId) {
+        return taskExecutorWorkers.get(workerId);
+    }
+
+    public TaskExecutorWorker getRandomTaskExecutorWorker() {
+        return taskExecutorWorkers.get(RandomUtils.nextInt(0, taskExecutorWorkers.size()));
+    }
+
+    public Optional<TaskExecutorWorker> getIdleTaskExecutorWorker() {
+        for (TaskExecutorWorker taskExecutorWorker : taskExecutorWorkers) {
+            if (taskExecutorWorker.getRegisteredTaskExecutorSize() == 0) {
+                return Optional.of(taskExecutorWorker);
+            }
+        }
+        return Optional.empty();
+    }
+}

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.integration.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -27,9 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,20 +36,13 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationTestCase {
 
     @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
     private SystemEventBus systemEventBus;
-
-    @Autowired
-    private Repository repository;
 
     @Test
     public void testGlobalFailover_runningWorkflow_withSubmittedTasks() {
@@ -63,28 +55,25 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS, "state should success")
                             .matches(t -> t.getFlag() == Flag.YES)
                             .matches(t -> StringUtils.isNotEmpty(t.getLogPath()));
                 });
+
+        masterContainer.assertAllResourceReleased();
 
     }
 
@@ -99,33 +88,27 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(2);
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE)
                             .matches(t -> t.getFlag() == Flag.NO);
 
-                    Assertions
-                            .assertThat(taskInstances.get(1))
+                    assertThat(taskInstances.get(1))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES)
                             .matches(t -> StringUtils.isNotEmpty(t.getLogPath()));
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -139,32 +122,27 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(2);
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE)
                             .matches(t -> t.getFlag() == Flag.NO);
 
-                    Assertions
-                            .assertThat(taskInstances.get(1))
+                    assertThat(taskInstances.get(1))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES)
                             .matches(t -> StringUtils.isNotEmpty(t.getLogPath()));
                 });
+        masterContainer.assertAllResourceReleased();
 
     }
 
@@ -179,27 +157,22 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -213,28 +186,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.FAILURE);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.FAILURE)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -248,28 +216,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.PAUSE);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.PAUSE)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -286,33 +249,27 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.PAUSE);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(2);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE)
                             .matches(t -> t.getFlag() == Flag.NO);
 
-                    Assertions
-                            .assertThat(taskInstances.get(1))
+                    assertThat(taskInstances.get(1))
                             .matches(t -> t.getState() == TaskExecutionStatus.PAUSE)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -326,28 +283,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -361,28 +313,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.FAILURE);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.FAILURE)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -396,28 +343,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.PAUSE);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.PAUSE)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -431,28 +373,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.STOP);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.KILL)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -469,33 +406,27 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.STOP);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(2);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE)
                             .matches(t -> t.getFlag() == Flag.NO);
 
-                    Assertions
-                            .assertThat(taskInstances.get(1))
+                    assertThat(taskInstances.get(1))
                             .matches(t -> t.getState() == TaskExecutionStatus.KILL)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -509,28 +440,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -544,28 +470,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.FAILURE);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.FAILURE)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -579,28 +500,23 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
-                                Assertions
-                                        .assertThat(workflowInstance.getState())
+                                assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.STOP);
-                                Assertions
-                                        .assertThat(workflowInstance.getName())
+                                assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
                             });
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(1);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> t.getState() == TaskExecutionStatus.KILL)
                             .matches(t -> t.getFlag() == Flag.YES);
                 });
-
+        masterContainer.assertAllResourceReleased();
     }
 
 }

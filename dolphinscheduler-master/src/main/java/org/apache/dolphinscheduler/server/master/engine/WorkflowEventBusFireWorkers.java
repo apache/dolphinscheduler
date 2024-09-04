@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.annotations.VisibleForTesting;
+
 @Slf4j
 @Component
 public class WorkflowEventBusFireWorkers implements AutoCloseable {
@@ -50,7 +52,7 @@ public class WorkflowEventBusFireWorkers implements AutoCloseable {
         final int workflowEventBusFireThreadCount = masterConfig.getWorkflowEventBusFireThreadCount();
         workflowEventBusFireThreadPool = Executors.newScheduledThreadPool(
                 workflowEventBusFireThreadCount,
-                ThreadUtils.newDaemonThreadFactory("DS-WorkflowEventBusFireWorker-%d"));
+                ThreadUtils.newDaemonThreadFactory("ds-workflow-eventbus-worker-%d"));
         workflowEventBusFireWorkers = new WorkflowEventBusFireWorker[workflowEventBusFireThreadCount];
 
         for (int i = 0; i < workflowEventBusFireThreadCount; i++) {
@@ -71,6 +73,11 @@ public class WorkflowEventBusFireWorkers implements AutoCloseable {
 
     public WorkflowEventBusFireWorker getWorker(Integer workerSlot) {
         return workflowEventBusFireWorkers[workerSlot];
+    }
+
+    @VisibleForTesting
+    public WorkflowEventBusFireWorker[] getWorkers() {
+        return workflowEventBusFireWorkers;
     }
 
     public int getWorkerSize() {

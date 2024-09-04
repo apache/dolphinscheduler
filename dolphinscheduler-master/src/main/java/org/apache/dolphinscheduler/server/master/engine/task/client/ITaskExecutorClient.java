@@ -19,12 +19,30 @@ package org.apache.dolphinscheduler.server.master.engine.task.client;
 
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskKillException;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskPauseException;
+import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskReassignMasterHostException;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
+import org.apache.dolphinscheduler.task.executor.TaskEngine;
+import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 
 /**
- * The client of task executor, used to communicate with task executor.
+ * The client used to communicate with {@link TaskEngine}.
  */
 public interface ITaskExecutorClient {
+
+    /**
+     * Dispatch the task to task executor.
+     *
+     * @throws TaskDispatchException If dispatch failed or error occurs.
+     */
+    void dispatch(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException;
+
+    /**
+     * Reassign the workflow instance host from task executor.
+     *
+     * @throws TaskReassignMasterHostException If an error occurs.
+     */
+    boolean reassignWorkflowInstanceHost(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskReassignMasterHostException;
 
     /**
      * Pause task from task executor.
@@ -34,7 +52,7 @@ public interface ITaskExecutorClient {
      *
      * @throws TaskPauseException If an error occurs.
      */
-    void pause(ITaskExecutionRunnable taskExecutionRunnable) throws TaskPauseException;
+    void pause(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskPauseException;
 
     /**
      * Kill task from task executor.
@@ -44,5 +62,14 @@ public interface ITaskExecutorClient {
      *
      * @throws TaskKillException If an error occurs.
      */
-    void kill(ITaskExecutionRunnable taskExecutionRunnable) throws TaskKillException;
+    void kill(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskKillException;
+
+    /**
+     * Send TaskExecutorLifecycleEventAck to TaskEngine.
+     * <p> This method will not throw exception, once send ack failed, the executor engine will retry.
+     */
+    void ackTaskExecutorLifecycleEvent(
+                                       final ITaskExecutionRunnable taskExecutionRunnable,
+                                       final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
+
 }

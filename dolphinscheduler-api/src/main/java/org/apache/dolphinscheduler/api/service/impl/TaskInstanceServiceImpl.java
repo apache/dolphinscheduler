@@ -46,14 +46,14 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
+import org.apache.dolphinscheduler.extract.worker.IPhysicalTaskExecutorOperator;
 import org.apache.dolphinscheduler.extract.worker.IStreamingTaskInstanceOperator;
-import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -302,11 +302,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
 
         // todo: we only support streaming task for now
-        final TaskInstanceKillResponse taskInstanceKillResponse = Clients
-                .withService(ITaskInstanceOperator.class)
+        final TaskExecutorKillResponse taskExecutorKillResponse = Clients
+                .withService(IPhysicalTaskExecutorOperator.class)
                 .withHost(taskInstance.getHost())
-                .killTask(new TaskInstanceKillRequest(taskInstanceId));
-        log.info("TaskInstance kill response: {}", taskInstanceKillResponse);
+                .killTask(TaskExecutorKillRequest.of(taskInstanceId));
+        log.info("TaskInstance kill response: {}", taskExecutorKillResponse);
 
         putMsg(result, Status.SUCCESS);
         return result;

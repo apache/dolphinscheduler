@@ -44,7 +44,7 @@ public abstract class AbstractTaskLifecycleEventHandler<T extends AbstractTaskLi
         final TaskExecutionStatus state = taskExecutionRunnable.getTaskInstance().getState();
         final ITaskStateAction taskStateAction = taskStateActionFactory.getTaskStateAction(state);
         handle(taskStateAction, workflowExecutionRunnable, taskExecutionRunnable, event);
-        log.info("Fired task {} LifecycleEvent[{}] with state {}",
+        log.info("Fired task {} {} with state {}",
                 taskExecutionRunnable.getName(),
                 event,
                 state.name());

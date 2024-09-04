@@ -64,7 +64,7 @@ public class IdSlotBasedCommandFetcher implements ICommandFetcher {
                 idSlotBasedFetchConfig.getIdStep(),
                 idSlotBasedFetchConfig.getFetchSize());
         long cost = System.currentTimeMillis() - scheduleStartTime;
-        log.info("[Slot-{}/{}] Fetch {} commands in {}ms.", currentSlotIndex, totalSlot, commands.size(), cost);
+        log.debug("[Slot-{}/{}] Fetch {} commands in {}ms.", currentSlotIndex, totalSlot, commands.size(), cost);
         WorkflowInstanceMetrics.recordCommandQueryTime(cost);
         return commands;
     }

@@ -38,6 +38,16 @@ public abstract class AbstractDelayEventBus<T extends AbstractDelayEvent> implem
     }
 
     @Override
+    public Optional<T> peek() {
+        return Optional.ofNullable(delayEventQueue.peek());
+    }
+
+    @Override
+    public Optional<T> remove() {
+        return Optional.ofNullable(delayEventQueue.remove());
+    }
+
+    @Override
     public boolean isEmpty() {
         return delayEventQueue.isEmpty();
     }

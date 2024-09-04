@@ -18,11 +18,14 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRunningLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,12 +35,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskRunningLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskRunningLifecycleEvent> {
 
+    private final ITaskExecutorClient taskExecutorClient;
+
+    public TaskRunningLifecycleEventHandler(final ITaskExecutorClient taskExecutorClient) {
+        this.taskExecutorClient = taskExecutorClient;
+    }
+
     @Override
     public void handle(final ITaskStateAction taskStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskRunningLifecycleEvent taskRunningEvent) {
         taskStateAction.startedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskRunningEvent);
+        taskExecutorClient.ackTaskExecutorLifecycleEvent(
+                taskExecutionRunnable,
+                new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
+                        taskExecutionRunnable.getId(),
+                        TaskExecutorLifecycleEventType.RUNNING));
     }
 
     @Override

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.integration.cases;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -27,36 +27,19 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import java.time.Duration;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The integration test for pausing a workflow instance.
  */
 public class WorkflowInstanceRecoverPauseTestCase extends AbstractMasterIntegrationTestCase {
-
-    @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
-    private WorkflowOperator workflowOperator;
-
-    @Autowired
-    private IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private Repository repository;
 
     @Test
     @DisplayName("Test recover a a workflow which is paused with one sub workflow task")
@@ -75,21 +58,19 @@ public class WorkflowInstanceRecoverPauseTestCase extends AbstractMasterIntegrat
                 .pollInterval(Duration.ofMillis(100))
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(context.getWorkflows().get(1)))
+                    assertThat(repository.queryWorkflowInstance(context.getWorkflows().get(1)))
                             .satisfiesExactly(workflowInstance -> {
                                 assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                             });
                 });
 
-        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess());
+        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
 
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .satisfies(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.PAUSE);
                                 assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.NO);
@@ -102,24 +83,20 @@ public class WorkflowInstanceRecoverPauseTestCase extends AbstractMasterIntegrat
                 .pollInterval(Duration.ofMillis(100))
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .matches(
                                     workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
-                    Assertions
-                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                    assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
 
                     List<WorkflowInstance> subWorkflowInstances =
                             repository.queryWorkflowInstance(context.getWorkflows().get(1));
-                    Assertions
-                            .assertThat(subWorkflowInstances)
+                    assertThat(subWorkflowInstances)
                             .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
                                     .isEqualTo(WorkflowExecutionStatus.SUCCESS));
-                    Assertions
-                            .assertThat(repository.queryTaskInstance(subWorkflowInstances.get(0).getId()))
+                    assertThat(repository.queryTaskInstance(subWorkflowInstances.get(0).getId()))
                             .hasSize(2)
                             .satisfies(taskInstance -> {
                                 assertThat(taskInstance.get(0).getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
@@ -130,7 +107,7 @@ public class WorkflowInstanceRecoverPauseTestCase extends AbstractMasterIntegrat
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
 }
