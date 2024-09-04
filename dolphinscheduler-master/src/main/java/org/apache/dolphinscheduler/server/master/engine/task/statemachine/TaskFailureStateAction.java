@@ -73,15 +73,14 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         // check the retry times
-        if (!taskExecutionRunnable.isTaskInstanceNeedRetry()) {
+        if (!taskExecutionRunnable.isTaskInstanceCanRetry()) {
             log.info("The task: {} cannot retry, because the retry times: {} is over the max retry times: {}",
                     taskInstance.getName(),
                     taskInstance.getRetryTimes(),
                     taskInstance.getMaxRetryTimes());
             return;
         }
-        taskExecutionRunnable.initializeRetryTaskInstance();
-        taskExecutionRunnable.getWorkflowEventBus().publish(TaskStartLifecycleEvent.of(taskExecutionRunnable));
+        taskExecutionRunnable.retry();
     }
 
     @Override
@@ -117,7 +116,7 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
         // This case happen when the task is failure but the task is in delay retry queue.
         // We don't remove the event in GlobalWorkflowDelayEventCoordinator the event should be dropped when the task is
         // killed.
-        if (taskExecutionRunnable.isTaskInstanceNeedRetry()
+        if (taskExecutionRunnable.isTaskInstanceCanRetry()
                 && workflowExecutionGraph.isTaskExecutionRunnableActive(taskExecutionRunnable)) {
             workflowExecutionGraph.markTaskExecutionRunnableChainPause(taskExecutionRunnable);
             publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
@@ -143,7 +142,7 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
         // This case happen when the task is failure but the task is in delay retry queue.
         // We don't remove the event in GlobalWorkflowDelayEventCoordinator the event should be dropped when the task is
         // killed.
-        if (taskExecutionRunnable.isTaskInstanceNeedRetry()
+        if (taskExecutionRunnable.isTaskInstanceCanRetry()
                 && workflowExecutionGraph.isTaskExecutionRunnableActive(taskExecutionRunnable)) {
             workflowExecutionGraph.markTaskExecutionRunnableChainKill(taskExecutionRunnable);
             publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);

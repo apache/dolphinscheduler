@@ -21,8 +21,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKillLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPauseLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
@@ -67,12 +66,10 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
         super.transformWorkflowInstanceState(workflowExecutionRunnable, WorkflowExecutionStatus.READY_PAUSE);
         try {
             LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
-            final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
             workflowExecutionRunnable
                     .getWorkflowExecutionGraph()
                     .getActiveTaskExecutionRunnable()
-                    .forEach(taskExecutionRunnable -> workflowEventBus
-                            .publish(TaskPauseLifecycleEvent.of(taskExecutionRunnable)));
+                    .forEach(ITaskExecutionRunnable::pause);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
         }
@@ -93,12 +90,10 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
         // do pause action
         try {
             LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
-            final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
             workflowExecutionRunnable
                     .getWorkflowExecutionGraph()
                     .getActiveTaskExecutionRunnable()
-                    .forEach(taskExecutionRunnable -> workflowEventBus
-                            .publish(TaskKillLifecycleEvent.of(taskExecutionRunnable)));
+                    .forEach(ITaskExecutionRunnable::kill);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
         }

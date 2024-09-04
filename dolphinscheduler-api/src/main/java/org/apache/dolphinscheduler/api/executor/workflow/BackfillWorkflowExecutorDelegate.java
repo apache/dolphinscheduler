@@ -122,7 +122,6 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 .startNodes(backfillWorkflowDTO.getStartNodes())
                 .failureStrategy(backfillWorkflowDTO.getFailureStrategy())
                 .taskDependType(backfillWorkflowDTO.getTaskDependType())
-                .execType(backfillWorkflowDTO.getExecType())
                 .warningType(backfillWorkflowDTO.getWarningType())
                 .warningGroupId(backfillWorkflowDTO.getWarningGroupId())
                 .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())

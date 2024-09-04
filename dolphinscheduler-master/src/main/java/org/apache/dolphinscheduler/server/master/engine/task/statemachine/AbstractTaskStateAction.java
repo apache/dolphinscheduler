@@ -23,12 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionSta
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.Clients;
-import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
-import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
@@ -170,7 +165,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceFailedEventToDB(taskExecutionRunnable, taskFailedEvent);
 
-        if (taskExecutionRunnable.isTaskInstanceNeedRetry()) {
+        if (taskExecutionRunnable.isTaskInstanceCanRetry()) {
             taskExecutionRunnable.getWorkflowEventBus().publish(TaskRetryLifecycleEvent.of(taskExecutionRunnable));
             return;
         }
@@ -227,44 +222,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
      * <p> If the take-over fails, will generate a failover task-instance and mark the task instance status to {@link TaskExecutionStatus#NEED_FAULT_TOLERANCE}.
      */
     protected void failoverTask(final ITaskExecutionRunnable taskExecutionRunnable) {
-        if (!taskExecutionRunnable.isTaskInstanceInitialized()) {
-            throw new IllegalStateException("The task instance hasn't been initialized, cannot take over the task");
-        }
-        if (takeOverTask(taskExecutionRunnable)) {
-            log.info("Failover task success, the task {} has been taken-over", taskExecutionRunnable.getName());
-            return;
-        }
-        taskExecutionRunnable.initializeFailoverTaskInstance();
-        tryToDispatchTask(taskExecutionRunnable);
-        log.info("Failover task success, the task {} has been resubmitted.", taskExecutionRunnable.getName());
-    }
-
-    private boolean takeOverTask(final ITaskExecutionRunnable taskExecutionRunnable) {
-        if (!taskExecutionRunnable.isTaskInstanceInitialized()) {
-            log.debug("Task: {} doesn't initialized yet, cannot take over the task", taskExecutionRunnable.getName());
-            return false;
-        }
-        if (TaskTypeUtils.isLogicTask(taskExecutionRunnable.getTaskInstance().getTaskType())) {
-            return false;
-        }
-        if (StringUtils.isEmpty(taskExecutionRunnable.getTaskInstance().getHost())) {
-            log.debug("Task: {} host is empty, cannot take over the task", taskExecutionRunnable.getName());
-            return false;
-        }
-        try {
-            final TakeOverTaskRequest takeOverTaskRequest = TakeOverTaskRequest.builder()
-                    .taskInstanceId(taskExecutionRunnable.getTaskInstance().getId())
-                    .workflowHost(masterConfig.getMasterAddress())
-                    .build();
-            final TakeOverTaskResponse takeOverTaskResponse = Clients
-                    .withService(ITaskInstanceOperator.class)
-                    .withHost(taskExecutionRunnable.getTaskInstance().getHost())
-                    .takeOverTask(takeOverTaskRequest);
-            return takeOverTaskResponse.isSuccess();
-        } catch (Exception ex) {
-            log.warn("Take over task: {} failed", taskExecutionRunnable.getName(), ex);
-            return false;
-        }
+        taskExecutionRunnable.failover();
     }
 
     protected void tryToDispatchTask(final ITaskExecutionRunnable taskExecutionRunnable) {

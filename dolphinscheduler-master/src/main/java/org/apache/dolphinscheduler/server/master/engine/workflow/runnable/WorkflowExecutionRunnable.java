@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
@@ -28,8 +29,6 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.context.ApplicationContext;
 
 @Slf4j
 public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
@@ -41,7 +40,6 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
 
     public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder) {
-        final ApplicationContext applicationContext = workflowExecutionRunnableBuilder.getApplicationContext();
         this.workflowExecuteContext = workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder().build();
         this.workflowInstanceLifecycleListeners = workflowExecuteContext.getWorkflowInstanceLifecycleListeners();
     }
@@ -67,4 +65,12 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
         workflowInstanceLifecycleListeners.add(listener);
     }
 
+    @Override
+    public String toString() {
+        final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        return "WorkflowExecutionRunnable{" +
+                "name=" + workflowInstance.getName() +
+                ", state=" + workflowInstance.getState().name() +
+                '}';
+    }
 }

@@ -32,17 +32,48 @@ public interface ITaskExecutionRunnable
         extends
             Comparable<ITaskExecutionRunnable> {
 
-    String getName();
+    default String getName() {
+        return getTaskDefinition().getName();
+    }
 
+    /**
+     * Whether the task instance is initialized.
+     * <p> If the ITaskExecutionRunnable is never triggered, it is not initialized.
+     * <p> If the ITaskExecutionRunnable is created by failover, recovered then it is initialized.
+     */
     boolean isTaskInstanceInitialized();
 
-    void initializeTaskInstance();
+    /**
+     * Initialize the task instance with {@link FirstRunTaskInstanceFactory}
+     */
+    void initializeFirstRunTaskInstance();
 
-    boolean isTaskInstanceNeedRetry();
+    /**
+     * Whether the task instance is running.
+     */
+    boolean isTaskInstanceCanRetry();
 
-    void initializeRetryTaskInstance();
+    /**
+     * Retry the TaskExecutionRunnable.
+     * <p> Will create retry task instance and start it.
+     */
+    void retry();
 
-    void initializeFailoverTaskInstance();
+    /**
+     * Failover the TaskExecutionRunnable.
+     * <p> The failover logic is judged by the task instance state.
+     */
+    void failover();
+
+    /**
+     * Pause the TaskExecutionRunnable.
+     */
+    void pause();
+
+    /**
+     * Kill the TaskExecutionRunnable.
+     */
+    void kill();
 
     WorkflowEventBus getWorkflowEventBus();
 
