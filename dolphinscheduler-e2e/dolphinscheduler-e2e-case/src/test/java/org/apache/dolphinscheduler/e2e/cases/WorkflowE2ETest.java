@@ -145,7 +145,7 @@ class WorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         workflowDefinitionPage
-                .createSubWorkflowWorkflow()
+                .createSubWorkflowTask()
 
                 .<SubWorkflowTaskForm>addTask(TaskType.SUB_WORKFLOW)
                 .childNode("test-workflow-1")

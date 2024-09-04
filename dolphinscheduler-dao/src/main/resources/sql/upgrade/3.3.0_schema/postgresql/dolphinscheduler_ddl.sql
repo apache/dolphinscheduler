@@ -127,6 +127,10 @@ DROP FUNCTION IF EXISTS drop_column_t_ds_alert_plugin_instance();
 DROP TABLE IF EXISTS t_ds_trigger_relation;
 
 -- Rename tables and fields from process to workflow
+delimiter d//
+CREATE OR REPLACE FUNCTION rename_tables_and_fields_from_process_to_workflow() RETURNS void AS $$
+BEGIN
+
 ALTER TABLE t_ds_alert RENAME COLUMN process_definition_code workflow_definition_code bigint;
 ALTER TABLE t_ds_alert RENAME COLUMN process_instance_id workflow_instance_id int;
 
@@ -174,3 +178,11 @@ ALTER TABLE t_ds_process_task_relation RENAME TO t_ds_workflow_task_relation;
 ALTER TABLE t_ds_process_task_relation_log RENAME TO t_ds_workflow_task_relation_log;
 ALTER TABLE t_ds_process_instance RENAME TO t_ds_workflow_instance;
 ALTER TABLE t_ds_relation_process_instance RENAME TO t_ds_relation_workflow_instance;
+
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select rename_tables_and_fields_from_process_to_workflow();
+DROP FUNCTION IF EXISTS rename_tables_and_fields_from_process_to_workflow();
+

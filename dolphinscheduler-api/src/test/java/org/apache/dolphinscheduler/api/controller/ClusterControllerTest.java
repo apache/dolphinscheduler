@@ -84,7 +84,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
         clusterCode = (String) result.getData();
     }
 
-    // @Test
+    @Test
     public void testUpdateCluster() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("code", clusterCode);

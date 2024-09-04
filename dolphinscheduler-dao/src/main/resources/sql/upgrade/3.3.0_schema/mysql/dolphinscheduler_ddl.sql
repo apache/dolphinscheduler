@@ -128,6 +128,11 @@ DROP PROCEDURE drop_column_t_ds_alert_plugin_instance;
 DROP TABLE IF EXISTS `t_ds_trigger_relation`;
 
 -- Rename tables and fields from process to workflow
+DROP PROCEDURE if EXISTS rename_tables_and_fields_from_process_to_workflow;
+delimiter d//
+CREATE PROCEDURE rename_tables_and_fields_from_process_to_workflow()
+BEGIN
+
 ALTER TABLE t_ds_alert change process_definition_code workflow_definition_code bigint(20);
 ALTER TABLE t_ds_alert change process_instance_id workflow_instance_id int(11);
 
@@ -172,3 +177,10 @@ RENAME TABLE t_ds_process_task_relation TO t_ds_workflow_task_relation;
 RENAME TABLE t_ds_process_task_relation_log TO t_ds_workflow_task_relation_log;
 RENAME TABLE t_ds_process_instance TO t_ds_workflow_instance;
 RENAME TABLE t_ds_relation_process_instance TO t_ds_relation_workflow_instance;
+
+END;
+d//
+delimiter ;
+CALL rename_tables_and_fields_from_process_to_workflow;
+DROP PROCEDURE rename_tables_and_fields_from_process_to_workflow;
+

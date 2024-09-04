@@ -68,7 +68,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
 
     private final SubWorkflowService subWorkflowService;
 
-    private final WorkflowDefinitionMapper processDefineMapper;
+    private final WorkflowDefinitionMapper workflowDefinitionMapper;
 
     private final CommandMapper commandMapper;
 
@@ -85,7 +85,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                             TaskInstanceDao taskInstanceDao,
                             SubWorkflowService subWorkflowService,
                             ProcessService processService,
-                            WorkflowDefinitionMapper processDefineMapper,
+                            WorkflowDefinitionMapper workflowDefinitionMapper,
                             CommandMapper commandMapper) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<DynamicParameters>() {
@@ -93,7 +93,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         this.workflowInstanceDao = workflowInstanceDao;
         this.subWorkflowService = subWorkflowService;
         this.processService = processService;
-        this.processDefineMapper = processDefineMapper;
+        this.workflowDefinitionMapper = workflowDefinitionMapper;
         this.commandMapper = commandMapper;
 
         this.workflowInstance = workflowInstanceDao.queryById(taskExecutionContext.getWorkflowInstanceId());
@@ -146,7 +146,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     public void generateSubWorkflowInstance(List<Map<String, String>> parameterGroup) throws MasterTaskExecuteException {
         List<WorkflowInstance> workflowInstanceList = new ArrayList<>();
         WorkflowDefinition subWorkflowDefinition =
-                processDefineMapper.queryByCode(taskParameters.getProcessDefinitionCode());
+                workflowDefinitionMapper.queryByCode(taskParameters.getWorkflowDefinitionCode());
         for (Map<String, String> parameters : parameterGroup) {
             String dynamicStartParams = JSONUtils.toJsonString(parameters);
             Command command = DynamicCommandUtils.createCommand(workflowInstance, subWorkflowDefinition.getCode(),

@@ -133,14 +133,12 @@ jobs:
           /bin/bash ${{ matrix.case.script }}
   schema-check:
     runs-on: ubuntu-latest
-    # Temporarily disable schema check until 3.3.0 is released
-#    if: ${{ (needs.paths-filter.outputs.db-schema == 'true') || (github.event_name == 'push') }}
-    if: false
+    if: ${{ (needs.paths-filter.outputs.db-schema == 'true') || (github.event_name == 'push') }}
     timeout-minutes: 20
     needs: build
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0.33
         env:
           MYSQL_ROOT_PASSWORD: mysql
           MYSQL_DATABASE: dolphinscheduler_dev
@@ -159,7 +157,7 @@ jobs:
       fail-fast: false
       matrix:
         db: ["mysql", "postgresql"]
-        version: ["3.3.0"]
+        version: ["3.1.9", "3.2.0"]
     steps:
       - name: Set up JDK 8
         uses: actions/setup-java@v4
@@ -181,6 +179,7 @@ jobs:
           echo "DATABASE_VERSION=${VERSION//\./}" >> $GITHUB_ENV
       - name: Prepare
         run: |
+          set -x
           wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P dolphinscheduler/${{ matrix.version }}
           tar -xzf dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -C dolphinscheduler/${{ matrix.version }} --strip-components 1
           tar -xzf dolphinscheduler/dev/apache-dolphinscheduler-*-bin.tar.gz -C dolphinscheduler/dev --strip-components 1
@@ -204,6 +203,7 @@ jobs:
           fi
       - name: Check
         run: |
+          set -x
           if [[ $DATABASE_VERSION -lt 300 ]]; then
             chmod +x dolphinscheduler/dev/tools/bin/upgrade-schema.sh dolphinscheduler/${{ matrix.version }}/script/create-dolphinscheduler.sh
           else
@@ -268,7 +268,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ build, paths-filter, cluster-test ]
+    needs: [ build, paths-filter, cluster-test, schema-check ]
     if: always()
     steps:
       - name: Status
@@ -277,7 +277,7 @@ jobs:
             echo "Skip Build!"
             exit 0
           fi
-          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' ]]; then
+          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' || ${{ needs.schema-check.result }} != 'success' ]]; then
             echo "Build Failed!"
             exit -1
           fi
