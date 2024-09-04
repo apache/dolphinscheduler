@@ -71,6 +71,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,8 @@ public class ResourcePermissionCheckServiceImpl
 
     public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP =
             new ConcurrentHashMap<>();
+    @Autowired
+    private ProcessServiceImpl processServiceImpl;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -256,6 +259,9 @@ public class ResourcePermissionCheckServiceImpl
 
         private final EnvironmentMapper environmentMapper;
 
+        @Autowired
+        private ProcessService processService;
+
         public EnvironmentResourcePermissionCheck(EnvironmentMapper environmentMapper) {
             this.environmentMapper = environmentMapper;
         }
@@ -267,6 +273,10 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
+            User user = processService.getUserById(userId);
+            if (user.getUserType() != UserType.ADMIN_USER) {
+                return false;
+            }
             return true;
         }
 
