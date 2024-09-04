@@ -95,6 +95,12 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                                 // put it back to the queue to get the status again.
                                 asyncMasterTaskDelayQueue.addAsyncTask(asyncTaskExecutionContext);
                                 break;
+                            case PAUSE:
+                                asyncTaskCallbackFunction.executePause();
+                                break;
+                            case KILL:
+                                asyncTaskCallbackFunction.executeKilled();
+                                break;
                             case SUCCESS:
                                 asyncTaskCallbackFunction.executeSuccess();
                                 break;

@@ -33,6 +33,10 @@ public interface AsyncTaskExecuteFunction {
 
         RUNNING,
 
+        PAUSE,
+
+        KILL,
+
         SUCCESS,
 
         FAILED,

@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,15 +33,6 @@ public abstract class BaseAsyncLogicTask<T extends AbstractParameters> implement
         this.taskExecutionContext = taskExecutionContext;
         this.taskParameters = taskParameters;
         log.info("Success initialize task parameters: \n{}", JSONUtils.toPrettyJsonString(taskParameters));
-    }
-
-    @Override
-    public void kill() {
-        MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
-    }
-
-    public void pause() throws MasterTaskExecuteException {
-        MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
     }
 
     @Override

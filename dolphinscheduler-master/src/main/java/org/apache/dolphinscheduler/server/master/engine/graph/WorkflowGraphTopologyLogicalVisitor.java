@@ -20,27 +20,31 @@ package org.apache.dolphinscheduler.server.master.engine.graph;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class WorkflowGraphBfsVisitor {
+import com.google.common.collect.Sets;
 
-    private IWorkflowGraph workflowGraph;
+public class WorkflowGraphTopologyLogicalVisitor {
 
-    private TaskDependType taskDependType;
+    private final IWorkflowGraph workflowGraph;
 
-    private Set<String> startNodes;
+    private final TaskDependType taskDependType;
 
-    private BiConsumer<String, Set<String>> visitFunction;
+    private final Set<String> startNodes;
 
-    private WorkflowGraphBfsVisitor(WorkflowGraphBfsVisitorBuilder workflowGraphBfsVisitorBuilder) {
+    private final BiConsumer<String, Set<String>> visitFunction;
+
+    private WorkflowGraphTopologyLogicalVisitor(WorkflowGraphBfsVisitorBuilder workflowGraphBfsVisitorBuilder) {
         this.taskDependType = workflowGraphBfsVisitorBuilder.taskDependType;
         this.workflowGraph = checkNotNull(workflowGraphBfsVisitorBuilder.workflowGraph);
         this.visitFunction = checkNotNull(workflowGraphBfsVisitorBuilder.visitFunction);
@@ -72,60 +76,76 @@ public class WorkflowGraphBfsVisitor {
     }
 
     /**
-     * visit start nodes only
+     * Visit start nodes only.
      */
     private void visitStartNodesOnly() {
-        startNodes.forEach(startNode -> {
-            final Set<String> realSuccessors = workflowGraph.getSuccessors(startNode)
-                    .stream()
-                    .filter(startNode::contains)
-                    .collect(Collectors.toSet());
-            visitFunction.accept(startNode, realSuccessors);
-        });
+        doVisitationInSubGraph(Sets.newHashSet(startNodes));
     }
 
     /**
-     * Find the graph nodes that can be reached to the start nodes
+     * Find the graph nodes that can be reached to the start nodes, and then do visitation with topology logical.
      */
     private void visitToStartNodes() {
         final LinkedList<String> bootstrapTaskCodes = new LinkedList<>(startNodes);
-        final Set<String> visited = new HashSet<>();
+        final Set<String> subGraphNodes = new HashSet<>();
         while (!bootstrapTaskCodes.isEmpty()) {
             String taskName = bootstrapTaskCodes.removeFirst();
-            if (visited.contains(taskName)) {
+            if (subGraphNodes.contains(taskName)) {
                 continue;
             }
-            visited.add(taskName);
+            subGraphNodes.add(taskName);
             final Set<String> successors = workflowGraph.getPredecessors(taskName);
             bootstrapTaskCodes.addAll(successors);
         }
-        visited.forEach(taskName -> {
-            Set<String> realSuccessors = workflowGraph.getSuccessors(taskName)
-                    .stream()
-                    .filter(visited::contains)
-                    .collect(Collectors.toSet());
-            visitFunction.accept(taskName, realSuccessors);
-        });
+        doVisitationInSubGraph(subGraphNodes);
     }
 
     /**
-     * Find the graph nodes that can be reached from the start nodes
+     * Find the graph nodes that can be reached from the start nodes, and then do visitation with topology logical.
      */
     private void visitFromStartNodes() {
         final LinkedList<String> bootstrapTaskCodes = new LinkedList<>(startNodes);
-        final Set<String> visited = new HashSet<>();
+        final Set<String> subGraphNodes = new HashSet<>();
+        while (!bootstrapTaskCodes.isEmpty()) {
+            String taskName = bootstrapTaskCodes.removeFirst();
+            if (subGraphNodes.contains(taskName)) {
+                continue;
+            }
+            subGraphNodes.add(taskName);
+            final Set<String> successors = workflowGraph.getSuccessors(taskName);
+            bootstrapTaskCodes.addAll(successors);
+        }
+        doVisitationInSubGraph(subGraphNodes);
+    }
+
+    private void doVisitationInSubGraph(Set<String> subGraphNodes) {
+        // visit from the workflow graph by topology
+        // If the node is not in the subGraph, then skip it.
+        Map<String, Integer> inDegreeMap = workflowGraph.getAllTaskNodes()
+                .stream()
+                .collect(Collectors.toMap(TaskDefinition::getName,
+                        taskDefinition -> workflowGraph.getPredecessors(taskDefinition.getName()).size()));
+        final LinkedList<String> bootstrapTaskCodes = inDegreeMap
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() == 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(LinkedList::new));
 
         while (!bootstrapTaskCodes.isEmpty()) {
             String taskName = bootstrapTaskCodes.removeFirst();
-            if (visited.contains(taskName)) {
+            if (inDegreeMap.get(taskName) > 0) {
                 continue;
             }
-            visited.add(taskName);
             final Set<String> successors = workflowGraph.getSuccessors(taskName);
-            visitFunction.accept(taskName, successors);
+            if (subGraphNodes.contains(taskName)) {
+                visitFunction.accept(taskName, successors);
+            }
+            for (String successor : successors) {
+                inDegreeMap.put(successor, inDegreeMap.get(successor) - 1);
+            }
             bootstrapTaskCodes.addAll(successors);
         }
-
     }
 
     public static class WorkflowGraphBfsVisitorBuilder {
@@ -158,8 +178,8 @@ public class WorkflowGraphBfsVisitor {
             return this;
         }
 
-        public WorkflowGraphBfsVisitor build() {
-            return new WorkflowGraphBfsVisitor(this);
+        public WorkflowGraphTopologyLogicalVisitor build() {
+            return new WorkflowGraphTopologyLogicalVisitor(this);
         }
     }
 }

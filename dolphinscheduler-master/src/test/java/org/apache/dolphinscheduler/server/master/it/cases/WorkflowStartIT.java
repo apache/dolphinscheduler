@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -72,21 +73,21 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
@@ -99,11 +100,115 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     }
 
     @Test
+    @DisplayName("Test start a workflow with one sub workflow task(A) success")
+    public void testStartWorkflow_with_subWorkflowTask_success() {
+        final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
+        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                            .matches(
+                                    workflowInstance -> workflowInstance.getIsSubProcess() == Flag.NO);
+
+                    final List<WorkflowInstance> subWorkflowInstance =
+                            repository.queryWorkflowInstance(context.getWorkflows().get(1));
+                    Assertions
+                            .assertThat(subWorkflowInstance)
+                            .hasSize(1)
+                            .satisfiesExactly(workflowInstance -> {
+                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.YES);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(subWorkflowInstance.get(0).getId()))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("fake_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                });
+
+        assertThat(workflowRepository.getAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one sub workflow task(A) failed")
+    public void testStartWorkflow_with_subWorkflowTask_failed() {
+        final String yaml = "/it/start/workflow_with_sub_workflow_task_failed.yaml";
+        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
+                            .matches(
+                                    workflowInstance -> workflowInstance.getIsSubProcess() == Flag.NO);
+
+                    final List<WorkflowInstance> subWorkflowInstance =
+                            repository.queryWorkflowInstance(context.getWorkflows().get(1));
+                    Assertions
+                            .assertThat(subWorkflowInstance)
+                            .hasSize(1)
+                            .satisfiesExactly(workflowInstance -> {
+                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.FAILURE);
+                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.YES);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(subWorkflowInstance.get(0).getId()))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("fake_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            });
+                });
+
+        assertThat(workflowRepository.getAll()).isEmpty();
+    }
+
+    @Test
     @DisplayName("Test start a workflow which using workflow params")
     public void testStartWorkflow_usingWorkflowParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -139,7 +244,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_usingCommandParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
@@ -184,7 +289,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_oneFailedTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -215,7 +320,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_oneFailedTaskWithRetry() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -268,7 +373,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoSerialSuccessTask() {
         String yaml = "/it/start/workflow_with_two_serial_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -307,7 +412,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoSerialFailedTask() {
         final String yaml = "/it/start/workflow_with_two_serial_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -338,7 +443,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -376,7 +481,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_twoParallelFailedTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -415,7 +520,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -482,7 +587,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     public void testStartWorkflowFromStartNodes_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .startNodes(Lists.newArrayList(6L))

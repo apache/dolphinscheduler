@@ -77,7 +77,7 @@ public class WorkflowITContextFactory {
     public WorkflowITContext initializeContextFromYaml(final String yamlPath) {
         final WorkflowITContext workflowITContext = YamlFactory.load(yamlPath);
         initializeProjectToDB(workflowITContext.getProject());
-        initializeWorkflowDefinitionToDB(workflowITContext.getWorkflow());
+        initializeWorkflowDefinitionToDB(workflowITContext.getWorkflows());
         initializeTaskDefinitionsToDB(workflowITContext.getTasks());
         initializeTaskRelationsToDB(workflowITContext.getTaskRelations());
         if (workflowITContext.getWorkflowInstance() != null) {
@@ -99,12 +99,14 @@ public class WorkflowITContextFactory {
         workflowInstanceDao.insert(workflowInstance);
     }
 
-    private void initializeWorkflowDefinitionToDB(final WorkflowDefinition workflowDefinition) {
-        workflowDefinitionDao.insert(workflowDefinition);
-        final WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
-        workflowDefinitionLog.setOperator(workflowDefinition.getUserId());
-        workflowDefinitionLog.setOperateTime(new Date());
-        workflowDefinitionLogDao.insert(workflowDefinitionLog);
+    private void initializeWorkflowDefinitionToDB(final List<WorkflowDefinition> workflowDefinitions) {
+        for (final WorkflowDefinition workflowDefinition : workflowDefinitions) {
+            workflowDefinitionDao.insert(workflowDefinition);
+            final WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
+            workflowDefinitionLog.setOperator(workflowDefinition.getUserId());
+            workflowDefinitionLog.setOperateTime(new Date());
+            workflowDefinitionLogDao.insert(workflowDefinitionLog);
+        }
     }
 
     private void initializeTaskDefinitionsToDB(final List<TaskDefinition> taskDefinitions) {

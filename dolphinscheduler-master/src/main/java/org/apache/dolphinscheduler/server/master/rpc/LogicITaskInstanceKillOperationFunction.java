@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillReque
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorThreadPoolManager;
@@ -54,16 +53,10 @@ public class LogicITaskInstanceKillOperationFunction
             }
             try {
                 masterTaskExecutor.cancelTask();
-                // todo: if we remove success then we don't need to cancel?
-                masterTaskExecutorThreadPool.removeMasterTaskExecutor(masterTaskExecutor);
                 return LogicTaskKillResponse.success();
             } catch (MasterTaskExecuteException e) {
                 log.error("Cancel MasterTaskExecuteRunnable failed ", e);
                 return LogicTaskKillResponse.fail("Cancel MasterTaskExecuteRunnable failed: " + e.getMessage());
-            } finally {
-                // todo: If cancel failed, we cannot remove the context?
-                MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskInstanceId);
-                MasterTaskExecutorHolder.removeMasterTaskExecutor(taskInstanceId);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();

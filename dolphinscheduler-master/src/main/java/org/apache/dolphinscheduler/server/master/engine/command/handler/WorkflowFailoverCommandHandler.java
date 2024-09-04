@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverComman
 import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphBfsVisitor;
+import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
@@ -129,13 +129,14 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
             workflowExecutionGraph.addEdge(task, successors);
         };
 
-        final WorkflowGraphBfsVisitor workflowGraphBfsVisitor = WorkflowGraphBfsVisitor.builder()
-                .taskDependType(workflowExecuteContextBuilder.getWorkflowInstance().getTaskDependType())
-                .onWorkflowGraph(workflowGraph)
-                .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
-                .doVisitFunction(taskExecutionRunnableCreator)
-                .build();
-        workflowGraphBfsVisitor.visit();
+        final WorkflowGraphTopologyLogicalVisitor workflowGraphTopologyLogicalVisitor =
+                WorkflowGraphTopologyLogicalVisitor.builder()
+                        .taskDependType(workflowExecuteContextBuilder.getWorkflowInstance().getTaskDependType())
+                        .onWorkflowGraph(workflowGraph)
+                        .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
+                        .doVisitFunction(taskExecutionRunnableCreator)
+                        .build();
+        workflowGraphTopologyLogicalVisitor.visit();
 
         workflowExecuteContextBuilder.setWorkflowExecutionGraph(workflowExecutionGraph);
     }

@@ -20,13 +20,10 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import lombok.Data;
 
@@ -271,52 +268,6 @@ public class TaskInstance implements Serializable {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
-    }
-
-    public boolean isTaskComplete() {
-
-        return this.getState().isSuccess()
-                || this.getState().isKill()
-                || (this.getState().isFailure() && !taskCanRetry())
-                || this.getState().isForceSuccess();
-    }
-
-    public boolean isFirstRun() {
-        return endTime == null;
-    }
-
-    /**
-     * determine if a task instance can retry
-     * if subProcess,
-     *
-     * @return can try result
-     */
-    public boolean taskCanRetry() {
-        if (TaskTypeUtils.isSubWorkflowTask(getTaskType())) {
-            return false;
-        }
-        if (this.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {
-            return true;
-        }
-        return this.getState() == TaskExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
-    }
-
-    /**
-     * whether the retry interval is timed out
-     *
-     * @return Boolean
-     */
-    public boolean retryTaskIntervalOverTime() {
-        if (getState() != TaskExecutionStatus.FAILURE) {
-            return true;
-        }
-        if (getMaxRetryTimes() == 0 || getRetryInterval() == 0) {
-            return true;
-        }
-        Date now = new Date();
-        long failedTimeInterval = DateUtils.differSec(now, getEndTime());
-        // task retry does not over time, return false
-        return TimeUnit.MINUTES.toSeconds(getRetryInterval()) < failedTimeInterval;
     }
 
 }
