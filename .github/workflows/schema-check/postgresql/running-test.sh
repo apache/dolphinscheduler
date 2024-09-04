@@ -20,6 +20,7 @@ set -euox pipefail
 DS_VERSION=$1
 DATABASE_VERSION=$2
 
+# Install dev schema
 export DATABASE="postgresql"
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver"
 export SPRING_DATASOURCE_USERNAME="postgres"
@@ -27,10 +28,12 @@ export SPRING_DATASOURCE_PASSWORD="postgres"
 export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_dev"
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
+# Install the target version schema and upgrade it
 export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_${DATABASE_VERSION}"
 bash ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
+# Compare the schema
 set +x
 atlas_result=$(atlas schema diff \
   --from "postgres://postgres:postgres@127.0.0.1:5432/dolphinscheduler_${DATABASE_VERSION}?search_path=public&sslmode=disable" \

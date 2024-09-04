@@ -20,6 +20,7 @@ set -euox pipefail
 DS_VERSION=$1
 DATABASE_VERSION=$2
 
+# Install dev schema
 export DATABASE="mysql"
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_dev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
@@ -27,10 +28,12 @@ export SPRING_DATASOURCE_USERNAME="root"
 export SPRING_DATASOURCE_PASSWORD="mysql"
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
+# Install the target version schema and upgrade it
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_${DATABASE_VERSION}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
 bash ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
+# Compare the schema
 set +x
 atlas_result=$(atlas schema diff \
   --from "mysql://root:mysql@127.0.0.1:3306/dolphinscheduler_${DATABASE_VERSION}" \

@@ -21,19 +21,19 @@ DS_VERSION=$1
 DATABASE_VERSION=${DS_VERSION//\./}
 
 # Install Atlas and Create Dir
-#mkdir -p ds_schema_check_test/dev ds_schema_check_test/${DS_VERSION}
-#curl -sSf https://atlasgo.sh | sh
-#
-## Preparing the environment
-#wget https://archive.apache.org/dist/dolphinscheduler/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz -P ds_schema_check_test/${DS_VERSION}
-#tar -xzf ds_schema_check_test/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz -C ds_schema_check_test/${DS_VERSION} --strip-components 1
-#tar -xzf ds_schema_check_test/dev/apache-dolphinscheduler-*-bin.tar.gz -C ds_schema_check_test/dev --strip-components 1
-#
-#if [[ $DATABASE_VERSION -lt 300 ]]; then
-#  chmod +x ds_schema_check_test/dev/tools/bin/upgrade-schema.sh ds_schema_check_test/${DS_VERSION}/script/create-dolphinscheduler.sh
-#else
-#  chmod +x ds_schema_check_test/dev/tools/bin/upgrade-schema.sh ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
-#fi
+mkdir -p ds_schema_check_test/dev ds_schema_check_test/${DS_VERSION}
+curl -sSf https://atlasgo.sh | sh
+
+# Preparing the environment
+wget https://archive.apache.org/dist/dolphinscheduler/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz -P ds_schema_check_test/${DS_VERSION}
+tar -xzf ds_schema_check_test/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz -C ds_schema_check_test/${DS_VERSION} --strip-components 1
+tar -xzf ds_schema_check_test/dev/apache-dolphinscheduler-*-bin.tar.gz -C ds_schema_check_test/dev --strip-components 1
+
+if [[ $DATABASE_VERSION -lt 300 ]]; then
+  chmod +x ds_schema_check_test/dev/tools/bin/upgrade-schema.sh ds_schema_check_test/${DS_VERSION}/script/create-dolphinscheduler.sh
+else
+  chmod +x ds_schema_check_test/dev/tools/bin/upgrade-schema.sh ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
+fi
 
 docker compose -f .github/workflows/schema-check/postgresql/docker-compose-base.yaml up -d --wait
 docker exec -i postgres psql -U postgres -c "create database dolphinscheduler_${DATABASE_VERSION}";
