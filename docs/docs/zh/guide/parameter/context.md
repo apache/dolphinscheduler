@@ -99,23 +99,23 @@ Node_mysql 运行结果如下：
 
 在子流程的工作流定义中创建 A 任务，在自定义参数中添加 var1 和 var2 参数，并编写如下脚本：
 
-![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+![context-subprocess01](../../../../img/new_ui/dev/parameter/context-sub-workflow01.png)
 
 保存 subprocess_example1 工作流，设置全局参数 var1。
 
-![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+![context-subprocess02](../../../../img/new_ui/dev/parameter/context-sub-workflow02.png)
 
 在新的工作流中创建 sub_workflow 任务，使用 subprocess_example1 工作流作为子节点。
 
-![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+![context-subprocess03](../../../../img/new_ui/dev/parameter/context-sub-workflow03.png)
 
 创建一个 shell 任务作为 sub_workflow 任务的下游任务，并编写如下脚本：
 
-![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+![context-subprocess04](../../../../img/new_ui/dev/parameter/context-sub-workflow04.png)
 
 保存该工作流并运行，下游任务运行结果如下：
 
-![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+![context-subprocess05](../../../../img/new_ui/dev/parameter/context-sub-workflow05.png)
 
 虽然在 A 任务中输出 var1 和 var2 两个参数，但是工作流定义中只定义了 var1 的 OUT 变量，下游任务成功输出 var1，证明var1 参数参照预期的值在该工作流中传递。
 
