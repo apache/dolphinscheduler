@@ -145,7 +145,7 @@ jobs:
           if [ ! -f /tmp/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
             echo "Binary package not found in cache, downloading..."
             mkdir -p /tmp/${{ matrix.version }}
-            wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
+            wget https://mirrors.aliyun.com/apache/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
           else
             echo "Binary package found in cache, skipping download."
           fi
