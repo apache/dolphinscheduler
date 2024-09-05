@@ -25,10 +25,10 @@ mkdir -p ds_schema_check_test/dev ds_schema_check_test/${DS_VERSION}
 curl -sSf https://atlasgo.sh | sh
 
 # Preparing the environment
-if [ ! -f /tmp/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz ]; then
+if [ ! -f /tmp/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz ]; then
   wget https://archive.apache.org/dist/dolphinscheduler/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz -P ds_schema_check_test/${DS_VERSION}
 else
-  mv /tmp/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz ds_schema_check_test/${DS_VERSION}
+  mv /tmp/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz ds_schema_check_test/${DS_VERSION}
 fi
 tar -xzf ds_schema_check_test/${DS_VERSION}/apache-dolphinscheduler-${DS_VERSION}-bin.tar.gz -C ds_schema_check_test/${DS_VERSION} --strip-components 1
 tar -xzf ds_schema_check_test/dev/apache-dolphinscheduler-*-bin.tar.gz -C ds_schema_check_test/dev --strip-components 1

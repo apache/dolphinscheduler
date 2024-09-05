@@ -137,21 +137,22 @@ jobs:
       - uses: actions/cache/restore@v4
         name: Download Binary Package Cache
         with:
-          path: ./
+          path: /tmp/${{ matrix.version }}
           key: apache-dolphinscheduler-${{ matrix.version }}-bin
           restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Download Binary Package if not cached
         run: |
           if [ ! -f ./apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
             echo "Binary package not found in cache, downloading..."
-            wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
+            mkdir -p /tmp/${{ matrix.version }}
+            wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
           else
             echo "Binary package found in cache, skipping download."
           fi
       - uses: actions/cache/save@v4
         name: Upload Binary Package Cache
         with:
-          path: apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
+          path: /tmp/${{ matrix.version }}
           key: apache-dolphinscheduler-${{ matrix.version }}-bin
   schema-check:
     name: ${{ matrix.case.name }}-${{ matrix.version }}
@@ -183,7 +184,7 @@ jobs:
       - uses: actions/cache/restore@v4
         name: Download Binary Package Cache
         with:
-          path: /tmp
+          path: /tmp/${{ matrix.version }}
           key: apache-dolphinscheduler-${{ matrix.version }}-bin
           restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Running Schema Check
