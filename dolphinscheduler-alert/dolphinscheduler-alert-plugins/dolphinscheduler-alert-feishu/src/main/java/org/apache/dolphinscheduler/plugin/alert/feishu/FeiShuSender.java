@@ -88,15 +88,15 @@ public final class FeiShuSender {
         alertResult.setSuccess(false);
 
         if (org.apache.commons.lang3.StringUtils.isBlank(result)) {
-            alertResult.setMessage("send feishu msg error: feishu server resp is null.");
-            log.info("send feishu msg error: feishu server resp is null.");
+            alertResult.setMessage("send feishu msg error: feishu server resp is blank.");
+            log.info("send feishu msg error: feishu server resp is blank.");
             return alertResult;
         }
         FeiShuSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, FeiShuSendMsgResponse.class);
 
         if (null == sendMsgResponse) {
-            alertResult.setMessage("send feishu msg error: feishu server resp parse error.");
-            log.info("send feishu msg error: feishu server resp parse error.");
+            alertResult.setMessage("send feishu msg error: feishu server resp parse error is null.");
+            log.info("send feishu msg error: feishu server resp parse error is null.");
             return alertResult;
         }
         if (sendMsgResponse.code == 0) {
