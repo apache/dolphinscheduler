@@ -142,7 +142,7 @@ jobs:
           restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Download Binary Package if not cached
         run: |
-          if [ ! -f ./apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
+          if [ ! -f /tmp/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
             echo "Binary package not found in cache, downloading..."
             mkdir -p /tmp/${{ matrix.version }}
             wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
