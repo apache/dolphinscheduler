@@ -117,7 +117,7 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
         }
 
         this.host = String.join(Constants.COMMA, hosts);
-        this.port = Integer.parseInt(portString);
+        this.port = (Integer) Integer.parseInt(portString);
     }
 
     public String getDatabase() {
