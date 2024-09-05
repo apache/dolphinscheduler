@@ -35,11 +35,11 @@ export function useDependencies() {
           if (res?.data?.length > 0) {
             res.data
               .filter(
-                (item: any) => item.processDefinitionCode !== workflowCode
+                (item: any) => item.workflowDefinitionCode !== workflowCode
               )
               .forEach((item: any) => {
                 tasks.push(
-                  item.processDefinitionName + '->' + item.taskDefinitionName
+                  item.workflowDefinitionName + '->' + item.taskDefinitionName
                 )
               })
           }
