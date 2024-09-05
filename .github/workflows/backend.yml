@@ -141,9 +141,19 @@ jobs:
       matrix:
         version: [ "3.1.9", "3.2.0" ]
     steps:
-      - name: Download Binary Package
+      - uses: actions/cache/save@v4
+        name: Download Binary Package Cache
+        with:
+          path: /tmp
+          key: apache-dolphinscheduler-${{ matrix.version }}-bin
+      - name: Download Binary Package if not cached
         run: |
-          wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
+          if [ ! -f apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
+            echo "Binary package not found in cache, downloading..."
+            wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
+          else
+            echo "Binary package found in cache, skipping download."
+          fi
       - uses: actions/cache/save@v4
         name: Upload Binary Package Cache
         with:
