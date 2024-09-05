@@ -36,104 +36,47 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_error_command")
 public class ErrorCommand {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.INPUT)
     private Integer id;
 
-    /**
-     * command type
-     */
     private CommandType commandType;
 
-    /**
-     * process definition code
-     */
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
-    private int processDefinitionVersion;
+    private int workflowDefinitionVersion;
 
-    private int processInstanceId;
+    private int workflowInstanceId;
 
-    /**
-     * executor id
-     */
     private int executorId;
 
-    /**
-     * command parameter, format json
-     */
     private String commandParam;
 
-    /**
-     * task depend type
-     */
     private TaskDependType taskDependType;
 
-    /**
-     * failure strategy
-     */
     private FailureStrategy failureStrategy;
 
-    /**
-     * warning type
-     */
     private WarningType warningType;
 
-    /**
-     * warning group id
-     */
     private Integer warningGroupId;
 
-    /**
-     * schedule time
-     */
     private Date scheduleTime;
 
-    /**
-     * start time
-     */
     private Date startTime;
 
-    /**
-     * process instance priority
-     */
-    private Priority processInstancePriority;
+    private Priority workflowInstancePriority;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
-    /**
-     * 执行信息
-     */
     private String message;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
 
-    /**
-     * tenant code
-     */
     private String tenantCode;
 
-    /**
-     * environment code
-     */
     private Long environmentCode;
 
-    /**
-     * dry run flag
-     */
     private int dryRun;
 
-    /**
-     * test flag
-     */
     @TableField("test_flag")
     private int testFlag;
 
@@ -144,9 +87,9 @@ public class ErrorCommand {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
-        this.processDefinitionCode = command.getProcessDefinitionCode();
-        this.processDefinitionVersion = command.getProcessDefinitionVersion();
-        this.processInstanceId = command.getProcessInstanceId();
+        this.workflowDefinitionCode = command.getWorkflowDefinitionCode();
+        this.workflowDefinitionVersion = command.getWorkflowDefinitionVersion();
+        this.workflowInstanceId = command.getWorkflowInstanceId();
         this.commandParam = command.getCommandParam();
         this.taskDependType = command.getTaskDependType();
         this.failureStrategy = command.getFailureStrategy();
@@ -155,7 +98,7 @@ public class ErrorCommand {
         this.scheduleTime = command.getScheduleTime();
         this.startTime = command.getStartTime();
         this.updateTime = command.getUpdateTime();
-        this.processInstancePriority = command.getProcessInstancePriority();
+        this.workflowInstancePriority = command.getWorkflowInstancePriority();
         this.workerGroup = command.getWorkerGroup();
         this.tenantCode = command.getTenantCode();
         this.environmentCode = command.getEnvironmentCode();

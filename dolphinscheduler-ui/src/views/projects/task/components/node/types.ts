@@ -376,7 +376,7 @@ interface ITaskParams {
   startupScript?: string
   executionTimeout?: string
   startTimeout?: string
-  processDefinitionCode?: number
+  workflowDefinitionCode?: number
   conditionResult?: {
     successNode?: number[]
     failedNode?: number[]
@@ -484,7 +484,7 @@ interface INodeData
     Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
-  processName?: number
+  workflowDefinitionName?: number
   delayTime?: number
   description?: string
   environmentCode?: number | null

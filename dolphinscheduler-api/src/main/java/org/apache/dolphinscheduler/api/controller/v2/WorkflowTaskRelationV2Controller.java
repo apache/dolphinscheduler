@@ -52,22 +52,19 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * process task relation controller
- */
 @Tag(name = "WORKFLOW_TASK_RELATION_TAG")
 @RestController
 @RequestMapping("v2/relations")
-public class ProcessTaskRelationV2Controller extends BaseController {
+public class WorkflowTaskRelationV2Controller extends BaseController {
 
     @Autowired
     private WorkflowTaskRelationService workflowTaskRelationService;
 
     /**
-     * create resource process task relation
+     * create resource workflow task relation
      *
      * @param loginUser login user
-     * @param TaskRelationCreateRequest process task definition json contains the object you want to create
+     * @param TaskRelationCreateRequest workflow task definition json contains the object you want to create
      * @return Result object created
      */
     @Operation(summary = "create", description = "CREATE_WORKFLOW_TASK_RELATION_NOTES")
@@ -82,7 +79,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     }
 
     /**
-     * delete resource process task relation
+     * delete resource workflow task relation
      *
      * @param loginUser login user
      * @param codePair code pair you want to delete the task relation, use `upstream,downstream` as example, will delete exists relation upstream -> downstream, throw error if not exists
@@ -111,7 +108,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
      * @param taskRelationUpdateUpstreamRequest workflowUpdateRequest
      * @return ResourceResponse object updated
      */
-    @Operation(summary = "update", description = "UPDATE_PROCESS_TASK_RELATION_NOTES")
+    @Operation(summary = "update", description = "UPDATE_WORKFLOW_TASK_RELATION_NOTES")
     @Parameters({
             @Parameter(name = "code", description = "DOWNSTREAM_TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })

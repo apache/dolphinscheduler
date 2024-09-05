@@ -42,9 +42,9 @@ public class WorkflowInstanceRepeatTrigger
                                               final WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.REPEAT_RUNNING)
-                .processInstanceId(workflowInstance.getId())
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion())
                 .executorId(repeatRunningRequest.getUserId())
                 .startTime(new Date())
                 .updateTime(new Date())

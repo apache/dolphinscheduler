@@ -28,7 +28,7 @@
             (#{relationSubWorkflow.parentWorkflowInstanceId}, #{relationSubWorkflow.parentTaskCode}, #{relationSubWorkflow.subWorkflowInstanceId})
         </foreach>
     </insert>
-    <select id="queryAllSubProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow">
+    <select id="queryAllSubWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow">
         select
         id, parent_workflow_instance_id, parent_task_code, sub_workflow_instance_id
         FROM t_ds_relation_sub_workflow

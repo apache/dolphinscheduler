@@ -36,7 +36,7 @@ export default defineComponent({
         pageNo: variables.page,
         searchVal: variables.searchVal,
         projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
+        workflowDefinitionCode: variables.workflowDefinitionCode
       })
     }
 
@@ -45,7 +45,7 @@ export default defineComponent({
     }
 
     const handleSearch = (params: ITimingSearch) => {
-      variables.processDefinitionCode = params.processDefinitionCode
+      variables.workflowDefinitionCode = params.workflowDefinitionCode
       variables.page = 1
       requestData()
     }

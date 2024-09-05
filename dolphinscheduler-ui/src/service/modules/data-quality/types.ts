@@ -36,11 +36,11 @@ interface ResultListReq extends ListReq {
 
 interface ResultItem {
   id: number
-  processDefinitionId: number
-  processDefinitionName: string
-  processDefinitionCode: number
-  processInstanceId: number
-  processInstanceName: string
+  workflowDefinitionId: number
+  workflowDefinitionName: string
+  workflowDefinitionCode: number
+  workflowInstanceId: number
+  workflowInstanceName: string
   projectCode: number
   taskInstanceId: number
   taskName: string

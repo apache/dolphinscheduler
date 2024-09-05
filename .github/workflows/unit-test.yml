@@ -100,8 +100,8 @@ jobs:
           -Dsonar.projectKey=apache-dolphinscheduler
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
           -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
-          -Dhttp.keepAlive=false 
-          -Dmaven.wagon.http.pool=false 
+          -Dhttp.keepAlive=false
+          -Dmaven.wagon.http.pool=false
           -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
           -DskipUT=true
         env:

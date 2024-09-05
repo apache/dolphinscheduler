@@ -87,7 +87,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
         this.workflowInstance =
-                workflowInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
+                workflowInstanceDao.queryById(taskExecutionContext.getWorkflowInstanceId());
         this.dependentDate = calculateDependentDate();
         this.dependentTaskList = initializeDependentTaskList();
         log.info("Initialized dependent task list successfully");

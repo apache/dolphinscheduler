@@ -29,7 +29,7 @@ interface IWorkflowInstanceSearch {
   stateType: string
   startDate: string
   endDate: string
-  processDefineCode: number
+  workflowDefinitionCode: number
 }
 
 export { ICountDownParam, IWorkflowInstanceSearch }

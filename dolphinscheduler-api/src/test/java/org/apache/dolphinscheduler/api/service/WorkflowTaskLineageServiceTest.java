@@ -42,14 +42,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * work flow lineage service test
- */
 @ExtendWith(MockitoExtension.class)
 public class WorkflowTaskLineageServiceTest {
 
     @InjectMocks
-    private WorkflowLineageServiceImpl processLineageService;
+    private WorkflowLineageServiceImpl workflowLineageService;
 
     @Mock
     private WorkflowTaskLineageDao workflowTaskLineageDao;
@@ -82,7 +79,7 @@ public class WorkflowTaskLineageServiceTest {
         when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workflowTaskLineageDao.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(getWorkFlowLineages());
-        List<WorkFlowRelationDetail> workFlowLineages = processLineageService.queryWorkFlowLineageByName(1L, name);
+        List<WorkFlowRelationDetail> workFlowLineages = workflowLineageService.queryWorkFlowLineageByName(1L, name);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(workFlowLineages));
     }
 
@@ -112,7 +109,7 @@ public class WorkflowTaskLineageServiceTest {
         when(workflowTaskLineageDao.queryWorkFlowLineageByCode(workflowTaskLineage.getWorkflowDefinitionCode()))
                 .thenReturn(workFlowRelationDetailList);
 
-        WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineage(1L);
+        WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineage(1L);
 
         List<WorkFlowRelationDetail> workFlowLineageList =
                 workFlowLineage.getWorkFlowRelationDetailList();

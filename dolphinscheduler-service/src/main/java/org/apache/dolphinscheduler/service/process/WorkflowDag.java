@@ -15,12 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.service.process;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 
-/**
- * ProcessDefinitionDto
- */
-public class WorkflowDefinitionDto extends WorkflowDefinition {
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class WorkflowDag {
+
+    /**
+     * DAG edge list
+     **/
+    private List<TaskNodeRelation> edges;
+
+    /**
+     * DAG node list
+     */
+    private List<TaskNode> nodes;
+
+    @Override
+    public String toString() {
+        return "WorkflowDag{"
+                + "edges=" + edges
+                + ", nodes=" + nodes
+                + '}';
+    }
 }

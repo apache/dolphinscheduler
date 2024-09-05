@@ -45,8 +45,8 @@ public class DynamicCommandUtils {
         } else {
             command.setCommandType(workflowInstance.getCommandType());
         }
-        command.setProcessDefinitionCode(subProcessDefinitionCode);
-        command.setProcessDefinitionVersion(subProcessDefinitionVersion);
+        command.setWorkflowDefinitionCode(subProcessDefinitionCode);
+        command.setWorkflowDefinitionVersion(subProcessDefinitionVersion);
         command.setTaskDependType(TaskDependType.TASK_POST);
         command.setFailureStrategy(workflowInstance.getFailureStrategy());
         command.setWarningType(workflowInstance.getWarningType());
@@ -62,7 +62,7 @@ public class DynamicCommandUtils {
         addDataToCommandParam(command, CommandKeyConstants.CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(parameters));
         command.setExecutorId(workflowInstance.getExecutorId());
         command.setWarningGroupId(workflowInstance.getWarningGroupId());
-        command.setProcessInstancePriority(workflowInstance.getProcessInstancePriority());
+        command.setWorkflowInstancePriority(workflowInstance.getWorkflowInstancePriority());
         command.setWorkerGroup(workflowInstance.getWorkerGroup());
         command.setDryRun(workflowInstance.getDryRun());
         command.setTenantCode(workflowInstance.getTenantCode());

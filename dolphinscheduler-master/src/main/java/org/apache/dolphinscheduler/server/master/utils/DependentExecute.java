@@ -186,7 +186,7 @@ public class DependentExecute {
         }
         log.warn(
                 "The dependent workflow did not execute successfully, so return depend failed. workflowDefinitionCode: {}, workflowInstanceName: {}",
-                workflowInstance.getProcessDefinitionCode(), workflowInstance.getName());
+                workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getName());
         return DependResult.FAILED;
     }
 
@@ -199,13 +199,13 @@ public class DependentExecute {
         if (!workflowInstance.getState().isFinished()) {
             log.info(
                     "Wait for the dependent workflow to complete, workflowDefinitionCode: {}, pworkflowInstanceId: {}.",
-                    workflowInstance.getProcessDefinitionCode(), workflowInstance.getId());
+                    workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getId());
             return DependResult.WAITING;
         }
         if (workflowInstance.getState().isSuccess()) {
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    processService.findRelationByCode(workflowInstance.getProcessDefinitionCode(),
-                            workflowInstance.getProcessDefinitionVersion());
+                    processService.findRelationByCode(workflowInstance.getWorkflowDefinitionCode(),
+                            workflowInstance.getWorkflowDefinitionVersion());
             List<TaskDefinitionLog> taskDefinitionLogs =
                     taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
             Map<Long, String> taskDefinitionCodeMap =
@@ -224,13 +224,13 @@ public class DependentExecute {
                 if (!taskExecutionStatusMap.containsKey(taskCode)) {
                     log.warn(
                             "The task of the workflow is not being executed, taskCode: {}, workflowInstanceId: {}, workflowInstanceName: {}.",
-                            taskCode, workflowInstance.getProcessDefinitionCode(), workflowInstance.getName());
+                            taskCode, workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getName());
                     return DependResult.FAILED;
                 } else {
                     if (!taskExecutionStatusMap.get(taskCode).isSuccess()) {
                         log.warn(
                                 "The task of the workflow is not being executed successfully, taskCode: {}, workflowInstanceId: {}, workflowInstanceName: {}.",
-                                taskCode, workflowInstance.getProcessDefinitionCode(), workflowInstance.getName());
+                                taskCode, workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getName());
                         return DependResult.FAILED;
                     }
                 }
@@ -274,7 +274,7 @@ public class DependentExecute {
             if (!workflowInstance.getState().isFinished()) {
                 log.info(
                         "Wait for the dependent workflow to complete, workflowDefinitionCode: {}, workflowInstanceId: {}.",
-                        workflowInstance.getProcessDefinitionCode(), workflowInstance.getId());
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getId());
                 return DependResult.WAITING;
             }
 
@@ -457,7 +457,7 @@ public class DependentExecute {
      * @return
      */
     public boolean isSelfDependent(DependentItem dependentItem) {
-        if (workflowInstance.getProcessDefinitionCode().equals(dependentItem.getDefinitionCode())) {
+        if (workflowInstance.getWorkflowDefinitionCode().equals(dependentItem.getDefinitionCode())) {
             if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
                 return true;
             }

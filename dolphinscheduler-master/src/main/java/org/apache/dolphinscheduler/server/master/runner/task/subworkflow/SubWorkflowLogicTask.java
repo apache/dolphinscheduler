@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowI
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
@@ -48,7 +48,7 @@ import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
-public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameters> {
+public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubWorkflowParameters> {
 
     private SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
 
@@ -60,7 +60,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
                                 final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                 final ApplicationContext applicationContext) {
         super(taskExecutionContext,
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubProcessParameters>() {
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubWorkflowParameters>() {
                 }));
         this.workflowExecutionRunnable = workflowExecutionRunnable;
         this.applicationContext = applicationContext;
@@ -176,9 +176,9 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
 
         final WorkflowDefinition subWorkflowDefinition = applicationContext.getBean(WorkflowDefinitionDao.class)
-                .queryByCode(taskParameters.getProcessDefinitionCode())
+                .queryByCode(taskParameters.getWorkflowDefinitionCode())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Cannot find the sub workflow definition: " + taskParameters.getProcessDefinitionCode()));
+                        "Cannot find the sub workflow definition: " + taskParameters.getWorkflowDefinitionCode()));
 
         final ICommandParam commandParam =
                 JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
@@ -190,7 +190,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
                 .failureStrategy(workflowInstance.getFailureStrategy())
                 .warningType(workflowInstance.getWarningType())
                 .warningGroupId(workflowInstance.getWarningGroupId())
-                .workflowInstancePriority(workflowInstance.getProcessInstancePriority())
+                .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .workerGroup(workflowInstance.getWorkerGroup())
                 .tenantCode(workflowInstance.getTenantCode())
                 .environmentCode(workflowInstance.getEnvironmentCode())
@@ -208,18 +208,18 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
     private void upsertSubWorkflowRelation() {
         final WorkflowInstanceMapDao workflowInstanceMapDao = applicationContext.getBean(WorkflowInstanceMapDao.class);
         WorkflowInstanceRelation workflowInstanceRelation = workflowInstanceMapDao.queryWorkflowMapByParent(
-                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getWorkflowInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         if (workflowInstanceRelation == null) {
             workflowInstanceRelation = WorkflowInstanceRelation.builder()
-                    .parentProcessInstanceId(taskExecutionContext.getProcessInstanceId())
+                    .parentWorkflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                     .parentTaskInstanceId(taskExecutionContext.getTaskInstanceId())
-                    .processInstanceId(subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId())
+                    .workflowInstanceId(subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId())
                     .build();
             workflowInstanceMapDao.insert(workflowInstanceRelation);
         } else {
             workflowInstanceRelation
-                    .setProcessInstanceId(subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
+                    .setWorkflowInstanceId(subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
             workflowInstanceMapDao.updateById(workflowInstanceRelation);
         }
     }

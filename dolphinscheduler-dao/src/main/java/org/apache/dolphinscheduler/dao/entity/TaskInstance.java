@@ -33,32 +33,20 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * task instance
- */
 @Data
 @TableName("t_ds_task_instance")
 public class TaskInstance implements Serializable {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * task name
-     */
     private String name;
 
-    /**
-     * task type
-     */
     private String taskType;
 
-    private int processInstanceId;
+    private int workflowInstanceId;
 
-    private String processInstanceName;
+    private String workflowInstanceName;
 
     private Long projectCode;
 
@@ -69,199 +57,87 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private String processDefinitionName;
 
-    /**
-     * process instance name
-     */
     @TableField(exist = false)
     private int taskGroupPriority;
 
-    /**
-     * state
-     */
     private TaskExecutionStatus state;
 
-    /**
-     * task first submit time.
-     */
     private Date firstSubmitTime;
 
-    /**
-     * task submit time
-     */
     private Date submitTime;
 
-    /**
-     * task start time
-     */
     private Date startTime;
 
-    /**
-     * task end time
-     */
     private Date endTime;
 
-    /**
-     * task host
-     */
     private String host;
 
-    /**
-     * task shell execute path and the resource down from hdfs
-     * default path: $base_run_dir/processInstanceId/taskInstanceId/retryTimes
-     */
     private String executePath;
 
-    /**
-     * task log path
-     * default path: $base_run_dir/processInstanceId/taskInstanceId/retryTimes
-     */
     private String logPath;
 
-    /**
-     * retry times
-     */
     private int retryTimes;
 
-    /**
-     * alert flag
-     */
     private Flag alertFlag;
 
-    /**
-     * process instance
-     */
     @TableField(exist = false)
     private WorkflowInstance workflowInstance;
 
-    /**
-     * process definition
-     */
     @TableField(exist = false)
-    private WorkflowDefinition processDefine;
+    private WorkflowDefinition workflowDefinition;
 
-    /**
-     * task definition
-     */
     @TableField(exist = false)
     private TaskDefinition taskDefine;
 
-    /**
-     * process id
-     */
     private int pid;
 
-    /**
-     * appLink
-     */
     private String appLink;
 
-    /**
-     * flag
-     */
     private Flag flag;
 
-    /**
-     * task is cache: yes/no
-     */
     private Flag isCache;
 
-    /**
-     * cache_key
-     */
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String cacheKey;
 
-    /**
-     * duration
-     */
     @TableField(exist = false)
     private String duration;
 
-    /**
-     * max retry times
-     */
     private int maxRetryTimes;
 
-    /**
-     * task retry interval, unit: minute
-     */
     private int retryInterval;
 
-    /**
-     * task intance priority
-     */
     private Priority taskInstancePriority;
 
-    /**
-     * process intance priority
-     */
     @TableField(exist = false)
-    private Priority processInstancePriority;
+    private Priority workflowInstancePriority;
 
-    /**
-     * workerGroup
-     */
     private String workerGroup;
 
-    /**
-     * environment code
-     */
     private Long environmentCode;
 
-    /**
-     * environment config
-     */
     private String environmentConfig;
 
-    /**
-     * executor id
-     */
     private int executorId;
 
-    /**
-     * varPool string
-     */
     private String varPool;
 
     private String executorName;
 
-    /**
-     * delay execution time.
-     */
     private int delayTime;
 
-    /**
-     * task params
-     */
     private String taskParams;
 
-    /**
-     * dry run flag
-     */
     private int dryRun;
-    /**
-     * task group id
-     */
+
     private int taskGroupId;
 
-    /**
-     * cpu quota
-     */
     private Integer cpuQuota;
 
-    /**
-     * max memory
-     */
     private Integer memoryMax;
 
-    /**
-     * task execute type
-     */
     private TaskExecuteType taskExecuteType;
 
-    /**
-     * test flag
-     */
     private int testFlag;
 
     public void init(String host, Date startTime, String executePath) {

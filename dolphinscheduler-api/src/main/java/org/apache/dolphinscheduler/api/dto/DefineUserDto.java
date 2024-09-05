@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.List;
 
-/**
- * user process define dto
- */
+import lombok.Data;
+
+@Data
 public class DefineUserDto {
 
     private int count;
@@ -38,19 +38,4 @@ public class DefineUserDto {
         this.userList = defineGroupByUsers;
     }
 
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public List<WorkflowDefinitionCountDto> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<WorkflowDefinitionCountDto> userList) {
-        this.userList = userList;
-    }
 }

@@ -86,13 +86,13 @@ public class DataAnalysisController extends BaseController {
                 dataAnalysisService.getTaskInstanceStateCountByProject(loginUser, projectCode, startDate, endDate));
     }
 
-    @Operation(summary = "countProcessInstanceState", description = "COUNT_WORKFLOW_INSTANCE_NOTES")
+    @Operation(summary = "countWorkflowInstanceState", description = "COUNT_WORKFLOW_INSTANCE_NOTES")
     @Parameters({
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "100"))
     })
-    @GetMapping(value = "/process-state-count")
+    @GetMapping(value = "/workflow-state-count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_WORKFLOW_INSTANCE_STATE_ERROR)
     public Result<WorkflowInstanceCountVO> getWorkflowInstanceStateCount(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
