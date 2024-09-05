@@ -141,7 +141,7 @@ jobs:
       matrix:
         version: [ "3.1.9", "3.2.0" ]
     steps:
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/restore@v4
         name: Download Binary Package Cache
         with:
           path: /tmp
@@ -186,7 +186,7 @@ jobs:
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/restore@v4
         name: Download Binary Package Cache
         with:
           path: /tmp
