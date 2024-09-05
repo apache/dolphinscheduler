@@ -146,6 +146,7 @@ jobs:
         with:
           path: ./
           key: apache-dolphinscheduler-${{ matrix.version }}-bin
+          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Download Binary Package if not cached
         run: |
           if [ ! -f ./apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
@@ -191,6 +192,7 @@ jobs:
         with:
           path: /tmp
           key: apache-dolphinscheduler-${{ matrix.version }}-bin
+          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Running Schema Check
         run: |
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
