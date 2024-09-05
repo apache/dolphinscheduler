@@ -131,9 +131,28 @@ jobs:
       - name: Running cluster test
         run: |
           /bin/bash ${{ matrix.case.script }}
+  schema-check-prepare:
+    name: schema-check-prepare-${{ matrix.version }}
+    needs: paths-filter
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ "3.1.9", "3.2.0" ]
+    steps:
+      - name: Download Binary Package
+        run: |
+          wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
+      - uses: actions/upload-artifact@v4
+        name: Upload Binary Package Cache
+        with:
+          name: archive-binary-package-${{ matrix.version }}
+          path: apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
+          retention-days: 1
   schema-check:
     name: ${{ matrix.case.name }}-${{ matrix.version }}
-    needs: build
+    needs: [ build, schema-check-prepare]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -158,6 +177,11 @@ jobs:
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev
+      - uses: actions/download-artifact@v4
+        name: Download Docker Images
+        with:
+          name: archive-binary-package-${{ matrix.version }}
+          path: /tmp
       - name: Running Schema Check
         run: |
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
