@@ -145,11 +145,10 @@ jobs:
           if [ ! -f ./apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
             echo "Binary package not found in cache, downloading..."
             mkdir -p /tmp/${{ matrix.version }}
-            wget https://github.com/apache/dolphinscheduler/archive/refs/tags/3.2.2.tar.gz -P /tmp/${{ matrix.version }}
+            wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
           else
             echo "Binary package found in cache, skipping download."
           fi
-
       - uses: actions/cache/save@v4
         name: Upload Binary Package Cache
         with:
