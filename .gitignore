@@ -54,3 +54,4 @@ dolphinscheduler-worker/logs
 dolphinscheduler-master/logs
 dolphinscheduler-api/logs
 __pycache__
+ds_schema_check_test

@@ -58,14 +58,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-/**
- * executor controller test
- */
 public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractControllerTest {
 
     final Gson gson = new Gson();
     final long projectCode = 1L;
-    final long processDefinitionCode = 2L;
+    final long workflowDefinitionCode = 2L;
     final String scheduleTime = "scheduleTime";
     final FailureStrategy failureStrategy = FailureStrategy.END;
     final String startNodeList = "startNodeList";
@@ -75,7 +72,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     final int warningGroupId = 3;
     final RunMode runMode = RunMode.RUN_MODE_SERIAL;
     final ExecutionOrder executionOrder = ExecutionOrder.DESC_ORDER;
-    final Priority processInstancePriority = Priority.HIGH;
+    final Priority workflowInstancePriority = Priority.HIGH;
     final String workerGroup = "workerGroup";
     final String tenantCode = "root";
     final Long environmentCode = 4L;
@@ -99,10 +96,10 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     private ExecutorService executorService;
 
     @Test
-    public void testStartProcessInstanceWithFullParams() throws Exception {
+    public void testStartWorkflowInstanceWithFullParams() throws Exception {
         // Given
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("workflowDefinitionCode", String.valueOf(workflowDefinitionCode));
         paramsMap.add("scheduleTime", scheduleTime);
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("startNodeList", startNodeList);
@@ -111,7 +108,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
         paramsMap.add("runMode", String.valueOf(runMode));
-        paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
+        paramsMap.add("workflowInstancePriority", String.valueOf(workflowInstancePriority));
         paramsMap.add("workerGroup", workerGroup);
         paramsMap.add("tenantCode", tenantCode);
         paramsMap.add("environmentCode", String.valueOf(environmentCode));
@@ -127,7 +124,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
 
         // When
         final MvcResult mvcResult = mockMvc
-                .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                .perform(post("/projects/{projectCode}/executors/start-workflow-instance", projectCode)
                         .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -140,10 +137,10 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     }
 
     @Test
-    public void testStartProcessInstanceWithoutTimeout() throws Exception {
+    public void testStartWorkflowInstanceWithoutTimeout() throws Exception {
         // Given
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("workflowDefinitionCode", String.valueOf(workflowDefinitionCode));
         paramsMap.add("scheduleTime", scheduleTime);
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("startNodeList", startNodeList);
@@ -152,7 +149,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
         paramsMap.add("runMode", String.valueOf(runMode));
-        paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
+        paramsMap.add("workflowInstancePriority", String.valueOf(workflowInstancePriority));
         paramsMap.add("workerGroup", workerGroup);
         paramsMap.add("tenantCode", tenantCode);
         paramsMap.add("environmentCode", String.valueOf(environmentCode));
@@ -167,7 +164,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
 
         // When
         final MvcResult mvcResult = mockMvc
-                .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                .perform(post("/projects/{projectCode}/executors/start-workflow-instance", projectCode)
                         .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -180,10 +177,10 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     }
 
     @Test
-    public void testStartProcessInstanceWithoutStartParams() throws Exception {
+    public void testStartWorkflowInstanceWithoutStartParams() throws Exception {
         // Given
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("workflowDefinitionCode", String.valueOf(workflowDefinitionCode));
         paramsMap.add("scheduleTime", scheduleTime);
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("startNodeList", startNodeList);
@@ -192,7 +189,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("warningGroupId", String.valueOf(warningGroupId));
         paramsMap.add("runMode", String.valueOf(runMode));
-        paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
+        paramsMap.add("workflowInstancePriority", String.valueOf(workflowInstancePriority));
         paramsMap.add("workerGroup", workerGroup);
         paramsMap.add("tenantCode", tenantCode);
         paramsMap.add("environmentCode", String.valueOf(environmentCode));
@@ -207,7 +204,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
 
         // When
         final MvcResult mvcResult = mockMvc
-                .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                .perform(post("/projects/{projectCode}/executors/start-workflow-instance", projectCode)
                         .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -220,10 +217,10 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     }
 
     @Test
-    public void testStartProcessInstanceWithRequiredParams() throws Exception {
+    public void testStartWorkflowInstanceWithRequiredParams() throws Exception {
         // Given
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", String.valueOf(processDefinitionCode));
+        paramsMap.add("workflowDefinitionCode", String.valueOf(workflowDefinitionCode));
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("scheduleTime", scheduleTime);
@@ -232,7 +229,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         when(executorService.triggerWorkflowDefinition(Mockito.any())).thenReturn(1);
 
         final MvcResult mvcResult = mockMvc
-                .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
+                .perform(post("/projects/{projectCode}/executors/start-workflow-instance", projectCode)
                         .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -247,17 +244,17 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     public void testExecuteWithSuccessStatus() throws Exception {
         // Given
         final ExecuteType executeType = ExecuteType.NONE;
-        final int processInstanceId = 40;
+        final int workflowInstanceId = 40;
         final long projectCode = 1113;
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceId", Integer.toString(processInstanceId));
+        paramsMap.add("workflowInstanceId", Integer.toString(workflowInstanceId));
         paramsMap.add("executeType", String.valueOf(executeType));
 
         final JsonObject expectResponseContent = gson
                 .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":null,\"success\":true,\"failed\":false}",
                         JsonObject.class);
 
-        doNothing().when(executorService).controlWorkflowInstance(any(User.class), eq(processInstanceId),
+        doNothing().when(executorService).controlWorkflowInstance(any(User.class), eq(workflowInstanceId),
                 eq(ExecuteType.NONE));
 
         // When

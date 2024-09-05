@@ -30,7 +30,7 @@ public interface WorkflowTaskLineageMapper extends BaseMapper<WorkflowTaskLineag
 
     int batchDeleteByWorkflowDefinitionCode(@Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 
-    int batchInsert(@Param("processTaskLineages") List<WorkflowTaskLineage> workflowTaskLineages);
+    int batchInsert(@Param("workflowTaskLineages") List<WorkflowTaskLineage> workflowTaskLineages);
 
     List<WorkflowTaskLineage> queryByProjectCode(@Param("projectCode") long projectCode);
 

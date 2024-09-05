@@ -178,7 +178,7 @@ class GlobalTaskDispatchWaitingQueueTest {
 
     private ITaskExecutionRunnable createTaskExecuteRunnable() {
         WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setProcessInstancePriority(Priority.MEDIUM);
+        workflowInstance.setWorkflowInstancePriority(Priority.MEDIUM);
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(RandomUtils.nextInt());

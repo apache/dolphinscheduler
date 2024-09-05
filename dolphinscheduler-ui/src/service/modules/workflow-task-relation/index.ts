@@ -17,7 +17,7 @@
 
 import {
   ProjectCodeReq,
-  ProcessDefinitionCodeReq,
+  WorkflowDefinitionCodeReq,
   PreTaskCodesReq,
   PostTaskCodesReq,
   TaskCodeReq,
@@ -27,7 +27,7 @@ import { axios } from '@/service/service'
 
 export function save(data: SaveReq, projectCode: ProjectCodeReq): any {
   return axios({
-    url: `/projects/${projectCode}/process-task-relation`,
+    url: `/projects/${projectCode}/workflow-task-relation`,
     method: 'post',
     data
   })
@@ -35,18 +35,18 @@ export function save(data: SaveReq, projectCode: ProjectCodeReq): any {
 
 export function deleteEdge(data: SaveReq): any {
   return axios({
-    url: `/projects/${data.projectCode}/process-task-relation/${data.processDefinitionCode}/${data.preTaskCode}/${data.postTaskCode}`,
+    url: `/projects/${data.projectCode}/workflow-task-relation/${data.workflowDefinitionCode}/${data.preTaskCode}/${data.postTaskCode}`,
     method: 'delete'
   })
 }
 
 export function deleteRelation(
-  data: ProcessDefinitionCodeReq,
+  data: WorkflowDefinitionCodeReq,
   projectCode: ProjectCodeReq,
   taskCode: TaskCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-task-relation/${taskCode}`,
+    url: `/projects/${projectCode}/workflow-task-relation/${taskCode}`,
     method: 'delete',
     data
   })
@@ -57,7 +57,7 @@ export function queryDownstreamRelation(
   taskCode: TaskCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-task-relation/${taskCode}/downstream`,
+    url: `/projects/${projectCode}/workflow-task-relation/${taskCode}/downstream`,
     method: 'get'
   })
 }
@@ -68,7 +68,7 @@ export function deleteDownstreamRelation(
   taskCode: TaskCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-task-relation/${taskCode}/downstream`,
+    url: `/projects/${projectCode}/workflow-task-relation/${taskCode}/downstream`,
     method: 'delete',
     data
   })
@@ -79,7 +79,7 @@ export function queryUpstreamRelation(
   taskCode: TaskCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-task-relation/${taskCode}/upstream`,
+    url: `/projects/${projectCode}/workflow-task-relation/${taskCode}/upstream`,
     method: 'get'
   })
 }
@@ -90,7 +90,7 @@ export function deleteUpstreamRelation(
   taskCode: TaskCodeReq
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-task-relation/${taskCode}/upstream`,
+    url: `/projects/${projectCode}/workflow-task-relation/${taskCode}/upstream`,
     method: 'delete',
     data
   })

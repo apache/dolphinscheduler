@@ -57,7 +57,7 @@ export function useTable(
     },
     {
       title: t('resource.task_group_queue.workflow_instance_name'),
-      key: 'processInstanceName',
+      key: 'workflowInstanceName',
       ...COLUMN_WIDTH_CONFIG['name']
     },
     {

@@ -25,7 +25,7 @@ import { get } from 'lodash'
  */
 export function useBusinessMapper() {
   /**
-   * Get connects, connects and processTaskRelationList are the same
+   * Get connects, connects and workflowTaskRelationList are the same
    * @param {Node[]} nodes
    * @param {Edge[]} edges
    * @param {TaskDefinition[]} taskDefinitions

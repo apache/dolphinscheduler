@@ -19,8 +19,8 @@ manual start or scheduled scheduling. Each time the process definition runs, a p
 **Task instance**: The task instance is the instantiation of the task node in the process definition, which identifies
 the specific task
 
-**Task type**: Currently supports SHELL, SQL, SUB_PROCESS (sub-process), PROCEDURE, MR, SPARK, PYTHON, DEPENDENT (
-depends), and plans to support dynamic plug-in expansion, note: **SUB_PROCESS**  need relation with another workflow definition which also a separate process
+**Task type**: Currently supports SHELL, SQL, SUB_WORKFLOW, PROCEDURE, MR, SPARK, PYTHON, DEPENDENT (
+depends), and plans to support dynamic plug-in expansion, note: **SUB_WORKFLOW**  need relation with another workflow definition which also a separate process
 definition that can be started and executed separately
 
 **Scheduling method**: The system supports scheduled scheduling and manual scheduling based on cron expressions. Command

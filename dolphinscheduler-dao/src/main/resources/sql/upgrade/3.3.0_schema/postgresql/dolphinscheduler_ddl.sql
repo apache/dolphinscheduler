@@ -15,8 +15,8 @@
  * limitations under the License.
 */
 
-DROP TABLE IF EXISTS t_ds_process_task_lineage;
-CREATE TABLE t_ds_process_task_lineage (
+DROP TABLE IF EXISTS t_ds_workflow_task_lineage;
+CREATE TABLE t_ds_workflow_task_lineage (
     id int NOT NULL,
     workflow_definition_code bigint NOT NULL DEFAULT 0,
     workflow_definition_version int NOT NULL DEFAULT 0,
@@ -30,9 +30,9 @@ CREATE TABLE t_ds_process_task_lineage (
     PRIMARY KEY (id)
 );
 
-create index idx_process_code_version on t_ds_process_task_lineage (workflow_definition_code,workflow_definition_version);
-create index idx_task_code_version on t_ds_process_task_lineage (task_definition_code,task_definition_version);
-create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_workflow_definition_code,dept_task_definition_code);
+create index idx_workflow_code_version on t_ds_workflow_task_lineage (workflow_definition_code,workflow_definition_version);
+create index idx_task_code_version on t_ds_workflow_task_lineage (task_definition_code,task_definition_version);
+create index idx_dept_code on t_ds_workflow_task_lineage (dept_project_code,dept_workflow_definition_code,dept_task_definition_code);
 
 DROP TABLE IF EXISTS t_ds_jdbc_registry_data;
 create table t_ds_jdbc_registry_data
@@ -125,3 +125,82 @@ select drop_column_t_ds_alert_plugin_instance();
 DROP FUNCTION IF EXISTS drop_column_t_ds_alert_plugin_instance();
 
 DROP TABLE IF EXISTS t_ds_trigger_relation;
+
+-- Rename tables and fields from process to workflow
+delimiter d//
+CREATE OR REPLACE FUNCTION rename_tables_and_fields_from_process_to_workflow() RETURNS void AS $$
+BEGIN
+
+ALTER TABLE t_ds_alert RENAME COLUMN process_definition_code TO workflow_definition_code;
+ALTER TABLE t_ds_alert RENAME COLUMN process_instance_id TO workflow_instance_id;
+
+ALTER TABLE t_ds_command RENAME COLUMN process_definition_code TO workflow_definition_code;
+ALTER TABLE t_ds_command RENAME COLUMN process_instance_priority TO workflow_instance_priority;
+ALTER TABLE t_ds_command RENAME COLUMN process_instance_id TO workflow_instance_id;
+ALTER TABLE t_ds_command RENAME COLUMN process_definition_version TO workflow_definition_version;
+
+ALTER TABLE t_ds_error_command RENAME COLUMN process_definition_code TO workflow_definition_code;
+ALTER TABLE t_ds_error_command RENAME COLUMN process_instance_priority TO workflow_instance_priority;
+ALTER TABLE t_ds_error_command RENAME COLUMN process_instance_id TO workflow_instance_id;
+ALTER TABLE t_ds_error_command RENAME COLUMN process_definition_version TO workflow_definition_version;
+
+ALTER TABLE t_ds_process_task_relation RENAME COLUMN process_definition_version TO workflow_definition_version;
+ALTER TABLE t_ds_process_task_relation RENAME COLUMN process_definition_code TO workflow_definition_code;
+
+ALTER TABLE t_ds_process_task_relation_log RENAME COLUMN process_definition_version TO workflow_definition_version;
+ALTER TABLE t_ds_process_task_relation_log RENAME COLUMN process_definition_code TO workflow_definition_code;
+
+ALTER TABLE t_ds_process_instance RENAME COLUMN process_definition_code TO workflow_definition_code;
+ALTER TABLE t_ds_process_instance RENAME COLUMN process_definition_version TO workflow_definition_version;
+ALTER TABLE t_ds_process_instance RENAME COLUMN is_sub_process TO is_sub_workflow;
+ALTER TABLE t_ds_process_instance RENAME COLUMN process_instance_priority TO workflow_instance_priority;
+ALTER TABLE t_ds_process_instance RENAME COLUMN next_process_instance_id TO next_workflow_instance_id;
+
+ALTER TABLE t_ds_schedules RENAME COLUMN process_definition_code TO workflow_definition_code;
+ALTER TABLE t_ds_schedules RENAME COLUMN process_instance_priority TO workflow_instance_priority;
+
+ALTER TABLE t_ds_task_instance RENAME COLUMN process_instance_id TO workflow_instance_id;
+ALTER TABLE t_ds_task_instance RENAME COLUMN process_instance_name TO workflow_instance_name;
+
+ALTER TABLE t_ds_dq_execute_result RENAME COLUMN process_definition_id TO workflow_definition_id;
+ALTER TABLE t_ds_dq_execute_result RENAME COLUMN process_instance_id TO workflow_instance_id;
+
+ALTER TABLE t_ds_dq_task_statistics_value RENAME COLUMN process_definition_id TO workflow_definition_id;
+
+ALTER TABLE t_ds_task_group_queue RENAME COLUMN process_id TO workflow_instance_id;
+
+ALTER TABLE t_ds_relation_process_instance RENAME COLUMN parent_process_instance_id TO parent_workflow_instance_id;
+ALTER TABLE t_ds_relation_process_instance RENAME COLUMN process_instance_id TO workflow_instance_id;
+
+ALTER TABLE t_ds_process_definition RENAME TO t_ds_workflow_definition;
+ALTER TABLE t_ds_process_definition_log RENAME TO t_ds_workflow_definition_log;
+ALTER TABLE t_ds_process_task_relation RENAME TO t_ds_workflow_task_relation;
+ALTER TABLE t_ds_process_task_relation_log RENAME TO t_ds_workflow_task_relation_log;
+ALTER TABLE t_ds_process_instance RENAME TO t_ds_workflow_instance;
+ALTER TABLE t_ds_relation_process_instance RENAME TO t_ds_relation_workflow_instance;
+
+ALTER SEQUENCE t_ds_relation_process_instance_id_sequence RENAME TO t_ds_relation_workflow_instance_id_sequence;
+ALTER SEQUENCE t_ds_process_definition_id_sequence RENAME TO t_ds_workflow_definition_id_sequence;
+ALTER SEQUENCE t_ds_process_definition_log_id_sequence RENAME TO t_ds_workflow_definition_log_id_sequence;
+ALTER SEQUENCE t_ds_process_instance_id_sequence RENAME TO t_ds_workflow_instance_id_sequence;
+ALTER SEQUENCE t_ds_process_task_relation_id_sequence RENAME TO t_ds_workflow_task_relation_id_sequence;
+ALTER SEQUENCE t_ds_process_task_relation_log_id_sequence RENAME TO t_ds_workflow_task_relation_log_id_sequence;
+
+ALTER INDEX "idx_relation_process_instance_parent_process_task" RENAME TO "idx_relation_workflow_instance_parent_workflow_task";
+ALTER INDEX "idx_relation_process_instance_process_instance_id" RENAME TO "idx_relation_workflow_instance_workflow_instance_id";
+ALTER INDEX "process_definition_index" RENAME TO "workflow_definition_index";
+ALTER INDEX "process_definition_unique" RENAME TO "workflow_definition_unique";
+ALTER TABLE "t_ds_workflow_instance" RENAME COLUMN "process_instance_json" TO "workflow_instance_json";
+ALTER INDEX "process_instance_index" RENAME TO "workflow_instance_index";
+ALTER INDEX "process_task_relation_idx_post_task_code_version" RENAME TO "workflow_task_relation_idx_post_task_code_version";
+ALTER INDEX "process_task_relation_idx_pre_task_code_version" RENAME TO "workflow_task_relation_idx_pre_task_code_version";
+ALTER INDEX "process_task_relation_idx_project_code_process_definition_code" RENAME TO "workflow_task_relation_idx_project_code_workflow_definition_cod";
+ALTER INDEX "process_task_relation_log_idx_project_code_process_definition_c" RENAME TO "workflow_task_relation_log_idx_project_code_workflow_definition";
+
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select rename_tables_and_fields_from_process_to_workflow();
+DROP FUNCTION IF EXISTS rename_tables_and_fields_from_process_to_workflow();
+

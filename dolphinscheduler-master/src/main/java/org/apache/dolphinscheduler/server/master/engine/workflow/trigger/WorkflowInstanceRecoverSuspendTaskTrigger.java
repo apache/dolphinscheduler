@@ -50,9 +50,9 @@ public class WorkflowInstanceRecoverSuspendTaskTrigger
                                               final WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.RECOVER_SUSPENDED_PROCESS)
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .processInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion())
+                .workflowInstanceId(workflowInstance.getId())
                 .executorId(workflowInstanceRecoverSuspendTasksRequest.getUserId())
                 .startTime(new Date())
                 .updateTime(new Date())

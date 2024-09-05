@@ -7,7 +7,7 @@ The sub-process node is to execute an external workflow definition as a task nod
 ## Create Task
 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag from the toolbar <img src="../../../../img/tasks/icons/sub_process.png" width="15"/> task node to canvas to create a new SubProcess task.
+- Drag from the toolbar <img src="../../../../img/tasks/icons/sub_workflow.png" width="15"/> task node to canvas to create a new SubProcess task.
 
 ## Task Parameter
 
@@ -30,16 +30,16 @@ Create a shell task to print "hello" and define the workflow as `test_dag01`.
 
 ![subprocess_task01](../../../../img/tasks/demo/subprocess_task01.png)
 
-## Create the Sub_process task
+## Create the Sub_workflow task
 
-To use the sub_process, you need to create the sub-node task, which is the workflow `test_dag01` we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
+To use the sub_workflow, you need to create the sub-node task, which is the workflow `test_dag01` we created in the first step. After that, as shown in the diagram below, select the corresponding sub-node in position ⑤.
 
 ![subprocess_task02](../../../../img/tasks/demo/subprocess_task02.png)
 
-After creating the sub_process, create a corresponding shell task for printing "world" and link both together. Save the current workflow and run it to get the expected result.
+After creating the sub_workflow, create a corresponding shell task for printing "world" and link both together. Save the current workflow and run it to get the expected result.
 
 ![subprocess_task03](../../../../img/tasks/demo/subprocess_task03.png)
 
 ## Note
 
-When using `sub_process` to recall a sub-node task, you need to ensure that the defined sub-node is online status, otherwise, the sub_process workflow will not work properly.
+When using `sub_workflow` to recall a sub-node task, you don't need to ensure that the defined sub-node is online status.

@@ -105,7 +105,7 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
     @SneakyThrows
     private List<ZonedDateTime> parseBackfillDateList(WorkflowBackFillRequest workflowBackFillRequest) {
         final WorkflowBackFillRequest.BackfillTime backfillTime = workflowBackFillRequest.getBackfillTime();
-        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+        List<Schedule> schedules = processService.queryReleaseSchedulerListByWorkflowDefinitionCode(
                 workflowBackFillRequest.getWorkflowDefinitionCode());
 
         if (StringUtils.isNotEmpty(backfillTime.getComplementStartDate())

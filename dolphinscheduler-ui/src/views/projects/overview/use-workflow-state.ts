@@ -17,7 +17,7 @@
 
 import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import { countProcessInstanceState } from '@/service/modules/projects-analysis'
+import { countWorkflowInstanceState } from '@/service/modules/projects-analysis'
 import { format } from 'date-fns'
 import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
@@ -25,18 +25,18 @@ import type { WorkflowInstanceCountVo } from '@/service/modules/projects-analysi
 import type { StateData } from './types'
 import { reactive, ref } from 'vue'
 
-export function useProcessState() {
+export function useWorkflowState() {
   const route = useRoute()
   const { t } = useI18n()
-  const processVariables = reactive({
-    processLoadingRef: ref(false)
+  const workflowVariables = reactive({
+    workflowLoadingRef: ref(false)
   })
 
-  const getProcessState = (date: Array<number>) => {
-    if (processVariables.processLoadingRef) return
-    processVariables.processLoadingRef = true
+  const getWorkflowState = (date: Array<number>) => {
+    if (workflowVariables.workflowLoadingRef) return
+    workflowVariables.workflowLoadingRef = true
     const { state } = useAsyncState(
-      countProcessInstanceState({
+      countWorkflowInstanceState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
         endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
         projectCode: Number(route.params.projectCode)
@@ -54,7 +54,7 @@ export function useProcessState() {
             name: t('home.' + toLower(item.state))
           }
         })
-        processVariables.processLoadingRef = false
+        workflowVariables.workflowLoadingRef = false
 
         return { table, chart }
       }),
@@ -64,5 +64,5 @@ export function useProcessState() {
     return state
   }
 
-  return { getProcessState, processVariables }
+  return { getWorkflowState, workflowVariables }
 }

@@ -89,26 +89,35 @@ jobs:
     strategy:
       matrix:
         case:
-          - name: Tenant
+          - name: TenantAPITest
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
-          - name: WorkerGroup
+          - name: WorkerGroupAPITest
             class: org.apache.dolphinscheduler.api.test.cases.WorkerGroupAPITest
-          - name: Project
+          - name: ProjectAPITest
             class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
-          - name: Workflow
-            class: org.apache.dolphinscheduler.api.test.cases.ProcessDefinitionAPITest
-          - name: Scheduler
+          - name: WorkflowDefinitionAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.WorkflowDefinitionAPITest
+          - name: SchedulerAPITest
             class: org.apache.dolphinscheduler.api.test.cases.SchedulerAPITest
-          - name: Executor
+          - name: ExecutorAPITest
             class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
-          - name: ProcessInstance
-            class: org.apache.dolphinscheduler.api.test.cases.ProcessInstanceAPITest
+          - name: WorkflowInstanceAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.WorkflowInstanceAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: 11
+          distribution: 'adopt'
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
       - name: Cache local Maven repository
         uses: actions/cache@v4
         with:

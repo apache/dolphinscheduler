@@ -44,7 +44,7 @@ public class WorkflowTaskRelationMapperTest extends BaseDaoTest {
         workflowTaskRelation.setName("def 1");
 
         workflowTaskRelation.setProjectCode(1L);
-        workflowTaskRelation.setProcessDefinitionCode(1L);
+        workflowTaskRelation.setWorkflowDefinitionCode(1L);
         workflowTaskRelation.setPostTaskCode(3L);
         workflowTaskRelation.setPreTaskCode(2L);
         workflowTaskRelation.setUpdateTime(new Date());
@@ -54,9 +54,9 @@ public class WorkflowTaskRelationMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testQueryByProcessCode() {
+    public void testQueryByWorkflowDefinitionCode() {
         WorkflowTaskRelation workflowTaskRelation = insertOne();
-        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper.queryByProcessCode(1L);
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper.queryByWorkflowDefinitionCode(1L);
         Assertions.assertNotEquals(0, workflowTaskRelations.size());
     }
 
@@ -77,9 +77,9 @@ public class WorkflowTaskRelationMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testDeleteByCode() {
+    public void testDeleteByWorkflowDefinitionCode() {
         WorkflowTaskRelation workflowTaskRelation = insertOne();
-        int i = workflowTaskRelationMapper.deleteByCode(1L, 1L);
+        int i = workflowTaskRelationMapper.deleteByWorkflowDefinitionCode(1L, 1L);
         Assertions.assertNotEquals(0, i);
     }
 

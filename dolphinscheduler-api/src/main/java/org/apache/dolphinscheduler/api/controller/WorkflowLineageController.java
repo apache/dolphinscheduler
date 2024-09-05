@@ -75,10 +75,10 @@ public class WorkflowLineageController extends BaseController {
     @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
     public Result<List<WorkFlowRelationDetail>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                           @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName) {
-        processDefinitionName = ParameterUtils.handleEscapes(processDefinitionName);
+                                                                           @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName) {
+        workflowDefinitionName = ParameterUtils.handleEscapes(workflowDefinitionName);
         List<WorkFlowRelationDetail> workFlowLineages =
-                workflowLineageService.queryWorkFlowLineageByName(projectCode, processDefinitionName);
+                workflowLineageService.queryWorkFlowLineageByName(projectCode, workflowDefinitionName);
         return Result.success(workFlowLineages);
     }
 
@@ -117,14 +117,14 @@ public class WorkflowLineageController extends BaseController {
      *
      * @param loginUser             login user
      * @param projectCode           project codes which taskCode belong
-     * @param processDefinitionCode project code which taskCode belong
+     * @param workflowDefinitionCode project code which taskCode belong
      * @param taskCode              task definition code
      * @return Result of task can be deleted or not
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "processDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
     })
     @PostMapping(value = "/tasks/verify-delete")
@@ -132,11 +132,11 @@ public class WorkflowLineageController extends BaseController {
     @ApiException(TASK_WITH_DEPENDENT_ERROR)
     public Result<Map<String, Object>> verifyTaskCanDelete(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                           @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
-                                                           @RequestParam(value = "taskCode", required = true) long taskCode) {
+                                                           @RequestParam(value = "workflowDefinitionCode") long workflowDefinitionCode,
+                                                           @RequestParam(value = "taskCode") long taskCode) {
         Result<Map<String, Object>> result = new Result<>();
         Optional<String> taskDepMsg =
-                workflowLineageService.taskDependentMsg(projectCode, processDefinitionCode, taskCode);
+                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }

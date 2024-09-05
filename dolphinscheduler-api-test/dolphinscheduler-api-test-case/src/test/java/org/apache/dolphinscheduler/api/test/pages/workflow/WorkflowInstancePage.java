@@ -32,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
-public class ProcessInstancePage {
+public class WorkflowInstancePage {
 
     private String sessionId;
 
-    public HttpResponse queryProcessInstancesByTriggerCode(User loginUser, long projectCode, long triggerCode) {
+    public HttpResponse queryWorkflowInstancesByTriggerCode(User loginUser, long projectCode, long triggerCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("triggerCode", triggerCode);
@@ -44,11 +44,11 @@ public class ProcessInstancePage {
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-instances/trigger", projectCode);
+        String url = String.format("/projects/%s/workflow-instances/trigger", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessInstanceList(User loginUser, long projectCode, int pageNo, int pageSize) {
+    public HttpResponse queryWorkflowInstanceList(User loginUser, long projectCode, int pageNo, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("pageNo", pageNo);
@@ -57,39 +57,39 @@ public class ProcessInstancePage {
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-instances", projectCode);
+        String url = String.format("/projects/%s/workflow-instances", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryTaskListByProcessId(User loginUser, long projectCode, long processInstanceId) {
+    public HttpResponse queryTaskListByWorkflowInstanceId(User loginUser, long projectCode, long workflowInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-instances/%s/tasks", projectCode, processInstanceId);
+        String url = String.format("/projects/%s/workflow-instances/%s/tasks", projectCode, workflowInstanceId);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessInstanceById(User loginUser, long projectCode, long processInstanceId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("loginUser", loginUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.SESSION_ID_KEY, sessionId);
-
-        RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-instances/%s", projectCode, processInstanceId);
-        return requestClient.get(url, headers, params);
-    }
-
-    public HttpResponse deleteProcessInstanceById(User loginUser, long projectCode, long processInstanceId) {
+    public HttpResponse queryWorkflowInstanceById(User loginUser, long projectCode, long workflowInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/process-instances/%s", projectCode, processInstanceId);
+        String url = String.format("/projects/%s/workflow-instances/%s", projectCode, workflowInstanceId);
+        return requestClient.get(url, headers, params);
+    }
+
+    public HttpResponse deleteWorkflowInstanceById(User loginUser, long projectCode, long workflowInstanceId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        String url = String.format("/projects/%s/workflow-instances/%s", projectCode, workflowInstanceId);
         return requestClient.delete(url, headers, params);
     }
 

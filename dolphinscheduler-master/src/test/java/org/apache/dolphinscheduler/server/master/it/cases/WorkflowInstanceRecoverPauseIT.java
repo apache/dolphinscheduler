@@ -92,7 +92,7 @@ public class WorkflowInstanceRecoverPauseIT extends AbstractMasterIntegrationTes
                             .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .satisfies(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.PAUSE);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.NO);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.NO);
                             });
                 });
 

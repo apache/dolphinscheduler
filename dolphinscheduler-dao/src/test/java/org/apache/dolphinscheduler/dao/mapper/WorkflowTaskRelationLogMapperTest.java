@@ -41,9 +41,9 @@ public class WorkflowTaskRelationLogMapperTest extends BaseDaoTest {
         // insertOne
         WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
         processTaskRelationLog.setName("def 1");
-        processTaskRelationLog.setProcessDefinitionVersion(1);
+        processTaskRelationLog.setWorkflowDefinitionVersion(1);
         processTaskRelationLog.setProjectCode(1L);
-        processTaskRelationLog.setProcessDefinitionCode(1L);
+        processTaskRelationLog.setWorkflowDefinitionCode(1L);
         processTaskRelationLog.setPostTaskCode(3L);
         processTaskRelationLog.setPreTaskCode(2L);
         processTaskRelationLog.setUpdateTime(new Date());
@@ -53,10 +53,10 @@ public class WorkflowTaskRelationLogMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testQueryByProcessCodeAndVersion() {
+    public void testQueryByWorkflowCodeAndVersion() {
         WorkflowTaskRelationLog processTaskRelationLog = insertOne();
         List<WorkflowTaskRelationLog> processTaskRelationLogs = workflowTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(1L, 1);
+                .queryByWorkflowCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(0, processTaskRelationLogs.size());
     }
 
