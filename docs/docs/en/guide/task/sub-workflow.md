@@ -16,8 +16,8 @@ The sub-workflow node is to execute an external workflow definition as a task no
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-| **Parameter** |                                                                              **Description**                                                                              |
-|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Parameter** |                                                                               **Description**                                                                               |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Child node    | It is the workflow definition of the selected sub-workflow. Enter the child node in the upper right corner to jump to the workflow definition of the selected sub-workflow. |
 
 ## Task Example
