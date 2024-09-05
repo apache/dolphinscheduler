@@ -161,7 +161,7 @@ export default defineComponent({
                 type='primary'
                 size='small'
                 onClick={this.createDefinition}
-                class='btn-create-process'
+                class='btn-create-workflow'
               >
                 {t('project.workflow.create_workflow')}
               </NButton>

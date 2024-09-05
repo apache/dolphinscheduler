@@ -67,7 +67,7 @@ export function useTable() {
       },
       {
         title: t('data_quality.task_result.workflow_instance'),
-        key: 'processInstanceName',
+        key: 'workflowInstanceName',
         ...COLUMN_WIDTH_CONFIG['name'],
         render: (row: ResultItem) =>
           h(
@@ -78,9 +78,9 @@ export function useTable() {
                   name: 'workflow-instance-detail',
                   params: {
                     projectCode: row.projectCode,
-                    id: row.processInstanceId
+                    id: row.workflowInstanceId
                   },
-                  query: { code: row.processDefinitionCode }
+                  query: { code: row.workflowDefinitionCode }
                 })
             },
             {
@@ -88,7 +88,7 @@ export function useTable() {
                 h(
                   NEllipsis,
                   COLUMN_WIDTH_CONFIG['linkEllipsis'],
-                  () => row.processInstanceName
+                  () => row.workflowInstanceName
                 )
             }
           )

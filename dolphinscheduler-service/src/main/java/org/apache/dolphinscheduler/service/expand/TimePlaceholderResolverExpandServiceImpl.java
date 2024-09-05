@@ -28,7 +28,7 @@ public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholder
     }
 
     @Override
-    public String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName) {
+    public String timeFunctionExtension(Integer workflowInstanceId, String timeZone, String placeholderName) {
         return null;
     }
 }

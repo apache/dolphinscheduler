@@ -68,7 +68,7 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
             }
             final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
             try {
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getWorkflowInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
                 LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
@@ -94,6 +94,12 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                                 // will
                                 // put it back to the queue to get the status again.
                                 asyncMasterTaskDelayQueue.addAsyncTask(asyncTaskExecutionContext);
+                                break;
+                            case PAUSE:
+                                asyncTaskCallbackFunction.executePause();
+                                break;
+                            case KILL:
+                                asyncTaskCallbackFunction.executeKilled();
                                 break;
                             case SUCCESS:
                                 asyncTaskCallbackFunction.executeSuccess();

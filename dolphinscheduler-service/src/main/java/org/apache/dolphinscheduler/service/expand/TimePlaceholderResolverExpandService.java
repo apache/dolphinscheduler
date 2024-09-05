@@ -31,5 +31,5 @@ public interface TimePlaceholderResolverExpandService {
      * @param placeholderName
      * @return
      */
-    String timeFunctionExtension(Integer processInstanceId, String timeZone, String placeholderName);
+    String timeFunctionExtension(Integer workflowInstanceId, String timeZone, String placeholderName);
 }

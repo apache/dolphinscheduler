@@ -51,6 +51,20 @@ public class AsyncTaskCallbackFunctionImpl implements AsyncTaskCallbackFunction 
         asyncMasterTaskExecuteRunnable.afterThrowing(throwable);
     }
 
+    @Override
+    public void executePause() {
+        asyncMasterTaskExecuteRunnable.getTaskExecutionContext()
+                .setCurrentExecutionStatus(TaskExecutionStatus.PAUSE);
+        executeFinished();
+    }
+
+    @Override
+    public void executeKilled() {
+        asyncMasterTaskExecuteRunnable.getTaskExecutionContext()
+                .setCurrentExecutionStatus(TaskExecutionStatus.KILL);
+        executeFinished();
+    }
+
     private void executeFinished() {
         TaskInstanceLogHeader.printFinalizeTaskHeader();
         int taskInstanceId = asyncMasterTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId();

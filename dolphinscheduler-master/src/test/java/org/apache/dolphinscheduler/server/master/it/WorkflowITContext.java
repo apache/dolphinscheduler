@@ -37,7 +37,7 @@ public class WorkflowITContext {
 
     private Project project;
 
-    private WorkflowDefinition workflow;
+    private List<WorkflowDefinition> workflows;
 
     private WorkflowInstance workflowInstance;
 

@@ -28,14 +28,15 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphBfsVisitor;
+import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskInstanceFactories;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,9 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private TaskInstanceFactories taskInstanceFactories;
+
     /**
      * Generate the recover workflow instance.
      * <p> Will use the origin workflow instance, but will update the following fields. Need to note we cannot not
@@ -88,16 +92,12 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
     protected void assembleWorkflowInstance(
                                             final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
         final Command command = workflowExecuteContextBuilder.getCommand();
-        final int workflowInstanceId = command.getProcessInstanceId();
+        final int workflowInstanceId = command.getWorkflowInstanceId();
         final WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
         workflowInstance.setVarPool(null);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setCommandType(command.getCommandType());
-        workflowInstance.setStartTime(new Date());
-        workflowInstance.setRestartTime(new Date());
-        workflowInstance.setEndTime(null);
-        workflowInstance.setRunTimes(workflowInstance.getRunTimes() + 1);
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
@@ -133,13 +133,14 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
             workflowExecutionGraph.addEdge(task, successors);
         };
 
-        final WorkflowGraphBfsVisitor workflowGraphBfsVisitor = WorkflowGraphBfsVisitor.builder()
-                .taskDependType(workflowExecuteContextBuilder.getWorkflowInstance().getTaskDependType())
-                .onWorkflowGraph(workflowGraph)
-                .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
-                .doVisitFunction(taskExecutionRunnableCreator)
-                .build();
-        workflowGraphBfsVisitor.visit();
+        final WorkflowGraphTopologyLogicalVisitor workflowGraphTopologyLogicalVisitor =
+                WorkflowGraphTopologyLogicalVisitor.builder()
+                        .taskDependType(workflowExecuteContextBuilder.getWorkflowInstance().getTaskDependType())
+                        .onWorkflowGraph(workflowGraph)
+                        .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
+                        .doVisitFunction(taskExecutionRunnableCreator)
+                        .build();
+        workflowGraphTopologyLogicalVisitor.visit();
 
         workflowExecuteContextBuilder.setWorkflowExecutionGraph(workflowExecutionGraph);
     }
@@ -155,42 +156,52 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
                 .stream()
                 .collect(Collectors.toMap(TaskInstance::getName, Function.identity()));
 
-        final Set<String> needRecreateTasks = taskInstanceMap.values()
-                .stream()
-                .filter(this::isTaskNeedRecreate)
-                .map(TaskInstance::getName)
-                .collect(Collectors.toSet());
-
         final IWorkflowGraph workflowGraph = workflowExecuteContextBuilder.getWorkflowGraph();
+
+        final Set<String> needRecoverTasks = new HashSet<>();
+        final Set<String> markInvalidTasks = new HashSet<>();
         final BiConsumer<String, Set<String>> historyTaskInstanceMarker = (task, successors) -> {
-            boolean isTaskNeedRecreate = needRecreateTasks.contains(task) || workflowGraph.getPredecessors(task)
-                    .stream()
-                    .anyMatch(needRecreateTasks::contains);
-            // If the task instance need to be recreated, then will mark the task instance invalid.
-            // and the TaskExecutionRunnable will not contain the task instance.
-            if (isTaskNeedRecreate) {
-                needRecreateTasks.add(task);
+            // If the parent is need recover
+            // Then the task should mark as invalid, and it's child should be mark as invalidated.
+            if (markInvalidTasks.contains(task)) {
                 if (taskInstanceMap.containsKey(task)) {
                     taskInstanceDao.markTaskInstanceInvalid(Lists.newArrayList(taskInstanceMap.get(task)));
                     taskInstanceMap.remove(task);
                 }
+                markInvalidTasks.addAll(successors);
+                return;
             }
-            // If the task instance need to be recovered, then will mark the task instance to submit.
-            // and the TaskExecutionRunnable will contain the task instance and pass the creation step.
-            if (isTaskNeedRecover(taskInstanceMap.get(task))) {
-                final TaskInstance taskInstance = taskInstanceMap.get(task);
-                taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-                taskInstanceDao.upsertTaskInstance(taskInstance);
+
+            final TaskInstance taskInstance = taskInstanceMap.get(task);
+            if (taskInstance == null) {
+                return;
+            }
+
+            if (isTaskNeedRecreate(taskInstance) || isTaskCanRecover(taskInstance)) {
+                needRecoverTasks.add(task);
+                markInvalidTasks.addAll(successors);
             }
         };
 
-        final WorkflowGraphBfsVisitor workflowGraphBfsVisitor = WorkflowGraphBfsVisitor.builder()
-                .onWorkflowGraph(workflowGraph)
-                .taskDependType(workflowInstance.getTaskDependType())
-                .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
-                .doVisitFunction(historyTaskInstanceMarker)
-                .build();
-        workflowGraphBfsVisitor.visit();
+        final WorkflowGraphTopologyLogicalVisitor workflowGraphTopologyLogicalVisitor =
+                WorkflowGraphTopologyLogicalVisitor.builder()
+                        .onWorkflowGraph(workflowGraph)
+                        .taskDependType(workflowInstance.getTaskDependType())
+                        .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
+                        .doVisitFunction(historyTaskInstanceMarker)
+                        .build();
+        workflowGraphTopologyLogicalVisitor.visit();
+
+        for (String task : needRecoverTasks) {
+            final TaskInstance taskInstance = taskInstanceMap.get(task);
+            if (isTaskCanRecover(taskInstance)) {
+                taskInstanceMap.put(task, createRecoverTaskInstance(taskInstance));
+                continue;
+            }
+            if (isTaskNeedRecreate(taskInstance)) {
+                taskInstanceMap.put(task, createRecreatedTaskInstance(taskInstance));
+            }
+        }
         return new ArrayList<>(taskInstanceMap.values());
     }
 
@@ -199,15 +210,32 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
      * <p> If the task state is FAILURE and KILL, then will mark the task invalid and recreate the task.
      */
     private boolean isTaskNeedRecreate(final TaskInstance taskInstance) {
+        if (taskInstance == null) {
+            return false;
+        }
         return taskInstance.getState() == TaskExecutionStatus.FAILURE
                 || taskInstance.getState() == TaskExecutionStatus.KILL;
     }
 
-    private boolean isTaskNeedRecover(final TaskInstance taskInstance) {
+    private TaskInstance createRecreatedTaskInstance(final TaskInstance taskInstance) {
+        return taskInstanceFactories.failedRecoverTaskInstanceFactory()
+                .builder()
+                .withTaskInstance(taskInstance)
+                .build();
+    }
+
+    private boolean isTaskCanRecover(final TaskInstance taskInstance) {
         if (taskInstance == null) {
             return false;
         }
         return taskInstance.getState() == TaskExecutionStatus.PAUSE;
+    }
+
+    private TaskInstance createRecoverTaskInstance(final TaskInstance taskInstance) {
+        return taskInstanceFactories.pauseRecoverTaskInstanceFactory()
+                .builder()
+                .withTaskInstance(taskInstance)
+                .build();
     }
 
     @Override

@@ -52,7 +52,7 @@ public class WorkflowInstanceQueryRequest extends PageQueryDto {
     @Schema(name = "state", example = "STATE")
     Integer state;
 
-    public WorkflowInstance convert2ProcessInstance() {
+    public WorkflowInstance convert2WorkflowInstance() {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         if (this.workflowName != null) {
             workflowInstance.setName(this.workflowName);

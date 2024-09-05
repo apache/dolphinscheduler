@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.it.cases;
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -62,7 +63,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     public void testStopWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -111,7 +112,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     public void testStopWorkflow_with_oneFailedTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_failed.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -160,7 +161,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     public void testStopWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/stop/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow();
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -206,6 +207,78 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
                                         assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
                                     });
                 });
+        assertThat(workflowRepository.getAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test stop a workflow with one sub workflow task")
+    public void testStopWorkflow_with_subWorkflowTask_success() {
+        final String yaml = "/it/stop/workflow_with_sub_workflow_task_success.yaml";
+        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .pollInterval(Duration.ofMillis(100))
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .satisfies(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                            });
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                            });
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(context.getWorkflows().get(1)))
+                            .satisfiesExactly(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                            });
+                });
+
+        assertThat(workflowOperator.stopWorkflowInstance(workflowInstanceId).isSuccess());
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .satisfies(workflowInstance -> {
+                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.NO);
+                            });
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            });
+
+                    final WorkflowDefinition subWorkflowDefinition = context.getWorkflows().get(1);
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(subWorkflowDefinition))
+                            .satisfiesExactly(workflowInstance -> {
+                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(subWorkflowDefinition))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            });
+                });
+
         assertThat(workflowRepository.getAll()).isEmpty();
     }
 }

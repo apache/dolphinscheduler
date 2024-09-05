@@ -217,8 +217,8 @@ CREATE TABLE t_ds_alert (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   project_code bigint DEFAULT NULL,
-  process_definition_code bigint DEFAULT NULL,
-  process_instance_id int DEFAULT NULL ,
+  workflow_definition_code bigint DEFAULT NULL,
+  workflow_instance_id int DEFAULT NULL ,
   alert_type int DEFAULT NULL ,
   PRIMARY KEY (id)
 );
@@ -252,7 +252,7 @@ DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command (
   id int NOT NULL  ,
   command_type              int DEFAULT NULL ,
-  process_definition_code   bigint NOT NULL ,
+  workflow_definition_code   bigint NOT NULL ,
   command_param             text ,
   task_depend_type          int DEFAULT NULL ,
   failure_strategy          int DEFAULT '0' ,
@@ -262,18 +262,18 @@ CREATE TABLE t_ds_command (
   start_time                timestamp DEFAULT NULL ,
   executor_id               int DEFAULT NULL ,
   update_time               timestamp DEFAULT NULL ,
-  process_instance_priority int DEFAULT '2' ,
+  workflow_instance_priority int DEFAULT '2' ,
   worker_group              varchar(255),
   tenant_code               varchar(64) DEFAULT 'default',
   environment_code          bigint DEFAULT '-1',
   dry_run                   int DEFAULT '0' ,
-  process_instance_id       int DEFAULT 0,
-  process_definition_version int DEFAULT 0,
+  workflow_instance_id       int DEFAULT 0,
+  workflow_definition_version int DEFAULT 0,
   test_flag                 int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
-create index priority_id_index on t_ds_command (process_instance_priority,id);
+create index priority_id_index on t_ds_command (workflow_instance_priority,id);
 
 --
 -- Table structure for table t_ds_datasource
@@ -301,7 +301,7 @@ DROP TABLE IF EXISTS t_ds_error_command;
 CREATE TABLE t_ds_error_command (
   id int NOT NULL  ,
   command_type              int DEFAULT NULL ,
-  process_definition_code   bigint NOT NULL ,
+  workflow_definition_code   bigint NOT NULL ,
   command_param             text ,
   task_depend_type          int DEFAULT NULL ,
   failure_strategy          int DEFAULT '0' ,
@@ -311,24 +311,24 @@ CREATE TABLE t_ds_error_command (
   start_time                timestamp DEFAULT NULL ,
   executor_id               int DEFAULT NULL ,
   update_time               timestamp DEFAULT NULL ,
-  process_instance_priority int DEFAULT '2' ,
+  workflow_instance_priority int DEFAULT '2' ,
   worker_group              varchar(255),
   tenant_code               varchar(64) DEFAULT 'default',
   environment_code          bigint DEFAULT '-1',
   dry_run                   int DEFAULT '0' ,
   message                   text ,
-  process_instance_id       int DEFAULT 0,
-  process_definition_version int DEFAULT 0,
+  workflow_instance_id       int DEFAULT 0,
+  workflow_definition_version int DEFAULT 0,
   test_flag                 int DEFAULT NULL ,
   PRIMARY KEY (id)
 );
 
 --
--- Table structure for table t_ds_process_definition
+-- Table structure for table t_ds_workflow_definition
 --
 
-DROP TABLE IF EXISTS t_ds_process_definition;
-CREATE TABLE t_ds_process_definition (
+DROP TABLE IF EXISTS t_ds_workflow_definition;
+CREATE TABLE t_ds_workflow_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
@@ -346,17 +346,17 @@ CREATE TABLE t_ds_process_definition (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id) ,
-  CONSTRAINT process_definition_unique UNIQUE (name, project_code)
+  CONSTRAINT workflow_definition_unique UNIQUE (name, project_code)
 ) ;
 
-create index process_definition_index on t_ds_process_definition (code,id);
+create index workflow_definition_index on t_ds_workflow_definition (code,id);
 
 --
--- Table structure for table t_ds_process_definition_log
+-- Table structure for table t_ds_workflow_definition_log
 --
 
-DROP TABLE IF EXISTS t_ds_process_definition_log;
-CREATE TABLE t_ds_process_definition_log (
+DROP TABLE IF EXISTS t_ds_workflow_definition_log;
+CREATE TABLE t_ds_workflow_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
@@ -378,7 +378,7 @@ CREATE TABLE t_ds_process_definition_log (
   PRIMARY KEY (id)
 ) ;
 
-create UNIQUE index uniq_idx_code_version on t_ds_process_definition_log (code,version);
+create UNIQUE index uniq_idx_code_version on t_ds_workflow_definition_log (code,version);
 
 --
 -- Table structure for table t_ds_task_definition
@@ -462,16 +462,16 @@ create index idx_task_definition_log_code_version on t_ds_task_definition_log (c
 create index idx_task_definition_log_project_code on t_ds_task_definition_log (project_code);
 
 --
--- Table structure for table t_ds_process_task_relation
+-- Table structure for table t_ds_workflow_task_relation
 --
 
-DROP TABLE IF EXISTS t_ds_process_task_relation;
-CREATE TABLE t_ds_process_task_relation (
+DROP TABLE IF EXISTS t_ds_workflow_task_relation;
+CREATE TABLE t_ds_workflow_task_relation (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   project_code bigint DEFAULT NULL ,
-  process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int DEFAULT NULL ,
+  workflow_definition_code bigint DEFAULT NULL ,
+  workflow_definition_version int DEFAULT NULL ,
   pre_task_code bigint DEFAULT NULL ,
   pre_task_version int DEFAULT '0' ,
   post_task_code bigint DEFAULT NULL ,
@@ -483,21 +483,21 @@ CREATE TABLE t_ds_process_task_relation (
   PRIMARY KEY (id)
 ) ;
 
-create index process_task_relation_idx_project_code_process_definition_code on t_ds_process_task_relation (project_code,process_definition_code);
-create index process_task_relation_idx_pre_task_code_version on t_ds_process_task_relation (pre_task_code, pre_task_version);
-create index process_task_relation_idx_post_task_code_version on t_ds_process_task_relation (post_task_code, post_task_version);
+create index workflow_task_relation_idx_project_code_workflow_definition_code on t_ds_workflow_task_relation (project_code,workflow_definition_code);
+create index workflow_task_relation_idx_pre_task_code_version on t_ds_workflow_task_relation (pre_task_code, pre_task_version);
+create index workflow_task_relation_idx_post_task_code_version on t_ds_workflow_task_relation (post_task_code, post_task_version);
 
 --
--- Table structure for table t_ds_process_task_relation_log
+-- Table structure for table t_ds_workflow_task_relation_log
 --
 
-DROP TABLE IF EXISTS t_ds_process_task_relation_log;
-CREATE TABLE t_ds_process_task_relation_log (
+DROP TABLE IF EXISTS t_ds_workflow_task_relation_log;
+CREATE TABLE t_ds_workflow_task_relation_log (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   project_code bigint DEFAULT NULL ,
-  process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int DEFAULT NULL ,
+  workflow_definition_code bigint DEFAULT NULL ,
+  workflow_definition_version int DEFAULT NULL ,
   pre_task_code bigint DEFAULT NULL ,
   pre_task_version int DEFAULT '0' ,
   post_task_code bigint DEFAULT NULL ,
@@ -511,18 +511,18 @@ CREATE TABLE t_ds_process_task_relation_log (
   PRIMARY KEY (id)
 ) ;
 
-create index process_task_relation_log_idx_project_code_process_definition_code on t_ds_process_task_relation_log (project_code,process_definition_code);
+create index workflow_task_relation_log_idx_project_code_workflow_definition_code on t_ds_workflow_task_relation_log (project_code,workflow_definition_code);
 
 --
--- Table structure for table t_ds_process_instance
+-- Table structure for table t_ds_workflow_instance
 --
 
-DROP TABLE IF EXISTS t_ds_process_instance;
-CREATE TABLE t_ds_process_instance (
+DROP TABLE IF EXISTS t_ds_workflow_instance;
+CREATE TABLE t_ds_workflow_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
-  process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int NOT NULL DEFAULT 1 ,
+  workflow_definition_code bigint DEFAULT NULL ,
+  workflow_definition_version int NOT NULL DEFAULT 1 ,
   project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
@@ -541,29 +541,29 @@ CREATE TABLE t_ds_process_instance (
   schedule_time timestamp DEFAULT NULL ,
   command_start_time timestamp DEFAULT NULL ,
   global_params text ,
-  process_instance_json text ,
+  workflow_instance_json text ,
   flag int DEFAULT '1' ,
   update_time timestamp NULL ,
-  is_sub_process int DEFAULT '0' ,
+  is_sub_workflow int DEFAULT '0' ,
   executor_id int NOT NULL ,
   executor_name varchar(64) DEFAULT NULL,
   history_cmd text ,
   dependence_schedule_times text ,
-  process_instance_priority int DEFAULT '2' ,
+  workflow_instance_priority int DEFAULT '2' ,
   worker_group varchar(255) ,
   environment_code bigint DEFAULT '-1',
   timeout int DEFAULT '0' ,
   tenant_code               varchar(64) DEFAULT 'default',
   var_pool text ,
   dry_run int DEFAULT '0' ,
-  next_process_instance_id int DEFAULT '0',
+  next_workflow_instance_id int DEFAULT '0',
   restart_time timestamp DEFAULT NULL ,
   test_flag int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
-create index process_instance_index on t_ds_process_instance (process_definition_code,id);
-create index start_time_index on t_ds_process_instance (start_time,end_time);
+create index workflow_instance_index on t_ds_workflow_instance (workflow_definition_code,id);
+create index start_time_index on t_ds_workflow_instance (start_time,end_time);
 
 --
 -- Table structure for table t_ds_project
@@ -662,19 +662,19 @@ CREATE TABLE t_ds_relation_datasource_user (
 ) ;
 
 --
--- Table structure for table t_ds_relation_process_instance
+-- Table structure for table t_ds_relation_workflow_instance
 --
 
-DROP TABLE IF EXISTS t_ds_relation_process_instance;
-CREATE TABLE t_ds_relation_process_instance (
+DROP TABLE IF EXISTS t_ds_relation_workflow_instance;
+CREATE TABLE t_ds_relation_workflow_instance (
   id int NOT NULL  ,
-  parent_process_instance_id int DEFAULT NULL ,
+  parent_workflow_instance_id int DEFAULT NULL ,
   parent_task_instance_id int DEFAULT NULL ,
-  process_instance_id int DEFAULT NULL ,
+  workflow_instance_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-create index idx_relation_process_instance_parent_process_task on t_ds_relation_process_instance (parent_process_instance_id, parent_task_instance_id);
-create index idx_relation_process_instance_process_instance_id on t_ds_relation_process_instance (process_instance_id);
+create index idx_relation_workflow_instance_parent_workflow_task on t_ds_relation_workflow_instance (parent_workflow_instance_id, parent_task_instance_id);
+create index idx_relation_workflow_instance_workflow_instance_id on t_ds_relation_workflow_instance (workflow_instance_id);
 
 
 --
@@ -754,7 +754,7 @@ CREATE TABLE t_ds_resources (
 DROP TABLE IF EXISTS t_ds_schedules;
 CREATE TABLE t_ds_schedules (
   id int NOT NULL ,
-  process_definition_code bigint NOT NULL ,
+  workflow_definition_code bigint NOT NULL ,
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
   timezone_id varchar(40) default NULL ,
@@ -764,7 +764,7 @@ CREATE TABLE t_ds_schedules (
   release_state int NOT NULL ,
   warning_type int NOT NULL ,
   warning_group_id int DEFAULT NULL ,
-  process_instance_priority int DEFAULT '2' ,
+  workflow_instance_priority int DEFAULT '2' ,
   worker_group varchar(255),
   tenant_code               varchar(64) DEFAULT 'default',
   environment_code bigint DEFAULT '-1',
@@ -798,8 +798,8 @@ CREATE TABLE t_ds_task_instance (
   task_execute_type int DEFAULT '0',
   task_code bigint NOT NULL,
   task_definition_version int NOT NULL DEFAULT '1' ,
-  process_instance_id int DEFAULT NULL ,
-  process_instance_name varchar(255) DEFAULT NULL,
+  workflow_instance_id int DEFAULT NULL ,
+  workflow_instance_name varchar(255) DEFAULT NULL,
   project_code bigint DEFAULT NULL,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
@@ -960,27 +960,27 @@ ALTER TABLE t_ds_command ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_command_id_se
 DROP SEQUENCE IF EXISTS t_ds_datasource_id_sequence;
 CREATE SEQUENCE  t_ds_datasource_id_sequence;
 ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
-CREATE SEQUENCE  t_ds_process_definition_id_sequence;
-ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_process_definition_log_id_sequence;
-CREATE SEQUENCE  t_ds_process_definition_log_id_sequence;
-ALTER TABLE t_ds_process_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_log_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_workflow_definition_id_sequence;
+CREATE SEQUENCE  t_ds_workflow_definition_id_sequence;
+ALTER TABLE t_ds_workflow_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_workflow_definition_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_workflow_definition_log_id_sequence;
+CREATE SEQUENCE  t_ds_workflow_definition_log_id_sequence;
+ALTER TABLE t_ds_workflow_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_workflow_definition_log_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_task_definition_id_sequence;
 CREATE SEQUENCE  t_ds_task_definition_id_sequence;
 ALTER TABLE t_ds_task_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_definition_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_task_definition_log_id_sequence;
 CREATE SEQUENCE  t_ds_task_definition_log_id_sequence;
 ALTER TABLE t_ds_task_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_definition_log_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_process_task_relation_id_sequence;
-CREATE SEQUENCE  t_ds_process_task_relation_id_sequence;
-ALTER TABLE t_ds_process_task_relation ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_task_relation_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_process_task_relation_log_id_sequence;
-CREATE SEQUENCE  t_ds_process_task_relation_log_id_sequence;
-ALTER TABLE t_ds_process_task_relation_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_task_relation_log_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
-CREATE SEQUENCE  t_ds_process_instance_id_sequence;
-ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_workflow_task_relation_id_sequence;
+CREATE SEQUENCE  t_ds_workflow_task_relation_id_sequence;
+ALTER TABLE t_ds_workflow_task_relation ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_workflow_task_relation_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_workflow_task_relation_log_id_sequence;
+CREATE SEQUENCE  t_ds_workflow_task_relation_log_id_sequence;
+ALTER TABLE t_ds_workflow_task_relation_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_workflow_task_relation_log_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_workflow_instance_id_sequence;
+CREATE SEQUENCE  t_ds_workflow_instance_id_sequence;
+ALTER TABLE t_ds_workflow_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_workflow_instance_id_sequence');
 
 DROP SEQUENCE IF EXISTS t_ds_project_id_sequence;
 CREATE SEQUENCE  t_ds_project_id_sequence;
@@ -993,9 +993,9 @@ ALTER TABLE t_ds_queue ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_queue_id_sequen
 DROP SEQUENCE IF EXISTS t_ds_relation_datasource_user_id_sequence;
 CREATE SEQUENCE  t_ds_relation_datasource_user_id_sequence;
 ALTER TABLE t_ds_relation_datasource_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_datasource_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_relation_process_instance_id_sequence;
-CREATE SEQUENCE  t_ds_relation_process_instance_id_sequence;
-ALTER TABLE t_ds_relation_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_process_instance_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_workflow_instance_id_sequence;
+CREATE SEQUENCE  t_ds_relation_workflow_instance_id_sequence;
+ALTER TABLE t_ds_relation_workflow_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_workflow_instance_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_relation_project_user_id_sequence;
 CREATE SEQUENCE  t_ds_relation_project_user_id_sequence;
 ALTER TABLE t_ds_relation_project_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_user_id_sequence');
@@ -1141,8 +1141,8 @@ VALUES(8, 'TargetTableTotalRows', 'SELECT COUNT(*) AS total FROM ${target_table}
 DROP TABLE IF EXISTS t_ds_dq_execute_result;
 CREATE TABLE t_ds_dq_execute_result (
     id serial NOT NULL,
-    process_definition_id int4 NULL,
-    process_instance_id int4 NULL,
+    workflow_definition_id int4 NULL,
+    workflow_instance_id int4 NULL,
     task_instance_id int4 NULL,
     rule_type int4 NULL,
     rule_name varchar(255) DEFAULT NULL,
@@ -1395,7 +1395,7 @@ VALUES(31, 'target_database', 'select', '$t(target_database)', NULL, NULL, 'Plea
 DROP TABLE IF EXISTS t_ds_dq_task_statistics_value;
 CREATE TABLE t_ds_dq_task_statistics_value (
     id serial NOT NULL,
-    process_definition_id int4 NOT NULL,
+    workflow_definition_id int4 NOT NULL,
     task_instance_id int4 NULL,
     rule_id int4 NOT NULL,
     unique_code varchar NOT NULL,
@@ -1953,7 +1953,7 @@ CREATE TABLE t_ds_task_group_queue (
    task_id      int DEFAULT NULL ,
    task_name    VARCHAR(255) DEFAULT NULL ,
    group_id     int DEFAULT NULL ,
-   process_id   int DEFAULT NULL ,
+   workflow_instance_id   int DEFAULT NULL ,
    priority     int DEFAULT '0' ,
    status       int DEFAULT '-1' ,
    force_start  int DEFAULT '0' ,
@@ -2111,10 +2111,10 @@ CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_cod
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
 -- ----------------------------
--- Table structure for t_ds_process_task_lineage
+-- Table structure for t_ds_workflow_task_lineage
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_task_lineage;
-CREATE TABLE t_ds_process_task_lineage (
+DROP TABLE IF EXISTS t_ds_workflow_task_lineage;
+CREATE TABLE t_ds_workflow_task_lineage (
     id int NOT NULL,
     workflow_definition_code bigint NOT NULL DEFAULT 0,
     workflow_definition_version int NOT NULL DEFAULT 0,
@@ -2128,9 +2128,9 @@ CREATE TABLE t_ds_process_task_lineage (
     PRIMARY KEY (id)
 );
 
-create index idx_process_code_version on t_ds_process_task_lineage (workflow_definition_code,workflow_definition_version);
-create index idx_task_code_version on t_ds_process_task_lineage (task_definition_code,task_definition_version);
-create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_workflow_definition_code,dept_task_definition_code);
+create index idx_workflow_code_version on t_ds_workflow_task_lineage (workflow_definition_code,workflow_definition_version);
+create index idx_task_code_version on t_ds_workflow_task_lineage (task_definition_code,task_definition_version);
+create index idx_dept_code on t_ds_workflow_task_lineage (dept_project_code,dept_workflow_definition_code,dept_task_definition_code);
 
 DROP TABLE IF EXISTS t_ds_jdbc_registry_data;
 create table t_ds_jdbc_registry_data

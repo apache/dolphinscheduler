@@ -26,20 +26,17 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-/**
- * workflow task relation log mapper interface
- */
 public interface WorkflowTaskRelationLogMapper extends BaseMapper<WorkflowTaskRelationLog> {
 
     /**
      * query workflow task relation log
      *
-     * @param processCode process definition code
-     * @param processVersion process version
+     * @param workflowDefinitionCode workflow definition code
+     * @param workflowDefinitionVersion workflow version
      * @return workflow task relation log
      */
-    List<WorkflowTaskRelationLog> queryByProcessCodeAndVersion(@Param("processCode") long processCode,
-                                                               @Param("processVersion") int processVersion);
+    List<WorkflowTaskRelationLog> queryByWorkflowCodeAndVersion(@Param("workflowDefinitionCode") long workflowDefinitionCode,
+                                                                @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
 
     /**
      * batch insert workflow task relation
@@ -50,32 +47,32 @@ public interface WorkflowTaskRelationLogMapper extends BaseMapper<WorkflowTaskRe
     int batchInsert(@Param("taskRelationList") List<WorkflowTaskRelationLog> taskRelationList);
 
     /**
-     * delete workflow task relation log by processCode and version
+     * delete workflow task relation log by workflowDefinitionCode and version
      *
-     * @param processCode process definition code
-     * @param processVersion process version
+     * @param workflowDefinitionCode workflow definition code
+     * @param workflowDefinitionVersion workflow version
      * @return int
      */
-    int deleteByCode(@Param("processCode") long processCode,
-                     @Param("processVersion") int processVersion);
+    int deleteByCode(@Param("workflowDefinitionCode") long workflowDefinitionCode,
+                     @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
 
     /**
      * delete workflow task relation
      *
-     * @param processTaskRelationLog  processTaskRelationLog
+     * @param workflowTaskRelationLog  workflowTaskRelationLog
      * @return int
      */
-    int deleteRelation(@Param("processTaskRelationLog") WorkflowTaskRelationLog processTaskRelationLog);
+    int deleteRelation(@Param("workflowTaskRelationLog") WorkflowTaskRelationLog workflowTaskRelationLog);
 
     /**
      * query workflow task relation log
      *
-     * @param workflowTaskRelation processTaskRelation
+     * @param workflowTaskRelation workflowTaskRelation
      * @return workflow task relation log
      */
-    WorkflowTaskRelationLog queryRelationLogByRelation(@Param("processTaskRelation") WorkflowTaskRelation workflowTaskRelation);
+    WorkflowTaskRelationLog queryRelationLogByRelation(@Param("workflowTaskRelation") WorkflowTaskRelation workflowTaskRelation);
 
-    List<WorkflowTaskRelationLog> queryByProcessCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
+    List<WorkflowTaskRelationLog> queryByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 
     void deleteByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 }

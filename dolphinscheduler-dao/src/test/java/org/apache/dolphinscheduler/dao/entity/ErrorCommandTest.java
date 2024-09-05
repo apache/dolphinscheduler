@@ -38,9 +38,9 @@ class ErrorCommandTest {
         command.setId(1);
         command.setCommandType(CommandType.PAUSE);
         command.setExecutorId(1);
-        command.setProcessDefinitionCode(123);
-        command.setProcessDefinitionVersion(1);
-        command.setProcessInstanceId(1);
+        command.setWorkflowDefinitionCode(123);
+        command.setWorkflowDefinitionVersion(1);
+        command.setWorkflowInstanceId(1);
         command.setCommandParam("param");
         command.setTaskDependType(TaskDependType.TASK_POST);
         command.setFailureStrategy(FailureStrategy.CONTINUE);
@@ -49,7 +49,7 @@ class ErrorCommandTest {
         command.setScheduleTime(new Date());
         command.setStartTime(new Date());
         command.setUpdateTime(new Date());
-        command.setProcessInstancePriority(Priority.HIGHEST);
+        command.setWorkflowInstancePriority(Priority.HIGHEST);
         command.setWorkerGroup("default");
         command.setTenantCode("root");
         command.setEnvironmentCode(1L);
@@ -59,9 +59,9 @@ class ErrorCommandTest {
         ErrorCommand errorCommand = new ErrorCommand(command, "test");
         assertEquals(command.getCommandType(), errorCommand.getCommandType());
         assertEquals(command.getExecutorId(), errorCommand.getExecutorId());
-        assertEquals(command.getProcessDefinitionCode(), errorCommand.getProcessDefinitionCode());
-        assertEquals(command.getProcessDefinitionVersion(), errorCommand.getProcessDefinitionVersion());
-        assertEquals(command.getProcessInstanceId(), errorCommand.getProcessInstanceId());
+        assertEquals(command.getWorkflowDefinitionCode(), errorCommand.getWorkflowDefinitionCode());
+        assertEquals(command.getWorkflowDefinitionVersion(), errorCommand.getWorkflowDefinitionVersion());
+        assertEquals(command.getWorkflowInstanceId(), errorCommand.getWorkflowInstanceId());
         assertEquals(command.getCommandParam(), errorCommand.getCommandParam());
         assertEquals(command.getTaskDependType(), errorCommand.getTaskDependType());
         assertEquals(command.getFailureStrategy(), errorCommand.getFailureStrategy());
@@ -70,7 +70,7 @@ class ErrorCommandTest {
         assertEquals(command.getScheduleTime(), errorCommand.getScheduleTime());
         assertEquals(command.getStartTime(), errorCommand.getStartTime());
         assertEquals(command.getUpdateTime(), errorCommand.getUpdateTime());
-        assertEquals(command.getProcessInstancePriority(), errorCommand.getProcessInstancePriority());
+        assertEquals(command.getWorkflowInstancePriority(), errorCommand.getWorkflowInstancePriority());
         assertEquals(command.getWorkerGroup(), errorCommand.getWorkerGroup());
         assertEquals(command.getTenantCode(), errorCommand.getTenantCode());
         assertEquals(command.getEnvironmentCode(), errorCommand.getEnvironmentCode());
