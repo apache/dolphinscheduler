@@ -27,7 +27,7 @@ echo "dolphinscheduler" | passwd --stdin dolphinscheduler
 
 # Configure sudo without password
 sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
-sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
 
 # Modify directory permissions and grant permissions for user you created above
 chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
@@ -37,7 +37,7 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 > **_NOTICE:_**
 >
 > - Due to DolphinScheduler's multi-tenant task switch user using command `sudo -u {linux-user} -i`, the deployment user needs to have `sudo` privileges and be password-free. If novice learners don’t understand, you can ignore this point for now.
-> - If you find the line "Defaults requirett" in the `/etc/sudoers` file, please comment the content.
+> - If you find the line "Defaults requiretty" in the `/etc/sudoers` file, please comment the content.
 
 ## Start DolphinScheduler Standalone Server
 

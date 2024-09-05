@@ -25,7 +25,7 @@ echo "dolphinscheduler" | passwd --stdin dolphinscheduler
 
 # 配置 sudo 免密
 sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
-sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
 
 # 修改目录权限，使得部署用户对二进制包解压后的 apache-dolphinscheduler-*-bin 目录有操作权限
 chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
@@ -35,7 +35,7 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 > **_注意:_**
 >
 > - 因为任务执行服务是以 `sudo -u {linux-user} -i` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
-> - 如果发现 `/etc/sudoers` 文件中有 "Defaults requirett" 这行，也请注释掉
+> - 如果发现 `/etc/sudoers` 文件中有 "Defaults requiretty" 这行，也请注释掉
 
 ## 启动 DolphinScheduler Standalone Server
 
