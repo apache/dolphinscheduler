@@ -177,7 +177,10 @@ public final class FeiShuSender {
             httpClient.close();
         }
     }
-
+    @AllArgsConstructor
+    @Builder
+    @Data
+    @NoArgsConstructor
     static final class FeiShuSendMsgResponse {
 
         @JsonProperty("data")
