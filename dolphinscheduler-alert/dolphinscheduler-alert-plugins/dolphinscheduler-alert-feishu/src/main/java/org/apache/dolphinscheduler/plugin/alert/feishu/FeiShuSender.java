@@ -101,7 +101,7 @@ public final class FeiShuSender {
             return alertResult;
         }
         alertResult.setMessage(String.format("alert send fei shu msg error : %s", sendMsgResponse.getMsg()));
-        log.info("alert send fei shu msg error : {} ,Data : {} ", sendMsgResponse.getMsg(),
+        log.info("alert send fei shu msg error : {}, Data : {} ", sendMsgResponse.getMsg(),
                 sendMsgResponse.getData());
         return alertResult;
     }
