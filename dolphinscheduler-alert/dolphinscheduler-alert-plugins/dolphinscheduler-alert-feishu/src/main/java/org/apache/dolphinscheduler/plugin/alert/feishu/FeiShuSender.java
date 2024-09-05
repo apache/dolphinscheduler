@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -40,8 +36,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -171,7 +170,8 @@ public final class FeiShuSender {
             } finally {
                 response.close();
             }
-            log.info("feishu send title: {}, content: {}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
+            log.info("feishu send title: {}, content: {}, resp: {}", alertData.getTitle(), alertData.getContent(),
+                    resp);
             return resp;
         } finally {
             httpClient.close();
