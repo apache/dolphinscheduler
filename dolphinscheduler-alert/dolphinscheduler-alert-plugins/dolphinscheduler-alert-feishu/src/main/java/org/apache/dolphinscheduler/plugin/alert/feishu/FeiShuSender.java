@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -84,25 +88,24 @@ public final class FeiShuSender {
         alertResult.setSuccess(false);
 
         if (org.apache.commons.lang3.StringUtils.isBlank(result)) {
-            alertResult.setMessage("send fei shu msg error");
-            log.info("send fei shu msg error,fei shu server resp is null");
+            alertResult.setMessage("send feishu msg error: feishu server resp is null.");
+            log.info("send feishu msg error: feishu server resp is null.");
             return alertResult;
         }
         FeiShuSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, FeiShuSendMsgResponse.class);
 
         if (null == sendMsgResponse) {
-            alertResult.setMessage("send fei shu msg fail");
-            log.info("send fei shu msg error,resp error");
+            alertResult.setMessage("send feishu msg error: feishu server resp parse error.");
+            log.info("send feishu msg error: feishu server resp parse error.");
             return alertResult;
         }
         if (sendMsgResponse.code == 0) {
             alertResult.setSuccess(true);
-            alertResult.setMessage("send fei shu msg success");
+            alertResult.setMessage("send feishu msg success.");
             return alertResult;
         }
-        alertResult.setMessage(String.format("alert send fei shu msg error : %s", sendMsgResponse.getMsg()));
-        log.info("alert send fei shu msg error : {} ,Data : {} ", sendMsgResponse.getMsg(),
-                sendMsgResponse.getData());
+        alertResult.setMessage(String.format("alert send feishu msg error: %s", sendMsgResponse.getMsg()));
+        log.info("alert send feishu msg error: {}", sendMsgResponse);
         return alertResult;
     }
 
@@ -119,7 +122,7 @@ public final class FeiShuSender {
             for (Map map : list) {
                 for (Entry<String, Object> entry : (Iterable<Entry<String, Object>>) map.entrySet()) {
                     String key = entry.getKey();
-                    String value = Objects.nonNull(entry.getValue()) ? entry.getValue().toString() : "null";
+                    String value = entry.getValue().toString();
                     contents.append(key + ":" + value);
                     contents.append("\n");
                 }
@@ -135,10 +138,10 @@ public final class FeiShuSender {
             String resp = sendMsg(alertData);
             return checkSendFeiShuSendMsgResult(resp);
         } catch (Exception e) {
-            log.error("send fei shu alert failed:", e);
+            log.error("send feishu alert failed:", e);
             alertResult = new AlertResult();
             alertResult.setSuccess(false);
-            alertResult.setMessage("send fei shu alert fail.");
+            alertResult.setMessage("send feishu alert fail.");
         }
         return alertResult;
     }
@@ -168,8 +171,7 @@ public final class FeiShuSender {
             } finally {
                 response.close();
             }
-            log.info("Fei Shu send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(),
-                    resp);
+            log.info("feishu send title: {}, content: {}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
             return resp;
         } finally {
             httpClient.close();
@@ -185,74 +187,5 @@ public final class FeiShuSender {
         @JsonProperty("msg")
         private String msg;
 
-        public FeiShuSendMsgResponse() {
-        }
-
-        public Object getData() {
-            return data;
-        }
-        @JsonProperty("data")
-        public void setData(Object data) {
-            this.data = data;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-        @JsonProperty("code")
-        public void setCode(Integer code) {
-            this.code = code;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-        @JsonProperty("msg")
-        public void setMsg(String msg) {
-            this.msg = msg;
-        }
-
-        public boolean equals(final Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (!(o instanceof FeiShuSendMsgResponse)) {
-                return false;
-            }
-            final FeiShuSendMsgResponse other = (FeiShuSendMsgResponse) o;
-            final Object this$data = this.getData();
-            final Object other$data = other.getData();
-            if (this$data == null ? other$data != null : !this$data.equals(other$data)) {
-                return false;
-            }
-            final Object this$code = this.getCode();
-            final Object other$code = other.getCode();
-            if (this$code == null ? other$code != null : !this$code.equals(other$code)) {
-                return false;
-            }
-            final Object this$msg = this.getMsg();
-            final Object other$msg = other.getMsg();
-            if (this$msg == null ? other$msg != null : !this$msg.equals(other$msg)) {
-                return false;
-            }
-            return true;
-        }
-
-        public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            final Object $data = this.getData();
-            result = result * PRIME + ($data == null ? 43 : $data.hashCode());
-            final Object $code = this.getCode();
-            result = result * PRIME + ($code == null ? 43 : $code.hashCode());
-            final Object $msg = this.getMsg();
-            result = result * PRIME + ($msg == null ? 43 : $msg.hashCode());
-            return result;
-        }
-
-        public String toString() {
-            return "FeiShuSender.FeiShuSendMsgResponse(data=" + this.getData() + ", code="
-                    + this.getCode() + ", msg=" + this.getMsg() + ")";
-        }
     }
 }
