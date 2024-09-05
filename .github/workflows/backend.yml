@@ -21,15 +21,8 @@ on:
   push:
     branches:
       - dev
-    paths:
-      - '.github/workflows/backend.yml'
-      - 'package.xml'
-      - 'pom.xml'
-      - 'dolphinscheduler-alert/**'
-      - 'dolphinscheduler-api/**'
-      - 'dolphinscheduler-common/**'
-      - 'dolphinscheduler-dao/**'
-      - 'dolphinscheduler-rpc/**'
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
   pull_request:
 
 concurrency:
