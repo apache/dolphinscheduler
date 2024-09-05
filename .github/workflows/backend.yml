@@ -144,11 +144,11 @@ jobs:
       - uses: actions/cache/restore@v4
         name: Download Binary Package Cache
         with:
-          path: /tmp
+          path: ./
           key: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Download Binary Package if not cached
         run: |
-          if [ ! -f apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
+          if [ ! -f ./apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
             echo "Binary package not found in cache, downloading..."
             wget https://archive.apache.org/dist/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz
           else
