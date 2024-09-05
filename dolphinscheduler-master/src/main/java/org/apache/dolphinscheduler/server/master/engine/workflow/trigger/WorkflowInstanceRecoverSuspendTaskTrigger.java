@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverSuspendTasksRequest;
@@ -34,7 +35,14 @@ public class WorkflowInstanceRecoverSuspendTaskTrigger
 
     @Override
     protected WorkflowInstance constructWorkflowInstance(final WorkflowInstanceRecoverSuspendTasksRequest workflowInstanceRecoverSuspendTasksRequest) {
-        return getWorkflowInstance(workflowInstanceRecoverSuspendTasksRequest.getWorkflowInstanceId());
+        final WorkflowInstance workflowInstance =
+                getWorkflowInstance(workflowInstanceRecoverSuspendTasksRequest.getWorkflowInstanceId());
+        workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                CommandType.START_FAILURE_TASK_PROCESS.name());
+        workflowInstance.setRunTimes(workflowInstance.getRunTimes() + 1);
+        workflowInstance.setRestartTime(new Date());
+        workflowInstance.setEndTime(null);
+        return workflowInstance;
     }
 
     @Override
@@ -42,9 +50,9 @@ public class WorkflowInstanceRecoverSuspendTaskTrigger
                                               final WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.RECOVER_SUSPENDED_PROCESS)
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .processInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion())
+                .workflowInstanceId(workflowInstance.getId())
                 .executorId(workflowInstanceRecoverSuspendTasksRequest.getUserId())
                 .startTime(new Date())
                 .updateTime(new Date())

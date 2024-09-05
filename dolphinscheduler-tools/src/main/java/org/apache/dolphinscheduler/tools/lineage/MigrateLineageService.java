@@ -84,9 +84,9 @@ public class MigrateLineageService {
                         .findFirst()
                         .ifPresent(processTaskRelation -> {
                             workflowTaskLineage
-                                    .setWorkflowDefinitionCode(processTaskRelation.getProcessDefinitionCode());
+                                    .setWorkflowDefinitionCode(processTaskRelation.getWorkflowDefinitionCode());
                             workflowTaskLineage
-                                    .setWorkflowDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
+                                    .setWorkflowDefinitionVersion(processTaskRelation.getWorkflowDefinitionVersion());
                         });
             }
         }

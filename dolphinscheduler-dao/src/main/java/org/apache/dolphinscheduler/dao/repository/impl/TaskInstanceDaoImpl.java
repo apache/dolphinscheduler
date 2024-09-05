@@ -126,7 +126,7 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
             return true;
         }
         List<TaskInstance> taskInstances =
-                this.queryValidTaskListByWorkflowInstanceId(taskInstance.getProcessInstanceId(),
+                this.queryValidTaskListByWorkflowInstanceId(taskInstance.getWorkflowInstanceId(),
                         taskInstance.getTestFlag());
 
         for (TaskInstance task : taskInstances) {
@@ -140,7 +140,7 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
 
     @Override
     public List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag) {
-        return mybatisMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES, testFlag);
+        return mybatisMapper.findValidTaskListByWorkflowInstanceId(processInstanceId, Flag.YES, testFlag);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     @Override
     public List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer workflowInstanceId) {
         WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
-        return mybatisMapper.findValidTaskListByProcessId(workflowInstanceId, Flag.NO,
+        return mybatisMapper.findValidTaskListByWorkflowInstanceId(workflowInstanceId, Flag.NO,
                 workflowInstance.getTestFlag());
     }
 

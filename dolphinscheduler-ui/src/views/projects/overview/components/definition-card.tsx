@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, PropType } from 'vue'
-import { useProcessDefinition } from '../use-process-definition'
+import { useWorkflowDefinition } from '../use-workflow-definition'
 import BarChart from '@/components/chart/modules/Bar'
 import Card from '@/components/card'
 
@@ -30,23 +30,23 @@ const DefinitionCard = defineComponent({
   name: 'DefinitionCard',
   props,
   setup() {
-    const { getProcessDefinition } = useProcessDefinition()
-    const processDefinition = getProcessDefinition()
+    const { getWorkflowDefinition } = useWorkflowDefinition()
+    const workflowDefinition = getWorkflowDefinition()
 
-    return { processDefinition }
+    return { workflowDefinition: workflowDefinition }
   },
   render() {
-    const { title, processDefinition } = this
+    const { title, workflowDefinition } = this
 
     return (
-      processDefinition.xAxisData.length > 0 &&
-      processDefinition.seriesData.length > 0 && (
+      workflowDefinition.xAxisData.length > 0 &&
+      workflowDefinition.seriesData.length > 0 && (
         <Card title={title}>
           {{
             default: () => (
               <BarChart
-                xAxisData={processDefinition.xAxisData}
-                seriesData={processDefinition.seriesData}
+                xAxisData={workflowDefinition.xAxisData}
+                seriesData={workflowDefinition.seriesData}
               />
             )
           }}

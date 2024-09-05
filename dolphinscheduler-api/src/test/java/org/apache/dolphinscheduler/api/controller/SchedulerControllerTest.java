@@ -72,7 +72,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateSchedule() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", "40");
+        paramsMap.add("workflowDefinitionCode", "40");
         paramsMap.add("schedule",
                 "{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 6 * * ? *'}");
         paramsMap.add("warningType", String.valueOf(WarningType.NONE));
@@ -82,7 +82,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("receiversCc", "");
         paramsMap.add("workerGroupId", "1");
         paramsMap.add("tenantCode", "root");
-        paramsMap.add("processInstancePriority", String.valueOf(Priority.HIGH));
+        paramsMap.add("workflowInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
@@ -113,7 +113,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("receiversCc", "");
         paramsMap.add("workerGroupId", "1");
         paramsMap.add("tenantCode", "root");
-        paramsMap.add("processInstancePriority", String.valueOf(Priority.HIGH));
+        paramsMap.add("workflowInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.updateSchedule(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
@@ -172,7 +172,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryScheduleListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionCode", "40");
+        paramsMap.add("workflowDefinitionCode", "40");
         paramsMap.add("searchVal", "test");
         paramsMap.add("pageNo", "1");
         paramsMap.add("pageSize", "30");

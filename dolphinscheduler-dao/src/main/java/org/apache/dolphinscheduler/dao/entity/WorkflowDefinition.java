@@ -44,128 +44,62 @@ import com.google.common.base.Strings;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("t_ds_process_definition")
+@TableName("t_ds_workflow_definition")
 public class WorkflowDefinition {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * code
-     */
     private long code;
 
-    /**
-     * name
-     */
     private String name;
 
-    /**
-     * version
-     */
     private int version;
 
-    /**
-     * release state : online/offline
-     */
     private ReleaseState releaseState;
 
-    /**
-     * project code
-     */
     private long projectCode;
 
-    /**
-     * description
-     */
     private String description;
 
-    /**
-     * user defined parameters
-     */
     private String globalParams;
 
-    /**
-     * user defined parameter list
-     */
     @TableField(exist = false)
     private List<Property> globalParamList;
 
-    /**
-     * user define parameter map
-     */
     @TableField(exist = false)
     private Map<String, String> globalParamMap;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
-    /**
-     * process is valid: yes/no
-     */
     private Flag flag;
 
-    /**
-     * process user id
-     */
     private int userId;
 
-    /**
-     * create user name
-     */
     @TableField(exist = false)
     private String userName;
 
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
 
-    /**
-     * locations array for web
-     */
     private String locations;
 
-    /**
-     * schedule release state : online/offline
-     */
     @TableField(exist = false)
     private ReleaseState scheduleReleaseState;
 
     @TableField(exist = false)
     private Schedule schedule;
 
-    /**
-     * process warning time out. unit: minute
-     */
     private int timeout;
 
-    /**
-     * modify user name
-     */
     @TableField(exist = false)
     private String modifyBy;
 
-    /**
-     * warningGroupId
-     */
     @TableField(exist = false)
     private Integer warningGroupId;
 
-    /**
-     * execution type
-     */
     private WorkflowExecutionTypeEnum executionType;
 
     public WorkflowDefinition(long projectCode,

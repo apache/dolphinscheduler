@@ -42,7 +42,7 @@ public class ConditionLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     @Override
     public ConditionLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
         IWorkflowExecutionRunnable workflowExecutionRunnable =
-                workflowExecutionRunnableMemoryRepository.get(taskExecutionContext.getProcessInstanceId());
+                workflowExecutionRunnableMemoryRepository.get(taskExecutionContext.getWorkflowInstanceId());
         return new ConditionLogicTask(workflowExecutionRunnable, taskExecutionContext, taskInstanceDao);
     }
 

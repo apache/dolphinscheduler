@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,9 +31,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SubWorkflowLogicTaskRuntimeContext {
 
-    private Integer subWorkflowCommandId;
-
     private Integer subWorkflowInstanceId;
 
-    private WorkflowExecutionStatus subWorkflowExecutionStatus;
+    public static SubWorkflowLogicTaskRuntimeContext of(final Integer subWorkflowInstanceId) {
+        return SubWorkflowLogicTaskRuntimeContext.builder()
+                .subWorkflowInstanceId(subWorkflowInstanceId)
+                .build();
+    }
+
 }

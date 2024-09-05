@@ -19,38 +19,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ScheduleMapper">
     <sql id="baseSql">
-        id, process_definition_code, start_time, end_time, timezone_id, crontab, failure_strategy, user_id, release_state,
-        warning_type, warning_group_id, process_instance_priority, worker_group, tenant_code, environment_code, create_time, update_time
+        id, workflow_definition_code, start_time, end_time, timezone_id, crontab, failure_strategy, user_id, release_state,
+        warning_type, warning_group_id, workflow_instance_priority, worker_group, tenant_code, environment_code, create_time, update_time
     </sql>
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.process_definition_code, ${alias}.start_time, ${alias}.end_time, ${alias}.timezone_id,
+        ${alias}.id, ${alias}.workflow_definition_code, ${alias}.start_time, ${alias}.end_time, ${alias}.timezone_id,
         ${alias}.crontab, ${alias}.failure_strategy, ${alias}.user_id, ${alias}.release_state, ${alias}.warning_type,
-        ${alias}.warning_group_id, ${alias}.process_instance_priority, ${alias}.worker_group, ${alias}.tenant_code, ${alias}.environment_code, ${alias}.create_time,
+        ${alias}.warning_group_id, ${alias}.workflow_instance_priority, ${alias}.worker_group, ${alias}.tenant_code, ${alias}.environment_code, ${alias}.create_time,
         ${alias}.update_time
     </sql>
-    <select id="queryByProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
+    <select id="queryByWorkflowDefinitionCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select p_f.name as workflow_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
         from t_ds_schedules s
-        join t_ds_process_definition p_f on s.process_definition_code = p_f.code
+        join t_ds_workflow_definition p_f on s.workflow_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
         left join t_ds_environment as e on s.environment_code = e.code
         where 1=1
-        <if test="processDefinitionCode != 0">
-            and s.process_definition_code = #{processDefinitionCode}
+        <if test="workflowDefinitionCode != 0">
+            and s.workflow_definition_code = #{workflowDefinitionCode}
         </if>
         order by s.update_time desc
     </select>
-    <select id="queryByProjectAndProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
+    <select id="queryByProjectAndWorkflowDefinitionCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select p_f.name as workflow_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
         from t_ds_schedules s
-        join t_ds_process_definition p_f on s.process_definition_code = p_f.code
+        join t_ds_workflow_definition p_f on s.workflow_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
         left join t_ds_environment as e on s.environment_code = e.code
@@ -58,78 +58,78 @@
         <if test="projectCode != 0">
             and p.code = #{projectCode}
         </if>
-        <if test="processDefinitionCode != 0">
-            and s.process_definition_code = #{processDefinitionCode}
+        <if test="workflowDefinitionCode != 0">
+            and s.workflow_definition_code = #{workflowDefinitionCode}
         </if>
         order by s.update_time desc
     </select>
     <select id="querySchedulerListByProjectName" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name, s.*
+        select p_f.name as workflow_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name, s.*
         from t_ds_schedules s
-        join t_ds_process_definition p_f on s.process_definition_code = p_f.code
+        join t_ds_workflow_definition p_f on s.workflow_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
         where p.name = #{projectName}
     </select>
-    <select id="selectAllByProcessDefineArray" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+    <select id="selectAllByWorkflowDefinitionArray" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select
         <include refid="baseSql"/>
         from t_ds_schedules
         where 1= 1
-        <if test="processDefineCodes != null and processDefineCodes.length != 0 ">
-            and process_definition_code in
-            <foreach collection="processDefineCodes" index="index" item="i" open="(" separator="," close=")">
+        <if test="workflowDefinitionCodes != null and workflowDefinitionCodes.length != 0 ">
+            and workflow_definition_code in
+            <foreach collection="workflowDefinitionCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         and release_state = 1
     </select>
-    <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        where process_definition_code = #{processDefinitionCode}
+        where workflow_definition_code = #{workflowDefinitionCode}
     </select>
 
-    <select id="querySchedulesByProcessDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+    <select id="querySchedulesByWorkflowDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        <if test="processDefinitionCodeList != null and processDefinitionCodeList.size() != 0">
-            where process_definition_code in
-            <foreach collection="processDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
+        <if test="workflowDefinitionCodeList != null and workflowDefinitionCodeList.size() != 0">
+            where workflow_definition_code in
+            <foreach collection="workflowDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
                 #{code}
             </foreach>
         </if>
     </select>
 
-    <select id="queryReleaseSchedulerListByProcessDefinitionCode"
+    <select id="queryReleaseSchedulerListByWorkflowDefinitionCode"
             resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        where process_definition_code = #{processDefinitionCode} and release_state = 1
+        where workflow_definition_code = #{workflowDefinitionCode} and release_state = 1
     </select>
 
     <select id="filterSchedules"
             parameterType="org.apache.dolphinscheduler.dao.entity.Schedule"
             resultType="org.apache.dolphinscheduler.dao.entity.Schedule"
     >
-        SELECT pd.name as process_definition_name, p.name as project_name,
+        SELECT pd.name as workflow_definition_name, p.name as project_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
         FROM t_ds_schedules s
-        join t_ds_process_definition pd on s.process_definition_code = pd.code
+        join t_ds_workflow_definition pd on s.workflow_definition_code = pd.code
         join t_ds_project as p on pd.project_code = p.code
         <where>
-            <if test=" schedule.projectName != null and schedule.projectName != ''">
+            <if test="schedule.projectName != null and schedule.projectName != ''">
                 and p.name like concat('%', #{schedule.projectName}, '%')
             </if>
-            <if test=" schedule.processDefinitionName != null and schedule.processDefinitionName != ''">
-                and pd.name like concat('%', #{schedule.processDefinitionName}, '%')
+            <if test="schedule.workflowDefinitionName != null and schedule.workflowDefinitionName != ''">
+                and pd.name like concat('%', #{schedule.workflowDefinitionName}, '%')
             </if>
-            <if test=" schedule.releaseState != null and schedule.releaseState != ''">
+            <if test="schedule.releaseState != null and schedule.releaseState != ''">
                 and s.release_state = #{schedule.releaseState}
             </if>
         </where>

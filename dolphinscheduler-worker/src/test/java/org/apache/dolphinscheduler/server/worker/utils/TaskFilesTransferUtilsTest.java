@@ -87,9 +87,9 @@ public class TaskFilesTransferUtilsTest {
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
                 .varPool(varPool)
                 .taskParams(taskParams)
-                .processInstanceId(processInstanceId)
-                .processDefineVersion(processDefineVersion)
-                .processDefineCode(processDefineCode)
+                .workflowInstanceId(processInstanceId)
+                .workflowDefinitionVersion(processDefineVersion)
+                .workflowDefinitionCode(processDefineCode)
                 .taskInstanceId(taskInstanceId)
                 .taskName(taskName)
                 .tenantCode(tenantCode)
@@ -144,9 +144,9 @@ public class TaskFilesTransferUtilsTest {
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
                 .varPool(varPool)
                 .taskParams(taskParams)
-                .processInstanceId(processInstanceId)
-                .processDefineVersion(processDefineVersion)
-                .processDefineCode(processDefineCode)
+                .workflowInstanceId(processInstanceId)
+                .workflowDefinitionVersion(processDefineVersion)
+                .workflowDefinitionCode(processDefineCode)
                 .taskInstanceId(taskInstanceId)
                 .taskName(taskName)
                 .tenantCode(tenantCode)
@@ -190,9 +190,9 @@ public class TaskFilesTransferUtilsTest {
 
         Mockito.when(taskExecutionContext.getEndTime()).thenReturn(endTime);
 
-        Mockito.when(taskExecutionContext.getProcessDefineCode()).thenReturn(processDefineCode);
-        Mockito.when(taskExecutionContext.getProcessDefineVersion()).thenReturn(processDefineVersion);
-        Mockito.when(taskExecutionContext.getProcessInstanceId()).thenReturn(processInstanceId);
+        Mockito.when(taskExecutionContext.getWorkflowDefinitionCode()).thenReturn(processDefineCode);
+        Mockito.when(taskExecutionContext.getWorkflowDefinitionVersion()).thenReturn(processDefineVersion);
+        Mockito.when(taskExecutionContext.getWorkflowInstanceId()).thenReturn(processInstanceId);
         Mockito.when(taskExecutionContext.getTaskInstanceId()).thenReturn(taskInstanceId);
         Mockito.when(taskExecutionContext.getTaskName()).thenReturn(taskName);
 

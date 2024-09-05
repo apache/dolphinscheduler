@@ -73,7 +73,7 @@ public class ScheduleUpdateRequest {
     private int warningGroupId;
 
     @Schema(allowableValues = "HIGHEST / HIGH / MEDIUM / LOW / LOWEST", example = "MEDIUM", description = "default MEDIUM if value not provide.")
-    private String processInstancePriority;
+    private String workflowInstancePriority;
 
     @Schema(example = "worker-group-name")
     private String workerGroup;
@@ -122,8 +122,8 @@ public class ScheduleUpdateRequest {
         if (this.warningGroupId != 0) {
             scheduleDeepCopy.setWarningGroupId(this.warningGroupId);
         }
-        if (this.processInstancePriority != null) {
-            scheduleDeepCopy.setProcessInstancePriority(Priority.valueOf(this.processInstancePriority));
+        if (this.workflowInstancePriority != null) {
+            scheduleDeepCopy.setWorkflowInstancePriority(Priority.valueOf(this.workflowInstancePriority));
         }
         if (this.workerGroup != null) {
             scheduleDeepCopy.setWorkerGroup(this.workerGroup);

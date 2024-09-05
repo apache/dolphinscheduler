@@ -69,7 +69,7 @@ public class TaskInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param searchVal search value
      * @param taskName task name
      * @param stateType state type
@@ -83,8 +83,8 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "queryTaskListPaging", description = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "WORKFLOW_INSTANCE_ID", schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "workflowInstanceId", description = "WORKFLOW_INSTANCE_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "workflowInstanceName", description = "WORKFLOW_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskName", description = "TASK_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskCode", description = "TASK_CODE", schema = @Schema(implementation = Long.class)),
@@ -102,9 +102,9 @@ public class TaskInstanceController extends BaseController {
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     public Result queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                      @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
-                                      @RequestParam(value = "processInstanceName", required = false) String processInstanceName,
-                                      @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName,
+                                      @RequestParam(value = "workflowInstanceId", required = false, defaultValue = "0") Integer workflowInstanceId,
+                                      @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
+                                      @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
                                       @RequestParam(value = "taskCode", required = false) Long taskCode,
@@ -121,9 +121,9 @@ public class TaskInstanceController extends BaseController {
         return taskInstanceService.queryTaskListPaging(
                 loginUser,
                 projectCode,
-                processInstanceId,
-                processInstanceName,
-                processDefinitionName,
+                workflowInstanceId,
+                workflowInstanceName,
+                workflowDefinitionName,
                 taskName,
                 taskCode,
                 executorName,

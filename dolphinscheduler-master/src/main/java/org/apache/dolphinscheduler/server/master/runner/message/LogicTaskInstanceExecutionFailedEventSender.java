@@ -40,7 +40,7 @@ public class LogicTaskInstanceExecutionFailedEventSender
     @Override
     public TaskExecutionFailedEvent buildMessage(final TaskExecutionContext taskExecutionContext) {
         return TaskExecutionFailedEvent.builder()
-                .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .taskInstanceHost(taskExecutionContext.getHost())

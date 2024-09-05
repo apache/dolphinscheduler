@@ -63,9 +63,9 @@ interface TaskGroupQueue {
   taskName: string
   projectName: string
   projectCode: string
-  processInstanceName: string
+  workflowInstanceName: string
   groupId: number
-  processId: number
+  workflowInstanceId: number
   priority: number
   forceStart: number
   inQueue: number

@@ -31,8 +31,8 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.version>5.7.2</junit.version>
@@ -46,6 +46,7 @@
         <guava.version>31.0.1-jre</guava.version>
         <jackson.version>2.13.2</jackson.version>
         <checkstyle.version>3.1.2</checkstyle.version>
+        <junit-pioneer.version>2.2.0</junit-pioneer.version>
     </properties>
 
     <dependencies>
@@ -64,6 +65,14 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>${junit-pioneer.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.testcontainers</groupId>

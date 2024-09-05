@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverFailureTasksRequest;
@@ -34,7 +35,14 @@ public class WorkflowInstanceRecoverFailureTaskTrigger
 
     @Override
     protected WorkflowInstance constructWorkflowInstance(final WorkflowInstanceRecoverFailureTasksRequest workflowInstanceRecoverFailureTasksRequest) {
-        return getWorkflowInstance(workflowInstanceRecoverFailureTasksRequest.getWorkflowInstanceId());
+        WorkflowInstance workflowInstance =
+                getWorkflowInstance(workflowInstanceRecoverFailureTasksRequest.getWorkflowInstanceId());
+        workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                CommandType.START_FAILURE_TASK_PROCESS.name());
+        workflowInstance.setRunTimes(workflowInstance.getRunTimes() + 1);
+        workflowInstance.setRestartTime(new Date());
+        workflowInstance.setEndTime(null);
+        return workflowInstance;
     }
 
     @Override
@@ -42,9 +50,9 @@ public class WorkflowInstanceRecoverFailureTaskTrigger
                                               final WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.START_FAILURE_TASK_PROCESS)
-                .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                .processDefinitionVersion(workflowInstance.getProcessDefinitionVersion())
-                .processInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion())
+                .workflowInstanceId(workflowInstance.getId())
                 .executorId(workflowInstanceRecoverFailureTasksRequest.getUserId())
                 .startTime(new Date())
                 .updateTime(new Date())

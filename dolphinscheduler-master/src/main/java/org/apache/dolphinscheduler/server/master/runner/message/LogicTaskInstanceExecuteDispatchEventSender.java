@@ -41,7 +41,7 @@ public class LogicTaskInstanceExecuteDispatchEventSender
     public TaskExecutionDispatchEvent buildMessage(TaskExecutionContext taskExecutionContext) {
         final TaskExecutionDispatchEvent taskExecutionDispatchEvent =
                 TaskExecutionDispatchEvent.builder()
-                        .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                        .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                         .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                         .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                         .taskInstanceHost(taskExecutionContext.getHost())

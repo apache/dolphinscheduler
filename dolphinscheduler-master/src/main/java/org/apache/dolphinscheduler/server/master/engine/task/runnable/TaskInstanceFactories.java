@@ -30,6 +30,12 @@ public class TaskInstanceFactories {
     private RetryTaskInstanceFactory retryTaskInstanceFactory;
 
     @Autowired
+    private FailedRecoverTaskInstanceFactory failedRecoverTaskInstanceFactory;
+
+    @Autowired
+    private PauseRecoverTaskInstanceFactory pauseRecoverTaskInstanceFactory;
+
+    @Autowired
     private FailoverTaskInstanceFactory failoverTaskInstanceFactory;
 
     public FirstRunTaskInstanceFactory firstRunTaskInstanceFactory() {
@@ -40,8 +46,15 @@ public class TaskInstanceFactories {
         return retryTaskInstanceFactory;
     }
 
+    public FailedRecoverTaskInstanceFactory failedRecoverTaskInstanceFactory() {
+        return failedRecoverTaskInstanceFactory;
+    }
+
     public FailoverTaskInstanceFactory failoverTaskInstanceFactory() {
         return failoverTaskInstanceFactory;
     }
 
+    public PauseRecoverTaskInstanceFactory pauseRecoverTaskInstanceFactory() {
+        return pauseRecoverTaskInstanceFactory;
+    }
 }
