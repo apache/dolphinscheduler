@@ -45,6 +45,10 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 > - Due to DolphinScheduler's multi-tenant task switch user using command `sudo -u {linux-user} -i`, the deployment user needs to have `sudo` privileges and be password-free. If novice learners don’t understand, you can ignore this point for now.
 > - If you find the line "Defaults requirett" in the `/etc/sudoers` file, please comment the content.
 
+### Prepare Zookeeper
+
+If you use Zookeeper as the registry center, you need to install Zookeeper and start it first.
+
 ## Modify Configuration
 
 After completing the preparation of the basic environment, you need to modify the configuration file according to the

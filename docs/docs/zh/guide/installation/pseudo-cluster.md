@@ -45,14 +45,9 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 > - 因为任务执行服务是以 `sudo -u {linux-user} -i` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
 > - 如果发现 `/etc/sudoers` 文件中有 "Defaults requirett" 这行，也请注释掉
 
-### 启动 zookeeper
+### 准备 zookeeper
 
-进入 zookeeper 的安装目录，将 `zoo_sample.cfg` 配置文件复制到 `conf/zoo.cfg`，并将 `conf/zoo.cfg` 中 dataDir 中的值改成 `dataDir=./tmp/zookeeper`
-
-```shell
-# 启动 zookeeper
-./bin/zkServer.sh start
-```
+如果使用 Zookeeper 作为注册中心，需要先安装 Zookeeper 并启动。
 
 ## 修改相关配置
 

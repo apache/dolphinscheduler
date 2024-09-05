@@ -12,6 +12,31 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 - JDK：下载[JDK][jdk] (1.8 or 11)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 - 二进制包：在[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)下载 DolphinScheduler 二进制包  <!-- markdown-link-check-disable-line -->
 
+## 配置用户免密及权限
+
+创建部署用户，并且一定要配置 `sudo` 免密。以创建 dolphinscheduler 用户为例
+
+```shell
+# 创建用户需使用 root 登录
+useradd dolphinscheduler
+
+# 添加密码
+echo "dolphinscheduler" | passwd --stdin dolphinscheduler
+
+# 配置 sudo 免密
+sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
+
+# 修改目录权限，使得部署用户对二进制包解压后的 apache-dolphinscheduler-*-bin 目录有操作权限
+chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
+```
+
+> **_注意:_**
+>
+> - 因为任务执行服务是以 `sudo -u {linux-user} -i` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
+> - 如果发现 `/etc/sudoers` 文件中有 "Defaults requirett" 这行，也请注释掉
+
 ## 启动 DolphinScheduler Standalone Server
 
 ### 解压并启动 DolphinScheduler
