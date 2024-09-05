@@ -14,7 +14,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
-* [SubProcess](../task/sub-process.md)
+* [SubProcess](../task/sub-workflow)
 * [Kubernetes](../task/kubernetes.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubProcess 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
