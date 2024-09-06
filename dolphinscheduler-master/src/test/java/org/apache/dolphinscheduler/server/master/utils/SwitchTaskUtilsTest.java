@@ -71,4 +71,12 @@ public class SwitchTaskUtilsTest {
         });
 
     }
+
+    @Test
+    public void testIncludes() throws ScriptException {
+        String content = "['abc','def'].includes('abc')";
+        boolean result = SwitchTaskUtils.evaluate(content);
+        Assertions.assertTrue(result);
+    }
+
 }
