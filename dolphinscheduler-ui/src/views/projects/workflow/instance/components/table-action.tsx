@@ -30,7 +30,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
-import { IWorkflowInstance } from '@/service/modules/process-instances/types'
+import { IWorkflowInstance } from '@/service/modules/workflow-instances/types'
 
 const props = {
   row: {
@@ -57,7 +57,7 @@ export default defineComponent({
       router.push({
         name: 'workflow-instance-detail',
         params: { id: props.row!.id },
-        query: { code: props.row!.processDefinitionCode }
+        query: { code: props.row!.workflowDefinitionCode }
       })
     }
 
@@ -65,7 +65,7 @@ export default defineComponent({
       router.push({
         name: 'workflow-instance-gantt',
         params: { id: props.row!.id },
-        query: { code: props.row!.processDefinitionCode }
+        query: { code: props.row!.workflowDefinitionCode }
       })
     }
 

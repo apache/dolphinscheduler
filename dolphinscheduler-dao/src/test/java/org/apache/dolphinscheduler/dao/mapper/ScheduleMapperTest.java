@@ -132,11 +132,11 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionCode(workflowDefinition.getCode());
+        schedule.setWorkflowDefinitionCode(workflowDefinition.getCode());
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByWorkflowDefinitionCodePaging(page,
                 workflowDefinition.getCode(), "");
         Assertions.assertNotEquals(0, scheduleIPage.getSize());
     }
@@ -170,12 +170,13 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionCode(workflowDefinition.getCode());
+        schedule.setWorkflowDefinitionCode(workflowDefinition.getCode());
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, project.getCode(),
-                workflowDefinition.getCode(), "");
+        IPage<Schedule> scheduleIPage =
+                scheduleMapper.queryByProjectAndWorkflowDefinitionCodePaging(page, project.getCode(),
+                        workflowDefinition.getCode(), "");
         Assertions.assertNotEquals(0, scheduleIPage.getSize());
     }
 
@@ -208,7 +209,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
         Schedule schedule = insertOne();
         schedule.setUserId(user.getId());
-        schedule.setProcessDefinitionCode(workflowDefinition.getCode());
+        schedule.setWorkflowDefinitionCode(workflowDefinition.getCode());
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);
@@ -222,15 +223,15 @@ public class ScheduleMapperTest extends BaseDaoTest {
      * test query by process definition ids
      */
     @Test
-    public void testSelectAllByProcessDefineArray() {
+    public void testSelectAllByWorkflowDefinitionArray() {
 
         Schedule schedule = insertOne();
-        schedule.setProcessDefinitionCode(12345);
+        schedule.setWorkflowDefinitionCode(12345);
         schedule.setReleaseState(ReleaseState.ONLINE);
         scheduleMapper.updateById(schedule);
 
         List<Schedule> schedules =
-                scheduleMapper.selectAllByProcessDefineArray(new long[]{schedule.getProcessDefinitionCode()});
+                scheduleMapper.selectAllByWorkflowDefinitionArray(new long[]{schedule.getWorkflowDefinitionCode()});
         Assertions.assertNotEquals(0, schedules.size());
     }
 
@@ -238,12 +239,12 @@ public class ScheduleMapperTest extends BaseDaoTest {
      * test query by process definition id
      */
     @Test
-    public void queryByProcessDefinitionCode() {
+    public void queryByWorkflowDefinitionCode() {
         Schedule schedule = insertOne();
-        schedule.setProcessDefinitionCode(12345);
+        schedule.setWorkflowDefinitionCode(12345);
         scheduleMapper.updateById(schedule);
 
-        Schedule schedules = scheduleMapper.queryByProcessDefinitionCode(schedule.getProcessDefinitionCode());
+        Schedule schedules = scheduleMapper.queryByWorkflowDefinitionCode(schedule.getWorkflowDefinitionCode());
         Assertions.assertNotNull(schedules);
     }
 }

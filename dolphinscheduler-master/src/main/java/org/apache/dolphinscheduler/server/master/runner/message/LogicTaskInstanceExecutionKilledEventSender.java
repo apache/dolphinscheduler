@@ -40,7 +40,7 @@ public class LogicTaskInstanceExecutionKilledEventSender
     @Override
     public TaskExecutionKilledEvent buildMessage(final TaskExecutionContext taskExecutionContext) {
         return TaskExecutionKilledEvent.builder()
-                .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .taskInstanceHost(taskExecutionContext.getHost())

@@ -121,8 +121,8 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
                                                     WorkflowExecutionStatus status) {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("WorkflowInstance" + System.currentTimeMillis());
-        workflowInstance.setProcessDefinitionCode(workflowDefinitionCode);
-        workflowInstance.setProcessDefinitionVersion(workflowDefinitionVersion);
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinitionCode);
+        workflowInstance.setWorkflowDefinitionVersion(workflowDefinitionVersion);
         workflowInstance.setState(status);
         return workflowInstance;
     }

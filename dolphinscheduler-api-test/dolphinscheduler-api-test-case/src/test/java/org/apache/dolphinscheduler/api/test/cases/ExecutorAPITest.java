@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.ExecutorPage;
-import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -50,7 +50,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-//TODO: Some test cases rely on ProcessInstance APIs. Should complete remaining cases after ProcessInstance related API tests done.
+//TODO: Some test cases rely on WorkflowInstance APIs. Should complete remaining cases after WorkflowInstance related API tests done.
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class ExecutorAPITest {
@@ -65,13 +65,13 @@ public class ExecutorAPITest {
 
     private static ExecutorPage executorPage;
 
-    private static ProcessDefinitionPage processDefinitionPage;
+    private static WorkflowDefinitionPage workflowDefinitionPage;
 
     private static ProjectPage projectPage;
 
     private static long projectCode;
 
-    private static long processDefinitionCode;
+    private static long workflowDefinitionCode;
 
     private static List<Integer> workflowInstanceIds;
 
@@ -82,7 +82,7 @@ public class ExecutorAPITest {
         sessionId =
                 JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         executorPage = new ExecutorPage(sessionId);
-        processDefinitionPage = new ProcessDefinitionPage(sessionId);
+        workflowDefinitionPage = new WorkflowDefinitionPage(sessionId);
         projectPage = new ProjectPage(sessionId);
         loginUser = new User();
         loginUser.setUserName("admin");
@@ -97,7 +97,7 @@ public class ExecutorAPITest {
 
     @Test
     @Order(1)
-    public void testStartProcessInstance() {
+    public void testStartWorkflowInstance() {
         try {
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
@@ -109,36 +109,36 @@ public class ExecutorAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-            CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
-                    .importProcessDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
+            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
+                    .importWorkflowDefinition(loginUser, projectCode, file);
+            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
             Assertions.assertTrue(data.contains("\"success\":true"));
 
             // get workflow definition code
-            HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
-                    processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
-            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString()
+            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                    workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
                     .contains("hello world"));
-            processDefinitionCode =
-                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
-                            .getBody().getData()).get(0)).get("processDefinition")).get("code");
+            workflowDefinitionCode =
+                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
 
             // release test workflow
-            HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser,
-                    projectCode, processDefinitionCode, ReleaseState.ONLINE);
-            Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+            HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
+                    projectCode, workflowDefinitionCode, ReleaseState.ONLINE);
+            Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
 
             // trigger workflow instance
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date();
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
-            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode,
-                    processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
-            Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
+            HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
+                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
-            workflowInstanceIds = (List<Integer>) startProcessInstanceResponse.getBody().getData();
+            workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();

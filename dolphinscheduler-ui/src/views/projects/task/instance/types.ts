@@ -21,7 +21,7 @@ export type { TaskInstancesRes } from '@/service/modules/task-instances/types'
 
 interface IRecord {
   name: string
-  processInstanceName: string
+  workflowInstanceName: string
   executorName: string
   taskType: string
   state: ITaskState

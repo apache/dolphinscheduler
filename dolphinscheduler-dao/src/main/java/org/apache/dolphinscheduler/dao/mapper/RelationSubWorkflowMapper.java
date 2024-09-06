@@ -25,15 +25,12 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-/**
- * process instance map mapper interface
- */
 public interface RelationSubWorkflowMapper extends BaseMapper<RelationSubWorkflow> {
 
     int batchInsert(@Param("relationSubWorkflows") List<RelationSubWorkflow> relationSubWorkflows);
 
-    List<RelationSubWorkflow> queryAllSubProcessInstance(@Param("parentWorkflowInstanceId") Long parentWorkflowInstanceId,
-                                                         @Param("parentTaskCode") Long parentTaskCode);
+    List<RelationSubWorkflow> queryAllSubWorkflowInstance(@Param("parentWorkflowInstanceId") Long parentWorkflowInstanceId,
+                                                          @Param("parentTaskCode") Long parentTaskCode);
 
     RelationSubWorkflow queryParentWorkflowInstance(@Param("subWorkflowInstanceId") Long subWorkflowInstanceId);
 

@@ -30,7 +30,7 @@
         pd.release_state, pd.user_id,pd.global_params, pd.flag, pd.locations,
         pd.warning_group_id, pd.timeout, pd.operator, pd.operate_time, pd.create_time,
         pd.update_time, u.user_name,p.name as project_name ,pd.execution_type
-        from t_ds_process_definition_log pd
+        from t_ds_workflow_definition_log pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
         WHERE p.code = #{projectCode}
@@ -39,20 +39,20 @@
     <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         WHERE code = #{code}
     </select>
     <select id="queryByDefinitionCodeAndVersion"
             resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         where code = #{code}
         and version = #{version}
     </select>
     <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
         select max(version)
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         where code = #{code}
     </select>
 
@@ -60,15 +60,15 @@
 
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         where code = #{code} order by version desc limit 1
     </select>
 
-    <select id="queryProcessDefinitionVersionsPaging"
+    <select id="queryWorkflowDefinitionVersionsPaging"
             resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         where code = #{code}
         <if test="projectCode != 0">
             and project_code = #{projectCode}
@@ -76,16 +76,16 @@
         order by version desc
     </select>
 
-    <delete id="deleteByProcessDefinitionCodeAndVersion">
+    <delete id="deleteByWorkflowDefinitionCodeAndVersion">
         delete
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         where code = #{code}
           and version = #{version}
     </delete>
 
-    <delete id="deleteByProcessDefinitionCode">
+    <delete id="deleteByWorkflowDefinitionCode">
         delete
-        from t_ds_process_definition_log
+        from t_ds_workflow_definition_log
         where code = #{workflowDefinitionCode}
     </delete>
 </mapper>

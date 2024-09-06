@@ -28,8 +28,8 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.ExecutorPage;
-import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessDefinitionPage;
-import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessInstancePage;
+import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowInstancePage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -55,10 +55,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
+@DisableIfTestFails
 public class WorkflowInstanceAPITest {
 
     private static final String username = "admin";
@@ -69,19 +71,19 @@ public class WorkflowInstanceAPITest {
 
     private static User loginUser;
 
-    private static ProcessInstancePage processInstancePage;
+    private static WorkflowInstancePage workflowInstancePage;
 
     private static ExecutorPage executorPage;
 
-    private static ProcessDefinitionPage processDefinitionPage;
+    private static WorkflowDefinitionPage workflowDefinitionPage;
 
     private static ProjectPage projectPage;
 
     private static long projectCode;
 
-    private static long processDefinitionCode;
+    private static long workflowDefinitionCode;
 
-    private static int processInstanceId;
+    private static int workflowInstanceId;
 
     @BeforeAll
     public static void setup() {
@@ -89,9 +91,9 @@ public class WorkflowInstanceAPITest {
         HttpResponse loginHttpResponse = loginPage.login(username, password);
         sessionId =
                 JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
-        processInstancePage = new ProcessInstancePage(sessionId);
+        workflowInstancePage = new WorkflowInstancePage(sessionId);
         executorPage = new ExecutorPage(sessionId);
-        processDefinitionPage = new ProcessDefinitionPage(sessionId);
+        workflowDefinitionPage = new WorkflowDefinitionPage(sessionId);
         projectPage = new ProjectPage(sessionId);
         loginUser = new User();
         loginUser.setUserName("admin");
@@ -106,7 +108,7 @@ public class WorkflowInstanceAPITest {
 
     @Test
     @Order(1)
-    public void testQueryProcessInstancesByWorkflowInstanceId() {
+    public void testQueryWorkflowInstancesByWorkflowInstanceId() {
         try {
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
@@ -118,49 +120,50 @@ public class WorkflowInstanceAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-            CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
-                    .importProcessDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
+            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
+                    .importWorkflowDefinition(loginUser, projectCode, file);
+            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
             assertTrue(data.contains("\"success\":true"));
 
             // get workflow definition code
-            HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
-                    processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
-            assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-            assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString()
+            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                    workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+            assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+            assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
                     .contains("hello world"));
-            processDefinitionCode =
-                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
-                            .getBody().getData()).get(0)).get("processDefinition")).get("code");
+            workflowDefinitionCode =
+                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
 
             // release test workflow
-            HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser,
-                    projectCode, processDefinitionCode, ReleaseState.ONLINE);
-            assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+            HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
+                    projectCode, workflowDefinitionCode, ReleaseState.ONLINE);
+            assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
 
             // trigger workflow instance
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date();
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
-            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode,
-                    processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
-            assertTrue(startProcessInstanceResponse.getBody().getSuccess());
-            final List<Integer> workflowInstanceIds = (List<Integer>) startProcessInstanceResponse.getBody().getData();
+            HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
+                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
+            final List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
 
             assertEquals(1, workflowInstanceIds.size());
-            processInstanceId = workflowInstanceIds.get(0);
+            workflowInstanceId = workflowInstanceIds.get(0);
 
-            // make sure process instance has completed and successfully persisted into db
+            // make sure workflow instance has completed and successfully persisted into db
             Awaitility.await()
                     .atMost(30, TimeUnit.SECONDS)
                     .untilAsserted(() -> {
                         // query workflow instance by trigger code
-                        HttpResponse queryProcessInstanceListResponse =
-                                processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
-                        assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
+                        HttpResponse queryWorkflowInstanceListResponse =
+                                workflowInstancePage.queryWorkflowInstanceById(loginUser, projectCode,
+                                        workflowInstanceId);
+                        assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
                         final Map<String, Object> workflowInstance =
-                                (Map<String, Object>) queryProcessInstanceListResponse.getBody().getData();
+                                (Map<String, Object>) queryWorkflowInstanceListResponse.getBody().getData();
                         assertEquals("SUCCESS", workflowInstance.get("state"));
                     });
         } catch (Exception e) {
@@ -171,42 +174,43 @@ public class WorkflowInstanceAPITest {
 
     @Test
     @Order(2)
-    public void testQueryProcessInstanceList() {
-        HttpResponse queryProcessInstanceListResponse =
-                processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
-        assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
-        assertTrue(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
+    public void testQueryWorkflowInstanceList() {
+        HttpResponse queryWorkflowInstanceListResponse =
+                workflowInstancePage.queryWorkflowInstanceList(loginUser, projectCode, 1, 10);
+        assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
+        assertTrue(queryWorkflowInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(3)
-    public void testQueryTaskListByProcessId() {
-        HttpResponse queryTaskListByProcessIdResponse =
-                processInstancePage.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
-        assertTrue(queryTaskListByProcessIdResponse.getBody().getSuccess());
-        assertTrue(queryTaskListByProcessIdResponse.getBody().getData().toString().contains("test_import"));
+    public void testQueryTaskListByWorkflowInstanceId() {
+        HttpResponse queryTaskListByWorkflowInstanceIdResponse =
+                workflowInstancePage.queryTaskListByWorkflowInstanceId(loginUser, projectCode, workflowInstanceId);
+        assertTrue(queryTaskListByWorkflowInstanceIdResponse.getBody().getSuccess());
+        assertTrue(queryTaskListByWorkflowInstanceIdResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(4)
-    public void testQueryProcessInstanceById() {
-        HttpResponse queryProcessInstanceByIdResponse =
-                processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
-        assertTrue(queryProcessInstanceByIdResponse.getBody().getSuccess());
-        assertTrue(queryProcessInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
+    public void testQueryWorkflowInstanceById() {
+        HttpResponse queryWorkflowInstanceByIdResponse =
+                workflowInstancePage.queryWorkflowInstanceById(loginUser, projectCode, workflowInstanceId);
+        assertTrue(queryWorkflowInstanceByIdResponse.getBody().getSuccess());
+        assertTrue(queryWorkflowInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(5)
-    public void testDeleteProcessInstanceById() {
-        HttpResponse deleteProcessInstanceByIdResponse =
-                processInstancePage.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
-        assertTrue(deleteProcessInstanceByIdResponse.getBody().getSuccess());
+    public void testDeleteWorkflowInstanceById() {
+        HttpResponse deleteWorkflowInstanceByIdResponse =
+                workflowInstancePage.deleteWorkflowInstanceById(loginUser, projectCode, workflowInstanceId);
+        assertTrue(deleteWorkflowInstanceByIdResponse.getBody().getSuccess());
 
-        HttpResponse queryProcessInstanceListResponse =
-                processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
-        assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
-        Assertions.assertFalse(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
+        HttpResponse queryWorkflowInstanceListResponse =
+                workflowInstancePage.queryWorkflowInstanceList(loginUser, projectCode, 1, 10);
+        assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
+        Assertions
+                .assertFalse(queryWorkflowInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }
 
 }

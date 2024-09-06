@@ -144,7 +144,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
     @Override
     public void run() {
         try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getWorkflowInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
@@ -192,7 +192,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         taskExecutionContext.setStartTime(taskStartTime);
         log.info("Set task startTime: {}", taskStartTime);
 
-        String taskAppId = String.format("%s_%s", taskExecutionContext.getProcessInstanceId(),
+        String taskAppId = String.format("%s_%s", taskExecutionContext.getWorkflowInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setTaskAppId(taskAppId);
         log.info("Set task appId: {}", taskAppId);

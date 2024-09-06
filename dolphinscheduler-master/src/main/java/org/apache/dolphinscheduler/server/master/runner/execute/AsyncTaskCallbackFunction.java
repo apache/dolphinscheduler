@@ -27,4 +27,7 @@ public interface AsyncTaskCallbackFunction {
 
     void executeThrowing(Throwable throwable);
 
+    void executePause();
+
+    void executeKilled();
 }

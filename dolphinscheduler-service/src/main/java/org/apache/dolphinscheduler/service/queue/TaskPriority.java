@@ -25,49 +25,24 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * task priority info
- */
+import lombok.Data;
+
+@Data
 public class TaskPriority implements Comparable<TaskPriority> {
 
-    /**
-     * processInstancePriority
-     */
-    private int processInstancePriority;
+    private int workflowInstancePriority;
 
-    /**
-     * processInstanceId
-     */
-    private int processInstanceId;
+    private int workflowInstanceId;
 
-    /**
-     * taskInstancePriority
-     */
     private int taskInstancePriority;
 
-    /**
-     * taskId
-     */
     private int taskId;
 
-    /**
-     * taskExecutionContext
-     */
     private TaskExecutionContext taskExecutionContext;
 
-    /**
-     * groupName
-     */
     private String groupName;
 
-    /**
-     * context
-     */
     private Map<String, String> context;
-
-    /**
-     * checkpoint
-     */
     private long checkpoint;
 
     private int taskGroupPriority;
@@ -76,13 +51,13 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.checkpoint = System.currentTimeMillis();
     }
 
-    public TaskPriority(int processInstancePriority,
-                        int processInstanceId,
+    public TaskPriority(int workflowInstancePriority,
+                        int workflowInstanceId,
                         int taskInstancePriority,
                         int taskId,
                         int taskGroupPriority, String groupName) {
-        this.processInstancePriority = processInstancePriority;
-        this.processInstanceId = processInstanceId;
+        this.workflowInstancePriority = workflowInstancePriority;
+        this.workflowInstanceId = workflowInstanceId;
         this.taskInstancePriority = taskInstancePriority;
         this.taskId = taskId;
         this.taskGroupPriority = taskGroupPriority;
@@ -90,91 +65,19 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.checkpoint = System.currentTimeMillis();
     }
 
-    public int getProcessInstancePriority() {
-        return processInstancePriority;
-    }
-
-    public void setProcessInstancePriority(int processInstancePriority) {
-        this.processInstancePriority = processInstancePriority;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public int getTaskInstancePriority() {
-        return taskInstancePriority;
-    }
-
-    public void setTaskInstancePriority(int taskInstancePriority) {
-        this.taskInstancePriority = taskInstancePriority;
-    }
-
-    public int getTaskId() {
-        return taskId;
-    }
-
-    public Map<String, String> getContext() {
-        return context;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public void setContext(Map<String, String> context) {
-        this.context = context;
-    }
-
-    public TaskExecutionContext getTaskExecutionContext() {
-        return taskExecutionContext;
-    }
-
-    public void setTaskExecutionContext(TaskExecutionContext taskExecutionContext) {
-        this.taskExecutionContext = taskExecutionContext;
-    }
-
-    public long getCheckpoint() {
-        return checkpoint;
-    }
-
-    public void setCheckpoint(long checkpoint) {
-        this.checkpoint = checkpoint;
-    }
-
-    public int getTaskGroupPriority() {
-        return taskGroupPriority;
-    }
-
-    public void setTaskGroupPriority(int taskGroupPriority) {
-        this.taskGroupPriority = taskGroupPriority;
-    }
-
     @Override
     public int compareTo(TaskPriority other) {
-        if (this.getProcessInstancePriority() > other.getProcessInstancePriority()) {
+        if (this.getWorkflowInstancePriority() > other.getWorkflowInstancePriority()) {
             return 1;
         }
-        if (this.getProcessInstancePriority() < other.getProcessInstancePriority()) {
+        if (this.getWorkflowInstancePriority() < other.getWorkflowInstancePriority()) {
             return -1;
         }
 
-        if (this.getProcessInstanceId() > other.getProcessInstanceId()) {
+        if (this.getWorkflowInstanceId() > other.getWorkflowInstanceId()) {
             return 1;
         }
-        if (this.getProcessInstanceId() < other.getProcessInstanceId()) {
+        if (this.getWorkflowInstanceId() < other.getWorkflowInstanceId()) {
             return -1;
         }
 
@@ -214,8 +117,8 @@ public class TaskPriority implements Comparable<TaskPriority> {
             return false;
         }
         TaskPriority that = (TaskPriority) o;
-        return processInstancePriority == that.processInstancePriority
-                && processInstanceId == that.processInstanceId
+        return workflowInstancePriority == that.workflowInstancePriority
+                && workflowInstanceId == that.workflowInstanceId
                 && taskInstancePriority == that.taskInstancePriority
                 && taskId == that.taskId
                 && taskGroupPriority == that.taskGroupPriority
@@ -224,8 +127,8 @@ public class TaskPriority implements Comparable<TaskPriority> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(processInstancePriority,
-                processInstanceId,
+        return Objects.hash(workflowInstancePriority,
+                workflowInstanceId,
                 taskInstancePriority,
                 taskId,
                 taskGroupPriority,
@@ -235,10 +138,10 @@ public class TaskPriority implements Comparable<TaskPriority> {
     @Override
     public String toString() {
         return "TaskPriority{"
-                + "processInstancePriority="
-                + processInstancePriority
-                + ", processInstanceId="
-                + processInstanceId
+                + "workflowInstancePriority="
+                + workflowInstancePriority
+                + ", workflowInstanceId="
+                + workflowInstanceId
                 + ", taskInstancePriority="
                 + taskInstancePriority
                 + ", taskId="

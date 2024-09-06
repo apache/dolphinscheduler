@@ -74,7 +74,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         }
 
         WorkflowDefinition workflowDefinition =
-                processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
+                processService.findWorkflowDefinitionByCode(schedule.getWorkflowDefinitionCode());
         // release state : online/offline
         ReleaseState releaseState = workflowDefinition.getReleaseState();
         if (releaseState == ReleaseState.OFFLINE) {
@@ -94,7 +94,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
                 .taskDependType(TaskDependType.TASK_POST)
                 .warningType(schedule.getWarningType())
                 .warningGroupId(schedule.getWarningGroupId())
-                .workflowInstancePriority(schedule.getProcessInstancePriority())
+                .workflowInstancePriority(schedule.getWorkflowInstancePriority())
                 .workerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup()))
                 .tenantCode(schedule.getTenantCode())
                 .environmentCode(schedule.getEnvironmentCode())

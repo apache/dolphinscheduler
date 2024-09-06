@@ -220,7 +220,7 @@ export default defineComponent({
 
     const restructureTimingForm = (timingForm: any) => {
       if (projectPreferences.value?.taskPriority) {
-        timingForm.processInstancePriority =
+        timingForm.workflowInstancePriority =
           projectPreferences.value.taskPriority
       }
       if (projectPreferences.value?.warningType) {
@@ -297,8 +297,8 @@ export default defineComponent({
         timingState.timingForm.timezoneId = props.row.timezoneId
         timingState.timingForm.failureStrategy = props.row.failureStrategy
         timingState.timingForm.warningType = props.row.warningType
-        timingState.timingForm.processInstancePriority =
-          props.row.processInstancePriority
+        timingState.timingForm.workflowInstancePriority =
+          props.row.workflowInstancePriority
         timingState.timingForm.workerGroup = props.row.workerGroup
         timingState.timingForm.tenantCode = props.row.tenantCode
         initWarningGroup()
@@ -466,12 +466,12 @@ export default defineComponent({
           )}
           <NFormItem
             label={t('project.workflow.workflow_priority')}
-            path='processInstancePriority'
+            path='workflowInstancePriority'
           >
             <NSelect
               options={this.priorityOptions}
               renderLabel={this.renderLabel}
-              v-model:value={this.timingForm.processInstancePriority}
+              v-model:value={this.timingForm.workflowInstancePriority}
             />
           </NFormItem>
           <NFormItem

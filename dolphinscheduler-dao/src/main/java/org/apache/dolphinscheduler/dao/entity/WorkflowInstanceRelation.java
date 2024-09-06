@@ -19,36 +19,30 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
-@TableName("t_ds_relation_process_instance")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("t_ds_relation_workflow_instance")
 public class WorkflowInstanceRelation {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * parent process instance id
-     */
-    private int parentProcessInstanceId;
+    private int parentWorkflowInstanceId;
 
-    /**
-     * parent task instance id
-     */
     private int parentTaskInstanceId;
 
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
+    private int workflowInstanceId;
 
     @Override
     public boolean equals(Object o) {
@@ -64,21 +58,22 @@ public class WorkflowInstanceRelation {
         if (!Objects.equals(id, that.id)) {
             return false;
         }
-        if (parentProcessInstanceId != that.parentProcessInstanceId) {
+        if (parentWorkflowInstanceId != that.parentWorkflowInstanceId) {
             return false;
         }
         if (parentTaskInstanceId != that.parentTaskInstanceId) {
             return false;
         }
-        return processInstanceId == that.processInstanceId;
+        return workflowInstanceId == that.workflowInstanceId;
     }
 
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + parentProcessInstanceId;
+        result = 31 * result + parentWorkflowInstanceId;
         result = 31 * result + parentTaskInstanceId;
-        result = 31 * result + processInstanceId;
+        result = 31 * result + workflowInstanceId;
         return result;
     }
+
 }

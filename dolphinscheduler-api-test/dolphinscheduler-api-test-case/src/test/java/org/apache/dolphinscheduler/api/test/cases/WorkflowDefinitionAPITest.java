@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
-import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -44,9 +44,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
+@DisableIfTestFails
 public class WorkflowDefinitionAPITest {
 
     private static final String username = "admin";
@@ -57,15 +59,15 @@ public class WorkflowDefinitionAPITest {
 
     private static User loginUser;
 
-    private static ProcessDefinitionPage processDefinitionPage;
+    private static WorkflowDefinitionPage workflowDefinitionPage;
 
     private static ProjectPage projectPage;
 
     private static long projectCode;
 
-    private static long processDefinitionCode;
+    private static long workflowDefinitionCode;
 
-    private static String processDefinitionName;
+    private static String workflowDefinitionName;
 
     @BeforeAll
     public static void setup() {
@@ -73,7 +75,7 @@ public class WorkflowDefinitionAPITest {
         HttpResponse loginHttpResponse = loginPage.login(username, password);
         sessionId =
                 JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
-        processDefinitionPage = new ProcessDefinitionPage(sessionId);
+        workflowDefinitionPage = new WorkflowDefinitionPage(sessionId);
         projectPage = new ProjectPage(sessionId);
         loginUser = new User();
         loginUser.setId(123);
@@ -87,7 +89,7 @@ public class WorkflowDefinitionAPITest {
 
     @Test
     @Order(1)
-    public void testImportProcessDefinition() {
+    public void testImportWorkflowDefinition() {
         try {
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
@@ -97,9 +99,9 @@ public class WorkflowDefinitionAPITest {
                     .getBody().getData()).get(0)).get("code");
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-            CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
-                    .importProcessDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
+            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
+                    .importWorkflowDefinition(loginUser, projectCode, file);
+            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
             Assertions.assertTrue(data.contains("\"success\":true"));
         } catch (Exception e) {
             log.error("failed", e);
@@ -109,93 +111,95 @@ public class WorkflowDefinitionAPITest {
 
     @Test
     @Order(2)
-    public void testQueryAllProcessDefinitionByProjectCode() {
-        HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
-                processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
-        Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
+    public void testQueryAllWorkflowDefinitionByProjectCode() {
+        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
         Assertions.assertTrue(
-                queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
-        processDefinitionCode =
-                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
-                        .getBody().getData()).get(0)).get("processDefinition")).get("code");
-        processDefinitionName =
-                (String) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
-                        .getBody().getData()).get(0)).get("processDefinition")).get("name");
+                queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
+        workflowDefinitionCode =
+                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                        .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+        workflowDefinitionName =
+                (String) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                        .getBody().getData()).get(0)).get("workflowDefinition")).get("name");
     }
 
     @Test
     @Order(3)
-    public void testQueryProcessDefinitionByCode() {
-        HttpResponse queryProcessDefinitionByCodeResponse =
-                processDefinitionPage.queryProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
-        Assertions.assertTrue(queryProcessDefinitionByCodeResponse.getBody().getSuccess());
+    public void testQueryWorkflowDefinitionByCode() {
+        HttpResponse queryWorkflowDefinitionByCodeResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionByCode(loginUser, projectCode, workflowDefinitionCode);
+        Assertions.assertTrue(queryWorkflowDefinitionByCodeResponse.getBody().getSuccess());
         Assertions.assertTrue(
-                queryProcessDefinitionByCodeResponse.getBody().getData().toString().contains("hello world"));
+                queryWorkflowDefinitionByCodeResponse.getBody().getData().toString().contains("hello world"));
     }
 
     @Test
     @Order(4)
-    public void testgetProcessListByProjectCode() {
-        HttpResponse getProcessListByProjectCodeResponse =
-                processDefinitionPage.getProcessListByProjectCode(loginUser, projectCode);
-        Assertions.assertTrue(getProcessListByProjectCodeResponse.getBody().getSuccess());
+    public void testGetWorkflowListByProjectCode() {
+        HttpResponse getWorkflowListByProjectCodeResponse =
+                workflowDefinitionPage.getWorkflowListByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(getWorkflowListByProjectCodeResponse.getBody().getSuccess());
         Assertions
-                .assertTrue(getProcessListByProjectCodeResponse.getBody().getData().toString().contains("test_import"));
+                .assertTrue(
+                        getWorkflowListByProjectCodeResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(5)
-    public void testQueryProcessDefinitionByName() {
-        HttpResponse queryProcessDefinitionByNameResponse =
-                processDefinitionPage.queryProcessDefinitionByName(loginUser, projectCode, processDefinitionName);
-        Assertions.assertTrue(queryProcessDefinitionByNameResponse.getBody().getSuccess());
+    public void testQueryWorkflowDefinitionByName() {
+        HttpResponse queryWorkflowDefinitionByNameResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionByName(loginUser, projectCode, workflowDefinitionName);
+        Assertions.assertTrue(queryWorkflowDefinitionByNameResponse.getBody().getSuccess());
         Assertions.assertTrue(
-                queryProcessDefinitionByNameResponse.getBody().getData().toString().contains("hello world"));
+                queryWorkflowDefinitionByNameResponse.getBody().getData().toString().contains("hello world"));
     }
 
     @Test
     @Order(6)
-    public void testQueryProcessDefinitionList() {
-        HttpResponse queryProcessDefinitionListResponse =
-                processDefinitionPage.queryProcessDefinitionList(loginUser, projectCode);
-        Assertions.assertTrue(queryProcessDefinitionListResponse.getBody().getSuccess());
+    public void testQueryWorkflowDefinitionList() {
+        HttpResponse queryWorkflowDefinitionListResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionList(loginUser, projectCode);
+        Assertions.assertTrue(queryWorkflowDefinitionListResponse.getBody().getSuccess());
         Assertions
-                .assertTrue(queryProcessDefinitionListResponse.getBody().getData().toString().contains("hello world"));
+                .assertTrue(queryWorkflowDefinitionListResponse.getBody().getData().toString().contains("hello world"));
     }
 
     @Test
     @Order(7)
-    public void testReleaseProcessDefinition() {
-        HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser,
-                projectCode, processDefinitionCode, ReleaseState.ONLINE);
-        Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+    public void testReleaseWorkflowDefinition() {
+        HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
+                projectCode, workflowDefinitionCode, ReleaseState.ONLINE);
+        Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
 
-        HttpResponse queryProcessDefinitionByCodeResponse =
-                processDefinitionPage.queryProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
-        Assertions.assertTrue(queryProcessDefinitionByCodeResponse.getBody().getSuccess());
+        HttpResponse queryWorkflowDefinitionByCodeResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionByCode(loginUser, projectCode, workflowDefinitionCode);
+        Assertions.assertTrue(queryWorkflowDefinitionByCodeResponse.getBody().getSuccess());
         Assertions.assertTrue(
-                queryProcessDefinitionByCodeResponse.getBody().getData().toString().contains("releaseState=ONLINE"));
+                queryWorkflowDefinitionByCodeResponse.getBody().getData().toString().contains("releaseState=ONLINE"));
     }
 
     @Test
     @Order(8)
-    public void testDeleteProcessDefinitionByCode() {
-        HttpResponse deleteProcessDefinitionByCodeResponse =
-                processDefinitionPage.deleteProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
-        Assertions.assertFalse(deleteProcessDefinitionByCodeResponse.getBody().getSuccess());
+    public void testDeleteWorkflowDefinitionByCode() {
+        HttpResponse deleteWorkflowDefinitionByCodeResponse =
+                workflowDefinitionPage.deleteWorkflowDefinitionByCode(loginUser, projectCode, workflowDefinitionCode);
+        Assertions.assertFalse(deleteWorkflowDefinitionByCodeResponse.getBody().getSuccess());
 
-        HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser,
-                projectCode, processDefinitionCode, ReleaseState.OFFLINE);
-        Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+        HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
+                projectCode, workflowDefinitionCode, ReleaseState.OFFLINE);
+        Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
 
-        deleteProcessDefinitionByCodeResponse =
-                processDefinitionPage.deleteProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
-        Assertions.assertTrue(deleteProcessDefinitionByCodeResponse.getBody().getSuccess());
+        deleteWorkflowDefinitionByCodeResponse =
+                workflowDefinitionPage.deleteWorkflowDefinitionByCode(loginUser, projectCode, workflowDefinitionCode);
+        Assertions.assertTrue(deleteWorkflowDefinitionByCodeResponse.getBody().getSuccess());
 
-        HttpResponse queryProcessDefinitionListResponse =
-                processDefinitionPage.queryProcessDefinitionList(loginUser, projectCode);
-        Assertions.assertTrue(queryProcessDefinitionListResponse.getBody().getSuccess());
+        HttpResponse queryWorkflowDefinitionListResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionList(loginUser, projectCode);
+        Assertions.assertTrue(queryWorkflowDefinitionListResponse.getBody().getSuccess());
         Assertions
-                .assertFalse(queryProcessDefinitionListResponse.getBody().getData().toString().contains("hello world"));
+                .assertFalse(
+                        queryWorkflowDefinitionListResponse.getBody().getData().toString().contains("hello world"));
     }
 }

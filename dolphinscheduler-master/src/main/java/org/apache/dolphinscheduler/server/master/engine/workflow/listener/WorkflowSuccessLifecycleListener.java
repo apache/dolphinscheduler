@@ -54,7 +54,7 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     public void notifyWorkflowLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        if (Flag.YES == workflowInstance.getIsSubProcess()) {
+        if (Flag.YES == workflowInstance.getIsSubWorkflow()) {
             // The sub workflow does not need to generate the backfill command
             // Since the parent workflow will trigger the task to generate the sub workflow instance.
             return;
@@ -84,15 +84,14 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
         final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
                 .userId(workflowInstance.getExecutorId())
                 .backfillTimeList(backfillTimeList)
-                .workflowCode(workflowInstance.getProcessDefinitionCode())
-                .workflowVersion(workflowInstance.getProcessDefinitionVersion())
+                .workflowCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowVersion(workflowInstance.getWorkflowDefinitionVersion())
                 .startNodes(commandParam.getStartNodes())
                 .failureStrategy(workflowInstance.getFailureStrategy())
                 .taskDependType(workflowInstance.getTaskDependType())
-                .execType(CommandType.COMPLEMENT_DATA)
                 .warningType(workflowInstance.getWarningType())
                 .warningGroupId(workflowInstance.getWarningGroupId())
-                .workflowInstancePriority(workflowInstance.getProcessInstancePriority())
+                .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .workerGroup(workflowInstance.getWorkerGroup())
                 .tenantCode(workflowInstance.getTenantCode())
                 .environmentCode(workflowInstance.getEnvironmentCode())

@@ -43,9 +43,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * process instance controller test
- */
 public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @MockBean
@@ -62,7 +59,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefineCode", "91");
+        paramsMap.add("workflowDefinitionCode", "91");
         paramsMap.add("searchVal", "cxc");
         paramsMap.add("stateType", WorkflowExecutionStatus.SUCCESS.name());
         paramsMap.add("host", "192.168.1.13");
@@ -71,7 +68,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/workflow-instances")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -91,8 +88,9 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                         Mockito.any()))
                 .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}/tasks", "1113", "123")
-                .header(SESSION_ID, sessionId))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/workflow-instances/{id}/tasks", "1113", "123")
+                        .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -122,13 +120,13 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("taskRelationJson", json);
         paramsMap.add("taskDefinitionJson", "");
-        paramsMap.add("processInstanceId", "91");
+        paramsMap.add("workflowInstanceId", "91");
         paramsMap.add("scheduleTime", "2019-12-15 00:00:00");
         paramsMap.add("syncDefine", "false");
         paramsMap.add("locations", locations);
         paramsMap.add("tenantCode", "123");
 
-        MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/process-instances/{id}", "1113", "123")
+        MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -146,7 +144,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Mockito.when(
                 workflowInstanceService.queryWorkflowInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(mockResult);
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}", "1113", "123")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -165,7 +163,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                 Mockito.anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc
-                .perform(get("/projects/{projectCode}/process-instances/query-sub-by-parent", "1113")
+                .perform(get("/projects/{projectCode}/workflow-instances/query-sub-by-parent", "1113")
                         .header(SESSION_ID, sessionId)
                         .param("taskId", "1203"))
                 .andExpect(status().isOk())
@@ -186,7 +184,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                 .thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc
-                .perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
+                .perform(get("/projects/{projectCode}/workflow-instances/query-parent-by-sub", "1113")
                         .header(SESSION_ID, sessionId)
                         .param("subId", "1204"))
                 .andExpect(status().isOk())
@@ -205,7 +203,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(workflowInstanceService.viewVariables(1113L, 123)).thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
-                .perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
+                .perform(get("/projects/{projectCode}/workflow-instances/{id}/view-variables", "1113", "123")
                         .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -221,7 +219,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.doNothing().when(workflowInstanceService).deleteWorkflowInstanceById(Mockito.any(), Mockito.anyInt());
 
-        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/process-instances/{id}", "1113", "123")
+        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -238,9 +236,9 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         mockResult.put(Constants.STATUS, Status.WORKFLOW_INSTANCE_NOT_EXIST);
 
         Mockito.doNothing().when(workflowInstanceService).deleteWorkflowInstanceById(Mockito.any(), Mockito.anyInt());
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/process-instances/batch-delete", "1113")
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/workflow-instances/batch-delete", "1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceIds", "1205,1206"))
+                .param("workflowInstanceIds", "1205,1206"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -259,7 +257,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                 .queryByTriggerCode(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances/trigger")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/workflow-instances/trigger")
                 .header("sessionId", sessionId)
                 .param("triggerCode", "12051206"))
                 .andExpect(status().isOk())

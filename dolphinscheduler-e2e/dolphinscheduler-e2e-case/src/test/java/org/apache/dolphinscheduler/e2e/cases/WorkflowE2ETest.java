@@ -41,12 +41,14 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DisableIfTestFails
 class WorkflowE2ETest {
 
     private static final String project = "test-workflow-1";
@@ -143,9 +145,9 @@ class WorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         workflowDefinitionPage
-                .createSubProcessWorkflow()
+                .createSubWorkflowTask()
 
-                .<SubWorkflowTaskForm>addTask(TaskType.SUB_PROCESS)
+                .<SubWorkflowTaskForm>addTask(TaskType.SUB_WORKFLOW)
                 .childNode("test-workflow-1")
                 .name("test-sub-1")
                 .submit()

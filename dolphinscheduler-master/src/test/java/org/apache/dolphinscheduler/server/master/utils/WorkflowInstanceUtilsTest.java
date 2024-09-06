@@ -46,7 +46,7 @@ public class WorkflowInstanceUtilsTest {
         workflowInstance.setCommandType(CommandType.REPEAT_RUNNING);
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
         workflowInstance.setHost("127.0.0.1");
-        workflowInstance.setIsSubProcess(Flag.NO);
+        workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.setRunTimes(1);
         workflowInstance.setMaxTryTimes(0);
         workflowInstance.setScheduleTime(Date.valueOf("2023-08-01"));
