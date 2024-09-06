@@ -21,15 +21,8 @@ on:
   push:
     branches:
       - dev
-    paths:
-      - '.github/workflows/backend.yml'
-      - 'package.xml'
-      - 'pom.xml'
-      - 'dolphinscheduler-alert/**'
-      - 'dolphinscheduler-api/**'
-      - 'dolphinscheduler-common/**'
-      - 'dolphinscheduler-dao/**'
-      - 'dolphinscheduler-rpc/**'
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
   pull_request:
 
 concurrency:
@@ -131,9 +124,39 @@ jobs:
       - name: Running cluster test
         run: |
           /bin/bash ${{ matrix.case.script }}
+  schema-check-prepare:
+    name: schema-check-prepare-${{ matrix.version }}
+    needs: paths-filter
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ "3.1.9", "3.2.0" ]
+    steps:
+      - uses: actions/cache/restore@v4
+        name: Download Binary Package Cache
+        with:
+          path: /tmp/${{ matrix.version }}
+          key: apache-dolphinscheduler-${{ matrix.version }}-bin
+          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
+      - name: Download Binary Package if not cached
+        run: |
+          if [ ! -f /tmp/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
+            echo "Binary package not found in cache, downloading..."
+            mkdir -p /tmp/${{ matrix.version }}
+            wget https://mirrors.tuna.tsinghua.edu.cn/apache/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
+          else
+            echo "Binary package found in cache, skipping download."
+          fi
+      - uses: actions/cache/save@v4
+        name: Upload Binary Package Cache
+        with:
+          path: /tmp/${{ matrix.version }}
+          key: apache-dolphinscheduler-${{ matrix.version }}-bin
   schema-check:
     name: ${{ matrix.case.name }}-${{ matrix.version }}
-    needs: build
+    needs: [ build, schema-check-prepare]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -158,6 +181,12 @@ jobs:
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev
+      - uses: actions/cache/restore@v4
+        name: Download Binary Package Cache
+        with:
+          path: /tmp/${{ matrix.version }}
+          key: apache-dolphinscheduler-${{ matrix.version }}-bin
+          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Running Schema Check
         run: |
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
