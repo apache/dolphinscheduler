@@ -555,7 +555,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     proto-google-cloud-storage-v2 2.18.0-alpha: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-cloud-storage-v2/2.18.0-alpha, Apache 2.0
     proto-google-iam-v1 1.9.0: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-iam-v1/1.9.0, Apache 2.0
     sshd-sftp https://mvnrepository.com/artifact/org.apache.sshd/sshd-sftp/2.8.0 Apache 2.0
-    sshd-scp https://mvnrepository.com/artifact/org.apache.sshd/sshd-scp/2.8.0 Aapache 2.0
+    sshd-scp https://mvnrepository.com/artifact/org.apache.sshd/sshd-scp/2.8.0 Apache 2.0
     casdoor-java-sdk 1.11.0  https://mvnrepository.com/artifact/org.casbin/casdoor-java-sdk/1.11.0  Apache 2.0
     casdoor-spring-boot-starter 1.6.0  https://mvnrepository.com/artifact/org.casbin/casdoor-spring-boot-starter/1.6.0  Apache 2.0
     org.apache.oltu.oauth2.client 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client/1.0.2  Apache 2.0
@@ -572,8 +572,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     tea-rpc-util 0.1.3.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
     tea-util 0.2.13.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
     delight-nashorn-sandbox 0.3.2 https://github.com/javadelight/delight-nashorn-sandbox/blob/master/README.md#license Apache 2.0
-
-
+    tencentcloud-sdk-java-common 3.1.213 https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-common/3.1.213, Apache 2.0
+    tencentcloud-sdk-java-kms 3.1.213 https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-kms/3.1.213, Apache 2.0
+    logging-interceptor 2.7.5 https://mvnrepository.com/artifact/com.squareup.okhttp/logging-interceptor/2.7.5, Apache 2.0
 
 
 
@@ -616,6 +617,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     google-auth-library-oauth2-http 1.15.0: https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http/1.15.0, BSD 3-clause
     threetenbp 1.6.5: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.6.5, BSD 3-clause
     dom4j 2.1.3 https://github.com/dom4j/dom4j/blob/master/LICENSE BSD 3-clause
+    xstream 1.4.20 https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream/1.4.20, BSD 3-clause
 
 ========================================================================
 CDDL licenses
@@ -714,6 +716,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     azure-storage-blob 12.21.0: https://mvnrepository.com/artifact/com.azure/azure-storage-blob/12.21.0, MIT
     azure-storage-internal-avro 12.6.0: https://mvnrepository.com/artifact/com.azure/azure-storage-internal-avro/12.6.0, MIT
     cos_api 5.6.231 https://mvnrepository.com/artifact/com.qcloud/cos_api/5.6.231, MIT
+    java-jwt 4.4.0 https://mvnrepository.com/artifact/com.auth0/java-jwt/4.4.0, MIT
 
 ========================================================================
 MPL 1.1 licenses
@@ -814,3 +817,19 @@ JDOM licenses
 Vertica Client Driver License
 ========================================
     vertica-jdbc 12.0.4-0: https://mvnrepository.com/artifact/com.vertica.jdbc/vertica-jdbc/12.0.4-0, Vertica Client Driver License
+
+========================================================================
+Indiana University Extreme! Lab Software License
+========================================================================
+
+The following components are provided under a Indiana University Extreme! Lab Software License. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+    mxparser 1.2.2: https://mvnrepository.com/artifact/io.github.x-stream/mxparser/1.2.2, Indiana University Extreme! Lab Software License
+
+========================================================================
+Public Domain License
+========================================================================
+
+The following components are provided under a Public Domain License. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+    xmlpull 1.1.3.1: https://mvnrepository.com/artifact/xmlpull/xmlpull/1.1.3.1, Public Domain License

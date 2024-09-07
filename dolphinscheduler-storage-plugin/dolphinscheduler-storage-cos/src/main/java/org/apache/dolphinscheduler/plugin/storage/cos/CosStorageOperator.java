@@ -76,8 +76,8 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
 
     private static final int TRANSFER_THREAD_POOL_SIZE = 16;
 
-    private static final long MULTIPART_UPLOAD_BYTES_THRESHOLD = 5 * 1024 * 1024;
-    private static final long MIN_UPLOAD_PART_BYTES = 1024 * 1024;
+    private static final long MULTIPART_UPLOAD_BYTES_THRESHOLD = 5 * 1024 * 1024L;
+    private static final long MIN_UPLOAD_PART_BYTES = 1024 * 1024L;
 
     private final String bucketName;
 
@@ -134,7 +134,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
     public void download(String srcFilePath, String dstFilePath, boolean overwrite) {
         String cosKey = transformAbsolutePathToCOSKey(srcFilePath);
 
-        File dstFile = new File(dstFilePath);
+        File dstFile = Paths.get(dstFilePath).normalize().toFile();
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {

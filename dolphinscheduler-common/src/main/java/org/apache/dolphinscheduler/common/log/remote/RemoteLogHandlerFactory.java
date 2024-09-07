@@ -41,6 +41,8 @@ public class RemoteLogHandlerFactory {
             return GcsRemoteLogHandler.getInstance();
         } else if ("ABS".equals(target)) {
             return AbsRemoteLogHandler.getInstance();
+        } else if ("COS".equals(target)) {
+            return CosRemoteLogHandler.getInstance();
         }
 
         log.error("No suitable remote logging target for {}", target);

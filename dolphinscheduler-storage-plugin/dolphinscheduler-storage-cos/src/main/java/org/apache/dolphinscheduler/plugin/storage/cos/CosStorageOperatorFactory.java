@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
+import java.util.Map;
+
 import com.google.auto.service.AutoService;
 
 @AutoService(StorageOperatorFactory.class)
@@ -41,12 +43,15 @@ public class CosStorageOperatorFactory implements StorageOperatorFactory {
     }
 
     private CosStorageProperties getCosStorageProperties() {
+
+        Map<String, String> cosPropertiesMap = PropertyUtils.getByPrefix("resource.tencent.cloud");
+
         return CosStorageProperties.builder()
-                .region(PropertyUtils.getString(Constants.TENCENT_CLOUD_COS_REGION))
-                .accessKeyId(PropertyUtils.getString(TaskConstants.TENCENT_CLOUD_ACCESS_KEY_ID))
-                .accessKeySecret(PropertyUtils.getString(TaskConstants.TENCENT_CLOUD_ACCESS_KEY_SECRET))
-                .bucketName(PropertyUtils.getString(Constants.TENCENT_CLOUD_COS_BUCKET_NAME))
-                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .region(cosPropertiesMap.get(Constants.TENCENT_CLOUD_COS_REGION))
+                .accessKeyId(cosPropertiesMap.get(TaskConstants.TENCENT_CLOUD_ACCESS_KEY_ID))
+                .accessKeySecret(cosPropertiesMap.get(TaskConstants.TENCENT_CLOUD_ACCESS_KEY_SECRET))
+                .bucketName(cosPropertiesMap.get(Constants.TENCENT_CLOUD_COS_BUCKET_NAME))
+                .resourceUploadPath(cosPropertiesMap.getOrDefault(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
                 .build();
     }
 }

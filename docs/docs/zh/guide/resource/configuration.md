@@ -92,17 +92,28 @@ resource.huawei.cloud.obs.endpoint=obs.cn-southwest-2.huaweicloud.com
 
 ## 对接腾讯云 COS
 
-如果需要使用到资源中心的 COS 上传资源，我们需要对以下路径的进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`。可参考如下：
+如果需要使用到资源中心的 COS 上传资源，我们需要对以下路径的进行配置：`api-server/conf/resource-center.yaml` 和 `worker-server/conf/resource-center.yaml`。可参考如下：
+
+```yaml
+resource:
+  # 腾讯云 COS 配置
+  tencent:
+    cloud:
+      access:
+        key:
+          id: <your-access-key-id>
+          secret: <your-access-key-secret>
+      cos:
+        # COS 区域代码可参考: https://cloud.tencent.com/document/product/436/6224
+        region: ap-nanjing
+        bucket:
+          name: dolphinscheduler
+
+```
+
+为了激活腾讯云存储 COS，还需要对以下路径的进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`。可参考如下：
 
 ```properties
-# access key id, required if you set resource.storage.type=COS
-resource.tencent.cloud.access.key.id=<your-access-key-id>
-# access key secret, required if you set resource.storage.type=COS
-resource.tencent.cloud.access.key.secret=<your-access-key-secret>
-# cos bucket name, required if you set resource.storage.type=COS
-resource.tencent.cloud.cos.bucket.name=dolphinscheduler
-# cos bucket region, required if you set resource.storage.type=COS, refer to https://cloud.tencent.com/document/product/436/6224
-resource.tencent.cloud.cos.region=ap-nanjing
-
+resource.storage.type=COS
 ```
 

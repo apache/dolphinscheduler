@@ -98,19 +98,30 @@ resource.huawei.cloud.obs.endpoint=obs.cn-southwest-2.huaweicloud.com
 
 ## connect COS
 
-if you want to upload resources to `Resource Center` connected to `COS`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`. You can refer to the following:
+if you want to upload resources to `Resource Center` connected to `COS`, you need to configure `api-server/conf/resource-center.yaml` and `worker-server/conf/resource-center.yaml`. You can refer to the following:
 
 config the following fields
 
-```properties
-# access key id, required if you set resource.storage.type=COS
-resource.tencent.cloud.access.key.id=<your-access-key-id>
-# access key secret, required if you set resource.storage.type=COS
-resource.tencent.cloud.access.key.secret=<your-access-key-secret>
-# cos bucket name, required if you set resource.storage.type=COS
-resource.tencent.cloud.cos.bucket.name=dolphinscheduler
-# cos bucket region, required if you set resource.storage.type=COS, refer to https://cloud.tencent.com/document/product/436/6224
-resource.tencent.cloud.cos.region=ap-nanjing
+```yaml
+resource:
+  # Tencent Cloud Storage (COS) setup, required if you set resource.storage.type=COS
+  tencent:
+    cloud:
+      access:
+        key:
+          id: <your-access-key-id>
+          secret: <your-access-key-secret>
+      cos:
+        # predefined region code: https://cloud.tencent.com/document/product/436/6224
+        region: ap-nanjing
+        bucket:
+          name: dolphinscheduler
 
+```
+
+To enable COS, you also need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`. You can refer to the following:
+
+```properties
+resource.storage.type=COS
 ```
 
