@@ -40,7 +40,8 @@ export default {
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
     all_permission: 'All Permission',
-    assign_worker_group: 'Worker Group'
+    assign_worker_group: 'Worker Group',
+    total_items: 'Total Item is'
   },
   workflow: {
     on_line: 'Online',
