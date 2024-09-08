@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.plugin.registry.raft.manage;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.raft.model.RaftLockEntry;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -37,13 +37,13 @@ public class RaftLockManager implements IRaftLockManager {
 
     private final Map<String, RaftLockEntry> distributedLockMap = new ConcurrentHashMap<>();
     private final RheaKVStore rheaKvStore;
-    private final RaftRegistryProperties raftRegistryProperties;
     private static final ScheduledExecutorService WATCH_DOG = Executors.newSingleThreadScheduledExecutor();
     private static final String LOCK_OWNER_PREFIX = NetUtils.getHost() + "_" + OSUtils.getProcessID() + "_";
+    private static final Duration DISTRIBUTE_LOCK_TIME_OUT = Duration.ofSeconds(3);
+    private static final Duration DISTRIBUTE_LOCK_RETRY_INTERVAL = Duration.ofMillis(50);
 
-    public RaftLockManager(RheaKVStore rheaKVStore, RaftRegistryProperties raftRegistryProperties) {
+    public RaftLockManager(RheaKVStore rheaKVStore) {
         this.rheaKvStore = rheaKVStore;
-        this.raftRegistryProperties = raftRegistryProperties;
     }
 
     @Override
@@ -54,8 +54,7 @@ public class RaftLockManager implements IRaftLockManager {
         }
 
         final DistributedLock<byte[]> distributedLock = rheaKvStore.getDistributedLock(lockKey,
-                raftRegistryProperties.getDistributedLockTimeout().toMillis(), TimeUnit.MILLISECONDS, WATCH_DOG);
-
+                DISTRIBUTE_LOCK_TIME_OUT.toMillis(), TimeUnit.MILLISECONDS, WATCH_DOG);
         while (true) {
             if (distributedLock.tryLock()) {
                 distributedLockMap.put(lockKey, RaftLockEntry.builder().distributedLock(distributedLock)
@@ -64,7 +63,7 @@ public class RaftLockManager implements IRaftLockManager {
                 return true;
             } else {
                 // fail to acquire lock
-                ThreadUtils.sleep(raftRegistryProperties.getDistributedLockRetryInterval().toMillis());
+                ThreadUtils.sleep(DISTRIBUTE_LOCK_RETRY_INTERVAL.toMillis());
             }
         }
     }
@@ -77,7 +76,7 @@ public class RaftLockManager implements IRaftLockManager {
         }
         final long endTime = System.currentTimeMillis() + timeout;
         final DistributedLock<byte[]> distributedLock = rheaKvStore.getDistributedLock(lockKey,
-                raftRegistryProperties.getDistributedLockTimeout().toMillis(), TimeUnit.MILLISECONDS, WATCH_DOG);
+                DISTRIBUTE_LOCK_TIME_OUT.toMillis(), TimeUnit.MILLISECONDS, WATCH_DOG);
 
         while (System.currentTimeMillis() < endTime) {
             if (distributedLock.tryLock()) {
@@ -87,7 +86,7 @@ public class RaftLockManager implements IRaftLockManager {
                 return true;
             } else {
                 // fail to acquire lock
-                ThreadUtils.sleep(raftRegistryProperties.getDistributedLockRetryInterval().toMillis());
+                ThreadUtils.sleep(DISTRIBUTE_LOCK_RETRY_INTERVAL.toMillis());
             }
         }
 

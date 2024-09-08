@@ -64,8 +64,8 @@ public class RaftRegistryServer {
         }
         log.info("starting raft registry server...");
         this.rheaKVStore.init(this.options);
-        log.info("raft registry server started successfully");
         this.started = true;
+        log.info("raft registry server started successfully");
     }
 
     public void stop() {

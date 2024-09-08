@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +41,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class RaftConnectionStateManager implements IRaftConnectionStateManager {
 
     private static final String DEFAULT_REGION_ID = "--1";
+    private static final Duration CONNECT_STATE_CHECK_INTERVAL = Duration.ofSeconds(2);
+    private static final int CONNECT_STATE_REFRESH_THREAD_POOL_SIZE = 1;
+    private static final Duration REFRESH_LEADER_TIME_OUT = Duration.ofSeconds(2);
+    private static final int MAX_RANDOM_DELAY_MS = 500;
     private ConnectionState currentConnectionState;
     private final RaftRegistryProperties properties;
     private final List<ConnectionListener> connectionListeners = new CopyOnWriteArrayList<>();
@@ -49,11 +55,9 @@ public class RaftConnectionStateManager implements IRaftConnectionStateManager {
     public RaftConnectionStateManager(RaftRegistryProperties properties) {
         this.properties = properties;
         this.cliOptions = new CliOptions();
-        this.cliOptions.setMaxRetry(properties.getCliMaxRetries());
-        this.cliOptions.setTimeoutMs((int) properties.getCliTimeout().toMillis());
         this.cliClientService = new CliClientServiceImpl();
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
-                properties.getConnectionListenerThreadPoolSize(),
+                CONNECT_STATE_REFRESH_THREAD_POOL_SIZE,
                 new ThreadFactoryBuilder().setNameFormat("ConnectionStateRefreshThread").setDaemon(true).build());
     }
     @Override
@@ -61,10 +65,18 @@ public class RaftConnectionStateManager implements IRaftConnectionStateManager {
         cliClientService.init(cliOptions);
         scheduledExecutorService.scheduleWithFixedDelay(
                 new ConnectionStateRefreshTask(connectionListeners),
-                properties.getConnectStateCheckInterval().toMillis(),
-                properties.getConnectStateCheckInterval().toMillis(),
+                getRandomizedDelay(CONNECT_STATE_CHECK_INTERVAL.toMillis()),
+                getRandomizedDelay(CONNECT_STATE_CHECK_INTERVAL.toMillis()),
                 TimeUnit.MILLISECONDS);
     }
+
+    private long getRandomizedDelay(long baseDelay) {
+        // Add a random value in the range [0, RANDOM_DELAY_RANGE_MS]
+        Random random = new Random();
+        long randomOffset = random.nextInt(MAX_RANDOM_DELAY_MS + 1);
+        return baseDelay + randomOffset;
+    }
+
     @Override
     public void addConnectionListener(ConnectionListener listener) {
         connectionListeners.add(listener);
@@ -113,8 +125,7 @@ public class RaftConnectionStateManager implements IRaftConnectionStateManager {
             try {
                 String groupId = properties.getClusterName() + DEFAULT_REGION_ID;
                 if (RouteTable.getInstance()
-                        .refreshLeader(cliClientService, groupId, (int) properties.getRefreshLeaderTimeout().toMillis())
-                        .isOk()) {
+                        .refreshLeader(cliClientService, groupId, (int) REFRESH_LEADER_TIME_OUT.toMillis()).isOk()) {
                     return ConnectionState.CONNECTED;
                 } else {
                     return ConnectionState.DISCONNECTED;

@@ -60,13 +60,12 @@ public class RaftRegistryClient implements IRaftRegistryClient {
     private final IRaftSubscribeDataManager raftSubscribeDataManager;
     private final IRaftLockManager raftLockManager;
     private volatile boolean started;
-    private static final String MASTER_MODULE = "master";
     public RaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
         this.raftRegistryProperties = raftRegistryProperties;
         this.rheaKvStore = new DefaultRheaKVStore();
         this.raftConnectionStateManager = new RaftConnectionStateManager(raftRegistryProperties);
-        this.raftSubscribeDataManager = new RaftSubscribeDataManager(raftRegistryProperties, rheaKvStore);
-        this.raftLockManager = new RaftLockManager(rheaKvStore, raftRegistryProperties);
+        this.raftSubscribeDataManager = new RaftSubscribeDataManager(rheaKvStore);
+        this.raftLockManager = new RaftLockManager(rheaKvStore);
 
         initRheakv();
     }
@@ -80,9 +79,9 @@ public class RaftRegistryClient implements IRaftRegistryClient {
                 .withFake(true)
                 .withRegionRouteTableOptionsList(regionRouteTableOptionsList)
                 .config();
-        final RheaKVStoreOptions opts = RheaKVStoreOptionsConfigured.newConfigured() //
-                .withClusterName(raftRegistryProperties.getClusterName()) //
-                .withPlacementDriverOptions(pdOpts) //
+        final RheaKVStoreOptions opts = RheaKVStoreOptionsConfigured.newConfigured()
+                .withClusterName(raftRegistryProperties.getClusterName())
+                .withPlacementDriverOptions(pdOpts)
                 .config();
         this.rheaKvStore.init(opts);
     }
@@ -94,9 +93,7 @@ public class RaftRegistryClient implements IRaftRegistryClient {
             return;
         }
         log.info("starting raft client registry...");
-        if (raftRegistryProperties.getModule().equals(MASTER_MODULE)) {
-            raftSubscribeDataManager.start();
-        }
+        raftSubscribeDataManager.start();
         raftConnectionStateManager.start();
         this.started = true;
         log.info("raft client registry started successfully");

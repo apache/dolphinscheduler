@@ -22,7 +22,6 @@ import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.raft.model.NodeItem;
 import org.apache.dolphinscheduler.plugin.registry.raft.model.NodeType;
 import org.apache.dolphinscheduler.registry.api.Event;
@@ -31,11 +30,13 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,27 +51,33 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
 
     private final Map<String, List<SubscribeListener>> dataSubScribeMap = new ConcurrentHashMap<>();
-
-    private final RaftRegistryProperties properties;
-
     private final RheaKVStore kvStore;
-
     private final ScheduledExecutorService scheduledExecutorService;
+    private static final Duration LISTENER_CHECK_INTERVAL = Duration.ofSeconds(2);
+    private static final Duration HEART_BEAT_TIME_OUT = Duration.ofSeconds(20);
+    private static final int MAX_RANDOM_DELAY_MS = 500;
+    private static final int SUBSCRIBE_LISTENER_THREAD_POOL_SIZE = 1;
 
-    public RaftSubscribeDataManager(RaftRegistryProperties properties, RheaKVStore kvStore) {
-        this.properties = properties;
+    public RaftSubscribeDataManager(RheaKVStore kvStore) {
         this.kvStore = kvStore;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
-                properties.getSubscribeListenerThreadPoolSize(),
+                SUBSCRIBE_LISTENER_THREAD_POOL_SIZE,
                 new ThreadFactoryBuilder().setNameFormat("SubscribeListenerCheckThread").setDaemon(true).build());
     }
 
     @Override
     public void start() {
         scheduledExecutorService.scheduleWithFixedDelay(new SubscribeCheckTask(),
-                properties.getListenerCheckInterval().toMillis(),
-                properties.getListenerCheckInterval().toMillis(),
+                getRandomizedDelay(LISTENER_CHECK_INTERVAL.toMillis()),
+                getRandomizedDelay(LISTENER_CHECK_INTERVAL.toMillis()),
                 TimeUnit.MILLISECONDS);
+    }
+
+    private long getRandomizedDelay(long baseDelay) {
+        // Add a random value in the range [0, MAX_RANDOM_DELAY_MS]
+        Random random = new Random();
+        long randomOffset = random.nextInt(MAX_RANDOM_DELAY_MS + 1);
+        return baseDelay + randomOffset;
     }
 
     @Override
@@ -132,8 +139,7 @@ public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
                 }
                 BaseHeartBeat baseHeartBeat = JSONUtils.parseObject(heartBeat, BaseHeartBeat.class);
                 if (baseHeartBeat != null) {
-                    return System.currentTimeMillis() - baseHeartBeat.getReportTime() > properties.getHeartBeatTimeOut()
-                            .toMillis();
+                    return System.currentTimeMillis() - baseHeartBeat.getReportTime() > HEART_BEAT_TIME_OUT.toMillis();
                 }
             } catch (Exception ex) {
                 log.error("Fail to parse heartBeat : {}", heartBeat, ex);

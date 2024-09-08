@@ -38,7 +38,6 @@ public class RaftRegistryAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "master")
     public RaftRegistryServer raftRegistryServer(RaftRegistryProperties raftRegistryProperties) {
         RaftRegistryServer raftRegistryServer = new RaftRegistryServer(raftRegistryProperties);
         raftRegistryServer.start();
@@ -47,24 +46,7 @@ public class RaftRegistryAutoConfiguration {
 
     @Bean
     @DependsOn("raftRegistryServer")
-    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "master")
-    public RaftRegistry masterRaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
-        RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
-        raftRegistry.start();
-        return raftRegistry;
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "worker")
-    public RaftRegistry workerRaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
-        RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
-        raftRegistry.start();
-        return raftRegistry;
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "api")
-    public RaftRegistry apiRaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
+    public RaftRegistry raftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
         RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
         raftRegistry.start();
         return raftRegistry;

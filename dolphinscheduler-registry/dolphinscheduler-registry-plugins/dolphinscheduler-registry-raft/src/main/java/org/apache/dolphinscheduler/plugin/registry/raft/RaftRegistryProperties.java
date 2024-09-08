@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.raft;
 
-import java.time.Duration;
-
 import lombok.Data;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,16 +34,5 @@ public class RaftRegistryProperties {
     private String serverAddress;
     private int serverPort;
     private String logStorageDir;
-    private Duration distributedLockTimeout = Duration.ofSeconds(3);
-    private Duration distributedLockRetryInterval = Duration.ofSeconds(5);
-    private String module = "master";
-    private Duration listenerCheckInterval = Duration.ofSeconds(3);
-    private int cliMaxRetries = 3;
-    private Duration cliTimeout = Duration.ofSeconds(5);
-    private Duration refreshLeaderTimeout = Duration.ofSeconds(2);
-    private Duration connectStateCheckInterval = Duration.ofSeconds(2);
-    private Duration heartBeatTimeOut = Duration.ofSeconds(20);
-    private int subscribeListenerThreadPoolSize = 1;
-    private int connectionListenerThreadPoolSize = 1;
 
 }
