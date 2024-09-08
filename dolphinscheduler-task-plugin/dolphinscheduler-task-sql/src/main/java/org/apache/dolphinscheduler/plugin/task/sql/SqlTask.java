@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +60,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 @Slf4j
 public class SqlTask extends AbstractTask {
@@ -234,6 +236,10 @@ public class SqlTask extends AbstractTask {
             while (resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
+                    if (Objects.isNull(resultSet.getObject(i))) {
+                        mapOfColValues.set(md.getColumnLabel(i), new TextNode("null"));
+                        continue;
+                    }
                     mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
                 resultJSONArray.add(mapOfColValues);
