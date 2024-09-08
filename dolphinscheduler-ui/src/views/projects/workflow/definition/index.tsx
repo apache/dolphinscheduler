@@ -46,6 +46,7 @@ import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
 import Search from '@/components/input-search'
 import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
+import totalCount from '@/utils/tableTotalCount'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -279,6 +280,8 @@ export default defineComponent({
                 show-quick-jumper
                 onUpdatePage={this.requestData}
                 onUpdatePageSize={this.handleChangePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

@@ -57,6 +57,7 @@ export function useTable() {
     page: ref(1),
     pageSize: ref(10),
     totalPage: ref(1),
+    totalCount: ref(0),
     searchVal: ref(),
     executorName: ref(),
     host: ref(),
@@ -264,6 +265,7 @@ export function useTable() {
     }
     queryWorkflowInstanceListPaging({ ...params }, variables.projectCode).then(
       (res: any) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }

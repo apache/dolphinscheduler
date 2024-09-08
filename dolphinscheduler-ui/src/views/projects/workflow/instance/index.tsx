@@ -29,6 +29,7 @@ import { useTable } from './use-table'
 import Card from '@/components/card'
 import WorkflowInstanceCondition from './components/workflow-instance-condition'
 import type { IWorkflowInstanceSearch } from './types'
+import totalCount from '@/utils/tableTotalCount'
 
 export default defineComponent({
   name: 'WorkflowInstanceList',
@@ -121,6 +122,8 @@ export default defineComponent({
                 show-quick-jumper
                 onUpdatePage={this.requestData}
                 onUpdatePageSize={this.handleChangePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

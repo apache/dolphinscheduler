@@ -16,7 +16,7 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { h, reactive } from 'vue'
+import { h, reactive, ref } from 'vue'
 import {
   downloadLog,
   queryTaskListPaging,
@@ -53,6 +53,7 @@ export function useTable() {
     tableData: [] as any[],
     page: 1,
     pageSize: 10,
+    totalCount: ref(0),
     searchVal: null,
     workflowInstanceId: workflowInstanceId ? workflowInstanceId : null,
     host: null,
@@ -302,6 +303,7 @@ export function useTable() {
 
     queryTaskListPaging(data, { projectCode })
       .then((res: TaskInstancesRes) => {
+        variables.totalCount = res.total
         variables.tableData = [...res.totalList]
         variables.totalPage = res.totalPage
       })

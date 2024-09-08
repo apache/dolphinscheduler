@@ -56,6 +56,7 @@ export function useTable() {
     tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
+    totalCount: ref(0),
     searchVal: ref(taskName || null),
     taskCode: ref(taskCode || null),
     workflowInstanceId: ref(workflowInstanceId ? workflowInstanceId : null),
@@ -331,6 +332,7 @@ export function useTable() {
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
+          variables.totalCount = res.total
           variables.tableData = res.totalList as IRecord[]
           variables.totalPage = res.totalPage
           variables.loadingRef = false

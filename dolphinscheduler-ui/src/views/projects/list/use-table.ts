@@ -247,6 +247,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(''),
     totalPage: ref(1),
+    totalCount: ref(0),
     showModalRef: ref(false),
     showWorkerGroupModalRef: ref(false),
     statusRef: ref(0),
@@ -259,6 +260,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryProjectListPaging(params).then((res: ProjectRes) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(

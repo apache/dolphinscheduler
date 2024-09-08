@@ -42,6 +42,7 @@ import { streamStateType } from '@/common/common'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
+import totalCount from '@/utils/tableTotalCount'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
@@ -271,6 +272,8 @@ const BatchTaskInstance = defineComponent({
                 show-quick-jumper
                 onUpdatePage={getTableData}
                 onUpdatePageSize={onUpdatePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>
