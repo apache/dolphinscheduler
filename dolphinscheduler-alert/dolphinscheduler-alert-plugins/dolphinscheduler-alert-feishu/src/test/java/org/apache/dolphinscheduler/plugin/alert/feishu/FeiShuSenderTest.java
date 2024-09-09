@@ -89,9 +89,10 @@ public class FeiShuSenderTest {
         AlertResult alertResult = feiShuSender.checkSendFeiShuSendMsgResult("");
         Assertions.assertFalse(alertResult.isSuccess());
         AlertResult alertResult2 = feiShuSender.checkSendFeiShuSendMsgResult("123");
-        Assertions.assertEquals("send fei shu msg fail", alertResult2.getMessage());
+        Assertions.assertEquals("send feishu msg error: feishu server resp parse error is null.",
+                alertResult2.getMessage());
 
-        String response = "{\"StatusCode\":\"0\",\"extra\":\"extra\",\"StatusMessage\":\"StatusMessage\"}";
+        String response = "{\"code\":\"0\",\"data\":{},\"msg\":\"success\"}";
         AlertResult alertResult3 = feiShuSender.checkSendFeiShuSendMsgResult(response);
         Assertions.assertTrue(alertResult3.isSuccess());
     }
