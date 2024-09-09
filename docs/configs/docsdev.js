@@ -98,8 +98,8 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/shell.html',
                             },
                             {
-                                title: 'SubProcess',
-                                link: '/en-us/docs/dev/user_doc/guide/task/sub-process.html',
+                                title: 'SubWorkflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sub-workflow.html',
                             },
                             {
                                 title: 'Dynamic',
@@ -822,8 +822,8 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/shell.html',
                             },
                             {
-                                title: 'SubProcess',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/sub-process.html',
+                                title: 'SubWorkflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sub-workflow.html',
                             },
                             {
                                 title: 'Dynamic',
