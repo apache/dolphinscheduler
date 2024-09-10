@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -28,11 +27,6 @@ import lombok.Data;
 
 @Data
 public class JavaParameters extends AbstractParameters {
-
-    /**
-     * origin java script
-     */
-    private String rawScript;
 
     /**
      * run in jar file
@@ -67,11 +61,11 @@ public class JavaParameters extends AbstractParameters {
     /**
      * Check that the parameters are valid
      *
-     * @returnboolean
+     * @return boolean
      */
     @Override
     public boolean checkParameters() {
-        return runType != null && (StringUtils.isNotBlank(rawScript) || mainJar != null);
+        return StringUtils.isNotEmpty(runType);
     }
 
     /**

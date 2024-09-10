@@ -21,12 +21,12 @@ import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, ProgramType, IMainJar } from '../types'
 
-export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
+export function useJavaTaskNormalJar(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
-  const mainJarSpan = computed(() => (model.runType === 'FAT_JAR' ? 24 : 0))
+  const mainJarSpan = computed(() => (model.runType === 'NORMAL_JAR' ? 24 : 0))
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
@@ -41,6 +41,7 @@ export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
     mainJarOptions.value = res || []
     taskStore.updateMainJar(programType, res)
   }
+
 
   onMounted(() => {
     getMainJars(model.programType)
