@@ -43,9 +43,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * task group queue service
- */
 @Service
 @Slf4j
 public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGroupQueueService {
@@ -66,8 +63,13 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryTasksByGroupId(User loginUser, String taskName, String processName, Integer status,
-                                                   int groupId, int pageNo, int pageSize) {
+    public Map<String, Object> queryTasksByGroupId(User loginUser,
+                                                   String taskName,
+                                                   String workflowInstanceName,
+                                                   Integer status,
+                                                   int groupId,
+                                                   int pageNo,
+                                                   int pageSize) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -79,8 +81,13 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
             return result;
         }
         List<Project> projects = projectMapper.selectBatchIds(projectIds);
-        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(page,
-                taskName, processName, status, groupId, projects);
+        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(
+                page,
+                taskName,
+                workflowInstanceName,
+                status,
+                groupId,
+                projects);
 
         pageInfo.setTotal((int) taskGroupQueue.getTotal());
         pageInfo.setTotalList(taskGroupQueue.getRecords());
@@ -88,80 +95,11 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * query tasks in task group queue by project id
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param processId process id
-     * @return tasks list
-     */
-    @Override
-    public Map<String, Object> queryTasksByProcessId(User loginUser, int pageNo, int pageSize, int processId) {
-        return this.doQuery(loginUser, pageNo, pageSize, processId);
-    }
-
-    /**
-     * query all tasks in task group queue
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @return tasks list
-     */
-    @Override
-    public Map<String, Object> queryAllTasks(User loginUser, int pageNo, int pageSize) {
-        return this.doQuery(loginUser, pageNo, pageSize, 0);
-    }
-
-    public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize,
-                                       int groupId) {
-        Map<String, Object> result = new HashMap<>();
-
-        Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
-        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueuePaging(page, groupId);
-
-        PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) taskGroupQueue.getTotal());
-        pageInfo.setTotalList(taskGroupQueue.getRecords());
-
-        result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * delete by task id
-     *
-     * @param taskId task id
-     * @return TaskGroupQueue entity
-     */
-
-    @Override
-    public boolean deleteByTaskId(int taskId) {
-        return taskGroupQueueMapper.deleteByTaskId(taskId) == 1;
-    }
-
-    @Override
-    public void deleteByTaskInstanceIds(List<Integer> taskInstanceIds) {
-        if (CollectionUtils.isEmpty(taskInstanceIds)) {
-            return;
-        }
-        taskGroupQueueMapper.deleteByTaskInstanceIds(taskInstanceIds);
     }
 
     @Override
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
         taskGroupQueueMapper.deleteByWorkflowInstanceId(workflowInstanceId);
-    }
-
-    @Override
-    public void forceStartTask(int queueId, int forceStart) {
-        taskGroupQueueMapper.updateForceStart(queueId, forceStart);
     }
 
     @Override

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.dto.workflow;
 
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.util.Date;
 
@@ -63,41 +63,41 @@ public class WorkflowUpdateRequest {
     private String location;
 
     /**
-     * Merge workflowUpdateRequest information into exists processDefinition object
+     * Merge workflowUpdateRequest information into exists workflowDefinition object
      *
-     * @param processDefinition exists processDefinition object
-     * @return process definition
+     * @param workflowDefinition exists workflowDefinition object
+     * @return workflow definition
      */
-    public ProcessDefinition mergeIntoProcessDefinition(ProcessDefinition processDefinition) {
-        ProcessDefinition processDefinitionDeepCopy =
-                JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
-        assert processDefinitionDeepCopy != null;
+    public WorkflowDefinition mergeIntoWorkflowDefinition(WorkflowDefinition workflowDefinition) {
+        WorkflowDefinition workflowDefinitionDeepCopy =
+                JSONUtils.parseObject(JSONUtils.toJsonString(workflowDefinition), WorkflowDefinition.class);
+        assert workflowDefinitionDeepCopy != null;
         if (this.name != null) {
-            processDefinitionDeepCopy.setName(this.name);
+            workflowDefinitionDeepCopy.setName(this.name);
         }
         if (this.description != null) {
-            processDefinitionDeepCopy.setDescription(this.description);
+            workflowDefinitionDeepCopy.setDescription(this.description);
         }
         if (this.releaseState != null) {
-            processDefinitionDeepCopy.setReleaseState(ReleaseState.valueOf(this.releaseState));
+            workflowDefinitionDeepCopy.setReleaseState(ReleaseState.valueOf(this.releaseState));
         }
         if (this.globalParams != null) {
-            processDefinitionDeepCopy.setGlobalParams(this.globalParams);
+            workflowDefinitionDeepCopy.setGlobalParams(this.globalParams);
         }
         if (this.warningGroupId != 0) {
-            processDefinitionDeepCopy.setWarningGroupId(this.warningGroupId);
+            workflowDefinitionDeepCopy.setWarningGroupId(this.warningGroupId);
         }
         if (this.timeout != 0) {
-            processDefinitionDeepCopy.setTimeout(this.timeout);
+            workflowDefinitionDeepCopy.setTimeout(this.timeout);
         }
         if (this.executionType != null) {
-            processDefinitionDeepCopy.setExecutionType(ProcessExecutionTypeEnum.valueOf(this.executionType));
+            workflowDefinitionDeepCopy.setExecutionType(WorkflowExecutionTypeEnum.valueOf(this.executionType));
         }
         if (this.location != null) {
-            processDefinitionDeepCopy.setLocations(this.location);
+            workflowDefinitionDeepCopy.setLocations(this.location);
         }
 
-        processDefinitionDeepCopy.setUpdateTime(new Date());
-        return processDefinitionDeepCopy;
+        workflowDefinitionDeepCopy.setUpdateTime(new Date());
+        return workflowDefinitionDeepCopy;
     }
 }

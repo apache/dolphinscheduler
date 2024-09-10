@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
@@ -53,10 +53,10 @@ import com.google.common.collect.Lists;
 public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitionMapper> implements TaskDefinitionDao {
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Autowired
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
@@ -66,15 +66,16 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
     }
 
     @Override
-    public List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
-        if (processDefinition == null) {
-            log.error("Cannot find process definition, code: {}", processDefinitionCode);
+    public List<TaskDefinition> getTaskDefinitionListByDefinition(long workflowDefinitionCode) {
+        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        if (workflowDefinition == null) {
+            log.error("Cannot find process definition, code: {}", workflowDefinitionCode);
             return Lists.newArrayList();
         }
 
-        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                processDefinition.getCode(), processDefinition.getVersion());
+        List<WorkflowTaskRelationLog> processTaskRelations =
+                workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(
+                        workflowDefinition.getCode(), workflowDefinition.getVersion());
         Set<TaskDefinition> taskDefinitionSet = processTaskRelations
                 .stream()
                 .filter(p -> p.getPostTaskCode() > 0)

@@ -16,7 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import { ProjectCodeReq, WorkflowCodeReq } from './types'
+import { DependentTaskReq, ProjectCodeReq, WorkflowCodeReq } from './types'
 
 export function queryWorkFlowList(projectCode: ProjectCodeReq): any {
   return axios({
@@ -39,5 +39,16 @@ export function queryLineageByWorkFlowCode(
   return axios({
     url: `/projects/${projectCode.projectCode}/lineages/${workFlowCode.workFlowCode}`,
     method: 'get'
+  })
+}
+
+export function queryDependentTasks(
+  projectCode: number,
+  params: DependentTaskReq
+): any {
+  return axios({
+    url: `/projects/${projectCode}/lineages/query-dependent-tasks`,
+    method: 'get',
+    params
   })
 }

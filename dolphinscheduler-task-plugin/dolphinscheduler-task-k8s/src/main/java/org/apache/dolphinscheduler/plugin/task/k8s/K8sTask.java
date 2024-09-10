@@ -43,26 +43,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
+@Slf4j
 public class K8sTask extends AbstractK8sTask {
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * task parameters
-     */
     private K8sTaskParameters k8sTaskParameters;
 
     private K8sTaskExecutionContext k8sTaskExecutionContext;
 
     private K8sConnectionParam k8sConnectionParam;
-    /**
-     * @param taskRequest taskRequest
-     */
     public K8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
@@ -77,14 +70,16 @@ public class K8sTask extends AbstractK8sTask {
         }
 
         k8sTaskExecutionContext =
-                k8sTaskParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
-        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
+                k8sTaskParameters.generateK8sTaskExecutionContext(taskExecutionContext.getResourceParametersHelper(),
+                        k8sTaskParameters.getDatasource());
         k8sConnectionParam =
                 (K8sConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(k8sTaskParameters.getType()),
                         k8sTaskExecutionContext.getConnectionParams());
         String kubeConfig = k8sConnectionParam.getKubeConfig();
         k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());
         k8sTaskParameters.setKubeConfig(kubeConfig);
+        k8sTaskExecutionContext.setConfigYaml(kubeConfig);
+        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
         log.info("Initialize k8s task params:{}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
     }
 
@@ -119,8 +114,8 @@ public class K8sTask extends AbstractK8sTask {
     }
 
     @Override
-    protected void dealOutParam(String result) {
-        this.k8sTaskParameters.dealOutParam(result);
+    protected void dealOutParam(Map<String, String> taskOutputParams) {
+        this.k8sTaskParameters.dealOutParam(taskOutputParams);
     }
 
     public List<NodeSelectorRequirement> convertToNodeSelectorRequirements(List<NodeSelectorExpression> expressions) {

@@ -17,22 +17,20 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -41,23 +39,25 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
 
     private final Optional<Host> masterTaskExecuteHost;
 
-    public MasterTaskDispatcher(TaskEventService taskEventService,
-                                MasterConfig masterConfig) {
-        super(taskEventService, masterConfig);
-        masterTaskExecuteHost = Optional.of(Host.of(masterConfig.getMasterAddress()));
+    @Autowired
+    private ILogicTaskInstanceOperator logicTaskInstanceOperator;
+
+    public MasterTaskDispatcher(MasterConfig masterConfig) {
+        this.masterTaskExecuteHost = Optional.of(Host.of(masterConfig.getMasterAddress()));
     }
 
     @Override
-    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+    protected void doDispatch(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException {
+        final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
         try {
-            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                    .getProxyClient(taskExecutionContext.getHost(), ILogicTaskInstanceOperator.class);
-            LogicTaskDispatchResponse logicTaskDispatchResponse = taskInstanceOperator
-                    .dispatchLogicTask(new LogicTaskDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
+            final LogicTaskDispatchRequest logicTaskDispatchRequest =
+                    new LogicTaskDispatchRequest(taskExecutionContext);
+            final LogicTaskDispatchResponse logicTaskDispatchResponse = logicTaskInstanceOperator.dispatchLogicTask(
+                    logicTaskDispatchRequest);
             if (!logicTaskDispatchResponse.isDispatchSuccess()) {
-                throw new TaskDispatchException(String.format("Dispatch LogicTask to %s failed, response is: %s",
-                        taskExecutionContext.getHost(), logicTaskDispatchResponse));
+                throw new TaskDispatchException(
+                        String.format("Dispatch LogicTask to %s failed, response is: %s",
+                                taskExecutionContext.getHost(), logicTaskDispatchResponse));
             }
         } catch (TaskDispatchException e) {
             throw e;
@@ -68,7 +68,7 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) {
+    protected Optional<Host> getTaskInstanceDispatchHost(ITaskExecutionRunnable taskExecutionContext) {
         return masterTaskExecuteHost;
     }
 }

@@ -33,7 +33,6 @@ public class SqlParametersTest {
 
     private final String type = "MYSQL";
     private final String sql = "select * from t_ds_user";
-    private final String udfs = "test-udfs-1.0.0-SNAPSHOT.jar";
     private final int datasource = 1;
     private final int sqlType = 0;
     private final Boolean sendEmail = true;
@@ -57,7 +56,6 @@ public class SqlParametersTest {
 
         sqlParameters.setType(type);
         sqlParameters.setSql(sql);
-        sqlParameters.setUdfs(udfs);
         sqlParameters.setDatasource(datasource);
         sqlParameters.setSqlType(sqlType);
         sqlParameters.setSendEmail(sendEmail);
@@ -68,7 +66,6 @@ public class SqlParametersTest {
 
         Assertions.assertEquals(type, sqlParameters.getType());
         Assertions.assertEquals(sql, sqlParameters.getSql());
-        Assertions.assertEquals(udfs, sqlParameters.getUdfs());
         Assertions.assertEquals(datasource, sqlParameters.getDatasource());
         Assertions.assertEquals(sqlType, sqlParameters.getSqlType());
         Assertions.assertEquals(sendEmail, sqlParameters.getSendEmail());

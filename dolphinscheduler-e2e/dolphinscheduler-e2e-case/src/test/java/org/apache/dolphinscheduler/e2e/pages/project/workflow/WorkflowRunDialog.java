@@ -19,22 +19,26 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 
 import lombok.Getter;
 
-import java.time.Duration;
-
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class WorkflowRunDialog {
+
     private final WorkflowDefinitionTab parent;
 
-    @FindBy(className = "btn-submit")
+    @FindBys({
+            @FindBy(xpath = "//div[contains(text(), 'Please set the parameters before starting')]/../.."),
+            @FindBy(className = "btn-submit")
+    })
     private WebElement buttonSubmit;
 
     public WorkflowRunDialog(WorkflowDefinitionTab parent) {
@@ -44,10 +48,16 @@ public final class WorkflowRunDialog {
     }
 
     public WorkflowDefinitionTab submit() {
-        new WebDriverWait(parent().driver(), Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
+        By runDialogTitleXpath =
+                By.xpath(String.format("//*[contains(text(), '%s')]", "Please set the parameters before starting"));
+        WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(runDialogTitleXpath));
+        WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
 
         buttonSubmit().click();
-
+        WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .until(ExpectedConditions.invisibilityOfElementLocated(runDialogTitleXpath));
         return parent();
     }
 }

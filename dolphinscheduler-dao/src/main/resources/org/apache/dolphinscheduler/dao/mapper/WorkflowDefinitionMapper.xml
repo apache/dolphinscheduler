@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper">
+    <sql id="baseSql">
+        id, code, name, version, release_state, project_code, user_id, description,
+        global_params, flag, locations, warning_group_id, create_time, timeout, update_time,execution_type
+    </sql>
+
+    <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
+        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,pd.execution_type
+        from t_ds_workflow_definition pd
+        WHERE pd.project_code = #{projectCode}
+        and pd.name = #{workflowDefinitionName}
+    </select>
+
+    <delete id="deleteByCode">
+        delete from t_ds_workflow_definition
+        where code = #{code}
+    </delete>
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_definition
+        where code = #{code}
+    </select>
+    <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_definition
+        where 1 = 1
+        <if test="codes != null and codes.size() != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, p.id as project_id, pd.user_id, pd.description,
+        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,
+        u.user_name,p.name as project_name,pd.execution_type
+        from t_ds_workflow_definition pd
+        JOIN t_ds_user u ON pd.user_id = u.id
+        JOIN  t_ds_project p ON pd.project_code = p.code
+        WHERE p.code = #{projectCode}
+        and pd.name = #{workflowDefinitionName}
+    </select>
+    <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_workflow_definition
+        where project_code = #{projectCode}
+        AND project_code = #{projectCode}
+        <if test=" userId != 0">
+            AND user_id = #{userId}
+        </if>
+        <if test=" searchVal != null and searchVal != ''">
+            AND (
+                name like concat('%', #{searchVal}, '%') OR description like concat('%', #{searchVal}, '%')
+                )
+        </if>
+        order by update_time desc, id asc
+    </select>
+    <select id="filterWorkflowDefinition"
+            parameterType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
+            resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
+    >
+        SELECT
+        <include refid="baseSql"/>
+        FROM t_ds_workflow_definition
+        <where>
+            <if test=" pd.projectCode != 0">
+                and project_code = #{pd.projectCode}
+            </if>
+            <if test="pd.name != null and pd.name != ''">
+                and name like concat('%', #{pd.name}, '%')
+            </if>
+            <if test="pd.releaseState != null and pd.releaseState != ''">
+                and release_state = #{pd.releaseState}
+            </if>
+        </where>
+        order by update_time desc, id asc
+    </select>
+
+    <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_definition
+        where project_code = #{projectCode}
+        order by create_time desc
+    </select>
+    <select id="queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes" resultType="org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition">
+        select
+            code, name, version
+        from t_ds_workflow_definition
+        where 1=1
+        AND project_code = #{projectCode}
+        <if test="codes != null and codes.size() != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_definition
+        where id in
+        <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </select>
+
+    <select id="countDefinitionByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
+        SELECT user_id as user_id, tu.user_name as user_name, count(0) as count
+        FROM t_ds_workflow_definition td
+        JOIN t_ds_user tu on tu.id=td.user_id
+        where 1 = 1
+        <if test="projectCodes != null and projectCodes.size() != 0">
+            and td.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        group by td.user_id,tu.user_name
+    </select>
+
+    <select id="countDefinitionByProjectCodesV2" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
+        SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
+        FROM t_ds_workflow_definition td
+        JOIN t_ds_user tu on tu.id=td.user_id
+        where 1 = 1
+        <if test="projectCodes != null and projectCodes.size() != 0">
+            and td.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="userId != null">
+            and td.user_id = #{userId}
+        </if>
+        <if test="releaseState != null">
+            and td.release_state = #{releaseState}
+        </if>
+        group by td.user_id,tu.user_name
+    </select>
+
+    <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition">
+        SELECT
+            pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
+            pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout,
+            pd.update_time, u.user_name,p.name AS project_name ,pd.execution_type
+        FROM
+            t_ds_workflow_definition pd,
+            t_ds_user u,
+            t_ds_project p
+        WHERE
+            pd.user_id = u.id AND pd.project_code = p.code
+        AND pd.id = #{workflowDefinitionId}
+    </select>
+
+    <select id="listProjectIds" resultType="java.lang.Integer">
+        SELECT DISTINCT(id) as project_id
+        FROM t_ds_project
+    </select>
+
+    <select id="queryDefinitionCodeListByProjectCodes" resultType="java.lang.Long">
+        select
+        code
+        from t_ds_workflow_definition
+        where project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+    </select>
+
+    <select id="queryProjectWorkflowDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount">
+        select
+            project_code as projectCode
+            ,count(*) as count
+        from t_ds_workflow_definition
+        where project_code in
+        <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+        group by project_code
+    </select>
+</mapper>

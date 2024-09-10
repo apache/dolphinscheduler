@@ -39,7 +39,7 @@ public class HttpAlertChannelFactoryTest {
     public void getParamsTest() {
 
         List<PluginParams> pluginParamsList = httpAlertChannelFactory.params();
-        Assertions.assertEquals(5, pluginParamsList.size());
+        Assertions.assertEquals(6, pluginParamsList.size());
     }
 
     @Test

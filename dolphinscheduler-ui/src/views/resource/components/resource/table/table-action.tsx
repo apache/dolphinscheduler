@@ -67,10 +67,18 @@ export default defineComponent({
       return !(flag && size < 1000000)
     }
 
-    const handleEditFile = (item: { fullName: string; user_name: string }) => {
+    const handleEditFile = (item: {
+      fullName: string
+      user_name: string
+      alias: string
+    }) => {
       router.push({
         name: 'resource-file-edit',
-        query: { prefix: item.fullName, tenantCode: item.user_name }
+        query: {
+          prefix: item.fullName,
+          tenantCode: item.user_name,
+          alias: item.alias
+        }
       })
     }
 
@@ -113,7 +121,7 @@ export default defineComponent({
     const { t } = useI18n()
     return (
       <NSpace>
-        {this.row.type !== 'UDF' && (
+        {
           <NTooltip trigger={'hover'}>
             {{
               default: () => t('resource.file.edit'),
@@ -126,7 +134,8 @@ export default defineComponent({
                   onClick={() => {
                     this.handleEditFile({
                       fullName: this.row.fullName,
-                      user_name: this.row.user_name
+                      user_name: this.row.user_name,
+                      alias: this.row.alias
                     })
                   }}
                   style={{ marginRight: '-5px' }}
@@ -140,7 +149,7 @@ export default defineComponent({
               )
             }}
           </NTooltip>
-        )}
+        }
         <NTooltip trigger={'hover'}>
           {{
             default: () => t('resource.file.reupload'),

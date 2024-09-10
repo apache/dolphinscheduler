@@ -23,6 +23,15 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import java.io.Serializable;
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Property implements Serializable {
 
     private static final long serialVersionUID = -4045513703397452451L;
@@ -45,72 +54,6 @@ public class Property implements Serializable {
      * value
      */
     private String value;
-
-    public Property() {
-    }
-
-    public Property(String prop, Direct direct, DataType type, String value) {
-        this.prop = prop;
-        this.direct = direct;
-        this.type = type;
-        this.value = value;
-    }
-
-    /**
-     * getter method
-     *
-     * @return the prop
-     * @see Property#prop
-     */
-    public String getProp() {
-        return prop;
-    }
-
-    /**
-     * setter method
-     *
-     * @param prop the prop to set
-     * @see Property#prop
-     */
-    public void setProp(String prop) {
-        this.prop = prop;
-    }
-
-    /**
-     * getter method
-     *
-     * @return the value
-     * @see Property#value
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * setter method
-     *
-     * @param value the value to set
-     * @see Property#value
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Direct getDirect() {
-        return direct;
-    }
-
-    public void setDirect(Direct direct) {
-        this.direct = direct;
-    }
-
-    public DataType getType() {
-        return type;
-    }
-
-    public void setType(DataType type) {
-        this.type = type;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -30,12 +30,14 @@ import java.time.Duration;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is the base class for all loop task type.
  * <p>
  * The loop task type means, we will submit a task, and loop the task status until the task is finished.
  */
+@Slf4j
 public abstract class BaseLoopTaskExecutor extends AbstractRemoteTask {
 
     /**

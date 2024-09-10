@@ -19,57 +19,24 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.List;
 
-/**
- * DagData
- */
+import lombok.Data;
+
+@Data
 public class DagData {
 
-    /**
-     * processDefinition
-     */
-    private ProcessDefinition processDefinition;
+    private WorkflowDefinition workflowDefinition;
 
-    /**
-     * processTaskRelationList
-     */
-    private List<ProcessTaskRelation> processTaskRelationList;
+    private List<WorkflowTaskRelation> workflowTaskRelationList;
 
-    /**
-     * processTaskRelationList
-     */
     private List<TaskDefinition> taskDefinitionList;
 
-    public DagData(ProcessDefinition processDefinition, List<ProcessTaskRelation> processTaskRelationList,
+    public DagData(WorkflowDefinition workflowDefinition, List<WorkflowTaskRelation> workflowTaskRelationList,
                    List<TaskDefinition> taskDefinitionList) {
-        this.processDefinition = processDefinition;
-        this.processTaskRelationList = processTaskRelationList;
+        this.workflowDefinition = workflowDefinition;
+        this.workflowTaskRelationList = workflowTaskRelationList;
         this.taskDefinitionList = taskDefinitionList;
     }
 
     public DagData() {
-    }
-
-    public ProcessDefinition getProcessDefinition() {
-        return processDefinition;
-    }
-
-    public void setProcessDefinition(ProcessDefinition processDefinition) {
-        this.processDefinition = processDefinition;
-    }
-
-    public List<ProcessTaskRelation> getProcessTaskRelationList() {
-        return processTaskRelationList;
-    }
-
-    public void setProcessTaskRelationList(List<ProcessTaskRelation> processTaskRelationList) {
-        this.processTaskRelationList = processTaskRelationList;
-    }
-
-    public List<TaskDefinition> getTaskDefinitionList() {
-        return taskDefinitionList;
-    }
-
-    public void setTaskDefinitionList(List<TaskDefinition> taskDefinitionList) {
-        this.taskDefinitionList = taskDefinitionList;
     }
 }

@@ -28,7 +28,7 @@ public class DamengDataSourceChannelFactory implements DataSourceChannelFactory 
 
     @Override
     public String getName() {
-        return DbType.DAMENG.getDescp();
+        return DbType.DAMENG.getName();
     }
 
     @Override

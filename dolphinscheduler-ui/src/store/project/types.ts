@@ -22,7 +22,7 @@ type TaskExecuteType = 'STREAM' | 'BATCH'
 
 type TaskType =
   | 'SHELL'
-  | 'SUB_PROCESS'
+  | 'SUB_WORKFLOW'
   | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'
@@ -33,7 +33,6 @@ type TaskType =
   | 'DEPENDENT'
   | 'HTTP'
   | 'DATAX'
-  | 'PIGEON'
   | 'SQOOP'
   | 'CONDITIONS'
   | 'DATA_QUALITY'
@@ -59,6 +58,7 @@ type TaskType =
   | 'LINKIS'
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
+  | 'ALIYUN_SERVERLESS_SPARK'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

@@ -17,34 +17,37 @@
 
 package org.apache.dolphinscheduler.spi.enums;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * resource type
  */
+@Getter
 public enum ResourceType {
 
     /**
-     * 0 file, 1 udf
+     * 0 file
      */
     FILE(0, "file"),
-    UDF(1, "udf"),
     ALL(2, "all");
 
-    ResourceType(int code, String descp) {
+    ResourceType(int code, String desc) {
         this.code = code;
-        this.descp = descp;
+        this.desc = desc;
     }
 
     @EnumValue
     private final int code;
-    private final String descp;
+    private final String desc;
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+    public static ResourceType getResourceType(int code) {
+        for (ResourceType resourceType : ResourceType.values()) {
+            if (resourceType.getCode() == code) {
+                return resourceType;
+            }
+        }
+        return null;
     }
 }

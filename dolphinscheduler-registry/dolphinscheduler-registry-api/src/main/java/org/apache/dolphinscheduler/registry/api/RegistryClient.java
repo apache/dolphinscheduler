@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -39,9 +41,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -61,11 +62,20 @@ public class RegistryClient {
 
     public RegistryClient(Registry registry) {
         this.registry = registry;
+        if (!registry.exists(RegistryNodeType.MASTER.getRegistryPath())) {
+            registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.WORKER.getRegistryPath())) {
+            registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.ALERT_SERVER.getRegistryPath())) {
+            registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        }
     }
 
-    @PostConstruct
-    public void afterConstruct() {
-        initNodes();
+    public boolean isConnected() {
+        return registry.isConnected();
+
     }
 
     public void connectUntilTimeout(@NonNull Duration duration) throws RegistryException {
@@ -120,6 +130,15 @@ public class RegistryClient {
             serverList.add(server);
         }
         return serverList;
+    }
+
+    public Optional<Server> getRandomServer(final RegistryNodeType registryNodeType) {
+        final List<Server> serverList = getServerList(registryNodeType);
+        if (CollectionUtils.isEmpty(serverList)) {
+            return Optional.empty();
+        }
+        final Server server = serverList.get(RandomUtils.nextInt(0, serverList.size()));
+        return Optional.ofNullable(server);
     }
 
     /**
@@ -229,14 +248,7 @@ public class RegistryClient {
         }
     }
 
-    private void initNodes() {
-        registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
-    }
-
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {
         return getChildrenKeys(nodeType.getRegistryPath());
     }
-
 }

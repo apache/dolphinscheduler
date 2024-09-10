@@ -23,13 +23,13 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRe
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,10 +45,17 @@ public class TaskInstanceKillOperationFunction
             ITaskInstanceOperationFunction<TaskInstanceKillRequest, TaskInstanceKillResponse> {
 
     @Autowired
-    private WorkerManagerThread workerManager;
+    private WorkerTaskExecutorThreadPool workerManager;
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
+
+    public TaskInstanceKillOperationFunction(
+                                             WorkerTaskExecutorThreadPool workerManager,
+                                             MessageRetryRunner messageRetryRunner) {
+        this.workerManager = workerManager;
+        this.messageRetryRunner = messageRetryRunner;
+    }
 
     @Override
     public TaskInstanceKillResponse operate(TaskInstanceKillRequest taskInstanceKillRequest) {
@@ -57,31 +64,33 @@ public class TaskInstanceKillOperationFunction
         int taskInstanceId = taskInstanceKillRequest.getTaskInstanceId();
         try {
             LogUtils.setTaskInstanceIdMDC(taskInstanceId);
-            TaskExecutionContext taskExecutionContext =
-                    TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-            if (taskExecutionContext == null) {
-                log.error("Cannot find TaskExecutionContext for taskInstance: {}", taskInstanceId);
-                return TaskInstanceKillResponse.fail("Cannot find TaskExecutionContext");
+            WorkerTaskExecutor workerTaskExecutor = WorkerTaskExecutorHolder.get(taskInstanceId);
+            if (workerTaskExecutor == null) {
+                log.error("Cannot find WorkerTaskExecutor for taskInstance: {}", taskInstanceId);
+                return TaskInstanceKillResponse.fail("Cannot find WorkerTaskExecutor");
             }
+            TaskExecutionContext taskExecutionContext = workerTaskExecutor.getTaskExecutionContext();
+
             LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
             boolean result = doKill(taskExecutionContext);
-            this.cancelApplication(taskInstanceId);
+            this.cancelApplication(workerTaskExecutor);
 
             int processId = taskExecutionContext.getProcessId();
             if (processId == 0) {
                 workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+                // todo: the task might be executed, but the processId is 0
+                WorkerTaskExecutorHolder.remove(taskInstanceId);
                 log.info("The task has not been executed and has been cancelled, task id:{}", taskInstanceId);
                 return TaskInstanceKillResponse.success(taskExecutionContext);
             }
 
             taskExecutionContext
-                    .setCurrentExecutionStatus(result ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
+                    .setCurrentExecutionStatus(result ? TaskExecutionStatus.KILL : TaskExecutionStatus.FAILURE);
 
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
+            WorkerTaskExecutorHolder.remove(taskInstanceId);
+            messageRetryRunner.removeRetryMessages(taskInstanceId);
             return TaskInstanceKillResponse.success(taskExecutionContext);
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
@@ -102,15 +111,11 @@ public class TaskInstanceKillOperationFunction
         return processFlag;
     }
 
-    protected void cancelApplication(int taskInstanceId) {
-        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
-        if (workerTaskExecuteRunnable == null) {
-            log.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
-            return;
-        }
-        AbstractTask task = workerTaskExecuteRunnable.getTask();
+    protected void cancelApplication(WorkerTaskExecutor workerTaskExecutor) {
+        AbstractTask task = workerTaskExecutor.getTask();
         if (task == null) {
-            log.warn("task not found, taskInstanceId:{}", taskInstanceId);
+            log.warn("task not found, taskInstanceId: {}",
+                    workerTaskExecutor.getTaskExecutionContext().getTaskInstanceId());
             return;
         }
         try {
@@ -118,7 +123,8 @@ public class TaskInstanceKillOperationFunction
         } catch (Exception e) {
             log.error("kill task error", e);
         }
-        log.info("kill task by cancelApplication, task id:{}", taskInstanceId);
+        log.info("kill task by cancelApplication, taskInstanceId: {}",
+                workerTaskExecutor.getTaskExecutionContext().getTaskInstanceId());
     }
 
     protected boolean killProcess(String tenantCode, Integer processId) {

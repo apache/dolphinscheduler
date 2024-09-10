@@ -4,7 +4,7 @@ A tools for convenient release DolphinScheduler.
 
 ## Prepare
 
-* python: python 3.6 or above
+* python: python 3.6 or higher
 * pip: latest version of pip is better
 
 To install dependence, you should run command

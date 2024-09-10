@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
-import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 
 /**
  * Used to do task dispatcher.
  */
 public interface TaskDispatcher {
 
-    void dispatchTask(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException, WorkerGroupNotFoundException;
+    void dispatchTask(ITaskExecutionRunnable ITaskExecutionRunnable) throws TaskDispatchException;
 
 }

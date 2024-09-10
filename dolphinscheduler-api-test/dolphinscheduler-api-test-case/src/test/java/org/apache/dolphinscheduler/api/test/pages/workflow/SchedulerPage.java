@@ -30,18 +30,17 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @AllArgsConstructor
 public class SchedulerPage {
 
     private String sessionId;
 
-    public HttpResponse createSchedule(User loginUser, long projectCode, long processDefinitionCode, String schedule) {
+    public HttpResponse createSchedule(User loginUser, long projectCode, long workflowDefinitionCode, String schedule) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("projectCode", projectCode);
-        params.put("processDefinitionCode", processDefinitionCode);
+        params.put("workflowDefinitionCode", workflowDefinitionCode);
         params.put("schedule", schedule);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
@@ -62,7 +61,6 @@ public class SchedulerPage {
         String url = String.format("/projects/%s/schedules/list", projectCode);
         return requestClient.post(url, headers, params);
     }
-
 
     public HttpResponse publishScheduleOnline(User loginUser, long projectCode, int scheduleId) {
         Map<String, Object> params = new HashMap<>();

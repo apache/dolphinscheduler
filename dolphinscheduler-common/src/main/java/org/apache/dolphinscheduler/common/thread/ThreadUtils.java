@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -31,24 +31,35 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class ThreadUtils {
 
-    /**
-     * Wrapper over newDaemonFixedThreadExecutor.
-     *
-     * @param threadName threadName
-     * @param threadsNum threadsNum
-     * @return ExecutorService
-     */
-    public static ExecutorService newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat(threadName).build();
-        return Executors.newFixedThreadPool(threadsNum, threadFactory);
+    public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadNameFormat, int threadsNum) {
+        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, newDaemonThreadFactory(threadNameFormat));
     }
 
-    public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadName) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat(threadName)
+    public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadNameFormat) {
+        return Executors.newSingleThreadScheduledExecutor(newDaemonThreadFactory(threadNameFormat));
+    }
+
+    /**
+     * Create a daemon scheduler thread pool, the thread name will be formatted with the given name.
+     *
+     * @param threadNameFormat the thread name format, e.g. "DemonThread-%d"
+     * @param threadsNum the number of threads in the pool
+     */
+    public static ScheduledExecutorService newDaemonScheduledExecutorService(String threadNameFormat, int threadsNum) {
+        return Executors.newScheduledThreadPool(threadsNum, newDaemonThreadFactory(threadNameFormat));
+    }
+
+    /**
+     * Create a daemon thread factory, the thread name will be formatted with the given name.
+     *
+     * @param threadNameFormat the thread name format, e.g. "DS-DemonThread-%d"
+     */
+    public static ThreadFactory newDaemonThreadFactory(String threadNameFormat) {
+        return new ThreadFactoryBuilder()
                 .setDaemon(true)
+                .setNameFormat(threadNameFormat)
+                .setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance())
                 .build();
-        return Executors.newSingleThreadScheduledExecutor(threadFactory);
     }
 
     /**

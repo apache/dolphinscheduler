@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,10 +58,10 @@ public class UserMapperTest extends BaseDaoTest {
     private QueueMapper queueMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     /**
      * insert one user
@@ -334,20 +334,20 @@ public class UserMapperTest extends BaseDaoTest {
     public void testQueryUserWithProcessDefinitionCode() {
         User user = insertOne();
         insertProcessDefinition(user.getId());
-        ProcessDefinitionLog log = insertProcessDefinitionLog(user.getId());
+        WorkflowDefinitionLog log = insertProcessDefinitionLog(user.getId());
         long processDefinitionCode = log.getCode();
-        List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithWorkflowDefinitionCode(
                 null);
-        UserWithProcessDefinitionCode userWithCode = userWithCodes.stream()
-                .filter(code -> code.getProcessDefinitionCode() == processDefinitionCode)
+        UserWithWorkflowDefinitionCode userWithCode = userWithCodes.stream()
+                .filter(code -> code.getWorkflowDefinitionCode() == processDefinitionCode)
                 .findAny().orElse(null);
         assert userWithCode != null;
         Assertions.assertEquals(userWithCode.getCreatorId(), user.getId());
     }
 
-    private ProcessDefinitionLog insertProcessDefinitionLog(int operator) {
+    private WorkflowDefinitionLog insertProcessDefinitionLog(int operator) {
         // insertOne
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setCode(199L);
         processDefinitionLog.setName("def 1");
         processDefinitionLog.setProjectCode(1L);
@@ -356,22 +356,22 @@ public class UserMapperTest extends BaseDaoTest {
         processDefinitionLog.setUpdateTime(new Date());
         processDefinitionLog.setCreateTime(new Date());
         processDefinitionLog.setOperator(operator);
-        processDefinitionLogMapper.insert(processDefinitionLog);
+        workflowDefinitionLogMapper.insert(processDefinitionLog);
         return processDefinitionLog;
     }
 
-    private ProcessDefinition insertProcessDefinition(int operator) {
+    private WorkflowDefinition insertProcessDefinition(int operator) {
         // insertOne
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(199L);
-        processDefinition.setName("process-name");
-        processDefinition.setProjectCode(1010L);
-        processDefinition.setVersion(10);
-        processDefinition.setUserId(operator);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
-        return processDefinition;
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(199L);
+        workflowDefinition.setName("process-name");
+        workflowDefinition.setProjectCode(1010L);
+        workflowDefinition.setVersion(10);
+        workflowDefinition.setUserId(operator);
+        workflowDefinition.setUpdateTime(new Date());
+        workflowDefinition.setCreateTime(new Date());
+        workflowDefinitionMapper.insert(workflowDefinition);
+        return workflowDefinition;
     }
 
 }

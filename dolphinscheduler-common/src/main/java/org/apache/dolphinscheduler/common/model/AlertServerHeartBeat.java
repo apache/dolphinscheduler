@@ -17,24 +17,16 @@
 
 package org.apache.dolphinscheduler.common.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class AlertServerHeartBeat implements HeartBeat {
+public class AlertServerHeartBeat extends BaseHeartBeat implements HeartBeat {
 
-    private int processId;
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double memoryUsage;
-    private double availablePhysicalMemorySize;
+    /**
+     * If the alert server is active or standby
+     */
+    private boolean isActive;
 
-    private String host;
-    private int port;
 }

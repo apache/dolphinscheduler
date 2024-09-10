@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.extract.base.server;
 
-public interface ServerMethodInvoker {
+interface ServerMethodInvoker {
 
     String getMethodIdentify();
+
+    String getMethodProviderIdentify();
 
     Object invoke(final Object... arg) throws Throwable;
 

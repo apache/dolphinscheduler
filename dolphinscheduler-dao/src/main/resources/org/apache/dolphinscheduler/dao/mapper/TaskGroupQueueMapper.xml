@@ -23,7 +23,7 @@
         <result property="taskId" column="task_id" jdbcType="INTEGER"/>
         <result property="taskName" column="task_name" jdbcType="VARCHAR"/>
         <result property="groupId" column="group_id" jdbcType="INTEGER"/>
-        <result property="processId" column="process_id" jdbcType="INTEGER"/>
+        <result property="workflowInstanceId" column="workflow_instance_id" jdbcType="INTEGER"/>
         <result property="priority" column="priority" jdbcType="INTEGER"/>
         <result property="status" column="status" jdbcType="INTEGER"/>
         <result property="forceStart" column="force_start" jdbcType="INTEGER"/>
@@ -33,7 +33,7 @@
     </resultMap>
 
     <sql id = "baseSql">
-        id, task_id, task_name, group_id, process_id, priority, status , force_start , in_queue, create_time, update_time
+        id, task_id, task_name, group_id, workflow_instance_id, priority, status , force_start , in_queue, create_time, update_time
     </sql>
 
     <select id="queryTaskGroupQueuePaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
@@ -46,7 +46,7 @@
                 and group_id = #{groupId}
             </if>
         </where>
-        order by update_time desc
+        order by update_time desc, id desc
     </select>
 
     <select id="queryByStatus" resultMap="TaskGroupQueueMap" resultType="map">
@@ -126,13 +126,23 @@
 
     <select id="queryTaskGroupQueueByTaskGroupIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
-        queue.id, queue.task_name, queue.group_id, queue.process_id, queue.priority, queue.status
-        , queue.force_start, queue.create_time, queue.update_time,
-        process.name as processInstanceName,p.name as projectName,p.code as projectCode
+        queue.id,
+        queue.task_name,
+        queue.group_id,
+        queue.workflow_instance_id,
+        queue.priority,
+        queue.in_queue,
+        queue.status,
+        queue.force_start,
+        queue.create_time,
+        queue.update_time,
+        workflow.name as workflowInstanceName,
+        p.name as projectName,
+        p.code as projectCode
         from t_ds_task_group_queue queue
-        left join t_ds_process_instance process on queue.process_id = process.id
-        left join t_ds_process_definition p_f on process.process_definition_code = p_f.code
-        and process.process_definition_version = p_f.version
+        left join t_ds_workflow_instance workflow on queue.workflow_instance_id = workflow.id
+        left join t_ds_workflow_definition p_f on workflow.workflow_definition_code = p_f.code
+        and workflow.workflow_definition_version = p_f.version
         join t_ds_project as p on p_f.project_code = p.code
         <where>
             <if test="groupId != null and groupId != -1">
@@ -141,8 +151,8 @@
             <if test="taskName != null and taskName != ''">
                 and task_name like concat('%', #{taskName}, '%')
             </if>
-            <if test="processName != null and processName != ''">
-                and process.name like concat('%', #{processName}, '%')
+            <if test="workflowName != null and workflowName != ''">
+                and workflow.name like concat('%', #{workflowName}, '%')
             </if>
             <if test="status != null">
                 and queue.status =#{status}
@@ -168,7 +178,16 @@
     <delete id="deleteByWorkflowInstanceId">
         delete
         from t_ds_task_group_queue
-        where process_id = #{workflowInstanceId}
+        where workflow_instance_id = #{workflowInstanceId}
+    </delete>
+
+    <delete id="deleteByWorkflowInstanceIds">
+        delete
+        from t_ds_task_group_queue
+        where workflow_instance_id in
+        <foreach collection="workflowInstanceIds" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
     </delete>
 
     <delete id="deleteByTaskGroupIds">
@@ -179,5 +198,66 @@
             #{i}
         </foreach>
     </delete>
+
+    <update id="updateTaskGroupPriorityByTaskInstanceId">
+        update t_ds_task_group_queue
+        set priority = #{priority}
+        where task_id = #{taskInstanceId}
+    </update>
+
+    <select id="queryAllInQueueTaskGroupQueueByGroupId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where group_id = #{taskGroupId} and in_queue = #{inQueue} order by priority desc
+    </select>
+
+    <select id="queryAllTaskGroupQueueByInQueue" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where in_queue = #{inQueue} order by priority desc
+    </select>
+
+    <select id="queryInQueueTaskGroupQueue" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group_queue
+        where in_queue = #{inQueue}
+        and id &gt; #{minTaskGroupQueueId}
+        order by id asc
+        limit #{limit}
+    </select>
+
+    <select id="queryByTaskInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where task_id = #{taskInstanceId}
+    </select>
+
+    <select id="queryUsingTaskGroupQueueByGroupId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where group_id = #{taskGroupId} and status = #{status} and force_start = #{forceStart} and in_queue = #{inQueue}
+    </select>
+
+    <select id="countUsingTaskGroupQueueByGroupId" resultType="java.lang.Integer">
+        select count(1)
+        from t_ds_task_group_queue
+        where group_id = #{taskGroupId} and status = #{status} and force_start = #{forceStart} and in_queue = #{inQueue}
+    </select>
+
+    <select id="queryWaitNotifyForceStartTaskGroupQueue" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group_queue
+        where in_queue = #{inQueue}
+        and force_start = #{forceStart}
+        and id &gt; #{minTaskGroupQueueId}
+        order by id asc
+        limit #{limit}
+    </select>
 
 </mapper>

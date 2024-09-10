@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.extract.base.server;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
 import org.apache.dolphinscheduler.extract.base.StandardRpcRequest;
 import org.apache.dolphinscheduler.extract.base.StandardRpcResponse;
 import org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter;
@@ -30,6 +29,7 @@ import org.apache.dolphinscheduler.extract.base.utils.ChannelUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,18 +38,19 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 @Slf4j
 @ChannelHandler.Sharable
-public class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
+class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
 
-    private final NettyRemotingServer nettyRemotingServer;
+    private final ExecutorService methodInvokeExecutor;
 
     private final Map<String, ServerMethodInvoker> methodInvokerMap;
 
-    public JdkDynamicServerHandler(NettyRemotingServer nettyRemotingServer) {
-        this.nettyRemotingServer = nettyRemotingServer;
+    JdkDynamicServerHandler(ExecutorService methodInvokeExecutor) {
+        this.methodInvokeExecutor = methodInvokeExecutor;
         this.methodInvokerMap = new ConcurrentHashMap<>();
     }
 
@@ -90,7 +91,7 @@ public class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
                 channel.writeAndFlush(response);
                 return;
             }
-            nettyRemotingServer.getDefaultExecutor().submit(() -> {
+            methodInvokeExecutor.execute(() -> {
                 StandardRpcResponse iRpcResponse;
                 try {
                     StandardRpcRequest standardRpcRequest =
@@ -160,7 +161,11 @@ public class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            ctx.channel().close();
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if (event.state() == IdleState.READER_IDLE) {
+                log.warn("Not receive heart beat from: {}, will close the channel", ctx.channel().remoteAddress());
+                ctx.close();
+            }
         } else {
             super.userEventTriggered(ctx, evt);
         }

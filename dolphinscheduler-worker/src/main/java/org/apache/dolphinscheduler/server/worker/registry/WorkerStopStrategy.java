@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,8 +33,6 @@ public class WorkerStopStrategy implements WorkerConnectStrategy {
 
     @Autowired
     public RegistryClient registryClient;
-    @Autowired
-    private WorkerConfig workerConfig;
 
     @Override
     public void disconnect() {

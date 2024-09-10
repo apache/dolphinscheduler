@@ -17,47 +17,59 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-
-import com.google.common.collect.Lists;
 
 @Slf4j
 public class TaskInstanceLogHeader {
 
-    private static final List<String> INITIALIZE_TASK_CONTEXT_HEADER = Lists.newArrayList(
-            "***********************************************************************************************",
-            "*********************************  Initialize task context  ***********************************",
-            "***********************************************************************************************");
-    private static final List<String> LOAD_TASK_INSTANCE_PLUGIN_HEADER = Lists.newArrayList(
-            "***********************************************************************************************",
-            "*********************************  Load task instance plugin  *********************************",
-            "***********************************************************************************************");
+    private static final String INITIALIZE_TASK_CONTEXT_HEADER = new StringBuilder()
+            .append("\n")
+            .append("************************************************************************************************")
+            .append("\n")
+            .append("*********************************  Initialize task context  ************************************")
+            .append("\n")
+            .append("************************************************************************************************")
+            .toString();
+    private static final String LOAD_TASK_INSTANCE_PLUGIN_HEADER = new StringBuilder()
+            .append("\n")
+            .append("***********************************************************************************************")
+            .append("\n")
+            .append("*********************************  Load task instance plugin  *********************************")
+            .append("\n")
+            .append("***********************************************************************************************")
+            .toString();
 
     public static void printInitializeTaskContextHeader() {
-        INITIALIZE_TASK_CONTEXT_HEADER.forEach(log::info);
+        log.info(INITIALIZE_TASK_CONTEXT_HEADER);
     }
 
-    private static final List<String> EXECUTE_TASK_HEADER = Lists.newArrayList(
-            "***********************************************************************************************",
-            "*********************************  Execute task instance  *************************************",
-            "***********************************************************************************************");
+    private static final String EXECUTE_TASK_HEADER = new StringBuilder()
+            .append("\n")
+            .append("************************************************************************************************")
+            .append("\n")
+            .append("*********************************  Execute task instance  *************************************")
+            .append("\n")
+            .append("***********************************************************************************************")
+            .toString();
 
-    private static final List<String> FINALIZE_TASK_HEADER = Lists.newArrayList(
-            "***********************************************************************************************",
-            "*********************************  Finalize task instance  ************************************",
-            "***********************************************************************************************");
+    private static final String FINALIZE_TASK_HEADER = new StringBuilder()
+            .append("\n")
+            .append("************************************************************************************************")
+            .append("\n")
+            .append("*********************************  Finalize task instance  ************************************")
+            .append("\n")
+            .append("***********************************************************************************************")
+            .toString();
 
     public static void printLoadTaskInstancePluginHeader() {
-        LOAD_TASK_INSTANCE_PLUGIN_HEADER.forEach(log::info);
+        log.info(LOAD_TASK_INSTANCE_PLUGIN_HEADER);
     }
 
     public static void printExecuteTaskHeader() {
-        EXECUTE_TASK_HEADER.forEach(log::info);
+        log.info(EXECUTE_TASK_HEADER);
     }
 
     public static void printFinalizeTaskHeader() {
-        FINALIZE_TASK_HEADER.forEach(log::info);
+        log.info(FINALIZE_TASK_HEADER);
     }
 }

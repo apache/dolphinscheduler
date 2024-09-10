@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -27,15 +26,17 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.ClusterPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DisableIfTestFails
 class ClusterE2ETest {
 
     private static final String clusterName = "test_cluster_name";
@@ -53,8 +54,7 @@ class ClusterE2ETest {
         new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
-                .goToTab(ClusterPage.class)
-        ;
+                .goToTab(ClusterPage.class);
     }
 
     @Test
@@ -78,10 +78,8 @@ class ClusterE2ETest {
         final ClusterPage page = new ClusterPage(browser);
         page.create(clusterName, clusterConfig, clusterDesc);
 
-        Awaitility.await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
-        );
+        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists"));
 
         page.createClusterForm().buttonCancel().click();
     }
@@ -112,12 +110,10 @@ class ClusterE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.clusterList()
-            )
-            .as("Cluster list should not contain deleted cluster")
-            .noneMatch(
-                    it -> it.getText().contains(clusterName) || it.getText().contains(editClusterName)
-            );
+                    page.clusterList())
+                            .as("Cluster list should not contain deleted cluster")
+                            .noneMatch(
+                                    it -> it.getText().contains(clusterName) || it.getText().contains(editClusterName));
         });
     }
 }

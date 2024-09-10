@@ -52,6 +52,14 @@
             <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
             <includes>
                 <include>**/*.properties</include>
+                <include>**/*.yaml</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-authentication/dolphinscheduler-aws-authentication/src/main/resources</directory>
+            <includes>
+                <include>**/*.yaml</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>

@@ -23,24 +23,24 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 
-import java.time.Duration;
-
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/datasource-postgresql/docker-compose.yaml")
+@DisableIfTestFails
 public class PostgresDataSourceE2ETest {
+
     private static RemoteWebDriver browser;
 
     private static final String tenant = System.getProperty("user.name");
@@ -67,12 +67,11 @@ public class PostgresDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
-
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login(user, password)
-            .goToNav(DataSourcePage.class);
+                .login(user, password)
+                .goToNav(DataSourcePage.class);
     }
 
     @Test
@@ -80,15 +79,16 @@ public class PostgresDataSourceE2ETest {
     void testCreatePostgresDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword,
+                database, jdbcParams);
 
-        new WebDriverWait(page.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.invisibilityOfElementLocated(
+        WebDriverWaitFactory.createWebDriverWait(page.driver()).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));
 
         Awaitility.await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
-            .as("DataSource list should contain newly-created database")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(dataSourceName)));
+                .as("DataSource list should contain newly-created database")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(dataSourceName)));
     }
 
     @Test
@@ -102,10 +102,8 @@ public class PostgresDataSourceE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.dataSourceItemsList()
-            ).noneMatch(
-                    it -> it.getText().contains(dataSourceName)
-            );
+                    page.dataSourceItemsList()).noneMatch(
+                            it -> it.getText().contains(dataSourceName));
         });
     }
 }

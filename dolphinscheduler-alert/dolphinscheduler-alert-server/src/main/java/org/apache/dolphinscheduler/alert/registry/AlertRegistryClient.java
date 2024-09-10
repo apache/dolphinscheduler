@@ -18,8 +18,9 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.service.AlertHAServer;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,12 +37,17 @@ public class AlertRegistryClient implements AutoCloseable {
     @Autowired
     private AlertConfig alertConfig;
 
+    @Autowired
+    private MetricsProvider metricsProvider;
+
     private AlertHeartbeatTask alertHeartbeatTask;
+
+    @Autowired
+    private AlertHAServer alertHAServer;
 
     public void start() {
         log.info("AlertRegistryClient starting...");
-        registryClient.getLock(RegistryNodeType.ALERT_LOCK.getRegistryPath());
-        alertHeartbeatTask = new AlertHeartbeatTask(alertConfig, registryClient);
+        alertHeartbeatTask = new AlertHeartbeatTask(alertConfig, metricsProvider, registryClient, alertHAServer);
         alertHeartbeatTask.start();
         // start heartbeat task
         log.info("AlertRegistryClient started...");
@@ -51,7 +57,10 @@ public class AlertRegistryClient implements AutoCloseable {
     public void close() {
         log.info("AlertRegistryClient closing...");
         alertHeartbeatTask.shutdown();
-        registryClient.releaseLock(RegistryNodeType.ALERT_LOCK.getRegistryPath());
         log.info("AlertRegistryClient closed...");
+    }
+
+    public boolean isAvailable() {
+        return registryClient.isConnected();
     }
 }

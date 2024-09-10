@@ -95,7 +95,7 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page,
                                                                  @Param("taskName") String taskName,
-                                                                 @Param("processName") String processName,
+                                                                 @Param("workflowName") String workflowName,
                                                                  @Param("status") Integer status,
                                                                  @Param("groupId") int groupId,
                                                                  @Param("projects") List<Project> projects);
@@ -104,5 +104,36 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
 
+    void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
+
     void deleteByTaskGroupIds(@Param("taskGroupIds") List<Integer> taskGroupIds);
+
+    void updateTaskGroupPriorityByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId,
+                                                 @Param("priority") int taskGroupPriority);
+
+    List<TaskGroupQueue> queryAllInQueueTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
+                                                                @Param("inQueue") int inQueue);
+
+    List<TaskGroupQueue> queryAllTaskGroupQueueByInQueue(@Param("inQueue") int inQueue);
+
+    List<TaskGroupQueue> queryByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId);
+
+    List<TaskGroupQueue> queryUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
+                                                           @Param("status") int status,
+                                                           @Param("inQueue") int inQueue,
+                                                           @Param("forceStart") int forceStart);
+
+    int countUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
+                                          @Param("status") int status,
+                                          @Param("inQueue") int inQueue,
+                                          @Param("forceStart") int forceStart);
+
+    List<TaskGroupQueue> queryInQueueTaskGroupQueue(@Param("inQueue") int inQueue,
+                                                    @Param("minTaskGroupQueueId") int minTaskGroupQueueId,
+                                                    @Param("limit") int limit);
+
+    List<TaskGroupQueue> queryWaitNotifyForceStartTaskGroupQueue(@Param("inQueue") int inQueue,
+                                                                 @Param("forceStart") int forceStart,
+                                                                 @Param("minTaskGroupQueueId") int minTaskGroupQueueId,
+                                                                 @Param("limit") int limit);
 }

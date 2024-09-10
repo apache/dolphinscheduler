@@ -27,17 +27,45 @@ import org.springframework.stereotype.Component;
 public class LogicTaskInstanceExecutionEventSenderManager {
 
     @Autowired
-    private LogicTaskInstanceExecutionFinishEventSender logicTaskInstanceExecutionFinishEventSender;
+    private LogicTaskInstanceExecuteDispatchEventSender logicTaskInstanceExecuteDispatchEventSender;
 
     @Autowired
     private LogicTaskInstanceExecuteRunningEventSender logicTaskInstanceExecuteRunningEventSender;
 
-    public LogicTaskInstanceExecutionFinishEventSender getLogicTaskInstanceExecutionFinishEventSender() {
-        return logicTaskInstanceExecutionFinishEventSender;
+    @Autowired
+    private LogicTaskInstanceExecutionFailedEventSender logicTaskInstanceExecutionFailedEventSender;
+
+    @Autowired
+    private LogicTaskInstanceExecutionPausedEventSender logicTaskInstanceExecutionPausedEventSender;
+
+    @Autowired
+    private LogicTaskInstanceExecutionSuccessEventSender logicTaskInstanceExecutionSuccessEventSender;
+
+    @Autowired
+    private LogicTaskInstanceExecutionKilledEventSender logicTaskInstanceExecutionKilledEventSender;
+
+    public LogicTaskInstanceExecuteDispatchEventSender dispatchEventSender() {
+        return logicTaskInstanceExecuteDispatchEventSender;
     }
 
-    public LogicTaskInstanceExecuteRunningEventSender getMasterTaskExecuteRunningMessageSender() {
+    public LogicTaskInstanceExecuteRunningEventSender runningEventSender() {
         return logicTaskInstanceExecuteRunningEventSender;
+    }
+
+    public LogicTaskInstanceExecutionFailedEventSender failedEventSender() {
+        return logicTaskInstanceExecutionFailedEventSender;
+    }
+
+    public LogicTaskInstanceExecutionPausedEventSender pausedEventSender() {
+        return logicTaskInstanceExecutionPausedEventSender;
+    }
+
+    public LogicTaskInstanceExecutionSuccessEventSender successEventSender() {
+        return logicTaskInstanceExecutionSuccessEventSender;
+    }
+
+    public LogicTaskInstanceExecutionKilledEventSender killedEventSender() {
+        return logicTaskInstanceExecutionKilledEventSender;
     }
 
 }

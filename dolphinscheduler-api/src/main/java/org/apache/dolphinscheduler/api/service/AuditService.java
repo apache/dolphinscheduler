@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.common.enums.AuditResourceType;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.api.dto.AuditDto;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.AuditLog;
 
 /**
  * audit information service
@@ -28,30 +27,28 @@ import org.apache.dolphinscheduler.dao.entity.User;
 public interface AuditService {
 
     /**
-     * add new audit record
+     * add audit object
      *
-     * @param user                  login user
-     * @param resourceType          resource type
-     * @param resourceId            resource id
-     * @param operation             operation type
+     * @param auditLog         auditLog
      */
-    void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation);
+    void addAudit(AuditLog auditLog);
 
     /**
      * query audit log list
      *
-     * @param loginUser         login user
-     * @param resourceType      resource type
-     * @param operationType     operation type
-     * @param startTime         start time
-     * @param endTime           end time
-     * @param userName          query user name
-     * @param pageNo            page number
-     * @param pageSize          page size
-     * @return                  audit log string
+     * @param modelTypes          model types
+     * @param modelName           model name
+     * @param operationTypes      operation types
+     * @param startTime           start time
+     * @param endTime             end time
+     * @param userName            query user name
+     * @param pageNo              page number
+     * @param pageSize            page size
+     * @return                    audit log string
      */
-    Result queryLogListPaging(User loginUser, AuditResourceType resourceType,
-                              AuditOperationType operationType, String startTime,
-                              String endTime, String userName,
-                              Integer pageNo, Integer pageSize);
+    PageInfo<AuditDto> queryLogListPaging(String modelTypes,
+                                          String operationTypes, String startTime,
+                                          String endTime, String userName, String modelName,
+                                          Integer pageNo, Integer pageSize);
+
 }

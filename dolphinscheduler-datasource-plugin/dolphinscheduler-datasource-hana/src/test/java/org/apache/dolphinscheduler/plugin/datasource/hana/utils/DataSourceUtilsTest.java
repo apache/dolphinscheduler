@@ -27,6 +27,13 @@ import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaConnectionPa
 import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,16 +41,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 @ExtendWith(MockitoExtension.class)
-public class DataSourceUtilsTest {
+class DataSourceUtilsTest {
 
     @Test
-    public void testCheckDatasourceParam() {
+    void testCheckDatasourceParam() {
         HanaDataSourceParamDTO hanaDataSourceParamDTO = new HanaDataSourceParamDTO();
         hanaDataSourceParamDTO.setHost("localhost");
         hanaDataSourceParamDTO.setDatabase("default");
@@ -55,7 +57,7 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testBuildConnectionParams() {
+    void testBuildConnectionParams() {
         HanaDataSourceParamDTO hanaDataSourceParamDTO = new HanaDataSourceParamDTO();
         hanaDataSourceParamDTO.setHost("localhost");
         hanaDataSourceParamDTO.setDatabase("default");
@@ -75,7 +77,7 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testBuildConnectionParams2() {
+    void testBuildConnectionParams2() {
         HanaDataSourceParamDTO hanaDatasourceParamDTO = new HanaDataSourceParamDTO();
         hanaDatasourceParamDTO.setHost("localhost");
         hanaDatasourceParamDTO.setDatabase("default");
@@ -88,39 +90,37 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testGetConnection() throws ExecutionException {
+    void testGetConnection() throws ExecutionException, SQLException {
         try (
                 MockedStatic<PropertyUtils> mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
             mockedStaticPropertyUtils.when(() -> PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
             HanaConnectionParam connectionParam = new HanaConnectionParam();
             connectionParam.setUser("root");
             connectionParam.setPassword("123456");
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.HANA, connectionParam);
 
             Assertions.assertNotNull(connection);
         }
     }
 
     @Test
-    public void testGetJdbcUrl() {
+    void testGetJdbcUrl() {
         HanaConnectionParam hanaConnectionParam = new HanaConnectionParam();
         hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.HANA, hanaConnectionParam);
         Assertions.assertEquals(
-                "jdbc:sap://localhost:30015?reconnect=true",
+                "jdbc:sap://localhost:30015&reconnect=true",
                 jdbcUrl);
     }
 
     @Test
-    public void testBuildDatasourceParamDTO() {
+    void testBuildDatasourceParamDTO() {
         HanaConnectionParam connectionParam = new HanaConnectionParam();
         connectionParam.setJdbcUrl(
                 "jdbc:sap://localhost:30015?reconnect=true");
@@ -134,12 +134,12 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testGetDatasourceProcessor() {
+    void testGetDatasourceProcessor() {
         Assertions.assertNotNull(DataSourceUtils.getDatasourceProcessor(DbType.HANA));
     }
 
     @Test
-    public void testGetDatasourceProcessorError() {
+    void testGetDatasourceProcessorError() {
         Assertions.assertThrows(Exception.class, () -> {
             DataSourceUtils.getDatasourceProcessor(null);
         });

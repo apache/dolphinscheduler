@@ -19,9 +19,10 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * monitor service
@@ -34,23 +35,13 @@ public interface MonitorService {
      * @param loginUser login user
      * @return data base state
      */
-    Map<String, Object> queryDatabaseState(User loginUser);
+    List<DatabaseMetrics> queryDatabaseState(User loginUser);
 
     /**
-     * query master list
+     * query server list
      *
-     * @param loginUser login user
-     * @return master information list
+     * @param nodeType RegistryNodeType
+     * @return server information list
      */
-    Map<String, Object> queryMaster(User loginUser);
-
-    /**
-     * query worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
-    Map<String, Object> queryWorker(User loginUser);
-
-    List<Server> getServerListFromRegistry(boolean isMaster);
+    List<Server> listServer(RegistryNodeType nodeType);
 }

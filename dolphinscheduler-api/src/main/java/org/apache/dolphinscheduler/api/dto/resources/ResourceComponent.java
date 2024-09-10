@@ -25,34 +25,13 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 /**
  * resource component
  */
 @Data
 @NoArgsConstructor
-@JsonPropertyOrder({"id", "pid", "name", "fullName", "description", "isDirctory", "children", "type"})
 public abstract class ResourceComponent {
 
-    public ResourceComponent(int id, String pid, String name, String fullName, String description, boolean isDirctory) {
-        this.id = id;
-        this.pid = pid;
-        this.name = name;
-        this.fullName = fullName;
-        this.isDirctory = isDirctory;
-        int directoryFlag = isDirctory ? 1 : 0;
-        this.idValue = String.format("%s_%s", id, directoryFlag);
-    }
-
-    /**
-     * id
-     */
-    protected int id;
-    /**
-     * parent id
-     */
-    protected String pid;
     /**
      * name
      */
@@ -73,10 +52,7 @@ public abstract class ResourceComponent {
      * is directory
      */
     protected boolean isDirctory;
-    /**
-     * id value
-     */
-    protected String idValue;
+
     /**
      * resoruce type
      */
@@ -88,14 +64,11 @@ public abstract class ResourceComponent {
 
     /**
      * add resource component
+     *
      * @param resourceComponent resource component
      */
     public void add(ResourceComponent resourceComponent) {
         children.add(resourceComponent);
     }
 
-    public void setIdValue(int id, boolean isDirctory) {
-        int directoryFlag = isDirctory ? 1 : 0;
-        this.idValue = String.format("%s_%s", id, directoryFlag);
-    }
 }

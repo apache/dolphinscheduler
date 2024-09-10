@@ -22,16 +22,9 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
 public class SqoopTaskChannel implements TaskChannel {
-
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
 
     @Override
     public AbstractTask createTask(TaskExecutionContext taskRequest) {
@@ -39,12 +32,8 @@ public class SqoopTaskChannel implements TaskChannel {
     }
 
     @Override
-    public AbstractParameters parseParameters(ParametersNode parametersNode) {
-        return JSONUtils.parseObject(parametersNode.getTaskParams(), SqoopParameters.class);
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, SqoopParameters.class);
     }
 
-    @Override
-    public ResourceParametersHelper getResources(String parameters) {
-        return JSONUtils.parseObject(parameters, SqoopParameters.class).getResources();
-    }
 }

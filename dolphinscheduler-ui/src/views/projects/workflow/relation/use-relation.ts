@@ -24,7 +24,7 @@ import {
 } from '@/service/modules/lineages'
 import type {
   WorkflowRes,
-  WorkFlowListRes
+  WorkFlowRelationDetailListRes
 } from '@/service/modules/lineages/types'
 
 export function useRelation() {
@@ -40,7 +40,7 @@ export function useRelation() {
     variables.seriesData = []
     variables.links = []
 
-    variables.seriesData = obj.workFlowList.map((item) => {
+    variables.seriesData = obj.workFlowRelationDetailList.map((item) => {
       return {
         name: item.workFlowName,
         id: item.workFlowCode,
@@ -59,7 +59,7 @@ export function useRelation() {
   const getWorkflowName = (projectCode: number) => {
     const { state } = useAsyncState(
       queryLineageByWorkFlowName({ projectCode }).then(
-        (res: Array<WorkFlowListRes>) => {
+        (res: Array<WorkFlowRelationDetailListRes>) => {
           variables.workflowOptions = res.map((item) => {
             return {
               label: item.workFlowName,

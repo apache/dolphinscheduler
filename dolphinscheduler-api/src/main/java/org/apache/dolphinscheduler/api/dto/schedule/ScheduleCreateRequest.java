@@ -33,14 +33,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-/**
- * schedule create request
- */
 @Data
 public class ScheduleCreateRequest {
 
     @Schema(example = "1234567890123", required = true)
-    private long processDefinitionCode;
+    private long workflowDefinitionCode;
 
     @Schema(example = "schedule timezone", required = true)
     private String crontab;
@@ -67,7 +64,7 @@ public class ScheduleCreateRequest {
     private int warningGroupId;
 
     @Schema(allowableValues = "HIGHEST / HIGH / MEDIUM / LOW / LOWEST", example = "MEDIUM", description = "default MEDIUM if value not provide.")
-    private String processInstancePriority;
+    private String workflowInstancePriority;
 
     @Schema(example = "worker-group-name")
     private String workerGroup;
@@ -87,7 +84,7 @@ public class ScheduleCreateRequest {
     public Schedule convert2Schedule() {
         Schedule schedule = new Schedule();
 
-        schedule.setProcessDefinitionCode(this.processDefinitionCode);
+        schedule.setWorkflowDefinitionCode(this.workflowDefinitionCode);
         schedule.setCrontab(this.crontab);
         schedule.setStartTime(stringToDate(this.startTime));
         schedule.setEndTime(stringToDate(this.endTime));
@@ -110,8 +107,9 @@ public class ScheduleCreateRequest {
         schedule.setWarningType(newWarningType);
 
         Priority newPriority =
-                this.processInstancePriority == null ? Priority.MEDIUM : Priority.valueOf(this.processInstancePriority);
-        schedule.setProcessInstancePriority(newPriority);
+                this.workflowInstancePriority == null ? Priority.MEDIUM
+                        : Priority.valueOf(this.workflowInstancePriority);
+        schedule.setWorkflowInstancePriority(newPriority);
 
         Date date = new Date();
         schedule.setCreateTime(date);

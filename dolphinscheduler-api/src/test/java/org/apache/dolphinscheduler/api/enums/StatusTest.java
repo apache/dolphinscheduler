@@ -38,6 +38,8 @@ public class StatusTest {
 
         LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
         Assertions.assertEquals("成功", Status.SUCCESS.getMsg());
+
+        LocaleContextHolder.setLocale(Locale.US);
     }
 
     @Test

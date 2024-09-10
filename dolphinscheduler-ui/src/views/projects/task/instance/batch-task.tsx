@@ -41,6 +41,7 @@ import { stateType } from '@/common/common'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
+import totalCount from '@/utils/tableTotalCount'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
@@ -55,12 +56,12 @@ const BatchTaskInstance = defineComponent({
         pageNo: variables.page,
         searchVal: variables.searchVal,
         taskCode: variables.taskCode,
-        processInstanceId: variables.processInstanceId,
+        workflowInstanceId: variables.workflowInstanceId,
         host: variables.host,
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        workflowInstanceName: variables.workflowInstanceName
       })
     }
 
@@ -84,8 +85,8 @@ const BatchTaskInstance = defineComponent({
       onSearch()
     }
 
-    const onClearSearchProcessInstanceName = () => {
-      variables.processInstanceName = null
+    const onClearSearchWorkflowInstanceName = () => {
+      variables.workflowInstanceName = null
       onSearch()
     }
 
@@ -190,7 +191,7 @@ const BatchTaskInstance = defineComponent({
       onSearch,
       onClearSearchTaskCode,
       onClearSearchTaskName,
-      onClearSearchProcessInstanceName,
+      onClearSearchWorkflowInstanceName,
       onClearSearchExecutorName,
       onClearSearchHost,
       onClearSearchStateType,
@@ -233,11 +234,11 @@ const BatchTaskInstance = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.processInstanceName, 'value']}
+              v-model={[this.workflowInstanceName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
-              onClear={this.onClearSearchProcessInstanceName}
+              onClear={this.onClearSearchWorkflowInstanceName}
             />
             <NInput
               allowInput={this.trim}
@@ -283,6 +284,7 @@ const BatchTaskInstance = defineComponent({
         <Card title={t('project.task.batch_task')}>
           <NSpace vertical>
             <NDataTable
+              row-class-name='batch-task-instance-items'
               loading={loadingRef}
               columns={this.columns}
               data={this.tableData}
@@ -298,6 +300,8 @@ const BatchTaskInstance = defineComponent({
                 show-quick-jumper
                 onUpdatePage={requestTableData}
                 onUpdatePageSize={onUpdatePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

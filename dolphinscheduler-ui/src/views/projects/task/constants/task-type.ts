@@ -16,7 +16,7 @@
  */
 export type TaskType =
   | 'SHELL'
-  | 'SUB_PROCESS'
+  | 'SUB_WORKFLOW'
   | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'
@@ -27,7 +27,6 @@ export type TaskType =
   | 'DEPENDENT'
   | 'HTTP'
   | 'DATAX'
-  | 'PIGEON'
   | 'SQOOP'
   | 'CONDITIONS'
   | 'DATA_QUALITY'
@@ -53,6 +52,7 @@ export type TaskType =
   | 'LINKIS'
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
+  | 'ALIYUN_SERVERLESS_SPARK'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -63,8 +63,8 @@ export const TASK_TYPES_MAP = {
   SHELL: {
     alias: 'SHELL'
   },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
+  SUB_WORKFLOW: {
+    alias: 'SUB_WORKFLOW'
   },
   DYNAMIC: {
     alias: 'DYNAMIC'
@@ -96,9 +96,6 @@ export const TASK_TYPES_MAP = {
   },
   DATAX: {
     alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
   },
   SQOOP: {
     alias: 'SQOOP',
@@ -193,6 +190,10 @@ export const TASK_TYPES_MAP = {
   },
   REMOTESHELL: {
     alias: 'REMOTESHELL',
+    helperLinkDisable: true
+  },
+  ALIYUN_SERVERLESS_SPARK: {
+    alias: 'ALIYUN_SERVERLESS_SPARK',
     helperLinkDisable: true
   }
 } as {

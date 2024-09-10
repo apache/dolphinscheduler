@@ -17,26 +17,28 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * DqsRuleService
  */
 public interface DqRuleService {
 
-    Map<String, Object> getRuleFormCreateJsonById(int id);
+    String getRuleFormCreateJsonById(int id);
 
-    Map<String, Object> queryAllRuleList();
+    List<DqRule> queryAllRuleList();
 
-    Result queryRuleListPaging(User loginUser,
-                               String searchVal,
-                               Integer ruleType,
-                               String startTime,
-                               String endTime,
-                               Integer pageNo, Integer pageSize);
+    PageInfo<DqRule> queryRuleListPaging(User loginUser,
+                                         String searchVal,
+                                         Integer ruleType,
+                                         String startTime,
+                                         String endTime,
+                                         Integer pageNo, Integer pageSize);
 
-    Map<String, Object> getDatasourceOptionsById(int datasourceId);
+    List<ParamsOptions> getDatasourceOptionsById(int datasourceId);
 }

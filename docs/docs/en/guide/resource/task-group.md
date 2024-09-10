@@ -2,6 +2,8 @@
 
 The task group is mainly used to control the concurrency of task instances, and is designed to control the pressure of other resources (it can also control the pressure of the Hadoop cluster, the cluster will have queue control it). When creating a new task definition, you can configure the corresponding task group and configure the priority of the task running in the task group. The user can only view the task groups belongs to authorized projects, and can create or update task groups belongs to one project only if they have write permission.
 
+> Note: The task group's resource restrictions are on the project level and unrelated to tenants.
+
 ## Task Group Configuration
 
 ### Create Task Group
@@ -28,7 +30,7 @@ Click the button to view task group usage information:
 
 ### Use of Task Groups
 
-**Note**: The use of task groups is applicable to tasks executed by workers, such as `switch` nodes, `condition` nodes, `sub_process` and other node types executed by the master are not controlled by the task group.
+**Note**: The use of task groups is applicable to tasks executed by workers, such as `switch` nodes, `condition` nodes, `sub_workflow` and other node types executed by the master are not controlled by the task group.
 
 Let's take the shell node as an example:
 

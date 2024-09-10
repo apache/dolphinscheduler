@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { useTaskType, useProcessName } from '.'
+import { useTaskType, useWorkflowName } from '.'
 import type { IJsonItem, ITaskData } from '../types'
 
 export const useTaskDefinition = ({
@@ -34,12 +34,12 @@ export const useTaskDefinition = ({
   if (from === 0) return []
   return [
     useTaskType(model, readonly),
-    useProcessName({
+    useWorkflowName({
       model,
       projectCode,
       isCreate: !data?.id,
       from,
-      processName: data?.processName,
+      workflowName: data?.workflowDefinitionName,
       taskCode: data?.code
     })
   ]

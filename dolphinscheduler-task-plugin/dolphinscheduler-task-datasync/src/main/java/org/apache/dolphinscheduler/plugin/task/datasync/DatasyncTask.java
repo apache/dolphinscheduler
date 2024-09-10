@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Setter
+@Slf4j
 public class DatasyncTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =

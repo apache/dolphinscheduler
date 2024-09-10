@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParameter;
+
 /**
  * source hdfs parameter
  */
-public class SourceHdfsParameter {
+public class SourceHdfsParameter extends SourceCommonParameter {
 
     /**
      * export dir

@@ -111,7 +111,6 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
   ]
 }
 
-
 export const IMAGE_PULL_POLICY_LIST = [
   {
     value: 'IfNotPresent',

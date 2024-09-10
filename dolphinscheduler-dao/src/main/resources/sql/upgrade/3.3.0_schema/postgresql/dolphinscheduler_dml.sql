@@ -14,5 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+
+UPDATE t_ds_task_definition SET task_type = 'SUB_WORKFLOW' WHERE task_type = 'SUB_PROCESS';
+UPDATE t_ds_task_definition_log SET task_type = 'SUB_WORKFLOW' WHERE task_type = 'SUB_PROCESS';
+UPDATE t_ds_task_definition SET task_params = replace(task_params, 'processDefinitionCode', 'workflowDefinitionCode') where task_type = 'SUB_WORKFLOW';
+UPDATE t_ds_task_definition_log SET task_params = replace(task_params, 'processDefinitionCode', 'workflowDefinitionCode') where task_type = 'SUB_WORKFLOW';
+UPDATE t_ds_task_definition SET task_params = replace(task_params, 'processDefinitionCode', 'workflowDefinitionCode') where task_type = 'DYNAMIC';
+UPDATE t_ds_task_definition_log SET task_params = replace(task_params, 'processDefinitionCode', 'workflowDefinitionCode') where task_type = 'DYNAMIC';

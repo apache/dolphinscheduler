@@ -31,129 +31,78 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_dq_execute_result")
 public class DqExecuteResult implements Serializable {
 
-    /**
-     * primary key
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * process defined id
-     */
-    @TableField(value = "process_definition_id")
-    private long processDefinitionId;
-    /**
-     * process definition name
-     */
+
+    @TableField(value = "workflow_definition_id")
+    private long workflowDefinitionId;
+
     @TableField(exist = false)
-    private String processDefinitionName;
-    /**
-     * process definition code
-     */
+    private String workflowDefinitionName;
+
     @TableField(exist = false)
     private long processDefinitionCode;
-    /**
-     * process instance id
-     */
+
     @TableField(value = "process_instance_id")
     private long processInstanceId;
-    /**
-     * process instance name
-     */
+
     @TableField(exist = false)
     private String processInstanceName;
-    /**
-     * project code
-     */
+
     @TableField(exist = false)
     private long projectCode;
-    /**
-     * task instance id
-     */
+
     @TableField(value = "task_instance_id")
     private long taskInstanceId;
-    /**
-     * task name
-     */
+
     @TableField(exist = false)
     private String taskName;
-    /**
-     * rule type
-     */
+
     @TableField(value = "rule_type")
     private int ruleType;
-    /**
-     * rule name
-     */
+
     @TableField(value = "rule_name")
     private String ruleName;
-    /**
-     * statistics value
-     */
+
     @TableField(value = "statistics_value")
     private double statisticsValue;
-    /**
-     * comparison value
-     */
+
     @TableField(value = "comparison_value")
     private double comparisonValue;
-    /**
-     * comparison type
-     */
+
     @TableField(value = "comparison_type")
     private int comparisonType;
-    /**
-     * comparison type name
-     */
+
     @TableField(exist = false)
     private String comparisonTypeName;
-    /**
-     * check type
-     */
+
     @TableField(value = "check_type")
     private int checkType;
-    /**
-     * threshold
-     */
+
     @TableField(value = "threshold")
     private double threshold;
-    /**
-     * operator
-     */
+
     @TableField(value = "operator")
     private int operator;
-    /**
-     * failure strategy
-     */
+
     @TableField(value = "failure_strategy")
     private int failureStrategy;
-    /**
-     * user id
-     */
+
     @TableField(value = "user_id")
     private int userId;
-    /**
-     * user name
-     */
+
     @TableField(exist = false)
     private String userName;
-    /**
-     * state
-     */
+
     @TableField(value = "state")
     private int state;
-    /**
-     * error output path
-     */
+
     @TableField(value = "error_output_path")
     private String errorOutputPath;
-    /**
-     * create_time
-     */
+
     @TableField(value = "create_time")
     private Date createTime;
-    /**
-     * update_time
-     */
+
     @TableField(value = "update_time")
     private Date updateTime;
 }

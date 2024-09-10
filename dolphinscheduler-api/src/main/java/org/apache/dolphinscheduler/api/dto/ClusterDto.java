@@ -22,21 +22,18 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * ClusterDto
- */
 @Data
 public class ClusterDto {
 
     private int id;
 
     /**
-     * clluster code
+     * cluster code
      */
     private Long code;
 
     /**
-     * clluster name
+     * cluster name
      */
     private String name;
 
@@ -47,7 +44,7 @@ public class ClusterDto {
 
     private String description;
 
-    private List<String> processDefinitions;
+    private List<String> workflowDefinitions;
 
     /**
      * operator user id

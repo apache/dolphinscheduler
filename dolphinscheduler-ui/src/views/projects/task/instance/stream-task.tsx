@@ -42,6 +42,7 @@ import { streamStateType } from '@/common/common'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
+import totalCount from '@/utils/tableTotalCount'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
@@ -67,7 +68,7 @@ const BatchTaskInstance = defineComponent({
     }
 
     const onClearSearchWorkFlowName = () => {
-      variables.processDefinitionName = null
+      variables.workflowDefinitionName = null
       onSearch()
     }
 
@@ -206,7 +207,7 @@ const BatchTaskInstance = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.processDefinitionName, 'value']}
+              v-model={[this.workflowDefinitionName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_name')}
               clearable
@@ -271,6 +272,8 @@ const BatchTaskInstance = defineComponent({
                 show-quick-jumper
                 onUpdatePage={getTableData}
                 onUpdatePageSize={onUpdatePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

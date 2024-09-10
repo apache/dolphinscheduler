@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.extract.base.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class ServerMethodInvokerImpl implements ServerMethodInvoker {
+class ServerMethodInvokerImpl implements ServerMethodInvoker {
 
     private final Object serviceBean;
 
@@ -27,7 +28,7 @@ public class ServerMethodInvokerImpl implements ServerMethodInvoker {
 
     private final String methodIdentify;
 
-    public ServerMethodInvokerImpl(Object serviceBean, Method method) {
+    ServerMethodInvokerImpl(Object serviceBean, Method method) {
         this.serviceBean = serviceBean;
         this.method = method;
         this.methodIdentify = method.toGenericString();
@@ -36,11 +37,20 @@ public class ServerMethodInvokerImpl implements ServerMethodInvoker {
     @Override
     public Object invoke(Object... args) throws Throwable {
         // todo: check the request param when register
-        return method.invoke(serviceBean, args);
+        try {
+            return method.invoke(serviceBean, args);
+        } catch (InvocationTargetException ex) {
+            throw ex.getTargetException();
+        }
     }
 
     @Override
     public String getMethodIdentify() {
         return methodIdentify;
+    }
+
+    @Override
+    public String getMethodProviderIdentify() {
+        return serviceBean.getClass().getName();
     }
 }

@@ -17,66 +17,25 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FS_DEFAULT_FS;
-import static org.apache.dolphinscheduler.common.constants.Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT;
-import static org.apache.dolphinscheduler.common.constants.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-import static org.apache.dolphinscheduler.common.constants.Constants.HDFS_ROOT_USER;
-import static org.apache.dolphinscheduler.common.constants.Constants.KERBEROS_EXPIRE_TIME;
-import static org.apache.dolphinscheduler.common.constants.Constants.YARN_APPLICATION_STATUS_ADDRESS;
-import static org.apache.dolphinscheduler.common.constants.Constants.YARN_JOB_HISTORY_STATUS_ADDRESS;
-import static org.apache.dolphinscheduler.common.constants.Constants.YARN_RESOURCEMANAGER_HA_RM_IDS;
+import java.util.Map;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import org.springframework.context.annotation.Configuration;
+import lombok.NoArgsConstructor;
 
 @Data
-@Configuration
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class HdfsStorageProperties {
 
-    /**
-     * HDFS storage user
-     */
-    private String user = PropertyUtils.getString(HDFS_ROOT_USER);
+    private String user;
 
-    /**
-     * HDFS default fs
-     */
-    private String defaultFS = PropertyUtils.getString(FS_DEFAULT_FS);
+    private String defaultFS;
 
-    /**
-     * YARN resource manager HA RM ids
-     */
-    private String yarnResourceRmIds = PropertyUtils.getString(YARN_RESOURCEMANAGER_HA_RM_IDS);
+    private Map<String, String> configurationProperties;
 
-    /**
-     * YARN application status address
-     */
-    private String yarnAppStatusAddress = PropertyUtils.getString(YARN_APPLICATION_STATUS_ADDRESS);
+    private String resourceUploadPath;
 
-    /**
-     * YARN job history status address
-     */
-    private String yarnJobHistoryStatusAddress = PropertyUtils.getString(YARN_JOB_HISTORY_STATUS_ADDRESS);
-
-    /**
-     * Hadoop resouece manager http address port
-     */
-    private String hadoopResourceManagerHttpAddressPort =
-            PropertyUtils.getString(HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT);
-
-    /**
-     * Hadoop security authentication startup state
-     */
-    private boolean hadoopSecurityAuthStartupState =
-            PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-
-    /**
-     * Kerberos expire time
-     */
-    public static int getKerberosExpireTime() {
-        return PropertyUtils.getInt(KERBEROS_EXPIRE_TIME, 2);
-    }
 }

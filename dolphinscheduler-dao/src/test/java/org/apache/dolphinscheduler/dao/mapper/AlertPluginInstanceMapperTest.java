@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -41,9 +40,6 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
 
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
-
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
 
     /**
      * Test function queryAllAlertPluginInstanceList behavior with different size.
@@ -96,27 +92,6 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
     }
 
     /**
-     * Test function queryAllGlobalAlertPluginInstanceList returning with different search variables.
-     */
-    @Test
-    public void testQueryAllGlobalAlertPluginInstanceList() {
-        List<AlertPluginInstance> withoutSingleOne = alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList();
-        Assertions.assertEquals(0, withoutSingleOne.size());
-
-        createNormalAlertPluginInstance("test_normal_instance");
-        List<AlertPluginInstance> withExactlyOne = alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList();
-        Assertions.assertEquals(0, withExactlyOne.size());
-
-        createGlobalAlertPluginInstance("test_global_instance_1");
-        List<AlertPluginInstance> withExactlyTwo = alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList();
-        Assertions.assertEquals(1, withExactlyTwo.size());
-
-        createGlobalAlertPluginInstance("test_global_instance_2");
-        List<AlertPluginInstance> withExactlyThree = alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList();
-        Assertions.assertEquals(2, withExactlyThree.size());
-    }
-
-    /**
      * Create normal alert plugin instance according to given alter plugin name.
      */
     private void createNormalAlertPluginInstance(String alterPluginInsName) {
@@ -131,7 +106,6 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
     private void createGlobalAlertPluginInstance(String alterPluginInsName) {
         PluginDefine pluginDefine = makeSurePluginDefineExists();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(pluginDefine.getId(), "", alterPluginInsName);
-        alertPluginInstance.setInstanceType(AlertPluginInstanceType.GLOBAL);
         alertPluginInstanceMapper.insert(alertPluginInstance);
     }
 

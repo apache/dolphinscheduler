@@ -17,40 +17,29 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.stereotype.Component;
-
-@Component
 @Slf4j
 public class TaskPluginManager {
 
-    private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();
-    private final Map<String, TaskChannel> taskChannelMap = new HashMap<>();
+    private static final Map<String, TaskChannel> taskChannelMap = new HashMap<>();
 
-    private final AtomicBoolean loadedFlag = new AtomicBoolean(false);
+    private static final AtomicBoolean loadedFlag = new AtomicBoolean(false);
 
-    /**
-     * Load task plugins from classpath.
-     */
-    public void loadPlugin() {
+    static {
+        loadTaskPlugin();
+    }
+
+    public static void loadTaskPlugin() {
         if (!loadedFlag.compareAndSet(false, true)) {
             log.warn("The task plugin has already been loaded");
             return;
@@ -60,58 +49,55 @@ public class TaskPluginManager {
             String factoryName = entry.getKey();
             TaskChannelFactory factory = entry.getValue();
 
-            log.info("Registering task plugin: {} - {}", factoryName, factory.getClass());
-
-            taskChannelFactoryMap.put(factoryName, factory);
             taskChannelMap.put(factoryName, factory.create());
-
-            log.info("Registered task plugin: {} - {}", factoryName, factory.getClass());
+            log.info("Success register task plugin: {}", factoryName);
         }
 
     }
 
-    public Map<String, TaskChannel> getTaskChannelMap() {
-        return Collections.unmodifiableMap(taskChannelMap);
-    }
-
-    public Map<String, TaskChannelFactory> getTaskChannelFactoryMap() {
-        return Collections.unmodifiableMap(taskChannelFactoryMap);
-    }
-
-    public TaskChannel getTaskChannel(String type) {
-        return this.getTaskChannelMap().get(type);
-    }
-
-    public boolean checkTaskParameters(ParametersNode parametersNode) {
-        AbstractParameters abstractParameters = this.getParameters(parametersNode);
-        return abstractParameters != null && abstractParameters.checkParameters();
-    }
-
-    public AbstractParameters getParameters(ParametersNode parametersNode) {
-        String taskType = parametersNode.getTaskType();
-        if (Objects.isNull(taskType)) {
-            return null;
+    /**
+     * Get the TaskChannel by type, if the TaskChannel is not found, will throw
+     * @param type task type, cannot be null
+     * @throws IllegalArgumentException if the TaskChannel is not found
+     */
+    public static TaskChannel getTaskChannel(String type) {
+        checkNotNull(type, "type cannot be null");
+        TaskChannel taskChannel = taskChannelMap.get(type);
+        if (taskChannel == null) {
+            throw new IllegalArgumentException("Cannot find TaskChannel for : " + type);
         }
-        switch (taskType) {
-            case TaskConstants.TASK_TYPE_CONDITIONS:
-                return JSONUtils.parseObject(parametersNode.getTaskParams(), ConditionsParameters.class);
-            case TaskConstants.TASK_TYPE_SWITCH:
-                return JSONUtils.parseObject(parametersNode.getTaskParams(), SwitchParameters.class);
-            case TaskConstants.TASK_TYPE_SUB_PROCESS:
-                return JSONUtils.parseObject(parametersNode.getTaskParams(), SubProcessParameters.class);
-            case TaskConstants.TASK_TYPE_DEPENDENT:
-                return JSONUtils.parseObject(parametersNode.getTaskParams(), DependentParameters.class);
-            case TaskConstants.TASK_TYPE_BLOCKING:
-                return JSONUtils.parseObject(parametersNode.getTaskParams(), BlockingParameters.class);
-            case TaskConstants.TASK_TYPE_DYNAMIC:
-                return JSONUtils.parseObject(parametersNode.getTaskParams(), DynamicParameters.class);
-            default:
-                TaskChannel taskChannel = this.getTaskChannelMap().get(taskType);
-                if (Objects.isNull(taskChannel)) {
-                    return null;
-                }
-                return taskChannel.parseParameters(parametersNode);
+        return taskChannel;
+    }
+
+    /**
+     * Check if the task parameters is validated
+     * @param taskType task type, cannot be null
+     * @param taskParams task parameters
+     * @return true if the task parameters is validated, otherwise false
+     * @throws IllegalArgumentException if the TaskChannel is not found
+     * @throws IllegalArgumentException if cannot deserialize the task parameters
+     */
+    public static boolean checkTaskParameters(String taskType, String taskParams) {
+        AbstractParameters abstractParameters = parseTaskParameters(taskType, taskParams);
+        return abstractParameters.checkParameters();
+    }
+
+    /**
+     * Parse the task parameters
+     * @param taskType task type, cannot be null
+     * @param taskParams task parameters
+     * @return AbstractParameters
+     * @throws IllegalArgumentException if the TaskChannel is not found
+     * @throws IllegalArgumentException if cannot deserialize the task parameters
+     */
+    public static AbstractParameters parseTaskParameters(String taskType, String taskParams) {
+        checkNotNull(taskType, "taskType cannot be null");
+        TaskChannel taskChannel = getTaskChannel(taskType);
+        AbstractParameters abstractParameters = taskChannel.parseParameters(taskParams);
+        if (abstractParameters == null) {
+            throw new IllegalArgumentException("Cannot parse task parameters: " + taskParams + " for : " + taskType);
         }
+        return abstractParameters;
     }
 
 }

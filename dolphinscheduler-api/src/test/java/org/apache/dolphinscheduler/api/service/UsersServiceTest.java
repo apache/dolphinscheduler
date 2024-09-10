@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,7 +37,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -44,17 +45,12 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +95,6 @@ public class UsersServiceTest {
     private TenantMapper tenantMapper;
 
     @Mock
-    private ResourceMapper resourceMapper;
-
-    @Mock
     private AlertGroupMapper alertGroupMapper;
 
     @Mock
@@ -111,13 +104,7 @@ public class UsersServiceTest {
     private ProjectUserMapper projectUserMapper;
 
     @Mock
-    private ResourceUserMapper resourceUserMapper;
-
-    @Mock
     private MetricsCleanUpService metricsCleanUpService;
-
-    @Mock
-    private UDFUserMapper udfUserMapper;
 
     @Mock
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -126,10 +113,13 @@ public class UsersServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Mock
+    private SessionService sessionService;
 
     private String queueName = "UsersServiceTestQueue";
 
@@ -301,20 +291,50 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testUpdateUser() throws IOException {
+    public void testUpdateUser() {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
         // user not exist
-        Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword,
-                "3443@qq.com", 1, "13457864543", "queue", 1, "Asia/Shanghai");
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        assertThrowsServiceException(
+                Status.USER_NOT_EXIST,
+                () -> usersService.updateUser(getLoginUser(),
+                        0,
+                        userName,
+                        userPassword,
+                        "3443@qq.com",
+                        1,
+                        "13457864543",
+                        "queue",
+                        1,
+                        "Asia/Shanghai"));
 
         // success
-        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userMapper.selectById(any())).thenReturn(getUser());
         when(userMapper.updateById(any())).thenReturn(1);
-        result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1,
-                "13457864543", "queue", 1, "Asia/Shanghai");
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
+                1,
+                userName,
+                userPassword,
+                "32222s@qq.com",
+                1,
+                "13457864543",
+                "queue",
+                1,
+                "Asia/Shanghai"));
+
+        // non-admin should not modify tenantId and queue
+        when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
+        User user = userMapper.selectById(2);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
+                2,
+                userName,
+                userPassword,
+                "abc@qq.com",
+                null,
+                "13457864543",
+                "offline",
+                1,
+                "Asia/Shanghai"));
     }
 
     @Test
@@ -373,6 +393,14 @@ public class UsersServiceTest {
         result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProject(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test
@@ -394,6 +422,14 @@ public class UsersServiceTest {
         result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test
@@ -493,44 +529,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testGrantResources() {
-        String resourceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantResources(loginUser, 2, resourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        // success
-        when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
-        when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
-        result = usersService.grantResources(loginUser, 1, resourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-    }
-
-    @Test
-    public void testGrantUDFFunction() {
-        String udfIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        // success
-        when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
-        result = usersService.grantUDFFunction(loginUser, 1, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
-    @Test
     public void testGrantNamespaces() {
         String namespaceIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
@@ -574,7 +572,7 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
     }
 
@@ -784,7 +782,7 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testCreateUserIfNotExists() throws IOException {
+    public void testCreateUserIfNotExists() {
         User user;
         String userName = "userTest0001";
         String userPassword = "userTest";
@@ -794,11 +792,12 @@ public class UsersServiceTest {
         int stat = 1;
 
         // User exists
-        Mockito.when(userMapper.existUser(userName)).thenReturn(true);
-        Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
-        Mockito.when(userMapper.queryDetailsById(getUser().getId())).thenReturn(getUser());
-        Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        when(userMapper.existUser(userName)).thenReturn(true);
+        when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
+        when(userMapper.queryDetailsById(getUser().getId())).thenReturn(getUser());
+        when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
+        when(userMapper.updateById(any())).thenReturn(1);
+        when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
         Assertions.assertEquals(getUser(), user);
 
@@ -834,7 +833,6 @@ public class UsersServiceTest {
         project.setName("PJ-001");
         project.setPerm(7);
         project.setDefCount(0);
-        project.setInstRunningCount(0);
         return project;
     }
 
@@ -869,6 +867,23 @@ public class UsersServiceTest {
     }
 
     /**
+     * get non-admin user
+     *
+     * @return user
+     */
+    private User getNonAdminUser() {
+
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        user.setTenantId(2);
+        user.setQueue("queue");
+        return user;
+    }
+
+    /**
      * get tenant
      *
      * @return tenant
@@ -877,22 +892,6 @@ public class UsersServiceTest {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         return tenant;
-    }
-
-    /**
-     * get resource
-     *
-     * @return resource
-     */
-    private Resource getResource() {
-        Resource resource = new Resource();
-        resource.setPid(-1);
-        resource.setUserId(1);
-        resource.setDescription("ResourcesServiceTest.jar");
-        resource.setAlias("ResourcesServiceTest.jar");
-        resource.setFullName("/ResourcesServiceTest.jar");
-        resource.setType(ResourceType.FILE);
-        return resource;
     }
 
     private List<AlertGroup> getAlertGroups() {

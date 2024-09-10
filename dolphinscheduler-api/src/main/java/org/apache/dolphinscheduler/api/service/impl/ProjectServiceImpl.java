@@ -32,18 +32,19 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -53,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -67,9 +69,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * project service impl
- **/
 @Service
 @Slf4j
 public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
@@ -85,7 +84,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     private ProjectUserMapper projectUserMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -125,7 +124,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             project = Project
                     .builder()
                     .name(name)
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .description(desc)
                     .userId(loginUser.getId())
                     .userName(loginUser.getUserName())
@@ -133,7 +132,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                     .updateTime(now)
                     .build();
         } catch (CodeGenerateException e) {
-            log.error("Generate process definition code error.", e);
+            log.error("Generate workflow definition code error.", e);
             putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
         }
@@ -142,8 +141,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             log.info("Project is created and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
-            permissionPostHandle(AuthorizationType.PROJECTS, loginUser.getId(),
-                    Collections.singletonList(project.getId()), log);
         } else {
             log.error("Project create error, projectName:{}.", project.getName());
             putMsg(result, Status.CREATE_PROJECT_ERROR);
@@ -159,9 +156,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     public static void checkDesc(Result result, String desc) {
         if (!StringUtils.isEmpty(desc) && desc.codePointCount(0, desc.length()) > 255) {
-            log.warn("Parameter description check failed.");
-            result.setCode(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
-            result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+            result.setCode(Status.DESCRIPTION_TOO_LONG_ERROR.getCode());
+            result.setMsg(Status.DESCRIPTION_TOO_LONG_ERROR.getMsg());
         } else {
             result.setCode(Status.SUCCESS.getCode());
         }
@@ -243,7 +239,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
-    public void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) {
+    public void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) {
+        if (projectCode == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
         Project project = projectMapper.queryByCode(projectCode);
         checkProjectAndAuthThrowException(loginUser, project, permission);
     }
@@ -320,6 +319,32 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
+    public void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        checkHasProjectWritePermissionThrowException(loginUser, project);
+    }
+
+    @Override
+    public void checkHasProjectWritePermissionThrowException(User loginUser, Project project) {
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, null);
+        }
+        // case 1: user is admin
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            return;
+        }
+        // case 2: user is project owner
+        if (project.getUserId().equals(loginUser.getId())) {
+            return;
+        }
+        // case 3: check user permission level
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+        if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+            throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+        }
+    }
+
+    @Override
     public boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission) {
         boolean checkResult = false;
         if (project == null) {
@@ -365,6 +390,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             for (Project project : projectList) {
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
+        }
+        List<User> userList = userMapper.selectByIds(projectList.stream()
+                .map(Project::getUserId).distinct().collect(Collectors.toList()));
+        Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
+        List<ProjectWorkflowDefinitionCount> projectWorkflowDefinitionCountList =
+                workflowDefinitionMapper.queryProjectWorkflowDefinitionCountByProjectCodes(
+                        projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
+        Map<Long, Integer> projectWorkflowDefinitionCountMap = projectWorkflowDefinitionCountList.stream()
+                .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,
+                        ProjectWorkflowDefinitionCount::getCount));
+        for (Project project : projectList) {
+            project.setUserName(userMap.get(project.getUserId()));
+            project.setDefCount(projectWorkflowDefinitionCountMap.getOrDefault(project.getCode(), 0));
         }
         pageInfo.setTotal((int) projectIPage.getTotal());
         pageInfo.setTotalList(projectList);
@@ -448,11 +486,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         assert project != null;
 
-        List<ProcessDefinition> processDefinitionList =
-                processDefinitionMapper.queryAllDefinitionList(project.getCode());
+        List<WorkflowDefinition> workflowDefinitionList =
+                workflowDefinitionMapper.queryAllDefinitionList(project.getCode());
 
-        if (!processDefinitionList.isEmpty()) {
-            log.warn("Please delete the process definitions in project first! project code:{}.", projectCode);
+        if (!workflowDefinitionList.isEmpty()) {
+            log.warn("Please delete the workflow definitions in project first! project code:{}.", projectCode);
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
@@ -489,7 +527,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * updateProcessInstance project
+     * updateWorkflowInstance project
      *
      * @param loginUser   login user
      * @param projectCode project code
@@ -811,5 +849,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public List<Long> getAuthorizedProjectCodes(User loginUser) {
+        if (loginUser == null) {
+            throw new IllegalArgumentException("loginUser can not be null");
+        }
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return Collections.emptyList();
+        }
+        return projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
     }
 }

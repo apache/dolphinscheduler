@@ -23,6 +23,7 @@ metadata:
     {{- include "dolphinscheduler.master.labels" . | nindent 4 }}
 spec:
   podManagementPolicy: {{ .Values.master.podManagementPolicy }}
+  updateStrategy: {{- include "dolphinscheduler.tplvalues.render" (dict "value" .Values.master.updateStrategy "context" $ ) | nindent 4 }}
   replicas: {{ .Values.master.replicas }}
   selector:
     matchLabels:
@@ -109,10 +110,15 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-master
+            {{- if .Values.master.enableCustomizedConfig }}
+            - name: master-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
+            {{- end }}
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
@@ -122,6 +128,11 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if .Values.master.enableCustomizedConfig }}
+        - name: master-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-master
+        {{- end }}
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         - name: config-volume
           configMap:

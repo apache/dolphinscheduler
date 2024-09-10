@@ -20,15 +20,17 @@ package org.apache.dolphinscheduler.tools.datasource.postgresql;
 import org.apache.dolphinscheduler.tools.datasource.jupiter.DatabaseContainerProvider;
 import org.apache.dolphinscheduler.tools.datasource.jupiter.DolphinSchedulerDatabaseContainer;
 
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Lists;
 
 @Slf4j
 @AutoService(DatabaseContainerProvider.class)
@@ -40,14 +42,25 @@ public class PostgresqlDatabaseContainerProvider implements DatabaseContainerPro
     @Override
     public GenericContainer<?> getContainer(DolphinSchedulerDatabaseContainer dataSourceContainer) {
         // todo: test with multiple pg version
-        GenericContainer<?> postgresqlContainer = new PostgreSQLContainer(DockerImageName.parse("postgres:11.1"))
-                .withUsername("root")
-                .withPassword("root")
-                .withDatabaseName("dolphinscheduler")
-                .withNetwork(NETWORK)
-                .withExposedPorts(5432);
-        postgresqlContainer.setPortBindings(Lists.newArrayList("5432:5432"));
+        GenericContainer<?> postgresqlContainer =
+                new PostgreSQLContainer(DockerImageName.parse(dataSourceContainer.imageName()))
+                        .withUsername("root")
+                        .withPassword("root")
+                        .withDatabaseName("dolphinscheduler")
+                        .withNetwork(NETWORK)
+                        .withExposedPorts(5432);
 
+        log.info("Create {} successfully.", postgresqlContainer.getDockerImageName());
+        postgresqlContainer.start();
+
+        log.info("Starting {}...", postgresqlContainer.getDockerImageName());
+        Startables.deepStart(Stream.of(postgresqlContainer)).join();
+        log.info("{} started", postgresqlContainer.getDockerImageName());
+
+        String jdbcUrl = "jdbc:mysql://localhost:" + postgresqlContainer.getMappedPort(5432)
+                + "/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8";
+        System.clearProperty("spring.datasource.url");
+        System.setProperty("spring.datasource.url", jdbcUrl);
         return postgresqlContainer;
     }
 

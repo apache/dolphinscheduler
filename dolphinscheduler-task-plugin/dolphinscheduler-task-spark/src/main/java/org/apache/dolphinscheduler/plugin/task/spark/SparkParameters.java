@@ -39,6 +39,11 @@ public class SparkParameters extends AbstractParameters {
     private String mainClass;
 
     /**
+     * master url
+     */
+    private String master;
+
+    /**
      * deploy mode  local / cluster / client
      */
     private String deployMode;

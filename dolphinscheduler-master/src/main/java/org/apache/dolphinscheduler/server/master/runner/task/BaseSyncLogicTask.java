@@ -18,8 +18,10 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +30,21 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseSyncLogicTask<T extends AbstractParameters> implements ISyncLogicTask {
 
     protected final TaskExecutionContext taskExecutionContext;
+
+    protected final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    protected final TaskInstance taskInstance;
     protected final T taskParameters;
 
-    protected BaseSyncLogicTask(TaskExecutionContext taskExecutionContext, T taskParameters) {
+    protected BaseSyncLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                TaskExecutionContext taskExecutionContext,
+                                T taskParameters) {
         this.taskExecutionContext = taskExecutionContext;
+        this.workflowExecutionRunnable = workflowExecutionRunnable;
+        this.taskInstance = workflowExecutionRunnable
+                .getWorkflowExecuteContext()
+                .getWorkflowExecutionGraph()
+                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                .getTaskInstance();
         this.taskParameters = taskParameters;
         log.info("Success initialize task parameters: \n{}", JSONUtils.toPrettyJsonString(taskParameters));
     }

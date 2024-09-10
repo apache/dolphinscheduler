@@ -23,9 +23,9 @@ import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryAllProjectListForDependent } from '@/service/modules/projects'
 import { tasksState } from '@/common/common'
 import {
-  queryProcessDefinitionList,
+  queryWorkflowDefinitionList,
   getTasksByDefinitionList
-} from '@/service/modules/process-definition'
+} from '@/service/modules/workflow-definition'
 import { Router, useRouter } from 'vue-router'
 import type {
   IJsonItem,
@@ -61,7 +61,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   const dependentResult = nodeStore.getDependentResult
   const TasksStateConfig = tasksState(t)
   const projectList = ref([] as IRenderOption[])
-  const processCache = {} as {
+  const workflowCache = {} as {
     [key: number]: IRenderOption[]
   }
   const taskCache = {} as {
@@ -214,26 +214,26 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     }))
     return projectList
   }
-  const getProcessList = async (code: number) => {
-    if (processCache[code]) {
-      return processCache[code]
+  const getWorkflowList = async (code: number) => {
+    if (workflowCache[code]) {
+      return workflowCache[code]
     }
-    const result = await queryProcessDefinitionList(code)
-    const processList = result.map((item: { code: number; name: string }) => ({
+    const result = await queryWorkflowDefinitionList(code)
+    const workflowList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
       label: () => h(NEllipsis, null, item.name),
       filterLabel: item.name
     }))
-    processCache[code] = processList
+    workflowCache[code] = workflowList
 
-    return processList
+    return workflowList
   }
 
-  const getTaskList = async (code: number, processCode: number) => {
-    if (taskCache[processCode]) {
-      return taskCache[processCode]
+  const getTaskList = async (code: number, workflowCode: number) => {
+    if (taskCache[workflowCode]) {
+      return taskCache[workflowCode]
     }
-    const result = await getTasksByDefinitionList(code, processCode)
+    const result = await getTasksByDefinitionList(code, workflowCode)
     const taskList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
       label: () => h(NEllipsis, null, item.name),
@@ -244,7 +244,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
       label: 'ALL',
       filterLabel: 'ALL'
     })
-    taskCache[processCode] = taskList
+    taskCache[workflowCode] = taskList
     return taskList
   }
 
@@ -282,12 +282,11 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             if (!dependItem.dependentType) {
               if (dependItem.depTaskCode == 0)
                 dependItem.dependentType = 'DEPENDENT_ON_WORKFLOW'
-              else
-                dependItem.dependentType = 'DEPENDENT_ON_TASK'
+              else dependItem.dependentType = 'DEPENDENT_ON_TASK'
             }
             if (dependItem.projectCode) {
               itemListOptions.value[itemIndex].definitionCodeOptions =
-                await getProcessList(dependItem.projectCode)
+                await getWorkflowList(dependItem.projectCode)
             }
             if (dependItem.projectCode && dependItem.definitionCode) {
               itemListOptions.value[itemIndex].depTaskCodeOptions =
@@ -326,7 +325,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               onUpdateValue: (dependentType: string) => {
                 const item = model.dependTaskList[i].dependItemList[j]
                 if (item.definitionCode)
-                  item.depTaskCode = dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
+                  item.depTaskCode =
+                    dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
               }
             },
             options: DependentTypeOptions,
@@ -349,7 +349,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 const options = selectOptions?.value[i] || {}
                 const itemListOptions = options?.dependItemList || []
                 const itemOptions = {} as IDependentItemOptions
-                itemOptions.definitionCodeOptions = await getProcessList(
+                itemOptions.definitionCodeOptions = await getWorkflowList(
                   projectCode
                 )
                 itemListOptions[j] = itemOptions
@@ -376,7 +376,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             type: 'select',
             field: 'definitionCode',
             span: 24,
-            name: t('project.node.process_name'),
+            name: t('project.node.workflow_name'),
             props: {
               filterable: true,
               filter: (query: string, option: IRenderOption) => {
@@ -384,11 +384,12 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                   .toLowerCase()
                   .includes(query.toLowerCase())
               },
-              onUpdateValue: async (processCode: number) => {
+              onUpdateValue: async (workflowCode: number) => {
                 const item = model.dependTaskList[i].dependItemList[j]
                 selectOptions.value[i].dependItemList[j].depTaskCodeOptions =
-                  await getTaskList(item.projectCode, processCode)
-                item.depTaskCode = item.dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
+                  await getTaskList(item.projectCode, workflowCode)
+                item.depTaskCode =
+                  item.dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
               }
             },
             options:
@@ -400,7 +401,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               trigger: ['input', 'blur'],
               validator(validate: any, value: string) {
                 if (!value) {
-                  return Error(t('project.node.process_name_tips'))
+                  return Error(t('project.node.workflow_name_tips'))
                 }
               }
             }

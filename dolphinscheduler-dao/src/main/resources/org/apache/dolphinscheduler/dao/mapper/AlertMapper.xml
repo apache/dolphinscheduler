@@ -21,14 +21,14 @@
     <sql id="baseSql">
         id
         , sign, title, content, alert_status, warning_type, log, alertgroup_id, create_time, update_time, project_code,
-            process_definition_code, process_instance_id, alert_type
+            workflow_definition_code, workflow_instance_id, alert_type
     </sql>
 
     <select id="selectByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select
         <include refid="baseSql"/>
         from t_ds_alert
-        where process_instance_id = #{workflowInstanceId}
+        where workflow_instance_id = #{workflowInstanceId}
     </select>
 
     <insert id="insertAlertWhenServerCrash">
@@ -55,13 +55,15 @@
         select
         <include refid="baseSql"/>
         from t_ds_alert
-        where alert_status = #{alertStatus}
+        where id > #{minAlertId}
+        and alert_status = #{alertStatus}
+        order by id asc
         limit #{limit}
     </select>
 
     <delete id="deleteByWorkflowInstanceId">
         delete
         from t_ds_alert
-        where process_instance_id = #{workflowInstanceId}
+        where workflow_instance_id = #{workflowInstanceId}
     </delete>
 </mapper>

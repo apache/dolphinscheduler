@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)]()
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
-[![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule)
+[![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule) <!-- markdown-link-check-disable-line -->
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://s.apache.org/dolphinscheduler-slack)
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 
@@ -14,14 +14,14 @@
 DolphinScheduler 的主要特性如下：
 
 - 易于部署，提供四种部署方式，包括Standalone、Cluster、Docker和Kubernetes
-- 易于使用，可以通过四种方式创建和管理工作流，包括Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/main/index.html)、Yaml文件和Open API
+- 易于使用，可以通过四种方式创建和管理工作流，包括Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/main/index.html)和Open API
 - 高可靠高可用，多主多从的去中心化架构，原生支持横向扩展
 - 高性能，性能比其他编排平台快N倍，每天可支持千万级任务
 - Cloud Native，DolphinScheduler支持编排多云/数据中心工作流，支持自定义任务类型
 - 对工作流和工作流实例（包括任务）进行版本控制
 - 工作流和任务的多种状态控制，支持随时暂停/停止/恢复它们
 - 多租户支持
-- 其他如回填支持（Web UI 原生），包括项目、资源和数据源的权限控制
+- 其他如补数支持（Web UI 原生），包括项目和数据源的权限控制
 
 ## 快速开始
 
@@ -61,15 +61,15 @@ DolphinScheduler 的主要特性如下：
 欢迎通过以方式加入社区：
 
 - 加入 [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack)
-- 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息
-- 订阅 DolphinScheduler 邮件列表, 用户订阅 users@dolphinscheduler.apache.org 开发者请订阅 dev@dolphinscheduler.apache.org
+- 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息 <!-- markdown-link-check-disable-line -->
+- 订阅 DolphinScheduler 邮件列表, 用户订阅 [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) 开发者请订阅 [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org)
 
 # Landscapes
 
 <p align="center">
 <br/><br/>
-<img src="https://landscape.cncf.io/images/left-logo.svg" width="150"/>&nbsp;&nbsp;<img src="https://landscape.cncf.io/images/right-logo.svg" width="200"/>
+<img src="./images/cncf-landscape-white-bg.jpg" width="175" alt="cncf-landscape"/>&nbsp;&nbsp;<img src="./images/cncf-white-bg.jpg" width="200" alt="cncf-logo"/>
 <br/><br/>
-DolphinScheduler enriches the <a href="https://landscape.cncf.io/?landscape=observability-and-analysis&license=apache-license-2-0">CNCF CLOUD NATIVE Landscape.</a >
+DolphinScheduler enriches the <a href="https://landscape.cncf.io/?item=orchestration-management--scheduling-orchestration--dolphinscheduler">CNCF CLOUD NATIVE Landscape.</a >
 
 </p >

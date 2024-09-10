@@ -49,7 +49,7 @@ export const useForm = () => {
   const startState = reactive({
     startFormRef: ref(),
     startForm: {
-      processDefinitionCode: -1,
+      workflowDefinitionCode: -1,
       startEndTime: [new Date(year, month, day), new Date(year, month, day)],
       scheduleTime: '',
       dataDateType: 1,
@@ -61,17 +61,17 @@ export const useForm = () => {
       taskDependType: 'TASK_POST',
       complementDependentMode: 'OFF_MODE',
       runMode: 'RUN_MODE_SERIAL',
-      processInstancePriority: 'MEDIUM',
+      workflowInstancePriority: 'MEDIUM',
       workerGroup: 'default',
       tenantCode: 'default',
       environmentCode: null,
       startParams: null,
-      expectedParallelismNumber: '',
+      expectedParallelismNumber: '2',
       dryRun: 0,
       testFlag: 0,
       version: null,
       allLevelDependent: 'false',
-      executionOrder: 'DESC_ORDER',
+      executionOrder: 'DESC_ORDER'
     },
     saving: false,
     rules: {
@@ -91,6 +91,17 @@ export const useForm = () => {
             return new Error(t('project.workflow.schedule_date_limit'))
           }
         }
+      },
+      warningGroupId: {
+        trigger: ['blur'],
+        validator() {
+          if (
+            startState.startForm.warningType !== 'NONE' &&
+            !startState.startForm.warningGroupId
+          ) {
+            return new Error(t('project.workflow.warning_group_tip'))
+          }
+        }
       }
     }
   })
@@ -106,13 +117,26 @@ export const useForm = () => {
       timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
-      processInstancePriority: 'MEDIUM',
+      workflowInstancePriority: 'MEDIUM',
       warningGroupId: null as null | number,
       workerGroup: 'default',
       tenantCode: 'default',
       environmentCode: null as null | string
     },
-    saving: false
+    saving: false,
+    rules: {
+      warningGroupId: {
+        trigger: ['blur'],
+        validator() {
+          if (
+            timingState.timingForm.warningType !== 'NONE' &&
+            !timingState.timingForm.warningGroupId
+          ) {
+            return new Error(t('project.workflow.warning_group_tip'))
+          }
+        }
+      }
+    }
   })
 
   const copyState = reactive({

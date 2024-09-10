@@ -31,17 +31,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
-    /**
-     * flink parameters
-     */
     private FlinkStreamParameters flinkParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     public FlinkStreamTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);

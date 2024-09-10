@@ -23,10 +23,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,7 +30,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * tenant mapper interface
  */
-@CacheConfig(cacheNames = "tenant", keyGenerator = "cacheKeyGenerator")
 public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**
@@ -43,19 +38,16 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      * @param tenantId tenantId
      * @return tenant
      */
-    @Cacheable(sync = true)
     Tenant queryById(@Param("tenantId") int tenantId);
 
     /**
      * delete by id
      */
-    @CacheEvict
     int deleteById(int id);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.id")
     int updateById(@Param("et") Tenant tenant);
 
     /**

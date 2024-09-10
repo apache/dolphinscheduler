@@ -630,7 +630,6 @@ CREATE TABLE t_ds_relation_project_user (
                                             PRIMARY KEY (id),
                                             CONSTRAINT t_ds_relation_project_user_un UNIQUE (user_id, project_id)
 ) ;
-create index relation_project_user_id_index on t_ds_relation_project_user (user_id);
 
 --
 -- Table structure for table t_ds_relation_resources_user

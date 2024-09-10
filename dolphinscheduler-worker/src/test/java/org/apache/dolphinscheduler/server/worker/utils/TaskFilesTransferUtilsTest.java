@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -87,9 +87,9 @@ public class TaskFilesTransferUtilsTest {
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
                 .varPool(varPool)
                 .taskParams(taskParams)
-                .processInstanceId(processInstanceId)
-                .processDefineVersion(processDefineVersion)
-                .processDefineCode(processDefineCode)
+                .workflowInstanceId(processInstanceId)
+                .workflowDefinitionVersion(processDefineVersion)
+                .workflowDefinitionCode(processDefineCode)
                 .taskInstanceId(taskInstanceId)
                 .taskName(taskName)
                 .tenantCode(tenantCode)
@@ -99,8 +99,8 @@ public class TaskFilesTransferUtilsTest {
 
         List<Property> oriProperties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
 
-        StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
-        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+        StorageOperator storageOperator = Mockito.mock(StorageOperator.class);
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperator);
         System.out.println(taskExecutionContext.getVarPool());
 
         String exceptFolder =
@@ -144,9 +144,9 @@ public class TaskFilesTransferUtilsTest {
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
                 .varPool(varPool)
                 .taskParams(taskParams)
-                .processInstanceId(processInstanceId)
-                .processDefineVersion(processDefineVersion)
-                .processDefineCode(processDefineCode)
+                .workflowInstanceId(processInstanceId)
+                .workflowDefinitionVersion(processDefineVersion)
+                .workflowDefinitionCode(processDefineCode)
                 .taskInstanceId(taskInstanceId)
                 .taskName(taskName)
                 .tenantCode(tenantCode)
@@ -154,10 +154,10 @@ public class TaskFilesTransferUtilsTest {
                 .endTime(endTime)
                 .build();
 
-        StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
+        StorageOperator storageOperator = Mockito.mock(StorageOperator.class);
         Mockito.mockStatic(ZipUtil.class);
         Assertions.assertDoesNotThrow(
-                () -> TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate));
+                () -> TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperator));
     }
 
     @Test
@@ -190,9 +190,9 @@ public class TaskFilesTransferUtilsTest {
 
         Mockito.when(taskExecutionContext.getEndTime()).thenReturn(endTime);
 
-        Mockito.when(taskExecutionContext.getProcessDefineCode()).thenReturn(processDefineCode);
-        Mockito.when(taskExecutionContext.getProcessDefineVersion()).thenReturn(processDefineVersion);
-        Mockito.when(taskExecutionContext.getProcessInstanceId()).thenReturn(processInstanceId);
+        Mockito.when(taskExecutionContext.getWorkflowDefinitionCode()).thenReturn(processDefineCode);
+        Mockito.when(taskExecutionContext.getWorkflowDefinitionVersion()).thenReturn(processDefineVersion);
+        Mockito.when(taskExecutionContext.getWorkflowInstanceId()).thenReturn(processInstanceId);
         Mockito.when(taskExecutionContext.getTaskInstanceId()).thenReturn(taskInstanceId);
         Mockito.when(taskExecutionContext.getTaskName()).thenReturn(taskName);
 

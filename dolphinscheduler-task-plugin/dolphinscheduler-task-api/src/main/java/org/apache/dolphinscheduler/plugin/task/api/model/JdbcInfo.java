@@ -17,9 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
+import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * JdbcInfo
  */
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class JdbcInfo {
 
     private String host;
@@ -30,67 +41,9 @@ public class JdbcInfo {
 
     private String database;
 
-    private String params;
+    private Map<String, String> params;
 
     private String address;
 
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getPort() {
-        return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
-    }
-
-    public String getDriverName() {
-        return driverName;
-    }
-
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public String getParams() {
-        return params;
-    }
-
-    public void setParams(String params) {
-        this.params = params;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    @Override
-    public String toString() {
-        return "JdbcInfo{"
-                + "host='" + host + '\''
-                + ", port='" + port + '\''
-                + ", driverName='" + driverName + '\''
-                + ", database='" + database + '\''
-                + ", params='" + params + '\''
-                + ", address='" + address + '\''
-                + '}';
-    }
+    private String jdbcUrl;
 }

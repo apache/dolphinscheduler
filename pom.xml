@@ -40,7 +40,7 @@
         <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
-        <module>dolphinscheduler-aop</module>
+        <module>dolphinscheduler-yarn-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-service</module>
@@ -57,6 +57,8 @@
         <module>dolphinscheduler-storage-plugin</module>
         <module>dolphinscheduler-extract</module>
         <module>dolphinscheduler-dao-plugin</module>
+        <module>dolphinscheduler-authentication</module>
+        <module>dolphinscheduler-eventbus</module>
     </modules>
 
     <properties>
@@ -73,7 +75,6 @@
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
@@ -86,8 +87,10 @@
         <jacoco.skip>false</jacoco.skip>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
-        <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
+        <owasp-dependency-check-maven.version>10.0.2</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
+        <awaitility.version>4.2.0</awaitility.version>
+        <truth.version>1.4.2</truth.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
@@ -98,7 +101,6 @@
         <spotless.skip>false</spotless.skip>
 
         <skipUT>false</skipUT>
-        <skipIT>true</skipIT>
     </properties>
 
     <dependencyManagement>
@@ -136,7 +138,7 @@
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-aop</artifactId>
+                <artifactId>dolphinscheduler-yarn-aop</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -295,6 +297,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-aws-authentication</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.version}</version>
@@ -365,6 +373,18 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>${truth.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -432,6 +452,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
+                        <quiet>true</quiet>
                         <source>8</source>
                         <failOnError>false</failOnError>
                     </configuration>
@@ -525,6 +546,7 @@
                         <skipRuntimeScope>true</skipRuntimeScope>
                         <skipSystemScope>true</skipSystemScope>
                         <failBuildOnCVSS>7</failBuildOnCVSS>
+                        <nvdApiKeyEnvironmentVariable>NIST_NVD_API_KEY</nvdApiKeyEnvironmentVariable>
                     </configuration>
                     <executions>
                         <execution>
@@ -595,31 +617,10 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skip>${skipUT}</skip>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-                <configuration>
-                    <skip>${skipIT}</skip>
-                    <additionalClasspathElements>dolphinscheduler-dao/src/main/resources</additionalClasspathElements>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- jenkins plugin jacoco report-->
@@ -637,15 +638,15 @@
                         <goals>
                             <goal>instrument</goal>
                         </goals>
+                        <configuration>
+                            <excludes>com/github/dreamhead/moco/*</excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>default-restore-instrumented-classes</id>
                         <goals>
                             <goal>restore-instrumented-classes</goal>
                         </goals>
-                        <configuration>
-                            <excludes>com/github/dreamhead/moco/*</excludes>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>default-report</id>
@@ -708,6 +709,14 @@
                             <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-e2e/dolphinscheduler-e2e-case/src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-e2e/dolphinscheduler-e2e-core/src/main/java/**/*.java</include>
+                            <include>dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-api-test/dolphinscheduler-api-test-core/src/main/java/**/*.java</include>
+                        </includes>
                     </java>
                     <pom>
                         <sortPom>
@@ -827,6 +836,38 @@
                 <docker.build.skip>false</docker.build.skip>
                 <docker.push.skip>false</docker.push.skip>
             </properties>
+        </profile>
+        <profile>
+            <id>helm-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>helm-doc</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>--rm</argument>
+                                        <argument>--volume</argument>
+                                        <argument>${project.basedir}/deploy/kubernetes:/helm-docs</argument>
+                                        <argument>jnorwood/helm-docs:v1.11.3</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

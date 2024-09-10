@@ -4,7 +4,7 @@
 
 DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker 会通过执行 `${DATAX_LAUNCHER}` 来解析传入的 json 文件。
 
-执行 datax 任务前需要在环境变量中配置`PYTHON_LAUNCHER`，部分 datax 发行版只支持 python2.7。
+执行 datax 任务前需要在环境变量或者 `dolphinshceduler_env.sh` 中配置 `PYTHON_LAUNCHER` 和 `DATAX_LAUNCHER`，部分 datax 发行版只支持 python2.7。
 
 ## 创建任务
 

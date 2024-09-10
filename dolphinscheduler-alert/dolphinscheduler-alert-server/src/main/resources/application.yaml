@@ -30,15 +30,7 @@ spring:
     password: root
     hikari:
       connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
       pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
 
 # Mybatis-plus configuration, you don't need to change it
 mybatis-plus:
@@ -80,8 +72,9 @@ alert:
   # Mark each alert of alert server if late after x milliseconds as failed.
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
-  heartbeat-interval: 60s
-  query_alert_threshold: 100
+  max-heartbeat-interval: 60s
+  # The maximum number of alerts that can be processed in parallel
+  sender-parallelism: 100
 
 registry:
   type: zookeeper
@@ -89,12 +82,12 @@ registry:
     namespace: dolphinscheduler
     connect-string: localhost:2181
     retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
+      base-sleep-time: 1s
+      max-sleep: 3s
       max-retries: 5
-    session-timeout: 30s
-    connection-timeout: 9s
-    block-until-connected: 600ms
+    session-timeout: 60s
+    connection-timeout: 15s
+    block-until-connected: 15s
     digest: ~
 
 metrics:

@@ -24,6 +24,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_GROUP_QUEU
 import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_GROUP_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
@@ -81,13 +83,14 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_GROUP_CREATE)
     public Result createTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("name") String name,
-                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectcode,
+                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectCode,
                                   @RequestParam("description") String description,
                                   @RequestParam("groupSize") Integer groupSize) {
         Map<String, Object> result =
-                taskGroupService.createTaskGroup(loginUser, projectcode, name, description, groupSize);
+                taskGroupService.createTaskGroup(loginUser, projectCode, name, description, groupSize);
         return returnDataList(result);
     }
 
@@ -112,6 +115,7 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_TASK_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_GROUP_UPDATE)
     public Result updateTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") Integer id,
                                   @RequestParam("name") String name,
@@ -214,6 +218,7 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/close-task-group")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CLOSE_TASK_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_GROUP_CLOSE)
     public Result closeTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id", required = false) Integer id) {
 
@@ -235,6 +240,7 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_GROUP_START)
     public Result startTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id", required = false) Integer id) {
         Map<String, Object> result = taskGroupService.startTaskGroup(loginUser, id);
@@ -255,9 +261,10 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_GROUP_START)
     public Result forceStart(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam(value = "queueId") Integer queueId) {
-        Map<String, Object> result = taskGroupService.forceStartTask(loginUser, queueId);
+                             @RequestParam(value = "queueId") Integer id) {
+        Map<String, Object> result = taskGroupService.forceStartTask(loginUser, id);
         return returnDataList(result);
     }
 
@@ -276,6 +283,7 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/modifyPriority")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_GROUP_MODIFY)
     public Result modifyPriority(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "queueId") Integer queueId,
                                  @RequestParam(value = "priority") Integer priority) {
@@ -291,18 +299,18 @@ public class TaskGroupController extends BaseController {
      *
      * @param groupId     ID for task group
      * @param taskName    Task Name
-     * @param processName Process instance name
+     * @param workflowInstanceName workflow instance name
      * @param status      Task queue status
      * @param loginUser   login user
      * @param pageNo      page number
      * @param pageSize    page size
      * @return queue list
      */
-    @Operation(summary = "queryTasksByGroupId", description = "QUERY_ALL_TASKS_GROUP_NOTES")
+    @Operation(summary = "queryTaskGroupQueuesByGroupId", description = "QUERY_TASKS_GROUP_GROUP_QUEUES")
     @Parameters({
             @Parameter(name = "groupId", description = "GROUP_ID", required = false, schema = @Schema(implementation = int.class, example = "1", defaultValue = "-1")),
             @Parameter(name = "taskInstanceName", description = "TASK_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "taskName")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "processName")),
+            @Parameter(name = "workflowInstanceName", description = "WORKFLOW_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "workflowInstanceName")),
             @Parameter(name = "status", description = "TASK_GROUP_STATUS", required = false, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
@@ -310,15 +318,21 @@ public class TaskGroupController extends BaseController {
     @GetMapping(value = "/query-list-by-group-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
-    public Result queryTasksByGroupId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
-                                      @RequestParam(value = "taskInstanceName", required = false) String taskName,
-                                      @RequestParam(value = "processInstanceName", required = false) String processName,
-                                      @RequestParam(value = "status", required = false) Integer status,
-                                      @RequestParam("pageNo") Integer pageNo,
-                                      @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName, processName, status,
-                groupId, pageNo, pageSize);
+    public Result queryTaskGroupQueues(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
+                                       @RequestParam(value = "taskInstanceName", required = false) String taskName,
+                                       @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
+                                       @RequestParam(value = "status", required = false) Integer status,
+                                       @RequestParam("pageNo") Integer pageNo,
+                                       @RequestParam("pageSize") Integer pageSize) {
+        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(
+                loginUser,
+                taskName,
+                workflowInstanceName,
+                status,
+                groupId,
+                pageNo,
+                pageSize);
         return returnDataList(result);
     }
 

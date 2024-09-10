@@ -29,8 +29,8 @@ export const TASK_TYPES_MAP = {
   SHELL: {
     alias: 'SHELL'
   },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
+  SUB_WORKFLOW: {
+    alias: 'SUB_WORKFLOW'
   },
   DYNAMIC: {
     alias: 'DYNAMIC'
@@ -63,9 +63,6 @@ export const TASK_TYPES_MAP = {
   DATAX: {
     alias: 'DataX'
   },
-  PIGEON: {
-    alias: 'PIGEON'
-  },
   SQOOP: {
     alias: 'SQOOP',
     helperLinkDisable: true
@@ -90,6 +87,10 @@ export const TASK_TYPES_MAP = {
   },
   ZEPPELIN: {
     alias: 'ZEPPELIN',
+    helperLinkDisable: true
+  },
+  ALIYUN_SERVERLESS_SPARK: {
+    alias: 'ALIYUN_SERVERLESS_SPARK',
     helperLinkDisable: true
   },
   JUPYTER: {

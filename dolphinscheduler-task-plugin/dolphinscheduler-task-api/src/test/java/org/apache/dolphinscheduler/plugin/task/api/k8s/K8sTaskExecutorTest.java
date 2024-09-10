@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.VAR_DELIMITER;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
@@ -27,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -65,7 +63,7 @@ public class K8sTaskExecutorTest {
         requirement.setKey("node-label");
         requirement.setOperator("In");
         requirement.setValues(Arrays.asList("1234", "123456"));
-        k8sTaskExecutor = new K8sTaskExecutor(logger, taskRequest);
+        k8sTaskExecutor = new K8sTaskExecutor(taskRequest);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
         k8sTaskMainParameters.setImagePullPolicy(imagePullPolicy);
@@ -91,7 +89,7 @@ public class K8sTaskExecutorTest {
         TaskResponse taskResponse = new TaskResponse();
         k8sTaskExecutor.setJob(job);
         k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse);
-        Assertions.assertEquals(0, Integer.compare(EXIT_CODE_KILL, taskResponse.getExitStatusCode()));
+        Assertions.assertEquals(0, taskResponse.getExitStatusCode());
     }
     @Test
     public void testWaitTimeoutNormal() {
@@ -103,9 +101,11 @@ public class K8sTaskExecutorTest {
     }
 
     @Test
-    public void testValpool() {
-        String result = "key=value" + VAR_DELIMITER;
-        k8sTaskExecutor.varPool.append(result);
-        Assertions.assertEquals(result, k8sTaskExecutor.getVarPool());
+    public void testLoadYamlCorrectly() {
+        List<String> expectedCommands = Arrays.asList("perl", "-Mbignum=bpi", "-wle", "print bpi(2000)");
+        List<String> actualCommands =
+                k8sTaskExecutor.getJob().getSpec().getTemplate().getSpec().getContainers().get(0).getCommand();
+        Assertions.assertEquals(expectedCommands, actualCommands);
     }
+
 }

@@ -21,6 +21,9 @@ INSERT INTO t_ds_tenant(id, tenant_code, description, queue_id, create_time, upd
 UPDATE t_ds_schedules as t1 SET tenant_code = COALESCE(t3.tenant_code, 'default') FROM t_ds_process_definition as t2 LEFT JOIN t_ds_tenant t3 ON t2.tenant_id = t3.id WHERE t1.process_definition_code = t2.code;
 UPDATE t_ds_process_instance SET tenant_code = 'default' WHERE tenant_code IS NULL;
 
+-- If the admin account is not associated with a tenant, the admin's tenant will be set to the default tenant.
+UPDATE t_ds_user SET tenant_id = '-1' WHERE (user_name = 'admin') AND (tenant_id = '0');
+
 -- data quality support choose database
 INSERT INTO t_ds_dq_rule_input_entry
 (id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)

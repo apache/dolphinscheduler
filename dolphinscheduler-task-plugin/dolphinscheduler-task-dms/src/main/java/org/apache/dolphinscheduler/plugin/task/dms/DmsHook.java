@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.dms;
 
+import org.apache.dolphinscheduler.authentication.aws.AWSDatabaseMigrationServiceClientFactory;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,11 +38,7 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.databasemigrationservice.AWSDatabaseMigrationService;
-import com.amazonaws.services.databasemigrationservice.AWSDatabaseMigrationServiceClientBuilder;
 import com.amazonaws.services.databasemigrationservice.model.CreateReplicationTaskRequest;
 import com.amazonaws.services.databasemigrationservice.model.CreateReplicationTaskResult;
 import com.amazonaws.services.databasemigrationservice.model.DeleteReplicationTaskRequest;
@@ -87,17 +84,8 @@ public class DmsHook {
     }
 
     public static AWSDatabaseMigrationService createClient() {
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
-        final BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
-        final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
-
-        // create a DMS client
-        return AWSDatabaseMigrationServiceClientBuilder.standard()
-                .withCredentials(awsCredentialsProvider)
-                .withRegion(awsRegion)
-                .build();
+        Map<String, String> awsProperties = PropertyUtils.getByPrefix("aws.dms.", "");
+        return AWSDatabaseMigrationServiceClientFactory.createAWSDatabaseMigrationServiceClient(awsProperties);
     }
 
     public Boolean createReplicationTask() throws Exception {

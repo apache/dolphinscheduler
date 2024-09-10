@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.dto.workflowInstance;
 
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import lombok.Data;
 
@@ -52,14 +52,14 @@ public class WorkflowInstanceQueryRequest extends PageQueryDto {
     @Schema(name = "state", example = "STATE")
     Integer state;
 
-    public ProcessInstance convert2ProcessInstance() {
-        ProcessInstance processInstance = new ProcessInstance();
+    public WorkflowInstance convert2WorkflowInstance() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
         if (this.workflowName != null) {
-            processInstance.setName(this.workflowName);
+            workflowInstance.setName(this.workflowName);
         }
         if (this.host != null) {
-            processInstance.setHost(this.host);
+            workflowInstance.setHost(this.host);
         }
-        return processInstance;
+        return workflowInstance;
     }
 }

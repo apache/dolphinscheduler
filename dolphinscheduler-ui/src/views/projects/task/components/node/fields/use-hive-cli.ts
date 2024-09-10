@@ -24,9 +24,7 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
   const hiveSqlScriptSpan = computed(() =>
     model.hiveCliTaskExecutionType === 'SCRIPT' ? 24 : 0
   )
-  const resourcesRequired = ref(
-    model.hiveCliTaskExecutionType !== 'SCRIPT'
-  )
+  const resourcesRequired = ref(model.hiveCliTaskExecutionType !== 'SCRIPT')
 
   const resourcesLimit = computed(() =>
     model.hiveCliTaskExecutionType === 'SCRIPT' ? -1 : 1
@@ -46,8 +44,7 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
   watch(
     () => model.hiveCliTaskExecutionType,
     () => {
-      resourcesRequired.value =
-        model.hiveCliTaskExecutionType !== 'SCRIPT'
+      resourcesRequired.value = model.hiveCliTaskExecutionType !== 'SCRIPT'
     }
   )
 

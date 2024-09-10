@@ -17,21 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * monitor service impl
@@ -61,76 +54,12 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return data base state
      */
     @Override
-    public Map<String, Object> queryDatabaseState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.DATA_LIST, Lists.newArrayList(databaseMonitor.getDatabaseMetrics()));
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * query master list
-     *
-     * @param loginUser login user
-     * @return master information list
-     */
-    @Override
-    public Map<String, Object> queryMaster(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-        List<Server> masterServers = getServerListFromRegistry(true);
-        result.put(Constants.DATA_LIST, masterServers);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * query worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
-    @Override
-    public Map<String, Object> queryWorker(User loginUser) {
-
-        Map<String, Object> result = new HashMap<>();
-        List<WorkerServerModel> workerServers = getServerListFromRegistry(false)
-                .stream()
-                .map((Server server) -> {
-                    WorkerServerModel model = new WorkerServerModel();
-                    model.setId(server.getId());
-                    model.setHost(server.getHost());
-                    model.setPort(server.getPort());
-                    model.setZkDirectories(Sets.newHashSet(server.getZkDirectory()));
-                    model.setResInfo(server.getResInfo());
-                    model.setCreateTime(server.getCreateTime());
-                    model.setLastHeartbeatTime(server.getLastHeartbeatTime());
-                    return model;
-                })
-                .collect(Collectors.toList());
-
-        Map<String, WorkerServerModel> workerHostPortServerMapping = workerServers
-                .stream()
-                .collect(Collectors.toMap(
-                        (WorkerServerModel worker) -> {
-                            String[] s = worker.getZkDirectories().iterator().next().split("/");
-                            return s[s.length - 1];
-                        }, Function.identity(), (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
-                            oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
-                            return oldOne;
-                        }));
-
-        result.put(Constants.DATA_LIST, workerHostPortServerMapping.values());
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+    public List<DatabaseMetrics> queryDatabaseState(User loginUser) {
+        return Lists.newArrayList(databaseMonitor.getDatabaseMetrics());
     }
 
     @Override
-    public List<Server> getServerListFromRegistry(boolean isMaster) {
-        return isMaster
-                ? registryClient.getServerList(RegistryNodeType.MASTER)
-                : registryClient.getServerList(RegistryNodeType.WORKER);
+    public List<Server> listServer(RegistryNodeType nodeType) {
+        return registryClient.getServerList(nodeType);
     }
-
 }

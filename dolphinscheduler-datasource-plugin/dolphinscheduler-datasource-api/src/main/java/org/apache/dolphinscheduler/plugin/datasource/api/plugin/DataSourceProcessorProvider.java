@@ -37,6 +37,10 @@ public class DataSourceProcessorProvider {
     private DataSourceProcessorProvider() {
     }
 
+    public static void initialize() {
+        log.info("Initialize DataSourceProcessorProvider");
+    }
+
     public static DataSourceProcessor getDataSourceProcessor(@NonNull DbType dbType) {
         return dataSourcePluginManager.getDataSourceProcessorMap().get(dbType.name());
     }

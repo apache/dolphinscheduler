@@ -29,15 +29,20 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.util.WebUtils;
 
 @Slf4j
 public abstract class AbstractAuthenticator implements Authenticator {
@@ -56,15 +61,14 @@ public abstract class AbstractAuthenticator implements Authenticator {
      *
      * @param userId user identity field
      * @param password user login password
-     * @param extra extra user login field
      * @return user object in databse
      */
-    public abstract User login(String userId, String password, String extra);
+    public abstract User login(@NonNull String userId, String password);
 
     @Override
-    public Result<Map<String, String>> authenticate(String userId, String password, String extra) {
+    public Result<Map<String, String>> authenticate(@NonNull String userId, String password, @NonNull String ip) {
         Result<Map<String, String>> result = new Result<>();
-        User user = login(userId, password, extra);
+        User user = login(userId, password);
         if (user == null) {
             if (Objects.equals(securityConfig.getType(), AuthenticationType.CASDOOR_SSO.name())) {
                 log.error("State or code entered incorrectly.");
@@ -87,18 +91,17 @@ public abstract class AbstractAuthenticator implements Authenticator {
         }
 
         // create session
-        String sessionId = sessionService.createSession(user, extra);
-        if (sessionId == null) {
-            log.error("Failed to create session, userName:{}.", user.getUserName());
+        Session session = sessionService.createSessionIfAbsent(user);
+        if (session == null) {
             result.setCode(Status.LOGIN_SESSION_FAILED.getCode());
             result.setMsg(Status.LOGIN_SESSION_FAILED.getMsg());
             return result;
         }
 
-        log.info("Session is created and sessionId is :{}.", sessionId);
+        log.info("Session is created, userName:{}.", user.getUserName());
 
         Map<String, String> data = new HashMap<>();
-        data.put(Constants.SESSION_ID, sessionId);
+        data.put(Constants.SESSION_ID, session.getId());
         data.put(Constants.SECURITY_CONFIG_TYPE, securityConfig.getType());
 
         result.setData(data);
@@ -109,9 +112,15 @@ public abstract class AbstractAuthenticator implements Authenticator {
 
     @Override
     public User getAuthUser(HttpServletRequest request) {
-        Session session = sessionService.getSession(request);
+        String sessionId = request.getHeader(Constants.SESSION_ID);
+        if (StringUtils.isBlank(sessionId)) {
+            Cookie cookie = WebUtils.getCookie(request, Constants.SESSION_ID);
+            if (cookie != null) {
+                sessionId = cookie.getValue();
+            }
+        }
+        Session session = sessionService.getSession(sessionId);
         if (session == null) {
-            log.info("session info is null ");
             return null;
         }
         // get user object from session

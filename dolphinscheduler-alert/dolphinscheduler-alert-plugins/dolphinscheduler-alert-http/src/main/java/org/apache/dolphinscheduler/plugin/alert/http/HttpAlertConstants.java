@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.http;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class HttpAlertConstants {
 
     public static final String URL = "$t('url')";
@@ -26,6 +29,10 @@ public final class HttpAlertConstants {
     public static final String HEADER_PARAMS = "$t('headerParams')";
 
     public static final String NAME_HEADER_PARAMS = "headerParams";
+
+    public static final String CONTENT_TYPE = "$t('contentType')";
+
+    public static final String NAME_CONTENT_TYPE = "contentType";
 
     public static final String BODY_PARAMS = "$t('bodyParams')";
 
@@ -39,7 +46,11 @@ public final class HttpAlertConstants {
 
     public static final String NAME_REQUEST_TYPE = "requestType";
 
-    private HttpAlertConstants() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+    public static final String TIMEOUT = "$t('timeout')";
+
+    public static final String NAME_TIMEOUT = "timeout";
+
+    public static final int DEFAULT_TIMEOUT = 120;
+
+    public static final String MSG_PARAMS = "${msg}";
 }

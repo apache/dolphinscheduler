@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.service.subworkflow;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.ArrayList;
@@ -43,21 +43,21 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     private RelationSubWorkflowMapper relationSubWorkflowMapper;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Override
-    public List<ProcessInstance> getAllDynamicSubWorkflow(long processInstanceId, long taskCode) {
+    public List<WorkflowInstance> getAllDynamicSubWorkflow(long processInstanceId, long taskCode) {
         List<RelationSubWorkflow> relationSubWorkflows =
-                relationSubWorkflowMapper.queryAllSubProcessInstance(processInstanceId, taskCode);
+                relationSubWorkflowMapper.queryAllSubWorkflowInstance(processInstanceId, taskCode);
         List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(Collectors.toList());
 
-        List<ProcessInstance> allSubProcessInstance = processInstanceDao.queryByIds(allSubProcessInstanceId);
-        allSubProcessInstance.sort(Comparator.comparing(ProcessInstance::getId));
-        return allSubProcessInstance;
+        List<WorkflowInstance> allSubWorkflowInstance = workflowInstanceDao.queryByIds(allSubProcessInstanceId);
+        allSubWorkflowInstance.sort(Comparator.comparing(WorkflowInstance::getId));
+        return allSubWorkflowInstance;
     }
 
     @Override
@@ -67,44 +67,44 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     }
 
     @Override
-    public List<ProcessInstance> filterFinishProcessInstances(List<ProcessInstance> processInstanceList) {
-        return processInstanceList.stream()
+    public List<WorkflowInstance> filterFinishProcessInstances(List<WorkflowInstance> workflowInstanceList) {
+        return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().isFinished()).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProcessInstance> filterSuccessProcessInstances(List<ProcessInstance> processInstanceList) {
-        return processInstanceList.stream()
+    public List<WorkflowInstance> filterSuccessProcessInstances(List<WorkflowInstance> workflowInstanceList) {
+        return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().isSuccess()).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProcessInstance> filterRunningProcessInstances(List<ProcessInstance> processInstanceList) {
-        return processInstanceList.stream()
+    public List<WorkflowInstance> filterRunningProcessInstances(List<WorkflowInstance> workflowInstanceList) {
+        return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().isRunning()).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProcessInstance> filterWaitToRunProcessInstances(List<ProcessInstance> processInstanceList) {
-        return processInstanceList.stream()
+    public List<WorkflowInstance> filterWaitToRunProcessInstances(List<WorkflowInstance> workflowInstanceList) {
+        return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().equals(WorkflowExecutionStatus.WAIT_TO_RUN))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProcessInstance> filterFailedProcessInstances(List<ProcessInstance> processInstanceList) {
-        return processInstanceList.stream()
+    public List<WorkflowInstance> filterFailedProcessInstances(List<WorkflowInstance> workflowInstanceList) {
+        return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().isFailure()).collect(Collectors.toList());
     }
 
     @Override
-    public List<Property> getWorkflowOutputParameters(ProcessInstance processInstance) {
+    public List<Property> getWorkflowOutputParameters(WorkflowInstance workflowInstance) {
         List<Property> outputParamList =
-                new ArrayList<>(JSONUtils.toList(processInstance.getVarPool(), Property.class));
+                new ArrayList<>(JSONUtils.toList(workflowInstance.getVarPool(), Property.class));
 
-        ProcessDefinitionLog processDefinition = processDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
+        WorkflowDefinitionLog processDefinition = workflowDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
         List<Property> globalParamList = JSONUtils.toList(processDefinition.getGlobalParams(), Property.class);
 
         Set<String> ouputParamSet = outputParamList.stream().map(Property::getProp).collect(Collectors.toSet());

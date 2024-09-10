@@ -31,18 +31,21 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.version>5.8.1</junit.version>
-        <selenium.version>4.6.0</selenium.version>
+        <selenium.version>4.21.0</selenium.version>
         <lombok.version>1.18.20</lombok.version>
         <assertj-core.version>3.20.2</assertj-core.version>
         <kotlin.version>1.5.30</kotlin.version>
         <slf4j-api.version>1.7.36</slf4j-api.version>
         <log4j-slf4j-impl.version>2.17.2</log4j-slf4j-impl.version>
         <guava.version>31.0.1-jre</guava.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
+        <junit-pioneer.version>2.2.0</junit-pioneer.version>
     </properties>
 
     <dependencies>
@@ -69,6 +72,12 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>${junit-pioneer.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -119,7 +128,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>1.18.3</version>
+                <version>${testcontainers.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -131,7 +140,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
         </plugins>
     </build>

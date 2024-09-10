@@ -17,25 +17,22 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
 
-import java.util.Date;
-
 import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
 public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> {
@@ -43,64 +40,54 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
     public static final String TASK_TYPE = "DEPENDENT";
 
     private final ProjectDao projectDao;
-    private final ProcessDefinitionDao processDefinitionDao;
+    private final WorkflowDefinitionDao workflowDefinitionDao;
     private final TaskDefinitionDao taskDefinitionDao;
     private final TaskInstanceDao taskInstanceDao;
-    private final ProcessInstanceDao processInstanceDao;
+    private final WorkflowInstanceDao workflowInstanceDao;
 
-    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+
+    private DependentAsyncTaskExecuteFunction dependentAsyncTaskExecuteFunction;
 
     public DependentLogicTask(TaskExecutionContext taskExecutionContext,
                               ProjectDao projectDao,
-                              ProcessDefinitionDao processDefinitionDao,
+                              WorkflowDefinitionDao workflowDefinitionDao,
                               TaskDefinitionDao taskDefinitionDao,
                               TaskInstanceDao taskInstanceDao,
-                              ProcessInstanceDao processInstanceDao,
-                              ProcessInstanceExecCacheManager processInstanceExecCacheManager) throws LogicTaskInitializeException {
+                              WorkflowInstanceDao workflowInstanceDao,
+                              IWorkflowExecutionRunnable workflowExecutionRunnable) {
         super(taskExecutionContext,
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
-                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                        .orElseThrow(() -> new LogicTaskInitializeException(
-                                "Cannot find the task instance in workflow execute runnable"))
-                        .getDependency());
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<DependentParameters>() {
+                }));
         this.projectDao = projectDao;
-        this.processDefinitionDao = processDefinitionDao;
+        this.workflowDefinitionDao = workflowDefinitionDao;
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
-        this.processInstanceDao = processInstanceDao;
-        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.workflowInstanceDao = workflowInstanceDao;
+        this.workflowExecutionRunnable = workflowExecutionRunnable;
 
     }
 
     @Override
     public AsyncTaskExecuteFunction getAsyncTaskExecuteFunction() {
-        return new DependentAsyncTaskExecuteFunction(taskExecutionContext,
+        dependentAsyncTaskExecuteFunction = new DependentAsyncTaskExecuteFunction(taskExecutionContext,
                 taskParameters,
                 projectDao,
-                processDefinitionDao,
+                workflowDefinitionDao,
                 taskDefinitionDao,
                 taskInstanceDao,
-                processInstanceDao);
+                workflowInstanceDao);
+        return dependentAsyncTaskExecuteFunction;
     }
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        if (workflowExecuteRunnable == null) {
-            log.error("Cannot find the WorkflowExecuteRunnable");
-            return;
-        }
-        TaskInstance taskInstance =
-                workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId()).orElse(null);
-        if (taskInstance == null) {
-            log.error("Cannot find the TaskInstance in workflowExecuteRunnable");
-            return;
-        }
-        taskInstance.setState(TaskExecutionStatus.PAUSE);
-        taskInstance.setEndTime(new Date());
-        taskInstanceDao.upsertTaskInstance(taskInstance);
-        super.pause();
+        // todo: support pause
+    }
+
+    @Override
+    public void kill() throws MasterTaskExecuteException {
+        // todo: support kill
     }
 
 }

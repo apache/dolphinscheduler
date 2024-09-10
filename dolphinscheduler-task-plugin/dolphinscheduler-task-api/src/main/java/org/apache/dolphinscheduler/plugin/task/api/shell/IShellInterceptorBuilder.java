@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
+import org.apache.dolphinscheduler.common.exception.FileOperateException;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -48,5 +50,5 @@ public interface IShellInterceptorBuilder<T extends IShellInterceptorBuilder<T, 
 
     T appendScript(String script);
 
-    Y build() throws IOException;
+    Y build() throws IOException, InterruptedException, FileOperateException;
 }

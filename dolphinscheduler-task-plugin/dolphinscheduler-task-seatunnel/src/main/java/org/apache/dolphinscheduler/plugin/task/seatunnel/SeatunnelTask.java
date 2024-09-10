@@ -47,9 +47,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * seatunnel task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class SeatunnelTask extends AbstractRemoteTask {
 
     private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
@@ -78,9 +78,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -109,7 +107,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
-            seatunnelParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            seatunnelParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current SeaTunnel task has been interrupted", e);
@@ -164,7 +162,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
                 args.add(CONFIG_OPTIONS);
                 // TODO: Need further check for refactored resource center
                 // TODO Currently resourceName is `/xxx.sh`, it has more `/` and needs to be optimized
-                args.add(resourceInfo.getResourceName().substring(1));
+                args.add(resourceInfo.getResourceName().replaceFirst(".*:", ""));
             });
         }
         return args;
@@ -186,8 +184,13 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+        return String.format("%s/seatunnel_%s.%s", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(), formatDetector());
+    }
+
+    private String formatDetector() {
+        return JSONUtils.checkJsonValid(seatunnelParameters.getRawScript(), false) ? Constants.JSON_SUFFIX
+                : Constants.CONF_SUFFIX;
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {

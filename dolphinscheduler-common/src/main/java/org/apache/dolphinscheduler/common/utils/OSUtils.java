@@ -18,27 +18,20 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,32 +39,17 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * os utils
- */
+// todo: Split to WindowsOSUtils/LinuxOSUtils/MacOSOSUtils/K8sOSUtils...
 @Slf4j
+@UtilityClass
 public class OSUtils {
 
     private static final SystemInfo SI = new SystemInfo();
-    public static final String TWO_DECIMAL = "0.00";
-
-    /**
-     * return -1 when the function can not get hardware env info
-     * e.g {@link OSUtils#cpuUsagePercentage()}
-     */
-    public static final double NEGATIVE_ONE = -1;
 
     private static final HardwareAbstractionLayer hal = SI.getHardware();
-    private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
-    private static long prevTickTime = 0L;
-    private static volatile double cpuUsage = 0.0D;
-    private static final double TOTAL_MEMORY = hal.getMemory().getTotal() / 1024.0 / 1024 / 1024;
-
-    private OSUtils() {
-        throw new UnsupportedOperationException("Construct OSUtils");
-    }
 
     /**
      * Initialization regularization, solve the problem of pre-compilation performance,
@@ -79,79 +57,12 @@ public class OSUtils {
      */
     private static final Pattern PATTERN = Pattern.compile("\\s+");
 
-    /**
-     * get disk usage
-     * Keep 2 decimal
-     *
-     * @return disk free size, unit: GB
-     */
-    public static double diskAvailable() {
-        File file = new File(".");
-        long freeSpace = file.getFreeSpace(); // unallocated / free disk space in bytes.
-
-        double diskAvailable = freeSpace / 1024.0 / 1024 / 1024;
-
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(diskAvailable));
+    public static long getTotalSystemMemory() {
+        return hal.getMemory().getTotal();
     }
 
-    /**
-     * get available physical or pod memory size
-     * <p>
-     * Keep 2 decimal
-     *
-     * @return Available physical or pod memory size, unit: G
-     */
-    public static double availablePhysicalMemorySize() {
-        double availablePhysicalMemorySize;
-
-        if (KubernetesUtils.isKubernetesMode()) {
-            long freeMemory = Runtime.getRuntime().freeMemory();
-            availablePhysicalMemorySize = freeMemory / 1024.0 / 1024 / 1024;
-        } else {
-            GlobalMemory memory = hal.getMemory();
-            availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
-        }
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(availablePhysicalMemorySize));
-    }
-
-    /**
-     * get cpu usage
-     *
-     * @return cpu usage
-     */
-    public static double cpuUsagePercentage() {
-        CentralProcessor processor = hal.getProcessor();
-
-        // Check if > ~ 0.95 seconds since last tick count.
-        long now = System.currentTimeMillis();
-        if (now - prevTickTime > 950) {
-            // Enough time has elapsed.
-            if (KubernetesUtils.isKubernetesMode()) {
-                OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-                cpuUsage = operatingSystemMXBean.getSystemLoadAverage();
-            } else {
-                cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
-            }
-
-            prevTickTime = System.currentTimeMillis();
-            prevTicks = processor.getSystemCpuLoadTicks();
-        }
-
-        if (Double.isNaN(cpuUsage)) {
-            return NEGATIVE_ONE;
-        }
-
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(cpuUsage));
-    }
-
-    public static double memoryUsagePercentage() {
-        return (TOTAL_MEMORY - availablePhysicalMemorySize()) / TOTAL_MEMORY;
+    public static long getSystemAvailableMemoryUsed() {
+        return hal.getMemory().getAvailable();
     }
 
     public static List<String> getUserList() {
@@ -272,11 +183,10 @@ public class OSUtils {
      *
      * @param userName user name
      */
-    public static void createUserIfAbsent(String userName) {
+    public static synchronized void createUserIfAbsent(String userName) {
         // if not exists this user, then create
         if (!getUserList().contains(userName)) {
-            boolean isSuccess = createUser(userName);
-            log.info("create user {} {}", userName, isSuccess ? "success" : "fail");
+            createUser(userName);
         }
     }
 
@@ -286,13 +196,12 @@ public class OSUtils {
      * @param userName user name
      * @return true if creation was successful, otherwise false
      */
-    public static boolean createUser(String userName) {
+    public static void createUser(String userName) {
         try {
             String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
-                String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
-                log.error(errorLog);
-                return false;
+                throw new UnsupportedOperationException(
+                        "There is no userGroup exist cannot create tenant, please create userGroupFirst");
             }
             if (SystemUtils.IS_OS_MAC) {
                 createMacUser(userName, userGroup);
@@ -301,24 +210,23 @@ public class OSUtils {
             } else {
                 createLinuxUser(userName, userGroup);
             }
-            return true;
+            log.info("Create tenant {} under userGroup: {} success", userName, userGroup);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException("Create tenant: {} failed", e);
         }
 
-        return false;
     }
 
     /**
      * create linux user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
     private static void createLinuxUser(String userName, String userGroup) throws IOException {
         log.info("create linux os user: {}", userName);
-        String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
+        String cmd = String.format("sudo useradd -m -g %s %s", userGroup, userName);
         log.info("execute cmd: {}", cmd);
         exeCmd(cmd);
     }
@@ -326,7 +234,7 @@ public class OSUtils {
     /**
      * create mac user (Supports Mac OSX 10.10+)
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -345,7 +253,7 @@ public class OSUtils {
     /**
      * create windows user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -393,15 +301,13 @@ public class OSUtils {
      * get sudo command
      *
      * @param tenantCode tenantCode
-     * @param command command
+     * @param command    command
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
         if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
-        tenantCode = TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER
-                : tenantCode;
         return String.format("sudo -u %s %s", tenantCode, command);
     }
 
@@ -436,41 +342,9 @@ public class OSUtils {
         return ShellExecutor.execCommand(command);
     }
 
-    /**
-     * get process id
-     *
-     * @return process id
-     */
     public static int getProcessID() {
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         return Integer.parseInt(runtimeMXBean.getName().split("@")[0]);
-    }
-
-    /**
-     * Check memory and cpu usage is overload the given thredshod.
-     *
-     * @param maxCpuLoadAvgThreshold  maxCpuLoadAvg
-     * @param reservedMemoryThreshold reservedMemory
-     * @return True, if the cpu or memory exceed the given thredshod.
-     */
-    public static Boolean isOverload(double maxCpuLoadAvgThreshold, double reservedMemoryThreshold) {
-        // system load average
-        double freeCPUPercentage = 1 - cpuUsagePercentage();
-        // system available physical memory
-        double freeMemoryPercentage = 1 - memoryUsagePercentage();
-        if (freeCPUPercentage > maxCpuLoadAvgThreshold) {
-            log.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", freeCPUPercentage,
-                    maxCpuLoadAvgThreshold);
-            return true;
-        }
-
-        if (freeMemoryPercentage < reservedMemoryThreshold) {
-            log.warn(
-                    "Current available memory percentage{} is too low, reserved.memory={}", freeMemoryPercentage,
-                    reservedMemoryThreshold);
-            return true;
-        }
-        return false;
     }
 
     public static Boolean isWindows() {

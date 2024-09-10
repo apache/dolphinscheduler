@@ -17,15 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
+
 /**
  * target mysql parameter
  */
-public class TargetMysqlParameter {
+public class TargetMysqlParameter extends TargetCommonParameter {
 
-    /**
-     * target datasource
-     */
-    private int targetDatasource;
     /**
      * target table
      */
@@ -58,14 +56,6 @@ public class TargetMysqlParameter {
      * target update mode
      */
     private String targetUpdateMode;
-
-    public int getTargetDatasource() {
-        return targetDatasource;
-    }
-
-    public void setTargetDatasource(int targetDatasource) {
-        this.targetDatasource = targetDatasource;
-    }
 
     public String getTargetTable() {
         return targetTable;

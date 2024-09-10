@@ -24,10 +24,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
 
 /**
  * base service
@@ -49,16 +46,7 @@ public interface BaseService {
      * @param result result code
      * @return true if not administrator, otherwise false
      */
-    boolean isNotAdmin(User loginUser, Map<String, Object> result);
-
-    /**
-     * permissionPostHandle
-     * @param authorizationType
-     * @param userId
-     * @param ids
-     * @param logger
-     */
-    void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger);
+    boolean isNotAdmin(User loginUser);
 
     /**
      * put message to map

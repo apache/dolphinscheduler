@@ -26,4 +26,6 @@ public interface ProjectDao extends IDao<Project> {
 
     List<Project> queryByCodes(Collection<Long> projectCodes);
 
+    Project queryByCode(Long projectCode);
+
 }

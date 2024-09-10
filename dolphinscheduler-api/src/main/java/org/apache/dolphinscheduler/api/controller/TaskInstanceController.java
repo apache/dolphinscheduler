@@ -23,6 +23,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.REMOVE_TASK_INSTANCE_
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -67,7 +69,7 @@ public class TaskInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param searchVal search value
      * @param taskName task name
      * @param stateType state type
@@ -81,8 +83,8 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "queryTaskListPaging", description = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "workflowInstanceId", description = "WORKFLOW_INSTANCE_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "workflowInstanceName", description = "WORKFLOW_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskName", description = "TASK_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskCode", description = "TASK_CODE", schema = @Schema(implementation = Long.class)),
@@ -100,9 +102,9 @@ public class TaskInstanceController extends BaseController {
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     public Result queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                      @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
-                                      @RequestParam(value = "processInstanceName", required = false) String processInstanceName,
-                                      @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName,
+                                      @RequestParam(value = "workflowInstanceId", required = false, defaultValue = "0") Integer workflowInstanceId,
+                                      @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
+                                      @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
                                       @RequestParam(value = "taskCode", required = false) Long taskCode,
@@ -114,17 +116,14 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(
+        return taskInstanceService.queryTaskListPaging(
                 loginUser,
                 projectCode,
-                processInstanceId,
-                processInstanceName,
-                processDefinitionName,
+                workflowInstanceId,
+                workflowInstanceName,
+                workflowDefinitionName,
                 taskName,
                 taskCode,
                 executorName,
@@ -136,7 +135,6 @@ public class TaskInstanceController extends BaseController {
                 taskExecuteType,
                 pageNo,
                 pageSize);
-        return result;
     }
 
     /**
@@ -154,10 +152,12 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
-                                   @PathVariable(value = "id") Integer id) {
-        return taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+    @OperatorLog(auditType = AuditType.TASK_INSTANCE_FORCE_SUCCESS)
+    public Result<Void> forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
+                                         @PathVariable(value = "id") Integer id) {
+        taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+        return Result.success();
     }
 
     /**

@@ -22,17 +22,18 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
-import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -63,39 +64,39 @@ import com.google.common.collect.Lists;
 public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
 
     public static final String TASK_TYPE = "DYNAMIC";
-    private final ProcessInstanceDao processInstanceDao;
+    private final WorkflowInstanceDao workflowInstanceDao;
 
     private final SubWorkflowService subWorkflowService;
 
-    private final ProcessDefinitionMapper processDefineMapper;
+    private final WorkflowDefinitionMapper workflowDefinitionMapper;
 
     private final CommandMapper commandMapper;
 
     private final ProcessService processService;
 
-    private ProcessInstance processInstance;
+    private WorkflowInstance workflowInstance;
 
     private TaskInstance taskInstance;
 
     private boolean haveBeenCanceled = false;
 
     public DynamicLogicTask(TaskExecutionContext taskExecutionContext,
-                            ProcessInstanceDao processInstanceDao,
+                            WorkflowInstanceDao workflowInstanceDao,
                             TaskInstanceDao taskInstanceDao,
                             SubWorkflowService subWorkflowService,
                             ProcessService processService,
-                            ProcessDefinitionMapper processDefineMapper,
+                            WorkflowDefinitionMapper workflowDefinitionMapper,
                             CommandMapper commandMapper) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<DynamicParameters>() {
                 }));
-        this.processInstanceDao = processInstanceDao;
+        this.workflowInstanceDao = workflowInstanceDao;
         this.subWorkflowService = subWorkflowService;
         this.processService = processService;
-        this.processDefineMapper = processDefineMapper;
+        this.workflowDefinitionMapper = workflowDefinitionMapper;
         this.commandMapper = commandMapper;
 
-        this.processInstance = processInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
+        this.workflowInstance = workflowInstanceDao.queryById(taskExecutionContext.getWorkflowInstanceId());
         this.taskInstance = taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
     }
 
@@ -110,86 +111,86 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         }
 
         // if already exists sub process instance, do not generate again
-        List<ProcessInstance> existsSubProcessInstanceList =
-                subWorkflowService.getAllDynamicSubWorkflow(processInstance.getId(), taskInstance.getTaskCode());
-        if (CollectionUtils.isEmpty(existsSubProcessInstanceList)) {
+        List<WorkflowInstance> existsSubWorkflowInstanceList =
+                subWorkflowService.getAllDynamicSubWorkflow(workflowInstance.getId(), taskInstance.getTaskCode());
+        if (CollectionUtils.isEmpty(existsSubWorkflowInstanceList)) {
             generateSubWorkflowInstance(parameterGroup);
         } else {
-            resetProcessInstanceStatus(existsSubProcessInstanceList);
+            resetProcessInstanceStatus(existsSubWorkflowInstanceList);
         }
-        return new DynamicAsyncTaskExecuteFunction(taskExecutionContext, processInstance, taskInstance, this,
+        return new DynamicAsyncTaskExecuteFunction(taskExecutionContext, workflowInstance, taskInstance, this,
                 commandMapper,
                 subWorkflowService, taskParameters.getDegreeOfParallelism());
     }
 
-    public void resetProcessInstanceStatus(List<ProcessInstance> existsSubProcessInstanceList) {
-        switch (processInstance.getCommandType()) {
+    public void resetProcessInstanceStatus(List<WorkflowInstance> existsSubWorkflowInstanceList) {
+        switch (workflowInstance.getCommandType()) {
             case REPEAT_RUNNING:
-                existsSubProcessInstanceList.forEach(processInstance -> {
+                existsSubWorkflowInstanceList.forEach(processInstance -> {
                     processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    processInstanceDao.updateById(processInstance);
+                    workflowInstanceDao.updateById(processInstance);
                 });
                 break;
             case START_FAILURE_TASK_PROCESS:
             case RECOVER_TOLERANCE_FAULT_PROCESS:
-                List<ProcessInstance> failedProcessInstances =
-                        subWorkflowService.filterFailedProcessInstances(existsSubProcessInstanceList);
-                failedProcessInstances.forEach(processInstance -> {
+                List<WorkflowInstance> failedWorkflowInstances =
+                        subWorkflowService.filterFailedProcessInstances(existsSubWorkflowInstanceList);
+                failedWorkflowInstances.forEach(processInstance -> {
                     processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    processInstanceDao.updateById(processInstance);
+                    workflowInstanceDao.updateById(processInstance);
                 });
                 break;
         }
     }
 
     public void generateSubWorkflowInstance(List<Map<String, String>> parameterGroup) throws MasterTaskExecuteException {
-        List<ProcessInstance> processInstanceList = new ArrayList<>();
-        ProcessDefinition subProcessDefinition =
-                processDefineMapper.queryByCode(taskParameters.getProcessDefinitionCode());
+        List<WorkflowInstance> workflowInstanceList = new ArrayList<>();
+        WorkflowDefinition subWorkflowDefinition =
+                workflowDefinitionMapper.queryByCode(taskParameters.getWorkflowDefinitionCode());
         for (Map<String, String> parameters : parameterGroup) {
             String dynamicStartParams = JSONUtils.toJsonString(parameters);
-            Command command = DynamicCommandUtils.createCommand(processInstance, subProcessDefinition.getCode(),
-                    subProcessDefinition.getVersion(), parameters);
+            Command command = DynamicCommandUtils.createCommand(workflowInstance, subWorkflowDefinition.getCode(),
+                    subWorkflowDefinition.getVersion(), parameters);
             // todo: set id to -1? we use command to generate sub process instance, but the generate method will use the
             // command id to do
             // somethings
             command.setId(-1);
             DynamicCommandUtils.addDataToCommandParam(command, CommandKeyConstants.CMD_DYNAMIC_START_PARAMS,
                     dynamicStartParams);
-            ProcessInstance subProcessInstance = createSubProcessInstance(command);
-            subProcessInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-            processInstanceDao.insert(subProcessInstance);
-            command.setProcessInstanceId(subProcessInstance.getId());
-            processInstanceList.add(subProcessInstance);
+            WorkflowInstance subWorkflowInstance = createSubProcessInstance(command);
+            subWorkflowInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
+            workflowInstanceDao.insert(subWorkflowInstance);
+            command.setWorkflowInstanceId(subWorkflowInstance.getId());
+            workflowInstanceList.add(subWorkflowInstance);
         }
 
         List<RelationSubWorkflow> relationSubWorkflowList = new ArrayList<>();
-        for (ProcessInstance subProcessInstance : processInstanceList) {
+        for (WorkflowInstance subWorkflowInstance : workflowInstanceList) {
             RelationSubWorkflow relationSubWorkflow = new RelationSubWorkflow();
-            relationSubWorkflow.setParentWorkflowInstanceId(Long.valueOf(processInstance.getId()));
+            relationSubWorkflow.setParentWorkflowInstanceId(Long.valueOf(workflowInstance.getId()));
             relationSubWorkflow.setParentTaskCode(taskInstance.getTaskCode());
-            relationSubWorkflow.setSubWorkflowInstanceId(Long.valueOf(subProcessInstance.getId()));
+            relationSubWorkflow.setSubWorkflowInstanceId(Long.valueOf(subWorkflowInstance.getId()));
             relationSubWorkflowList.add(relationSubWorkflow);
         }
 
         log.info("Expected number of runs : {}, actual number of runs : {}", parameterGroup.size(),
-                processInstanceList.size());
+                workflowInstanceList.size());
 
         int insertN = subWorkflowService.batchInsertRelationSubWorkflow(relationSubWorkflowList);
         log.info("insert {} relation sub workflow", insertN);
     }
 
-    public ProcessInstance createSubProcessInstance(Command command) throws MasterTaskExecuteException {
-        ProcessInstance subProcessInstance;
+    public WorkflowInstance createSubProcessInstance(Command command) throws MasterTaskExecuteException {
+        WorkflowInstance subWorkflowInstance;
         try {
-            subProcessInstance = processService.constructProcessInstance(command, processInstance.getHost());
-            subProcessInstance.setIsSubProcess(Flag.YES);
-            subProcessInstance.setVarPool(taskExecutionContext.getVarPool());
+            subWorkflowInstance = processService.constructWorkflowInstance(command, workflowInstance.getHost());
+            subWorkflowInstance.setIsSubWorkflow(Flag.YES);
+            subWorkflowInstance.setVarPool(taskExecutionContext.getVarPool());
         } catch (Exception e) {
             log.error("create sub process instance error", e);
             throw new MasterTaskExecuteException(e.getMessage());
         }
-        return subProcessInstance;
+        return subWorkflowInstance;
     }
 
     public List<Map<String, String>> generateParameterGroup() {
@@ -250,51 +251,69 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     }
 
     @Override
+    public void pause() throws MasterTaskExecuteException {
+        // todo: support pause
+    }
+
+    @Override
     public void kill() {
         try {
-            changeRunningSubprocessInstancesToStop(WorkflowExecutionStatus.READY_STOP);
+            doKillSubWorkflowInstances();
         } catch (MasterTaskExecuteException e) {
             log.error("kill {} error", taskInstance.getName(), e);
         }
     }
 
-    private void changeRunningSubprocessInstancesToStop(WorkflowExecutionStatus stopStatus) throws MasterTaskExecuteException {
+    private void doKillSubWorkflowInstances() throws MasterTaskExecuteException {
+        List<WorkflowInstance> existsSubWorkflowInstanceList =
+                subWorkflowService.getAllDynamicSubWorkflow(workflowInstance.getId(), taskInstance.getTaskCode());
+        if (CollectionUtils.isEmpty(existsSubWorkflowInstanceList)) {
+            return;
+        }
+
+        commandMapper.deleteByWorkflowInstanceIds(
+                existsSubWorkflowInstanceList.stream().map(WorkflowInstance::getId).collect(Collectors.toList()));
+
+        List<WorkflowInstance> runningSubWorkflowInstanceList =
+                subWorkflowService.filterRunningProcessInstances(existsSubWorkflowInstanceList);
+        doKillRunningSubWorkflowInstances(runningSubWorkflowInstanceList);
+
+        List<WorkflowInstance> waitToRunWorkflowInstances =
+                subWorkflowService.filterWaitToRunProcessInstances(existsSubWorkflowInstanceList);
+        doKillWaitToRunSubWorkflowInstances(waitToRunWorkflowInstances);
+
         this.haveBeenCanceled = true;
-        List<ProcessInstance> existsSubProcessInstanceList =
-                subWorkflowService.getAllDynamicSubWorkflow(processInstance.getId(), taskInstance.getTaskCode());
-        List<ProcessInstance> runningSubProcessInstanceList =
-                subWorkflowService.filterRunningProcessInstances(existsSubProcessInstanceList);
-        for (ProcessInstance subProcessInstance : runningSubProcessInstanceList) {
-            subProcessInstance.setState(stopStatus);
-            processInstanceDao.updateById(subProcessInstance);
-            if (subProcessInstance.getState().isFinished()) {
-                log.info("The process instance [{}] is finished, no need to stop", subProcessInstance.getId());
-                return;
-            }
+    }
+
+    private void doKillRunningSubWorkflowInstances(List<WorkflowInstance> runningSubWorkflowInstanceList) throws MasterTaskExecuteException {
+        for (WorkflowInstance subWorkflowInstance : runningSubWorkflowInstanceList) {
             try {
-                sendToSubProcess(taskExecutionContext, subProcessInstance);
-                log.info("Success send [{}] request to SubWorkflow's master: {}", stopStatus,
-                        subProcessInstance.getHost());
+                WorkflowInstanceStopResponse workflowInstanceStopResponse = Clients
+                        .withService(IWorkflowControlClient.class)
+                        .withHost(subWorkflowInstance.getHost())
+                        .stopWorkflowInstance(new WorkflowInstanceStopRequest(subWorkflowInstance.getId()));
+                if (workflowInstanceStopResponse.isSuccess()) {
+                    log.info("Stop SubWorkflow: {} successfully", subWorkflowInstance.getName());
+                } else {
+                    throw new MasterTaskExecuteException(
+                            "Stop subWorkflow: " + subWorkflowInstance.getName() + " failed");
+                }
+            } catch (MasterTaskExecuteException me) {
+                throw me;
             } catch (Exception e) {
                 throw new MasterTaskExecuteException(
                         String.format("Send stop request to SubWorkflow's master: %s failed",
-                                subProcessInstance.getHost()),
+                                subWorkflowInstance.getHost()),
                         e);
             }
         }
     }
 
-    private void sendToSubProcess(TaskExecutionContext taskExecutionContext, ProcessInstance subProcessInstance) {
-        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
-        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId(),
-                subProcessInstance.getState(),
-                subProcessInstance.getId(),
-                0);
-        iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
+    private void doKillWaitToRunSubWorkflowInstances(List<WorkflowInstance> waitToRunWorkflowInstances) {
+        for (WorkflowInstance subWorkflowInstance : waitToRunWorkflowInstances) {
+            subWorkflowInstance.setState(WorkflowExecutionStatus.STOP);
+            workflowInstanceDao.updateById(subWorkflowInstance);
+        }
     }
 
     public boolean isCancel() {

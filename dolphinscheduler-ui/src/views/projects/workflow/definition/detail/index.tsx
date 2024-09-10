@@ -22,9 +22,9 @@ import { useMessage } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Dag from '../../components/dag'
 import {
-  queryProcessDefinitionByCode,
-  updateProcessDefinition
-} from '@/service/modules/process-definition'
+  queryWorkflowDefinitionByCode,
+  updateWorkflowDefinition
+} from '@/service/modules/workflow-definition'
 import {
   WorkflowDefinition,
   SaveForm,
@@ -60,11 +60,11 @@ export default defineComponent({
 
     const refresh = () => {
       isLoading.value = true
-      queryProcessDefinitionByCode(code, projectCode).then((res: any) => {
-        readonly.value = res.processDefinition.releaseState === 'ONLINE'
+      queryWorkflowDefinitionByCode(code, projectCode).then((res: any) => {
+        readonly.value = res.workflowDefinition.releaseState === 'ONLINE'
         definition.value = res
         isLoading.value = false
-        if (!res.processDefinition.locations) {
+        if (!res.workflowDefinition.locations) {
           setTimeout(() => {
             const graph = dagRef.value
             const { submit } = useGraphAutoLayout({ graph })
@@ -85,11 +85,11 @@ export default defineComponent({
           prop: p.key,
           value: p.value,
           direct: p.direct,
-          type: 'VARCHAR'
+          type: p.type
         }
       })
 
-      updateProcessDefinition(
+      updateWorkflowDefinition(
         {
           taskDefinitionJson: JSON.stringify(taskDefinitions),
           taskRelationJson: JSON.stringify(connects),

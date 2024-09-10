@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.tools.demo;
 import static org.apache.dolphinscheduler.common.enums.ConditionType.NONE;
 import static org.apache.dolphinscheduler.common.enums.Flag.YES;
 import static org.apache.dolphinscheduler.common.enums.Priority.MEDIUM;
-import static org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum.PARALLEL;
+import static org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum.PARALLEL;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
@@ -28,11 +28,11 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -85,7 +85,7 @@ public class ProcessDefinitionDemo {
             project = Project
                     .builder()
                     .name("demo")
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .description("")
                     .userId(loginUser.getId())
                     .userName(loginUser.getUserName())
@@ -167,7 +167,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 1; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -175,22 +175,22 @@ public class ProcessDefinitionDemo {
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String absolutePath = System.getProperty("user.dir");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setName("demo_clear_log");
         processDefinitionLog.setDescription("Clear the DS log files from 30 days ago");
         processDefinitionLog.setGlobalParams("[]");
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
@@ -242,7 +242,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 2; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -250,28 +250,28 @@ public class ProcessDefinitionDemo {
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setName("demo_dependent");
         processDefinitionLog.setDescription("Check the completion of daily tasks");
         processDefinitionLog.setGlobalParams("[]");
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
         processTaskRelationLogFirst.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        WorkflowTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
         processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogSecond.setPreTaskVersion(1);
         processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
@@ -334,7 +334,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 2; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -342,28 +342,28 @@ public class ProcessDefinitionDemo {
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setName("demo_parameter_context");
         processDefinitionLog.setDescription("Upstream and downstream task node parameter transfer");
         processDefinitionLog.setGlobalParams(DemoConstants.PARAMETER_CONTEXT_PARAMS);
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
         processTaskRelationLogFirst.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        WorkflowTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
         processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogSecond.setPreTaskVersion(1);
         processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
@@ -420,7 +420,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 4; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -430,40 +430,40 @@ public class ProcessDefinitionDemo {
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
         String taskCodeFourth = String.valueOf(taskCodes.get(3)).replaceAll("\\[|\\]", "");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setName("demo_condition");
         processDefinitionLog.setDescription("Coin Toss");
         processDefinitionLog.setGlobalParams("[]");
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(1));
         processTaskRelationLogFirst.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        WorkflowTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
         processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogSecond.setPreTaskVersion(1);
         processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(2));
         processTaskRelationLogSecond.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
+        WorkflowTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
         processTaskRelationLogThird.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogThird.setPreTaskVersion(1);
         processTaskRelationLogThird.setPostTaskCode(taskCodes.get(3));
         processTaskRelationLogThird.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogFourth = processTaskRelationLogs.get(3);
+        WorkflowTaskRelationLog processTaskRelationLogFourth = processTaskRelationLogs.get(3);
         processTaskRelationLogFourth.setPreTaskCode(taskCodes.get(1));
         processTaskRelationLogFourth.setPreTaskVersion(1);
         processTaskRelationLogFourth.setPostTaskCode(taskCodes.get(0));
@@ -537,7 +537,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 4; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -547,40 +547,40 @@ public class ProcessDefinitionDemo {
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
         String taskCodeFourth = String.valueOf(taskCodes.get(3)).replaceAll("\\[|\\]", "");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setName("demo_switch");
         processDefinitionLog.setDescription("Determine which task to perform based on conditions");
         processDefinitionLog.setGlobalParams(DemoConstants.SWITCH_GLOBAL_PARAMS);
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
         processTaskRelationLogFirst.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        WorkflowTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
         processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogSecond.setPreTaskVersion(1);
         processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
         processTaskRelationLogSecond.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
+        WorkflowTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
         processTaskRelationLogThird.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogThird.setPreTaskVersion(1);
         processTaskRelationLogThird.setPostTaskCode(taskCodes.get(2));
         processTaskRelationLogThird.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogFourth = processTaskRelationLogs.get(3);
+        WorkflowTaskRelationLog processTaskRelationLogFourth = processTaskRelationLogs.get(3);
         processTaskRelationLogFourth.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogFourth.setPreTaskVersion(1);
         processTaskRelationLogFourth.setPostTaskCode(taskCodes.get(3));
@@ -656,7 +656,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 3; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -665,34 +665,34 @@ public class ProcessDefinitionDemo {
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
         processDefinitionLog.setName("demo_shell");
         processDefinitionLog.setDescription("Production, processing and sales of a series of processes");
         processDefinitionLog.setGlobalParams(DemoConstants.SHELL_GLOBAL_PARAMS);
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
         processTaskRelationLogFirst.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
+        WorkflowTaskRelationLog processTaskRelationLogSecond = processTaskRelationLogs.get(1);
         processTaskRelationLogSecond.setPreTaskCode(taskCodes.get(0));
         processTaskRelationLogSecond.setPreTaskVersion(1);
         processTaskRelationLogSecond.setPostTaskCode(taskCodes.get(1));
         processTaskRelationLogSecond.setPostTaskVersion(1);
 
-        ProcessTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
+        WorkflowTaskRelationLog processTaskRelationLogThird = processTaskRelationLogs.get(2);
         processTaskRelationLogThird.setPreTaskCode(taskCodes.get(1));
         processTaskRelationLogThird.setPreTaskVersion(1);
         processTaskRelationLogThird.setPostTaskCode(taskCodes.get(2));
@@ -755,29 +755,29 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 1; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
         }
         String taskCode = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
 
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
-        processDefinitionLog.setName("demo_sub_process");
+        WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
+        processDefinitionLog.setName("demo_sub_workflow");
         processDefinitionLog.setDescription("Start the production line");
         processDefinitionLog.setGlobalParams("[]");
         processDefinitionLog.setLocations(null);
         processDefinitionLog.setTimeout(0);
 
-        List<ProcessTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
+        List<WorkflowTaskRelationLog> processTaskRelationLogs = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
             processTaskRelationLog.setName("");
             processTaskRelationLog.setConditionType(NONE);
             processTaskRelationLog.setConditionParams("{}");
             processTaskRelationLogs.add(processTaskRelationLog);
         }
-        ProcessTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
+        WorkflowTaskRelationLog processTaskRelationLogFirst = processTaskRelationLogs.get(0);
         processTaskRelationLogFirst.setPreTaskCode(0);
         processTaskRelationLogFirst.setPreTaskVersion(0);
         processTaskRelationLogFirst.setPostTaskCode(taskCodes.get(0));
@@ -798,7 +798,7 @@ public class ProcessDefinitionDemo {
             taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
             taskDefinitionLog.setTimeoutNotifyStrategy(null);
             taskDefinitionLog.setWorkerGroup("default");
-            taskDefinitionLog.setTaskType("SUB_PROCESS");
+            taskDefinitionLog.setTaskType("SUB_WORKFLOW");
             taskDefinitionLogs.add(taskDefinitionLog);
         }
         TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);

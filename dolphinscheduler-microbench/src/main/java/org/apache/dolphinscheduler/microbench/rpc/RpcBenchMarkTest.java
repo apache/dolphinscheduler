@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.microbench.rpc;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
@@ -46,19 +45,20 @@ import org.openjdk.jmh.infra.Blackhole;
 @BenchmarkMode({Mode.Throughput, Mode.AverageTime, Mode.SampleTime})
 public class RpcBenchMarkTest extends AbstractBaseBenchmark {
 
-    private NettyRemotingServer nettyRemotingServer;
+    private SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery;
 
     private IService iService;
 
     @Setup
     public void before() {
-        nettyRemotingServer = new NettyRemotingServer(new NettyServerConfig(12345));
-        nettyRemotingServer.start();
-        SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery =
-                new SpringServerMethodInvokerDiscovery(nettyRemotingServer);
+        NettyServerConfig nettyServerConfig =
+                NettyServerConfig.builder().serverName("NettyRemotingServer").listenPort(12345).build();
+        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
         springServerMethodInvokerDiscovery.postProcessAfterInitialization(new IServiceImpl(), "iServiceImpl");
-        iService =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient("localhost:12345", IService.class);
+        springServerMethodInvokerDiscovery.start();
+        iService = Clients
+                .withService(IService.class)
+                .withHost("localhost:12345");
     }
 
     @Benchmark
@@ -71,6 +71,6 @@ public class RpcBenchMarkTest extends AbstractBaseBenchmark {
 
     @TearDown
     public void after() {
-        nettyRemotingServer.close();
+        springServerMethodInvokerDiscovery.close();
     }
 }

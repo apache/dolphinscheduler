@@ -18,11 +18,16 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
+import org.apache.dolphinscheduler.alert.service.AlertHAServer;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -37,29 +42,41 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
     private final AlertConfig alertConfig;
     private final Integer processId;
     private final RegistryClient registryClient;
+
+    private final MetricsProvider metricsProvider;
+
+    private final AlertHAServer alertHAServer;
     private final String heartBeatPath;
     private final long startupTime;
 
     public AlertHeartbeatTask(AlertConfig alertConfig,
-                              RegistryClient registryClient) {
-        super("AlertHeartbeatTask", alertConfig.getHeartbeatInterval().toMillis());
+                              MetricsProvider metricsProvider,
+                              RegistryClient registryClient,
+                              AlertHAServer alertHAServer) {
+        super("AlertHeartbeatTask", alertConfig.getMaxHeartbeatInterval().toMillis());
         this.startupTime = System.currentTimeMillis();
         this.alertConfig = alertConfig;
+        this.metricsProvider = metricsProvider;
         this.registryClient = registryClient;
         this.heartBeatPath =
                 RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.getAlertServerAddress();
+        this.alertHAServer = alertHAServer;
         this.processId = OSUtils.getProcessID();
     }
 
     @Override
     public AlertServerHeartBeat getHeartBeat() {
+        SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
         return AlertServerHeartBeat.builder()
                 .processId(processId)
                 .startupTime(startupTime)
                 .reportTime(System.currentTimeMillis())
-                .cpuUsage(OSUtils.cpuUsagePercentage())
-                .memoryUsage(OSUtils.memoryUsagePercentage())
-                .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
+                .jvmCpuUsage(systemMetrics.getJvmCpuUsagePercentage())
+                .cpuUsage(systemMetrics.getSystemCpuUsagePercentage())
+                .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
+                .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .serverStatus(ServerStatus.NORMAL)
+                .isActive(alertHAServer.isActive())
                 .host(NetUtils.getHost())
                 .port(alertConfig.getPort())
                 .build();
@@ -69,6 +86,7 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
     public void writeHeartBeat(AlertServerHeartBeat heartBeat) {
         String heartBeatJson = JSONUtils.toJsonString(heartBeat);
         registryClient.persistEphemeral(heartBeatPath, heartBeatJson);
+        AlertServerMetrics.incAlertHeartbeatCount();
         log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, heartBeatJson);
     }

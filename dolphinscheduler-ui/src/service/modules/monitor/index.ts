@@ -16,6 +16,7 @@
  */
 
 import { axios } from '@/service/service'
+import type { ServerNodeType } from './types'
 
 export function queryDatabaseState(): any {
   return axios({
@@ -34,6 +35,13 @@ export function listMaster(): any {
 export function listWorker(): any {
   return axios({
     url: '/monitor/workers',
+    method: 'get'
+  })
+}
+
+export function listMonitorServerNode(nodeType: ServerNodeType): any {
+  return axios({
+    url: `/monitor/${nodeType}`,
     method: 'get'
   })
 }

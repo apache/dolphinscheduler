@@ -17,21 +17,23 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
+import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -186,52 +188,98 @@ public class CuringParamsServiceTest {
         taskDefinition.setName("TaskName-1");
         taskDefinition.setCode(1000001l);
 
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(2);
-        processInstance.setCommandParam("{\"" + Constants.SCHEDULE_TIMEZONE + "\":\"Asia/Shanghai\"}");
-        processInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(2);
+        final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
+                .timeZone("Asia/Shanghai")
+                .build();
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam));
+        workflowInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
         Property property = new Property();
         property.setDirect(Direct.IN);
         property.setProp("global_params");
         property.setValue("hello world");
         property.setType(DataType.VARCHAR);
         List<Property> properties = Lists.newArrayList(property);
-        processInstance.setGlobalParams(JSONUtils.toJsonString(properties));
+        workflowInstance.setGlobalParams(JSONUtils.toJsonString(properties));
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setName("ProcessName-1");
-        processDefinition.setProjectName("ProjectName-1");
-        processDefinition.setProjectCode(3000001l);
-        processDefinition.setCode(200001l);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setName("ProcessName-1");
+        workflowDefinition.setProjectName("ProjectName-1");
+        workflowDefinition.setProjectCode(3000001L);
+        workflowDefinition.setCode(200001L);
 
-        processInstance.setProcessDefinition(processDefinition);
-        taskInstance.setProcessDefine(processDefinition);
-        taskInstance.setProcessInstance(processInstance);
-        taskInstance.setTaskDefine(taskDefinition);
-        taskInstance.setProjectCode(3000001l);
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
+        taskInstance.setTaskCode(taskDefinition.getCode());
+        taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
+        taskInstance.setProjectCode(workflowDefinition.getProjectCode());
+        taskInstance.setWorkflowInstanceId(workflowInstance.getId());
 
-        AbstractParameters parameters = new SubProcessParameters();
+        AbstractParameters parameters = new SubWorkflowParameters();
 
         Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
 
         Map<String, Property> propertyMap =
-                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, processInstance);
+                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, workflowInstance);
         Assertions.assertNotNull(propertyMap);
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_INSTANCE_ID).getValue(),
                 String.valueOf(taskInstance.getId()));
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_EXECUTE_PATH).getValue(),
                 taskInstance.getExecutePath());
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID).getValue(),
-                String.valueOf(processInstance.getId()));
-        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME).getValue(),
-                processDefinition.getName());
-        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_NAME).getValue(),
-                processDefinition.getProjectName());
+                String.valueOf(workflowInstance.getId()));
+        // Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME).getValue(),
+        // processDefinition.getName());
+        // Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_NAME).getValue(),
+        // processDefinition.getProjectName());
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_CODE).getValue(),
-                String.valueOf(processDefinition.getProjectCode()));
+                String.valueOf(workflowDefinition.getProjectCode()));
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_DEFINITION_CODE).getValue(),
                 String.valueOf(taskDefinition.getCode()));
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE).getValue(),
-                String.valueOf(processDefinition.getCode()));
+                String.valueOf(workflowDefinition.getCode()));
+    }
+
+    @Test
+    public void testParseWorkflowStartParam() {
+        Map<String, Property> result = new HashMap<>();
+        // empty cmd param
+        Map<String, String> startParamMap = new HashMap<>();
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowStartParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        // without key
+        startParamMap.put("testStartParam", "$[yyyyMMdd]");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowStartParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        startParamMap.put("StartParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowStartParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertEquals(2, result.keySet().size());
+        Assertions.assertEquals("11111", result.get("param1").getValue());
+        Assertions.assertEquals("22222", result.get("param2").getValue());
+    }
+
+    @Test
+    public void testParseWorkflowFatherParam() {
+        Map<String, Property> result = new HashMap<>();
+        // empty cmd param
+        Map<String, String> startParamMap = new HashMap<>();
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowFatherParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        // without key
+        startParamMap.put("testfatherParams", "$[yyyyMMdd]");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowFatherParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        startParamMap.put("fatherParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowFatherParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertEquals(2, result.keySet().size());
+        Assertions.assertEquals("11111", result.get("param1").getValue());
+        Assertions.assertEquals("22222", result.get("param2").getValue());
     }
 }

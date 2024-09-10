@@ -91,9 +91,4 @@ public class Project {
     @TableField(exist = false)
     private int defCount;
 
-    /**
-     * process instance running count
-     */
-    @TableField(exist = false)
-    private int instRunningCount;
 }

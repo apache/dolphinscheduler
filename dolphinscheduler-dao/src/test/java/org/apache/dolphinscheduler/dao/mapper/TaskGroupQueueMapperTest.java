@@ -39,7 +39,7 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task1");
         taskGroupQueue.setGroupId(10);
-        taskGroupQueue.setProcessId(11);
+        taskGroupQueue.setWorkflowInstanceId(11);
         taskGroupQueue.setPriority(10);
         taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
         Date date = new Date(System.currentTimeMillis());

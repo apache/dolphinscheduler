@@ -9,8 +9,33 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 
 ## 前置准备工作
 
-- JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
+- JDK：下载[JDK][jdk] (1.8 or 11)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 - 二进制包：在[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)下载 DolphinScheduler 二进制包  <!-- markdown-link-check-disable-line -->
+
+## 配置用户免密及权限
+
+创建部署用户，并且一定要配置 `sudo` 免密。以创建 dolphinscheduler 用户为例
+
+```shell
+# 创建用户需使用 root 登录
+useradd dolphinscheduler
+
+# 添加密码
+echo "dolphinscheduler" | passwd --stdin dolphinscheduler
+
+# 配置 sudo 免密
+sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
+
+# 修改目录权限，使得部署用户对二进制包解压后的 apache-dolphinscheduler-*-bin 目录有操作权限
+chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
+```
+
+> **_注意:_**
+>
+> - 因为任务执行服务是以 `sudo -u {linux-user} -i` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
+> - 如果发现 `/etc/sudoers` 文件中有 "Defaults requiretty" 这行，也请注释掉
 
 ## 启动 DolphinScheduler Standalone Server
 
@@ -45,9 +70,16 @@ bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 ```
 
+> **_注意_**: Python 网关服务默认为关闭状态，如果您想启动 Python 网关服务，
+> 请修改 YAML 配置文件，将 `python-gateway.enabled` 设置为 `true`，
+> 配置文件路径为 `api-server/conf/application.yaml`
+
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 ## 配置数据库
 
 Standalone server 使用 H2 数据库作为其元数据存储数据，这是为了上手简单，用户在启动服务器之前不需要启动数据库。但是如果用户想将元数据库存储在
 MySQL 或 PostgreSQL 等其他数据库中，必须更改一些配置。请参考 [数据源配置](../howto/datasource-setting.md) `Standalone 切换元数据库` 创建并初始化数据库
+
+> **_注意_**: DS默认使用本地模式的目录 /tmp/dolphinscheduler 作为资源中心, 如果需要修改资源中心目录, 请修改配置文件 conf/common.properties 中 resource 的相关配置项
+

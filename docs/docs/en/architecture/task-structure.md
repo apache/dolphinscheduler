@@ -146,7 +146,6 @@ No.|parameter name||type|description |note
 5| |type |String |database type
 6| |datasource |Int |datasource id
 7| |sql |String |query SQL statement
-8| |udfs | String| udf functions|specify UDF function ids, separate by comma
 9| |sqlType | String| SQL node type |0 for query and 1 for none-query SQL
 10| |title |String | mail title
 11| |receivers |String |receivers
@@ -180,7 +179,6 @@ No.|parameter name||type|description |note
         "type":"MYSQL",
         "datasource":1,
         "sql":"select id , namge , age from emp where id =  ${id}",
-        "udfs":"",
         "sqlType":"0",
         "title":"xxxx@xxx.com",
         "receivers":"xxxx@xxx.com",
@@ -921,7 +919,7 @@ No.|parameter name||type|description |notes
 
 ```bash
 {
-            "type":"SUB_PROCESS",
+            "type":"SUB_WORKFLOW",
             "id":"tasks-14806",
             "name":"SubProcessTask",
             "params":{

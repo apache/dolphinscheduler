@@ -45,7 +45,7 @@ export function usePytorch({
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
     pythonEnvTool: 'conda',
-    pythonCommand: '${PYTHON_LAUNCHER}',
+    pythonLauncher: '${PYTHON_LAUNCHER}',
     condaPythonVersion: '3.7',
     requirements: 'requirements.txt',
     pythonPath: '.'
@@ -55,12 +55,12 @@ export function usePytorch({
   if (from === 1) {
     extra = [
       Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
+      Fields.useWorkflowName({
         model,
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName
+        workflowName: data?.workflowDefinitionName
       })
     ]
   }
@@ -73,7 +73,7 @@ export function usePytorch({
       Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
-      Fields.useWorkerGroup(),
+      Fields.useWorkerGroup(projectCode),
       Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),

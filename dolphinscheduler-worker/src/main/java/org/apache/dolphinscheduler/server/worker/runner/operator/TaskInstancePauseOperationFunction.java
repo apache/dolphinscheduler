@@ -36,7 +36,7 @@ public class TaskInstancePauseOperationFunction
         try {
             LogUtils.setTaskInstanceIdMDC(taskInstancePauseRequest.getTaskInstanceId());
             log.info("Receive TaskInstancePauseRequest: {}", taskInstancePauseRequest);
-            log.warn("TaskInstancePauseOperationFunction is not support for worker task yet!");
+            log.info("TaskInstancePauseOperationFunction is not support for worker task yet!");
             return TaskInstancePauseResponse.success();
         } finally {
             LogUtils.removeTaskInstanceIdMDC();

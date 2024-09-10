@@ -31,6 +31,8 @@ export function useDropDown() {
       useLogout()
     } else if (key === 'password') {
       router.push({ path: '/password' })
+    } else if (key === 'about') {
+      router.push({ path: '/about' })
     } else if (key === 'profile') {
       router.push({ path: '/profile' })
     }
@@ -42,7 +44,6 @@ export function useDropDown() {
       userStore.setSecurityConfigType('')
       userStore.setUserInfo({})
       userStore.setBaseResDir('')
-      userStore.setBaseUdfDir('')
       cookies.remove('sessionId')
 
       router.push({ path: '/login' })

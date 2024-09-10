@@ -27,8 +27,9 @@ import {
 } from 'naive-ui'
 import { useTable } from './use-table'
 import Card from '@/components/card'
-import ProcessInstanceCondition from './components/process-instance-condition'
+import WorkflowInstanceCondition from './components/workflow-instance-condition'
 import type { IWorkflowInstanceSearch } from './types'
+import totalCount from '@/utils/tableTotalCount'
 
 export default defineComponent({
   name: 'WorkflowInstanceList',
@@ -42,7 +43,7 @@ export default defineComponent({
     }
 
     const handleSearch = (params: IWorkflowInstanceSearch) => {
-      variables.processDefineCode = params.processDefineCode
+      variables.workflowDefinitionCode = params.workflowDefinitionCode
       variables.searchVal = params.searchVal
       variables.executorName = params.executorName
       variables.host = params.host
@@ -96,7 +97,7 @@ export default defineComponent({
     return (
       <NSpace vertical>
         <Card>
-          <ProcessInstanceCondition onHandleSearch={this.handleSearch} />
+          <WorkflowInstanceCondition onHandleSearch={this.handleSearch} />
         </Card>
         <Card title={t('project.workflow.workflow_instance')}>
           <NSpace vertical>
@@ -121,6 +122,8 @@ export default defineComponent({
                 show-quick-jumper
                 onUpdatePage={this.requestData}
                 onUpdatePageSize={this.handleChangePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

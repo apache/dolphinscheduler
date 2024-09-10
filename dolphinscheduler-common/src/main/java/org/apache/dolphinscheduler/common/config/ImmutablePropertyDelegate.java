@@ -49,7 +49,7 @@ public class ImmutablePropertyDelegate implements IPropertyDelegate {
             } catch (IOException e) {
                 log.error("Load property: {} error, please check if the file exist under classpath",
                         propertyAbsolutePath, e);
-                System.exit(1);
+                throw new RuntimeException(e);
             }
         }
         printProperties();

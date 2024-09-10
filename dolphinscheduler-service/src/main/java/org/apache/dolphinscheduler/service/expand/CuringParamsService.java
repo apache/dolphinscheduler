@@ -18,14 +18,16 @@
 package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import lombok.NonNull;
 
@@ -40,12 +42,12 @@ public interface CuringParamsService {
 
     /**
      * time function extension
-     * @param processInstanceId
+     * @param workflowInstanceId
      * @param timezone
      * @param placeholderName
      * @return
      */
-    String timeFunctionExtension(Integer processInstanceId, String timezone, String placeholderName);
+    String timeFunctionExtension(Integer workflowInstanceId, String timezone, String placeholderName);
 
     /**
      * convert parameter placeholders
@@ -57,7 +59,7 @@ public interface CuringParamsService {
 
     /**
      * curing global params
-     * @param processInstanceId
+     * @param workflowInstanceId
      * @param globalParamMap
      * @param globalParamList
      * @param commandType
@@ -65,7 +67,7 @@ public interface CuringParamsService {
      * @param timezone
      * @return
      */
-    String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap,
+    String curingGlobalParams(Integer workflowInstanceId, Map<String, String> globalParamMap,
                               List<Property> globalParamList, CommandType commandType, Date scheduleTime,
                               String timezone);
 
@@ -73,19 +75,29 @@ public interface CuringParamsService {
      * param parsing preparation
      * @param parameters
      * @param taskInstance
-     * @param processInstance
+     * @param workflowInstance
      * @return
      */
     Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                   @NonNull AbstractParameters parameters,
-                                                  @NonNull ProcessInstance processInstance);
+                                                  @NonNull WorkflowInstance workflowInstance);
+
+    /**
+     * Parse workflow star parameter
+     */
+    Map<String, Property> parseWorkflowStartParam(@Nullable Map<String, String> cmdParam);
+
+    /**
+     * Parse workflow father parameter
+     */
+    Map<String, Property> parseWorkflowFatherParam(@Nullable Map<String, String> cmdParam);
 
     /**
      * preBuildBusinessParams
-     * @param processInstance
+     * @param workflowInstance
      * @return
      */
-    Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance);
+    Map<String, Property> preBuildBusinessParams(WorkflowInstance workflowInstance);
 
     Map<String, Property> getProjectParameterMap(long projectCode);
 }

@@ -38,6 +38,7 @@ export interface IDefinitionData {
   projectName: any
   releaseState: string
   scheduleReleaseState: any
+  schedule: any
   tenantCode: any
   tenantId: number
   timeout: number
@@ -55,9 +56,9 @@ export interface ICrontabData {
   endTime: string
   environmentCode: number
   failureStrategy: string
-  processDefinitionCode: number
-  processDefinitionName: string
-  processInstancePriority: string
+  workflowDefinitionCode: number
+  workflowDefinitionName: string
+  workflowInstancePriority: string
   projectName: string
   releaseState: 'ONLINE' | 'OFFLINE'
   startTime: string

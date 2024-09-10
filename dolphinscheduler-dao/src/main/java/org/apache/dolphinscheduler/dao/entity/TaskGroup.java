@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -36,44 +38,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_task_group")
 public class TaskGroup implements Serializable {
 
-    /**
-     * key
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * task_group name
-     */
     private String name;
 
-    private String description;
-    /**
-     * 作业组大小
-     */
-    private int groupSize;
-    /**
-     * 已使用作业组大小
-     */
-    private int useSize;
-    /**
-     * creator id
-     */
-    private int userId;
-    /**
-     * 0 not available, 1 available
-     */
-    private Integer status;
-    /**
-     * create time
-     */
-    private Date createTime;
-    /**
-     * update time
-     */
-    private Date updateTime;
-    /**
-     * project code
-     */
     private long projectCode;
+    private String description;
+    private int groupSize;
+    private int useSize;
+    private int userId;
+    private Flag status;
+    private Date createTime;
+    private Date updateTime;
 
 }

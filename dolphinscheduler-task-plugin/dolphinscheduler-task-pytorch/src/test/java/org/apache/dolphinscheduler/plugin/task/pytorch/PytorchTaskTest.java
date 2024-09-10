@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -71,6 +70,12 @@ public class PytorchTaskTest {
                 "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r "
                         + requirementPath);
 
+    }
+
+    @Test
+    public void testGitProjectUrlInjection() {
+        Assertions.assertFalse(GitProjectManager.isGitPath("git@& cat /etc/passwd >/poc.txt #"));
+        Assertions.assertFalse(GitProjectManager.isGitPath("git@| cat /etc/passwd >/poc.txt #"));
     }
 
     @Test
@@ -198,7 +203,6 @@ public class PytorchTaskTest {
         String parameters = JSONUtils.toJsonString(pytorchParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
         return taskExecutionContext;
     }
 

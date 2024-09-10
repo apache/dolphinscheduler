@@ -62,9 +62,9 @@ public class HttpAlertChannelTest {
 
         // HttpSender(paramsMap).send(alertData.getContent()); already test in HttpSenderTest.sendTest. so we can mock
         // it
-        doReturn(new AlertResult("true", "success")).when(alertChannel).process(any());
+        doReturn(new AlertResult(true, "success")).when(alertChannel).process(any());
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assertions.assertEquals("true", alertResult.getStatus());
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     /**
@@ -98,11 +98,17 @@ public class HttpAlertChannelTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
+        InputParam timeout = InputParam.newBuilder("timeout", "timeout")
+                .setValue(120)
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
+
         paramsList.add(urlParam);
         paramsList.add(headerParams);
         paramsList.add(bodyParams);
         paramsList.add(content);
         paramsList.add(requestType);
+        paramsList.add(timeout);
 
         return JSONUtils.toJsonString(paramsList);
     }

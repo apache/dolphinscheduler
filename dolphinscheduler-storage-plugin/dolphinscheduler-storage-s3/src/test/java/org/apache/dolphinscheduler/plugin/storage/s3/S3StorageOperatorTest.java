@@ -17,289 +17,289 @@
 
 package org.apache.dolphinscheduler.plugin.storage.s3;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import java.io.IOException;
-import java.util.Collections;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
+import java.util.stream.Stream;
 
+import lombok.SneakyThrows;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.testcontainers.containers.MinIOContainer;
+import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
-@ExtendWith(MockitoExtension.class)
 public class S3StorageOperatorTest {
 
-    private static final String ACCESS_KEY_ID_MOCK = "ACCESS_KEY_ID_MOCK";
+    private static final String demoSql = S3StorageOperatorTest.class.getResource("/demo.sql").getFile();
 
-    private static final String ACCESS_KEY_SECRET_MOCK = "ACCESS_KEY_SECRET_MOCK";
+    private static MinIOContainer minIOContainer;
 
-    private static final String REGION_MOCK = "REGION_MOCK";
+    private static S3StorageOperator s3StorageOperator;
 
-    private static final String END_POINT_MOCK = "END_POINT_MOCK";
+    @BeforeAll
+    public static void setUp() throws Exception {
+        String bucketName = "dolphinscheduler";
+        String accessKey = "accessKey123";
+        String secretKey = "secretKey123";
+        String region = "us-east-1";
 
-    private static final String BUCKET_NAME_MOCK = "BUCKET_NAME_MOCK";
+        minIOContainer = new MinIOContainer("minio/minio:RELEASE.2023-09-04T19-57-37Z")
+                .withEnv("MINIO_ACCESS_KEY", accessKey)
+                .withEnv("MINIO_SECRET_KEY", secretKey)
+                .withEnv("MINIO_REGION", region)
+                .withNetworkAliases(bucketName + "." + "localhost");
 
-    private static final String TENANT_CODE_MOCK = "TENANT_CODE_MOCK";
+        Startables.deepStart(Stream.of(minIOContainer)).join();
 
-    private static final String DIR_MOCK = "DIR_MOCK";
+        String endpoint = minIOContainer.getS3URL();
 
-    private static final String FILE_NAME_MOCK = "FILE_NAME_MOCK";
+        AmazonS3 amazonS3 = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
+                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
+                .withPathStyleAccessEnabled(true)
+                .build();
+        amazonS3.createBucket(bucketName);
 
-    private static final String FILE_PATH_MOCK = "FILE_PATH_MOCK";
-
-    private static final String FULL_NAME = "/tmp/dir1/";
-
-    private static final String DEFAULT_PATH = "/tmp/";
-
-    @Mock
-    private AmazonS3 s3Client;
-
-    private S3StorageOperator s3StorageOperator;
+        S3StorageProperties s3StorageProperties = S3StorageProperties.builder()
+                .bucketName(bucketName)
+                .resourceUploadPath("tmp/dolphinscheduler")
+                .s3Configuration(ImmutableMap.of(
+                        "access.key.id", accessKey,
+                        "access.key.secret", secretKey,
+                        "region", region,
+                        "endpoint", endpoint))
+                .build();
+        s3StorageOperator = new S3StorageOperator(s3StorageProperties);
+    }
 
     @BeforeEach
-    public void setUp() throws Exception {
-        s3StorageOperator = Mockito.spy(new S3StorageOperator());
-
-        doReturn(ACCESS_KEY_ID_MOCK).when(s3StorageOperator)
-                .readAccessKeyID();
-        doReturn(ACCESS_KEY_SECRET_MOCK).when(s3StorageOperator)
-                .readAccessKeySecret();
-        doReturn(REGION_MOCK).when(s3StorageOperator).readRegion();
-        doReturn(BUCKET_NAME_MOCK).when(s3StorageOperator).readBucketName();
-        doReturn(END_POINT_MOCK).when(s3StorageOperator).readEndPoint();
-        Mockito.doReturn(s3Client)
-                .when(s3StorageOperator).buildS3Client();
-        Mockito.doNothing()
-                .when(s3StorageOperator).checkBucketNameExists(Mockito.any());
-
-        s3StorageOperator.init();
+    public void initializeFiles() {
+        s3StorageOperator.delete("tmp/dolphinscheduler/default/resources", true);
+        s3StorageOperator.createStorageDir("tmp/dolphinscheduler/default/resources/sqlDirectory");
+        s3StorageOperator.createStorageDir("tmp/dolphinscheduler/default/resources/multipleDirectories");
+        s3StorageOperator.createStorageDir("tmp/dolphinscheduler/default/resources/multipleDirectories/1");
+        s3StorageOperator.createStorageDir("tmp/dolphinscheduler/default/resources/multipleDirectories/2");
+        s3StorageOperator.createStorageDir("tmp/dolphinscheduler/default/resources/multipleDirectories/3");
+        s3StorageOperator.upload(demoSql, "tmp/dolphinscheduler/default/resources/multipleDirectories/1/demo.sql",
+                false, true);
+        s3StorageOperator.createStorageDir("tmp/dolphinscheduler/default/resources/emptyDirectory");
+        s3StorageOperator.upload(demoSql, "tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql", false, true);
     }
 
     @Test
-    public void testInit() {
-        verify(s3StorageOperator, times(1)).buildS3Client();
-        Assertions.assertEquals(ACCESS_KEY_ID_MOCK, s3StorageOperator.getAccessKeyId());
-        Assertions.assertEquals(ACCESS_KEY_SECRET_MOCK, s3StorageOperator.getAccessKeySecret());
-        Assertions.assertEquals(REGION_MOCK, s3StorageOperator.getRegion());
-        Assertions.assertEquals(BUCKET_NAME_MOCK, s3StorageOperator.getBucketName());
+    public void testGetResourceMetaData() {
+        ResourceMetadata resourceMetaData =
+                s3StorageOperator.getResourceMetaData("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql");
+        assertEquals("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql",
+                resourceMetaData.getResourceAbsolutePath());
+        assertEquals("tmp/dolphinscheduler", resourceMetaData.getResourceBaseDirectory());
+        assertEquals("default", resourceMetaData.getTenant());
+        assertEquals(ResourceType.FILE, resourceMetaData.getResourceType());
+        assertEquals("sqlDirectory/demo.sql", resourceMetaData.getResourceRelativePath());
+        assertEquals("tmp/dolphinscheduler/default/resources/sqlDirectory",
+                resourceMetaData.getResourceParentAbsolutePath());
+        assertFalse(resourceMetaData.isDirectory());
     }
 
     @Test
-    public void testTearDown() throws IOException {
-        doNothing().when(s3Client).shutdown();
-        s3StorageOperator.close();
-        verify(s3Client, times(1)).shutdown();
+    public void testGetStorageBaseDirectory() {
+        assertEquals("tmp/dolphinscheduler", s3StorageOperator.getStorageBaseDirectory());
     }
 
     @Test
-    public void testCreateTenantResAndUdfDir() throws Exception {
-        doReturn(DIR_MOCK).when(s3StorageOperator).getS3ResDir(TENANT_CODE_MOCK);
-        doReturn(DIR_MOCK).when(s3StorageOperator).getS3UdfDir(TENANT_CODE_MOCK);
-        doReturn(true).when(s3StorageOperator).mkdir(TENANT_CODE_MOCK, DIR_MOCK);
-        s3StorageOperator.createTenantDirIfNotExists(TENANT_CODE_MOCK);
-        verify(s3StorageOperator, times(2)).mkdir(TENANT_CODE_MOCK, DIR_MOCK);
+    public void testGetStorageBaseDirectory_withTenant() {
+        assertEquals("tmp/dolphinscheduler/default", s3StorageOperator.getStorageBaseDirectory("default"));
     }
 
     @Test
-    public void testGetResDir() {
-        final String expectedResourceDir = String.format("dolphinscheduler/%s/resources/", TENANT_CODE_MOCK);
-        final String dir = s3StorageOperator.getResDir(TENANT_CODE_MOCK);
-        Assertions.assertEquals(expectedResourceDir, dir);
+    public void testGetStorageBaseDirectory_withTenant_withResourceTypeFile() {
+        String storageBaseDirectory = s3StorageOperator.getStorageBaseDirectory("default", ResourceType.FILE);
+        assertThat(storageBaseDirectory).isEqualTo("tmp/dolphinscheduler/default/resources");
     }
 
     @Test
-    public void testGetUdfDir() {
-        final String expectedUdfDir = String.format("dolphinscheduler/%s/udfs/", TENANT_CODE_MOCK);
-        final String dir = s3StorageOperator.getUdfDir(TENANT_CODE_MOCK);
-        Assertions.assertEquals(expectedUdfDir, dir);
+    public void testGetStorageBaseDirectory_withTenant_withResourceTypeAll() {
+        String storageBaseDirectory = s3StorageOperator.getStorageBaseDirectory("default", ResourceType.ALL);
+        assertThat(storageBaseDirectory).isEqualTo("tmp/dolphinscheduler/default");
     }
 
     @Test
-    public void mkdirWhenDirExists() {
-        boolean isSuccess = false;
-        try {
-            final String key = DIR_MOCK + FOLDER_SEPARATOR;
-            doReturn(true).when(s3Client).doesObjectExist(BUCKET_NAME_MOCK, key);
-            isSuccess = s3StorageOperator.mkdir(TENANT_CODE_MOCK, DIR_MOCK);
-            verify(s3Client, times(1)).doesObjectExist(BUCKET_NAME_MOCK, key);
+    public void testGetStorageFileAbsolutePath() {
+        assertThat(s3StorageOperator.getStorageFileAbsolutePath("default", "demo.sql"))
+                .isEqualTo("tmp/dolphinscheduler/default/resources/demo.sql");
+    }
 
-        } catch (IOException e) {
-            Assertions.fail("test failed due to unexpected IO exception");
+    @Test
+    public void testCreateStorageDir_notExist() {
+        String dirName = "tmp/dolphinscheduler/default/resources/testDirectory";
+        s3StorageOperator.createStorageDir(dirName);
+        assertTrue(s3StorageOperator.exists(dirName));
+
+    }
+
+    @Test
+    public void testCreateStorageDir_exist() {
+        final String dirName = "tmp/dolphinscheduler/default/resources/emptyDirectory";
+        Assertions.assertThrows(FileAlreadyExistsException.class, () -> s3StorageOperator.createStorageDir(dirName));
+    }
+
+    @Test
+    public void testExists_fileExist() {
+        assertTrue(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql"));
+    }
+
+    @Test
+    public void testExists_fileNotExist() {
+        assertFalse(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/notExist.sql"));
+    }
+
+    @Test
+    public void testExists_directoryExist() {
+        assertTrue(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory"));
+    }
+
+    @Test
+    public void testExists_directoryNotExist() {
+        assertFalse(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/notExistDirectory"));
+    }
+
+    @Test
+    public void delete_fileExist() {
+        s3StorageOperator.delete("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql", true);
+        assertFalse(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql"));
+    }
+
+    @Test
+    public void delete_fileNotExist() {
+        s3StorageOperator.delete("tmp/dolphinscheduler/default/resources/sqlDirectory/notExist.sql", true);
+        assertFalse(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/notExist.sql"));
+    }
+
+    @Test
+    public void delete_directoryExist() {
+        s3StorageOperator.delete("tmp/dolphinscheduler/default/resources/sqlDirectory", true);
+        assertFalse(s3StorageOperator.exists("/tmp/dolphinscheduler/default/resources/sqlDirectory"));
+    }
+
+    @Test
+    public void delete_directoryNotExist() {
+        s3StorageOperator.delete("tmp/dolphinscheduler/default/resources/notExist", true);
+        assertFalse(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/notExist"));
+    }
+
+    @Test
+    public void copy_file() {
+        s3StorageOperator.copy("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql",
+                "tmp/dolphinscheduler/default/resources/sqlDirectory/demo_copy.sql", true, true);
+        assertTrue(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/demo_copy.sql"));
+        assertFalse(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql"));
+    }
+
+    @Test
+    public void copy_directory() {
+        assertThrows(UnsupportedOperationException.class,
+                () -> s3StorageOperator.copy("tmp/dolphinscheduler/default/resources/sqlDirectory",
+                        "tmp/dolphinscheduler/default/resources/sqlDirectory_copy", true, true));
+    }
+
+    @Test
+    public void testUpload_file() {
+        String file = S3StorageOperatorTest.class.getResource("/student.sql").getFile();
+        s3StorageOperator.upload(file, "tmp/dolphinscheduler/default/resources/sqlDirectory/student.sql", false, true);
+        assertTrue(s3StorageOperator.exists("tmp/dolphinscheduler/default/resources/sqlDirectory/student.sql"));
+    }
+
+    @Test
+    public void testFetchFileContent() {
+        List<String> strings = s3StorageOperator
+                .fetchFileContent("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql", 0, 2);
+        assertThat(strings).hasSize(2);
+    }
+
+    @Test
+    public void testListStorageEntity_file() {
+        List<StorageEntity> storageEntities =
+                s3StorageOperator.listStorageEntity("tmp/dolphinscheduler/default/resources/sqlDirectory");
+        assertThat(storageEntities).hasSize(1);
+
+        StorageEntity storageEntity = storageEntities.get(0);
+        assertThat(storageEntity.getFullName())
+                .isEqualTo("tmp/dolphinscheduler/default/resources/sqlDirectory/demo.sql");
+        assertThat(storageEntity.getFileName())
+                .isEqualTo("demo.sql");
+        assertThat(storageEntity.isDirectory()).isFalse();
+        assertThat(storageEntity.getPfullName()).isEqualTo("tmp/dolphinscheduler/default/resources/sqlDirectory");
+        assertThat(storageEntity.getType()).isEqualTo(ResourceType.FILE);
+    }
+
+    @Test
+    public void testListStorageEntity_directory() {
+        List<StorageEntity> storageEntities =
+                s3StorageOperator.listStorageEntity("tmp/dolphinscheduler/default/resources");
+        assertThat(storageEntities).hasSize(3);
+
+    }
+
+    @Test
+    public void testListStorageEntity_directoryNotExist() {
+        List<StorageEntity> storageEntities =
+                s3StorageOperator.listStorageEntity("tmp/dolphinscheduler/notExist/resources");
+        assertThat(storageEntities).isEmpty();
+
+    }
+
+    @Test
+    public void testListStorageEntityRecursively() {
+        List<StorageEntity> storageEntities =
+                s3StorageOperator
+                        .listFileStorageEntityRecursively("tmp/dolphinscheduler/default/resources/multipleDirectories");
+        assertThat(storageEntities).hasSize(1);
+
+        StorageEntity storageEntity = storageEntities.get(0);
+        assertThat(storageEntity.getFullName())
+                .isEqualTo("tmp/dolphinscheduler/default/resources/multipleDirectories/1/demo.sql");
+        assertThat(storageEntity.getFileName())
+                .isEqualTo("demo.sql");
+        assertThat(storageEntity.isDirectory()).isFalse();
+        assertThat(storageEntity.getPfullName())
+                .isEqualTo("tmp/dolphinscheduler/default/resources/multipleDirectories/1");
+        assertThat(storageEntity.getType()).isEqualTo(ResourceType.FILE);
+
+    }
+
+    @Test
+    public void testExceptionWhenBucketNameNotExists() {
+        Assertions.assertDoesNotThrow(() -> s3StorageOperator.exceptionWhenBucketNameNotExists("dolphinscheduler"));
+    }
+
+    @SneakyThrows
+    @AfterAll
+    public static void tearDown() {
+        if (s3StorageOperator != null) {
+            s3StorageOperator.close();
         }
-
-        Assertions.assertTrue(isSuccess);
-    }
-
-    @Test
-    public void mkdirWhenDirNotExists() {
-        boolean isSuccess = true;
-        try {
-            final String key = DIR_MOCK + FOLDER_SEPARATOR;
-            doReturn(false).when(s3Client).doesObjectExist(BUCKET_NAME_MOCK, key);
-            isSuccess = s3StorageOperator.mkdir(TENANT_CODE_MOCK, DIR_MOCK);
-            verify(s3Client, times(1)).doesObjectExist(BUCKET_NAME_MOCK, key);
-
-        } catch (IOException e) {
-            Assertions.fail("test failed due to unexpected IO exception");
+        if (minIOContainer != null) {
+            minIOContainer.stop();
         }
-
-        Assertions.assertTrue(isSuccess);
     }
 
-    @Test
-    public void getResourceFullName() {
-        final String expectedResourceFullName =
-                String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        final String resourceFullName = s3StorageOperator.getResourceFullName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        Assertions.assertEquals(expectedResourceFullName, resourceFullName);
-    }
-
-    @Test
-    public void getResourceFileName() {
-        final String expectedResourceFileName = FILE_NAME_MOCK;
-        final String resourceFullName =
-                String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        final String resourceFileName = s3StorageOperator.getResourceFileName(TENANT_CODE_MOCK, resourceFullName);
-        Assertions.assertEquals(expectedResourceFileName, resourceFileName);
-    }
-
-    @Test
-    public void getFileName() {
-        final String expectedFileName =
-                String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        final String fileName = s3StorageOperator.getFileName(ResourceType.FILE, TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        Assertions.assertEquals(expectedFileName, fileName);
-    }
-
-    @Test
-    public void exists() {
-        boolean doesExist = false;
-        doReturn(true).when(s3Client).doesObjectExist(BUCKET_NAME_MOCK, FILE_NAME_MOCK);
-        try {
-            doesExist = s3StorageOperator.exists(FILE_NAME_MOCK);
-        } catch (IOException e) {
-            Assertions.fail("unexpected IO exception in unit test");
-        }
-
-        Assertions.assertTrue(doesExist);
-        verify(s3Client, times(1)).doesObjectExist(BUCKET_NAME_MOCK, FILE_NAME_MOCK);
-    }
-
-    @Test
-    public void delete() {
-        doNothing().when(s3Client).deleteObject(anyString(), anyString());
-        try {
-            s3StorageOperator.delete(FILE_NAME_MOCK, true);
-        } catch (IOException e) {
-            Assertions.fail("unexpected IO exception in unit test");
-        }
-
-        verify(s3Client, times(1)).deleteObject(anyString(), anyString());
-    }
-
-    @Test
-    public void copy() {
-        boolean isSuccess = false;
-        doReturn(null).when(s3Client).copyObject(anyString(), anyString(), anyString(), anyString());
-        try {
-            isSuccess = s3StorageOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false);
-        } catch (IOException e) {
-            Assertions.fail("unexpected IO exception in unit test");
-        }
-
-        Assertions.assertTrue(isSuccess);
-        verify(s3Client, times(1)).copyObject(anyString(), anyString(), anyString(), anyString());
-    }
-
-    @Test
-    public void deleteTenant() {
-        doNothing().when(s3StorageOperator).deleteTenantCode(anyString());
-        try {
-            s3StorageOperator.deleteTenant(TENANT_CODE_MOCK);
-        } catch (Exception e) {
-            Assertions.fail("unexpected exception caught in unit test");
-        }
-
-        verify(s3StorageOperator, times(1)).deleteTenantCode(anyString());
-    }
-
-    @Test
-    public void testGetS3ResDir() {
-        final String expectedS3ResDir = String.format("dolphinscheduler/%s/resources", TENANT_CODE_MOCK);
-        final String s3ResDir = s3StorageOperator.getS3ResDir(TENANT_CODE_MOCK);
-        Assertions.assertEquals(expectedS3ResDir, s3ResDir);
-    }
-
-    @Test
-    public void testGetS3UdfDir() {
-        final String expectedS3UdfDir = String.format("dolphinscheduler/%s/udfs", TENANT_CODE_MOCK);
-        final String s3UdfDir = s3StorageOperator.getS3UdfDir(TENANT_CODE_MOCK);
-        Assertions.assertEquals(expectedS3UdfDir, s3UdfDir);
-    }
-
-    @Test
-    public void testGetS3TenantDir() {
-        final String expectedS3TenantDir = String.format(FORMAT_S_S, DIR_MOCK, TENANT_CODE_MOCK);
-        doReturn(DIR_MOCK).when(s3StorageOperator).getS3DataBasePath();
-        final String s3TenantDir = s3StorageOperator.getS3TenantDir(TENANT_CODE_MOCK);
-        Assertions.assertEquals(expectedS3TenantDir, s3TenantDir);
-    }
-
-    @Test
-    public void deleteDir() {
-        doReturn(true).when(s3Client).doesObjectExist(anyString(), anyString());
-        s3StorageOperator.deleteDir(DIR_MOCK);
-        verify(s3Client, times(1)).deleteObject(anyString(), anyString());
-    }
-
-    @Test
-    public void testGetFileStatus() throws Exception {
-        doReturn(new ListObjectsV2Result()).when(s3Client).listObjectsV2(Mockito.any(ListObjectsV2Request.class));
-        StorageEntity entity =
-                s3StorageOperator.getFileStatus(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK, ResourceType.FILE);
-        Assertions.assertEquals(FULL_NAME, entity.getFullName());
-        Assertions.assertEquals("dir1/", entity.getFileName());
-    }
-
-    @Test
-    public void testListFilesStatus() throws Exception {
-        doReturn(new ListObjectsV2Result()).when(s3Client).listObjectsV2(Mockito.any(ListObjectsV2Request.class));
-        List<StorageEntity> result =
-                s3StorageOperator.listFilesStatus(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK, ResourceType.FILE);
-        Assertions.assertEquals(0, result.size());
-    }
-
-    @Test
-    public void testListFilesStatusRecursively() throws Exception {
-        StorageEntity entity = new StorageEntity();
-        entity.setFullName(FULL_NAME);
-
-        doReturn(entity).when(s3StorageOperator).getFileStatus(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK,
-                ResourceType.FILE);
-        doReturn(Collections.EMPTY_LIST).when(s3StorageOperator).listFilesStatus(anyString(), anyString(), anyString(),
-                Mockito.any(ResourceType.class));
-
-        List<StorageEntity> result =
-                s3StorageOperator.listFilesStatusRecursively(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK,
-                        ResourceType.FILE);
-        Assertions.assertEquals(0, result.size());
-    }
 }

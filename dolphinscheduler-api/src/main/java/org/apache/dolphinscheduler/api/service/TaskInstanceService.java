@@ -24,17 +24,14 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-/**
- * task instance service
- */
 public interface TaskInstanceService {
 
     /**
-     * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
+     * query task list by project, workflow instance, task name, task start time, task end time, task status, keyword paging
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param searchVal search value
      * @param taskName task name
      * @param taskCode task code
@@ -49,9 +46,9 @@ public interface TaskInstanceService {
      */
     Result queryTaskListPaging(User loginUser,
                                long projectCode,
-                               Integer processInstanceId,
-                               String processInstanceName,
-                               String processDefinitionName,
+                               Integer workflowInstanceId,
+                               String workflowInstanceName,
+                               String workflowDefinitionName,
                                String taskName,
                                Long taskCode,
                                String executorName,
@@ -72,9 +69,9 @@ public interface TaskInstanceService {
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    Result forceTaskSuccess(User loginUser,
-                            long projectCode,
-                            Integer taskInstanceId);
+    void forceTaskSuccess(User loginUser,
+                          long projectCode,
+                          Integer taskInstanceId);
 
     /**
      * task savepoint

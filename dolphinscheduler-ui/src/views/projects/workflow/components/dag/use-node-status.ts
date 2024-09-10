@@ -20,7 +20,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { tasksState } from '@/common/common'
 import { NODE, NODE_STATUS_MARKUP } from './dag-config'
-import { queryTaskListByProcessId } from '@/service/modules/process-instances'
+import { queryTaskListByWorkflowId } from '@/service/modules/workflow-instances'
 import NodeStatus from '@/views/projects/workflow/components/dag/dag-node-status'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import type { IWorkflowTaskInstance, ITaskState } from './types'
@@ -73,7 +73,7 @@ export function useNodeStatus(options: Options) {
     const projectCode = Number(route.params.projectCode)
     const instanceId = Number(route.params.id)
 
-    queryTaskListByProcessId(instanceId, projectCode).then((res: any) => {
+    queryTaskListByWorkflowId(instanceId, projectCode).then((res: any) => {
       window.$message.success(t('project.workflow.refresh_status_succeeded'))
       taskList.value = res.taskList
       if (taskList.value) {
@@ -81,7 +81,10 @@ export function useNodeStatus(options: Options) {
         taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
           if (taskInstance.dependentResult) {
-            Object.assign(allDependentResult, JSON.parse(taskInstance.dependentResult))
+            Object.assign(
+              allDependentResult,
+              JSON.parse(taskInstance.dependentResult)
+            )
           }
         })
         nodeStore.updateDependentResult(allDependentResult)

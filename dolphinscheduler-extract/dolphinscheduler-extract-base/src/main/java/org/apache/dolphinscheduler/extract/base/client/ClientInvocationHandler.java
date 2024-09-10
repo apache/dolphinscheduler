@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.extract.base.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
@@ -31,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ClientInvocationHandler implements InvocationHandler {
+class ClientInvocationHandler implements InvocationHandler {
 
     private final NettyRemotingClient nettyRemotingClient;
 
@@ -39,7 +38,7 @@ public class ClientInvocationHandler implements InvocationHandler {
 
     private final Host serverHost;
 
-    public ClientInvocationHandler(Host serverHost, NettyRemotingClient nettyRemotingClient) {
+    ClientInvocationHandler(Host serverHost, NettyRemotingClient nettyRemotingClient) {
         this.serverHost = checkNotNull(serverHost);
         this.nettyRemotingClient = checkNotNull(nettyRemotingClient);
         this.methodInvokerMap = new ConcurrentHashMap<>();

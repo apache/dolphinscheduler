@@ -45,9 +45,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * chunjun task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ChunJunTask extends AbstractTask {
 
     /**
@@ -79,8 +79,7 @@ public class ChunJunTask extends AbstractTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     /**

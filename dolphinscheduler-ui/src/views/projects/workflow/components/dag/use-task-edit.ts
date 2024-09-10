@@ -52,10 +52,10 @@ export function useTaskEdit(options: Options) {
   } = useCellUpdate({
     graph
   })
-  const processDefinition = ref(
+  const workflowDefinition = ref(
     definition?.value || {
-      processDefinition: {},
-      processTaskRelationList: [],
+      workflowDefinition: {},
+      workflowTaskRelationList: [],
       taskDefinitionList: []
     }
   ) as Ref<EditWorkflowDefinition>
@@ -72,7 +72,7 @@ export function useTaskEdit(options: Options) {
    */
   function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
     addNode(code + '', type, '', 'YES', coordinate)
-    processDefinition.value.taskDefinitionList.push({
+    workflowDefinition.value.taskDefinitionList.push({
       code,
       taskType: type,
       name: ''
@@ -92,7 +92,7 @@ export function useTaskEdit(options: Options) {
     coordinate: Coordinate
   ) {
     addNode(code + '', type, name, flag, coordinate)
-    const definition = processDefinition.value.taskDefinitionList.find(
+    const definition = workflowDefinition.value.taskDefinitionList.find(
       (t) => t.code === targetCode
     )
 
@@ -102,7 +102,7 @@ export function useTaskEdit(options: Options) {
       name
     } as NodeData
 
-    processDefinition.value.taskDefinitionList.push(newDefinition)
+    workflowDefinition.value.taskDefinitionList.push(newDefinition)
   }
 
   /**
@@ -110,15 +110,15 @@ export function useTaskEdit(options: Options) {
    * @param {number} codes
    */
   function removeTasks(codes: number[], cells: any[]) {
-    processDefinition.value.taskDefinitionList =
-      processDefinition.value.taskDefinitionList.filter(
+    workflowDefinition.value.taskDefinitionList =
+      workflowDefinition.value.taskDefinitionList.filter(
         (task) => !codes.includes(task.code)
       )
     codes.forEach((code: number) => {
       remove(
-        processDefinition.value.processTaskRelationList,
-        (process) =>
-          process.postTaskCode === code || process.preTaskCode === code
+        workflowDefinition.value.workflowTaskRelationList,
+        (workflow) =>
+          workflow.postTaskCode === code || workflow.preTaskCode === code
       )
     })
     cells?.forEach((cell) => {
@@ -126,10 +126,10 @@ export function useTaskEdit(options: Options) {
         const preTaskCode = cell.getSourceCellId()
         const postTaskCode = cell.getTargetCellId()
         remove(
-          processDefinition.value.processTaskRelationList,
-          (process) =>
-            String(process.postTaskCode) === postTaskCode &&
-            String(process.preTaskCode) === preTaskCode
+          workflowDefinition.value.workflowTaskRelationList,
+          (workflow) =>
+            String(workflow.postTaskCode) === postTaskCode &&
+            String(workflow.preTaskCode) === preTaskCode
         )
       }
     })
@@ -145,7 +145,7 @@ export function useTaskEdit(options: Options) {
    * @param {number} code
    */
   function editTask(code: number) {
-    const definition = processDefinition.value.taskDefinitionList.find(
+    const definition = workflowDefinition.value.taskDefinitionList.find(
       (t) => t.code === code
     )
     if (definition) {
@@ -163,15 +163,17 @@ export function useTaskEdit(options: Options) {
    */
   function taskConfirm({ data }: any) {
     const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
+
     // override target config
-    processDefinition.value.taskDefinitionList =
-      processDefinition.value.taskDefinitionList.map((task) => {
+    workflowDefinition.value.taskDefinitionList =
+      workflowDefinition.value.taskDefinitionList.map((task) => {
         if (task.code === currTask.value?.code) {
           setNodeName(task.code + '', taskDef.name)
           let fillColor = '#ffffff'
-          if (task.flag === 'YES') {
+          if (taskDef.flag === 'NO') {
             fillColor = 'var(--custom-disable-bg)'
           }
+
           setNodeFillColor(task.code + '', fillColor)
 
           setNodeEdge(String(task.code), data.preTasks)
@@ -197,22 +199,22 @@ export function useTaskEdit(options: Options) {
     if (!currTask.value.name) {
       removeNode(String(currTask.value.code))
       remove(
-        processDefinition.value.taskDefinitionList,
+        workflowDefinition.value.taskDefinitionList,
         (task) => task.code === currTask.value.code
       )
     }
   }
 
   function updatePreTasks(preTasks: number[], code: number) {
-    if (processDefinition.value?.processTaskRelationList?.length) {
+    if (workflowDefinition.value?.workflowTaskRelationList?.length) {
       remove(
-        processDefinition.value.processTaskRelationList,
-        (process) => process.postTaskCode === code
+        workflowDefinition.value.workflowTaskRelationList,
+        (workflow) => workflow.postTaskCode === code
       )
     }
     if (!preTasks?.length) return
     preTasks.forEach((task) => {
-      processDefinition.value?.processTaskRelationList.push({
+      workflowDefinition.value?.workflowTaskRelationList.push({
         postTaskCode: code,
         preTaskCode: task,
         name: '',
@@ -228,12 +230,12 @@ export function useTaskEdit(options: Options) {
     const targets = getTargets(String(code))
     targets.forEach((target: number) => {
       if (
-        !processDefinition.value?.processTaskRelationList.find(
+        !workflowDefinition.value?.workflowTaskRelationList.find(
           (relation) =>
             relation.postTaskCode === target && relation.preTaskCode === code
         )
       ) {
-        processDefinition.value?.processTaskRelationList.push({
+        workflowDefinition.value?.workflowTaskRelationList.push({
           postTaskCode: target,
           preTaskCode: code,
           name: '',
@@ -256,13 +258,13 @@ export function useTaskEdit(options: Options) {
   })
 
   watch(definition, () => {
-    if (definition.value) processDefinition.value = definition.value
+    if (definition.value) workflowDefinition.value = definition.value
   })
 
   return {
     currTask,
     taskModalVisible,
-    processDefinition,
+    workflowDefinition,
     taskConfirm,
     taskCancel,
     appendTask,

@@ -22,6 +22,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -268,6 +271,21 @@ public class JSONUtilsTest {
         Date date = JSONUtils.parseObject(json, Date.class);
         Assertions.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
 
+    }
+
+    @Test
+    public void toOffsetDateTimeNodeTest() {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        JSONUtils.setTimeZone(timeZone);
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 7, 10, 15, 0, 0);
+        OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.ofHours(0));
+        Map<String, OffsetDateTime> map = new HashMap<>();
+        map.put("time", offsetDateTime);
+        JsonNode jsonNodes = JSONUtils.toJsonNode(map);
+        String s = JSONUtils.toJsonString(jsonNodes);
+
+        String json = "{\"time\":\"2024-07-10T15:00:00Z\"}";
+        Assertions.assertEquals(json, s);
     }
 
 }

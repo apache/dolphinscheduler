@@ -17,16 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ActiveProfiles("master")
-@ExtendWith(SpringExtension.class)
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerType;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@AutoConfigureMockMvc
 @SpringBootTest(classes = MasterConfig.class)
 public class MasterConfigTest {
 
@@ -34,8 +37,39 @@ public class MasterConfigTest {
     private MasterConfig masterConfig;
 
     @Test
-    public void getMasterDispatchTaskNumber() {
-        int masterDispatchTaskNumber = masterConfig.getDispatchTaskNumber();
-        Assertions.assertEquals(3, masterDispatchTaskNumber);
+    public void getServerLoadProtection() {
+        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
+        assertTrue(serverLoadProtection.isEnabled());
+        assertEquals(0.9, serverLoadProtection.getMaxSystemCpuUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds());
+        assertEquals(0.9, serverLoadProtection.getMaxDiskUsagePercentageThresholds());
+    }
+
+    @Test
+    public void getCommandFetchStrategy() {
+        CommandFetchStrategy commandFetchStrategy = masterConfig.getCommandFetchStrategy();
+        assertThat(commandFetchStrategy.getType())
+                .isEqualTo(CommandFetchStrategy.CommandFetchStrategyType.ID_SLOT_BASED);
+
+        CommandFetchStrategy.IdSlotBasedFetchConfig idSlotBasedFetchConfig =
+                (CommandFetchStrategy.IdSlotBasedFetchConfig) commandFetchStrategy.getConfig();
+        assertThat(idSlotBasedFetchConfig.getIdStep()).isEqualTo(1);
+        assertThat(idSlotBasedFetchConfig.getFetchSize()).isEqualTo(10);
+    }
+
+    @Test
+    public void getWorkerLoadBalancerConfigurationProperties() {
+        WorkerLoadBalancerConfigurationProperties workerLoadBalancerConfigurationProperties =
+                masterConfig.getWorkerLoadBalancerConfigurationProperties();
+        assertThat(workerLoadBalancerConfigurationProperties.getType())
+                .isEqualTo(WorkerLoadBalancerType.DYNAMIC_WEIGHTED_ROUND_ROBIN);
+
+        WorkerLoadBalancerConfigurationProperties.DynamicWeightConfigProperties dynamicWeightConfigProperties =
+                workerLoadBalancerConfigurationProperties.getDynamicWeightConfigProperties();
+        assertThat(dynamicWeightConfigProperties.getMemoryUsageWeight()).isEqualTo(40);
+        assertThat(dynamicWeightConfigProperties.getCpuUsageWeight()).isEqualTo(30);
+        assertThat(dynamicWeightConfigProperties.getTaskThreadPoolUsageWeight()).isEqualTo(30);
     }
 }

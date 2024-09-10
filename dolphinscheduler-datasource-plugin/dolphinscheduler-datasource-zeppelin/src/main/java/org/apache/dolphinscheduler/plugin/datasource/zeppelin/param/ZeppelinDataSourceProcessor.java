@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin.param;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -36,7 +37,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 @Slf4j
-public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
+public class ZeppelinDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -55,7 +56,7 @@ public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         ZeppelinConnectionParam baseConnectionParam = (ZeppelinConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getRestEndpoint(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(), baseConnectionParam.getRestEndpoint(),
                 baseConnectionParam.getUsername(), PasswordUtils.encodePassword(baseConnectionParam.getPassword()));
     }
 

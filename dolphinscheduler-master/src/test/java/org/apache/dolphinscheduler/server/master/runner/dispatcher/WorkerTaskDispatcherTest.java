@@ -19,11 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.IWorkerLoadBalancer;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.Optional;
 
@@ -37,17 +34,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class WorkerTaskDispatcherTest {
 
     @Test
-    public void getTaskInstanceDispatchHost() throws WorkerGroupNotFoundException {
-        TaskEventService taskEventService = Mockito.mock(TaskEventService.class);
-        MasterConfig masterConfig = Mockito.mock(MasterConfig.class);
-        HostManager hostManager = Mockito.mock(HostManager.class);
-        Mockito.when(hostManager.select(Mockito.any())).thenReturn(Optional.of(Host.of("localhost:1234")));
-        WorkerTaskDispatcher workerTaskDispatcher =
-                new WorkerTaskDispatcher(taskEventService, masterConfig, hostManager);
+    public void getTaskInstanceDispatchHost() {
+        IWorkerLoadBalancer workerLoadBalancer = Mockito.mock(IWorkerLoadBalancer.class);
+        Mockito.when(workerLoadBalancer.select(Mockito.any())).thenReturn(Optional.of("localhost:1234"));
+        WorkerTaskDispatcher workerTaskDispatcher = new WorkerTaskDispatcher(workerLoadBalancer);
 
-        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
-        Mockito.when(taskExecuteRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
-        Optional<Host> taskInstanceDispatchHost = workerTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable);
+        ITaskExecutionRunnable ITaskExecutionRunnable = Mockito.mock(ITaskExecutionRunnable.class);
+        Mockito.when(ITaskExecutionRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
+        Optional<Host> taskInstanceDispatchHost =
+                workerTaskDispatcher.getTaskInstanceDispatchHost(ITaskExecutionRunnable);
         Assertions.assertEquals("localhost:1234", taskInstanceDispatchHost.get().getAddress());
     }
 }

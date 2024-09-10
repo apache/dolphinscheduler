@@ -42,9 +42,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * shell task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MlflowTask extends AbstractTask {
 
     private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)");
@@ -71,7 +71,7 @@ public class MlflowTask extends AbstractTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext, log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     static public String getPresetRepository() {
@@ -130,7 +130,7 @@ public class MlflowTask extends AbstractTask {
             }
             setExitStatusCode(exitCode);
             setProcessId(commandExecuteResult.getProcessId());
-            mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            mlflowParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current Mlflow task has been interrupted", e);

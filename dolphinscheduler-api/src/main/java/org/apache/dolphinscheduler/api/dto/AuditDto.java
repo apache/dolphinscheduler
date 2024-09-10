@@ -19,55 +19,26 @@ package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class AuditDto {
 
     private String userName;
 
-    private String resource;
+    private String modelType;
+
+    private String modelName;
 
     private String operation;
 
-    private Date time;
+    private Date createTime;
 
-    private String resourceName;
+    private String description;
 
-    public String getUserName() {
-        return userName;
-    }
+    private String detail;
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public String getOperation() {
-        return operation;
-    }
-
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
-
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
+    private String latency;
 }

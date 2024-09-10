@@ -20,15 +20,20 @@ package org.apache.dolphinscheduler.tools.datasource.mysql;
 import org.apache.dolphinscheduler.tools.datasource.jupiter.DatabaseContainerProvider;
 import org.apache.dolphinscheduler.tools.datasource.jupiter.DolphinSchedulerDatabaseContainer;
 
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Lists;
 
+@Slf4j
 @AutoService(DatabaseContainerProvider.class)
 public class MysqlDatabaseContainerProvider implements DatabaseContainerProvider {
 
@@ -43,7 +48,19 @@ public class MysqlDatabaseContainerProvider implements DatabaseContainerProvider
                 .withNetwork(NETWORK)
                 .withExposedPorts(3306)
                 .waitingFor(Wait.forHealthcheck());
-        mysqlContainer.setPortBindings(Lists.newArrayList("3306:3306"));
+
+        log.info("Create {} successfully.", mysqlContainer.getDockerImageName());
+        mysqlContainer.start();
+
+        log.info("Starting {}...", mysqlContainer.getDockerImageName());
+        Startables.deepStart(Stream.of(mysqlContainer)).join();
+        log.info("{} started", mysqlContainer.getDockerImageName());
+
+        String jdbcUrl = "jdbc:mysql://localhost:" + mysqlContainer.getMappedPort(3306)
+                + "/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8";
+        System.clearProperty("spring.datasource.url");
+        System.setProperty("spring.datasource.url", jdbcUrl);
+
         return mysqlContainer;
     }
 

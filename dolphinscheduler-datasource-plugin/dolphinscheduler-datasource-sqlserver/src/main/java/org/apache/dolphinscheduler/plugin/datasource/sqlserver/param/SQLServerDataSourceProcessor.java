@@ -33,8 +33,11 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -122,6 +125,14 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new SQLServerDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.sqlserver)
+                .stream()
+                .map(subSql -> subSql.concat(";"))
+                .collect(Collectors.toList());
     }
 
     private String transformOther(Map<String, String> otherMap) {

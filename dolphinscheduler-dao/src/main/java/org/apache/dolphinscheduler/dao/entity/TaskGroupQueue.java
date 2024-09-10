@@ -39,66 +39,43 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_task_group_queue")
 public class TaskGroupQueue implements Serializable {
 
-    /**
-     * key
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * taskInstanceId
-     */
+
     private int taskId;
-    /**
-     * TaskInstance name
-     */
+
     private String taskName;
-    /**
-     * project name
-     */
+
     @TableField(exist = false)
     private String projectName;
-    /**
-     * project code
-     */
+
     @TableField(exist = false)
     private String projectCode;
-    /**
-     * process instance name
-     */
+
     @TableField(exist = false)
-    private String processInstanceName;
-    /**
-     * taskGroup id
-     */
+    private String workflowInstanceName;
+
     private int groupId;
-    /**
-     * processInstance id
-     */
-    private int processId;
-    /**
-     * the priority of task instance
-     */
+
+    private Integer workflowInstanceId;
+
     private int priority;
+
     /**
      * is force start
      * 0 NO ,1 YES
      */
     private int forceStart;
+
     /**
      * ready to get the queue by other task finish
      * 0 NO ,1 YES
      */
     private int inQueue;
-    /**
-     * -1: waiting  1: running  2: finished
-     */
+
     private TaskGroupQueueStatus status;
-    /**
-     * create time
-     */
+
     private Date createTime;
-    /**
-     * update time
-     */
+
     private Date updateTime;
 }

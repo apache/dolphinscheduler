@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClient
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -46,24 +47,18 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.collect.Maps;
 
-/**
- * procedure task
- */
+@Slf4j
 public class ProcedureTask extends AbstractTask {
 
-    /**
-     * procedure parameters
-     */
-    private ProcedureParameters procedureParameters;
+    private final ProcedureParameters procedureParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+    private final ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
     /**
      * constructor
@@ -137,9 +132,9 @@ public class ProcedureTask extends AbstractTask {
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
-        setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
+        setSqlParamsMap(procedureParameters.getMethod(), sqlParamsMap, paramsMap,
                 taskExecutionContext.getTaskInstanceId());
-        return procedureParameters.getMethod().replaceAll(rgex, "?");
+        return procedureParameters.getMethod().replaceAll(TaskConstants.SQL_PARAMS_REGEX, "?");
     }
 
     /**

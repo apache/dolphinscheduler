@@ -21,3 +21,13 @@
 [submodule ".github/actions/translate-on-issue"]
 	path = .github/actions/translate-on-issue
 	url = https://github.com/xingchun-chen/translation-helper
+[submodule ".github/actions/auto-assign-action"]
+	path = .github/actions/auto-assign-action
+	url = https://github.com/kentaro-m/auto-assign-action.git
+	branch = 288f36f
+[submodule ".github/actions/workflow-telemetry-action"]
+	path = .github/actions/workflow-telemetry-action
+	url = https://github.com/catchpoint/workflow-telemetry-action
+[submodule ".github/actions/maximize-build-space"]
+	path = .github/actions/maximize-build-space
+	url = https://github.com/easimon/maximize-build-space

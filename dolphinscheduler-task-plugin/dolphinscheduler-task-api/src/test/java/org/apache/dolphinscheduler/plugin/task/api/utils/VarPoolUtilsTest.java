@@ -17,34 +17,46 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import java.util.HashMap;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import org.junit.jupiter.api.Assertions;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 
 class VarPoolUtilsTest {
 
     @Test
-    void findVar() {
-        HashMap<String, String> tcs = new HashMap<>();
-        tcs.put("${(set_val=123)dsVal}", "set_val=123");
-        tcs.put("1970-01-01 ${(set_val=123)dsVal}", "set_val=123");
-        tcs.put("1970-01-01 ${(set_val=123)dsVal}123", null);
-        tcs.put("${(set_val=123}dsVal", null);
-        tcs.put("#{(set_val=123)dsVal}", "set_val=123");
-        tcs.put("1970-01-01 #{(set_val=123)dsVal}", "set_val=123");
-        tcs.put("1970-01-01 #{(set_val=123)dsVal}123", null);
-        tcs.put("#{(set_val=123)dsVal}123", null);
-        tcs.put("#{(set_val=123dsVal}", null);
+    void mergeVarPool() {
+        Truth.assertThat(VarPoolUtils.mergeVarPool(null)).isNull();
 
-        tcs.put("${(set_val=123)dsVal}${(set_val=456)dsVal}", "set_val=123)dsVal}${(set_val=456");
-        tcs.put("1970-01-01$#{(set_val=123)dsVal}", "set_val=123");
-        tcs.put("1970-01-01{(set_val=123)dsVal}123", null);
-        tcs.put("1970-01-01$#{(${(set_val=123)})dsVal}", "${(set_val=123)}");
-        tcs.put("1970-01-01$#{(${(set_val=123\\)})dsVal}", "${(set_val=123\\)}");
+        // Override the value of the same property
+        // Merge the property with different key.
+        List<Property> varpool1 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"));
+        List<Property> varpool2 = Lists.newArrayList(
+                new Property("name", Direct.OUT, DataType.VARCHAR, "tim"),
+                new Property("age", Direct.OUT, DataType.INTEGER, "10"));
 
-        for (String tc : tcs.keySet()) {
-            Assertions.assertEquals(tcs.get(tc), VarPoolUtils.findVarPool(tc));
-        }
+        Truth.assertThat(VarPoolUtils.mergeVarPool(Lists.newArrayList(varpool1, varpool2)))
+                .containsExactly(
+                        new Property("name", Direct.OUT, DataType.VARCHAR, "tim"),
+                        new Property("age", Direct.OUT, DataType.INTEGER, "10"));
+
+    }
+
+    @Test
+    void subtractVarPool() {
+        Truth.assertThat(VarPoolUtils.subtractVarPool(null, null)).isNull();
+        List<Property> varpool1 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"),
+                new Property("age", Direct.OUT, DataType.INTEGER, "10"));
+        List<Property> varpool2 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"));
+        List<Property> varpool3 = Lists.newArrayList(new Property("location", Direct.OUT, DataType.VARCHAR, "china"));
+
+        Truth.assertThat(VarPoolUtils.subtractVarPool(varpool1, Lists.newArrayList(varpool2, varpool3)))
+                .containsExactly(new Property("age", Direct.OUT, DataType.INTEGER, "10"));
     }
 }

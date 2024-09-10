@@ -42,6 +42,16 @@ public interface IDao<Entity> {
     List<Entity> queryByIds(Collection<? extends Serializable> ids);
 
     /**
+     * Query all entities.
+     */
+    List<Entity> queryAll();
+
+    /**
+     * Query the entity by condition.
+     */
+    List<Entity> queryByCondition(Entity queryCondition);
+
+    /**
      * Insert the entity.
      */
     int insert(@NonNull Entity model);
@@ -65,5 +75,10 @@ public interface IDao<Entity> {
      * Delete the entities by primary keys.
      */
     boolean deleteByIds(Collection<? extends Serializable> ids);
+
+    /**
+     * Delete the entities by condition.
+     */
+    boolean deleteByCondition(Entity queryCondition);
 
 }

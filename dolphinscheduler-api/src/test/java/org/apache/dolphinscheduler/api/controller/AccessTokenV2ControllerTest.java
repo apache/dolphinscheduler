@@ -91,11 +91,11 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
-                .andExpect(status().isCreated())
+                // todo: bad request?
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

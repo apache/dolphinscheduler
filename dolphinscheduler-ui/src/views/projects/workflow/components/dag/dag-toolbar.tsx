@@ -49,6 +49,7 @@ import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 import { WorkflowDefinition, WorkflowInstance } from './types'
+import { useDependencies } from '@/views/projects/components/dependencies/use-dependencies'
 
 const props = {
   layoutToggle: {
@@ -61,9 +62,13 @@ const props = {
     default: null
   },
   definition: {
-    // The same as the structure responsed by the queryProcessDefinitionByCode api
+    // The same as the structure responsed by the queryWorkflowDefinitionByCode api
     type: Object as PropType<WorkflowDefinition>,
     default: null
+  },
+  dependenciesData: {
+    type: Object as PropType<any>,
+    require: false
   }
 }
 
@@ -79,6 +84,11 @@ export default defineComponent({
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
     const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+    const workflowCode = Number(route.params.code)
+    const { getDependentTaskLinksByMultipleTasks } = useDependencies()
+
+    const dependenciesData = props.dependenciesData
 
     /**
      * Node search and navigate
@@ -138,17 +148,18 @@ export default defineComponent({
      * Back to the entrance
      */
     const onClose = () => {
-      if (history.state.back !== '/login') {
+      const { back, current } = history.state
+      if (back && back !== '/login') {
         router.go(-1)
         return
       }
-      if (history.state.current.includes('workflow/definitions')) {
+      if (!back || current.includes('workflow/definitions')) {
         router.push({
           path: `/projects/${route.params.projectCode}/workflow-definition`
         })
         return
       }
-      if (history.state.current.includes('workflow/instances')) {
+      if (current.includes('workflow/instances')) {
         router.push({
           path: `/projects/${route.params.projectCode}/workflow/instances`
         })
@@ -164,15 +175,29 @@ export default defineComponent({
     /**
      * Delete selected edges and nodes
      */
-    const removeCells = () => {
+    const removeCells = async () => {
       if (graph.value) {
         const cells = graph.value.getSelectedCells()
         if (cells) {
           const codes = cells
             .filter((cell) => cell.isNode())
             .map((cell) => +cell.id)
-          context.emit('removeTasks', codes, cells)
-          graph.value?.removeCells(cells)
+          const res = await getDependentTaskLinksByMultipleTasks(
+            projectCode,
+            workflowCode,
+            codes
+          )
+          if (res.length > 0) {
+            dependenciesData.showRef = true
+            dependenciesData.taskLinks = res
+            dependenciesData.tip = t(
+              'project.task.delete_validate_dependent_tasks_desc'
+            )
+            dependenciesData.required = true
+          } else {
+            context.emit('removeTasks', codes, cells)
+            graph.value?.removeCells(cells)
+          }
         }
       }
     }
@@ -187,10 +212,10 @@ export default defineComponent({
         <span class={Styles['workflow-name']}>
           {route.name === 'workflow-instance-detail'
             ? props.instance?.name
-            : props.definition?.processDefinition?.name ||
+            : props.definition?.workflowDefinition?.name ||
               t('project.dag.create')}
         </span>
-        {props.definition?.processDefinition?.name && (
+        {props.definition?.workflowDefinition?.name && (
           <NTooltip
             v-slots={{
               trigger: () => (
@@ -201,7 +226,7 @@ export default defineComponent({
                     const name =
                       route.name === 'workflow-instance-detail'
                         ? props.instance?.name
-                        : props.definition?.processDefinition?.name
+                        : props.definition?.workflowDefinition?.name
                     copy(name)
                   }}
                   class={Styles['toolbar-btn']}
@@ -215,7 +240,7 @@ export default defineComponent({
             }}
           ></NTooltip>
         )}
-        {props.definition?.processDefinition?.name && (
+        {props.definition?.workflowDefinition?.name && (
           <NTooltip
             v-slots={{
               trigger: () => (
@@ -248,7 +273,7 @@ export default defineComponent({
         )}
         <div class={Styles['toolbar-left-part']}>
           {route.name !== 'workflow-instance-detail' &&
-            props.definition?.processDefinition?.releaseState === 'ONLINE' && (
+            props.definition?.workflowDefinition?.releaseState === 'ONLINE' && (
               <NTag round size='small' type='info'>
                 {t('project.dag.online')}
               </NTag>
@@ -484,7 +509,7 @@ export default defineComponent({
             secondary
             round
             disabled={
-              props.definition?.processDefinition?.releaseState === 'ONLINE' &&
+              props.definition?.workflowDefinition?.releaseState === 'ONLINE' &&
               !props.instance
             }
             onClick={() => {

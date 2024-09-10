@@ -31,6 +31,8 @@ public final class AlertConstants {
     public static final String WARNING_TYPE = "warningType";
 
     public static final String NAME_WARNING_TYPE = "WarningType";
+    public static final String TEST_TITLE = "DolphinScheduler test alert";
+    public static final String TEST_CONTENT = "[{\"message\":\" This is a test alert message form DolphinScheduler\"}]";
 
     private AlertConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");

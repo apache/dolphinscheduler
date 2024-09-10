@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
 
+import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -31,13 +33,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import lombok.Getter;
 
 @Getter
 public final class ClusterPage extends NavBarPage implements SecurityPage.Tab {
+
     @FindBy(className = "btn-create-cluster")
     private WebElement buttonCreateCluster;
 
@@ -45,8 +44,8 @@ public final class ClusterPage extends NavBarPage implements SecurityPage.Tab {
     private List<WebElement> clusterList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -78,7 +77,6 @@ public final class ClusterPage extends NavBarPage implements SecurityPage.Tab {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No edit button in cluster list"))
                 .click();
-
 
         editClusterForm().inputClusterName().sendKeys(Keys.CONTROL + "a");
         editClusterForm().inputClusterName().sendKeys(Keys.BACK_SPACE);
@@ -114,31 +112,32 @@ public final class ClusterPage extends NavBarPage implements SecurityPage.Tab {
 
     @Getter
     public class ClusterForm {
+
         ClusterForm() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-            @FindBy(className = "input-cluster-name"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-cluster-name"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputClusterName;
 
         @FindBys({
-            @FindBy(className = "input-cluster-config"),
-            @FindBy(tagName = "textarea"),
+                @FindBy(className = "input-cluster-config"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputClusterConfig;
 
         @FindBys({
-            @FindBy(className = "input-cluster-desc"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-cluster-desc"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputClusterDesc;
 
         @FindBys({
-            @FindBy(className = "n-base-selection-tags"),
-            @FindBy(className = "n-tag__content"),
+                @FindBy(className = "n-base-selection-tags"),
+                @FindBy(className = "n-tag__content"),
         })
         private WebElement selectedWorkerGroup;
 

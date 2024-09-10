@@ -18,162 +18,130 @@
 package org.apache.dolphinscheduler.server.master.runner.task.switchtask;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
 public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
     public static final String TASK_TYPE = "SWITCH";
 
-    private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
-
-    private final ProcessInstance processInstance;
+    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
     private final TaskInstance taskInstance;
 
-    public SwitchLogicTask(TaskExecutionContext taskExecutionContext,
-                           ProcessInstanceExecCacheManager processInstanceExecCacheManager) throws LogicTaskInitializeException {
-        super(taskExecutionContext,
-                // todo: we need to refactor the logic task parameter........
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
-                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                        .orElseThrow(() -> new LogicTaskInitializeException(
-                                "Cannot find the task instance in workflow execute runnable"))
-                        .getSwitchDependency());
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        this.processInstance = workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
-        this.taskInstance = workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                .orElseThrow(() -> new LogicTaskInitializeException(
-                        "Cannot find the task instance in workflow execute runnable"));
+    public SwitchLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                           TaskExecutionContext taskExecutionContext) {
+        super(workflowExecutionRunnable,
+                taskExecutionContext,
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {
+                }));
+        this.workflowExecutionRunnable = workflowExecutionRunnable;
+        this.taskInstance = workflowExecutionRunnable
+                .getWorkflowExecuteContext()
+                .getWorkflowExecutionGraph()
+                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                .getTaskInstance();
     }
 
     @Override
     public void handle() throws MasterTaskExecuteException {
-        DependResult conditionResult = calculateConditionResult();
-        TaskExecutionStatus status =
-                (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
-        log.info("Switch task execute finished, condition result is: {}, task status is: {}", conditionResult,
-                status.name());
-        taskExecutionContext.setCurrentExecutionStatus(status);
+        if (CollectionUtils.isEmpty(taskParameters.getSwitchResult().getDependTaskList())) {
+            // If the branch is empty then will go into the default branch
+            // This case shouldn't happen, we can directly throw exception and forbid the user to set branch
+            log.info("The switch items is empty");
+            moveToDefaultBranch();
+        } else {
+            calculateSwitchBranch();
+        }
+        checkIfBranchExist(taskParameters.getNextBranch());
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParameters));
+        taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
+        log.info("Switch task execute finished: {}", taskExecutionContext.getCurrentExecutionStatus().name());
     }
 
-    // todo: don't use depend result, use switch result
-    private DependResult calculateConditionResult() {
-        DependResult conditionResult = DependResult.SUCCESS;
-
-        List<SwitchResultVo> switchResultVos = taskParameters.getDependTaskList();
-
-        SwitchResultVo switchResultVo = new SwitchResultVo();
-        switchResultVo.setNextNode(taskParameters.getNextNode());
-        switchResultVos.add(switchResultVo);
-        // todo: refactor these calculate code
-        int finalConditionLocation = switchResultVos.size() - 1;
-        int i = 0;
-        for (SwitchResultVo info : switchResultVos) {
-            log.info("Begin to execute {} condition: {} ", (i + 1), info.getCondition());
-            if (StringUtils.isEmpty(info.getCondition())) {
-                finalConditionLocation = i;
-                break;
-            }
-            String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
-            log.info("Format condition sentence::{} successfully", content);
-            Boolean result;
-            try {
-                result = SwitchTaskUtils.evaluate(content);
-                log.info("Execute condition sentence: {} successfully: {}", content, result);
-            } catch (Exception e) {
-                log.info("Execute condition sentence: {} failed", content, e);
-                conditionResult = DependResult.FAILED;
-                break;
-            }
-            if (result) {
-                finalConditionLocation = i;
-                break;
-            }
-            i++;
+    private void moveToDefaultBranch() {
+        log.info("Begin to move to the default branch");
+        if (taskParameters.getSwitchResult().getNextNode() == null) {
+            throw new IllegalArgumentException(
+                    "The default branch is empty, please check the switch task configuration");
         }
-        taskParameters.setDependTaskList(switchResultVos);
-        taskParameters.setResultConditionLocation(finalConditionLocation);
-        taskInstance.setSwitchDependency(taskParameters);
-
-        if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
-            conditionResult = DependResult.FAILED;
-            log.error("The switch task depend result is invalid, result:{}, switch branch:{}", conditionResult,
-                    finalConditionLocation);
-        }
-
-        log.info("The switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
-        return conditionResult;
+        taskParameters.setNextBranch(taskParameters.getSwitchResult().getNextNode());
+        log.info("The condition is not satisfied, move to the default branch: {}",
+                getTaskName(taskParameters.getNextBranch()));
     }
 
-    public String setTaskParams(String content, String rgex) {
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        Map<String, Property> globalParams = JSONUtils
-                .toList(processInstance.getGlobalParams(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+    private void calculateSwitchBranch() {
+        List<SwitchResultVo> switchResultVos = taskParameters.getSwitchResult().getDependTaskList();
+        Map<String, Property> globalParams = taskExecutionContext.getPrepareParamsMap();
         Map<String, Property> varParams = JSONUtils
                 .toList(taskInstance.getVarPool(), Property.class)
                 .stream()
                 .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        if (varParams.size() > 0) {
-            varParams.putAll(globalParams);
-            globalParams = varParams;
-        }
-        while (m.find()) {
-            String paramName = m.group(1);
-            Property property = globalParams.get(paramName);
-            if (property == null) {
-                return "";
+
+        Long nextBranch = null;
+        for (SwitchResultVo switchResultVo : switchResultVos) {
+            log.info("Begin to execute switch item: {} ", switchResultVo);
+            try {
+                String content = SwitchTaskUtils.generateContentWithTaskParams(switchResultVo.getCondition(),
+                        globalParams, varParams);
+                log.info("Format condition sentence::{} successfully", content);
+                boolean conditionResult = SwitchTaskUtils.evaluate(content);
+                log.info("Execute condition sentence: {} successfully: {}", content, conditionResult);
+                if (conditionResult) {
+                    // If matched, break the loop
+                    nextBranch = switchResultVo.getNextNode();
+                    break;
+                }
+            } catch (Exception e) {
+                log.info("Execute switch item: {} failed", switchResultVo, e);
             }
-            String value;
-            if (ParameterUtils.isNumber(property) || ParameterUtils.isBoolean(property)) {
-                value = "" + ParameterUtils.getParameterValue(property);
-            } else {
-                value = "\"" + ParameterUtils.getParameterValue(property) + "\"";
-            }
-            log.info("paramName:{}，paramValue:{}", paramName, value);
-            content = content.replace("${" + paramName + "}", value);
         }
-        return content;
+
+        if (nextBranch == null) {
+            log.info("All switch item is not satisfied");
+            moveToDefaultBranch();
+        }
     }
 
-    private boolean isValidSwitchResult(SwitchResultVo switchResult) {
-        if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
-            return false;
+    private void checkIfBranchExist(Long branchNode) {
+        if (branchNode == null) {
+            throw new IllegalArgumentException("The branch is empty, please check the switch task configuration");
         }
-        for (Long nextNode : switchResult.getNextNode()) {
-            if (nextNode == null) {
-                return false;
-            }
+        if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowGraph()
+                .getTaskNodeByCode(branchNode) == null) {
+            throw new IllegalArgumentException(
+                    "The branch(code= " + branchNode
+                            + ") is not in the dag, please check the switch task configuration");
         }
-        return true;
+    }
+
+    private String getTaskName(Long taskCode) {
+        return Optional.ofNullable(workflowExecutionRunnable.getWorkflowExecuteContext())
+                .map(IWorkflowExecuteContext::getWorkflowGraph)
+                .map(iWorkflowGraph -> iWorkflowGraph.getTaskNodeByCode(taskCode))
+                .map(TaskDefinition::getName)
+                .orElse(null);
     }
 
 }

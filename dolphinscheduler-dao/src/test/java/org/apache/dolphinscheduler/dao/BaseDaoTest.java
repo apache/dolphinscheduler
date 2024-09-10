@@ -22,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +29,5 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootApplication(scanBasePackageClasses = DaoConfiguration.class)
 @Transactional
 @Rollback
-@EnableTransactionManagement
 public abstract class BaseDaoTest {
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { useRouter,useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { clearCookie, getOauth2Provider, login } from '@/service/modules/login'
 import { getUserInfo } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
@@ -48,11 +48,7 @@ export function useLogin(state: any) {
         const baseResDir = await queryBaseDir({
           type: 'FILE'
         })
-        const baseUdfDir = await queryBaseDir({
-          type: 'UDF'
-        })
         await userStore.setBaseResDir(baseResDir)
-        await userStore.setBaseUdfDir(baseUdfDir)
 
         const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
         await timezoneStore.setTimezone(timezone)
@@ -64,8 +60,6 @@ export function useLogin(state: any) {
     })
   }
 
-
-
   const handleGetOAuth2Provider = () => {
     getOauth2Provider().then((res: Array<OAuth2Provider> | []) => {
       oauth2Providers.value = res
@@ -76,7 +70,8 @@ export function useLogin(state: any) {
 
   const gotoOAuth2Page = async (oauth2Provider: OAuth2Provider) => {
     await clearCookie()
-    window.location.href = `${oauth2Provider.authorizationUri}?client_id=${oauth2Provider.clientId}` +
+    window.location.href =
+      `${oauth2Provider.authorizationUri}?client_id=${oauth2Provider.clientId}` +
       `&response_type=code&redirect_uri=${oauth2Provider.redirectUri}?provider=${oauth2Provider.provider}`
   }
 

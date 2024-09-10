@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -56,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
@@ -68,6 +71,7 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class DataxTask extends AbstractTask {
 
     /**
@@ -125,8 +129,7 @@ public class DataxTask extends AbstractTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     /**
@@ -418,7 +421,7 @@ public class DataxTask extends AbstractTask {
      */
     private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg,
                                            String sql) {
-        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
+        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql, dataSourceCfg.getCompatibleMode());
 
         if (columnNames == null || columnNames.length == 0) {
             log.info("try to execute sql analysis query column name");
@@ -438,11 +441,14 @@ public class DataxTask extends AbstractTask {
      * @return column name array
      * @throws RuntimeException if error throws RuntimeException
      */
-    private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql) {
+    private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql, String compatibleMode) {
         String[] columnNames;
 
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
+            if (StringUtils.isNotBlank(compatibleMode)) {
+                parser = DataxUtils.getSqlStatementParser(compatibleMode, sql);
+            }
             if (parser == null) {
                 log.warn("database driver [{}] is not support grammatical analysis sql", dbType);
                 return new String[0];

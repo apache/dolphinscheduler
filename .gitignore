@@ -7,6 +7,7 @@
 .target
 .idea/
 !.idea/icon.png
+!.idea/vcs.xml
 .run/
 target/
 dist/
@@ -52,3 +53,5 @@ dolphinscheduler-common/test
 dolphinscheduler-worker/logs
 dolphinscheduler-master/logs
 dolphinscheduler-api/logs
+__pycache__
+ds_schema_check_test

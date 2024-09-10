@@ -20,8 +20,6 @@
 
 - 一个用户可以有多个项目，用户项目授权通过`t_ds_relation_project_user`表完成project_id和user_id的关系绑定；<br />
 - `t_ds_projcet`表中的`user_id`表示创建该项目的用户，`t_ds_relation_project_user`表中的`user_id`表示对项目有权限的用户；<br />
-- `t_ds_resources`表中的`user_id`表示创建该资源的用户，`t_ds_relation_resources_user`中的`user_id`表示对资源有权限的用户；<br />
-- `t_ds_udfs`表中的`user_id`表示创建该UDF的用户，`t_ds_relation_udfs_user`表中的`user_id`表示对UDF有权限的用户；<br />
 
 ### 项目 - 租户 - 工作流定义 - 定时
 

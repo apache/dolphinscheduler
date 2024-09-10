@@ -22,6 +22,7 @@ service:
       url: /api/v1/submit
       method: POST
       dataType: Json
+      httpHeaders: { "Content-Type": "text/html", "Content-Length": "1234" }
       requestParams: { "taskId": "704" }
       taskInstanceIdJPath: "$.taskInstanceId[0]"
     queryState:

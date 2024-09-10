@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -32,9 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.List;
 import java.util.Map;
 
-/**
- * scheduler service
- */
 public interface SchedulerService {
 
     /**
@@ -42,12 +38,12 @@ public interface SchedulerService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefineCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param schedule scheduler
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
-     * @param processInstancePriority process instance priority
+     * @param workflowInstancePriority workflow instance priority
      * @param workerGroup worker group
      * @param tenantCode tenant code
      * @param environmentCode environment code
@@ -55,12 +51,12 @@ public interface SchedulerService {
      */
     Map<String, Object> insertSchedule(User loginUser,
                                        long projectCode,
-                                       long processDefineCode,
+                                       long workflowDefinitionCode,
                                        String schedule,
                                        WarningType warningType,
                                        int warningGroupId,
                                        FailureStrategy failureStrategy,
-                                       Priority processInstancePriority,
+                                       Priority workflowInstancePriority,
                                        String workerGroup,
                                        String tenantCode,
                                        Long environmentCode);
@@ -76,7 +72,7 @@ public interface SchedulerService {
                                ScheduleCreateRequest scheduleCreateRequest);
 
     /**
-     * updateProcessInstance schedule
+     * updateWorkflowInstance schedule
      *
      * @param loginUser login user
      * @param projectCode project code
@@ -88,7 +84,7 @@ public interface SchedulerService {
      * @param workerGroup worker group
      * @param tenantCode tenant code
      * @param environmentCode environment code
-     * @param processInstancePriority process instance priority
+     * @param workflowInstancePriority workflow instance priority
      * @return update result code
      */
     Map<String, Object> updateSchedule(User loginUser,
@@ -98,7 +94,7 @@ public interface SchedulerService {
                                        WarningType warningType,
                                        int warningGroupId,
                                        FailureStrategy failureStrategy,
-                                       Priority processInstancePriority,
+                                       Priority workflowInstancePriority,
                                        String workerGroup,
                                        String tenantCode,
                                        Long environmentCode);
@@ -126,33 +122,20 @@ public interface SchedulerService {
                          Integer scheduleId);
 
     /**
-     * set schedule online or offline
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
-     * @param scheduleStatus schedule status
-     */
-    void setScheduleState(User loginUser,
-                          long projectCode,
-                          Integer id,
-                          ReleaseState scheduleStatus);
-
-    /**
      * query schedule
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefineCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param pageNo page number
      * @param pageSize page size
      * @param searchVal search value
      * @return schedule list page
      */
-    Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
+    Result querySchedule(User loginUser, long projectCode, long workflowDefinitionCode, String searchVal,
                          Integer pageNo, Integer pageSize);
 
-    List<Schedule> queryScheduleByProcessDefinitionCodes(List<Long> processDefinitionCodes);
+    List<Schedule> queryScheduleByWorkflowDefinitionCodes(List<Long> workflowDefinitionCodes);
 
     /**
      * query schedule V2
@@ -174,15 +157,6 @@ public interface SchedulerService {
     Map<String, Object> queryScheduleList(User loginUser, long projectCode);
 
     /**
-     * delete schedule
-     *
-     * @param projectId project id
-     * @param scheduleId schedule id
-     * @throws RuntimeException runtime exception
-     */
-    void deleteSchedule(int projectId, int scheduleId);
-
-    /**
      * delete schedule by id
      *
      * @param loginUser login user
@@ -200,29 +174,49 @@ public interface SchedulerService {
     Map<String, Object> previewSchedule(User loginUser, String schedule);
 
     /**
-     * update process definition schedule
+     * update workflow definition schedule
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param workflowDefinitionCode workflow definition code
      * @param scheduleExpression scheduleExpression
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
      * @param tenantCode tenant code
-     * @param processInstancePriority process instance priority
+     * @param workflowInstancePriority workflow instance priority
      * @return update result code
      */
-    Map<String, Object> updateScheduleByProcessDefinitionCode(User loginUser,
-                                                              long projectCode,
-                                                              long processDefinitionCode,
-                                                              String scheduleExpression,
-                                                              WarningType warningType,
-                                                              int warningGroupId,
-                                                              FailureStrategy failureStrategy,
-                                                              Priority processInstancePriority,
-                                                              String workerGroup,
-                                                              String tenantCode,
-                                                              long environmentCode);
+    Map<String, Object> updateScheduleByWorkflowDefinitionCode(User loginUser,
+                                                               long projectCode,
+                                                               long workflowDefinitionCode,
+                                                               String scheduleExpression,
+                                                               WarningType warningType,
+                                                               int warningGroupId,
+                                                               FailureStrategy failureStrategy,
+                                                               Priority workflowInstancePriority,
+                                                               String workerGroup,
+                                                               String tenantCode,
+                                                               long environmentCode);
+
+    /**
+     * Online the scheduler by scheduler id, if the related workflow definition is not online will throw exception.
+     */
+    void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId);
+
+    /**
+     * Do online scheduler by workflow code, this method will not do permission check.
+     */
+    void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode);
+
+    /**
+     * Offline the scheduler by scheduler id, will not offline the related workflow definition.
+     */
+    void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId);
+
+    /**
+     * Do offline scheduler by workflow code, this method will not do permission check.
+     */
+    void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode);
 }

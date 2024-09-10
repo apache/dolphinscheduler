@@ -1,0 +1,72 @@
+################################################################################
+#  Licensed to the Apache Software Foundation (ASF) under one
+#  or more contributor license agreements.  See the NOTICE file
+#  distributed with this work for additional information
+#  regarding copyright ownership.  The ASF licenses this file
+#  to you under the Apache License, Version 2.0 (the
+#  "License"); you may not use this file except in compliance
+#  with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+# limitations under the License.
+# Details: https://github.com/apps/boring-cyborg
+
+###### IssueLink Adder #################################################################################################
+# Insert Issue (Jira/Github etc) link in PR description based on the Issue ID in PR title.
+insertIssueLinkInPrDescription:
+  # specify the placeholder for the issue link that should be present in the description
+  descriptionIssuePlaceholderRegexp: "^fix: (.*)$"
+  matchers:
+    # you can have several matches - for different types of issues
+    # only the first matching entry is replaced
+    jiraIssueMatch:
+      # specify the regexp of issue id that you can find in the title of the PR
+      # the match groups can be used to build the issue id (${1}, ${2}, etc.).
+      titleIssueIdRegexp: \[(Feature|Fix|Improvement|Test|E2E|Doc-[0-9]+)\]
+      # the issue link to be added. ${1}, ${2} ... are replaced with the match groups from the
+      # title match (remember to use quotes)
+      descriptionIssueLink: "[${1}](https://github.com/apache/dolphinschedule/${1}/)"
+
+###### Title Validator #################################################################################################
+# Verifies if commit/PR titles match the regexp specified
+verifyTitles:
+  # Regular expression that should be matched by titles of commits or PR
+  titleRegexp: ^\[DSIP-[0-9]+\].*$|^\[Feature-[0-9]+\].*$|^\[Fix-[0-9]+\].*$|^\[Doc-[0-9]+\].*$|^\[Improvement-[0-9]+\].*$|^\[Test-[0-9]+\].*$|^\[E2E-[0-9]+\].*$|^\[CI].*$|^\[Chore].*$
+  # If set to true, it will always check the PR title (as opposed to the individual commits).
+  alwaysUsePrTitle: true
+  # If set to true, it will only check the commit in case there is a single commit.
+  # In case of multiple commits it will check PR title.
+  # This reflects the standard behaviour of Github that for `Squash & Merge` GitHub
+  # uses the PR title rather than commit messages for the squashed commit ¯\_(ツ)_/¯
+  # For single-commit PRs it takes the squashed commit message from the commit as expected.
+  #
+  # If set to false it will check all commit messages. This is useful when you do not squash commits at merge.
+  validateEitherPrOrSingleCommitTitle: true
+  # The title the GitHub status should appear from.
+  statusTitle: "Title Validator"
+  # A custom message to be displayed when the title passes validation.
+  successMessage: "Title Validation successful!"
+  # A custom message to be displayed when the title fails validation.
+  # Allows insertion of ${type} (commit/PR), ${title} (the title validated) and ${regex} (the titleRegexp above).
+  failureMessage: "Wrong ${type} title: ${title}"
+
+# Various Flags to control behaviour of the "Labeler"
+labelerFlags:
+  # If this flag is changed to 'false', labels would only be added when the PR is first created
+  # and not when existing PR is updated.
+  # The default is 'true' which means the labels would be added when PR is updated even if they
+  # were removed by the user
+  labelOnPRUpdates: true
+
+# Comment to be posted to welcome users when they open their first PR
+firstPRWelcomeComment: >
+  Thanks for opening this pull request! Please check out our contributing guidelines. (https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/join/pull-request.md)
+
+# Comment to be posted to congratulate user on their first merged PR
+firstPRMergeComment: >
+  Awesome work, congrats on your first merged pull request!

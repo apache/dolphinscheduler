@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export type ResourceType = 'FILE' | 'UDF'
+export type ResourceType = 'FILE'
 
 export interface ResourceFileTableData {
   name: string
@@ -23,6 +23,7 @@ export interface ResourceFileTableData {
   user_name: string
   directory: string
   file_name: string
+  alias: string
   description: string
   size: number
   type: ResourceType
@@ -132,7 +133,6 @@ export interface IUploadDefaultValue {
     name: string
     file: string
     type: ResourceType
-    pid: number
     currentDir: string
   }
 }

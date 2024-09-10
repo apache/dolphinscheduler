@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HANA;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HDFS;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.MYSQL;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.ORACLE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.SQLSERVER;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -25,8 +32,18 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopJobType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHanaParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHdfsParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHiveParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceOracleParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceSqlServerParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHanaParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHiveParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetOracleParameter;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetSqlServerParameter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -223,16 +240,16 @@ public class SqoopParameters extends AbstractParameters {
             return resources;
         }
 
-        SourceMysqlParameter sourceMysqlParameter =
-                JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
-        if (sourceMysqlParameter.getSrcDatasource() != 0) {
-            resources.put(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
+        SourceCommonParameter sourceParameter = (SourceCommonParameter) JSONUtils.parseObject(this.getSourceParams(),
+                getSourceParameter(this.getSourceType()));
+        if (sourceParameter.getSrcDatasource() != 0) {
+            resources.put(ResourceType.DATASOURCE, sourceParameter.getSrcDatasource());
         }
 
-        TargetMysqlParameter targetMysqlParameter =
-                JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
-        if (targetMysqlParameter.getTargetDatasource() != 0) {
-            resources.put(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+        TargetCommonParameter targetParameter = (TargetCommonParameter) JSONUtils.parseObject(this.getTargetParams(),
+                getTargetParameter(this.getTargetType()));
+        if (targetParameter.getTargetDatasource() != 0) {
+            resources.put(ResourceType.DATASOURCE, targetParameter.getTargetDatasource());
         }
 
         return resources;
@@ -245,28 +262,78 @@ public class SqoopParameters extends AbstractParameters {
             return sqoopTaskExecutionContext;
         }
 
-        SourceMysqlParameter sourceMysqlParameter =
-                JSONUtils.parseObject(this.getSourceParams(), SourceMysqlParameter.class);
-        TargetMysqlParameter targetMysqlParameter =
-                JSONUtils.parseObject(this.getTargetParams(), TargetMysqlParameter.class);
+        SourceCommonParameter sourceParameter = (SourceCommonParameter) JSONUtils.parseObject(this.getSourceParams(),
+                getSourceParameter(this.getSourceType()));
+        TargetCommonParameter targetParameter = (TargetCommonParameter) JSONUtils.parseObject(this.getTargetParams(),
+                getTargetParameter(this.getTargetType()));
 
         DataSourceParameters dataSource = (DataSourceParameters) parametersHelper
-                .getResourceParameters(ResourceType.DATASOURCE, sourceMysqlParameter.getSrcDatasource());
+                .getResourceParameters(ResourceType.DATASOURCE, sourceParameter.getSrcDatasource());
         DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper
-                .getResourceParameters(ResourceType.DATASOURCE, targetMysqlParameter.getTargetDatasource());
+                .getResourceParameters(ResourceType.DATASOURCE, targetParameter.getTargetDatasource());
 
         if (Objects.nonNull(dataSource)) {
-            sqoopTaskExecutionContext.setDataSourceId(sourceMysqlParameter.getSrcDatasource());
+            sqoopTaskExecutionContext.setDataSourceId(sourceParameter.getSrcDatasource());
             sqoopTaskExecutionContext.setSourcetype(dataSource.getType());
             sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
         }
 
         if (Objects.nonNull(dataTarget)) {
-            sqoopTaskExecutionContext.setDataTargetId(targetMysqlParameter.getTargetDatasource());
+            sqoopTaskExecutionContext.setDataTargetId(targetParameter.getTargetDatasource());
             sqoopTaskExecutionContext.setTargetType(dataTarget.getType());
             sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
         }
 
         return sqoopTaskExecutionContext;
+    }
+
+    /**
+     * get the target generator
+     *
+     * @param targetType sqoop target type
+     * @return sqoop target generator
+     */
+    private Class<?> getTargetParameter(String targetType) {
+        switch (targetType) {
+            case MYSQL:
+                return TargetMysqlParameter.class;
+            case HIVE:
+                return TargetHiveParameter.class;
+            case HDFS:
+                return TargetHdfsParameter.class;
+            case ORACLE:
+                return TargetOracleParameter.class;
+            case HANA:
+                return TargetHanaParameter.class;
+            case SQLSERVER:
+                return TargetSqlServerParameter.class;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * get the target generator
+     *
+     * @param targetType sqoop target type
+     * @return sqoop target generator
+     */
+    private Class<?> getSourceParameter(String targetType) {
+        switch (targetType) {
+            case HIVE:
+                return SourceHiveParameter.class;
+            case HDFS:
+                return SourceHdfsParameter.class;
+            case MYSQL:
+                return SourceMysqlParameter.class;
+            case ORACLE:
+                return SourceOracleParameter.class;
+            case HANA:
+                return SourceHanaParameter.class;
+            case SQLSERVER:
+                return SourceSqlServerParameter.class;
+            default:
+                return null;
+        }
     }
 }

@@ -400,7 +400,7 @@ export const workflowExecutionState = (
     icon: HourglassOutlined,
     isSpin: false,
     classNames: 'wait_to_run'
-  },
+  }
 })
 
 /**

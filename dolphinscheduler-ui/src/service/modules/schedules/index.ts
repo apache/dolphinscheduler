@@ -23,11 +23,11 @@ import {
   ScheduleReq,
   WorkerGroupIdReq,
   CreateScheduleReq,
-  ProcessDefinitionCodeReq
+  WorkflowDefinitionCodeReq
 } from './types'
 
 export function queryScheduleListPaging(
-  params: ListReq & ProcessDefinitionCodeReq,
+  params: ListReq & WorkflowDefinitionCodeReq,
   projectCode: number
 ): any {
   return axios({
@@ -63,7 +63,7 @@ export function previewSchedule(data: ScheduleReq, projectCode: number): any {
   })
 }
 
-export function updateScheduleByProcessDefinitionCode(
+export function updateScheduleByWorkflowDefinitionCode(
   data: CreateScheduleReq,
   projectCode: ProjectCodeReq,
   code: CodeReq

@@ -23,6 +23,7 @@ metadata:
     {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
 spec:
   podManagementPolicy: {{ .Values.worker.podManagementPolicy }}
+  updateStrategy: {{- include "dolphinscheduler.tplvalues.render" (dict "value" .Values.worker.updateStrategy "context" $ ) | nindent 4 }}
   replicas: {{ .Values.worker.replicas }}
   selector:
     matchLabels:
@@ -111,9 +112,14 @@ spec:
               name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+            {{- if .Values.worker.enableCustomizedConfig }}
+            - name: worker-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
+            {{- end }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
@@ -138,6 +144,11 @@ spec:
           emptyDir: {}
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
           emptyDir: {}
+        {{- end }}
+        {{- if .Values.worker.enableCustomizedConfig }}
+        - name: worker-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-worker
         {{- end }}
         - name: config-volume
           configMap:

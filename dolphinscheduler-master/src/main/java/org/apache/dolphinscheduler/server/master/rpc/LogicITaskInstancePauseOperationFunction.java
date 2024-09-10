@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseResp
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorHolder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,16 +39,16 @@ public class LogicITaskInstancePauseOperationFunction
     public LogicTaskPauseResponse operate(LogicTaskPauseRequest taskPauseRequest) {
         try {
             LogUtils.setTaskInstanceIdMDC(taskPauseRequest.getTaskInstanceId());
-            final MasterTaskExecuteRunnable masterTaskExecuteRunnable =
-                    MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskPauseRequest.getTaskInstanceId());
-            if (masterTaskExecuteRunnable == null) {
+            final MasterTaskExecutor masterTaskExecutor =
+                    MasterTaskExecutorHolder.getMasterTaskExecutor(taskPauseRequest.getTaskInstanceId());
+            if (masterTaskExecutor == null) {
                 log.info("Cannot find the MasterTaskExecuteRunnable");
                 return LogicTaskPauseResponse.fail("Cannot find the MasterTaskExecuteRunnable");
             }
-            final TaskExecutionContext taskExecutionContext = masterTaskExecuteRunnable.getTaskExecutionContext();
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            final TaskExecutionContext taskExecutionContext = masterTaskExecutor.getTaskExecutionContext();
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getWorkflowInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
-            masterTaskExecuteRunnable.pauseTask();
+            masterTaskExecutor.pauseTask();
             return LogicTaskPauseResponse.success();
         } catch (MasterTaskExecuteException e) {
             log.error("Pause MasterTaskExecuteRunnable failed", e);

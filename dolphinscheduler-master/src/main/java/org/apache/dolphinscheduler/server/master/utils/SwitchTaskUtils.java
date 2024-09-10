@@ -17,23 +17,71 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import org.apache.commons.collections4.MapUtils;
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.script.ScriptException;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.collect.Maps;
+
+import delight.nashornsandbox.NashornSandbox;
+import delight.nashornsandbox.NashornSandboxes;
+
+@Slf4j
 public class SwitchTaskUtils {
 
-    private static final ScriptEngineManager manager;
-    private static final ScriptEngine engine;
+    private static final NashornSandbox sandbox;
+    private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
     static {
-        manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("js");
+        sandbox = NashornSandboxes.create();
     }
 
     public static boolean evaluate(String expression) throws ScriptException {
-        Object result = engine.eval(expression);
+        Object result = sandbox.eval(expression);
         return Boolean.TRUE.equals(result);
+    }
+
+    public static String generateContentWithTaskParams(String condition, Map<String, Property> globalParams,
+                                                       Map<String, Property> varParams) {
+        String content = condition.replaceAll("'", "\"");
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(varParams)) {
+            return content;
+        }
+        Map<String, Property> params = Maps.newHashMap();
+        if (MapUtils.isNotEmpty(globalParams)) {
+            params.putAll(globalParams);
+        }
+        if (MapUtils.isNotEmpty(varParams)) {
+            params.putAll(varParams);
+        }
+        Pattern pattern = Pattern.compile(rgex);
+        Matcher m = pattern.matcher(content);
+        while (m.find()) {
+            String paramName = m.group(1);
+            Property property = params.get(paramName);
+            if (property == null) {
+                continue;
+            }
+            String value;
+            if (ParameterUtils.isNumber(property) || ParameterUtils.isBoolean(property)) {
+                value = "" + ParameterUtils.getParameterValue(property);
+            } else {
+                value = "\"" + ParameterUtils.getParameterValue(property) + "\"";
+            }
+            log.info("paramName:{}，paramValue:{}", paramName, value);
+            content = content.replace("${" + paramName + "}", value);
+        }
+
+        return content;
     }
 
 }

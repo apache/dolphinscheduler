@@ -17,260 +17,109 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
+import org.apache.dolphinscheduler.api.dto.resources.CreateDirectoryRequest;
+import org.apache.dolphinscheduler.api.dto.resources.CreateFileFromContentRequest;
+import org.apache.dolphinscheduler.api.dto.resources.CreateFileRequest;
+import org.apache.dolphinscheduler.api.dto.resources.DeleteResourceRequest;
+import org.apache.dolphinscheduler.api.dto.resources.DownloadFileRequest;
+import org.apache.dolphinscheduler.api.dto.resources.FetchFileContentRequest;
+import org.apache.dolphinscheduler.api.dto.resources.PagingResourceItemRequest;
+import org.apache.dolphinscheduler.api.dto.resources.RenameDirectoryRequest;
+import org.apache.dolphinscheduler.api.dto.resources.RenameFileRequest;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.api.dto.resources.UpdateFileFromContentRequest;
+import org.apache.dolphinscheduler.api.dto.resources.UpdateFileRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.api.vo.ResourceItemVO;
+import org.apache.dolphinscheduler.api.vo.resources.FetchFileContentResponse;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
+import javax.servlet.http.HttpServletResponse;
 
-/**
- * resources service
- */
 public interface ResourcesService {
 
     /**
-     * create directory
-     *
-     * @param loginUser login user
-     * @param name alias
-     * @param type type
-     * @param pid parent id
-     * @param currentDir current directory
-     * @return create directory result
+     * Create a new directory in the resource storage, if the directory already exists will throw exception
      */
-    Result<Object> createDirectory(User loginUser,
-                                   String name,
-                                   ResourceType type,
-                                   int pid,
-                                   String currentDir);
+    void createDirectory(CreateDirectoryRequest createDirectoryRequest);
 
     /**
-     * create resource
-     *
-     * @param loginUser login user
-     * @param name alias
-     * @param type type
-     * @param file file
-     * @param currentDir current directory
-     * @return create result code
+     * Rename the directory in the resource storage, if the origin directory not exists or the new directory already exists will throw exception.
+     * <p> If the origin directory is empty will only update the directory name.
+     * <p> If the origin directory is not empty will move all the files and directories to the new directory.
+     * <p> After update the origin directory will be deleted.
      */
-    Result<Object> createResource(User loginUser,
-                                  String name,
-                                  ResourceType type,
-                                  MultipartFile file,
-                                  String currentDir);
+    void renameDirectory(RenameDirectoryRequest renameDirectoryRequest);
 
     /**
-     * update resource
-     * @param loginUser     login user
-     * @param name          name
-     * @param type          resource type
-     * @param file          resource file
-     * @return  update result code
+     * Upload a new file to the resource storage, if the file already exists will throw exception
      */
-    Result<Object> updateResource(User loginUser,
-                                  String fullName,
-                                  String tenantCode,
-                                  String name,
-                                  ResourceType type,
-                                  MultipartFile file);
+    void createFile(CreateFileRequest createFileRequest);
 
     /**
-     * query resources list paging
-     *
-     * @param loginUser login user
-     * @param type resource type
-     * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
-     * @return resource list page
+     * Update the file in the resource storage, if the origin file not exists or the new file already exists will throw exception.
+     * <p> If the new file is empty will only update the file name.
+     * <p> If the new file is not empty will update the file content and name.
+     * <p> After update the origin file will be deleted.
      */
-    Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                                            ResourceType type, String searchVal, Integer pageNo,
-                                                            Integer pageSize);
+    void updateFile(UpdateFileRequest updateFileRequest);
 
     /**
-     * query resource list
-     *
-     * @param loginUser login user
-     * @param type resource type
-     * @return resource list
+     * Rename the file in the resource storage, if the origin file not exists or the new file already exists will throw exception.
      */
-    Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName);
+    void renameFile(RenameFileRequest renameFileRequest);
 
     /**
-     * query resource list by program type
-     *
-     * @param loginUser login user
-     * @param type resource type
-     * @return resource list
+     * Create a new file in the resource storage, if the file already exists will throw exception.
+     * Different with {@link ResourcesService#createFile(CreateFileRequest)} this method will create a new file with the given content.
      */
-    Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType);
+    void createFileFromContent(CreateFileFromContentRequest createFileFromContentRequest);
 
     /**
-     * delete resource
-     *
-     * @param loginUser login user
-     * @return delete result code
-     * @throws IOException exception
+     * Update the file content.
      */
-    Result<Object> delete(User loginUser, String fullName, String tenantCode) throws IOException;
+    void updateFileFromContent(UpdateFileFromContentRequest updateFileContentRequest);
 
     /**
-     * verify resource by name and type
-     * @param loginUser login user
-     * @param fullName  resource full name
-     * @param type      resource type
-     * @return true if the resource name not exists, otherwise return false
+     * Paging query resource items.
+     * <p>If the login user is not admin will only query the resource items that under the user's tenant.
+     * <p>If the login user is admin and {@link PagingResourceItemRequest##resourceAbsolutePath} is null will return all the resource items.
      */
-    Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser);
+    PageInfo<ResourceItemVO> pagingResourceItem(PagingResourceItemRequest pagingResourceItemRequest);
 
     /**
-     * verify resource by file name
-     * @param fileName  resource file name
-     * @param type      resource type
-     * @return true if the resource file name, otherwise return false
+     * Query the resource file items by the given resource type and program type.
      */
-    Result<Object> queryResourceByFileName(User loginUser, String fileName, ResourceType type, String resTenantCode);
+    List<ResourceComponent> queryResourceFiles(User loginUser, ResourceType type);
 
     /**
-     * view resource file online
-     *
-     * @param skipLineNum skip line number
-     * @param limit limit
-     * @param fullName fullName
-     * @return resource content
+     * Delete the resource item.
+     * <p>If the resource item is a directory will delete all the files and directories under the directory.
+     * <p>If the resource item is a file will delete the file.
+     * <p>If the resource item not exists will throw exception.
      */
-    Result<Object> readResource(User loginUser, String fullName, String tenantCode, int skipLineNum, int limit);
+    void delete(DeleteResourceRequest deleteResourceRequest);
 
     /**
-     * create resource file online
-     *
-     * @param loginUser login user
-     * @param type resource type
-     * @param fileName file name
-     * @param fileSuffix file suffix
-     * @param content content
-     * @return create result code
+     * Fetch the file content.
      */
-    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                        String content, String currentDirectory);
+    FetchFileContentResponse fetchResourceFileContent(FetchFileContentRequest fetchFileContentRequest);
+
+    void downloadResource(HttpServletResponse response, DownloadFileRequest downloadFileRequest);
 
     /**
-     * create or update resource.
-     * If the folder is not already created, it will be ignored and directly create the new file
-     *
-     * @param userName user who create or update resource
-     * @param fullName The fullname of resource.Includes path and suffix.
-     * @param resourceContent content of resource
-     */
-    StorageEntity createOrUpdateResource(String userName, String fullName, String resourceContent) throws Exception;
-
-    /**
-     * updateProcessInstance resource
-     *
-     * @param loginUser login user
-     * @param fullName full name
-     * @param tenantCode tenantCode
-     * @param content content
-     * @return update result cod
-     */
-    Result<Object> updateResourceContent(User loginUser, String fullName, String tenantCode,
-                                         String content);
-
-    /**
-     * download file
-     *
-     * @return resource content
-     * @throws IOException exception
-     */
-    org.springframework.core.io.Resource downloadResource(User loginUser, String fullName) throws IOException;
-
-    /**
-     * list all file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
-
-    /**
-     * Get resource by given resource type and full name.
-     * Useful in Python API create task which need processDefinition information.
+     * Get resource by given resource type and file name.
+     * Useful in Python API create task which need workflowDefinition information.
      *
      * @param userName user who query resource
-     * @param fullName full name of the resource
+     * @param fileName file name of the resource
      */
-    StorageEntity queryFileStatus(String userName, String fullName) throws Exception;
+    StorageEntity queryFileStatus(String userName, String fileName) throws Exception;
 
-    /**
-     * delete DATA_TRANSFER data in resource center
-     *
-     * @param loginUser user who query resource
-     * @param days number of days
-     */
-    DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days);
-
-    /**
-     * unauthorized file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> unauthorizedFile(User loginUser, Integer userId);
-
-    /**
-     * unauthorized udf function
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId);
-
-    /**
-     * authorized udf function
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result code
-     */
-    Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId);
-
-    /**
-     * authorized file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result
-     */
-    Map<String, Object> authorizedFile(User loginUser, Integer userId);
-
-    /**
-     * get resource by id
-     * @param fullName resource full name
-     * @param tenantCode owner's tenant code of resource
-     * @return resource
-     */
-    Result<Object> queryResourceByFullName(User loginUser, String fullName, String tenantCode,
-                                           ResourceType type) throws IOException;
-
-    /**
-     * get resource base dir
-     *
-     * @param loginUser login user
-     * @param type      resource type
-     * @return
-     */
-    Result<Object> queryResourceBaseDir(User loginUser, ResourceType type);
+    String queryResourceBaseDir(User loginUser, ResourceType type);
 
 }

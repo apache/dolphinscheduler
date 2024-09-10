@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -34,26 +35,25 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IMasterLogService;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.worker.IStreamingTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
-import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -75,9 +75,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * task instance service impl
- */
 @Service
 @Slf4j
 public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
@@ -109,12 +106,15 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
 
+    @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
+
     /**
-     * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
+     * query task list by project, workflow instance, task name, task start time, task end time, task status, keyword paging
      *
      * @param loginUser         login user
      * @param projectCode       project code
-     * @param processInstanceId process instance id
+     * @param workflowInstanceId workflow instance id
      * @param searchVal         search value
      * @param taskName          task name
      * @param taskCode          task code
@@ -129,9 +129,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Override
     public Result queryTaskListPaging(User loginUser,
                                       long projectCode,
-                                      Integer processInstanceId,
-                                      String processInstanceName,
-                                      String processDefinitionName,
+                                      Integer workflowInstanceId,
+                                      String workflowInstanceName,
+                                      String workflowDefinitionName,
                                       String taskName,
                                       Long taskCode,
                                       String executorName,
@@ -144,9 +144,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                       Integer pageNo,
                                       Integer pageSize) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_INSTANCE);
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.getCode()};
@@ -157,11 +156,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<TaskInstance> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
-            // stream task without process instance
+            // stream task without workflow instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
                     page,
-                    project.getCode(),
-                    processDefinitionName,
+                    projectCode,
+                    workflowDefinitionName,
                     searchVal,
                     taskName,
                     taskCode,
@@ -174,9 +173,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                     page,
-                    project.getCode(),
-                    processInstanceId,
-                    processInstanceName,
+                    projectCode,
+                    workflowInstanceId,
+                    workflowInstanceName,
                     searchVal,
                     taskName,
                     taskCode,
@@ -219,57 +218,39 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      */
     @Transactional
     @Override
-    public Result forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
-        Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+    public void forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, FORCED_SUCCESS);
+
+        TaskInstance task = taskInstanceDao.queryOptionalById(taskInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.TASK_INSTANCE_NOT_FOUND));
+
+        if (task.getProjectCode() != projectCode) {
+            throw new ServiceException("The task instance is not under the project: " + projectCode);
         }
 
-        // check whether the task instance can be found
-        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
-        if (task == null) {
-            log.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
-                    taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
-            return result;
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            log.error("Task definition can not be found, projectCode:{}, taskDefinitionCode:{}.", projectCode,
-                    task.getTaskCode());
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
-            return result;
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId())
+                .orElseThrow(
+                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, task.getWorkflowInstanceId()));
+        if (!workflowInstance.getState().isFinished()) {
+            throw new ServiceException("The workflow instance is not finished: " + workflowInstance.getState()
+                    + " cannot force start task instance");
         }
 
         // check whether the task instance state type is failure or cancel
         if (!task.getState().isFailure() && !task.getState().isKill()) {
-            log.warn("{} type task instance can not perform force success, projectCode:{}, taskInstanceId:{}.",
-                    task.getState().getDesc(), projectCode, taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState());
         }
 
         // change the state of the task instance
         task.setState(TaskExecutionStatus.FORCED_SUCCESS);
+        task.setEndTime(new Date());
         int changedNum = taskInstanceMapper.updateById(task);
-        if (changedNum > 0) {
-            processService.forceProcessInstanceSuccessByTaskInstanceId(taskInstanceId);
-            log.info("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}", projectCode,
-                    taskInstanceId);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            log.error("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}",
-                    projectCode, taskInstanceId);
-            putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
+        if (changedNum <= 0) {
+            throw new ServiceException(Status.FORCE_TASK_SUCCESS_ERROR);
         }
-        return result;
+        processService.forceWorkflowInstanceSuccessByTaskInstanceId(task);
+        log.info("Force success task instance:{} success", taskInstanceId);
     }
 
     @Override
@@ -293,11 +274,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
-        IStreamingTaskInstanceOperator streamingTaskInstanceOperator =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstance.getHost(), IStreamingTaskInstanceOperator.class);
-        TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse =
-                streamingTaskInstanceOperator.triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
+        final TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse = Clients
+                .withService(IStreamingTaskInstanceOperator.class)
+                .withHost(taskInstance.getHost())
+                .triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
         log.info("StreamingTaskInstance trigger savepoint response: {}", taskInstanceTriggerSavepointResponse);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -326,10 +306,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
 
         // todo: we only support streaming task for now
-        ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
-        TaskInstanceKillResponse taskInstanceKillResponse =
-                iTaskInstanceOperator.killTask(new TaskInstanceKillRequest(taskInstanceId));
+        final TaskInstanceKillResponse taskInstanceKillResponse = Clients
+                .withService(ITaskInstanceOperator.class)
+                .withHost(taskInstance.getHost())
+                .killTask(new TaskInstanceKillRequest(taskInstanceId));
         log.info("TaskInstance kill response: {}", taskInstanceKillResponse);
 
         putMsg(result, Status.SUCCESS);
@@ -382,16 +362,15 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return;
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
-            // delete log
-            if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
-                if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-                    IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
-                            .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
-                    masterLogService.removeLogicTaskInstanceLog(taskInstance.getLogPath());
-                } else {
-                    IWorkerLogService workerLogService = SingletonJdkDynamicRpcClientProxyFactory
-                            .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
-                    workerLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+            if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
+                try {
+                    // Remove task instance log failed will not affect the deletion of task instance
+                    Clients
+                            .withService(ILogService.class)
+                            .withHost(taskInstance.getHost())
+                            .removeTaskInstanceLog(taskInstance.getLogPath());
+                } catch (Exception ex) {
+                    log.error("Remove task instance log error", ex);
                 }
             }
         }

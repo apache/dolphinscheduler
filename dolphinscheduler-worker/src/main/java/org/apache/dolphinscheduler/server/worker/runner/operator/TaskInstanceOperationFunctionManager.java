@@ -27,7 +27,7 @@ public class TaskInstanceOperationFunctionManager {
     private TaskInstanceKillOperationFunction taskInstanceKillOperationFunction;
 
     @Autowired
-    private UpdateWorkflowHostOperationFunction updateWorkflowHostOperationFunction;
+    private TakeOverTaskOperationFunction takeOverTaskOperationFunction;
 
     @Autowired
     private TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction;
@@ -35,12 +35,23 @@ public class TaskInstanceOperationFunctionManager {
     @Autowired
     private TaskInstancePauseOperationFunction taskInstancePauseOperationFunction;
 
+    public TaskInstanceOperationFunctionManager(
+                                                TaskInstanceKillOperationFunction taskInstanceKillOperationFunction,
+                                                TakeOverTaskOperationFunction takeOverTaskOperationFunction,
+                                                TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction,
+                                                TaskInstancePauseOperationFunction taskInstancePauseOperationFunction) {
+        this.taskInstanceKillOperationFunction = taskInstanceKillOperationFunction;
+        this.takeOverTaskOperationFunction = takeOverTaskOperationFunction;
+        this.taskInstanceDispatchOperationFunction = taskInstanceDispatchOperationFunction;
+        this.taskInstancePauseOperationFunction = taskInstancePauseOperationFunction;
+    }
+
     public TaskInstanceKillOperationFunction getTaskInstanceKillOperationFunction() {
         return taskInstanceKillOperationFunction;
     }
 
-    public UpdateWorkflowHostOperationFunction getUpdateWorkflowHostOperationFunction() {
-        return updateWorkflowHostOperationFunction;
+    public TakeOverTaskOperationFunction getUpdateWorkflowHostOperationFunction() {
+        return takeOverTaskOperationFunction;
     }
 
     public TaskInstanceDispatchOperationFunction getTaskInstanceDispatchOperationFunction() {

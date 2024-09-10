@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -65,21 +65,22 @@ public class TaskFilesTransferUtils {
      * upload output files to resource storage
      *
      * @param taskExecutionContext is the context of task
-     * @param storageOperate       is the storage operate
+     * @param storageOperator      is the storage operate
      * @throws TaskException TaskException
      */
     public static void uploadOutputFiles(TaskExecutionContext taskExecutionContext,
-                                         StorageOperate storageOperate) throws TaskException {
-        List<Property> varPools = getVarPools(taskExecutionContext);
-        // get map of varPools for quick search
-        Map<String, Property> varPoolsMap = varPools.stream().collect(Collectors.toMap(Property::getProp, x -> x));
-
+                                         StorageOperator storageOperator) throws TaskException {
         // get OUTPUT FILE parameters
         List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.OUT);
-
         if (localParamsProperty.isEmpty()) {
             return;
         }
+
+        List<Property> varPools = getVarPools(taskExecutionContext);
+        // get map of varPools for quick search
+        Map<String, Property> varPoolsMap = varPools.stream()
+                .filter(property -> Direct.OUT.equals(property.getDirect()))
+                .collect(Collectors.toMap(Property::getProp, x -> x));
 
         log.info("Upload output files ...");
         for (Property property : localParamsProperty) {
@@ -101,15 +102,15 @@ public class TaskFilesTransferUtils {
             try {
                 // upload file to storage
                 String resourceWholePath =
-                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperator.getStorageFileAbsolutePath(taskExecutionContext.getTenantCode(), resourcePath);
                 String resourceCRCWholePath =
-                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourceCRCPath);
+                        storageOperator.getStorageFileAbsolutePath(taskExecutionContext.getTenantCode(),
+                                resourceCRCPath);
                 log.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
-                storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
+                storageOperator.upload(srcPath, resourceWholePath, false, true);
                 log.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
-                storageOperate.upload(taskExecutionContext.getTenantCode(), srcCRCPath, resourceCRCWholePath, false,
-                        true);
-            } catch (IOException ex) {
+                storageOperator.upload(srcCRCPath, resourceCRCWholePath, false, true);
+            } catch (Exception ex) {
                 throw new TaskException("Upload file to storage error", ex);
             }
 
@@ -133,20 +134,24 @@ public class TaskFilesTransferUtils {
      * only download files which are defined in the task parameters
      *
      * @param taskExecutionContext is the context of task
-     * @param storageOperate       is the storage operate
+     * @param storageOperator      is the storage operate
      * @throws TaskException task exception
      */
-    public static void downloadUpstreamFiles(TaskExecutionContext taskExecutionContext, StorageOperate storageOperate) {
-        List<Property> varPools = getVarPools(taskExecutionContext);
-        // get map of varPools for quick search
-        Map<String, Property> varPoolsMap = varPools.stream().collect(Collectors.toMap(Property::getProp, x -> x));
-
+    public static void downloadUpstreamFiles(TaskExecutionContext taskExecutionContext,
+                                             StorageOperator storageOperator) {
         // get "IN FILE" parameters
         List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.IN);
 
         if (localParamsProperty.isEmpty()) {
             return;
         }
+
+        List<Property> varPools = getVarPools(taskExecutionContext);
+        // get map of varPools for quick search
+        Map<String, Property> varPoolsMap = varPools
+                .stream()
+                .filter(property -> Direct.IN.equals(property.getDirect()))
+                .collect(Collectors.toMap(Property::getProp, x -> x));
 
         String executePath = taskExecutionContext.getExecutePath();
         // data path to download packaged data
@@ -174,14 +179,10 @@ public class TaskFilesTransferUtils {
                 downloadPath = targetPath;
             }
 
-            try {
-                String resourceWholePath =
-                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
-                log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
-                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, true);
-            } catch (IOException ex) {
-                throw new TaskException("Download file from storage error", ex);
-            }
+            String resourceWholePath =
+                    storageOperator.getStorageFileAbsolutePath(taskExecutionContext.getTenantCode(), resourcePath);
+            log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
+            storageOperator.download(resourceWholePath, downloadPath, true);
 
             // unpack if the data is packaged
             if (isPack) {
@@ -231,8 +232,8 @@ public class TaskFilesTransferUtils {
                 DateUtils.formatTimeStamp(taskExecutionContext.getEndTime(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         // get resource Folder: RESOURCE_TAG/DATE/ProcessDefineCode/ProcessDefineVersion_ProcessInstanceID
         String resourceFolder = String.format("%s/%s/%d/%d_%d", RESOURCE_TAG, date,
-                taskExecutionContext.getProcessDefineCode(), taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId());
+                taskExecutionContext.getWorkflowDefinitionCode(), taskExecutionContext.getWorkflowDefinitionVersion(),
+                taskExecutionContext.getWorkflowInstanceId());
         // get resource fileL: resourceFolder/TaskName_TaskInstanceID_FileName
         return String.format("%s/%s_%s_%s", resourceFolder, taskExecutionContext.getTaskName().replace(" ", "_"),
                 taskExecutionContext.getTaskInstanceId(), fileName);

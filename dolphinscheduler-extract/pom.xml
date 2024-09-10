@@ -34,6 +34,7 @@
         <module>dolphinscheduler-extract-master</module>
         <module>dolphinscheduler-extract-worker</module>
         <module>dolphinscheduler-extract-alert</module>
+        <module>dolphinscheduler-extract-common</module>
     </modules>
 
 </project>

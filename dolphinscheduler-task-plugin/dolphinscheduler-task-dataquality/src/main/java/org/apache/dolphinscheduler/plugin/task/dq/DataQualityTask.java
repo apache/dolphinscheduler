@@ -50,7 +50,6 @@ import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,11 +57,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * In DataQualityTask, the input parameters will be converted into DataQualityConfiguration,
  * which will be converted into a string as the parameter of DataQualityApplication,
  * and DataQualityApplication is spark application
  */
+@Slf4j
 public class DataQualityTask extends AbstractYarnTask {
 
     /**
@@ -114,6 +116,7 @@ public class DataQualityTask extends AbstractYarnTask {
         DataQualityConfiguration dataQualityConfiguration =
                 ruleManager.generateDataQualityParameter();
 
+        log.info("data quality configuration: {}", JSONUtils.toPrettyJsonString(dataQualityConfiguration));
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""
@@ -135,8 +138,8 @@ public class DataQualityTask extends AbstractYarnTask {
         inputParameter.put(RULE_NAME, ArgsUtils.wrapperSingleQuotes(dataQualityTaskExecutionContext.getRuleName()));
         inputParameter.put(CREATE_TIME, ArgsUtils.wrapperSingleQuotes(now));
         inputParameter.put(UPDATE_TIME, ArgsUtils.wrapperSingleQuotes(now));
-        inputParameter.put(PROCESS_DEFINITION_ID, String.valueOf(dqTaskExecutionContext.getProcessDefineId()));
-        inputParameter.put(PROCESS_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getProcessInstanceId()));
+        inputParameter.put(PROCESS_DEFINITION_ID, String.valueOf(dqTaskExecutionContext.getWorkflowDefinitionId()));
+        inputParameter.put(PROCESS_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getWorkflowInstanceId()));
         inputParameter.put(TASK_INSTANCE_ID, String.valueOf(dqTaskExecutionContext.getTaskInstanceId()));
 
         if (StringUtils.isEmpty(inputParameter.get(DATA_TIME))) {
@@ -151,8 +154,8 @@ public class DataQualityTask extends AbstractYarnTask {
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getHdfsPath())) {
             inputParameter.put(ERROR_OUTPUT_PATH,
                     dataQualityTaskExecutionContext.getHdfsPath()
-                            + SLASH + dqTaskExecutionContext.getProcessDefineId()
-                            + UNDERLINE + dqTaskExecutionContext.getProcessInstanceId()
+                            + SLASH + dqTaskExecutionContext.getWorkflowDefinitionId()
+                            + UNDERLINE + dqTaskExecutionContext.getWorkflowInstanceId()
                             + UNDERLINE + dqTaskExecutionContext.getTaskName());
         } else {
             inputParameter.put(ERROR_OUTPUT_PATH, "");
@@ -174,9 +177,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
     protected void setMainJarName() {
         ResourceInfo mainJar = new ResourceInfo();
-        String basePath = System.getProperty("user.dir").replace(File.separator + "bin", "");
-        mainJar.setResourceName(
-                basePath + File.separator + "libs" + File.separator + CommonUtils.getDataQualityJarName());
+        mainJar.setResourceName(CommonUtils.getDataQualityJarPath());
         dataQualityParameters.getSparkParameters().setMainJar(mainJar);
     }
 

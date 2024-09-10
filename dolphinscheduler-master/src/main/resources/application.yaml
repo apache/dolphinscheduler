@@ -22,17 +22,6 @@ spring:
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
-  cache:
-    # default enable cache, you can disable by `type: none`
-    type: none
-    cache-names:
-      - tenant
-      - user
-      - processDefinition
-      - processTaskRelation
-      - taskDefinition
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s,recordStats
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
@@ -40,15 +29,7 @@ spring:
     password: root
     hikari:
       connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
       pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -70,6 +51,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+  cloud.discovery.client.composite-indicator.enabled: false
 
 # Mybatis-plus configuration, you don't need to change it
 mybatis-plus:
@@ -92,47 +74,53 @@ registry:
     namespace: dolphinscheduler
     connect-string: localhost:2181
     retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
+      base-sleep-time: 1s
+      max-sleep: 3s
       max-retries: 5
-    session-timeout: 30s
-    connection-timeout: 9s
-    block-until-connected: 600ms
+    session-timeout: 60s
+    connection-timeout: 15s
+    block-until-connected: 15s
     digest: ~
 
 master:
   listen-port: 5678
-  # master fetch command num
-  fetch-command-num: 10
-  # master prepare execute thread number to limit handle commands in parallel
-  pre-exec-threads: 10
-  # master execute thread number to limit process instances in parallel
-  exec-threads: 100
-  # master dispatch task number per batch, if all the tasks dispatch failed in a batch, will sleep 1s.
-  dispatch-task-number: 3
-  # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
-  host-selector: lower_weight
-  # master heartbeat interval
-  heartbeat-interval: 10s
-  # master commit task retry times
-  task-commit-retry-times: 5
-  # master commit task interval
-  task-commit-interval: 1s
-  state-wheel-interval: 5s
-  # master max cpuload avg percentage, only higher than the system cpu load average, master server can schedule. default value 1: will use 100% cpu
-  max-cpu-load-avg: 1
-  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, only the available memory is higher than 30%, master server can schedule.
-  reserved-memory: 0.3
-  # failover interval, the unit is minute
-  failover-interval: 10m
-  # kill yarn / k8s application when failover taskInstance, default true
-  kill-application-when-task-failover: true
+  # The number of workflow event bus fire worker used to fire the workflow event, default is 2*CPU core + 1.
+  #  workflow-event-bus-fire-thread-count: 10
+  # The number of threads used to execute sync logic task e.g. Switch/Condition, default is CPU core.
+  #  master-sync-task-executor-thread-pool-size: 10
+  # The number of threads used to execute async logic task e.g. Dependent/SubWorkflow default is CPU core.
+  #  master-async-task-executor-thread-pool-size: 10
+  max-heartbeat-interval: 10s
+  server-load-protection:
+    # If set true, will open master overload protection
+    enabled: true
+    # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
+    max-system-cpu-usage-percentage-thresholds: 0.7
+    # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
+    max-jvm-cpu-usage-percentage-thresholds: 0.7
+    # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+    max-system-memory-usage-percentage-thresholds: 0.7
+    # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
+    max-disk-usage-percentage-thresholds: 0.7
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
-    strategy: waiting
-    # The max waiting time to reconnect to registry if you set the strategy to waiting
-    max-waiting-time: 100s
+    strategy: stop
   worker-group-refresh-interval: 10s
+  command-fetch-strategy:
+    type: ID_SLOT_BASED
+    config:
+      # The incremental id step
+      id-step: 1
+      # master fetch command num
+      fetch-size: 10
+  worker-load-balancer-configuration-properties:
+    # RANDOM, ROUND_ROBIN, FIXED_WEIGHTED_ROUND_ROBIN, DYNAMIC_WEIGHTED_ROUND_ROBIN
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # dynamic-weight-config-properties only used in DYNAMIC_WEIGHTED_ROUND_ROBIN, the weight of memory-usage, cpu-usage, task-thread-pool-usage should sum to 100.
+    dynamic-weight-config-properties:
+      memory-usage-weight: 30
+      cpu-usage-weight: 30
+      task-thread-pool-usage-weight: 40
 
 server:
   port: 5679

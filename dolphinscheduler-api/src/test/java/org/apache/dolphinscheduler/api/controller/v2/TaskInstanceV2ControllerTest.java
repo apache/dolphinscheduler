@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceSuccessResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -51,9 +52,9 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     public void testQueryTaskListPaging() {
 
         TaskInstanceQueryRequest taskInstanceQueryReq = new TaskInstanceQueryRequest();
-        taskInstanceQueryReq.setProcessInstanceId(1);
-        taskInstanceQueryReq.setProcessInstanceName("");
-        taskInstanceQueryReq.setProcessDefinitionName("");
+        taskInstanceQueryReq.setWorkflowInstanceId(1);
+        taskInstanceQueryReq.setWorkflowInstanceName("");
+        taskInstanceQueryReq.setWorkflowDefinitionName("");
         taskInstanceQueryReq.setTaskName("");
         taskInstanceQueryReq.setExecutorName("");
         taskInstanceQueryReq.setStartTime("2022-06-01 00:00:00");
@@ -72,8 +73,8 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
-        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(taskInstanceQueryReq.getProcessInstanceId()),
-                eq(taskInstanceQueryReq.getProcessInstanceName()), eq(taskInstanceQueryReq.getProcessInstanceName()),
+        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(taskInstanceQueryReq.getWorkflowInstanceId()),
+                eq(taskInstanceQueryReq.getWorkflowInstanceName()), eq(taskInstanceQueryReq.getWorkflowInstanceName()),
                 eq(taskInstanceQueryReq.getTaskName()), Mockito.any(), eq(taskInstanceQueryReq.getExecutorName()),
                 any(), any(),
                 eq(taskInstanceQueryReq.getSearchVal()), Mockito.any(), eq(taskInstanceQueryReq.getHost()),
@@ -85,12 +86,9 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     @Test
     public void testForceTaskSuccess() {
 
-        Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        Mockito.doNothing().when(taskInstanceService).forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt());
 
-        when(taskInstanceService.forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
-
-        Result taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
+        TaskInstanceSuccessResponse taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
 
     }

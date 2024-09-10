@@ -17,38 +17,76 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
+import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
+import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@AllArgsConstructor
 public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
-    @Getter
-    private final ProcessDefinition workflowDefinition;
+    private final Command command;
 
-    @Getter
-    private final ProcessInstance workflowInstance;
+    private final WorkflowDefinition workflowDefinition;
 
-    // This is the task definition graph
-    // todo: we need to add a task instance graph, then move the task instance from WorkflowExecuteRunnable to
-    // WorkflowExecuteContext
-    @Getter
+    private final WorkflowInstance workflowInstance;
+
     private final IWorkflowGraph workflowGraph;
 
-    public WorkflowExecuteContext(ProcessDefinition workflowDefinition,
-                                  ProcessInstance workflowInstance,
-                                  IWorkflowGraph workflowGraph) {
-        checkNotNull(workflowDefinition, "workflowDefinition is null");
-        checkNotNull(workflowInstance, "workflowInstance is null");
-        checkNotNull(workflowGraph, "workflowGraph is null");
+    private final IWorkflowExecutionGraph workflowExecutionGraph;
 
-        this.workflowDefinition = workflowDefinition;
-        this.workflowInstance = workflowInstance;
-        this.workflowGraph = workflowGraph;
+    private final WorkflowEventBus workflowEventBus;
+
+    private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
+
+    public static WorkflowExecuteContextBuilder builder() {
+        return new WorkflowExecuteContextBuilder();
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class WorkflowExecuteContextBuilder {
+
+        private Command command;
+
+        private WorkflowDefinition workflowDefinition;
+
+        private WorkflowInstance workflowInstance;
+
+        private IWorkflowGraph workflowGraph;
+
+        private IWorkflowExecutionGraph workflowExecutionGraph;
+
+        private WorkflowEventBus workflowEventBus;
+
+        private List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
+
+        public WorkflowExecuteContextBuilder withCommand(Command command) {
+            this.command = command;
+            return this;
+        }
+
+        public WorkflowExecuteContext build() {
+            return new WorkflowExecuteContext(
+                    command,
+                    workflowDefinition,
+                    workflowInstance,
+                    workflowGraph,
+                    workflowExecutionGraph,
+                    workflowEventBus,
+                    workflowInstanceLifecycleListeners);
+        }
     }
 
 }

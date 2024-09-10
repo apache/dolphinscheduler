@@ -52,7 +52,6 @@
             <excludes>
                 <exclude>libs/</exclude>
                 <exclude>bin/</exclude>
-                <exclude>dist-bin/</exclude>
             </excludes>
         </fileSet>
         <fileSet>
@@ -60,7 +59,7 @@
             <outputDirectory>standalone-server/libs/standalone-server</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/dist-bin</directory>
+            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/bin</directory>
             <outputDirectory>standalone-server/bin</outputDirectory>
         </fileSet>
 

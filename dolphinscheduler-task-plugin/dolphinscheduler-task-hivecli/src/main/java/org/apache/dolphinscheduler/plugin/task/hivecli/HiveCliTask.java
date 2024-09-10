@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -53,6 +54,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class HiveCliTask extends AbstractRemoteTask {
 
     private HiveCliParameters hiveCliParameters;
@@ -65,9 +69,7 @@ public class HiveCliTask extends AbstractRemoteTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -96,7 +98,7 @@ public class HiveCliTask extends AbstractRemoteTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
+            setTaskOutputParams(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current HiveCLI Task has been interrupted", e);
@@ -136,8 +138,9 @@ public class HiveCliTask extends AbstractRemoteTask {
 
             try {
                 resourceFileName = resourceInfos.get(0).getResourceName();
+                ResourceContext resourceContext = taskExecutionContext.getResourceContext();
                 sqlContent = FileUtils.readFileToString(
-                        new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                        new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                         StandardCharsets.UTF_8);
             } catch (IOException e) {
                 log.error("read hive sql content from file {} error ", resourceFileName, e);

@@ -16,10 +16,11 @@
  */
 package org.apache.dolphinscheduler.alert.rpc;
 
-import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
+import org.apache.dolphinscheduler.alert.service.AlertSender;
 import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,17 +32,26 @@ import org.springframework.stereotype.Service;
 public class AlertOperatorImpl implements IAlertOperator {
 
     @Autowired
-    private AlertBootstrapService alertBootstrapService;
+    private AlertSender alertSender;
 
     @Override
     public AlertSendResponse sendAlert(AlertSendRequest alertSendRequest) {
         log.info("Received AlertSendRequest : {}", alertSendRequest);
-        AlertSendResponse alertSendResponse = alertBootstrapService.syncHandler(
+        AlertSendResponse alertSendResponse = alertSender.syncHandler(
                 alertSendRequest.getGroupId(),
                 alertSendRequest.getTitle(),
-                alertSendRequest.getContent(),
-                alertSendRequest.getWarnType());
+                alertSendRequest.getContent());
         log.info("Handle AlertSendRequest finish: {}", alertSendResponse);
+        return alertSendResponse;
+    }
+
+    @Override
+    public AlertSendResponse sendTestAlert(AlertTestSendRequest alertSendRequest) {
+        log.info("Received AlertTestSendRequest : {}", alertSendRequest);
+        AlertSendResponse alertSendResponse = alertSender.syncTestSend(
+                alertSendRequest.getPluginDefineId(),
+                alertSendRequest.getPluginInstanceParams());
+        log.info("Handle AlertTestSendRequest finish: {}", alertSendResponse);
         return alertSendResponse;
     }
 }

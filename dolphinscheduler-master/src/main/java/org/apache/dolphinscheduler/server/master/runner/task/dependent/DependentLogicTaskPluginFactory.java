@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 
-import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
@@ -39,27 +40,32 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     @Autowired
     private ProjectDao projectDao;
     @Autowired
-    private ProcessDefinitionDao processDefinitionDao;
+    private WorkflowDefinitionDao workflowDefinitionDao;
     @Autowired
     private TaskDefinitionDao taskDefinitionDao;
     @Autowired
     private TaskInstanceDao taskInstanceDao;
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowRepository IWorkflowRepository;
 
     @Override
     public DependentLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
+        final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
+        final IWorkflowExecutionRunnable workflowExecutionRunnable = IWorkflowRepository.get(workflowInstanceId);
+        if (workflowExecutionRunnable == null) {
+            throw new LogicTaskInitializeException("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);
+        }
         return new DependentLogicTask(
                 taskExecutionContext,
                 projectDao,
-                processDefinitionDao,
+                workflowDefinitionDao,
                 taskDefinitionDao,
                 taskInstanceDao,
-                processInstanceDao,
-                processInstanceExecCacheManager);
+                workflowInstanceDao,
+                workflowExecutionRunnable);
     }
 
     @Override

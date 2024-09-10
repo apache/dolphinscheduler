@@ -21,7 +21,7 @@ interface AuditListReq {
   endDate?: string
   moduleType?: string
   operationType?: string
-  processName?: string
+  workflowName?: string
   projectName?: string
   resourceType?: string
   startDate?: string
@@ -45,4 +45,20 @@ interface AuditListRes {
   start: number
 }
 
-export { AuditListReq, AuditListRes }
+interface AuditModelTypeItem {
+  code: number
+  name: string
+  child: AuditModelTypeItem[] | null
+}
+
+interface AuditOperationTypeItem {
+  code: number
+  name: string
+}
+
+export {
+  AuditListReq,
+  AuditListRes,
+  AuditModelTypeItem,
+  AuditOperationTypeItem
+}

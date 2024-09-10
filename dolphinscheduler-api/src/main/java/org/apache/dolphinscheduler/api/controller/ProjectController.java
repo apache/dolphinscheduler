@@ -27,7 +27,10 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -67,6 +70,9 @@ public class ProjectController extends BaseController {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private AuditService auditService;
+
     /**
      * create project
      *
@@ -83,6 +89,7 @@ public class ProjectController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_ERROR)
+    @OperatorLog(auditType = AuditType.PROJECT_CREATE)
     public Result createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
@@ -107,6 +114,7 @@ public class ProjectController extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_ERROR)
+    @OperatorLog(auditType = AuditType.PROJECT_UPDATE)
     public Result updateProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code,
                                 @RequestParam("projectName") String projectName,
@@ -156,14 +164,9 @@ public class ProjectController extends BaseController {
                                          @RequestParam("pageSize") Integer pageSize,
                                          @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            log.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
-        return result;
+        return projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
     }
 
     /**
@@ -192,14 +195,10 @@ public class ProjectController extends BaseController {
                                                             @RequestParam("pageSize") Integer pageSize,
                                                             @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
+        return projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
                 searchVal);
-        return result;
     }
 
     /**
@@ -216,6 +215,7 @@ public class ProjectController extends BaseController {
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
+    @OperatorLog(auditType = AuditType.PROJECT_DELETE)
     public Result deleteProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code) {
         return projectService.deleteProject(loginUser, code);
@@ -226,7 +226,7 @@ public class ProjectController extends BaseController {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return the projects which user have not permission to see
+     * @return the projects which user have no permission to see
      */
     @Operation(summary = "queryUnauthorizedProject", description = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @Parameters({

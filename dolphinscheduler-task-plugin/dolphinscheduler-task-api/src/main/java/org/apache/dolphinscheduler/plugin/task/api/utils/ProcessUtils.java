@@ -39,6 +39,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +72,7 @@ public final class ProcessUtils {
      * Initialization regularization, solve the problem of pre-compilation performance,
      * avoid the thread safety problem of multi-thread operation
      */
-    private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
+    private static final Pattern MACPATTERN = Pattern.compile("-[+|-][-|=]\\s(\\d+)");
 
     /**
      * Expression of PID recognition in Windows scene
@@ -117,33 +118,45 @@ public final class ProcessUtils {
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        Matcher mat = null;
+
+        String rawPidStr;
+
         // pstree pid get sub pids
         if (SystemUtils.IS_OS_MAC) {
-            String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-            if (StringUtils.isNotEmpty(pids)) {
-                mat = MACPATTERN.matcher(pids);
+            rawPidStr = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
+        } else if (SystemUtils.IS_OS_LINUX) {
+            rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+        } else {
+            rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+        }
+
+        return parsePidStr(rawPidStr);
+    }
+
+    public static String parsePidStr(String rawPidStr) {
+
+        log.info("prepare to parse pid, raw pid string: {}", rawPidStr);
+        ArrayList<String> allPidList = new ArrayList<>();
+        Matcher mat = null;
+        if (SystemUtils.IS_OS_MAC) {
+            if (StringUtils.isNotEmpty(rawPidStr)) {
+                mat = MACPATTERN.matcher(rawPidStr);
             }
         } else if (SystemUtils.IS_OS_LINUX) {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            if (StringUtils.isNotEmpty(pids)) {
-                mat = LINUXPATTERN.matcher(pids);
+            if (StringUtils.isNotEmpty(rawPidStr)) {
+                mat = LINUXPATTERN.matcher(rawPidStr);
             }
         } else {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            if (StringUtils.isNotEmpty(pids)) {
-                mat = WINDOWSPATTERN.matcher(pids);
+            if (StringUtils.isNotEmpty(rawPidStr)) {
+                mat = WINDOWSPATTERN.matcher(rawPidStr);
             }
         }
-
         if (null != mat) {
             while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
+                allPidList.add(mat.group(1));
             }
         }
-
-        return sb.toString().trim();
+        return String.join(" ", allPidList).trim();
     }
 
     /**

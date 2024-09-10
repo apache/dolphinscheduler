@@ -104,8 +104,8 @@ $bgLight: #ffffff;
     &.icon-shell {
       background-image: url('/images/task-icons/shell.png');
     }
-    &.icon-sub_process {
-      background-image: url('/images/task-icons/sub_process.png');
+    &.icon-sub_workflow {
+      background-image: url('/images/task-icons/sub_workflow.png');
     }
     &.icon-dynamic {
       background-image: url('/images/task-icons/dynamic.png');
@@ -137,9 +137,6 @@ $bgLight: #ffffff;
     }
     &.icon-datax {
       background-image: url('/images/task-icons/datax.png');
-    }
-    &.icon-pigeon {
-      background-image: url('/images/task-icons/pigeon.png');
     }
     &.icon-sqoop {
       background-image: url('/images/task-icons/sqoop.png');
@@ -213,6 +210,9 @@ $bgLight: #ffffff;
     &.icon-remoteshell {
       background-image: url('/images/task-icons/remoteshell.png');
     }
+    &.icon-icon-aliyun_serverless_spark {
+      background-image: url('/images/task-icons/aliyun_serverless_spark.png');
+    }
   }
 
   &:hover {
@@ -220,8 +220,8 @@ $bgLight: #ffffff;
       &.icon-shell {
         background-image: url('/images/task-icons/shell_hover.png');
       }
-      &.icon-sub_process {
-        background-image: url('/images/task-icons/sub_process_hover.png');
+      &.icon-sub_workflow {
+        background-image: url('/images/task-icons/sub_workflow_hover.png');
       }
       &.icon-dynamic {
         background-image: url('/images/task-icons/dynamic_hover.png');
@@ -253,9 +253,6 @@ $bgLight: #ffffff;
       }
       &.icon-datax {
         background-image: url('/images/task-icons/datax_hover.png');
-      }
-      &.icon-pigeon {
-        background-image: url('/images/task-icons/pigeon_hover.png');
       }
       &.icon-sqoop {
         background-image: url('/images/task-icons/sqoop_hover.png');
@@ -328,6 +325,9 @@ $bgLight: #ffffff;
       }
       &.icon-remoteshell {
         background-image: url('/images/task-icons/remoteshell_hover.png');
+      }
+      &.icon-aliyun_serverless_spark {
+        background-image: url('/images/task-icons/aliyun_serverless_spark_hover.png');
       }
     }
   }

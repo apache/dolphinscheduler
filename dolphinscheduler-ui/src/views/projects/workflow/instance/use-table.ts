@@ -23,10 +23,10 @@ import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
 import { NEllipsis, NIcon, NSpin, NTooltip } from 'naive-ui'
 import {
-  queryProcessInstanceListPaging,
-  deleteProcessInstanceById,
-  batchDeleteProcessInstanceByIds
-} from '@/service/modules/process-instances'
+  queryWorkflowInstanceListPaging,
+  deleteWorkflowInstanceById,
+  batchDeleteWorkflowInstanceByIds
+} from '@/service/modules/workflow-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import {
@@ -40,7 +40,7 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
-import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
+import type { IWorkflowInstance } from '@/service/modules/workflow-instances/types'
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
 import { IWorkflowExecutionState } from '@/common/types'
@@ -57,6 +57,7 @@ export function useTable() {
     page: ref(1),
     pageSize: ref(10),
     totalPage: ref(1),
+    totalCount: ref(0),
     searchVal: ref(),
     executorName: ref(),
     host: ref(),
@@ -64,8 +65,9 @@ export function useTable() {
     startDate: ref(),
     endDate: ref(),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
-    processDefineCode: router.currentRoute.value.query.processDefineCode
-      ? ref(Number(router.currentRoute.value.query.processDefineCode))
+    workflowDefinitionCode: router.currentRoute.value.query
+      .workflowDefinitionCode
+      ? ref(Number(router.currentRoute.value.query.workflowDefinitionCode))
       : ref(),
     loadingRef: ref(false)
   })
@@ -100,7 +102,7 @@ export function useTable() {
                 const routeUrl = router.resolve({
                   name: 'workflow-instance-detail',
                   params: { id: row.id },
-                  query: { code: row.processDefinitionCode }
+                  query: { code: row.workflowDefinitionCode }
                 })
                 window.open(routeUrl.href, '_blank')
               }
@@ -197,14 +199,14 @@ export function useTable() {
             onReRun: () =>
               _countDownFn({
                 index,
-                processInstanceId: _row.id,
+                workflowInstanceId: _row.id,
                 executeType: 'REPEAT_RUNNING',
                 buttonType: 'run'
               }),
             onReStore: () =>
               _countDownFn({
                 index,
-                processInstanceId: _row.id,
+                workflowInstanceId: _row.id,
                 executeType: 'START_FAILURE_TASK_PROCESS',
                 buttonType: 'store'
               }),
@@ -212,13 +214,13 @@ export function useTable() {
               if (_row.state === 'STOP') {
                 _countDownFn({
                   index,
-                  processInstanceId: _row.id,
+                  workflowInstanceId: _row.id,
                   executeType: 'RECOVER_SUSPENDED_PROCESS',
                   buttonType: 'suspend'
                 })
               } else {
                 _upExecutorsState({
-                  processInstanceId: _row.id,
+                  workflowInstanceId: _row.id,
                   executeType: 'STOP'
                 })
               }
@@ -227,13 +229,13 @@ export function useTable() {
               if (_row.state === 'PAUSE') {
                 _countDownFn({
                   index,
-                  processInstanceId: _row.id,
+                  workflowInstanceId: _row.id,
                   executeType: 'RECOVER_SUSPENDED_PROCESS',
                   buttonType: 'suspend'
                 })
               } else {
                 _upExecutorsState({
-                  processInstanceId: _row.id,
+                  workflowInstanceId: _row.id,
                   executeType: 'PAUSE'
                 })
               }
@@ -259,10 +261,11 @@ export function useTable() {
       stateType: variables.stateType,
       startDate: variables.startDate,
       endDate: variables.endDate,
-      processDefineCode: variables.processDefineCode
+      workflowDefinitionCode: variables.workflowDefinitionCode
     }
-    queryProcessInstanceListPaging({ ...params }, variables.projectCode).then(
+    queryWorkflowInstanceListPaging({ ...params }, variables.projectCode).then(
       (res: any) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
@@ -273,7 +276,7 @@ export function useTable() {
   }
 
   const deleteInstance = (id: number) => {
-    deleteProcessInstanceById(id, variables.projectCode).then(() => {
+    deleteWorkflowInstanceById(id, variables.projectCode).then(() => {
       window.$message.success(t('project.workflow.success'))
       if (variables.tableData.length === 1 && variables.page > 1) {
         variables.page -= 1
@@ -285,10 +288,10 @@ export function useTable() {
 
   const batchDeleteInstance = () => {
     const data = {
-      processInstanceIds: _.join(variables.checkedRowKeys, ',')
+      workflowInstanceIds: _.join(variables.checkedRowKeys, ',')
     }
 
-    batchDeleteProcessInstanceByIds(data, variables.projectCode).then(() => {
+    batchDeleteWorkflowInstanceByIds(data, variables.projectCode).then(() => {
       window.$message.success(t('project.workflow.success'))
 
       if (

@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,23 +35,23 @@ import com.google.common.collect.Lists;
 
 public class DynamicCommandUtils {
 
-    static public Command createCommand(ProcessInstance processInstance,
+    static public Command createCommand(WorkflowInstance workflowInstance,
                                         Long subProcessDefinitionCode,
                                         Integer subProcessDefinitionVersion,
                                         Map<String, String> parameters) {
         Command command = new Command();
-        if (processInstance.getCommandType().equals(CommandType.START_PROCESS)) {
+        if (workflowInstance.getCommandType().equals(CommandType.START_PROCESS)) {
             command.setCommandType(CommandType.DYNAMIC_GENERATION);
         } else {
-            command.setCommandType(processInstance.getCommandType());
+            command.setCommandType(workflowInstance.getCommandType());
         }
-        command.setProcessDefinitionCode(subProcessDefinitionCode);
-        command.setProcessDefinitionVersion(subProcessDefinitionVersion);
+        command.setWorkflowDefinitionCode(subProcessDefinitionCode);
+        command.setWorkflowDefinitionVersion(subProcessDefinitionVersion);
         command.setTaskDependType(TaskDependType.TASK_POST);
-        command.setFailureStrategy(processInstance.getFailureStrategy());
-        command.setWarningType(processInstance.getWarningType());
+        command.setFailureStrategy(workflowInstance.getFailureStrategy());
+        command.setWarningType(workflowInstance.getWarningType());
 
-        String globalParams = processInstance.getGlobalParams();
+        String globalParams = workflowInstance.getGlobalParams();
         if (StringUtils.isNotEmpty(globalParams)) {
             List<Property> parentParams = Lists.newArrayList(JSONUtils.toList(globalParams, Property.class));
             for (Property parentParam : parentParams) {
@@ -60,11 +60,12 @@ public class DynamicCommandUtils {
         }
 
         addDataToCommandParam(command, CommandKeyConstants.CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(parameters));
-        command.setExecutorId(processInstance.getExecutorId());
-        command.setWarningGroupId(processInstance.getWarningGroupId());
-        command.setProcessInstancePriority(processInstance.getProcessInstancePriority());
-        command.setWorkerGroup(processInstance.getWorkerGroup());
-        command.setDryRun(processInstance.getDryRun());
+        command.setExecutorId(workflowInstance.getExecutorId());
+        command.setWarningGroupId(workflowInstance.getWarningGroupId());
+        command.setWorkflowInstancePriority(workflowInstance.getWorkflowInstancePriority());
+        command.setWorkerGroup(workflowInstance.getWorkerGroup());
+        command.setDryRun(workflowInstance.getDryRun());
+        command.setTenantCode(workflowInstance.getTenantCode());
         return command;
     }
 

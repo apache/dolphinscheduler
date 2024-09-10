@@ -18,14 +18,14 @@
 package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseResponse;
-import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 import org.apache.dolphinscheduler.server.worker.runner.operator.TaskInstanceOperationFunctionManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,25 +38,26 @@ public class TaskInstanceOperatorImpl implements ITaskInstanceOperator {
     private TaskInstanceOperationFunctionManager taskInstanceOperationFunctionManager;
 
     @Override
-    public TaskInstanceDispatchResponse dispatchTask(TaskInstanceDispatchRequest taskInstanceDispatchRequest) {
+    public TaskInstanceDispatchResponse dispatchTask(final TaskInstanceDispatchRequest taskInstanceDispatchRequest) {
         return taskInstanceOperationFunctionManager.getTaskInstanceDispatchOperationFunction()
                 .operate(taskInstanceDispatchRequest);
     }
 
     @Override
-    public TaskInstanceKillResponse killTask(TaskInstanceKillRequest taskInstanceKillRequest) {
+    public TaskInstanceKillResponse killTask(final TaskInstanceKillRequest taskInstanceKillRequest) {
         return taskInstanceOperationFunctionManager.getTaskInstanceKillOperationFunction()
                 .operate(taskInstanceKillRequest);
     }
 
     @Override
-    public TaskInstancePauseResponse pauseTask(TaskInstancePauseRequest taskPauseRequest) {
-        return taskInstanceOperationFunctionManager.getTaskInstancePauseOperationFunction().operate(taskPauseRequest);
+    public TaskInstancePauseResponse pauseTask(final TaskInstancePauseRequest taskPauseRequest) {
+        return taskInstanceOperationFunctionManager.getTaskInstancePauseOperationFunction()
+                .operate(taskPauseRequest);
     }
 
     @Override
-    public UpdateWorkflowHostResponse updateWorkflowInstanceHost(UpdateWorkflowHostRequest updateWorkflowHostRequest) {
+    public TakeOverTaskResponse takeOverTask(final TakeOverTaskRequest takeOverTaskRequest) {
         return taskInstanceOperationFunctionManager.getUpdateWorkflowHostOperationFunction()
-                .operate(updateWorkflowHostRequest);
+                .operate(takeOverTaskRequest);
     }
 }

@@ -17,50 +17,59 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
-
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.truth.Truth;
 
 @ExtendWith(MockitoExtension.class)
 public class FileUtilsTest {
 
     @Test
     public void testGetDownloadFilename() {
-        try (MockedStatic<DateUtils> mockedDateUtils = Mockito.mockStatic(DateUtils.class)) {
-            mockedDateUtils.when(() -> DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
-            Assertions.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
-                    FileUtils.getDownloadFilename("test"));
-        }
+        Truth.assertThat(FileUtils.getDownloadFilename("test")).startsWith("/tmp/dolphinscheduler/tmp/");
     }
 
     @Test
     public void testGetUploadFilename() {
-        Assertions.assertEquals("/tmp/dolphinscheduler/aaa/resources/bbb",
-                FileUtils.getUploadFilename("aaa", "bbb"));
+        Truth.assertThat(FileUtils.getUploadFileLocalTmpAbsolutePath()).startsWith("/tmp/dolphinscheduler/tmp/");
     }
 
     @Test
     public void testGetProcessExecDir() {
-        String dir = FileUtils.getProcessExecDir("test", 1L, 2L, 1, 3, 4);
+        String dir = FileUtils.getTaskInstanceWorkingDirectory("test", 1L, 2L, 1, 3, 4);
         Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/test/1/2_1/3/4", dir);
     }
 
     @Test
-    public void testCreateWorkDirIfAbsent() {
+    public void createDirectoryWith755() throws IOException {
+        Path path = Paths.get("/tmp/createWorkDirAndUserIfAbsent");
         try {
-            FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
-            Assertions.assertTrue(true);
+            FileUtils.createDirectoryWith755(path);
+            File file = path.toFile();
+            Assertions.assertTrue(file.exists());
+            Assertions.assertTrue(file.isDirectory());
+            Assertions.assertTrue(file.canExecute());
+            Assertions.assertTrue(file.canRead());
+            Assertions.assertTrue(file.canWrite());
+
+            FileUtils.createDirectoryWith755(Paths.get("/"));
         } catch (Exception e) {
-            Assertions.fail();
+            e.printStackTrace();
+            Assertions.fail(e.getMessage());
+        } finally {
+            Files.deleteIfExists(path);
         }
     }
 

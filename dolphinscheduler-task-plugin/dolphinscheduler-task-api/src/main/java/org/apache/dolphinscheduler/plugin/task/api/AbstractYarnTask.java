@@ -29,15 +29,16 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class AbstractYarnTask extends AbstractRemoteTask {
 
     private ShellCommandExecutor shellCommandExecutor;
 
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
     }
 
     // todo split handle to submit and track

@@ -33,12 +33,15 @@ import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
-import org.apache.dolphinscheduler.data.quality.utils.ParserUtils;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import lombok.SneakyThrows;
 
 import com.google.common.base.Strings;
 
@@ -70,6 +73,7 @@ public class JdbcWriter implements BatchWriter {
         }
     }
 
+    @SneakyThrows
     @Override
     public void write(Dataset<Row> data, SparkRuntimeEnvironment env) {
         if (!Strings.isNullOrEmpty(config.getString(SQL))) {
@@ -82,7 +86,7 @@ public class JdbcWriter implements BatchWriter {
                 .option(URL, config.getString(URL))
                 .option(DB_TABLE, config.getString(DATABASE) + "." + config.getString(TABLE))
                 .option(USER, config.getString(USER))
-                .option(PASSWORD, ParserUtils.decode(config.getString(PASSWORD)))
+                .option(PASSWORD, URLDecoder.decode(config.getString(PASSWORD), StandardCharsets.UTF_8.name()))
                 .mode(config.getString(SAVE_MODE))
                 .save();
     }

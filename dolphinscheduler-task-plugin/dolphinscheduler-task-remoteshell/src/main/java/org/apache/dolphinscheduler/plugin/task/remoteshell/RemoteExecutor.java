@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.remoteshell;
 
+import static org.apache.dolphinscheduler.plugin.task.remoteshell.RemoteExecutor.COMMAND.PSTREE_COMMAND;
+
 import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
@@ -36,28 +40,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
-public class RemoteExecutor {
-
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME, getClass()));
-
-    protected static final Pattern SETVALUE_REGEX = Pattern.compile(TaskConstants.SETVALUE_REGEX);
+@Slf4j
+public class RemoteExecutor implements AutoCloseable {
 
     static final String REMOTE_SHELL_HOME = "/tmp/dolphinscheduler-remote-shell-%s/";
     static final String STATUS_TAG_MESSAGE = "DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-";
     static final int TRACK_INTERVAL = 5000;
 
-    protected StringBuilder varPool = new StringBuilder();
-
-    SshClient sshClient;
-    ClientSession session;
-    SSHConnectionParam sshConnectionParam;
+    protected Map<String, String> taskOutputParams = new HashMap<>();
+    private SshClient sshClient;
+    private ClientSession session;
+    private SSHConnectionParam sshConnectionParam;
 
     public RemoteExecutor(SSHConnectionParam sshConnectionParam) {
 
@@ -105,60 +104,43 @@ public class RemoteExecutor {
     public void track(String taskId) throws Exception {
         int logN = 0;
         String pid;
-        logger.info("Remote shell task log:");
+        log.info("Remote shell task log:");
+        TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
         do {
             pid = getTaskPid(taskId);
             String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
-            String log = runRemote(trackCommand);
-            if (StringUtils.isEmpty(log)) {
+            String logLine = runRemote(trackCommand);
+            if (StringUtils.isEmpty(logLine)) {
                 Thread.sleep(TRACK_INTERVAL);
             } else {
-                logN += log.split("\n").length;
-                setVarPool(log);
-                logger.info(log);
+                logN += logLine.split("\n").length;
+                log.info(logLine);
+                taskOutputParameterParser.appendParseLog(logLine);
             }
         } while (StringUtils.isNotEmpty(pid));
+        taskOutputParams.putAll(taskOutputParameterParser.getTaskOutputParams());
     }
 
-    public String getVarPool() {
-        return varPool.toString();
-    }
-
-    private void setVarPool(String log) {
-        String[] lines = log.split("\n");
-        for (String line : lines) {
-            if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
-                varPool.append(findVarPool(line));
-                varPool.append("$VarPool$");
-            }
-        }
-    }
-
-    private String findVarPool(String line) {
-        Matcher matcher = SETVALUE_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
+    public Map<String, String> getTaskOutputParams() {
+        return taskOutputParams;
     }
 
     public Integer getTaskExitCode(String taskId) throws IOException {
         String trackCommand = String.format(COMMAND.LOG_TAIL_COMMAND, getRemoteShellHome(), taskId);
-        String log = runRemote(trackCommand);
+        String logLine = runRemote(trackCommand);
         int exitCode = -1;
-        logger.info("Remote shell task run status: {}", log);
-        if (log.contains(STATUS_TAG_MESSAGE)) {
-            String status = log.replace(STATUS_TAG_MESSAGE, "").trim();
+        log.info("Remote shell task run status: {}", logLine);
+        if (logLine.contains(STATUS_TAG_MESSAGE)) {
+            String status = StringUtils.substringAfter(logLine, STATUS_TAG_MESSAGE).trim();
             if (status.equals("0")) {
-                logger.info("Remote shell task success");
+                log.info("Remote shell task success");
                 exitCode = 0;
             } else {
-                logger.error("Remote shell task failed");
+                log.error("Remote shell task failed");
                 exitCode = Integer.parseInt(status);
             }
         }
         cleanData(taskId);
-        logger.error("Remote shell task failed");
         return exitCode;
     }
 
@@ -168,15 +150,49 @@ public class RemoteExecutor {
         try {
             runRemote(cleanCommand);
         } catch (Exception e) {
-            logger.error("Remote shell task clean data failed, but will not affect the task execution", e);
+            log.error("Remote shell task clean data failed, but will not affect the task execution", e);
         }
     }
 
     public void kill(String taskId) throws IOException {
         String pid = getTaskPid(taskId);
-        String killCommand = String.format(COMMAND.KILL_COMMAND, pid);
+
+        if (StringUtils.isEmpty(pid)) {
+            log.warn("query remote-shell task remote process id with empty");
+            return;
+        }
+        if (!NumberUtils.isParsable(pid)) {
+            log.error("query remote-shell task remote process id error, pid {} can not parse to number", pid);
+            return;
+        }
+
+        // query all pid
+        String remotePidStr = getAllRemotePidStr(pid);
+        String killCommand = String.format(COMMAND.KILL_COMMAND, remotePidStr);
+        log.info("prepare to execute kill command in host: {}, kill cmd: {}", sshConnectionParam.getHost(),
+                killCommand);
         runRemote(killCommand);
         cleanData(taskId);
+    }
+
+    protected String getAllRemotePidStr(String pid) {
+
+        String remoteProcessIdStr = "";
+        String cmd = String.format(PSTREE_COMMAND, pid);
+        log.info("query all process id cmd: {}", cmd);
+
+        try {
+            String rawPidStr = runRemote(cmd);
+            remoteProcessIdStr = ProcessUtils.parsePidStr(rawPidStr);
+            if (!remoteProcessIdStr.startsWith(pid)) {
+                log.error("query remote process id error, [{}] first pid not equal [{}]", remoteProcessIdStr, pid);
+                remoteProcessIdStr = pid;
+            }
+        } catch (Exception e) {
+            log.error("query remote all process id error", e);
+            remoteProcessIdStr = pid;
+        }
+        return remoteProcessIdStr;
     }
 
     public String getTaskPid(String taskId) throws IOException {
@@ -189,14 +205,14 @@ public class RemoteExecutor {
         runRemote(checkDirCommand);
         uploadScript(taskId, localFile);
 
-        logger.info("The final script is: \n{}",
+        log.info("The final script is: \n{}",
                 runRemote(String.format(COMMAND.CAT_FINAL_SCRIPT, getRemoteShellHome(), taskId)));
     }
 
     public void uploadScript(String taskId, String localFile) throws IOException {
 
         String remotePath = getRemoteShellHome() + taskId + ".sh";
-        logger.info("upload script from local:{} to remote: {}", localFile, remotePath);
+        log.info("upload script from local:{} to remote: {}", localFile, remotePath);
         try (SftpFileSystem fs = SftpClientFactory.instance().createSftpFileSystem(getSession())) {
             Path path = fs.getPath(remotePath);
             Files.copy(Paths.get(localFile), path);
@@ -215,8 +231,10 @@ public class RemoteExecutor {
             channel.open();
             channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0);
             channel.close();
-            if (channel.getExitStatus() != 0) {
-                throw new TaskException("Remote shell task error, error message: " + err.toString());
+            Integer exitStatus = channel.getExitStatus();
+            if (exitStatus == null || exitStatus != 0) {
+                throw new TaskException(
+                        "Remote shell task error, exitStatus: " + exitStatus + " error message: " + err);
             }
             return out.toString();
         }
@@ -224,6 +242,18 @@ public class RemoteExecutor {
 
     private String getRemoteShellHome() {
         return String.format(REMOTE_SHELL_HOME, sshConnectionParam.getUser());
+    }
+
+    @SneakyThrows
+    @Override
+    public void close() {
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
+        if (sshClient != null && sshClient.isStarted()) {
+            sshClient.close();
+        }
+
     }
 
     static class COMMAND {
@@ -246,6 +276,9 @@ public class RemoteExecutor {
         static final String ADD_STATUS_COMMAND = "\necho %s$?";
 
         static final String CAT_FINAL_SCRIPT = "cat %s%s.sh";
+
+        static final String PSTREE_COMMAND = "pstree -p %s";
+
     }
 
 }

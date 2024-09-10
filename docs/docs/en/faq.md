@@ -459,11 +459,11 @@ A: 1, cd dolphinscheduler-ui and delete node_modules directory
 sudo rm -rf node_modules
 ```
 
-​ 2, install node-sass through npm.taobao.org
+​ 2, install node-sass through npmmirror.com
 
 ```
 sudo npm uninstall node-sass
-sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+sudo npm i node-sass --sass_binary_site=https://npmmirror.com/mirrors/node-sass/
 ```
 
 3, if the 2nd step failure, please, [referer url](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/frontend-development.md)
@@ -506,7 +506,7 @@ A: 1, Where is the executed server? Specify one worker to run the task, you can 
 
 ## Q : What’s the best deploy mode you suggest in production env
 
-A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines.
+A: 1, I suggest you use 3 nodes for stability if you don't have too many tasks to run. And deploy Master/Worker/Api server on different nodes is better. If you only have one node, you of course only can deploy them together! By the way, how many machines you need is determined by your business. The DolphinScheduler system itself does not use too many resources. Test more, and you'll find the right way to use a few machines.
 
 ---
 

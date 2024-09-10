@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.security.impl.ldap;
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import lombok.NonNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LdapAuthenticator extends AbstractAuthenticator {
@@ -28,7 +30,7 @@ public class LdapAuthenticator extends AbstractAuthenticator {
     LdapService ldapService;
 
     @Override
-    public User login(String userId, String password, String extra) {
+    public User login(@NonNull String userId, String password) {
         User user = null;
         String ldapEmail = ldapService.ldapLogin(userId, password);
         if (ldapEmail != null) {

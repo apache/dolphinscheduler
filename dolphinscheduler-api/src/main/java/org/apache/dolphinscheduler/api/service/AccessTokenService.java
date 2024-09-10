@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * access token service
@@ -36,7 +37,7 @@ public interface AccessTokenService {
      * @param pageSize page size
      * @return token list for page number and page size
      */
-    Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    PageInfo<AccessToken> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query access token for specified user
@@ -45,7 +46,7 @@ public interface AccessTokenService {
      * @param userId user id
      * @return token list for specified user
      */
-    Map<String, Object> queryAccessTokenByUser(User loginUser, Integer userId);
+    List<AccessToken> queryAccessTokenByUser(User loginUser, Integer userId);
 
     /**
      * create token
@@ -55,7 +56,7 @@ public interface AccessTokenService {
      * @param token token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
-    Result createToken(User loginUser, int userId, String expireTime, String token);
+    AccessToken createToken(User loginUser, int userId, String expireTime, String token);
 
     /**
      * generate token
@@ -64,7 +65,7 @@ public interface AccessTokenService {
      * @param expireTime token expire time
      * @return token string
      */
-    Map<String, Object> generateToken(User loginUser, int userId, String expireTime);
+    String generateToken(User loginUser, int userId, String expireTime);
 
     /**
      * delete access token
@@ -73,7 +74,7 @@ public interface AccessTokenService {
      * @param id token id
      * @return delete result code
      */
-    Map<String, Object> delAccessTokenById(User loginUser, int id);
+    void deleteAccessTokenById(User loginUser, int id);
 
     /**
      * update token by id
@@ -84,5 +85,5 @@ public interface AccessTokenService {
      * @param token token string (if it is absent, it will be automatically generated)
      * @return updated access token entity
      */
-    Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token);
+    AccessToken updateToken(User loginUser, int id, int userId, String expireTime, String token);
 }

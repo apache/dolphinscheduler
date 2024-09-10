@@ -48,11 +48,14 @@ public class Command {
     @TableField("command_type")
     private CommandType commandType;
 
-    @TableField("process_definition_code")
-    private long processDefinitionCode;
+    @TableField("workflow_definition_code")
+    private long workflowDefinitionCode;
 
-    @TableField("executor_id")
-    private int executorId;
+    @TableField("workflow_definition_version")
+    private int workflowDefinitionVersion;
+
+    @TableField("workflow_instance_id")
+    private int workflowInstanceId;
 
     /**
      * command parameter, format json
@@ -60,56 +63,66 @@ public class Command {
     @TableField("command_param")
     private String commandParam;
 
+    @TableField("workflow_instance_priority")
+    private Priority workflowInstancePriority;
+
+    @Deprecated
+    @TableField("executor_id")
+    private int executorId;
+
+    @Deprecated
     @TableField("task_depend_type")
     @Builder.Default
     private TaskDependType taskDependType = TaskDependType.TASK_POST;
 
+    @Deprecated
     @TableField("failure_strategy")
     @Builder.Default
     private FailureStrategy failureStrategy = FailureStrategy.CONTINUE;
 
+    @Deprecated
     @TableField("warning_type")
     private WarningType warningType;
 
+    @Deprecated
     @TableField("warning_group_id")
     private Integer warningGroupId;
 
+    @Deprecated
     @TableField("schedule_time")
     private Date scheduleTime;
 
+    @Deprecated
     @TableField("start_time")
     private Date startTime = new Date();
 
-    @TableField("process_instance_priority")
-    private Priority processInstancePriority;
-
+    @Deprecated
     @TableField("update_time")
     @Builder.Default
     private Date updateTime = new Date();
 
+    @Deprecated
     @TableField("worker_group")
     private String workerGroup;
 
     /**
      * tenant code
      */
+    @Deprecated
     private String tenantCode;
 
+    @Deprecated
     @TableField("environment_code")
     private Long environmentCode;
 
+    @Deprecated
     @TableField("dry_run")
     private int dryRun;
-
-    @TableField("process_instance_id")
-    private int processInstanceId;
-
-    @TableField("process_definition_version")
-    private int processDefinitionVersion;
 
     /**
      * test flag
      */
+    @Deprecated
     @TableField("test_flag")
     private int testFlag;
 
@@ -118,21 +131,21 @@ public class Command {
                    TaskDependType taskDependType,
                    FailureStrategy failureStrategy,
                    int executorId,
-                   long processDefinitionCode,
+                   long workflowDefinitionCode,
                    String commandParam,
                    WarningType warningType,
                    int warningGroupId,
                    Date scheduleTime,
                    String workerGroup,
                    Long environmentCode,
-                   Priority processInstancePriority,
+                   Priority workflowInstancePriority,
                    int dryRun,
-                   int processInstanceId,
-                   int processDefinitionVersion,
+                   int workflowInstanceId,
+                   int workflowDefinitionVersion,
                    int testFlag) {
         this.commandType = commandType;
         this.executorId = executorId;
-        this.processDefinitionCode = processDefinitionCode;
+        this.workflowDefinitionCode = workflowDefinitionCode;
         this.commandParam = commandParam;
         this.warningType = warningType;
         this.warningGroupId = warningGroupId;
@@ -143,10 +156,10 @@ public class Command {
         this.updateTime = new Date();
         this.workerGroup = workerGroup;
         this.environmentCode = environmentCode;
-        this.processInstancePriority = processInstancePriority;
+        this.workflowInstancePriority = workflowInstancePriority;
         this.dryRun = dryRun;
-        this.processInstanceId = processInstanceId;
-        this.processDefinitionVersion = processDefinitionVersion;
+        this.workflowInstanceId = workflowInstanceId;
+        this.workflowDefinitionVersion = workflowDefinitionVersion;
         this.testFlag = testFlag;
     }
 }

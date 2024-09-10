@@ -34,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class TrinoDataSourceProcessorTest {
 
-    private TrinoDataSourceProcessor TrinoDatasourceProcessor = new TrinoDataSourceProcessor();
+    private final TrinoDataSourceProcessor TrinoDatasourceProcessor = new TrinoDataSourceProcessor();
 
     @Test
     public void testCreateConnectionParams() {
@@ -91,5 +91,18 @@ public class TrinoDataSourceProcessorTest {
     public void testGetValidationQuery() {
         Assertions.assertEquals(DataSourceConstants.TRINO_VALIDATION_QUERY,
                 TrinoDatasourceProcessor.getValidationQuery());
+    }
+
+    @Test
+    public void testCheckDatasourceParam() {
+        Map<String, String> others = new HashMap<>();
+        others.put("SSL", "true");
+        others.put("SSLKeyStorePassword", "******");
+        others.put("SSLKeyStorePath", "/home/dolphinscheduler/trino.jks");
+        TrinoDataSourceParamDTO trinoDataSourceParamDTO = new TrinoDataSourceParamDTO();
+        trinoDataSourceParamDTO.setDatabase("dwh");
+        trinoDataSourceParamDTO.setHost("10.11.12.13");
+        trinoDataSourceParamDTO.setOther(others);
+        Assertions.assertDoesNotThrow(() -> TrinoDatasourceProcessor.checkDatasourceParam(trinoDataSourceParamDTO));
     }
 }

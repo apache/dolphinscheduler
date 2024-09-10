@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -288,7 +289,8 @@ public class FlinkArgsUtils {
             if (ProgramType.PYTHON == programType) {
                 args.add(FlinkConstants.FLINK_PYTHON);
             }
-            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            args.add(resourceContext.getResourceItem(mainJar.getResourceName()).getResourceAbsolutePathInLocal());
         }
 
         String mainArgs = flinkParameters.getMainArgs();

@@ -23,24 +23,12 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 public class K8sTaskChannel implements TaskChannel {
 
     @Override
-    public void cancelApplication(boolean status) {
-
-    }
-
-    @Override
-    public AbstractParameters parseParameters(ParametersNode parametersNode) {
-        return JSONUtils.parseObject(parametersNode.getTaskParams(), K8sTaskParameters.class);
-    }
-
-    @Override
-    public ResourceParametersHelper getResources(String parameters) {
-        return JSONUtils.parseObject(parameters, K8sTaskParameters.class).getResources();
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, K8sTaskParameters.class);
     }
 
     @Override

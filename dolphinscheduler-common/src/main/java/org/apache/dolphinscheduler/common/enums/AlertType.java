@@ -17,27 +17,30 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * describe the reason why alert generates
  */
+@Getter
 public enum AlertType {
 
     /**
-     * 0 process instance failure, 1 process instance success, 2 process instance blocked, 3 process instance timeout, 4 fault tolerance warning,
+     * 0 workflow instance failure, 1 workflow instance success, 2 workflow instance blocked, 3 workflow instance timeout, 4 fault tolerance warning,
      * 5 task failure, 6 task success, 7 task timeout, 8 close alert
       */
-    PROCESS_INSTANCE_FAILURE(0, "process instance failure"),
-    PROCESS_INSTANCE_SUCCESS(1, "process instance success"),
-    PROCESS_INSTANCE_BLOCKED(2, "process instance blocked"),
-    PROCESS_INSTANCE_TIMEOUT(3, "process instance timeout"),
+    WORKFLOW_INSTANCE_FAILURE(0, "workflow instance failure"),
+    WORKFLOW_INSTANCE_SUCCESS(1, "workflow instance success"),
+    WORKFLOW_INSTANCE_BLOCKED(2, "workflow instance blocked"),
+    WORKFLOW_INSTANCE_TIMEOUT(3, "workflow instance timeout"),
     FAULT_TOLERANCE_WARNING(4, "fault tolerance warning"),
     TASK_FAILURE(5, "task failure"),
     TASK_SUCCESS(6, "task success"),
     TASK_TIMEOUT(7, "task timeout"),
 
-    CLOSE_ALERT(8, "the process instance success, can close the before alert");
+    CLOSE_ALERT(8, "the workflow instance success, can close the before alert");
 
     AlertType(int code, String descp) {
         this.code = code;
@@ -48,11 +51,4 @@ public enum AlertType {
     private final int code;
     private final String descp;
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }

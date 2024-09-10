@@ -10,25 +10,15 @@
 
 ### 前置准备工作 && 准备 DolphinScheduler 启动环境
 
-其中除了[伪集群部署](pseudo-cluster.md)中的“前置准备工作”，“准备启动环境”除了“启动zookeeper”以及“初始化数据库”外，别的都需要在每台机器中进行配置
+需要将安装包分发至每台集群的每台服务器上，并且需要在每台机器中进行配置执行[伪集群部署](pseudo-cluster.md)中的所有执行项
+
+> **_注意:_** 请确保每台机器的配置文件都是一致的，否则会导致集群无法正常工作
+> **_注意:_** 每个服务都是无状态且互相独立的，所以可以在每台机器上部署多个服务，但是需要注意端口冲突问题
+> **_注意_**: DS默认使用本地模式的目录 /tmp/dolphinscheduler 作为资源中心, 如果需要修改资源中心目录, 请修改配置文件 conf/common.properties 中 resource 的相关配置项
 
 ### 修改相关配置
 
-这个是与[伪集群部署](pseudo-cluster.md)差异较大的一步，因为部署脚本会通过 `scp` 的方式将安装需要的资源传输到各个机器上，所以这一步我们仅需要修改运行`install.sh`脚本的所在机器的配置即可。配置文件在路径在`bin/env/install_env.sh`下，此处我们仅需修改**INSTALL MACHINE**，**DolphinScheduler ENV、Database、Registry Server**与伪集群部署保持一致，下面对必须修改参数进行说明
-
-```shell
-# ---------------------------------------------------------
-# INSTALL MACHINE
-# ---------------------------------------------------------
-# 需要配置master、worker、API server，所在服务器的IP均为机器IP或者localhost
-# 如果是配置hostname的话，需要保证机器间可以通过hostname相互链接
-# 如下图所示，部署 DolphinScheduler 机器的 hostname 为 ds1,ds2,ds3,ds4,ds5，其中 ds1,ds2 安装 master 服务，ds3,ds4,ds5安装 worker 服务，alert server安装在ds4中，api server 安装在ds5中
-ips="ds1,ds2,ds3,ds4,ds5"
-masters="ds1,ds2"
-workers="ds3:default,ds4:default,ds5:default"
-alertServer="ds4"
-apiServers="ds5"
-```
+这个是与[伪集群部署](pseudo-cluster.md)差异较大的一步，请使用 scp 等方式将配置文件分发到各台机器上，然后修改配置文件
 
 ## 启动 DolphinScheduler && 登录 DolphinScheduler && 启停服务
 

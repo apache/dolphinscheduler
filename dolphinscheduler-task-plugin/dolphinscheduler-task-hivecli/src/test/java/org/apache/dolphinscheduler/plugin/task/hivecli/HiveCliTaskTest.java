@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import org.apache.commons.io.FileUtils;
 
@@ -64,7 +65,7 @@ public class HiveCliTaskTest {
     }
 
     @Test
-    public void hiveCliTaskExecuteSqlFromScript() throws Exception {
+    public void hiveCliTaskExecuteSqlFromScript() {
         String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromScriptParameters();
         HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
         hiveCliTask.init();
@@ -72,9 +73,17 @@ public class HiveCliTaskTest {
     }
 
     @Test
-    public void hiveCliTaskExecuteSqlFromFile() throws Exception {
+    public void hiveCliTaskExecuteSqlFromFile() {
         String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromFileParameters();
-        HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(hiveCliTaskParameters);
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(new ResourceContext.ResourceItem("/sql_tasks/hive_task.sql",
+                "/sql_tasks/hive_task.sql"));
+        taskExecutionContext.setResourceContext(resourceContext);
+
+        HiveCliTask hiveCliTask = spy(new HiveCliTask(taskExecutionContext));
+        doReturn("123_node.sql").when(hiveCliTask).generateSqlScriptFile(Mockito.any());
         hiveCliTask.init();
         Assertions.assertEquals(hiveCliTask.buildCommand(), EXPECTED_HIVE_CLI_TASK_EXECUTE_FROM_FILE_COMMAND);
     }

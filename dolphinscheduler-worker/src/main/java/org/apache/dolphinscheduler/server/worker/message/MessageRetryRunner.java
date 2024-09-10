@@ -20,9 +20,10 @@ package org.apache.dolphinscheduler.server.worker.message;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.time.Duration;
@@ -58,7 +59,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
     @Autowired
     private List<TaskInstanceExecutionEventSender> messageSenders;
 
-    private final Map<ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender<ITaskInstanceExecutionEvent>> messageSenderMap =
+    private final Map<ITaskExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender<ITaskExecutionEvent>> messageSenderMap =
             new HashMap<>();
 
     private final Map<Integer, List<TaskInstanceMessage>> needToRetryMessages = new ConcurrentHashMap<>();
@@ -68,20 +69,20 @@ public class MessageRetryRunner extends BaseDaemonThread {
         log.info("Message retry runner staring");
         messageSenders.forEach(messageSender -> {
             messageSenderMap.put(messageSender.getMessageType(), messageSender);
-            log.info("Injected message sender: {}", messageSender.getClass().getName());
+            log.info("Injected message sender: {}", messageSender.getClass().getSimpleName());
         });
         super.start();
         log.info("Message retry runner started");
     }
 
-    public void addRetryMessage(int taskInstanceId, @NonNull ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent) {
+    public void addRetryMessage(int taskInstanceId, @NonNull ITaskExecutionEvent iTaskExecutionEvent) {
         needToRetryMessages.computeIfAbsent(taskInstanceId, k -> Collections.synchronizedList(new ArrayList<>()))
-                .add(TaskInstanceMessage.of(taskInstanceId, iTaskInstanceExecutionEvent.getEventType(),
-                        iTaskInstanceExecutionEvent));
+                .add(TaskInstanceMessage.of(taskInstanceId, iTaskExecutionEvent.getEventType(),
+                        iTaskExecutionEvent));
     }
 
     public void removeRetryMessage(int taskInstanceId,
-                                   @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType) {
+                                   @NonNull ITaskExecutionEvent.TaskInstanceExecutionEventType eventType) {
         List<TaskInstanceMessage> taskInstanceMessages = needToRetryMessages.get(taskInstanceId);
         if (taskInstanceMessages != null) {
             taskInstanceMessages.remove(TaskInstanceMessage.of(taskInstanceId, eventType, null));
@@ -92,13 +93,15 @@ public class MessageRetryRunner extends BaseDaemonThread {
         needToRetryMessages.remove(taskInstanceId);
     }
 
-    public void updateMessageHost(int taskInstanceId, String messageReceiverHost) {
+    public boolean updateMessageHost(int taskInstanceId, String messageReceiverHost) {
         List<TaskInstanceMessage> taskInstanceMessages = this.needToRetryMessages.get(taskInstanceId);
-        if (taskInstanceMessages != null) {
-            taskInstanceMessages.forEach(taskInstanceMessage -> {
-                taskInstanceMessage.getEvent().setWorkflowInstanceHost(messageReceiverHost);
-            });
+        if (CollectionUtils.isEmpty(taskInstanceMessages)) {
+            return false;
         }
+        taskInstanceMessages.forEach(taskInstanceMessage -> {
+            taskInstanceMessage.getEvent().setWorkflowInstanceHost(messageReceiverHost);
+        });
+        return true;
     }
 
     public void run() {
@@ -122,9 +125,9 @@ public class MessageRetryRunner extends BaseDaemonThread {
                     LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
                         for (TaskInstanceMessage taskInstanceMessage : taskInstanceMessages) {
-                            ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType =
+                            ITaskExecutionEvent.TaskInstanceExecutionEventType eventType =
                                     taskInstanceMessage.getEventType();
-                            ITaskInstanceExecutionEvent event = taskInstanceMessage.getEvent();
+                            ITaskExecutionEvent event = taskInstanceMessage.getEvent();
                             if (now - event.getEventSendTime() > MESSAGE_RETRY_WINDOW) {
                                 log.info("Begin retry send message to master, event: {}", event);
                                 event.setEventSendTime(now);
@@ -160,12 +163,12 @@ public class MessageRetryRunner extends BaseDaemonThread {
     public static class TaskInstanceMessage {
 
         private long taskInstanceId;
-        private ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType;
-        private ITaskInstanceExecutionEvent event;
+        private ITaskExecutionEvent.TaskInstanceExecutionEventType eventType;
+        private ITaskExecutionEvent event;
 
         public static TaskInstanceMessage of(long taskInstanceId,
-                                             ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType,
-                                             ITaskInstanceExecutionEvent event) {
+                                             ITaskExecutionEvent.TaskInstanceExecutionEventType eventType,
+                                             ITaskExecutionEvent event) {
             TaskInstanceMessage taskInstanceMessage = new TaskInstanceMessage();
             taskInstanceMessage.setTaskInstanceId(taskInstanceId);
             taskInstanceMessage.setEventType(eventType);

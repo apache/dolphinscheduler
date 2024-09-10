@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -145,7 +146,7 @@ public class ParameterUtils {
         } else if (dataType.equals(DataType.DATE)) {
             stmt.setDate(index, java.sql.Date.valueOf(value));
         } else if (dataType.equals(DataType.TIME)) {
-            stmt.setString(index, value);
+            stmt.setTime(index, java.sql.Time.valueOf(value));
         } else if (dataType.equals(DataType.TIMESTAMP)) {
             stmt.setTimestamp(index, java.sql.Timestamp.valueOf(value));
         } else if (dataType.equals(DataType.BOOLEAN)) {
@@ -192,24 +193,27 @@ public class ParameterUtils {
         if (params == null || params.isEmpty()) {
             return sql;
         }
-        String[] split = sql.split("\\?");
-        if (split.length == 0) {
-            return sql;
-        }
-        StringBuilder ret = new StringBuilder(split[0]);
+        StringBuilder ret = new StringBuilder(sql);
+        Matcher m = TaskConstants.SQL_PARAMS_PATTERN.matcher(sql);
         int index = 1;
-        for (int i = 1; i < split.length; i++) {
-            Property property = params.get(i);
+        int paramsIndex = 1;
+        // When matching with a regex, determine whether the corresponding property is a list.
+        while (m.find()) {
+            Property property = params.get(paramsIndex++);
+            if (property == null) {
+                continue;
+            }
             String value = property.getValue();
+            StringBuilder tempReplace = new StringBuilder();
             if (DataType.LIST.equals(property.getType())) {
                 List<Object> valueList = JSONUtils.toList(value, Object.class);
                 if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
                     valueList.add(value);
                 }
                 for (int j = 0; j < valueList.size(); j++) {
-                    ret.append(PARAM_REPLACE_CHAR);
+                    tempReplace.append(PARAM_REPLACE_CHAR);
                     if (j != valueList.size() - 1) {
-                        ret.append(",");
+                        tempReplace.append(",");
                     }
                 }
                 for (Object v : valueList) {
@@ -231,14 +235,12 @@ public class ParameterUtils {
                     expandMap.put(index++, newProperty);
                 }
             } else {
-                ret.append(PARAM_REPLACE_CHAR);
+                tempReplace.append(PARAM_REPLACE_CHAR);
                 expandMap.put(index++, property);
             }
-            ret.append(split[i]);
-        }
-        if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
-            ret.append(PARAM_REPLACE_CHAR);
-            expandMap.put(index, params.get(split.length));
+            ret.replace(m.start(), m.end(), tempReplace.toString());
+            // After replacement, the string length will change, so a reset is required
+            m.reset(ret.toString());
         }
         params.clear();
         params.putAll(expandMap);
@@ -301,7 +303,6 @@ public class ParameterUtils {
                 continue;
             }
             String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);
-            assert value != null;
             matcher.appendReplacement(newValue, value);
         }
 
@@ -342,5 +343,4 @@ public class ParameterUtils {
         }
         return userDefParamsMaps;
     }
-
 }

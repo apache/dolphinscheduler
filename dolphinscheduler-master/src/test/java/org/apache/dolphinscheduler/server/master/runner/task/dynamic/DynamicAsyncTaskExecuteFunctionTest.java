@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner.task.dynamic;
 
 import static org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction.AsyncTaskExecutionStatus;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
 import org.apache.dolphinscheduler.service.subworkflow.SubWorkflowService;
@@ -40,7 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DynamicAsyncTaskExecuteFunctionTest {
 
     @Mock
-    private ProcessInstance processInstance;
+    private WorkflowInstance workflowInstance;
 
     @Mock
     private TaskInstance taskInstance;
@@ -58,15 +58,15 @@ class DynamicAsyncTaskExecuteFunctionTest {
 
     @BeforeEach
     void setUp() {
-        processInstance = new ProcessInstance();
+        workflowInstance = new WorkflowInstance();
         taskInstance = new TaskInstance();
 
-        processInstance.setId(1);
+        workflowInstance.setId(1);
         taskInstance.setTaskCode(2L);
 
         function = new DynamicAsyncTaskExecuteFunction(
                 null,
-                processInstance,
+                workflowInstance,
                 taskInstance,
                 dynamicLogicTask,
                 commandMapper,
@@ -77,12 +77,12 @@ class DynamicAsyncTaskExecuteFunctionTest {
     @Test
     void shouldReturnSuccessWhenAllSubProcessInstancesFinishedSuccessfully() {
         // Given
-        List<ProcessInstance> processInstances = Arrays.asList(Mockito.mock(ProcessInstance.class));
+        List<WorkflowInstance> workflowInstances = Arrays.asList(Mockito.mock(WorkflowInstance.class));
 
-        Mockito.when(processInstances.get(0).getCommandParam()).thenReturn("{}");
-        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(processInstances);
-        Mockito.when(subWorkflowService.filterFinishProcessInstances(Mockito.any())).thenReturn(processInstances);
-        Mockito.when(subWorkflowService.filterSuccessProcessInstances(Mockito.any())).thenReturn(processInstances);
+        Mockito.when(workflowInstances.get(0).getCommandParam()).thenReturn("{}");
+        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(workflowInstances);
+        Mockito.when(subWorkflowService.filterFinishProcessInstances(Mockito.any())).thenReturn(workflowInstances);
+        Mockito.when(subWorkflowService.filterSuccessProcessInstances(Mockito.any())).thenReturn(workflowInstances);
 
         // When
         DynamicParameters dynamicParameters = new DynamicParameters();
@@ -96,12 +96,12 @@ class DynamicAsyncTaskExecuteFunctionTest {
     @Test
     void shouldReturnFailedWhenSomeSubProcessInstancesFinishedUnsuccessfully() {
         // Given
-        List<ProcessInstance> processInstances =
-                Arrays.asList(Mockito.mock(ProcessInstance.class), Mockito.mock(ProcessInstance.class));
-        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(processInstances);
-        Mockito.when(subWorkflowService.filterFinishProcessInstances(Mockito.anyList())).thenReturn(processInstances);
+        List<WorkflowInstance> workflowInstances =
+                Arrays.asList(Mockito.mock(WorkflowInstance.class), Mockito.mock(WorkflowInstance.class));
+        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(workflowInstances);
+        Mockito.when(subWorkflowService.filterFinishProcessInstances(Mockito.anyList())).thenReturn(workflowInstances);
         Mockito.when(subWorkflowService.filterSuccessProcessInstances(Mockito.anyList()))
-                .thenReturn(Arrays.asList(processInstances.get(0)));
+                .thenReturn(Arrays.asList(workflowInstances.get(0)));
 
         // When
         AsyncTaskExecutionStatus status = function.getAsyncTaskExecutionStatus();
@@ -113,8 +113,8 @@ class DynamicAsyncTaskExecuteFunctionTest {
     @Test
     void shouldReturnRunningWhenSomeSubProcessInstancesAreRunning() {
         // Given
-        List<ProcessInstance> processInstances = Arrays.asList(Mockito.mock(ProcessInstance.class));
-        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(processInstances);
+        List<WorkflowInstance> workflowInstances = Arrays.asList(Mockito.mock(WorkflowInstance.class));
+        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(workflowInstances);
         Mockito.when(subWorkflowService.filterFinishProcessInstances(Mockito.anyList())).thenReturn(Arrays.asList());
 
         // When
@@ -127,8 +127,8 @@ class DynamicAsyncTaskExecuteFunctionTest {
     @Test
     void shouldReturnFailedWhenLogicTaskIsCancelled() {
         // Given
-        List<ProcessInstance> processInstances = Arrays.asList(Mockito.mock(ProcessInstance.class));
-        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(processInstances);
+        List<WorkflowInstance> workflowInstances = Arrays.asList(Mockito.mock(WorkflowInstance.class));
+        Mockito.when(subWorkflowService.getAllDynamicSubWorkflow(1, 2L)).thenReturn(workflowInstances);
         Mockito.when(dynamicLogicTask.isCancel()).thenReturn(true);
 
         // When
