@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -236,10 +237,6 @@ public class SqlTask extends AbstractTask {
             while (resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
-                    if (Objects.isNull(resultSet.getObject(i))) {
-                        mapOfColValues.set(md.getColumnLabel(i), new TextNode("null"));
-                        continue;
-                    }
                     mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
                 resultJSONArray.add(mapOfColValues);
@@ -259,9 +256,18 @@ public class SqlTask extends AbstractTask {
                 : JSONUtils.toJsonString(resultJSONArray);
 
         if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
+            resultJSONArray.forEach(row -> {
+                row.fields().forEachRemaining(field -> {
+                    if (field.getValue() instanceof NullNode) {
+                        field.setValue(new TextNode("null"));
+                    }
+                });
+            });
+            String sendResult = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
+                    : JSONUtils.toJsonString(resultJSONArray);
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", result);
+                    : taskExecutionContext.getTaskName() + " query result sets", sendResult);
         }
         log.debug("execute sql result : {}", result);
         return result;
