@@ -63,8 +63,7 @@ public class FeiShuSenderTest {
                 + "    \"recovery\": \"NO\",\n"
                 + "    \"retryTimes\": 0,\n"
                 + "    \"runTimes\": 1,\n"
-                + "    \"taskId\": 0,\n"
-                + "    \"other\": null\n"
+                + "    \"taskId\": 0\n"
                 + "  }\n"
                 + "]";
         AlertData alertData = new AlertData();
