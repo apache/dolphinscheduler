@@ -42,6 +42,7 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- the SPI should have only minimal dependencies -->

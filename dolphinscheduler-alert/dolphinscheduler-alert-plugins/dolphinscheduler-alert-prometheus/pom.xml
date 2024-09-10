@@ -26,14 +26,45 @@
     <artifactId>dolphinscheduler-alert-prometheus</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <plugin.name>alert.prometheus</plugin.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+<!--                        <configuration>-->
+<!--&lt;!&ndash;                            <relocations>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <relocation>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <pattern>org.apache.dolphinscheduler</pattern>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    &lt;!&ndash;suppress UnresolvedMavenProperty, this property is added by submodule&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <shadedPattern>${dolphinscheduler.shade.package}.${plugin.name}.org.apache</shadedPattern>&ndash;&gt;-->
+<!--&lt;!&ndash;                                </relocation>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </relocations>&ndash;&gt;-->
+<!--                        </configuration>-->
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

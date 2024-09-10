@@ -26,6 +26,10 @@
     <artifactId>dolphinscheduler-alert-feishu</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <plugin.name>alert.feishu</plugin.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
@@ -36,4 +40,30 @@
             <artifactId>httpclient</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.dolphinscheduler</pattern>
+                                    <!--suppress UnresolvedMavenProperty, this property is added by submodule-->
+                                    <shadedPattern>${dolphinscheduler.shade.package}.${plugin.name}.org.apache</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

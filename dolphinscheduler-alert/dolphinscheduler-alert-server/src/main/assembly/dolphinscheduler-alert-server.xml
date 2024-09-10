@@ -64,6 +64,7 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
     </fileSets>
+
     <dependencySets>
         <dependencySet>
             <outputDirectory>libs</outputDirectory>
