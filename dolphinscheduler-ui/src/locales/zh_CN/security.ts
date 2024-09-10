@@ -240,7 +240,7 @@ export default {
     requestType: '请求方式',
     headerParams: '请求头',
     bodyParams: '请求体',
-    contentField: '内容字段',
+    contentType: 'Content Type',
     timeout: '超时时间（秒）',
     Keyword: '关键词',
     userParams: '自定义参数',
@@ -262,7 +262,7 @@ export default {
     // eslint-disable-next-line quotes
     AtMobiles: "被{'@'}人的手机号",
     // eslint-disable-next-line quotes
-    AtUserIds: "被{'@'}人的用户ID",
+    AtDingtalkIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
     IsAtAll: "{'@'}所有人",

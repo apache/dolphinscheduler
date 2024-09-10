@@ -18,7 +18,7 @@
 import { useFlink } from './use-flink'
 import { useFlinkStream } from './use-flink-stream'
 import { useShell } from './use-shell'
-import { useSubProcess } from './use-sub-process'
+import { useSubWorkflow } from './use-sub-workflow'
 import { usePython } from './use-python'
 import { useSpark } from './use-spark'
 import { useMr } from './use-mr'
@@ -52,10 +52,11 @@ import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
 import { useDynamic } from './use-dynamic'
+import { useAliyunServerlessSpark } from './use-aliyun-serverless-spark'
 
 export default {
   SHELL: useShell,
-  SUB_PROCESS: useSubProcess,
+  SUB_WORKFLOW: useSubWorkflow,
   DYNAMIC: useDynamic,
   PYTHON: usePython,
   SPARK: useSpark,
@@ -90,5 +91,6 @@ export default {
   KUBEFLOW: useKubeflow,
   LINKIS: useLinkis,
   DATA_FACTORY: useDataFactory,
-  REMOTESHELL: useRemoteShell
+  REMOTESHELL: useRemoteShell,
+  ALIYUN_SERVERLESS_SPARK: useAliyunServerlessSpark
 }

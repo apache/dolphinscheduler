@@ -421,7 +421,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         user.setUpdateTime(new Date());
         user.setTenantId(tenantId);
-        // updateProcessInstance user
+        // updateWorkflowInstance user
         if (userMapper.updateById(user) <= 0) {
             throw new ServiceException(Status.UPDATE_USER_ERROR);
         }
@@ -812,6 +812,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can grant datasource.");
             return result;
         }
         User user = userMapper.selectById(userId);

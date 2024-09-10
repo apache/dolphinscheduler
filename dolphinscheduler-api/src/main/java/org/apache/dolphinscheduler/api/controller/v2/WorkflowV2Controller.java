@@ -17,22 +17,22 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_WORKFLOW_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINITION_LIST;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_WORKFLOW_DEFINITION_ERROR;
 
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,7 +62,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class WorkflowV2Controller extends BaseController {
 
     @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private WorkflowDefinitionService workflowDefinitionService;
 
     /**
      * Create resource workflow
@@ -74,19 +74,19 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_WORKFLOWS_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
-    public Result<ProcessDefinition> createWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                    @RequestBody WorkflowCreateRequest workflowCreateRequest) {
-        ProcessDefinition processDefinition =
-                processDefinitionService.createSingleProcessDefinition(loginUser, workflowCreateRequest);
-        return Result.success(processDefinition);
+    @ApiException(CREATE_WORKFLOW_DEFINITION_ERROR)
+    public Result<WorkflowDefinition> createWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @RequestBody WorkflowCreateRequest workflowCreateRequest) {
+        WorkflowDefinition workflowDefinition =
+                workflowDefinitionService.createSingleWorkflowDefinition(loginUser, workflowCreateRequest);
+        return Result.success(workflowDefinition);
     }
 
     /**
      * Delete workflow by code
      *
      * @param loginUser login user
-     * @param code      process definition code
+     * @param code      workflow definition code
      * @return Result result object delete
      */
     @Operation(summary = "delete", description = "DELETE_WORKFLOWS_NOTES")
@@ -95,10 +95,10 @@ public class WorkflowV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
+    @ApiException(DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR)
     public Result deleteWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @PathVariable("code") Long code) {
-        processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
+        workflowDefinitionService.deleteWorkflowDefinitionByCode(loginUser, code);
         return Result.success();
     }
 
@@ -113,13 +113,13 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "update", description = "UPDATE_WORKFLOWS_NOTES")
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
-    public Result<ProcessDefinition> updateWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                    @PathVariable("code") Long code,
-                                                    @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
-        ProcessDefinition processDefinition =
-                processDefinitionService.updateSingleProcessDefinition(loginUser, code, workflowUpdateRequest);
-        return Result.success(processDefinition);
+    @ApiException(UPDATE_WORKFLOW_DEFINITION_ERROR)
+    public Result<WorkflowDefinition> updateWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @PathVariable("code") Long code,
+                                                     @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
+        WorkflowDefinition workflowDefinition =
+                workflowDefinitionService.updateSingleWorkflowDefinition(loginUser, code, workflowUpdateRequest);
+        return Result.success(workflowDefinition);
     }
 
     /**
@@ -132,11 +132,11 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "get", description = "GET_WORKFLOWS_NOTES")
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
-    public Result<ProcessDefinition> getWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @PathVariable("code") Long code) {
-        ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(loginUser, code);
-        return Result.success(processDefinition);
+    @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
+    public Result<WorkflowDefinition> getWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @PathVariable("code") Long code) {
+        WorkflowDefinition workflowDefinition = workflowDefinitionService.getWorkflowDefinition(loginUser, code);
+        return Result.success(workflowDefinition);
     }
 
     /**
@@ -149,11 +149,11 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "get", description = "FILTER_WORKFLOWS_NOTES")
     @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
-    public Result<PageInfo<ProcessDefinition>> filterWorkflows(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                               @RequestBody WorkflowFilterRequest workflowFilterRequest) {
-        PageInfo<ProcessDefinition> processDefinitions =
-                processDefinitionService.filterProcessDefinition(loginUser, workflowFilterRequest);
-        return Result.success(processDefinitions);
+    @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
+    public Result<PageInfo<WorkflowDefinition>> filterWorkflows(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                @RequestBody WorkflowFilterRequest workflowFilterRequest) {
+        PageInfo<WorkflowDefinition> workflowDefinitions =
+                workflowDefinitionService.filterWorkflowDefinition(loginUser, workflowFilterRequest);
+        return Result.success(workflowDefinitions);
     }
 }

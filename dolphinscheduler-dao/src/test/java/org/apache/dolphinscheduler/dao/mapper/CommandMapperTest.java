@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import java.util.Date;
@@ -56,7 +56,7 @@ public class CommandMapperTest extends BaseDaoTest {
     private CommandMapper commandMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * test insert
@@ -72,7 +72,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command expectedCommand = createCommand();
         Page<Command> page = new Page<>(1, 10);
         IPage<Command> commandIPage = commandMapper.queryCommandPageByIds(page,
-                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+                Lists.newArrayList(expectedCommand.getWorkflowDefinitionCode()));
         List<Command> commandList = commandIPage.getRecords();
         assertThat(commandList).isNotEmpty();
         assertThat(commandIPage.getTotal()).isEqualTo(1);
@@ -89,7 +89,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
         Assertions.assertNotNull(actualCommand);
-        Assertions.assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
+        Assertions.assertEquals(expectedCommand.getWorkflowDefinitionCode(), actualCommand.getWorkflowDefinitionCode());
     }
 
     /**
@@ -146,9 +146,9 @@ public class CommandMapperTest extends BaseDaoTest {
     @Test
     public void testGetOneToRun() {
 
-        ProcessDefinition processDefinition = createProcessDefinition();
+        WorkflowDefinition workflowDefinition = createProcessDefinition();
 
-        createCommand(CommandType.START_PROCESS, processDefinition.getCode());
+        createCommand(CommandType.START_PROCESS, workflowDefinition.getCode());
 
         List<Command> actualCommand = commandMapper.selectList(new QueryWrapper<>());
 
@@ -162,16 +162,16 @@ public class CommandMapperTest extends BaseDaoTest {
     public void testCountCommandState() {
         Integer count = 10;
 
-        ProcessDefinition processDefinition = createProcessDefinition();
+        WorkflowDefinition workflowDefinition = createProcessDefinition();
 
-        createCommandMap(count, CommandType.START_PROCESS, processDefinition.getCode());
+        createCommandMap(count, CommandType.START_PROCESS, workflowDefinition.getCode());
 
         Date startTime = DateUtils.stringToDate("2019-12-29 00:10:00");
 
         Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
 
         List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime,
-                Lists.newArrayList(processDefinition.getProjectCode()));
+                Lists.newArrayList(workflowDefinition.getProjectCode()));
 
         Assertions.assertTrue(actualCommandCounts.size() >= 1);
     }
@@ -194,7 +194,7 @@ public class CommandMapperTest extends BaseDaoTest {
     void deleteByWorkflowInstanceIds() {
         Command command = createCommand();
         assertThat(commandMapper.selectList(null)).isNotEmpty();
-        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getProcessInstanceId()));
+        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getWorkflowInstanceId()));
         assertThat(commandMapper.selectList(null)).isEmpty();
     }
 
@@ -243,19 +243,19 @@ public class CommandMapperTest extends BaseDaoTest {
      *
      * @return process definition
      */
-    private ProcessDefinition createProcessDefinition() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setName("ut test");
-        processDefinition.setProjectCode(1L);
-        processDefinition.setFlag(Flag.YES);
-        processDefinition.setCreateTime(new Date());
-        processDefinition.setUpdateTime(new Date());
+    private WorkflowDefinition createProcessDefinition() {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setReleaseState(ReleaseState.ONLINE);
+        workflowDefinition.setName("ut test");
+        workflowDefinition.setProjectCode(1L);
+        workflowDefinition.setFlag(Flag.YES);
+        workflowDefinition.setCreateTime(new Date());
+        workflowDefinition.setUpdateTime(new Date());
 
-        processDefinitionMapper.insert(processDefinition);
+        workflowDefinitionMapper.insert(workflowDefinition);
 
-        return processDefinition;
+        return workflowDefinition;
     }
 
     /**
@@ -292,7 +292,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionCode(processDefinitionCode);
+        command.setWorkflowDefinitionCode(processDefinitionCode);
         command.setExecutorId(4);
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
@@ -300,12 +300,12 @@ public class CommandMapperTest extends BaseDaoTest {
         command.setWarningType(WarningType.ALL);
         command.setWarningGroupId(1);
         command.setScheduleTime(DateUtils.stringToDate("2019-12-29 12:10:00"));
-        command.setProcessInstancePriority(Priority.MEDIUM);
+        command.setWorkflowInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-        command.setProcessInstanceId(0);
-        command.setProcessDefinitionVersion(0);
+        command.setWorkflowInstanceId(0);
+        command.setWorkflowDefinitionVersion(0);
         commandMapper.insert(command);
 
         return command;

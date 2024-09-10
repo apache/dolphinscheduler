@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
@@ -40,12 +39,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * query task definition by name
      *
      * @param projectCode projectCode
-     * @param processCode processCode
+     * @param workflowDefinitionCode workflowDefinitionCode
      * @param name name
      * @return task definition
      */
     TaskDefinition queryByName(@Param("projectCode") long projectCode,
-                               @Param("processCode") long processCode,
+                               @Param("workflowDefinitionCode") long workflowDefinitionCode,
                                @Param("name") String name);
 
     /**
@@ -89,22 +88,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     int batchInsert(@Param("taskDefinitions") List<TaskDefinitionLog> taskDefinitions);
 
     /**
-     * task main info page
-     *
-     * @param page page
-     * @param projectCode projectCode
-     * @param searchTaskName searchTaskName
-     * @param taskType taskType
-     * @param taskExecuteType taskExecuteType
-     * @return task main info IPage
-     */
-    IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
-                                              @Param("projectCode") long projectCode,
-                                              @Param("searchTaskName") String searchTaskName,
-                                              @Param("taskType") String taskType,
-                                              @Param("taskExecuteType") TaskExecuteType taskExecuteType);
-
-    /**
      * task main info
      * @param projectCode project code
      * @param codeList code list
@@ -125,7 +108,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * Filter task definition
      *
      * @param page page
-     * @param taskDefinition process definition object
+     * @param taskDefinition task definition
      * @return task definition IPage
      */
     IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,

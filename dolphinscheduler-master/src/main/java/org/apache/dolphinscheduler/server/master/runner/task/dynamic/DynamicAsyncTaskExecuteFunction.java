@@ -21,8 +21,8 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -47,7 +47,7 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
 
     private static final String OUTPUT_KEY = "dynamic.out";
 
-    private final ProcessInstance processInstance;
+    private final WorkflowInstance workflowInstance;
 
     private final TaskInstance taskInstance;
 
@@ -60,13 +60,13 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
     private final DynamicLogicTask logicTask;
 
     public DynamicAsyncTaskExecuteFunction(TaskExecutionContext taskExecutionContext,
-                                           ProcessInstance processInstance,
+                                           WorkflowInstance workflowInstance,
                                            TaskInstance taskInstance,
                                            DynamicLogicTask dynamicLogicTask,
                                            CommandMapper commandMapper,
                                            SubWorkflowService subWorkflowService,
                                            int degreeOfParallelism) {
-        this.processInstance = processInstance;
+        this.workflowInstance = workflowInstance;
         this.taskInstance = taskInstance;
         this.logicTask = dynamicLogicTask;
         this.degreeOfParallelism = degreeOfParallelism;
@@ -77,15 +77,15 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
 
     @Override
     public @NonNull AsyncTaskExecutionStatus getAsyncTaskExecutionStatus() {
-        List<ProcessInstance> allSubProcessInstance = getAllSubProcessInstance();
-        int totalSubProcessInstanceCount = allSubProcessInstance.size();
+        List<WorkflowInstance> allSubWorkflowInstance = getAllSubProcessInstance();
+        int totalSubProcessInstanceCount = allSubWorkflowInstance.size();
 
-        List<ProcessInstance> finishedSubProcessInstance =
-                subWorkflowService.filterFinishProcessInstances(allSubProcessInstance);
+        List<WorkflowInstance> finishedSubWorkflowInstance =
+                subWorkflowService.filterFinishProcessInstances(allSubWorkflowInstance);
 
-        if (finishedSubProcessInstance.size() == totalSubProcessInstanceCount) {
+        if (finishedSubWorkflowInstance.size() == totalSubProcessInstanceCount) {
             log.info("all sub process instance finish");
-            int successCount = subWorkflowService.filterSuccessProcessInstances(finishedSubProcessInstance).size();
+            int successCount = subWorkflowService.filterSuccessProcessInstances(finishedSubWorkflowInstance).size();
             log.info("success sub process instance count: {}", successCount);
             if (successCount == totalSubProcessInstanceCount) {
                 log.info("all sub process instance success");
@@ -102,11 +102,11 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
             return AsyncTaskExecutionStatus.FAILED;
         }
 
-        int runningCount = subWorkflowService.filterRunningProcessInstances(allSubProcessInstance).size();
+        int runningCount = subWorkflowService.filterRunningProcessInstances(allSubWorkflowInstance).size();
         int startCount = degreeOfParallelism - runningCount;
         if (startCount > 0) {
             log.info("There are {} sub process instances that can be started", startCount);
-            startSubProcessInstances(allSubProcessInstance, startCount);
+            startSubProcessInstances(allSubWorkflowInstance, startCount);
         }
         // query the status of sub workflow instance
         return AsyncTaskExecutionStatus.RUNNING;
@@ -114,18 +114,18 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
 
     private void setOutputParameters() {
         log.info("set varPool");
-        List<ProcessInstance> allSubProcessInstance = getAllSubProcessInstance();
+        List<WorkflowInstance> allSubWorkflowInstance = getAllSubProcessInstance();
 
         List<DynamicOutput> dynamicOutputs = new ArrayList<>();
         int index = 1;
-        for (ProcessInstance processInstance : allSubProcessInstance) {
+        for (WorkflowInstance workflowInstance : allSubWorkflowInstance) {
             DynamicOutput dynamicOutput = new DynamicOutput();
             Map<String, String> dynamicParams =
-                    JSONUtils.toMap(JSONUtils.toMap(processInstance.getCommandParam()).get(CMD_DYNAMIC_START_PARAMS));
+                    JSONUtils.toMap(JSONUtils.toMap(workflowInstance.getCommandParam()).get(CMD_DYNAMIC_START_PARAMS));
             dynamicOutput.setDynParams(dynamicParams);
 
             Map<String, String> outputValueMap = new HashMap<>();
-            List<Property> propertyList = subWorkflowService.getWorkflowOutputParameters(processInstance);
+            List<Property> propertyList = subWorkflowService.getWorkflowOutputParameters(workflowInstance);
             for (Property property : propertyList) {
                 outputValueMap.put(property.getProp(), property.getValue());
             }
@@ -148,26 +148,27 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
         log.info("set property: {}", property);
     }
 
-    private void startSubProcessInstances(List<ProcessInstance> allSubProcessInstance, int startCount) {
-        List<ProcessInstance> waitingProcessInstances =
-                subWorkflowService.filterWaitToRunProcessInstances(allSubProcessInstance);
+    private void startSubProcessInstances(List<WorkflowInstance> allSubWorkflowInstance, int startCount) {
+        List<WorkflowInstance> waitingWorkflowInstances =
+                subWorkflowService.filterWaitToRunProcessInstances(allSubWorkflowInstance);
 
-        for (int i = 0; i < Math.min(startCount, waitingProcessInstances.size()); i++) {
-            ProcessInstance subProcessInstance = waitingProcessInstances.get(i);
+        for (int i = 0; i < Math.min(startCount, waitingWorkflowInstances.size()); i++) {
+            WorkflowInstance subWorkflowInstance = waitingWorkflowInstances.get(i);
             Map<String, String> parameters = JSONUtils.toMap(DynamicCommandUtils
-                    .getDataFromCommandParam(subProcessInstance.getCommandParam(), CMD_DYNAMIC_START_PARAMS));
-            Command command = DynamicCommandUtils.createCommand(this.processInstance,
-                    subProcessInstance.getProcessDefinitionCode(), subProcessInstance.getProcessDefinitionVersion(),
+                    .getDataFromCommandParam(subWorkflowInstance.getCommandParam(), CMD_DYNAMIC_START_PARAMS));
+            Command command = DynamicCommandUtils.createCommand(this.workflowInstance,
+                    subWorkflowInstance.getWorkflowDefinitionCode(), subWorkflowInstance.getWorkflowDefinitionVersion(),
                     parameters);
-            command.setProcessInstanceId(subProcessInstance.getId());
+            command.setWorkflowInstanceId(subWorkflowInstance.getId());
             commandMapper.insert(command);
-            log.info("start sub process instance, sub process instance id: {}, command: {}", subProcessInstance.getId(),
+            log.info("start sub process instance, sub process instance id: {}, command: {}",
+                    subWorkflowInstance.getId(),
                     command);
         }
     }
 
-    public List<ProcessInstance> getAllSubProcessInstance() {
-        return subWorkflowService.getAllDynamicSubWorkflow(processInstance.getId(), taskInstance.getTaskCode());
+    public List<WorkflowInstance> getAllSubProcessInstance() {
+        return subWorkflowService.getAllDynamicSubWorkflow(workflowInstance.getId(), taskInstance.getTaskCode());
     }
 
     @Override

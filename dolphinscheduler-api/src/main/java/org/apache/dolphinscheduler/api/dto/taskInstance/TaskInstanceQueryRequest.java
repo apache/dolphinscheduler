@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,19 +31,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * task instance request
  */
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class TaskInstanceQueryRequest extends PageQueryDto {
 
-    @Schema(name = "processInstanceId", example = "PROCESS_INSTANCE_ID", defaultValue = "0")
-    Integer processInstanceId;
+    @Schema(name = "workflowInstanceId", example = "WORKFLOW_INSTANCE_ID", defaultValue = "0")
+    Integer workflowInstanceId;
 
-    @Schema(name = "processInstanceName", example = "PROCESS-INSTANCE-NAME")
-    String processInstanceName;
+    @Schema(name = "workflowInstanceName", example = "WORKFLOW-INSTANCE-NAME")
+    String workflowInstanceName;
 
-    @Schema(name = "processDefinitionName", example = "PROCESS-DEFINITION-NAME")
-    String processDefinitionName;
+    @Schema(name = "workflowDefinitionName", example = "WORKFLOW-DEFINITION-NAME")
+    String workflowDefinitionName;
 
     @Schema(name = "searchVal", example = "SEARCH-VAL")
     String searchVal;

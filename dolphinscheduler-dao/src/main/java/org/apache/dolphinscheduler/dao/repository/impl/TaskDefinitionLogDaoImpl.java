@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 
@@ -46,7 +46,7 @@ public class TaskDefinitionLogDaoImpl extends BaseDao<TaskDefinitionLog, TaskDef
             TaskDefinitionLogDao {
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     public TaskDefinitionLogDaoImpl(@NonNull TaskDefinitionLogMapper taskDefinitionLogMapper) {
         super(taskDefinitionLogMapper);
@@ -56,20 +56,20 @@ public class TaskDefinitionLogDaoImpl extends BaseDao<TaskDefinitionLog, TaskDef
     public List<TaskDefinitionLog> queryByWorkflowDefinitionCodeAndVersion(Long workflowDefinitionCode,
                                                                            Integer workflowDefinitionVersion) {
 
-        List<ProcessTaskRelation> processTaskRelationLogs = processTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion)
+        List<WorkflowTaskRelation> workflowTaskRelationLogs = workflowTaskRelationLogMapper
+                .queryByWorkflowCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion)
                 .stream()
-                .map(p -> (ProcessTaskRelation) p)
+                .map(p -> (WorkflowTaskRelation) p)
                 .collect(Collectors.toList());
-        return queryTaskDefineLogList(processTaskRelationLogs);
+        return queryTaskDefineLogList(workflowTaskRelationLogs);
     }
 
     @Override
-    public List<TaskDefinitionLog> queryTaskDefineLogList(List<ProcessTaskRelation> processTaskRelations) {
-        if (CollectionUtils.isEmpty(processTaskRelations)) {
+    public List<TaskDefinitionLog> queryTaskDefineLogList(List<WorkflowTaskRelation> workflowTaskRelations) {
+        if (CollectionUtils.isEmpty(workflowTaskRelations)) {
             return Collections.emptyList();
         }
-        Set<TaskDefinition> taskDefinitionSet = processTaskRelations.stream()
+        Set<TaskDefinition> taskDefinitionSet = workflowTaskRelations.stream()
                 .filter(p -> p.getPostTaskCode() > 0)
                 .map(p -> new TaskDefinition(p.getPostTaskCode(), p.getPostTaskVersion()))
                 .collect(Collectors.toSet());

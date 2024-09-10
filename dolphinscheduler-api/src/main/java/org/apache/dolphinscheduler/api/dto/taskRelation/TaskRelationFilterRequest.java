@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.dto.taskRelation;
 
 import org.apache.dolphinscheduler.api.dto.PageQueryDto;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import lombok.Data;
 
@@ -55,17 +55,17 @@ public class TaskRelationFilterRequest extends PageQueryDto {
         this.postTaskCode = postTaskCode;
     }
 
-    public ProcessTaskRelation convert2TaskDefinition() {
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+    public WorkflowTaskRelation convert2TaskDefinition() {
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         if (this.workflowCode != 0L) {
-            processTaskRelation.setProcessDefinitionCode(this.workflowCode);
+            workflowTaskRelation.setWorkflowDefinitionCode(this.workflowCode);
         }
         if (this.preTaskCode != 0L) {
-            processTaskRelation.setPreTaskCode(this.preTaskCode);
+            workflowTaskRelation.setPreTaskCode(this.preTaskCode);
         }
         if (this.postTaskCode != 0L) {
-            processTaskRelation.setPostTaskCode(this.postTaskCode);
+            workflowTaskRelation.setPostTaskCode(this.postTaskCode);
         }
-        return processTaskRelation;
+        return workflowTaskRelation;
     }
 }

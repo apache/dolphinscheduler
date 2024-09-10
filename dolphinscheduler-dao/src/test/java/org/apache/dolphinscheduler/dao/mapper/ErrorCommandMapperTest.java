@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.util.Date;
 import java.util.List;
@@ -42,7 +42,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
     private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * insert
@@ -64,7 +64,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         ErrorCommand expectedCommand = insertOne();
         Page<ErrorCommand> page = new Page<>(1, 10);
         IPage<ErrorCommand> commandIPage = errorCommandMapper.queryErrorCommandPageByIds(page,
-                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+                Lists.newArrayList(expectedCommand.getWorkflowDefinitionCode()));
         List<ErrorCommand> commandList = commandIPage.getRecords();
         assertThat(commandList).isNotEmpty();
         assertThat(commandIPage.getTotal()).isEqualTo(1);
@@ -78,16 +78,16 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
     public void testQuery() {
         ErrorCommand errorCommand = insertOne();
 
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setName("def 1");
-        processDefinition.setProjectCode(1010L);
-        processDefinition.setUserId(101);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
-        processDefinitionMapper.insert(processDefinition);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(1L);
+        workflowDefinition.setName("def 1");
+        workflowDefinition.setProjectCode(1010L);
+        workflowDefinition.setUserId(101);
+        workflowDefinition.setUpdateTime(new Date());
+        workflowDefinition.setCreateTime(new Date());
+        workflowDefinitionMapper.insert(workflowDefinition);
 
-        errorCommand.setProcessDefinitionCode(processDefinition.getCode());
+        errorCommand.setWorkflowDefinitionCode(workflowDefinition.getCode());
         errorCommandMapper.updateById(errorCommand);
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
@@ -98,7 +98,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
                 null,
                 null,
-                Lists.newArrayList(processDefinition.getProjectCode(), 200L));
+                Lists.newArrayList(workflowDefinition.getProjectCode(), 200L));
 
         Assertions.assertEquals(0, commandCounts.size());
         Assertions.assertNotEquals(0, commandCounts2.size());

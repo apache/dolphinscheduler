@@ -34,17 +34,17 @@ class TaskExecutionContextUtilsTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTenantCode("tenantCode");
         taskExecutionContext.setProjectCode(1);
-        taskExecutionContext.setProcessDefineCode(1L);
-        taskExecutionContext.setProcessDefineVersion(1);
-        taskExecutionContext.setProcessInstanceId(1);
+        taskExecutionContext.setWorkflowDefinitionCode(1L);
+        taskExecutionContext.setWorkflowDefinitionVersion(1);
+        taskExecutionContext.setWorkflowInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
 
         String taskWorkingDirectory = FileUtils.getTaskInstanceWorkingDirectory(
                 taskExecutionContext.getTenantCode(),
                 taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getWorkflowDefinitionCode(),
+                taskExecutionContext.getWorkflowDefinitionVersion(),
+                taskExecutionContext.getWorkflowInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         try {
             // Test if the working directory is exist

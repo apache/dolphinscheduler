@@ -39,8 +39,8 @@ public class ScheduleFilterRequest extends PageQueryDto {
     @Schema(example = "project-name")
     private String projectName;
 
-    @Schema(example = "process-definition-name")
-    private String processDefinitionName;
+    @Schema(example = "workflow-definition-name")
+    private String workflowDefinitionName;
 
     @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", description = "default OFFLINE if value not provide.")
     private String releaseState;
@@ -50,8 +50,8 @@ public class ScheduleFilterRequest extends PageQueryDto {
         if (this.projectName != null) {
             schedule.setProjectName(this.projectName);
         }
-        if (this.processDefinitionName != null) {
-            schedule.setProcessDefinitionName(this.processDefinitionName);
+        if (this.workflowDefinitionName != null) {
+            schedule.setWorkflowDefinitionName(this.workflowDefinitionName);
         }
         if (this.releaseState != null) {
             schedule.setReleaseState(ReleaseState.valueOf(this.releaseState));

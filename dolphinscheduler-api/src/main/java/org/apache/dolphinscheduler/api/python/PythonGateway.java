@@ -20,31 +20,31 @@ package org.apache.dolphinscheduler.api.python;
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -52,12 +52,13 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -101,7 +102,7 @@ public class PythonGateway {
     private static final int ADMIN_USER_ID = 1;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private ProjectService projectService;
@@ -116,7 +117,7 @@ public class PythonGateway {
     private ExecutorService executorService;
 
     @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private WorkflowDefinitionService workflowDefinitionService;
 
     @Autowired
     private TaskDefinitionService taskDefinitionService;
@@ -176,7 +177,7 @@ public class PythonGateway {
         return taskDefinitionService.genTaskCodeList(genNum);
     }
 
-    public Map<String, Long> getCodeAndVersion(String projectName, String processDefinitionName,
+    public Map<String, Long> getCodeAndVersion(String projectName, String workflowDefinitionName,
                                                String taskName) throws CodeGenerateUtils.CodeGenerateException {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
@@ -187,18 +188,18 @@ public class PythonGateway {
             return result;
         }
 
-        ProcessDefinition processDefinition =
-                processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
+        WorkflowDefinition workflowDefinition =
+                workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinitionName);
         // In the case project exists, but current workflow still not created, we should also return the init
         // version of it
-        if (processDefinition == null) {
+        if (workflowDefinition == null) {
             result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
             return result;
         }
 
         TaskDefinition taskDefinition =
-                taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
+                taskDefinitionMapper.queryByName(project.getCode(), workflowDefinition.getCode(), taskName);
         if (taskDefinition == null) {
             result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
@@ -256,20 +257,20 @@ public class PythonGateway {
         Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
 
-        ProcessDefinition processDefinition = getWorkflow(user, projectCode, name);
-        ProcessExecutionTypeEnum executionTypeEnum = ProcessExecutionTypeEnum.valueOf(executionType);
-        long processDefinitionCode;
+        WorkflowDefinition workflowDefinition = getWorkflow(user, projectCode, name);
+        WorkflowExecutionTypeEnum executionTypeEnum = WorkflowExecutionTypeEnum.valueOf(executionType);
+        long workflowDefinitionCode;
         // create or update workflow
-        if (processDefinition != null) {
-            processDefinitionCode = processDefinition.getCode();
+        if (workflowDefinition != null) {
+            workflowDefinitionCode = workflowDefinition.getCode();
             // make sure workflow offline which could edit
-            processDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
-            processDefinitionService.updateProcessDefinition(user, projectCode, name,
-                    processDefinitionCode, description, globalParams,
+            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowDefinitionCode);
+            workflowDefinitionService.updateWorkflowDefinition(user, projectCode, name,
+                    workflowDefinitionCode, description, globalParams,
                     null, timeout, taskRelationJson, taskDefinitionJson,
                     executionTypeEnum);
         } else {
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
+            Map<String, Object> result = workflowDefinitionService.createWorkflowDefinition(user, projectCode, name,
                     description, globalParams,
                     null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
@@ -277,22 +278,22 @@ public class PythonGateway {
                 log.error(result.get(Constants.MSG).toString());
                 throw new ServiceException(result.get(Constants.MSG).toString());
             }
-            processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
-            processDefinitionCode = processDefinition.getCode();
+            workflowDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
+            workflowDefinitionCode = workflowDefinition.getCode();
         }
 
         // Fresh workflow schedule
         if (schedule != null) {
-            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, onlineSchedule, workerGroup,
+            createOrUpdateSchedule(user, projectCode, workflowDefinitionCode, schedule, onlineSchedule, workerGroup,
                     warningType,
                     warningGroupId);
         }
         if (ReleaseState.ONLINE.equals(ReleaseState.getEnum(releaseState))) {
-            processDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+            workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowDefinitionCode);
         } else if (ReleaseState.OFFLINE.equals(ReleaseState.getEnum(releaseState))) {
-            processDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowDefinitionCode);
         }
-        return processDefinitionCode;
+        return workflowDefinitionCode;
     }
 
     /**
@@ -302,14 +303,14 @@ public class PythonGateway {
      * @param projectCode  project which workflow belongs to
      * @param workflowName workflow name
      */
-    private ProcessDefinition getWorkflow(User user, long projectCode, String workflowName) {
-        Map<String, Object> verifyProcessDefinitionExists =
-                processDefinitionService.verifyProcessDefinitionName(user, projectCode, workflowName, 0);
-        Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
+    private WorkflowDefinition getWorkflow(User user, long projectCode, String workflowName) {
+        Map<String, Object> verifyWorkflowDefinitionExists =
+                workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, workflowName, 0);
+        Status verifyStatus = (Status) verifyWorkflowDefinitionExists.get(Constants.STATUS);
 
-        ProcessDefinition processDefinition = null;
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
-            processDefinition = processDefinitionMapper.queryByDefineName(projectCode, workflowName);
+        WorkflowDefinition workflowDefinition = null;
+        if (verifyStatus == Status.WORKFLOW_DEFINITION_NAME_EXIST) {
+            workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
         } else if (verifyStatus != Status.SUCCESS) {
             String msg =
                     "Verify workflow exists status is invalid, neither SUCCESS or WORKFLOW_NAME_EXIST.";
@@ -317,7 +318,7 @@ public class PythonGateway {
             throw new RuntimeException(msg);
         }
 
-        return processDefinition;
+        return workflowDefinition;
     }
 
     /**
@@ -342,11 +343,11 @@ public class PythonGateway {
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
-        Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(workflowCode);
+        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(workflowCode);
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
-            processDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
+            workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, workflowCode,
                     schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
@@ -354,14 +355,14 @@ public class PythonGateway {
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
-            processDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
+            workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
                     DEFAULT_ENVIRONMENT_CODE);
         }
         if (onlineSchedule) {
             // set workflow online to make sure we can set schedule online
-            processDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
+            workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
             schedulerService.onlineScheduler(user, projectCode, scheduleId);
         }
     }
@@ -376,36 +377,20 @@ public class PythonGateway {
                                      Integer timeout) {
         User user = usersService.queryUser(userName);
         Project project = projectMapper.queryByName(projectName);
-        ProcessDefinition processDefinition =
-                processDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
+        WorkflowDefinition workflowDefinition =
+                workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
 
         // make sure workflow online
-        processDefinitionService.onlineWorkflowDefinition(user, project.getCode(), processDefinition.getCode());
+        workflowDefinitionService.onlineWorkflowDefinition(user, project.getCode(), workflowDefinition.getCode());
 
-        executorService.execProcessInstance(user,
-                project.getCode(),
-                processDefinition.getCode(),
-                cronTime,
-                null,
-                DEFAULT_FAILURE_STRATEGY,
-                null,
-                DEFAULT_TASK_DEPEND_TYPE,
-                WarningType.valueOf(warningType),
-                warningGroupId,
-                DEFAULT_RUN_MODE,
-                DEFAULT_PRIORITY,
-                workerGroup,
-                user.getTenantCode(),
-                DEFAULT_ENVIRONMENT_CODE,
-                timeout,
-                null,
-                null,
-                DEFAULT_DRY_RUN,
-                DEFAULT_TEST_FLAG,
-                COMPLEMENT_DEPENDENT_MODE,
-                processDefinition.getVersion(),
-                false,
-                DEFAULT_EXECUTION_ORDER);
+        WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
+                .loginUser(user)
+                .workflowDefinitionCode(workflowDefinition.getCode())
+                .workerGroup(workerGroup)
+                .warningType(WarningType.of(warningType))
+                .warningGroupId(warningGroupId)
+                .build();
+        executorService.triggerWorkflowDefinition(workflowTriggerRequest);
     }
 
     // side object
@@ -541,7 +526,7 @@ public class PythonGateway {
 
     /**
      * Get workflow object by given workflow name. It returns map contain workflow id, name, code.
-     * Useful in Python API create subProcess task which need workflow information.
+     * Useful in Python API create sub workflow task which need workflow information.
      *
      * @param userName     user who create or update schedule
      * @param projectName  project name which workflow belongs to
@@ -554,14 +539,14 @@ public class PythonGateway {
         User user = usersService.queryUser(userName);
         Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
         long projectCode = project.getCode();
-        ProcessDefinition processDefinition = getWorkflow(user, projectCode, workflowName);
+        WorkflowDefinition workflowDefinition = getWorkflow(user, projectCode, workflowName);
         // get workflow info
-        if (processDefinition != null) {
+        if (workflowDefinition != null) {
             // make sure workflow online
-            processDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinition.getCode());
-            result.put("id", processDefinition.getId());
-            result.put("name", processDefinition.getName());
-            result.put("code", processDefinition.getCode());
+            workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowDefinition.getCode());
+            result.put("id", workflowDefinition.getId());
+            result.put("name", workflowDefinition.getName());
+            result.put("code", workflowDefinition.getCode());
         } else {
             String msg = String.format("Can not find valid workflow by name %s", workflowName);
             log.error(msg);
@@ -591,18 +576,18 @@ public class PythonGateway {
         long projectCode = project.getCode();
         result.put("projectCode", projectCode);
 
-        ProcessDefinition processDefinition =
-                processDefinitionMapper.queryByDefineName(projectCode, workflowName);
-        if (processDefinition == null) {
+        WorkflowDefinition workflowDefinition =
+                workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
+        if (workflowDefinition == null) {
             String msg = String.format("Can not find valid workflow by name %s", workflowName);
             log.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        result.put("processDefinitionCode", processDefinition.getCode());
+        result.put("workflowDefinitionCode", workflowDefinition.getCode());
 
         if (taskName != null) {
             TaskDefinition taskDefinition =
-                    taskDefinitionMapper.queryByName(projectCode, processDefinition.getCode(), taskName);
+                    taskDefinitionMapper.queryByName(projectCode, workflowDefinition.getCode(), taskName);
             result.put("taskDefinitionCode", taskDefinition.getCode());
         }
         return result;

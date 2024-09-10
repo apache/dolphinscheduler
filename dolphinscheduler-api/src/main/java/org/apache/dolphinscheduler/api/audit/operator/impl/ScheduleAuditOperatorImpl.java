@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Override
     public void modifyRequestParams(String[] paramNameArr, Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
@@ -51,7 +51,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
         int id = (int) paramsMap.get(paramNameArr[0]);
         Schedule schedule = scheduleMapper.selectById(id);
         if (schedule != null) {
-            paramsMap.put(AuditLogConstants.CODE, schedule.getProcessDefinitionCode());
+            paramsMap.put(AuditLogConstants.CODE, schedule.getWorkflowDefinitionCode());
             paramNameArr[0] = AuditLogConstants.CODE;
             auditLogList.forEach(auditLog -> auditLog.setDetail(String.valueOf(id)));
         }
@@ -78,7 +78,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        ProcessDefinition obj = processDefinitionMapper.queryByCode(objId);
+        WorkflowDefinition obj = workflowDefinitionMapper.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

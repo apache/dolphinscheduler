@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkflowTaskLineageMapper">
+    <sql id="baseSql">
+        id
+        , workflow_definition_code
+        , workflow_definition_version
+        , task_definition_code
+        , task_definition_version
+        , dept_project_code
+        , dept_workflow_definition_code
+        , dept_task_definition_code
+        , create_time
+        , update_time
+    </sql>
+
+    <delete id="batchDeleteByWorkflowDefinitionCode">
+        delete from t_ds_workflow_task_lineage
+        where workflow_definition_code in
+        <foreach collection="workflowDefinitionCodes" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </delete>
+
+    <insert id="batchInsert">
+        insert into t_ds_workflow_task_lineage (workflow_definition_code, workflow_definition_version, task_definition_code,
+        task_definition_version, dept_project_code, dept_workflow_definition_code, dept_task_definition_code)
+        values
+        <foreach collection="workflowTaskLineages" item="workflowTaskLineage" separator=",">
+            (#{workflowTaskLineage.workflowDefinitionCode},#{workflowTaskLineage.workflowDefinitionVersion},
+            #{workflowTaskLineage.taskDefinitionCode},#{workflowTaskLineage.taskDefinitionVersion},
+            #{workflowTaskLineage.deptProjectCode},#{workflowTaskLineage.deptWorkflowDefinitionCode},
+            #{workflowTaskLineage.deptTaskDefinitionCode})
+        </foreach>
+    </insert>
+
+    <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage">
+        select
+            <include refid="baseSql"/>
+        from
+        t_ds_workflow_task_lineage
+        where workflow_definition_code in (select code from t_ds_workflow_definition where project_code = #{projectCode})
+    </select>
+
+    <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
+        select
+            pd.code as work_flow_code
+            ,pd.name as work_flow_name
+            ,pd.release_state as work_flow_publish_status
+            ,schd.start_time as schedule_start_time
+            ,schd.end_time as schedule_end_time
+            ,schd.crontab as crontab
+            ,schd.release_state as schedule_publish_status
+        from t_ds_workflow_definition pd
+        left join t_ds_schedules schd on pd.code = schd.workflow_definition_code
+        where pd.code = #{workflowDefinitionCode}
+    </select>
+
+    <select id="queryWorkFlowLineageByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
+        select
+        pd.code as work_flow_code
+        ,pd.name as work_flow_name
+        ,pd.release_state as work_flow_publish_status
+        ,schd.start_time as schedule_start_time
+        ,schd.end_time as schedule_end_time
+        ,schd.crontab as crontab
+        ,schd.release_state as schedule_publish_status
+        from t_ds_workflow_definition pd
+        left join t_ds_schedules schd on pd.code = schd.workflow_definition_code
+        where 1=1
+        <if test="workflowDefinitionName != null and workflowDefinitionName != ''">
+            and pd.name = #{workflowDefinitionName}
+        </if>
+        and pd.project_code = #{projectCode}
+    </select>
+
+    <select id="queryWorkFlowLineageByDept" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage">
+        select
+            <include refid="baseSql"/>
+        from
+        t_ds_workflow_task_lineage
+        where 1=1
+        <if test="deptProjectCode != null and deptProjectCode != 0">
+        and dept_project_code = #{deptProjectCode}
+        </if>
+        and dept_workflow_definition_code = #{deptWorkflowDefinitionCode}
+        <if test="deptTaskDefinitionCode != null and deptTaskDefinitionCode != 0">
+        and dept_task_definition_code = #{deptTaskDefinitionCode}
+        </if>
+    </select>
+
+    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage">
+        select
+            <include refid="baseSql"/>
+        from
+        t_ds_workflow_task_lineage
+        where workflow_definition_code = #{workflowDefinitionCode}
+    </select>
+
+</mapper>

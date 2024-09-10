@@ -29,17 +29,17 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -68,9 +68,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.facebook.presto.jdbc.internal.guava.base.Strings;
 
-/**
- * worker group service impl
- */
 @Service
 @Slf4j
 public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
@@ -79,7 +76,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private WorkerGroupMapper workerGroupMapper;
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Autowired
     private RegistryClient registryClient;
@@ -97,7 +94,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * create or update a worker group
@@ -219,12 +216,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 .selectList(new QueryWrapper<Schedule>().lambda().eq(Schedule::getWorkerGroup, workerGroup.getName()));
 
         if (CollectionUtils.isNotEmpty(schedules)) {
-            List<String> processNames = schedules.stream().limit(3)
-                    .map(schedule -> processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode()).getName())
+            List<String> workflowDefinitionNames = schedules.stream().limit(3)
+                    .map(schedule -> workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode())
+                            .getName())
                     .collect(Collectors.toList());
 
             putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
-                    JSONUtils.toJsonString(processNames));
+                    JSONUtils.toJsonString(workflowDefinitionNames));
             return true;
         }
 
@@ -393,16 +391,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
-        List<ProcessInstance> processInstances = processInstanceMapper
+        List<WorkflowInstance> workflowInstances = workflowInstanceMapper
                 .queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                         org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
-        if (CollectionUtils.isNotEmpty(processInstances)) {
-            List<Integer> processInstanceIds =
-                    processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(workflowInstances)) {
+            List<Integer> workflowInstanceIds =
+                    workflowInstances.stream().map(WorkflowInstance::getId).collect(Collectors.toList());
             log.warn(
-                    "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
-                    processInstances.size(), processInstanceIds);
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+                    "Delete worker group failed because there are {} workflowInstances are using it, workflowInstanceIds:{}.",
+                    workflowInstances.size(), workflowInstanceIds);
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, workflowInstances.size());
             return result;
         }
 
@@ -432,10 +430,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     }
 
     @Override
-    public Map<Long, String> queryWorkerGroupByProcessDefinitionCodes(List<Long> processDefinitionCodeList) {
-        List<Schedule> processDefinitionScheduleList =
-                scheduleMapper.querySchedulesByProcessDefinitionCodes(processDefinitionCodeList);
-        return processDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
+    public Map<Long, String> queryWorkerGroupByWorkflowDefinitionCodes(List<Long> workflowDefinitionCodeList) {
+        List<Schedule> workflowDefinitionScheduleList =
+                scheduleMapper.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodeList);
+        return workflowDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getWorkflowDefinitionCode,
                 Schedule::getWorkerGroup));
     }
 

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecut
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorFactoryBuilder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorThreadPoolManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,13 +44,16 @@ public class LogicITaskInstanceDispatchOperationFunction
     @Autowired
     private MasterTaskExecutorThreadPoolManager masterTaskExecutorThreadPool;
 
+    @Autowired
+    private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
+
     @Override
     public LogicTaskDispatchResponse operate(LogicTaskDispatchRequest taskDispatchRequest) {
         log.info("Received dispatchLogicTask request: {}", taskDispatchRequest);
         TaskExecutionContext taskExecutionContext = taskDispatchRequest.getTaskExecutionContext();
         try {
             final int taskInstanceId = taskExecutionContext.getTaskInstanceId();
-            final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+            final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
             final String taskInstanceName = taskExecutionContext.getTaskName();
 
             taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
@@ -59,7 +63,7 @@ public class LogicITaskInstanceDispatchOperationFunction
 
             MasterTaskExecutionContextHolder.putTaskExecutionContext(taskExecutionContext);
 
-            MasterTaskExecutor masterTaskExecutor = masterTaskExecutorFactoryBuilder
+            final MasterTaskExecutor masterTaskExecutor = masterTaskExecutorFactoryBuilder
                     .createMasterTaskExecutorFactory(taskExecutionContext.getTaskType())
                     .createMasterTaskExecutor(taskExecutionContext);
             if (masterTaskExecutorThreadPool.submitMasterTaskExecutor(masterTaskExecutor)) {

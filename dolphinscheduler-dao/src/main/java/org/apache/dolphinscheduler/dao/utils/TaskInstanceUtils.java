@@ -32,12 +32,12 @@ public class TaskInstanceUtils {
         target.setId(source.getId());
         target.setName(source.getName());
         target.setTaskType(source.getTaskType());
-        target.setProcessInstanceId(source.getProcessInstanceId());
-        target.setProcessInstanceName(source.getProcessInstanceName());
+        target.setWorkflowInstanceId(source.getWorkflowInstanceId());
+        target.setWorkflowInstanceName(source.getWorkflowInstanceName());
         target.setProjectCode(source.getProjectCode());
         target.setTaskCode(source.getTaskCode());
         target.setTaskDefinitionVersion(source.getTaskDefinitionVersion());
-        target.setProcessInstanceName(source.getProcessInstanceName());
+        target.setWorkflowInstanceName(source.getWorkflowInstanceName());
         target.setTaskGroupPriority(source.getTaskGroupPriority());
         target.setState(source.getState());
         target.setFirstSubmitTime(source.getFirstSubmitTime());
@@ -49,8 +49,8 @@ public class TaskInstanceUtils {
         target.setLogPath(source.getLogPath());
         target.setRetryTimes(source.getRetryTimes());
         target.setAlertFlag(source.getAlertFlag());
-        target.setProcessInstance(source.getProcessInstance());
-        target.setProcessDefine(source.getProcessDefine());
+        target.setWorkflowInstance(source.getWorkflowInstance());
+        target.setWorkflowDefinition(source.getWorkflowDefinition());
         target.setTaskDefine(source.getTaskDefine());
         target.setPid(source.getPid());
         target.setAppLink(source.getAppLink());

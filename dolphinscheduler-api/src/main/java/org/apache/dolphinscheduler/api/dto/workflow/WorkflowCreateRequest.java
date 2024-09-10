@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.dto.workflow;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.VERSION_FIRST;
 
-import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
 import java.util.Date;
 
@@ -58,28 +58,28 @@ public class WorkflowCreateRequest {
     @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
     private String executionType;
 
-    public ProcessDefinition convert2ProcessDefinition() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
+    public WorkflowDefinition convert2WorkflowDefinition() {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
 
-        processDefinition.setName(this.name);
-        processDefinition.setDescription(this.description);
-        processDefinition.setProjectCode(this.projectCode);
-        processDefinition.setGlobalParams(this.globalParams);
-        processDefinition.setWarningGroupId(this.warningGroupId);
-        processDefinition.setTimeout(this.timeout);
+        workflowDefinition.setName(this.name);
+        workflowDefinition.setDescription(this.description);
+        workflowDefinition.setProjectCode(this.projectCode);
+        workflowDefinition.setGlobalParams(this.globalParams);
+        workflowDefinition.setWarningGroupId(this.warningGroupId);
+        workflowDefinition.setTimeout(this.timeout);
 
         ReleaseState pdReleaseState =
                 this.releaseState == null ? ReleaseState.OFFLINE : ReleaseState.valueOf(this.releaseState);
-        processDefinition.setReleaseState(pdReleaseState);
-        ProcessExecutionTypeEnum processExecutionTypeEnum =
-                this.executionType == null ? ProcessExecutionTypeEnum.PARALLEL
-                        : ProcessExecutionTypeEnum.valueOf(this.executionType);
-        processDefinition.setExecutionType(processExecutionTypeEnum);
+        workflowDefinition.setReleaseState(pdReleaseState);
+        WorkflowExecutionTypeEnum workflowExecutionTypeEnum =
+                this.executionType == null ? WorkflowExecutionTypeEnum.PARALLEL
+                        : WorkflowExecutionTypeEnum.valueOf(this.executionType);
+        workflowDefinition.setExecutionType(workflowExecutionTypeEnum);
 
-        processDefinition.setVersion(VERSION_FIRST);
+        workflowDefinition.setVersion(VERSION_FIRST);
         Date date = new Date();
-        processDefinition.setCreateTime(date);
-        processDefinition.setUpdateTime(date);
-        return processDefinition;
+        workflowDefinition.setCreateTime(date);
+        workflowDefinition.setUpdateTime(date);
+        return workflowDefinition;
     }
 }

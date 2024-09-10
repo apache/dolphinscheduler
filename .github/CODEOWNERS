@@ -40,9 +40,9 @@
 /dolphinscheduler-spi/ @caishunfeng
 /dolphinscheduler-standalone-server/ @SbloodyS
 /dolphinscheduler-storage-plugin/ @ruanwenjun @SbloodyS
-/dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @zhuangchong @Gallardot
+/dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @Gallardot
 /dolphinscheduler-tools/ @caishunfeng @SbloodyS @EricGao888
-/dolphinscheduler-ui/ @songjianet @Amy0104
+/dolphinscheduler-ui/ @songjianet @SbloodyS
 /dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-yarn-aop/ @ruanwenjun
 

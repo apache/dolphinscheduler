@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 
 import java.time.Duration;
@@ -32,33 +31,36 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
 
     private static final Duration SUB_WORKFLOW_TASK_EXECUTE_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
 
-    private final TaskExecutionContext taskExecutionContext;
-    private final ProcessInstanceDao processInstanceDao;
-    private ProcessInstance subWorkflowInstance;
+    private final WorkflowInstanceDao workflowInstanceDao;
 
-    public SubWorkflowAsyncTaskExecuteFunction(TaskExecutionContext taskExecutionContext,
-                                               ProcessInstanceDao processInstanceDao) {
-        this.taskExecutionContext = taskExecutionContext;
-        this.processInstanceDao = processInstanceDao;
+    private final SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
+
+    public SubWorkflowAsyncTaskExecuteFunction(final SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext,
+                                               final WorkflowInstanceDao workflowInstanceDao) {
+        this.subWorkflowLogicTaskRuntimeContext = subWorkflowLogicTaskRuntimeContext;
+        this.workflowInstanceDao = workflowInstanceDao;
     }
 
     @Override
     public @NonNull AsyncTaskExecutionStatus getAsyncTaskExecutionStatus() {
-        // query the status of sub workflow instance
+        final Integer subWorkflowInstanceId = subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId();
+        final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(subWorkflowInstanceId);
         if (subWorkflowInstance == null) {
-            subWorkflowInstance = processInstanceDao.querySubProcessInstanceByParentId(
-                    taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+            log.info("Cannot find the SubWorkflow instance: {}, maybe it has been deleted", subWorkflowInstanceId);
+            return AsyncTaskExecutionStatus.FAILED;
         }
-        if (subWorkflowInstance == null) {
-            log.info("The sub workflow instance doesn't created");
-            return AsyncTaskExecutionStatus.RUNNING;
+        switch (subWorkflowInstance.getState()) {
+            case PAUSE:
+                return AsyncTaskExecutionStatus.PAUSE;
+            case STOP:
+                return AsyncTaskExecutionStatus.KILL;
+            case SUCCESS:
+                return AsyncTaskExecutionStatus.SUCCESS;
+            case FAILURE:
+                return AsyncTaskExecutionStatus.FAILED;
+            default:
+                return AsyncTaskExecutionStatus.RUNNING;
         }
-        subWorkflowInstance = processInstanceDao.queryById(subWorkflowInstance.getId());
-        if (subWorkflowInstance != null && subWorkflowInstance.getState().isFinished()) {
-            return subWorkflowInstance.getState().isSuccess() ? AsyncTaskExecutionStatus.SUCCESS
-                    : AsyncTaskExecutionStatus.FAILED;
-        }
-        return AsyncTaskExecutionStatus.RUNNING;
     }
 
     @Override

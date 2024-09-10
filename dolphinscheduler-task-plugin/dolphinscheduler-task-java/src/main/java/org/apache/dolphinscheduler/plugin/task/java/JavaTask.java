@@ -195,7 +195,6 @@ public class JavaTask extends AbstractTask {
         return javaParameters;
     }
 
-
     /**
      * Construct a Classpath or module path based on isModulePath
      *

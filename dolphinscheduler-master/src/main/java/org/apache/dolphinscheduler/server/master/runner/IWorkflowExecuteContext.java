@@ -17,17 +17,30 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
+import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 
-// todo: Add method to manage the task instance
+import java.util.List;
+
 public interface IWorkflowExecuteContext {
 
-    ProcessDefinition getWorkflowDefinition();
+    Command getCommand();
 
-    ProcessInstance getWorkflowInstance();
+    WorkflowDefinition getWorkflowDefinition();
+
+    WorkflowInstance getWorkflowInstance();
 
     IWorkflowGraph getWorkflowGraph();
+
+    IWorkflowExecutionGraph getWorkflowExecutionGraph();
+
+    WorkflowEventBus getWorkflowEventBus();
+
+    List<IWorkflowLifecycleListener> getWorkflowInstanceLifecycleListeners();
 
 }

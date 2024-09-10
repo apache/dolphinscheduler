@@ -24,10 +24,8 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
-import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
 import java.time.Duration;
 
@@ -50,11 +48,7 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     @Autowired
     private RegistryClient registryClient;
     @Autowired
-    private WorkflowEventQueue workflowEventQueue;
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
-    @Autowired
-    private StateWheelExecuteThread stateWheelExecuteThread;
+    private IWorkflowRepository IWorkflowRepository;
 
     @Override
     public void disconnect() {
@@ -113,12 +107,9 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     }
 
     private void clearMasterResource() {
-        workflowEventQueue.clearWorkflowEventQueue();
         log.warn("Master clear workflow event queue due to lost registry connection");
-        processInstanceExecCacheManager.clearCache();
-        log.warn("Master clear process instance cache due to lost registry connection");
-        stateWheelExecuteThread.clearAllTasks();
-        log.warn("Master clear all state wheel task due to lost registry connection");
+        IWorkflowRepository.clear();
+        log.warn("Master clear workflow instance cache due to lost registry connection");
 
     }
 

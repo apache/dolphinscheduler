@@ -29,14 +29,14 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -75,7 +75,7 @@ public class WorkerGroupServiceTest {
     private WorkerGroupMapper workerGroupMapper;
 
     @Mock
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Mock
     private ProcessService processService;
@@ -238,13 +238,13 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
-        processInstances.add(processInstance);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
+        workflowInstances.add(workflowInstance);
+        Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
-                .thenReturn(processInstances);
+                .thenReturn(workflowInstances);
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
@@ -260,7 +260,7 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
-        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+        Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(null);
 
         Mockito.when(workerGroupMapper.deleteById(1)).thenReturn(1);

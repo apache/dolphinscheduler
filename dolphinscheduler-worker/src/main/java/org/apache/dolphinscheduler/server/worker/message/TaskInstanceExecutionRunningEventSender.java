@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceExecutionRunningEvent;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.ITaskExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskExecutionRunningEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import lombok.NonNull;
@@ -30,22 +30,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskInstanceExecutionRunningEventSender
         implements
-            TaskInstanceExecutionEventSender<TaskInstanceExecutionRunningEvent> {
+            TaskInstanceExecutionEventSender<TaskExecutionRunningEvent> {
 
     @Override
-    public void sendEvent(TaskInstanceExecutionRunningEvent taskInstanceExecutionRunningEvent) {
-        ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstanceExecutionRunningEvent.getWorkflowInstanceHost(),
-                                ITaskInstanceExecutionEventListener.class);
-        iTaskInstanceExecutionEventListener.onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);
+    public void sendEvent(final TaskExecutionRunningEvent taskInstanceExecutionRunningEvent) {
+        Clients.withService(ITaskExecutionEventListener.class)
+                .withHost(taskInstanceExecutionRunningEvent.getWorkflowInstanceHost())
+                .onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);
     }
 
     @Override
-    public TaskInstanceExecutionRunningEvent buildEvent(@NonNull TaskExecutionContext taskExecutionContext) {
-        TaskInstanceExecutionRunningEvent taskExecuteRunningMessage = new TaskInstanceExecutionRunningEvent();
+    public TaskExecutionRunningEvent buildEvent(@NonNull TaskExecutionContext taskExecutionContext) {
+        TaskExecutionRunningEvent taskExecuteRunningMessage = new TaskExecutionRunningEvent();
         taskExecuteRunningMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        taskExecuteRunningMessage.setWorkflowInstanceId(taskExecutionContext.getWorkflowInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());
         taskExecuteRunningMessage.setLogPath(taskExecutionContext.getLogPath());
         taskExecuteRunningMessage.setWorkflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost());
@@ -57,7 +55,7 @@ public class TaskInstanceExecutionRunningEventSender
     }
 
     @Override
-    public ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType getMessageType() {
-        return ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING;
+    public ITaskExecutionEvent.TaskInstanceExecutionEventType getMessageType() {
+        return ITaskExecutionEvent.TaskInstanceExecutionEventType.RUNNING;
     }
 }

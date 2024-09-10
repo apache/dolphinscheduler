@@ -14,6 +14,31 @@ If you want to deploy DolphinScheduler in production, we recommend you follow [c
 - JDK：download [JDK][jdk] (1.8 or 11), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
 - Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/<version>).  <!-- markdown-link-check-disable-line -->
 
+### Configure User Exemption and Permissions
+
+Create a deployment user, and make sure to configure `sudo` without password. Here make an example to create user `dolphinscheduler`:
+
+```shell
+# To create a user, login as root
+useradd dolphinscheduler
+
+# Add password
+echo "dolphinscheduler" | passwd --stdin dolphinscheduler
+
+# Configure sudo without password
+sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
+
+# Modify directory permissions and grant permissions for user you created above
+chown -R dolphinscheduler:dolphinscheduler apache-dolphinscheduler-*-bin
+chmod -R 755 apache-dolphinscheduler-*-bin
+```
+
+> **_NOTICE:_**
+>
+> - Due to DolphinScheduler's multi-tenant task switch user using command `sudo -u {linux-user} -i`, the deployment user needs to have `sudo` privileges and be password-free. If novice learners don’t understand, you can ignore this point for now.
+> - If you find the line "Defaults requiretty" in the `/etc/sudoers` file, please comment the content.
+
 ## Start DolphinScheduler Standalone Server
 
 ### Extract and Start DolphinScheduler
@@ -47,8 +72,8 @@ bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 ```
 
-> Note: Python gateway service is started along with the api-server, and if you do not want to start Python gateway
-> service please disabled it by changing the yaml config `python-gateway.enabled : false` in api-server's configuration
+> Note: Python gateway service is disabled by default. If you want to start the Python gateway
+> service please enable it by changing the yaml config `python-gateway.enabled : true` in api-server's configuration
 > path `api-server/conf/application.yaml`
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html

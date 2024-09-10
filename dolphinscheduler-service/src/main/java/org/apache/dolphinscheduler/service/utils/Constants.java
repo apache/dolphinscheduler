@@ -26,10 +26,8 @@ import lombok.experimental.UtilityClass;
 public final class Constants {
 
     public static final int[] NOT_TERMINATED_STATES = new int[]{
-            WorkflowExecutionStatus.SUBMITTED_SUCCESS.getCode(),
             TaskExecutionStatus.DISPATCH.getCode(),
             WorkflowExecutionStatus.RUNNING_EXECUTION.getCode(),
-            WorkflowExecutionStatus.DELAY_EXECUTION.getCode(),
             WorkflowExecutionStatus.READY_PAUSE.getCode(),
             WorkflowExecutionStatus.READY_STOP.getCode(),
             TaskExecutionStatus.NEED_FAULT_TOLERANCE.getCode(),

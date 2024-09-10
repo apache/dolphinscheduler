@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowAlertContent;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -189,37 +189,37 @@ public class AlertDao {
     }
 
     /**
-     * process time out alert
+     * workflow time out alert
      *
-     * @param processInstance processInstance
+     * @param workflowInstance workflowInstance
      * @param projectUser     projectUser
      */
-    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
-        int alertGroupId = processInstance.getWarningGroupId();
+    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
+        int alertGroupId = workflowInstance.getWarningGroupId();
         Alert alert = new Alert();
-        List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
-        ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
+        List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
+        WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
                 .owner(projectUser.getUserName())
-                .processId(processInstance.getId())
-                .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                .processName(processInstance.getName())
-                .processType(processInstance.getCommandType())
-                .processState(processInstance.getState())
-                .runTimes(processInstance.getRunTimes())
-                .processStartTime(processInstance.getStartTime())
-                .processHost(processInstance.getHost())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowInstanceName(workflowInstance.getName())
+                .commandType(workflowInstance.getCommandType())
+                .workflowExecutionStatus(workflowInstance.getState())
+                .runTimes(workflowInstance.getRunTimes())
+                .workflowStartTime(workflowInstance.getStartTime())
+                .workflowHost(workflowInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
                 .warnLevel(AlertWarnLevel.MIDDLE)
                 .build();
-        processAlertContentList.add(processAlertContent);
-        String content = JSONUtils.toJsonString(processAlertContentList);
-        alert.setTitle("Process Timeout Warn");
+        workflowAlertContentList.add(workflowAlertContent);
+        String content = JSONUtils.toJsonString(workflowAlertContentList);
+        alert.setTitle("Workflow Timeout Warn");
         alert.setProjectCode(projectUser.getProjectCode());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
-        alert.setAlertType(AlertType.PROCESS_INSTANCE_TIMEOUT);
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
+        alert.setAlertType(AlertType.WORKFLOW_INSTANCE_TIMEOUT);
         saveTaskTimeoutAlert(alert, content, alertGroupId);
     }
 
@@ -237,21 +237,22 @@ public class AlertDao {
     /**
      * task timeout warn
      *
-     * @param processInstance processInstanceId
+     * @param workflowInstance workflowInstance
      * @param taskInstance    taskInstance
      * @param projectUser     projectUser
      */
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
+    public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,
+                                     TaskInstance taskInstance,
                                      ProjectUser projectUser) {
         Alert alert = new Alert();
-        List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
-        ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
+        List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
+        WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
                 .owner(projectUser.getUserName())
-                .processId(processInstance.getId())
-                .processDefinitionCode(processInstance.getProcessDefinitionCode())
-                .processName(processInstance.getName())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                .workflowInstanceName(workflowInstance.getName())
                 .taskCode(taskInstance.getTaskCode())
                 .taskName(taskInstance.getName())
                 .taskType(taskInstance.getTaskType())
@@ -260,14 +261,14 @@ public class AlertDao {
                 .event(AlertEvent.TIME_OUT)
                 .warnLevel(AlertWarnLevel.MIDDLE)
                 .build();
-        processAlertContentList.add(processAlertContent);
-        String content = JSONUtils.toJsonString(processAlertContentList);
+        workflowAlertContentList.add(workflowAlertContent);
+        String content = JSONUtils.toJsonString(workflowAlertContentList);
         alert.setTitle("Task Timeout Warn");
         alert.setProjectCode(projectUser.getProjectCode());
-        alert.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(processInstance.getId());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.TASK_TIMEOUT);
-        saveTaskTimeoutAlert(alert, content, processInstance.getWarningGroupId());
+        saveTaskTimeoutAlert(alert, content, workflowInstance.getWarningGroupId());
     }
 
     /**
@@ -278,9 +279,9 @@ public class AlertDao {
                 QUERY_ALERT_THRESHOLD);
     }
 
-    public List<Alert> listAlerts(int processInstanceId) {
+    public List<Alert> listAlerts(int workflowInstanceId) {
         LambdaQueryWrapper<Alert> wrapper = new LambdaQueryWrapper<Alert>()
-                .eq(Alert::getProcessInstanceId, processInstanceId);
+                .eq(Alert::getWorkflowInstanceId, workflowInstanceId);
         return alertMapper.selectList(wrapper);
     }
 
@@ -322,15 +323,15 @@ public class AlertDao {
         this.crashAlarmSuppression = crashAlarmSuppression;
     }
 
-    public void deleteByWorkflowInstanceId(Integer processInstanceId) {
-        if (processInstanceId == null) {
+    public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
+        if (workflowInstanceId == null) {
             return;
         }
-        List<Alert> alertList = alertMapper.selectByWorkflowInstanceId(processInstanceId);
+        List<Alert> alertList = alertMapper.selectByWorkflowInstanceId(workflowInstanceId);
         if (CollectionUtils.isEmpty(alertList)) {
             return;
         }
-        alertMapper.deleteByWorkflowInstanceId(processInstanceId);
+        alertMapper.deleteByWorkflowInstanceId(workflowInstanceId);
         List<Integer> alertIds = alertList
                 .stream()
                 .map(Alert::getId)

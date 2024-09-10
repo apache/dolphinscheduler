@@ -919,7 +919,7 @@ No.|parameter name||type|description |notes
 
 ```bash
 {
-            "type":"SUB_PROCESS",
+            "type":"SUB_WORKFLOW",
             "id":"tasks-14806",
             "name":"SubProcessTask",
             "params":{

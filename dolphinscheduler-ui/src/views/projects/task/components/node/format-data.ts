@@ -28,14 +28,14 @@ import type {
 import { ref } from 'vue'
 
 export function formatParams(data: INodeData): {
-  processDefinitionCode: string
+  workflowDefinitionCode: string
   upstreamCodes: string
   taskDefinitionJsonObj: object
 } {
   const rdbmsSourceTypes = ref(['MYSQL', 'ORACLE', 'SQLSERVER', 'HANA'])
   const taskParams: ITaskParams = {}
-  if (data.taskType === 'SUB_PROCESS' || data.taskType === 'DYNAMIC') {
-    taskParams.processDefinitionCode = data.processDefinitionCode
+  if (data.taskType === 'SUB_WORKFLOW' || data.taskType === 'DYNAMIC') {
+    taskParams.workflowDefinitionCode = data.workflowDefinitionCode
   }
 
   if (data.taskType === 'JAVA') {
@@ -336,6 +336,20 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
   }
 
+  if (data.taskType === 'ALIYUN_SERVERLESS_SPARK') {
+    taskParams.workspaceId = data.workspaceId
+    taskParams.resourceQueueId = data.resourceQueueId
+    taskParams.codeType = data.codeType
+    taskParams.jobName = data.jobName
+    taskParams.engineReleaseVersion = data.engineReleaseVersion
+    taskParams.entryPoint = data.entryPoint
+    taskParams.entryPointArguments = data.entryPointArguments
+    taskParams.sparkSubmitParameters = data.sparkSubmitParameters
+    taskParams.isProduction = data.isProduction
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+  }
+
   if (data.taskType === 'K8S') {
     taskParams.namespace = data.namespace
     taskParams.minCpuCores = data.minCpuCores
@@ -406,7 +420,7 @@ export function formatParams(data: INodeData): {
     taskParams.scriptParams = data.scriptParams
     taskParams.pythonPath = data.pythonPath
     taskParams.isCreateEnvironment = data.isCreateEnvironment
-    taskParams.pythonCommand = data.pythonCommand
+    taskParams.pythonLauncher = data.pythonLauncher
     taskParams.pythonEnvTool = data.pythonEnvTool
     taskParams.requirements = data.requirements
     taskParams.condaPythonVersion = data.condaPythonVersion
@@ -482,7 +496,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'DYNAMIC') {
-    taskParams.processDefinitionCode = data.processDefinitionCode
+    taskParams.workflowDefinitionCode = data.workflowDefinitionCode
     taskParams.maxNumOfSubWorkflowInstances = data.maxNumOfSubWorkflowInstances
     taskParams.degreeOfParallelism = data.degreeOfParallelism
     taskParams.filterCondition = data.filterCondition
@@ -499,7 +513,9 @@ export function formatParams(data: INodeData): {
     }
   }
   const params = {
-    processDefinitionCode: data.processName ? String(data.processName) : '',
+    workflowDefinitionCode: data.workflowDefinitionName
+      ? String(data.workflowDefinitionName)
+      : '',
     upstreamCodes: data?.preTasks?.join(','),
     taskDefinitionJsonObj: {
       code: data.code,
@@ -540,7 +556,7 @@ export function formatParams(data: INodeData): {
       taskExecuteType: data.taskExecuteType
     }
   } as {
-    processDefinitionCode: string
+    workflowDefinitionCode: string
     upstreamCodes: string
     taskDefinitionJsonObj: { timeout: number; timeoutNotifyStrategy: string }
   }

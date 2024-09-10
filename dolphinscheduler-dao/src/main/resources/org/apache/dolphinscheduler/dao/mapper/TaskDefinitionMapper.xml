@@ -36,10 +36,10 @@
             <property name="alias" value="td"/>
         </include>
         from t_ds_task_definition td
-        join t_ds_process_task_relation ptr on ptr.project_code = td.project_code
+        join t_ds_workflow_task_relation ptr on ptr.project_code = td.project_code
         where td.project_code = #{projectCode}
         and td.name = #{name}
-        and ptr.process_definition_code = #{processCode}
+        and ptr.workflow_definition_code = #{workflowDefinitionCode}
         and td.code = ptr.post_task_code
         limit 1
     </select>
@@ -98,29 +98,14 @@
             #{taskDefinition.taskGroupId}, #{taskDefinition.taskExecuteType})
         </foreach>
     </insert>
-    <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
-        select td.code        task_code
-        from t_ds_task_definition td
-        WHERE td.project_code = #{projectCode}
-        <if test="taskType != ''">
-            and td.task_type = #{taskType}
-        </if>
-        <if test="taskExecuteType != null">
-            and td.task_execute_type = #{taskExecuteType.code}
-        </if>
-        <if test="searchTaskName != null and searchTaskName != ''">
-            and td.name like concat('%', #{searchTaskName}, '%')
-        </if>
-        order by td.update_time desc
-    </select>
 
     <select id="queryDefineListByCodeList" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
         select td.name task_name,td.code task_code,td.version task_version,td.task_type,td.create_time task_create_time,td.update_time task_update_time,
-        pd.code process_definition_code,pd.version process_definition_version,pd.name process_definition_name,pd.release_state process_release_state,
+        pd.code workflow_definition_code,pd.version workflow_definition_version,pd.name workflow_definition_name,pd.release_state workflow_release_state,
         pt.pre_task_code upstream_task_code,up.name upstream_task_name
         from t_ds_task_definition td
-        LEFT JOIN t_ds_process_task_relation pt ON td.code	= pt.post_task_code and td.version=pt.post_task_version
-        LEFT JOIN t_ds_process_definition pd ON pt.process_definition_code = pd.code and pt.process_definition_version=pd.version
+        LEFT JOIN t_ds_workflow_task_relation pt ON td.code	= pt.post_task_code and td.version=pt.post_task_version
+        LEFT JOIN t_ds_workflow_definition pd ON pt.workflow_definition_code = pd.code and pt.workflow_definition_version=pd.version
         LEFT JOIN t_ds_task_definition up on pt.pre_task_code=up.code and pt.pre_task_version=up.version
         WHERE td.project_code = #{projectCode} and td.code in
         <foreach collection="codeList" item="code" open="(" separator="," close=")">

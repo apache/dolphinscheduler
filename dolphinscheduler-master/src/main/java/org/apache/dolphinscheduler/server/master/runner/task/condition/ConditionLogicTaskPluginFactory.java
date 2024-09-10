@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.server.master.runner.task.condition;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +37,13 @@ public class ConditionLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowRepository workflowExecutionRunnableMemoryRepository;
 
     @Override
-    public ConditionLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
-                taskExecutionContext.getProcessInstanceId());
-        return new ConditionLogicTask(workflowExecuteRunnable, taskExecutionContext, taskInstanceDao);
+    public ConditionLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
+        IWorkflowExecutionRunnable workflowExecutionRunnable =
+                workflowExecutionRunnableMemoryRepository.get(taskExecutionContext.getWorkflowInstanceId());
+        return new ConditionLogicTask(workflowExecutionRunnable, taskExecutionContext, taskInstanceDao);
     }
 
     @Override
