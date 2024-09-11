@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
-import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessDefinitionPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.SchedulerPage;
+import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -42,9 +42,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
+@DisableIfTestFails
 public class SchedulerAPITest {
 
     private static final String username = "admin";
@@ -57,13 +59,13 @@ public class SchedulerAPITest {
 
     private static SchedulerPage schedulerPage;
 
-    private static ProcessDefinitionPage processDefinitionPage;
+    private static WorkflowDefinitionPage workflowDefinitionPage;
 
     private static ProjectPage projectPage;
 
     private static long projectCode;
 
-    private static long processDefinitionCode;
+    private static long workflowDefinitionCode;
 
     private static int scheduleId;
 
@@ -75,7 +77,7 @@ public class SchedulerAPITest {
                 JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         projectPage = new ProjectPage(sessionId);
         schedulerPage = new SchedulerPage(sessionId);
-        processDefinitionPage = new ProcessDefinitionPage(sessionId);
+        workflowDefinitionPage = new WorkflowDefinitionPage(sessionId);
         loginUser = new User();
         loginUser.setUserName("admin");
         loginUser.setId(1);
@@ -98,20 +100,20 @@ public class SchedulerAPITest {
                 .getBody().getData()).get(0)).get("code");
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-        processDefinitionPage.importProcessDefinition(loginUser, projectCode, file);
-        HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
-                processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
-        Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-        processDefinitionCode =
-                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
-                        .getBody().getData()).get(0)).get("processDefinition")).get("code");
+        workflowDefinitionPage.importWorkflowDefinition(loginUser, projectCode, file);
+        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+        workflowDefinitionCode =
+                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                        .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
 
-        processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode,
+        workflowDefinitionPage.releaseWorkflowDefinition(loginUser, projectCode, workflowDefinitionCode,
                 ReleaseState.ONLINE);
         final String schedule =
                 "{\"startTime\":\"2019-08-08 00:00:00\",\"endTime\":\"2100-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
         HttpResponse createScheduleResponse =
-                schedulerPage.createSchedule(loginUser, projectCode, processDefinitionCode, schedule);
+                schedulerPage.createSchedule(loginUser, projectCode, workflowDefinitionCode, schedule);
         Assertions.assertTrue(createScheduleResponse.getBody().getSuccess());
         Assertions.assertTrue(createScheduleResponse.getBody().getData().toString().contains("2019-08-08"));
     }

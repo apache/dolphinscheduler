@@ -19,21 +19,21 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   querySimpleList,
-  queryProcessDefinitionByCode
-} from '@/service/modules/process-definition'
+  queryWorkflowDefinitionByCode
+} from '@/service/modules/workflow-definition'
 import type { IJsonItem } from '../types'
 
 export function useChildNode({
   model,
   projectCode,
   from,
-  processName,
+  workflowName,
   code
 }: {
   model: { [field: string]: any }
   projectCode: number
   from?: number
-  processName?: number
+  workflowName?: number
   code?: number
 }): IJsonItem {
   const { t } = useI18n()
@@ -41,7 +41,7 @@ export function useChildNode({
   const options = ref([] as { label: string; value: string }[])
   const loading = ref(false)
 
-  const getProcessList = async () => {
+  const getWorkflowList = async () => {
     if (loading.value) return
     loading.value = true
     const res = await querySimpleList(projectCode)
@@ -53,22 +53,22 @@ export function useChildNode({
       }))
     loading.value = false
   }
-  const getProcessListByCode = async (processCode: number) => {
-    if (!processCode) return
-    const res = await queryProcessDefinitionByCode(processCode, projectCode)
+  const getWorkflowListByCode = async (workflowCode: number) => {
+    if (!workflowCode) return
+    const res = await queryWorkflowDefinitionByCode(workflowCode, projectCode)
     model.definition = res
   }
 
   onMounted(() => {
-    if (from === 1 && processName) {
-      getProcessListByCode(processName)
+    if (from === 1 && workflowName) {
+      getWorkflowListByCode(workflowName)
     }
-    getProcessList()
+    getWorkflowList()
   })
 
   return {
     type: 'select',
-    field: 'processDefinitionCode',
+    field: 'workflowDefinitionCode',
     span: 24,
     name: t('project.node.child_node'),
     props: {

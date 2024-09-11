@@ -112,8 +112,8 @@ public class WorkflowAlertManager {
 
         String res = "";
         WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
-                        workflowInstance.getProcessDefinitionVersion());
+                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
 
         String modifyBy = "";
         if (workflowDefinitionLog != null) {
@@ -127,17 +127,17 @@ public class WorkflowAlertManager {
                     .projectCode(projectUser.getProjectCode())
                     .projectName(projectUser.getProjectName())
                     .owner(projectUser.getUserName())
-                    .processId(workflowInstance.getId())
-                    .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                    .processName(workflowInstance.getName())
-                    .processType(workflowInstance.getCommandType())
-                    .processState(workflowInstance.getState())
+                    .workflowInstanceId(workflowInstance.getId())
+                    .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                    .workflowInstanceName(workflowInstance.getName())
+                    .commandType(workflowInstance.getCommandType())
+                    .workflowExecutionStatus(workflowInstance.getState())
                     .modifyBy(modifyBy)
                     .recovery(workflowInstance.getRecovery())
                     .runTimes(workflowInstance.getRunTimes())
-                    .processStartTime(workflowInstance.getStartTime())
-                    .processEndTime(workflowInstance.getEndTime())
-                    .processHost(workflowInstance.getHost())
+                    .workflowStartTime(workflowInstance.getStartTime())
+                    .workflowEndTime(workflowInstance.getEndTime())
+                    .workflowHost(workflowInstance.getHost())
                     .build();
             successTaskList.add(workflowAlertContent);
             res = JSONUtils.toJsonString(successTaskList);
@@ -152,9 +152,9 @@ public class WorkflowAlertManager {
                         .projectCode(projectUser.getProjectCode())
                         .projectName(projectUser.getProjectName())
                         .owner(projectUser.getUserName())
-                        .processId(workflowInstance.getId())
-                        .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                        .processName(workflowInstance.getName())
+                        .workflowInstanceId(workflowInstance.getId())
+                        .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                        .workflowInstanceName(workflowInstance.getName())
                         .modifyBy(modifyBy)
                         .taskCode(task.getTaskCode())
                         .taskName(task.getName())
@@ -186,8 +186,8 @@ public class WorkflowAlertManager {
         List<WorkflowAlertContent> toleranceTaskInstanceList = new ArrayList<>();
 
         WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
-                        workflowInstance.getProcessDefinitionVersion());
+                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
         String modifyBy = "";
         if (workflowDefinitionLog != null) {
             User operator = userMapper.selectById(workflowDefinitionLog.getOperator());
@@ -196,9 +196,9 @@ public class WorkflowAlertManager {
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
-                    .processId(workflowInstance.getId())
-                    .processDefinitionCode(workflowInstance.getProcessDefinitionCode())
-                    .processName(workflowInstance.getName())
+                    .workflowInstanceId(workflowInstance.getId())
+                    .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
+                    .workflowInstanceName(workflowInstance.getName())
                     .modifyBy(modifyBy)
                     .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
@@ -258,8 +258,8 @@ public class WorkflowAlertManager {
         alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alert.setProjectCode(projectUser.getProjectCode());
-        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(workflowInstance.getId());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(workflowInstance.getState().isSuccess() ? AlertType.WORKFLOW_INSTANCE_SUCCESS
                 : AlertType.WORKFLOW_INSTANCE_FAILURE);
         alertDao.addAlert(alert);
@@ -272,7 +272,7 @@ public class WorkflowAlertManager {
      * @return
      */
     public boolean isNeedToSendWarning(WorkflowInstance workflowInstance) {
-        if (Flag.YES == workflowInstance.getIsSubProcess()) {
+        if (Flag.YES == workflowInstance.getIsSubWorkflow()) {
             return false;
         }
         boolean sendWarning = false;
@@ -318,8 +318,8 @@ public class WorkflowAlertManager {
         alert.setUpdateTime(new Date());
         alert.setCreateTime(new Date());
         alert.setProjectCode(workflowInstance.getWorkflowDefinition().getProjectCode());
-        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(workflowInstance.getId());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.CLOSE_ALERT);
         alertDao.addAlert(alert);
     }
@@ -331,7 +331,7 @@ public class WorkflowAlertManager {
      * @param projectUser     projectUser
      */
     public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
-        alertDao.sendProcessTimeoutAlert(workflowInstance, projectUser);
+        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser);
     }
 
     /**
@@ -346,8 +346,8 @@ public class WorkflowAlertManager {
         alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alert.setProjectCode(result.getProjectCode());
-        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(workflowInstance.getId());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
         // might need to change to data quality status
         alert.setAlertType(workflowInstance.getState().isSuccess() ? AlertType.WORKFLOW_INSTANCE_SUCCESS
                 : AlertType.WORKFLOW_INSTANCE_FAILURE);
@@ -364,8 +364,8 @@ public class WorkflowAlertManager {
         alert.setContent(content);
         alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
-        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(workflowInstance.getId());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.TASK_FAILURE);
         alertDao.addAlert(alert);
     }
@@ -378,8 +378,8 @@ public class WorkflowAlertManager {
     public String getDataQualityAlterContent(DqExecuteResult result) {
 
         DqExecuteResultAlertContent content = DqExecuteResultAlertContent.newBuilder()
-                .processDefinitionId(result.getProcessDefinitionId())
-                .processDefinitionName(result.getProcessDefinitionName())
+                .processDefinitionId(result.getWorkflowDefinitionId())
+                .processDefinitionName(result.getWorkflowDefinitionName())
                 .processInstanceId(result.getProcessInstanceId())
                 .processInstanceName(result.getProcessInstanceName())
                 .taskInstanceId(result.getTaskInstanceId())
@@ -409,8 +409,8 @@ public class WorkflowAlertManager {
     public String getTaskAlterContent(TaskInstance taskInstance) {
 
         TaskAlertContent content = TaskAlertContent.builder()
-                .processInstanceName(taskInstance.getProcessInstanceName())
-                .processInstanceId(taskInstance.getProcessInstanceId())
+                .processInstanceName(taskInstance.getWorkflowInstanceName())
+                .processInstanceId(taskInstance.getWorkflowInstanceId())
                 .taskInstanceId(taskInstance.getId())
                 .taskName(taskInstance.getName())
                 .taskType(taskInstance.getTaskType())
@@ -445,8 +445,8 @@ public class WorkflowAlertManager {
         List<WorkflowAlertContent> blockingNodeList = new ArrayList<>(1);
 
         WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(workflowInstance.getProcessDefinitionCode(),
-                        workflowInstance.getProcessDefinitionVersion());
+                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
 
         String modifyBy = "";
         if (workflowDefinitionLog != null) {
@@ -458,15 +458,15 @@ public class WorkflowAlertManager {
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
                 .owner(projectUser.getUserName())
-                .processId(workflowInstance.getId())
-                .processName(workflowInstance.getName())
-                .processType(workflowInstance.getCommandType())
-                .processState(workflowInstance.getState())
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowInstanceName(workflowInstance.getName())
+                .commandType(workflowInstance.getCommandType())
+                .workflowExecutionStatus(workflowInstance.getState())
                 .modifyBy(modifyBy)
                 .runTimes(workflowInstance.getRunTimes())
-                .processStartTime(workflowInstance.getStartTime())
-                .processEndTime(workflowInstance.getEndTime())
-                .processHost(workflowInstance.getHost())
+                .workflowStartTime(workflowInstance.getStartTime())
+                .workflowEndTime(workflowInstance.getEndTime())
+                .workflowHost(workflowInstance.getHost())
                 .build();
         blockingNodeList.add(workflowAlertContent);
         String content = JSONUtils.toJsonString(blockingNodeList);
@@ -475,8 +475,8 @@ public class WorkflowAlertManager {
         alert.setAlertGroupId(workflowInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alert.setProjectCode(projectUser.getProjectCode());
-        alert.setProcessDefinitionCode(workflowInstance.getProcessDefinitionCode());
-        alert.setProcessInstanceId(workflowInstance.getId());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.WORKFLOW_INSTANCE_BLOCKED);
         alertDao.addAlert(alert);
     }

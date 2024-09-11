@@ -40,7 +40,7 @@ public class LogicTaskInstanceExecutionPausedEventSender
     @Override
     public TaskExecutionPausedEvent buildMessage(final TaskExecutionContext taskExecutionContext) {
         return TaskExecutionPausedEvent.builder()
-                .workflowInstanceId(taskExecutionContext.getProcessInstanceId())
+                .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .taskInstanceHost(taskExecutionContext.getHost())

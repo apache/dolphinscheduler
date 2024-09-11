@@ -36,7 +36,7 @@ public class MasterServerMetrics {
                     .register(Metrics.globalRegistry);
 
     /**
-     * Used to measure the number of process command consumed by master.
+     * Used to measure the number of workflow command consumed by master.
      */
     private final Counter masterConsumeCommandCounter =
             Counter.builder("ds.master.consume.command.count")

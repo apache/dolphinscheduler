@@ -28,7 +28,7 @@ import {
   deleteByCode,
   queryListPaging,
   release
-} from '@/service/modules/process-definition'
+} from '@/service/modules/workflow-definition'
 import { offline, online } from '@/service/modules/schedules'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -62,6 +62,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
+    totalCount: ref(0),
     timingType: ref('create'),
     timingState: ref('OFFLINE'),
     showRef: ref(false),
@@ -176,7 +177,7 @@ export function useTable() {
                   onClick: () => {
                     void router.push({
                       name: 'workflow-instance-list',
-                      query: { processDefineCode: row.code }
+                      query: { workflowDefinitionCode: row.code }
                     })
                   }
                 },
@@ -564,6 +565,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }

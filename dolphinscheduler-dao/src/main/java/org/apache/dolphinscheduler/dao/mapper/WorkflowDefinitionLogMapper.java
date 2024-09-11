@@ -82,9 +82,9 @@ public interface WorkflowDefinitionLogMapper extends BaseMapper<WorkflowDefiniti
      * @param projectCode project code
      * @return the paging workflow definition version list
      */
-    IPage<WorkflowDefinitionLog> queryProcessDefinitionVersionsPaging(Page<WorkflowDefinitionLog> page,
-                                                                      @Param("code") long code,
-                                                                      @Param("projectCode") long projectCode);
+    IPage<WorkflowDefinitionLog> queryWorkflowDefinitionVersionsPaging(Page<WorkflowDefinitionLog> page,
+                                                                       @Param("code") long code,
+                                                                       @Param("projectCode") long projectCode);
 
     /**
      * delete the certain workflow definition version by workflow definition id and version number
@@ -93,7 +93,7 @@ public interface WorkflowDefinitionLogMapper extends BaseMapper<WorkflowDefiniti
      * @param version version number
      * @return delete result
      */
-    int deleteByProcessDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
+    int deleteByWorkflowDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
-    void deleteByProcessDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
+    void deleteByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 }

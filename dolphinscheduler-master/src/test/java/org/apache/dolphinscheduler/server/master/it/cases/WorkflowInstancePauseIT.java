@@ -284,7 +284,7 @@ public class WorkflowInstancePauseIT extends AbstractMasterIntegrationTest {
                             .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .satisfies(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.PAUSE);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.NO);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.NO);
                             });
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
@@ -298,7 +298,7 @@ public class WorkflowInstancePauseIT extends AbstractMasterIntegrationTest {
                             .assertThat(repository.queryWorkflowInstance(subWorkflowDefinition))
                             .satisfiesExactly(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.PAUSE);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.YES);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
                             });
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(subWorkflowDefinition);

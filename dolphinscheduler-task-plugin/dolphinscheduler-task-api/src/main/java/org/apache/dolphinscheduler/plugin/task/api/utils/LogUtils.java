@@ -90,9 +90,9 @@ public class LogUtils {
     public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext) {
         return getTaskInstanceLogFullPath(
                 DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getWorkflowDefinitionCode(),
+                taskExecutionContext.getWorkflowDefinitionVersion(),
+                taskExecutionContext.getWorkflowInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
     }
 

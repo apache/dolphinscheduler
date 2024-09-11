@@ -39,12 +39,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * query task definition by name
      *
      * @param projectCode projectCode
-     * @param processCode processCode
+     * @param workflowDefinitionCode workflowDefinitionCode
      * @param name name
      * @return task definition
      */
     TaskDefinition queryByName(@Param("projectCode") long projectCode,
-                               @Param("processCode") long processCode,
+                               @Param("workflowDefinitionCode") long workflowDefinitionCode,
                                @Param("name") String name);
 
     /**
@@ -108,7 +108,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * Filter task definition
      *
      * @param page page
-     * @param taskDefinition process definition object
+     * @param taskDefinition task definition
      * @return task definition IPage
      */
     IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,

@@ -65,32 +65,32 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
     List<WorkflowDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
 
     /**
-     * verify workflow definition by name
+     * verify workflow definition by workflowDefinitionName
      *
      * @param projectCode projectCode
-     * @param name name
+     * @param workflowDefinitionName workflowDefinitionName
      * @return workflow definition
      */
     WorkflowDefinition verifyByDefineName(@Param("projectCode") long projectCode,
-                                          @Param("processDefinitionName") String name);
+                                          @Param("workflowDefinitionName") String workflowDefinitionName);
 
     /**
-     * query workflow definition by name
+     * query workflow definition by workflowDefinitionName
      *
      * @param projectCode projectCode
-     * @param name name
+     * @param workflowDefinitionName workflowDefinitionName
      * @return workflow definition
      */
     WorkflowDefinition queryByDefineName(@Param("projectCode") long projectCode,
-                                         @Param("processDefinitionName") String name);
+                                         @Param("workflowDefinitionName") String workflowDefinitionName);
 
     /**
      * query workflow definition by id
      *
-     * @param processDefineId processDefineId
+     * @param workflowDefinitionId workflowDefinitionId
      * @return workflow definition
      */
-    WorkflowDefinition queryByDefineId(@Param("processDefineId") int processDefineId);
+    WorkflowDefinition queryByDefineId(@Param("workflowDefinitionId") int workflowDefinitionId);
 
     /**
      * workflow definition page
@@ -113,8 +113,8 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
      * @param workflowDefinition workflow definition object
      * @return workflow definition IPage
      */
-    IPage<WorkflowDefinition> filterProcessDefinition(IPage<WorkflowDefinition> page,
-                                                      @Param("pd") WorkflowDefinition workflowDefinition);
+    IPage<WorkflowDefinition> filterWorkflowDefinition(IPage<WorkflowDefinition> page,
+                                                       @Param("pd") WorkflowDefinition workflowDefinition);
 
     /**
      * query all workflow definition list
@@ -130,8 +130,8 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
      * @param projectCode projectCode
      * @return workflow definition list
      */
-    List<DependentSimplifyDefinition> queryDefinitionListByProjectCodeAndProcessDefinitionCodes(@Param("projectCode") long projectCode,
-                                                                                                @Param("codes") Collection<Long> codes);
+    List<DependentSimplifyDefinition> queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(@Param("projectCode") long projectCode,
+                                                                                                 @Param("codes") Collection<Long> codes);
 
     /**
      * query workflow definition by ids
@@ -174,5 +174,5 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
 
     List<Long> queryDefinitionCodeListByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 
-    List<ProjectWorkflowDefinitionCount> queryProjectProcessDefinitionCountByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
+    List<ProjectWorkflowDefinitionCount> queryProjectWorkflowDefinitionCountByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 }

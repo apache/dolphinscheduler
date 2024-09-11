@@ -37,7 +37,7 @@ public class SwitchLogicTaskPluginFactory implements ILogicTaskPluginFactory<Swi
 
     @Override
     public SwitchLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
         IWorkflowExecutionRunnable workflowExecutionRunnable =
                 IWorkflowRepository.get(workflowInstanceId);
         if (workflowExecutionRunnable == null) {

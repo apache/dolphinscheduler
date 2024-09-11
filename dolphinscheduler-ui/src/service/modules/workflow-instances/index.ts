@@ -18,31 +18,31 @@
 import { axios } from '@/service/service'
 import {
   CodeReq,
-  ProcessInstanceListReq,
+  WorkflowInstanceListReq,
   BatchDeleteReq,
   SubIdReq,
   TaskReq,
   LongestReq,
-  ProcessInstanceReq
+  WorkflowInstanceReq
 } from './types'
 
-export function queryProcessInstanceListPaging(
-  params: ProcessInstanceListReq,
+export function queryWorkflowInstanceListPaging(
+  params: WorkflowInstanceListReq,
   code: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-instances`,
+    url: `/projects/${code}/workflow-instances`,
     method: 'get',
     params
   })
 }
 
-export function batchDeleteProcessInstanceByIds(
+export function batchDeleteWorkflowInstanceByIds(
   data: BatchDeleteReq,
   code: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-instances/batch-delete`,
+    url: `/projects/${code}/workflow-instances/batch-delete`,
     method: 'post',
     data
   })
@@ -53,80 +53,80 @@ export function queryParentInstanceBySubId(
   code: CodeReq
 ): any {
   return axios({
-    url: `/projects/${code}/process-instances/query-parent-by-sub`,
+    url: `/projects/${code}/workflow-instances/query-parent-by-sub`,
     method: 'get',
     params
   })
 }
 
-export function querySubProcessInstanceByTaskCode(
+export function querySubWorkflowInstanceByTaskCode(
   params: TaskReq,
   code: CodeReq
 ): any {
   return axios({
-    url: `/projects/${code.projectCode}/process-instances/query-sub-by-parent`,
+    url: `/projects/${code.projectCode}/workflow-instances/query-sub-by-parent`,
     method: 'get',
     params
   })
 }
 
-export function queryTopNLongestRunningProcessInstance(
+export function queryTopNLongestRunningWorkflowInstance(
   params: LongestReq,
   code: CodeReq
 ): any {
   return axios({
-    url: `/projects/${code}/process-instances/top-n`,
+    url: `/projects/${code}/workflow-instances/top-n`,
     method: 'get',
     params
   })
 }
 
-export function queryProcessInstanceById(
+export function queryWorkflowInstanceById(
   instanceId: number,
   projectCode: number
 ): any {
   return axios({
-    url: `/projects/${projectCode}/process-instances/${instanceId}`,
+    url: `/projects/${projectCode}/workflow-instances/${instanceId}`,
     method: 'get'
   })
 }
 
-export function updateProcessInstance(
-  data: ProcessInstanceReq,
+export function updateWorkflowInstance(
+  data: WorkflowInstanceReq,
   id: number,
   code: number
 ): any {
   return axios({
-    url: `/projects/${code}/process-instances/${id}`,
+    url: `/projects/${code}/workflow-instances/${id}`,
     method: 'put',
     data
   })
 }
 
-export function deleteProcessInstanceById(id: number, code: number): any {
+export function deleteWorkflowInstanceById(id: number, code: number): any {
   return axios({
-    url: `/projects/${code}/process-instances/${id}`,
+    url: `/projects/${code}/workflow-instances/${id}`,
     method: 'delete'
   })
 }
 
-export function queryTaskListByProcessId(id: number, code: number): any {
+export function queryTaskListByWorkflowId(id: number, code: number): any {
   return axios({
-    url: `/projects/${code}/process-instances/${id}/tasks`,
+    url: `/projects/${code}/workflow-instances/${id}/tasks`,
     method: 'get'
   })
 }
 
 export function viewGanttTree(id: number, code: number): any {
   return axios({
-    url: `/projects/${code}/process-instances/${id}/view-gantt`,
+    url: `/projects/${code}/workflow-instances/${id}/view-gantt`,
     method: 'get'
   })
 }
 
 export function viewVariables(id: number, code: number): any {
   return axios({
-    url: `/projects/${code}/process-instances/${id}/view-variables`,
+    url: `/projects/${code}/workflow-instances/${id}/view-variables`,
     method: 'get'
   })
 }

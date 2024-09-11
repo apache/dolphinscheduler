@@ -26,10 +26,9 @@ public final class AuditLogConstants {
     public static final String CODE = "code";
     public static final String CODES = "codes";
     public static final String VERSION = "version";
-    public static final String PROCESS_DEFINITION_CODE = "processDefinitionCode";
-    public static final String PROCESS_DEFINITION_CODES = "processDefinitionCodes";
-    public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
-    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
+    public static final String WORKFLOW_DEFINITION_CODES = "workflowDefinitionCodes";
+    public static final String WORKFLOW_INSTANCE_IDS = "workflowInstanceIds";
+    public static final String WORKFLOW_INSTANCE_ID = "workflowInstanceId";
     public static final String WORKFLOW_DEFINITION_CODE = "workflowDefinitionCode";
     public static final String TYPE = "type";
     public static final String NAME = "name";

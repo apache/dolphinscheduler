@@ -71,7 +71,7 @@ public class WorkflowSchedulingIT extends AbstractMasterIntegrationTest {
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final Schedule schedule = Schedule.builder()
-                .processDefinitionCode(workflow.getCode())
+                .workflowDefinitionCode(workflow.getCode())
                 .startTime(new Date())
                 .endTime(DateUtils.addDays(new Date(), 1))
                 .timezoneId(TimeZone.getDefault().getID())
@@ -82,7 +82,7 @@ public class WorkflowSchedulingIT extends AbstractMasterIntegrationTest {
                 .updateTime(new Date())
                 .userId(1)
                 .releaseState(ReleaseState.ONLINE)
-                .processInstancePriority(Priority.MEDIUM)
+                .workflowInstancePriority(Priority.MEDIUM)
                 .build();
 
         scheduleMapper.insert(schedule);

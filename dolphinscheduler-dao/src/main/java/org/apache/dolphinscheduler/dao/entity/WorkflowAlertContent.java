@@ -45,56 +45,82 @@ public class WorkflowAlertContent implements Serializable {
 
     @JsonProperty("projectId")
     private Integer projectId;
+
     @JsonProperty("projectCode")
     private Long projectCode;
+
     @JsonProperty("projectName")
     private String projectName;
+
     @JsonProperty("owner")
     private String owner;
-    @JsonProperty("processId")
-    private Integer processId;
-    @JsonProperty("processDefinitionCode")
-    private Long processDefinitionCode;
-    @JsonProperty("processName")
-    private String processName;
-    @JsonProperty("processType")
-    private CommandType processType;
-    @JsonProperty("processState")
-    private WorkflowExecutionStatus processState;
+
+    @JsonProperty("workflowInstanceId")
+    private Integer workflowInstanceId;
+
+    @JsonProperty("workflowDefinitionCode")
+    private Long workflowDefinitionCode;
+
+    @JsonProperty("workflowInstanceName")
+    private String workflowInstanceName;
+
+    @JsonProperty("commandType")
+    private CommandType commandType;
+
+    @JsonProperty("workflowExecutionStatus")
+    private WorkflowExecutionStatus workflowExecutionStatus;
+
     @JsonProperty("modifyBy")
     private String modifyBy;
+
     @JsonProperty("recovery")
     private Flag recovery;
+
     @JsonProperty("runTimes")
     private Integer runTimes;
-    @JsonProperty("processStartTime")
-    private Date processStartTime;
-    @JsonProperty("processEndTime")
-    private Date processEndTime;
-    @JsonProperty("processHost")
-    private String processHost;
+
+    @JsonProperty("workflowStartTime")
+    private Date workflowStartTime;
+
+    @JsonProperty("workflowEndTime")
+    private Date workflowEndTime;
+
+    @JsonProperty("workflowHost")
+    private String workflowHost;
+
     @JsonProperty("taskCode")
     private Long taskCode;
+
     @JsonProperty("taskName")
     private String taskName;
+
     @JsonProperty("event")
     private AlertEvent event;
+
     @JsonProperty("warnLevel")
     private AlertWarnLevel warnLevel;
+
     @JsonProperty("taskType")
     private String taskType;
+
     @JsonProperty("retryTimes")
     private Integer retryTimes;
+
     @JsonProperty("taskState")
     private TaskExecutionStatus taskState;
+
     @JsonProperty("taskStartTime")
     private Date taskStartTime;
+
     @JsonProperty("taskEndTime")
     private Date taskEndTime;
+
     @JsonProperty("taskHost")
     private String taskHost;
+
     @JsonProperty("taskPriority")
     private String taskPriority;
+
     @JsonProperty("logPath")
     private String logPath;
 

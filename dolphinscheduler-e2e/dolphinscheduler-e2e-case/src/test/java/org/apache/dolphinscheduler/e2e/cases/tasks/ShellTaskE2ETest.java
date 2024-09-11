@@ -39,9 +39,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DisableIfTestFails
 public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
 
     @BeforeAll

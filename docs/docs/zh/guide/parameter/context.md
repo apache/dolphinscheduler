@@ -14,10 +14,10 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
-* [SubProcess](../task/sub-process.md)
+* [SubWorkflow](../task/sub-workflow)
 * [Kubernetes](../task/kubernetes.md)
 
-当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubProcess 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
+当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubWorkflow 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
 
 上游传递的参数可以在下游节点中被更新，更新方法与[设置参数](#创建-shell-任务并设置参数)相同。
 
@@ -93,29 +93,29 @@ Node_mysql 运行结果如下：
 
 注意： 当变量 value 中含有 `\n` 标识，如 `value = "hello \n world"`， 则需要将 value 进行特殊进行，需要使用 `print('${setValue(key=%s)}' % repr(value))`, 否则参数无法传递到后面的流程。
 
-#### SubProcess 任务传递参数
+#### SubWorkflow 任务传递参数
 
 在子流程的工作流定义中定义方向是 OUT 的变量作为输出参数，可以将这些参数传递到子流程节点的下游任务。
 
 在子流程的工作流定义中创建 A 任务，在自定义参数中添加 var1 和 var2 参数，并编写如下脚本：
 
-![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+![context-sub-workflow01](../../../../img/new_ui/dev/parameter/context-sub-workflow01.png)
 
-保存 subprocess_example1 工作流，设置全局参数 var1。
+保存 sub-workflow_example1 工作流，设置全局参数 var1。
 
-![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+![context-sub-workflow02](../../../../img/new_ui/dev/parameter/context-sub-workflow02.png)
 
-在新的工作流中创建 sub_process 任务，使用 subprocess_example1 工作流作为子节点。
+在新的工作流中创建 sub_workflow 任务，使用 sub-workflow_example1 工作流作为子节点。
 
-![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+![context-sub-workflow03](../../../../img/new_ui/dev/parameter/context-sub-workflow03.png)
 
-创建一个 shell 任务作为 sub_process 任务的下游任务，并编写如下脚本：
+创建一个 shell 任务作为 sub_workflow 任务的下游任务，并编写如下脚本：
 
-![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+![context-sub-workflow04](../../../../img/new_ui/dev/parameter/context-sub-workflow04.png)
 
 保存该工作流并运行，下游任务运行结果如下：
 
-![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+![context-sub-workflow05](../../../../img/new_ui/dev/parameter/context-sub-workflow05.png)
 
 虽然在 A 任务中输出 var1 和 var2 两个参数，但是工作流定义中只定义了 var1 的 OUT 变量，下游任务成功输出 var1，证明var1 参数参照预期的值在该工作流中传递。
 

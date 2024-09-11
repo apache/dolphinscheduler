@@ -68,7 +68,7 @@ public class WorkflowInstanceUtils {
                         .getAllTaskExecutionRunnable().size())
                 .append("\n")
                 .append("Host:                    ").append(workflowInstance.getHost()).append("\n")
-                .append("Is SubWorkflow:          ").append(workflowInstance.getIsSubProcess().name()).append("\n")
+                .append("Is SubWorkflow:          ").append(workflowInstance.getIsSubWorkflow().name()).append("\n")
                 .append("Run Times:               ").append(workflowInstance.getRunTimes()).append("\n")
                 .append("Tenant:                  ").append(workflowInstance.getTenantCode()).append("\n")
                 .append("Work Group:              ").append(workflowInstance.getWorkerGroup()).append("\n")

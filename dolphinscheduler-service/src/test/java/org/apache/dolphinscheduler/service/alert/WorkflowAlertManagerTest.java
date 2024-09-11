@@ -89,8 +89,8 @@ public class WorkflowAlertManagerTest {
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
         workflowInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         workflowInstance.setWarningGroupId(1);
-        workflowInstance.setProcessDefinitionCode(1L);
-        workflowInstance.setProcessDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(1L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
         TaskInstance taskInstance = new TaskInstance();
@@ -116,8 +116,8 @@ public class WorkflowAlertManagerTest {
         workflowInstance.setEndTime(new Date());
         workflowInstance.setHost("127.0.0.1");
         workflowInstance.setWarningGroupId(1);
-        workflowInstance.setProcessDefinitionCode(1L);
-        workflowInstance.setProcessDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(1L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
 

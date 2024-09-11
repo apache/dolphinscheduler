@@ -217,7 +217,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
         if (CollectionUtils.isNotEmpty(schedules)) {
             List<String> workflowDefinitionNames = schedules.stream().limit(3)
-                    .map(schedule -> workflowDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode())
+                    .map(schedule -> workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode())
                             .getName())
                     .collect(Collectors.toList());
 
@@ -432,8 +432,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<Long, String> queryWorkerGroupByWorkflowDefinitionCodes(List<Long> workflowDefinitionCodeList) {
         List<Schedule> workflowDefinitionScheduleList =
-                scheduleMapper.querySchedulesByProcessDefinitionCodes(workflowDefinitionCodeList);
-        return workflowDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getProcessDefinitionCode,
+                scheduleMapper.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodeList);
+        return workflowDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getWorkflowDefinitionCode,
                 Schedule::getWorkerGroup));
     }
 
