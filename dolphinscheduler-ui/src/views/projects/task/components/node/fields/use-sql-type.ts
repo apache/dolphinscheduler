@@ -71,7 +71,7 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
       type: 'switch',
       field: 'sendEmail',
       span: querySpan,
-      name: t('project.node.send_email')
+      name: t('project.node.send_alarm')
     },
     {
       type: 'select',
