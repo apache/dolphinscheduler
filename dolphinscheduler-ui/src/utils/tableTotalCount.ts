@@ -15,24 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.feishu;
+import { useI18n } from 'vue-i18n'
+import { RenderPrefix } from 'naive-ui/es/pagination/src/interface'
 
-import org.apache.dolphinscheduler.alert.api.AlertChannel;
-import org.apache.dolphinscheduler.alert.api.AlertData;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
-import org.apache.dolphinscheduler.alert.api.AlertResult;
+export default function totalCount(params: Parameters<RenderPrefix>[0]) {
+  const { t } = useI18n()
 
-import java.util.Map;
+  const prefix = t('project.list.total_items')
+  const count = Number.prototype.toLocaleString.call(params?.itemCount ?? 0)
 
-public final class FeiShuAlertChannel implements AlertChannel {
-
-    @Override
-    public AlertResult process(AlertInfo alertInfo) {
-        AlertData alertData = alertInfo.getAlertData();
-        Map<String, String> paramsMap = alertInfo.getAlertParams();
-        if (null == paramsMap) {
-            return new AlertResult(false, "feishu params is null");
-        }
-        return new FeiShuSender(paramsMap).sendFeiShuMsg(alertData);
-    }
+  return `${prefix}: ${count}`
 }
