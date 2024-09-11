@@ -714,6 +714,15 @@ export default {
                 ],
             },
             {
+                title: 'Security Model',
+                children: [
+                    {
+                        title: 'Security Model',
+                        link: '/en-cn/docs/dev/user_doc/security-model.html',
+                    },
+                ],
+            },
+            {
                 title: 'FAQ',
                 children: [
                     {
@@ -1418,6 +1427,15 @@ export default {
                     {
                         title: 'DSIP',
                         link: '/zh-cn/docs/dev/user_doc/DSIP.html',
+                    },
+                ],
+            },
+            {
+                title: '安全模型',
+                children: [
+                    {
+                        title: '安全模型',
+                        link: '/zh-cn/docs/dev/user_doc/security-model.html',
                     },
                 ],
             },
