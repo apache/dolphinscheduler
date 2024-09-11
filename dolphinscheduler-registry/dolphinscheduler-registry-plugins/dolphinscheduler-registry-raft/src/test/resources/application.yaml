@@ -17,14 +17,10 @@
 
 registry:
   type: raft
-  module: master
   clusterName: dolphinscheduler
   serverAddressList: 127.0.0.1:8082
   serverAddress: 127.0.0.1
   serverPort: 8082
   logStorageDir: raft-data/
-  distributedLockTimeout: 3s
-  distributedLockRetryInterval: 3s
-  listenerCheckInterval: 3s
 
 
