@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.storage.oss;
 
-public enum ResourceManagerType {
+import lombok.experimental.UtilityClass;
 
-    YARN,
+@UtilityClass
+public class OssConstants {
 
-    KUBERNETES;
-
+    public static final String ALIBABA_CLOUD_ACCESS_KEY_ID = "resource.alibaba.cloud.access.key.id";
+    public static final String ALIBABA_CLOUD_ACCESS_KEY_SECRET = "resource.alibaba.cloud.access.key.secret";
+    public static final String ALIBABA_CLOUD_REGION = "resource.alibaba.cloud.region";
 }

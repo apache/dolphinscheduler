@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.spi.thread.ThreadUtils;
 
 import java.util.Collections;
 import java.util.List;

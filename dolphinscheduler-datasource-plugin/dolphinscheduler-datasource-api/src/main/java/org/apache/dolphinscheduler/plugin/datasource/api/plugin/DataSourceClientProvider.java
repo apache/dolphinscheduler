@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -27,6 +26,7 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -47,7 +47,8 @@ public class DataSourceClientProvider {
     // One DataSourceClient corresponds to one unique datasource.
     private static final Cache<String, PooledDataSourceClient> POOLED_DATASOURCE_CLIENT_CACHE =
             CacheBuilder.newBuilder()
-                    .expireAfterWrite(PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24L), TimeUnit.HOURS)
+                    .expireAfterWrite(PropertyUtils.getLong(DataSourceConstants.KERBEROS_EXPIRE_TIME, 24L),
+                            TimeUnit.HOURS)
                     .removalListener((RemovalListener<String, PooledDataSourceClient>) notification -> {
                         try (PooledDataSourceClient closedClient = notification.getValue()) {
                             log.info("Datasource: {} is removed from cache due to expire", notification.getKey());

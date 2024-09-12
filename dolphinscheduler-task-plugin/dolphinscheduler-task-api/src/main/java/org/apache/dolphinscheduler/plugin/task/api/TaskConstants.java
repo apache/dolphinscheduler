@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.common.constants.DateConstants;
+import org.apache.dolphinscheduler.spi.constants.DateConstants;
 
 import java.time.Duration;
 import java.util.Set;
@@ -34,6 +34,9 @@ public class TaskConstants {
     public static final String YARN_APPLICATION_REGEX = "application_\\d+_\\d+";
 
     public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
+
+    public static final String DATASOURCE_PASSWORD_REGEX =
+            "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
 
     /**
      * exit code kill
@@ -99,10 +102,7 @@ public class TaskConstants {
      * EQUAL SIGN
      */
     public static final String EQUAL_SIGN = "=";
-    /**
-     * AT SIGN
-     */
-    public static final String AT_SIGN = "@";
+
     /**
      * UNDERLINE
      */
@@ -305,23 +305,6 @@ public class TaskConstants {
     public static final String D = "-D";
 
     /**
-     * datasource encryption salt
-     */
-    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
-    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
-    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
-
-    /**
-     * kerberos
-     */
-    public static final String KERBEROS = "kerberos";
-
-    /**
-     * kerberos expire time
-     */
-    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
-
-    /**
      * java.security.krb5.conf
      */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
@@ -332,36 +315,10 @@ public class TaskConstants {
     public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
 
     /**
-     * loginUserFromKeytab user
-     */
-    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
-
-    /**
-     * loginUserFromKeytab path
-     */
-    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
-
-    /**
-     * hadoop.security.authentication
-     */
-    public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
-
-    /**
      * hadoop.security.authentication
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
             "hadoop.security.authentication.startup.state";
-
-    /**
-     * hdfs/s3 configuration
-     * resource.storage.upload.base.path
-     */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
-
-    /**
-     * data.quality.jar.dir
-     */
-    public static final String DATA_QUALITY_JAR_DIR = "data-quality.jar.dir";
 
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
@@ -375,19 +332,6 @@ public class TaskConstants {
     public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
     public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
     public static final String QUERY_INTERVAL = "resource.query.interval";
-
-    /**
-     * alibaba cloud config
-     */
-    public static final String ALIBABA_CLOUD_ACCESS_KEY_ID = "resource.alibaba.cloud.access.key.id";
-    public static final String ALIBABA_CLOUD_ACCESS_KEY_SECRET = "resource.alibaba.cloud.access.key.secret";
-    public static final String ALIBABA_CLOUD_REGION = "resource.alibaba.cloud.region";
-
-    /**
-     * huawei cloud config
-     */
-    public static final String HUAWEI_CLOUD_ACCESS_KEY_ID = "resource.huawei.cloud.access.key.id";
-    public static final String HUAWEI_CLOUD_ACCESS_KEY_SECRET = "resource.huawei.cloud.access.key.secret";
 
     /**
      * use for k8s task
@@ -428,4 +372,18 @@ public class TaskConstants {
             String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", GROUP_NAME1, GROUP_NAME2);
     public static final Pattern SQL_PARAMS_PATTERN = Pattern.compile(SQL_PARAMS_REGEX);
 
+    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+    /**
+     * fetch applicationId way
+     */
+    public static final String APPID_COLLECT = "appId.collect";
+    public static final String DEFAULT_COLLECT_WAY = "log";
+
+    public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
+    public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
+
+    public static final String STAR = "*";
 }

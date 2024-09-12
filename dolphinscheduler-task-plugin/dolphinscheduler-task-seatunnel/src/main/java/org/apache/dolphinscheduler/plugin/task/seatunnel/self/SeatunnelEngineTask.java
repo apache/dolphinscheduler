@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.self;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.Constants;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelTask;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

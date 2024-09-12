@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.storage.obs;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import com.google.auto.service.AutoService;
 
@@ -37,11 +36,11 @@ public class ObsStorageOperatorFactory implements StorageOperatorFactory {
 
     private ObsStorageProperties getObsStorageProperties() {
         return ObsStorageProperties.builder()
-                .accessKeyId(PropertyUtils.getString(TaskConstants.HUAWEI_CLOUD_ACCESS_KEY_ID))
-                .accessKeySecret(PropertyUtils.getString(TaskConstants.HUAWEI_CLOUD_ACCESS_KEY_SECRET))
-                .bucketName(PropertyUtils.getString(Constants.HUAWEI_CLOUD_OBS_BUCKET_NAME))
-                .endPoint(PropertyUtils.getString(Constants.HUAWEI_CLOUD_OBS_END_POINT))
-                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .accessKeyId(PropertyUtils.getString(StorageConstants.HUAWEI_CLOUD_ACCESS_KEY_ID))
+                .accessKeySecret(PropertyUtils.getString(StorageConstants.HUAWEI_CLOUD_ACCESS_KEY_SECRET))
+                .bucketName(PropertyUtils.getString(StorageConstants.HUAWEI_CLOUD_OBS_BUCKET_NAME))
+                .endPoint(PropertyUtils.getString(StorageConstants.HUAWEI_CLOUD_OBS_END_POINT))
+                .resourceUploadPath(PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
                 .build();
     }
 

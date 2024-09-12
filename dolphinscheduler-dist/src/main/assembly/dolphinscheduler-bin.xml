@@ -29,22 +29,100 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
             <outputDirectory>alert-server</outputDirectory>
+            <excludes>
+                <exclude>libs/</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
+            <outputDirectory>./</outputDirectory>
+            <includes>
+                <include>libs/</include>
+            </includes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
             <outputDirectory>api-server</outputDirectory>
+            <excludes>
+                <exclude>libs/</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
+            <outputDirectory>./</outputDirectory>
+            <includes>
+                <include>libs/*</include>
+            </includes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
             <outputDirectory>master-server</outputDirectory>
+            <excludes>
+                <exclude>libs/</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
+            <outputDirectory>./</outputDirectory>
+            <includes>
+                <include>libs/</include>
+            </includes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
             <outputDirectory>worker-server</outputDirectory>
+            <excludes>
+                <exclude>libs/</exclude>
+            </excludes>
         </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
+            <outputDirectory>./</outputDirectory>
+            <includes>
+                <include>libs/</include>
+            </includes>
+        </fileSet>
+
+        <!-- plugins -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-plugins</directory>
+            <includes>
+                <include>dolphinscheduler-alert-*/target/dolphinscheduler-alert-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/alert-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-datasource-*/target/dolphinscheduler-datasource-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/datasource-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-task-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-task-*/target/dolphinscheduler-task-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/task-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-storage-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-storage-*/target/dolphinscheduler-storage-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/storage-plugins</outputDirectory>
+        </fileSet>
+        <!-- plugins -->
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>

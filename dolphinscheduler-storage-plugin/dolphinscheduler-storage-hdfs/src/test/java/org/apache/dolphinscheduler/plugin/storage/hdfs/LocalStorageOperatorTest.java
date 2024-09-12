@@ -20,12 +20,13 @@ package org.apache.dolphinscheduler.plugin.storage.hdfs;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
+import org.apache.dolphinscheduler.spi.constants.Constants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.utils.FileUtils;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -46,14 +47,14 @@ class LocalStorageOperatorTest {
             Paths.get(LocalStorageOperatorTest.class.getResource("/").getFile(), "localStorage").toString();
     private static final String tenantCode = "default";
     private static final String baseDir =
-            Paths.get(resourceBaseDir, tenantCode, Constants.RESOURCE_TYPE_FILE).toString();
+            Paths.get(resourceBaseDir, tenantCode, StorageConstants.RESOURCE_TYPE_FILE).toString();
 
     @SneakyThrows
     @BeforeEach
     public void setup() {
         Files.createDirectories(Paths.get(resourceBaseDir));
-        System.clearProperty(Constants.RESOURCE_UPLOAD_PATH);
-        System.setProperty(Constants.RESOURCE_UPLOAD_PATH, resourceBaseDir);
+        System.clearProperty(StorageConstants.RESOURCE_UPLOAD_PATH);
+        System.setProperty(StorageConstants.RESOURCE_UPLOAD_PATH, resourceBaseDir);
 
         LocalStorageOperatorFactory localStorageOperatorFactory = new LocalStorageOperatorFactory();
         storageOperator = localStorageOperatorFactory.createStorageOperate();

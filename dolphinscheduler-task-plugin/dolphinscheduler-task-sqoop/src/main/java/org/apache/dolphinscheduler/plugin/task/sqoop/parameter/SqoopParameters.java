@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.MYSQL
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.ORACLE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.SQLSERVER;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -44,6 +43,7 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHiv
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetOracleParameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetSqlServerParameter;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

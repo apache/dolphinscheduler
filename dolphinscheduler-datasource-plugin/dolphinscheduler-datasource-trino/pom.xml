@@ -35,17 +35,18 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>io.trino</groupId>
             <artifactId>trino-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -60,15 +61,6 @@
                             <goal>shade</goal>
                         </goals>
                         <phase>package</phase>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.dolphinscheduler</pattern>
-                                    <!--suppress UnresolvedMavenProperty, this property is added by submodule-->
-                                    <shadedPattern>${dolphinscheduler.shade.package}.${plugin.name}.org.apache</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

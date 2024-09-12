@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

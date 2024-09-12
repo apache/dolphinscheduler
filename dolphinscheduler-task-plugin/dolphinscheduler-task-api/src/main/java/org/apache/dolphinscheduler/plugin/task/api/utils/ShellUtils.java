@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

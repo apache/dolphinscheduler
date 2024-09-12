@@ -17,17 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 /**
  * property utils
@@ -47,8 +44,7 @@ public class PropertyUtils {
     public static List<Property> startParamsTransformPropertyList(String startParams) {
         List<Property> startParamList = null;
         if (startParams != null) {
-            JsonElement jsonElement = JsonParser.parseString(startParams);
-            boolean isJson = jsonElement.isJsonObject();
+            boolean isJson = JSONUtils.checkJsonValid(startParams);
             if (isJson) {
                 Map<String, String> startParamMap = JSONUtils.toMap(startParams);
                 startParamList = startParamMap.entrySet().stream()

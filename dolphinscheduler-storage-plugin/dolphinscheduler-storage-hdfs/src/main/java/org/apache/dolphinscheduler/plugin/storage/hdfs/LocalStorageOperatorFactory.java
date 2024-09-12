@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
+import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import com.google.auto.service.AutoService;
 
@@ -39,7 +39,7 @@ public class LocalStorageOperatorFactory implements StorageOperatorFactory {
     private HdfsStorageProperties getHdfsStorageProperties() {
         return HdfsStorageProperties.builder()
                 .defaultFS(LOCAL_DEFAULT_FS)
-                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .resourceUploadPath(PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
                 .build();
     }
 

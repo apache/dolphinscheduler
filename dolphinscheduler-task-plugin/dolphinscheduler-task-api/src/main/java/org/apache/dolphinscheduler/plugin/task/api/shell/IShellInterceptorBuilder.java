@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
-import org.apache.dolphinscheduler.common.exception.FileOperateException;
+import org.apache.dolphinscheduler.spi.exception.FileOperateException;
 
 import java.io.IOException;
 import java.util.Map;

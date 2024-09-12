@@ -17,14 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
-import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
-import org.apache.dolphinscheduler.common.model.OkHttpResponse;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -32,6 +27,11 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.spi.model.OkHttpRequestHeaderContentType;
+import org.apache.dolphinscheduler.spi.model.OkHttpRequestHeaders;
+import org.apache.dolphinscheduler.spi.model.OkHttpResponse;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.OkHttpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -86,7 +86,7 @@ public class HttpTask extends AbstractTask {
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_CONTAINS.name(), body);
-                    exitStatusCode = Constants.EXIT_CODE_FAILURE;
+                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
@@ -94,7 +94,7 @@ public class HttpTask extends AbstractTask {
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_NOT_CONTAINS.name(), body);
-                    exitStatusCode = Constants.EXIT_CODE_FAILURE;
+                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
@@ -102,7 +102,7 @@ public class HttpTask extends AbstractTask {
                 if (statusCode != Integer.parseInt(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_CUSTOM.name(), body);
-                    exitStatusCode = Constants.EXIT_CODE_FAILURE;
+                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
@@ -110,7 +110,7 @@ public class HttpTask extends AbstractTask {
                 if (HttpConstants.RESPONSE_CODE_SUCCESS != statusCode) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_DEFAULT.name(), body);
-                    exitStatusCode = Constants.EXIT_CODE_FAILURE;
+                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
@@ -121,7 +121,7 @@ public class HttpTask extends AbstractTask {
 
         // default success log
         log.info("http request success, url: {}, statusCode: {}, body: {}", httpParameters.getUrl(), statusCode, body);
-        exitStatusCode = Constants.EXIT_CODE_SUCCESS;
+        exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
     }
 
     private OkHttpResponse sendRequest() {

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
+import org.apache.dolphinscheduler.spi.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

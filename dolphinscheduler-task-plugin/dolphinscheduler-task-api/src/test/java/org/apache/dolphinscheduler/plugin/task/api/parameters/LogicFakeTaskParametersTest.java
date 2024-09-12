@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.junit.jupiter.api.Test;
 

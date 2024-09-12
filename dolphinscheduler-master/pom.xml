@@ -304,6 +304,11 @@
             <!-- master should never depend on worker, this is only for tests -->
         </dependency>
 
+        <dependency>
+            <groupId>org.javadelight</groupId>
+            <artifactId>delight-nashorn-sandbox</artifactId>
+        </dependency>
+
         <!-- TODO: Have to use spring-cloud-starter-kubernetes-fabric8-config after upgrading to Spring 3.x to unify kubernetes client (fabric8)  -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

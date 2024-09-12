@@ -35,14 +35,17 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -57,15 +60,6 @@
                             <goal>shade</goal>
                         </goals>
                         <phase>package</phase>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.dolphinscheduler</pattern>
-                                    <!--suppress UnresolvedMavenProperty, this property is added by submodule-->
-                                    <shadedPattern>${dolphinscheduler.shade.package}.${plugin.name}.org.apache</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

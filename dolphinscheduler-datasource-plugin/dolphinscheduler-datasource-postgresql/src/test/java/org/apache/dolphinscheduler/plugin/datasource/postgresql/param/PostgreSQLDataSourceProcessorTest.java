@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
-import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.ORG_POSTGRESQL_DRIVER;
-import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
+import static org.apache.dolphinscheduler.spi.constants.DataSourceConstants.ORG_POSTGRESQL_DRIVER;
+import static org.apache.dolphinscheduler.spi.constants.DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;

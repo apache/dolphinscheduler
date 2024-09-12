@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.trino;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.trino.param.TrinoConnectionParam;
+import org.apache.dolphinscheduler.spi.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.jupiter.api.Assertions;

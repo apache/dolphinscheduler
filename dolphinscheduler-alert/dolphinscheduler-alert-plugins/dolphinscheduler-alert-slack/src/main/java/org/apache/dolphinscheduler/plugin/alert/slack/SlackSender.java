@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.slack;
 
 import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;

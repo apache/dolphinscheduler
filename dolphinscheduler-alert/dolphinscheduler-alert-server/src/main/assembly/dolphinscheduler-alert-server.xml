@@ -57,7 +57,7 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-authentication/dolphinscheduler-aws-authentication/src/main/resources</directory>
+            <directory>${basedir}/../../dolphinscheduler-authentication/dolphinscheduler-aws-authentication/src/main/resources</directory>
             <includes>
                 <include>**/*.yaml</include>
             </includes>
