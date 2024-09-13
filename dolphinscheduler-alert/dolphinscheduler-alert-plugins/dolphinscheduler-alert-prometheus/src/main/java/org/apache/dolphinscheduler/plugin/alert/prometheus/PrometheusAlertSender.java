@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.prometheus;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpEntity;

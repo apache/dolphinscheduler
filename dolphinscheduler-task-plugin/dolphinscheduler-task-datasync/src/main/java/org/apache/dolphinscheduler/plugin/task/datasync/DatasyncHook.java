@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
 import org.apache.dolphinscheduler.authentication.aws.DataSyncClientFactory;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import software.amazon.awssdk.services.datasync.DataSyncClient;
 import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionRequest;

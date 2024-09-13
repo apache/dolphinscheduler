@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.model.OkHttpRequestHeaderContentType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;

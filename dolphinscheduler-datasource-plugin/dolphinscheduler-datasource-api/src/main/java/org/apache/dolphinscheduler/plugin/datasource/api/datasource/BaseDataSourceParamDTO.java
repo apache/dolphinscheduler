@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
-import org.apache.dolphinscheduler.spi.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.Serializable;

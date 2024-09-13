@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.plugin.task.dms;
 
 import org.apache.dolphinscheduler.authentication.aws.AWSDatabaseMigrationServiceClientFactory;
-import org.apache.dolphinscheduler.spi.thread.ThreadUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.commons.io.IOUtils;
 

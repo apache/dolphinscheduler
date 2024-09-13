@@ -36,15 +36,17 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-api</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>dyvmsapi20170525</artifactId>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-common</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <scope>test</scope>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dyvmsapi20170525</artifactId>
         </dependency>
     </dependencies>
 

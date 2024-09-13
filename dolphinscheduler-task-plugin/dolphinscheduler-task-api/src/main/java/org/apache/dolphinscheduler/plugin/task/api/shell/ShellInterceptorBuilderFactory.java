@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.shell.bash.BashShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.cmd.CmdShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.sh.ShShellInterceptorBuilder;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 public class ShellInterceptorBuilderFactory {
 

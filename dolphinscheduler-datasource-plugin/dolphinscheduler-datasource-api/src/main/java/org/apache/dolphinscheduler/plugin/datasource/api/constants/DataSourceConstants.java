@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.constants;
 
-import org.apache.dolphinscheduler.spi.constants.DateConstants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 
 import java.time.Duration;
 import java.util.Set;

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.spi.params.radio;
 
-import static org.apache.dolphinscheduler.spi.constants.Constants.STRING_PLUGIN_PARAM_OPTIONS;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_OPTIONS;
 import static org.apache.dolphinscheduler.spi.params.base.FormType.RADIO;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;

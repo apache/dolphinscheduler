@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;

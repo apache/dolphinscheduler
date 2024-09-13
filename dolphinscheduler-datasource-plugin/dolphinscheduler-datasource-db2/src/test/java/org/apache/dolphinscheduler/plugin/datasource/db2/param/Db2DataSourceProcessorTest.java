@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
-import org.apache.dolphinscheduler.spi.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;

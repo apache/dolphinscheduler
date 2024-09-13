@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.plugin.task.dq.utils.placeholder;
 
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 
+import org.apache.dolphinscheduler.common.constants.DateConstants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.enums.CommandType;
-import org.apache.dolphinscheduler.spi.constants.DateConstants;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
 
 import java.util.Date;
 import java.util.HashMap;

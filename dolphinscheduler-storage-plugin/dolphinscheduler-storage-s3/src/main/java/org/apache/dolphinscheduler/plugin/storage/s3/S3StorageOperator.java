@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.plugin.storage.s3;
 
 import org.apache.dolphinscheduler.authentication.aws.AmazonS3ClientFactory;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
-import org.apache.dolphinscheduler.spi.utils.FileUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

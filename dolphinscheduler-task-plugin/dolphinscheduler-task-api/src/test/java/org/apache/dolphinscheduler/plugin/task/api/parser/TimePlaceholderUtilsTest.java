@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.api.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.spi.enums.CommandType;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.placeholder.BusinessTimeUtils;
 
 import java.util.Date;
 import java.util.Map;

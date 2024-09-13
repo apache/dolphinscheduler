@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.datafactory;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.webexteams;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;

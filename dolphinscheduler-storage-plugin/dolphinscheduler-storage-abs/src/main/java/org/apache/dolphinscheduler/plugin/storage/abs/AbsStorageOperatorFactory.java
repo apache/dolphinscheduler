@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.storage.abs;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import com.google.auto.service.AutoService;
 

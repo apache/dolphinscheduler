@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.dolphinscheduler.common.constants.DateConstants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
-import org.apache.dolphinscheduler.spi.constants.DateConstants;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

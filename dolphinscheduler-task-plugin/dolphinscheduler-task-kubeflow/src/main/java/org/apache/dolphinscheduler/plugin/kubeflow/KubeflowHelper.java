@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.kubeflow;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
