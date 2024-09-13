@@ -81,7 +81,6 @@
         <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
         <spotless.version>2.27.2</spotless.version>
         <jacoco.version>0.8.8</jacoco.version>
-        <maven.deploy.skip>false</maven.deploy.skip>
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
         <auto-service.version>1.0.1</auto-service.version>
         <jacoco.skip>false</jacoco.skip>

@@ -26,9 +26,6 @@
 
     <artifactId>dolphinscheduler-dist</artifactId>
     <name>${project.artifactId}</name>
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
 
     <dependencyManagement>
         <dependencies>

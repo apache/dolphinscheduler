@@ -165,8 +165,6 @@ jpam-1.1.jar
 jsch-0.1.55.jar
 json-1.8.jar
 json-20140107.jar
-json-path-2.7.0.jar
-json-smart-2.4.8.jar
 json-utils-2.17.282.jar
 jsp-api-2.1.jar
 jsqlparser-4.4.jar
