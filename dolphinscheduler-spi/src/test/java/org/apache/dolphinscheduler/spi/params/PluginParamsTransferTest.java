@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 /**
  * PluginParamsTransfer Tester.
@@ -186,9 +184,9 @@ public class PluginParamsTransferTest {
                 + ",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\""
                 + ":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\""
                 + ",\"value\":\"tableattachment\",\"disabled\":false}]}]";
-        JsonElement paramsJsonElement = JsonParser.parseString(paramsJson);
-        JsonElement paramsAssertJsonElement = JsonParser.parseString(paramsJsonAssert);
-        Assertions.assertEquals(paramsAssertJsonElement, paramsJsonElement);
+        String paramsJsonElement = JSONUtils.toJsonString(paramsJson);
+        String paramsAssertJsonElement = JSONUtils.toJsonString(paramsJsonAssert);
+        Assertions.assertEquals(paramsJsonElement, paramsAssertJsonElement);
     }
 
     @Test
