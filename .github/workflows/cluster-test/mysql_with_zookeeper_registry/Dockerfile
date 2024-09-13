@@ -33,11 +33,7 @@ COPY .github/workflows/cluster-test/mysql_with_zookeeper_registry/dolphinschedul
 #Download mysql jar
 ENV MYSQL_URL "https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
 ENV MYSQL_DRIVER "mysql-connector-java-8.0.16.jar"
-RUN wget -O $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $MYSQL_URL ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/api-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/master-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/worker-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/tools/libs/$MYSQL_DRIVER
+RUN wget -O $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $MYSQL_URL
 
 #Deploy
 COPY .github/workflows/cluster-test/mysql_with_zookeeper_registry/deploy.sh /root/deploy.sh

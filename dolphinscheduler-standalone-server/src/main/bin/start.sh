@@ -18,12 +18,13 @@
 set -eo pipefail
 
 BIN_DIR=$(dirname $(readlink -f "$0"))
-DOLPHINSCHEDULER_HOME=$(cd ${BIN_DIR}/..;pwd)
+DOLPHINSCHEDULER_HOME=$(cd ${BIN_DIR}/../..;pwd)
+STANDALONE_HOME=$(cd ${BIN_DIR}/..;pwd)
 
 export DATABASE=${DATABASE:-h2}
-source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
+source "$STANDALONE_HOME/conf/dolphinscheduler_env.sh"
 
-JVM_ARGS_ENV_FILE=${DOLPHINSCHEDULER_HOME}/bin/jvm_args_env.sh
+JVM_ARGS_ENV_FILE=${STANDALONE_HOME}/bin/jvm_args_env.sh
 JVM_ARGS="-server"
 
 if [ -f $JVM_ARGS_ENV_FILE ]; then
@@ -41,11 +42,22 @@ if [[ "$DOCKER" == "true" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
 fi
 
+echo "JAVA_HOME=${JAVA_HOME}"
+echo "JAVA_OPTS=${JAVA_OPTS}"
+
 CP=""
-for d in $DOLPHINSCHEDULER_HOME/libs/*; do
-  CP=$CP:"$d/*"
+for jar in $(find $DOLPHINSCHEDULER_HOME/libs/* -name "*.jar"); do
+  CP=$CP:"$jar"
+done
+
+for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar"); do
+  CP=$CP:"$jar"
+done
+
+for jar in $(find $DOLPHINSCHEDULER_HOME/standalone-server/libs/* -name "*.jar"); do
+  CP=$CP:"$jar"
 done
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/conf""$CP" \
+  -cp "$STANDALONE_HOME/conf":"$CP" \
   org.apache.dolphinscheduler.StandaloneServer

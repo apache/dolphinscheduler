@@ -127,23 +127,14 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
             <outputDirectory>standalone-server</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-                <exclude>bin/</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/libs/standalone-server</directory>
-            <outputDirectory>standalone-server/libs/standalone-server</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/bin</directory>
-            <outputDirectory>standalone-server/bin</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-tools/target/tools</directory>
             <outputDirectory>tools</outputDirectory>
+            <excludes>
+                <exclude>libs/</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>

@@ -17,7 +17,8 @@
 #
 
 BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/../..; pwd)}
+DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd ${BIN_DIR}/../..;pwd)}
+TOOLS_HOME=$(cd ${BIN_DIR}/..;pwd)
 
 if [ "$DOCKER" != "true" ]; then
   source "$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh"
@@ -26,6 +27,6 @@ fi
 JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms4g -Xmx4g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/tools/conf":"$DOLPHINSCHEDULER_HOME/tools/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
+  -cp "$TOOLS_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
   -Dspring.profiles.active=lineage,${DATABASE} \
   org.apache.dolphinscheduler.tools.lineage.MigrateLineage

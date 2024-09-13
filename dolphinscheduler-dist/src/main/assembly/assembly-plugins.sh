@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -14,21 +15,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -xeo pipefail
 
-FROM eclipse-temurin:8-jdk
+DIST_DIR="$(pwd)/target"
+BIN_TAR_FILE="$DIST_DIR/apache-dolphinscheduler-*-bin.tar.gz"
+if [ ! -f $BIN_TAR_FILE ]; then
+  echo "$BIN_TAR_FILE not found!!!"
+  exit 1
+fi
 
-ENV DOCKER true
-ENV TZ Asia/Shanghai
-ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
+cd $DIST_DIR && tar -zxf apache-dolphinscheduler-*-bin.tar.gz
+BIN_DIR="$DIST_DIR/apache-dolphinscheduler-*-bin"
 
-RUN apt update ; \
-    apt install -y sudo ; \
-    rm -rf /var/lib/apt/lists/*
+PLUGINS_PATH=(
+alert-plugins
+datasource-plugins
+storage-plugins
+task-plugins
+)
 
-WORKDIR $DOLPHINSCHEDULER_HOME
+for plugin_path in ${PLUGINS_PATH[@]}
+do
+  cd $BIN_DIR/plugins/$plugin_path
+  find ./* -name "*.jar" | xargs -I {} mv {} ./
+  ls -d */ | xargs -I {} rm -rf {}
+done
 
-ADD ./target/worker-server $DOLPHINSCHEDULER_HOME
+BIN_TAR_FILE_NAME=$(basename $BIN_TAR_FILE)
+cd $DIST_DIR && tar -zcf $BIN_TAR_FILE_NAME apache-dolphinscheduler-*-bin
 
-EXPOSE 1235
-
-CMD [ "/bin/bash", "./bin/start.sh" ]
+echo "assembly-plugins.sh done"

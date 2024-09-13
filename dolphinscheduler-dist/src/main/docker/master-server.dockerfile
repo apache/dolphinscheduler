@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,17 +15,20 @@
 # limitations under the License.
 #
 
-BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd ${BIN_DIR}/../..;pwd)}
-TOOLS_HOME=$(cd ${BIN_DIR}/..;pwd)
+FROM eclipse-temurin:8-jdk
 
-if [ "$DOCKER" != "true" ]; then
-  source "$DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh"
-fi
+ENV DOCKER=true
+ENV TZ=Asia/Shanghai
+ENV DOLPHINSCHEDULER_HOME=/opt/dolphinscheduler
 
-JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
+RUN apt update ; \
+    apt install -y sudo ; \
+    rm -rf /var/lib/apt/lists/*
 
-$JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$TOOLS_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
-  -Dspring.profiles.active=resource,${DATABASE} \
-  org.apache.dolphinscheduler.tools.resource.MigrateResource $1
+WORKDIR $DOLPHINSCHEDULER_HOME
+
+ADD ./target/apache-dolphinscheduler-*-bin $DOLPHINSCHEDULER_HOME
+
+EXPOSE 12345 25333
+
+CMD [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
