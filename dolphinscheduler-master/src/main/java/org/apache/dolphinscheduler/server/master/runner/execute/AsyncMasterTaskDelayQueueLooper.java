@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
+
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -27,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 
 @Slf4j
 @Component
@@ -90,7 +90,8 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                         LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
                         AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus;
                         if (taskExecutionContext.getDryRun() == DRY_RUN_FLAG_YES) {
-                            log.info("The current execute mode is dry run, will stop the logic task and set the taskInstance status to success");
+                            log.info(
+                                    "The current execute mode is dry run, will stop the logic task and set the taskInstance status to success");
                             asyncTaskExecutionStatus = AsyncTaskExecuteFunction.AsyncTaskExecutionStatus.SUCCESS;
                         } else {
                             asyncTaskExecutionStatus = asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();
