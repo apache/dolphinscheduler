@@ -29,8 +29,8 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSo
 import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.RESOURCE_UPLOAD_PATH;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.StorageType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.enums.StorageType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;

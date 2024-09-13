@@ -63,7 +63,6 @@ cron-utils-9.1.6.jar
 curator-client-5.3.0.jar
 curator-framework-5.3.0.jar
 curator-recipes-5.3.0.jar
-curator-test-5.3.0.jar
 curvesapi-1.06.jar
 datanucleus-api-jdo-4.2.4.jar
 datanucleus-core-4.1.17.jar
@@ -433,8 +432,6 @@ azure-core-management-1.10.1.jar
 api-common-2.6.0.jar
 auto-value-1.10.1.jar
 auto-value-annotations-1.10.4.jar
-bcpkix-jdk15on-1.67.jar
-bcprov-jdk15on-1.67.jar
 conscrypt-openjdk-uber-2.5.2.jar
 gapic-google-cloud-storage-v2-2.18.0-alpha.jar
 gax-2.23.0.jar
