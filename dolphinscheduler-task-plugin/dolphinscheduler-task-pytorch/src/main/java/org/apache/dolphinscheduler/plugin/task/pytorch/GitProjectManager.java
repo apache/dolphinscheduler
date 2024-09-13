@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.pytorch;
 
-import static org.apache.dolphinscheduler.spi.shell.AbstractShell.ExitCodeException;
+import static org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
