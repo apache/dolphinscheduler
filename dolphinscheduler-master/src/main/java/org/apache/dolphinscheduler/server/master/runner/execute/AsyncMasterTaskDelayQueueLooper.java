@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
+
 @Slf4j
 @Component
 public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements AutoCloseable {
@@ -86,8 +88,13 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                     try {
                         LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
                         LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
-                        AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus =
-                                asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();
+                        AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus;
+                        if (taskExecutionContext.getDryRun() == DRY_RUN_FLAG_YES) {
+                            log.info("The current execute mode is dry run, will stop the logic task and set the taskInstance status to success");
+                            asyncTaskExecutionStatus = AsyncTaskExecuteFunction.AsyncTaskExecutionStatus.SUCCESS;
+                        } else {
+                            asyncTaskExecutionStatus = asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();
+                        }
                         switch (asyncTaskExecutionStatus) {
                             case RUNNING:
                                 // If the task status is running, means the task real status is not finished. We
