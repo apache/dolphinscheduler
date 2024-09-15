@@ -89,7 +89,6 @@
             <artifactId>dolphinscheduler-eventbus</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
