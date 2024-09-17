@@ -63,11 +63,11 @@ export function useDependencies() {
           if (res?.data?.length > 0) {
             res.data
               .filter(
-                (item: any) => item.processDefinitionCode !== workflowCode
+                (item: any) => item.workflowDefinitionCode !== workflowCode
               )
               .forEach((item: any) => {
                 tasks.push(
-                  item.processDefinitionName + '->' + item.taskDefinitionName
+                  item.workflowDefinitionName + '->' + item.taskDefinitionName
                 )
               })
           }
@@ -127,8 +127,8 @@ export function useDependencies() {
           if (res?.data?.length > 0) {
             res.data
               .filter((item: any) => {
-                if (item.processDefinitionCode) {
-                  return item.processDefinitionCode !== workflowCode
+                if (item.workflowDefinitionCode) {
+                  return item.workflowDefinitionCode !== workflowCode
                 } else {
                   return false
                 }
@@ -136,10 +136,10 @@ export function useDependencies() {
               .forEach((item: any) => {
                 dependentTaskLinks.push({
                   text:
-                    item.processDefinitionName + '->' + item.taskDefinitionName,
+                    item.workflowDefinitionName + '->' + item.taskDefinitionName,
                   show: true,
                   action: () => {
-                    const url = `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
+                    const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
                     window.open(url, '_blank')
                   }
                 })
@@ -167,15 +167,15 @@ export function useDependencies() {
           if (res?.data?.length > 0) {
             res.data
               .filter(
-                (item: any) => item.processDefinitionCode !== workflowCode
+                (item: any) => item.workflowDefinitionCode !== workflowCode
               )
               .forEach((item: any) => {
                 dependentTaskLinks.push({
                   text:
-                    item.processDefinitionName + '->' + item.taskDefinitionName,
+                    item.workflowDefinitionName + '->' + item.taskDefinitionName,
                   show: true,
                   action: () => {
-                    const url = `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
+                    const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
                     window.open(url, '_blank')
                   }
                 })
