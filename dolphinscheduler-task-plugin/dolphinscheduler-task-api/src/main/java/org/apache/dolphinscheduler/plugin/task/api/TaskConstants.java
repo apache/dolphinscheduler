@@ -334,12 +334,6 @@ public class TaskConstants {
     public static final String QUERY_INTERVAL = "resource.query.interval";
 
     /**
-     * tencent cloud config
-     */
-    public static final String TENCENT_CLOUD_ACCESS_KEY_ID = "resource.tencent.cloud.access.key.id";
-    public static final String TENCENT_CLOUD_ACCESS_KEY_SECRET = "resource.tencent.cloud.access.key.secret";
-
-    /**
      * use for k8s task
      */
     public static final String API_VERSION = "batch/v1";

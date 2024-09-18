@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -133,8 +134,14 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public void download(String srcFilePath, String dstFilePath, boolean overwrite) {
         String cosKey = transformAbsolutePathToCOSKey(srcFilePath);
-
-        File dstFile = Paths.get(dstFilePath).normalize().toFile();
+        Path dsTempFolder = Paths.get(FileUtils.DATA_BASEDIR).normalize().toAbsolutePath();
+        Path fileDownloadPathNormalized = dsTempFolder.resolve(dstFilePath).normalize().toAbsolutePath();
+        if (!fileDownloadPathNormalized.startsWith(dsTempFolder)) {
+            // if the destination file path is NOT in DS temp folder (e.g., '/tmp/dolphinscheduler'),
+            // an IllegalArgumentException should be thrown.
+            throw new IllegalArgumentException("failed to download to " + fileDownloadPathNormalized);
+        }
+        File dstFile = fileDownloadPathNormalized.toFile();
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
