@@ -31,9 +31,6 @@ ENV DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-test-SNAPSHOT-bin
 #Setting dolphinscheduler_env.sh
 COPY .github/workflows/cluster-test/mysql_with_mysql_registry/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
-ENV http_proxy=http://xiangzihao-M1-Pro.local:7890
-ENV https_proxy=http://xiangzihao-M1-Pro.local:7890
-
 #Download mysql jar
 ENV MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
 ENV MYSQL_DRIVER="mysql-connector-java-8.0.16.jar"
