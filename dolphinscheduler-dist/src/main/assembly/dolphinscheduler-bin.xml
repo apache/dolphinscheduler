@@ -132,9 +132,6 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-tools/target/tools</directory>
             <outputDirectory>tools</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-            </excludes>
         </fileSet>
 
         <fileSet>

@@ -44,13 +44,12 @@ public class PropertyUtils {
     public static List<Property> startParamsTransformPropertyList(String startParams) {
         List<Property> startParamList = null;
         if (startParams != null) {
-            boolean isJson = JSONUtils.checkJsonValid(startParams);
-            if (isJson) {
+            try {
                 Map<String, String> startParamMap = JSONUtils.toMap(startParams);
                 startParamList = startParamMap.entrySet().stream()
                         .map(entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue()))
                         .collect(Collectors.toList());
-            } else {
+            } catch (Exception ignore) {
                 startParamList = JSONUtils.toList(startParams, Property.class);
             }
         }

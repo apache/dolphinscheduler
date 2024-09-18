@@ -55,6 +55,7 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
             <outputDirectory>libs</outputDirectory>
         </dependencySet>
     </dependencySets>

@@ -26,7 +26,11 @@ fi
 
 JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms1g -Xmx1g -Xmn512m -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
 
+for jar in $(find "$DOLPHINSCHEDULER_HOME/libs" -name "*.jar" | grep -v "dolphinscheduler*.jar"); do
+  CP=$CP:"$jar"
+done
+
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$TOOLS_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*":"$DOLPHINSCHEDULER_HOME/tools/sql" \
+  -cp "$TOOLS_HOME/conf":"$CP":"$TOOLS_HOME/sql" \
   -Dspring.profiles.active=resource,${DATABASE} \
   org.apache.dolphinscheduler.tools.resource.MigrateResource $1

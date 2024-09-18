@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,9 @@ import org.springframework.stereotype.Component;
 public class MigrateLineage {
 
     public static void main(String[] args) {
-        SpringApplication.run(MigrateResource.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(MigrateLineage.class, args);
+
+        SpringApplication.exit(context, () -> 0);
     }
 
     @Component
