@@ -49,10 +49,10 @@ for jar in $(find $DOLPHINSCHEDULER_HOME/libs/* -name "*.jar"); do
   CP=$CP:"$jar"
 done
 
-for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar" | | grep -v "alert-plugins"); do
+for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar" -not -name "alert-plugins"); do
   CP=$CP:"$jar"
 done
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$API_HOME/conf":"$CP" \
+  -cp "$API_HOME/conf/*":"$CP" \
   org.apache.dolphinscheduler.api.ApiApplicationServer

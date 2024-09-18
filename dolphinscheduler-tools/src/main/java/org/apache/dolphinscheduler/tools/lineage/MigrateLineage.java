@@ -36,9 +36,7 @@ import org.springframework.stereotype.Component;
 public class MigrateLineage {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MigrateLineage.class, args);
-
-        SpringApplication.exit(context, () -> 0);
+        SpringApplication.run(MigrateLineage.class, args);
     }
 
     @Component

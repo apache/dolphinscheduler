@@ -35,9 +35,7 @@ import org.springframework.stereotype.Component;
 public class MigrateResource {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MigrateResource.class, args);
-
-        SpringApplication.exit(context, () -> 0);
+        SpringApplication.run(MigrateResource.class, args);
     }
 
     @Component

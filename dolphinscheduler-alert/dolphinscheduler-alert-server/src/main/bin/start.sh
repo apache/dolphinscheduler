@@ -38,7 +38,7 @@ fi
 JAVA_OPTS=${JAVA_OPTS:-"${JVM_ARGS}"}
 
 if [[ "$DOCKER" == "true" ]]; then
-  JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
+  JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport -DDOCKER=true"
 fi
 
 echo "JAVA_HOME=${JAVA_HOME}"
@@ -55,5 +55,5 @@ done
 
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$ALERT_HOME/conf":"$CP" \
+  -cp "$ALERT_HOME/conf""$CP" \
   org.apache.dolphinscheduler.alert.AlertServer

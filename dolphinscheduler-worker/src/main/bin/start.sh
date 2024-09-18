@@ -38,7 +38,7 @@ fi
 JAVA_OPTS=${JAVA_OPTS:-"${JVM_ARGS}"}
 
 if [[ "$DOCKER" == "true" ]]; then
-  JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
+  JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport -DDOCKER=true"
 fi
 
 echo "JAVA_HOME=${JAVA_HOME}"
@@ -49,10 +49,10 @@ for jar in $(find $DOLPHINSCHEDULER_HOME/libs/* -name "*.jar"); do
   CP=$CP:"$jar"
 done
 
-for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar" | grep -v "alert-plugins"); do
+for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar" -not -name "alert-plugins"); do
   CP=$CP:"$jar"
 done
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$WORKER_HOME/conf":"$CP" \
+  -cp "$WORKER_HOME/conf""$CP" \
   org.apache.dolphinscheduler.server.worker.WorkerServer

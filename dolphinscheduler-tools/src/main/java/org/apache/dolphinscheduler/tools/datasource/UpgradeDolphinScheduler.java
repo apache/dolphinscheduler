@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -34,9 +33,7 @@ import org.springframework.stereotype.Component;
 public class UpgradeDolphinScheduler {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(UpgradeDolphinScheduler.class, args);
-
-        SpringApplication.exit(context, () -> 0);
+        SpringApplication.run(UpgradeDolphinScheduler.class, args);
     }
 
     @Component

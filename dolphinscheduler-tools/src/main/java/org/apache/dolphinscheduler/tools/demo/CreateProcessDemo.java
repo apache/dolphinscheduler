@@ -37,9 +37,7 @@ import org.springframework.stereotype.Component;
 public class CreateProcessDemo {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(CreateProcessDemo.class, args);
-
-        SpringApplication.exit(context, () -> 0);
+        SpringApplication.run(CreateProcessDemo.class, args);
     }
 
     @Component
