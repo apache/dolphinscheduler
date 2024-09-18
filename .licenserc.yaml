@@ -47,7 +47,7 @@ header:
     - '**/.gitkeep'
     - 'org.mockito.plugins.MockMaker'
     - tools/dependencies/known-dependencies.txt
-    - '**/banner.txt'
+    - '**/**-banner.txt'
     - '.terraform.lock.hcl'
     - deploy/kubernetes/dolphinscheduler/README.md.gotmpl
     - .idea/vcs.xml
