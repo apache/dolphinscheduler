@@ -31,4 +31,4 @@ ADD ./target/apache-dolphinscheduler-*-bin $DOLPHINSCHEDULER_HOME
 
 EXPOSE 12345 25333
 
-CMD [ "/bin/bash", "/opt/dolphinscheduler/worker-server/bin/start.sh" ]
+CMD [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
