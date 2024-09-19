@@ -64,7 +64,7 @@ do
     mv $MODULE_LIB_DIR/$jar $SHARED_LIB_DIR/$jar
 
     # create a symbolic link in the subproject's lib directory
-    ln -s ../../$jar $jar
+    ln -s ../../libs/$jar $jar
   done
 done
 
