@@ -68,7 +68,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       # Sonar check need to run after jacoco report generated.
       - name: Run SonarCloud Analysis
-        if: '8' == matrix.java.version
+        if: ${{ matrix.java.version }} == '8'
         run: >
           ./mvnw --batch-mode verify sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
