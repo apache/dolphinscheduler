@@ -136,7 +136,9 @@ export function useDependencies() {
               .forEach((item: any) => {
                 dependentTaskLinks.push({
                   text:
-                    item.workflowDefinitionName + '->' + item.taskDefinitionName,
+                    item.workflowDefinitionName +
+                    '->' +
+                    item.taskDefinitionName,
                   show: true,
                   action: () => {
                     const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
@@ -172,7 +174,9 @@ export function useDependencies() {
               .forEach((item: any) => {
                 dependentTaskLinks.push({
                   text:
-                    item.workflowDefinitionName + '->' + item.taskDefinitionName,
+                    item.workflowDefinitionName +
+                    '->' +
+                    item.taskDefinitionName,
                   show: true,
                   action: () => {
                     const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
