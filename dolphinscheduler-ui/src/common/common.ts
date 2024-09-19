@@ -395,7 +395,7 @@ export const workflowExecutionState = (
   },
   WAIT_TO_RUN: {
     id: 18,
-    desc: `${t('project.overview.wait_to_run')}`,
+    desc: `${t('project.workflow.wait_to_run')}`,
     color: '#5102ce',
     icon: HourglassOutlined,
     isSpin: false,
