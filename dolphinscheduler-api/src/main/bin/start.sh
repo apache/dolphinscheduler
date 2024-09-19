@@ -45,7 +45,7 @@ echo "JAVA_HOME=${JAVA_HOME}"
 echo "JAVA_OPTS=${JAVA_OPTS}"
 
 CP=""
-for jar in $(find $DOLPHINSCHEDULER_HOME/libs/* -name "*.jar"); do
+for jar in $(find $API_HOME/libs/* -name "*.jar"); do
   CP=$CP:"$jar"
 done
 

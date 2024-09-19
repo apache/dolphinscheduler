@@ -54,7 +54,7 @@ for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar"); do
   CP=$CP:"$jar"
 done
 
-for jar in $(find $DOLPHINSCHEDULER_HOME/standalone-server/libs/dolphinscheduler-standalone-server*.jar -name "*.jar"); do
+for jar in $(find $STANDALONE_HOME/libs/* -name "*.jar"); do
   CP=$CP:"$jar"
 done
 

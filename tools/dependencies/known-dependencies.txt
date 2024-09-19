@@ -433,6 +433,8 @@ api-common-2.6.0.jar
 auto-value-1.10.1.jar
 auto-value-annotations-1.10.4.jar
 conscrypt-openjdk-uber-2.5.2.jar
+bcpkix-jdk15on-1.67.jar
+bcprov-jdk15on-1.67.jar
 gapic-google-cloud-storage-v2-2.18.0-alpha.jar
 gax-2.23.0.jar
 gax-grpc-2.23.0.jar

@@ -25,8 +25,10 @@ if [ ! -f $BIN_TAR_FILE ]; then
 fi
 
 cd $DIST_DIR && tar -zxf apache-dolphinscheduler-*-bin.tar.gz
-BIN_DIR="$DIST_DIR/apache-dolphinscheduler-*-bin"
+cd $DIST_DIR/apache-dolphinscheduler-*-bin
+BIN_DIR=$(pwd)
 
+# move *-plugins/target/*-plugin/target/*.jar to *-plugins/
 PLUGINS_PATH=(
 alert-plugins
 datasource-plugins
@@ -41,6 +43,32 @@ do
   ls -d */ | xargs -I {} rm -rf {}
 done
 
+# move *-server/libs/*.jar to libs/ and create symbolic link in *-server/libs/
+MODULES_PATH=(
+api-server
+master-server
+worker-server
+alert-server
+tools
+)
+
+SHARED_LIB_DIR="$BIN_DIR/libs"
+mkdir -p $SHARED_LIB_DIR
+
+for module in ${MODULES_PATH[@]}
+do
+  MODULE_LIB_DIR="$BIN_DIR/$module/libs"
+  cd $MODULE_LIB_DIR
+  for jar in $(find $MODULE_LIB_DIR/* -name "*.jar" -execdir echo {} ';'); do
+    # move jar file to share lib directory
+    mv $MODULE_LIB_DIR/$jar $SHARED_LIB_DIR/$jar
+
+    # create a symbolic link in the subproject's lib directory
+    ln -s ../../$jar $jar
+  done
+done
+
+# repack bin tar
 BIN_TAR_FILE_NAME=$(basename $BIN_TAR_FILE)
 cd $DIST_DIR && tar -zcf $BIN_TAR_FILE_NAME apache-dolphinscheduler-*-bin
 

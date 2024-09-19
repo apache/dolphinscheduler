@@ -29,65 +29,21 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
             <outputDirectory>alert-server</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-            </excludes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
-            <outputDirectory>./</outputDirectory>
-            <includes>
-                <include>libs/</include>
-            </includes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
             <outputDirectory>api-server</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-            </excludes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
-            <outputDirectory>./</outputDirectory>
-            <includes>
-                <include>libs/*</include>
-            </includes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
             <outputDirectory>master-server</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-            </excludes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
-            <outputDirectory>./</outputDirectory>
-            <includes>
-                <include>libs/</include>
-            </includes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
             <outputDirectory>worker-server</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-            </excludes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
-            <outputDirectory>./</outputDirectory>
-            <includes>
-                <include>libs/</include>
-            </includes>
         </fileSet>
 
         <!-- plugins -->
