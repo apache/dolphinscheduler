@@ -54,13 +54,18 @@ alert-server
 
 CP=""
 for module in ${MODULES_PATH[@]}; do
-  for jar in $(find $DOLPHINSCHEDULER_HOME/$module/libs/* -name "*.jar"); do
-    CP=$CP:"$jar"
-  done
+  CP=$CP:"$DOLPHINSCHEDULER_HOME/$module/libs/*"
 done
 
-for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar"); do
-  CP=$CP:"$jar"
+PLUGINS_PATH=(
+alert-plugins
+datasource-plugins
+storage-plugins
+task-plugins
+)
+
+for plugin in ${PLUGINS_PATH[@]}; do
+  CP=$CP:"$DOLPHINSCHEDULER_HOME/plugins/$plugin/*"
 done
 
 for jar in $(find $STANDALONE_HOME/libs/* -name "*.jar"); do

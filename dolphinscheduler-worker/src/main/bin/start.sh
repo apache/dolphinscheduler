@@ -44,13 +44,23 @@ fi
 echo "JAVA_HOME=${JAVA_HOME}"
 echo "JAVA_OPTS=${JAVA_OPTS}"
 
+MODULES_PATH=(
+worker-server
+)
+
 CP=""
-for jar in $(find $WORKER_HOME/libs/* -name "*.jar"); do
-  CP=$CP:"$jar"
+for module in ${MODULES_PATH[@]}; do
+  CP=$CP:"$DOLPHINSCHEDULER_HOME/$module/libs/*"
 done
 
-for jar in $(find $DOLPHINSCHEDULER_HOME/plugins/* -name "*.jar" -not -name "alert-plugins"); do
-  CP=$CP:"$jar"
+PLUGINS_PATH=(
+datasource-plugins
+storage-plugins
+task-plugins
+)
+
+for plugin in ${PLUGINS_PATH[@]}; do
+  CP=$CP:"$DOLPHINSCHEDULER_HOME/plugins/$plugin/*"
 done
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
