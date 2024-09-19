@@ -23,11 +23,7 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispat
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorFactoryBuilder;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
+import org.apache.dolphinscheduler.server.worker.runner.TaskCoordinator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,21 +40,13 @@ public class TaskInstanceDispatchOperationFunction
     private WorkerConfig workerConfig;
 
     @Autowired
-    private WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder;
-
-    @Autowired
-    private WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool;
-
-    @Autowired
-    private WorkerMessageSender workerMessageSender;
+    private TaskCoordinator taskCoordinator;
 
     public TaskInstanceDispatchOperationFunction(
                                                  WorkerConfig workerConfig,
-                                                 WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder,
-                                                 WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool) {
+                                                 TaskCoordinator taskCoordinator) {
         this.workerConfig = workerConfig;
-        this.workerTaskExecutorFactoryBuilder = workerTaskExecutorFactoryBuilder;
-        this.workerTaskExecutorThreadPool = workerTaskExecutorThreadPool;
+        this.taskCoordinator = taskCoordinator;
     }
 
     @Override
@@ -79,19 +67,15 @@ public class TaskInstanceDispatchOperationFunction
                         "server is not running");
             }
 
-            TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
-
-            WorkerTaskExecutor workerTaskExecutor = workerTaskExecutorFactoryBuilder
-                    .createWorkerTaskExecutorFactory(taskExecutionContext)
-                    .createWorkerTaskExecutor();
-            if (!workerTaskExecutorThreadPool.submitWorkerTaskExecutor(workerTaskExecutor)) {
-                log.info("Submit task: {} to wait queue failed", taskExecutionContext.getTaskName());
+            if (!taskCoordinator.register(taskExecutionContext)) {
+                log.info("Register task: {} to taskCoordinator failed", taskExecutionContext.getTaskName());
                 return TaskInstanceDispatchResponse.failed(taskExecutionContext.getTaskInstanceId(),
                         "WorkerManagerThread is full");
             } else {
-                log.info("Submit task: {} to wait queue success", taskExecutionContext.getTaskName());
+                log.info("Register task: {} to taskCoordinator success", taskExecutionContext.getTaskName());
                 return TaskInstanceDispatchResponse.success(taskExecutionContext.getTaskInstanceId());
             }
+
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }

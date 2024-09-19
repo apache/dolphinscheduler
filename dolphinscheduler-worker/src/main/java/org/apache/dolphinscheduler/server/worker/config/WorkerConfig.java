@@ -43,6 +43,8 @@ public class WorkerConfig implements Validator {
 
     private int listenPort = 1234;
     private int execThreads = 10;
+    private long registerInitialDelay = 60L;
+    private long registerDelay = 60L;
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
     private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
