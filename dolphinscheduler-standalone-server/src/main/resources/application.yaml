@@ -23,7 +23,6 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
   banner:
     charset: UTF-8
-    location: classpath:standalone-banner.txt
   sql:
     init:
       schema-locations: classpath:sql/dolphinscheduler_h2.sql

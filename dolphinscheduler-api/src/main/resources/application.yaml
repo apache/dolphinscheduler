@@ -35,7 +35,6 @@ spring:
     active: postgresql
   banner:
     charset: UTF-8
-    location: classpath:api-banner.txt
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"

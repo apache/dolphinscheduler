@@ -23,7 +23,6 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
   banner:
     charset: UTF-8
-    location: classpath:alert-banner.txt
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler

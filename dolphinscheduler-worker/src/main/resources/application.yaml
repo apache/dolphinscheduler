@@ -17,7 +17,6 @@
 spring:
   banner:
     charset: UTF-8
-    location: classpath:worker-banner.txt
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
