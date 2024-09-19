@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,14 +46,14 @@ public class DataQualityParameterTest {
 
     private DataQualityParameters dataQualityParameters = null;
 
-//    @BeforeEach
+    // @BeforeEach
     public void before() {
         dataQualityParameters = new DataQualityParameters();
         dataQualityParameters.setRuleId(1);
         dataQualityParameters.setSparkParameters(new SparkParameters());
     }
 
-//    @Test
+    // @Test
     public void testCheckParameterNormal() {
 
         Map<String, String> inputParameterValue = new HashMap<>();
@@ -79,7 +77,7 @@ public class DataQualityParameterTest {
         Assertions.assertTrue(dataQualityParameters.checkParameters());
     }
 
-//    @Test
+    // @Test
     public void testRuleInputParameter() {
         String formCreateJson = "[{\"field\":\"src_connector_type\",\"name\":\"源数据类型\","
                 + "\"props\":{\"disabled\":false,\"multiple\":false,\"size\":\"small\"},"

@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 /**
  * DataQualityTaskTest
@@ -47,7 +46,7 @@ import org.junit.jupiter.api.Test;
 
 public class DataQualityTaskTest {
 
-//    @Test
+    // @Test
     public void testSingleTable() throws Exception {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = getSingleTableContext();
 
@@ -322,7 +321,7 @@ public class DataQualityTaskTest {
         return dataQualityTaskExecutionContext;
     }
 
-//    @Test
+    // @Test
     public void testSingleTableCustomSql() throws Exception {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
 
@@ -575,7 +574,7 @@ public class DataQualityTaskTest {
         Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
-//    @Test
+    // @Test
     public void testMultiTableComparison() throws Exception {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
         dataQualityTaskExecutionContext.setRuleName("跨表值比对");
@@ -886,7 +885,7 @@ public class DataQualityTaskTest {
         Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
-//    @Test
+    // @Test
     public void testMultiTableAccuracy() throws Exception {
 
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
