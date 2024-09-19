@@ -48,13 +48,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-common</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.sap.cloud.db.jdbc</groupId>
             <artifactId>ngdbc</artifactId>
         </dependency>
