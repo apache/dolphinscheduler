@@ -63,7 +63,7 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
         final ICommandParam commandParam =
                 JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
         if (commandParam == null) {
-            log.warn("Command param: {} is invalid for workflow{}", workflowInstance.getCommandParam(),
+            log.warn("Command param: {} is invalid for workflow: {}", workflowInstance.getCommandParam(),
                     workflowInstance.getName());
             return;
         }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it;
+package org.apache.dolphinscheduler.server.master.integration;
 
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -45,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WorkflowITContextFactory {
+public class WorkflowTestCaseContextFactory {
 
     @Autowired
     private ProjectDao projectDao;
@@ -74,19 +74,19 @@ public class WorkflowITContextFactory {
     @Autowired
     private TaskInstanceDao taskInstanceDao;
 
-    public WorkflowITContext initializeContextFromYaml(final String yamlPath) {
-        final WorkflowITContext workflowITContext = YamlFactory.load(yamlPath);
-        initializeProjectToDB(workflowITContext.getProject());
-        initializeWorkflowDefinitionToDB(workflowITContext.getWorkflows());
-        initializeTaskDefinitionsToDB(workflowITContext.getTasks());
-        initializeTaskRelationsToDB(workflowITContext.getTaskRelations());
-        if (workflowITContext.getWorkflowInstance() != null) {
-            initializeWorkflowInstanceToDB(workflowITContext.getWorkflowInstance());
+    public WorkflowTestCaseContext initializeContextFromYaml(final String yamlPath) {
+        final WorkflowTestCaseContext workflowTestCaseContext = YamlFactory.load(yamlPath);
+        initializeProjectToDB(workflowTestCaseContext.getProject());
+        initializeWorkflowDefinitionToDB(workflowTestCaseContext.getWorkflows());
+        initializeTaskDefinitionsToDB(workflowTestCaseContext.getTasks());
+        initializeTaskRelationsToDB(workflowTestCaseContext.getTaskRelations());
+        if (workflowTestCaseContext.getWorkflowInstance() != null) {
+            initializeWorkflowInstanceToDB(workflowTestCaseContext.getWorkflowInstance());
         }
-        if (CollectionUtils.isNotEmpty(workflowITContext.getTaskInstances())) {
-            initializeTaskInstancesToDB(workflowITContext.getTaskInstances());
+        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getTaskInstances())) {
+            initializeTaskInstancesToDB(workflowTestCaseContext.getTaskInstances());
         }
-        return workflowITContext;
+        return workflowTestCaseContext;
     }
 
     private void initializeTaskInstancesToDB(List<TaskInstance> taskInstances) {

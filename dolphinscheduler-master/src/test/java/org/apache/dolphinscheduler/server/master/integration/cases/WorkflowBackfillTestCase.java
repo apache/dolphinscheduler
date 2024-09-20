@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it.cases;
+package org.apache.dolphinscheduler.server.master.integration.cases;
 
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
-import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
-import org.apache.dolphinscheduler.server.master.it.Repository;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContext;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContextFactory;
-import org.apache.dolphinscheduler.server.master.it.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
+import org.apache.dolphinscheduler.server.master.integration.Repository;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -43,10 +42,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * The integration test for scheduling a workflow from workflow definition.
  */
-public class WorkflowBackfillIT extends AbstractMasterIntegrationTest {
+public class WorkflowBackfillTestCase extends AbstractMasterIntegrationTestCase {
 
     @Autowired
-    private WorkflowITContextFactory workflowITContextFactory;
+    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
 
     @Autowired
     private WorkflowOperator workflowOperator;
@@ -54,14 +53,11 @@ public class WorkflowBackfillIT extends AbstractMasterIntegrationTest {
     @Autowired
     private Repository repository;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
-
     @Test
     @DisplayName("Test backfill a workflow in asc order success")
     public void testSerialBackfillWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/backfill/workflow_with_one_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()

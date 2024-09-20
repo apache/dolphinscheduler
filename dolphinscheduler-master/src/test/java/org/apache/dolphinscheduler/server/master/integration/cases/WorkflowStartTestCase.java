@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it.cases;
+package org.apache.dolphinscheduler.server.master.integration.cases;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -30,12 +30,12 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
+import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.it.Repository;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContext;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContextFactory;
-import org.apache.dolphinscheduler.server.master.it.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.Repository;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -54,10 +54,10 @@ import com.google.common.collect.Lists;
  * <p> In each test method, will create different workflow from yaml, and then trigger it, and do assertions.
  * <p> The method name should be clear to describe the test scenario.
  */
-public class WorkflowStartIT extends AbstractMasterIntegrationTest {
+public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
     @Autowired
-    private WorkflowITContextFactory workflowITContextFactory;
+    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
 
     @Autowired
     private WorkflowOperator workflowOperator;
@@ -72,7 +72,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with one fake task(A) success")
     public void testStartWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -103,7 +103,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with one sub workflow task(A) success")
     public void testStartWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -155,7 +155,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with one sub workflow task(A) failed")
     public void testStartWorkflow_with_subWorkflowTask_failed() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_failed.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -207,7 +207,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow which using workflow params")
     public void testStartWorkflow_usingWorkflowParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -243,7 +243,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow which using command params")
     public void testStartWorkflow_usingCommandParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
@@ -288,7 +288,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with one fake task(A) failed")
     public void testStartWorkflow_with_oneFailedTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -319,7 +319,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with one fake task(A) failed")
     public void testStartWorkflow_with_oneFailedTaskWithRetry() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -372,7 +372,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with two serial fake tasks(A -> B) success")
     public void testStartWorkflow_with_twoSerialSuccessTask() {
         String yaml = "/it/start/workflow_with_two_serial_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -411,7 +411,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with two serial fake tasks(A(failed) -> B) success")
     public void testStartWorkflow_with_twoSerialFailedTask() {
         final String yaml = "/it/start/workflow_with_two_serial_fake_task_failed.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -442,7 +442,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with two parallel fake tasks(A, B) success")
     public void testStartWorkflow_with_twoParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -480,7 +480,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with two parallel fake tasks(A(failed), B(failed)) success")
     public void testStartWorkflow_with_twoParallelFailedTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_failed.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -519,7 +519,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with three parallel three fake tasks(A1->A2->A3, B1->B2->B3, C1->C2->C3) success")
     public void testStartWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -586,7 +586,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test start a workflow with three parallel three fake tasks(A1->A2->A3, B1->B2->B3, C1->C2->C3) success")
     public void testStartWorkflowFromStartNodes_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
