@@ -90,7 +90,7 @@ jobs:
       # Sonar check need to run after jacoco report generated.
       - name: Run SonarCloud Analysis
         run: >
-          if [[ ${{ matrix.java }} == '8' ]]; then
+          if [[ ${{ matrix.java }} == '11' ]]; then
             ./mvnw --batch-mode verify sonar:sonar
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
             -Dmaven.test.skip=true

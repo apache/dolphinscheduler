@@ -76,7 +76,6 @@
         <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
-        <dolphinscheduler.shade.package>org.apache.dolphinscheduler.shade</dolphinscheduler.shade.package>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
         <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
         <spotless.version>2.27.2</spotless.version>
