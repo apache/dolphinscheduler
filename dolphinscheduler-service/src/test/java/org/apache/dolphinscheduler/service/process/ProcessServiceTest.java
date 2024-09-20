@@ -39,31 +39,19 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -102,52 +90,36 @@ public class ProcessServiceTest {
 
     @InjectMocks
     private ProcessServiceImpl processService;
-    @Mock
-    private CommandMapper commandMapper;
+
     @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
+
     @Mock
-    private ErrorCommandMapper errorCommandMapper;
-    @Mock
-    private WorkflowDefinitionMapper processDefineMapper;
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
+
     @Mock
     private WorkflowInstanceMapper workflowInstanceMapper;
-    @Mock
-    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
-    private TaskInstanceDao taskInstanceDao;
-
-    @Mock
-    private TaskDefinitionLogDao taskDefinitionLogDao;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
     private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
-    private UserMapper userMapper;
-    @Mock
-    private TenantMapper tenantMapper;
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
-    private TaskInstanceMapper taskInstanceMapper;
+    private UserMapper userMapper;
+
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
-    @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
-    @Mock
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
-    @Mock
-    private WorkflowDefinitionLogMapper processDefineLogMapper;
-    @Mock
-    private TaskGroupMapper taskGroupMapper;
-    @Mock
-    private DataSourceMapper dataSourceMapper;
-    @Mock
-    private TaskGroupQueueMapper taskGroupQueueMapper;
 
     @Mock
-    private DqExecuteResultMapper dqExecuteResultMapper;
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private TaskGroupQueueMapper taskGroupQueueMapper;
 
     @Mock
     private DqRuleMapper dqRuleMapper;
@@ -159,13 +131,7 @@ public class ProcessServiceTest {
     private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
     @Mock
-    private DqComparisonTypeMapper dqComparisonTypeMapper;
-
-    @Mock
     CuringParamsService curingGlobalParamsService;
-
-    @Mock
-    TaskPluginManager taskPluginManager;
 
     @Test
     public void testGetUserById() {
@@ -179,17 +145,17 @@ public class ProcessServiceTest {
     public void testFormatTaskAppId() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(333);
-        taskInstance.setProcessInstanceId(222);
-        when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(null);
+        taskInstance.setWorkflowInstanceId(222);
+        when(processService.findWorkflowInstanceById(taskInstance.getWorkflowInstanceId())).thenReturn(null);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setId(111);
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(222);
-        workflowInstance.setProcessDefinitionVersion(1);
-        workflowInstance.setProcessDefinitionCode(1L);
-        when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId()))
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        workflowInstance.setWorkflowDefinitionCode(1L);
+        when(processService.findWorkflowInstanceById(taskInstance.getWorkflowInstanceId()))
                 .thenReturn(workflowInstance);
         Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
     }
@@ -203,7 +169,7 @@ public class ProcessServiceTest {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(parentProcessDefineCode);
         workflowDefinition.setVersion(parentProcessDefineVersion);
-        when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(workflowDefinition);
+        when(workflowDefinitionMapper.selectById(parentProcessDefineId)).thenReturn(workflowDefinition);
 
         long postTaskCode = 2L;
         int postTaskVersion = 2;
@@ -213,12 +179,12 @@ public class ProcessServiceTest {
         processTaskRelationLog.setPostTaskCode(postTaskCode);
         processTaskRelationLog.setPostTaskVersion(postTaskVersion);
         relationLogList.add(processTaskRelationLog);
-        when(workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode,
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(parentProcessDefineCode,
                 parentProcessDefineVersion)).thenReturn(relationLogList);
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
-        taskDefinitionLog1.setTaskParams("{\"processDefinitionCode\": 123L}");
+        taskDefinitionLog1.setTaskParams("{\"workflowDefinitionCode\": 123L}");
         taskDefinitionLogs.add(taskDefinitionLog1);
         when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 
@@ -411,9 +377,9 @@ public class ProcessServiceTest {
 
         WorkflowTaskRelationLog processTaskRelation = new WorkflowTaskRelationLog();
         processTaskRelation.setName("def 1");
-        processTaskRelation.setProcessDefinitionVersion(1);
+        processTaskRelation.setWorkflowDefinitionVersion(1);
         processTaskRelation.setProjectCode(1L);
-        processTaskRelation.setProcessDefinitionCode(1L);
+        processTaskRelation.setWorkflowDefinitionCode(1L);
         processTaskRelation.setPostTaskCode(3L);
         processTaskRelation.setPreTaskCode(2L);
         processTaskRelation.setUpdateTime(new Date());
@@ -447,7 +413,7 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(td2);
 
         when(taskDefinitionLogDao.queryTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
-        when(workflowTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(list);
 
         DAG<Long, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
@@ -458,7 +424,7 @@ public class ProcessServiceTest {
     @Test
     public void testChangeOutParam() {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setProcessInstanceId(62);
+        taskInstance.setWorkflowInstanceId(62);
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(62);
         taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");

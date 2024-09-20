@@ -24,10 +24,21 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TakeOverTaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKillLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPauseLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskStartLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -62,14 +73,9 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
         this.workflowInstance = checkNotNull(taskExecutionRunnableBuilder.getWorkflowInstance());
         this.taskDefinition = checkNotNull(taskExecutionRunnableBuilder.getTaskDefinition());
         this.taskInstance = taskExecutionRunnableBuilder.getTaskInstance();
-        if (taskInstance != null) {
+        if (isTaskInstanceInitialized()) {
             initializeTaskExecutionContext();
         }
-    }
-
-    @Override
-    public String getName() {
-        return taskDefinition.getName();
     }
 
     @Override
@@ -78,8 +84,9 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     }
 
     @Override
-    public void initializeTaskInstance() {
-        checkState(taskInstance == null, "The task instance is not null, should not initialize again.");
+    public void initializeFirstRunTaskInstance() {
+        checkState(!isTaskInstanceInitialized(),
+                "The task instance is already initialized, can't initialize first run task.");
         this.taskInstance = applicationContext.getBean(TaskInstanceFactories.class)
                 .firstRunTaskInstanceFactory()
                 .builder()
@@ -90,35 +97,50 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     }
 
     @Override
-    public boolean isTaskInstanceNeedRetry() {
+    public boolean isTaskInstanceCanRetry() {
         return taskInstance.getRetryTimes() < taskInstance.getMaxRetryTimes();
     }
 
     @Override
-    public void initializeRetryTaskInstance() {
-        checkState(taskInstance != null, "The task instance can't retry, should not initialize retry task instance.");
+    public void retry() {
+        checkState(isTaskInstanceInitialized(), "The task instance is not initialized, can't initialize retry task.");
         this.taskInstance = applicationContext.getBean(TaskInstanceFactories.class)
                 .retryTaskInstanceFactory()
                 .builder()
                 .withTaskInstance(taskInstance)
                 .build();
         initializeTaskExecutionContext();
+        getWorkflowEventBus().publish(TaskStartLifecycleEvent.of(this));
     }
 
     @Override
-    public void initializeFailoverTaskInstance() {
-        checkState(taskInstance != null,
-                "The task instance can't failover, should not initialize failover task instance.");
+    public void failover() {
+        checkState(isTaskInstanceInitialized(), "The task instance is not initialized, can't failover.");
+        if (takeOverTaskFromExecutor()) {
+            log.info("Failover task success, the task {} has been taken-over from executor", taskInstance.getName());
+            return;
+        }
         this.taskInstance = applicationContext.getBean(TaskInstanceFactories.class)
                 .failoverTaskInstanceFactory()
                 .builder()
                 .withTaskInstance(taskInstance)
                 .build();
         initializeTaskExecutionContext();
+        getWorkflowEventBus().publish(TaskStartLifecycleEvent.of(this));
+    }
+
+    @Override
+    public void pause() {
+        getWorkflowEventBus().publish(TaskPauseLifecycleEvent.of(this));
+    }
+
+    @Override
+    public void kill() {
+        getWorkflowEventBus().publish(TaskKillLifecycleEvent.of(this));
     }
 
     private void initializeTaskExecutionContext() {
-        checkState(taskInstance != null, "The task instance is null, can't initialize TaskExecutionContext.");
+        checkState(isTaskInstanceInitialized(), "The task instance is null, can't initialize TaskExecutionContext.");
         final TaskExecutionContextCreateRequest request = TaskExecutionContextCreateRequest.builder()
                 .workflowDefinition(workflowDefinition)
                 .workflowInstance(workflowInstance)
@@ -129,13 +151,39 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
                 .createTaskExecutionContext(request);
     }
 
+    private boolean takeOverTaskFromExecutor() {
+        checkState(isTaskInstanceInitialized(), "The task instance is null, can't take over from executor.");
+        if (TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
+            return false;
+        }
+        if (StringUtils.isEmpty(taskInstance.getHost())) {
+            log.debug("Task: {} host is empty, cannot take over the task from executor(This is normal case).",
+                    taskInstance.getName());
+            return false;
+        }
+        try {
+            final TakeOverTaskRequest takeOverTaskRequest = TakeOverTaskRequest.builder()
+                    .taskInstanceId(taskInstance.getId())
+                    .workflowHost(applicationContext.getBean(MasterConfig.class).getMasterAddress())
+                    .build();
+            final TakeOverTaskResponse takeOverTaskResponse = Clients
+                    .withService(ITaskInstanceOperator.class)
+                    .withHost(taskInstance.getHost())
+                    .takeOverTask(takeOverTaskRequest);
+            return takeOverTaskResponse.isSuccess();
+        } catch (Exception ex) {
+            log.warn("Take over task: {} failed", taskInstance.getName(), ex);
+            return false;
+        }
+    }
+
     @Override
     public int compareTo(ITaskExecutionRunnable other) {
         if (other == null) {
             return 1;
         }
-        int workflowInstancePriorityCompareResult = workflowInstance.getProcessInstancePriority().getCode() -
-                other.getWorkflowInstance().getProcessInstancePriority().getCode();
+        int workflowInstancePriorityCompareResult = workflowInstance.getWorkflowInstancePriority().getCode() -
+                other.getWorkflowInstance().getWorkflowInstancePriority().getCode();
         if (workflowInstancePriorityCompareResult != 0) {
             return workflowInstancePriorityCompareResult;
         }
@@ -159,6 +207,9 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
 
     @Override
     public String toString() {
+        if (taskInstance != null) {
+            return "TaskExecutionRunnable{" + "name=" + getName() + ", state=" + taskInstance.getState() + '}';
+        }
         return "TaskExecutionRunnable{" + "name=" + getName() + '}';
     }
 }

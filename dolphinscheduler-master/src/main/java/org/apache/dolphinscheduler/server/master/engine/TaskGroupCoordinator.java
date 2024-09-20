@@ -382,7 +382,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
                 .taskId(taskInstance.getId())
                 .taskName(taskInstance.getName())
                 .groupId(taskInstance.getTaskGroupId())
-                .processId(taskInstance.getProcessInstanceId())
+                .workflowInstanceId(taskInstance.getWorkflowInstanceId())
                 .priority(taskInstance.getTaskGroupPriority())
                 .inQueue(Flag.YES.getCode())
                 .forceStart(Flag.NO.getCode())
@@ -448,10 +448,10 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
                     "The TaskInstance: " + taskInstance.getId() + " state is " + taskInstance.getState()
                             + ", no need to notify");
         }
-        WorkflowInstance workflowInstance = workflowInstanceDao.queryById(taskInstance.getProcessInstanceId());
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryById(taskInstance.getWorkflowInstanceId());
         if (workflowInstance == null) {
             throw new UnsupportedOperationException(
-                    "The WorkflowInstance: " + taskInstance.getProcessInstanceId()
+                    "The WorkflowInstance: " + taskInstance.getWorkflowInstanceId()
                             + " is not exist, no need to notify");
         }
         if (workflowInstance.getState() != WorkflowExecutionStatus.RUNNING_EXECUTION) {

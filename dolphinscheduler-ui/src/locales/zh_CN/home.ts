@@ -17,8 +17,8 @@
 
 export default {
   task_state_statistics: '任务实例状态统计',
-  process_state_statistics: '工作流实例状态统计',
-  process_definition_statistics: '工作流定义统计',
+  workflow_state_statistics: '工作流实例状态统计',
+  workflow_definition_statistics: '工作流定义统计',
   number: '数量',
   state: '状态',
   submitted_success: '提交成功',

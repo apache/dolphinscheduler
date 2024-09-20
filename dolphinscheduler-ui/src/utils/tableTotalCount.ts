@@ -15,36 +15,14 @@
  * limitations under the License.
  */
 
-interface ProjectCodeReq {
-  projectCode: string
-}
+import { useI18n } from 'vue-i18n'
+import { RenderPrefix } from 'naive-ui/es/pagination/src/interface'
 
-interface ProcessDefinitionCodeReq {
-  processDefinitionCode: string
-}
+export default function totalCount(params: Parameters<RenderPrefix>[0]) {
+  const { t } = useI18n()
 
-interface PreTaskCodesReq {
-  preTaskCodes: string
-}
+  const prefix = t('project.list.total_items')
+  const count = Number.prototype.toLocaleString.call(params?.itemCount ?? 0)
 
-interface PostTaskCodesReq {
-  postTaskCodes: string
-}
-
-interface TaskCodeReq {
-  taskCode: string
-}
-
-interface SaveReq extends ProcessDefinitionCodeReq, ProjectCodeReq {
-  postTaskCode: string
-  preTaskCode: string
-}
-
-export {
-  ProjectCodeReq,
-  ProcessDefinitionCodeReq,
-  PreTaskCodesReq,
-  PostTaskCodesReq,
-  TaskCodeReq,
-  SaveReq
+  return `${prefix}: ${count}`
 }

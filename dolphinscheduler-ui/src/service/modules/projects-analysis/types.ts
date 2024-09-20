@@ -30,7 +30,7 @@ interface UserList {
   count: number
 }
 
-interface ProcessDefinitionRes {
+interface WorkflowDefinitionRes {
   count: number
   userList: UserList[]
 }
@@ -75,7 +75,7 @@ interface ListReq {
 export {
   CodeReq,
   StateReq,
-  ProcessDefinitionRes,
+  WorkflowDefinitionRes,
   WorkflowInstanceCountVo,
   TaskInstanceCountVo,
   TaskQueueRes,

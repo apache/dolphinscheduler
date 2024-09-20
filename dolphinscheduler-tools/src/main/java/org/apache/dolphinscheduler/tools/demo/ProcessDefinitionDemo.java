@@ -763,7 +763,7 @@ public class ProcessDefinitionDemo {
         String taskCode = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
 
         WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
-        processDefinitionLog.setName("demo_sub_process");
+        processDefinitionLog.setName("demo_sub_workflow");
         processDefinitionLog.setDescription("Start the production line");
         processDefinitionLog.setGlobalParams("[]");
         processDefinitionLog.setLocations(null);
@@ -798,7 +798,7 @@ public class ProcessDefinitionDemo {
             taskDefinitionLog.setTimeoutFlag(TimeoutFlag.CLOSE);
             taskDefinitionLog.setTimeoutNotifyStrategy(null);
             taskDefinitionLog.setWorkerGroup("default");
-            taskDefinitionLog.setTaskType("SUB_PROCESS");
+            taskDefinitionLog.setTaskType("SUB_WORKFLOW");
             taskDefinitionLogs.add(taskDefinitionLog);
         }
         TaskDefinitionLog taskDefinitionLogFirst = taskDefinitionLogs.get(0);

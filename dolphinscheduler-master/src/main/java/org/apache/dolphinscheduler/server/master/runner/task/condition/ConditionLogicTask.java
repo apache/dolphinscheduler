@@ -66,7 +66,7 @@ public class ConditionLogicTask extends BaseSyncLogicTask<ConditionsParameters> 
 
     private DependResult calculateConditionResult() {
         final List<TaskInstance> taskInstances = taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
-                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTestFlag());
+                taskExecutionContext.getWorkflowInstanceId(), taskExecutionContext.getTestFlag());
         final Map<Long, TaskInstance> taskInstanceMap = taskInstances.stream()
                 .collect(Collectors.toMap(TaskInstance::getTaskCode, Function.identity()));
 

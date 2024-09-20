@@ -14,10 +14,10 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
-* [SubProcess](../task/sub-process.md)
+* [SubWorkflow](../task/sub-workflow)
 * [Kubernetes](../task/kubernetes.md)
 
-When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a SubProcess node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the subprocess.
+When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a sub-workflow node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the sub-workflow.
 
 The value of upstream parameter can be updated in downstream node in the same way as [setting parameter](#create-a-shell-task-and-set-parameters).
 
@@ -94,29 +94,29 @@ For example
 
 Attention: When the variable value contains the `\n` identifier, such as ` value = "hello \n world" `, value needs to be carried out in a special way. You need to use `print('${setValue(key=%s)}' % repr(value))`, otherwise the argument cannot be passed to the subsequent flow.
 
-#### Pass parameter from SubProcess task to downstream
+#### Pass parameter from SubWorkflow task to downstream
 
-In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
+In the workflow definition of the sub-workflow, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the sub-workflow node.
 
-Create an A task in the workflow definition of the subprocess, add var1 and var2 parameters to the custom parameters, and write the following script:
+Create an A task in the workflow definition of the sub-workflow, add var1 and var2 parameters to the custom parameters, and write the following script:
 
-![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+![context-sub-workflow01](../../../../img/new_ui/dev/parameter/context-sub-workflow01.png)
 
-Save the subprocess_example1 workflow and set the global parameters var1.
+Save the sub-workflow_example1 workflow and set the global parameters var1.
 
-![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+![context-sub-workflow02](../../../../img/new_ui/dev/parameter/context-sub-workflow02.png)
 
-Create a sub_process task in a new workflow, and use the subprocess_example1 workflow as the sub-node.
+Create a sub_workflow task in a new workflow, and use the sub-workflow_example1 workflow as the sub-node.
 
-![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+![context-sub-workflow03](../../../../img/new_ui/dev/parameter/context-sub-workflow03.png)
 
-Create a shell task as a downstream task of the sub_process task, and write the following script:
+Create a shell task as a downstream task of the sub_workflow task, and write the following script:
 
-![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+![context-sub-workflow04](../../../../img/new_ui/dev/parameter/context-sub-workflow04.png)
 
 Save the workflow and run it. The result of the downstream task is as follows:
 
-![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+![context-sub-workflow05](../../../../img/new_ui/dev/parameter/context-sub-workflow05.png)
 
 Although the two parameters var1 and var2 are output in the A task, only the `OUT` parameter var1 is defined in the workflow definition, and the downstream task successfully outputs var1. It proves that the var1 parameter is passed in the workflow with reference to the expected value.
 

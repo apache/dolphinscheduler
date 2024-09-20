@@ -121,7 +121,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                             .matches(
                                     workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubProcess() == Flag.NO);
+                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO);
 
                     final List<WorkflowInstance> subWorkflowInstance =
                             repository.queryWorkflowInstance(context.getWorkflows().get(1));
@@ -130,7 +130,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                             .hasSize(1)
                             .satisfiesExactly(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.YES);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
                             });
 
                     Assertions
@@ -173,7 +173,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                             .matches(
                                     workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubProcess() == Flag.NO);
+                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO);
 
                     final List<WorkflowInstance> subWorkflowInstance =
                             repository.queryWorkflowInstance(context.getWorkflows().get(1));
@@ -182,7 +182,7 @@ public class WorkflowStartIT extends AbstractMasterIntegrationTest {
                             .hasSize(1)
                             .satisfiesExactly(workflowInstance -> {
                                 assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.FAILURE);
-                                assertThat(workflowInstance.getIsSubProcess()).isEqualTo(Flag.YES);
+                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
                             });
 
                     Assertions

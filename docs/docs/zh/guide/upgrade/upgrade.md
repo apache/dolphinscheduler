@@ -59,7 +59,7 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
 执行结果：
 
-- 原血缘数据迁移至新血缘表 `t_ds_process_task_lineage`。
+- 原血缘数据迁移至新血缘表 `t_ds_workflow_task_lineage`。
 - 此脚本仅执行 upsert 操作，不执行删除操作，如果需要删除，您可以手动删除。
 
 ### 服务升级

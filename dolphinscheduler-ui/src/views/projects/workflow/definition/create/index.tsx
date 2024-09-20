@@ -27,7 +27,7 @@ import {
   Connect,
   Location
 } from '../../components/dag/types'
-import { createProcessDefinition } from '@/service/modules/process-definition'
+import { createWorkflowDefinition } from '@/service/modules/workflow-definition'
 import { useI18n } from 'vue-i18n'
 import Styles from './index.module.scss'
 
@@ -63,7 +63,7 @@ export default defineComponent({
         }
       })
 
-      createProcessDefinition(
+      createWorkflowDefinition(
         {
           taskDefinitionJson: JSON.stringify(taskDefinitions),
           taskRelationJson: JSON.stringify(connects),

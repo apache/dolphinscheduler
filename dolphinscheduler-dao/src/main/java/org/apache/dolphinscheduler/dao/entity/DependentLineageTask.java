@@ -27,8 +27,8 @@ import lombok.NoArgsConstructor;
 public class DependentLineageTask {
 
     private long projectCode;
-    private long processDefinitionCode;
-    private String processDefinitionName;
+    private long workflowDefinitionCode;
+    private String workflowDefinitionName;
     private long taskDefinitionCode;
     private String taskDefinitionName;
 }

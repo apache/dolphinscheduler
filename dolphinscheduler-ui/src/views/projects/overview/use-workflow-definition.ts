@@ -15,26 +15,29 @@
  * limitations under the License.
  */
 
+import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { countDefinitionByUser } from '@/service/modules/projects-analysis'
-import type { ProcessDefinitionRes } from '@/service/modules/projects-analysis/types'
+import type { WorkflowDefinitionRes } from '@/service/modules/projects-analysis/types'
 import type { DefinitionChartData } from './types'
 
-export function useProcessDefinition() {
-  const getProcessDefinition = () => {
-    const { state } = useAsyncState(
-      countDefinitionByUser({}).then(
-        (res: ProcessDefinitionRes): DefinitionChartData => {
-          const xAxisData = res.userList.map((item) => item.userName)
-          const seriesData = res.userList.map((item) => item.count)
+export function useWorkflowDefinition() {
+  const route = useRoute()
 
-          return { xAxisData, seriesData }
-        }
-      ),
+  const getWorkflowDefinition = () => {
+    const { state } = useAsyncState(
+      countDefinitionByUser({
+        projectCode: Number(route.params.projectCode)
+      }).then((res: WorkflowDefinitionRes): DefinitionChartData => {
+        const xAxisData = res.userList.map((item) => item.userName)
+        const seriesData = res.userList.map((item) => item.count)
+
+        return { xAxisData, seriesData }
+      }),
       { xAxisData: [], seriesData: [] }
     )
     return state
   }
 
-  return { getProcessDefinition }
+  return { getWorkflowDefinition }
 }

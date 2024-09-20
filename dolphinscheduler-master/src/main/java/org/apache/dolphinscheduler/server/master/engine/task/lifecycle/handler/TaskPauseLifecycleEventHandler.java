@@ -34,9 +34,6 @@ public class TaskPauseLifecycleEventHandler extends AbstractTaskLifecycleEventHa
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskPauseLifecycleEvent taskPauseEvent) {
-        if (!taskExecutionRunnable.isTaskInstanceInitialized()) {
-            taskExecutionRunnable.initializeTaskInstance();
-        }
         taskStateAction.pauseEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskPauseEvent);
     }
 

@@ -64,7 +64,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         ErrorCommand expectedCommand = insertOne();
         Page<ErrorCommand> page = new Page<>(1, 10);
         IPage<ErrorCommand> commandIPage = errorCommandMapper.queryErrorCommandPageByIds(page,
-                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+                Lists.newArrayList(expectedCommand.getWorkflowDefinitionCode()));
         List<ErrorCommand> commandList = commandIPage.getRecords();
         assertThat(commandList).isNotEmpty();
         assertThat(commandIPage.getTotal()).isEqualTo(1);
@@ -87,7 +87,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         workflowDefinition.setCreateTime(new Date());
         workflowDefinitionMapper.insert(workflowDefinition);
 
-        errorCommand.setProcessDefinitionCode(workflowDefinition.getCode());
+        errorCommand.setWorkflowDefinitionCode(workflowDefinition.getCode());
         errorCommandMapper.updateById(errorCommand);
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(

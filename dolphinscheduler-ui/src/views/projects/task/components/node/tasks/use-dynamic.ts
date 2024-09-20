@@ -72,7 +72,7 @@ export function useDynamic({
         model,
         projectCode,
         from,
-        processName: data?.processName,
+        workflowName: data?.workflowDefinitionName,
         code: from === 1 ? 0 : Number(workflowCode)
       }),
       ...Fields.useDynamic(model),

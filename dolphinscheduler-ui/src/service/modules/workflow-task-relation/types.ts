@@ -15,23 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.parameters;
+interface ProjectCodeReq {
+  projectCode: string
+}
 
-public class SubProcessParameters extends AbstractParameters {
+interface WorkflowDefinitionCodeReq {
+  workflowDefinitionCode: string
+}
 
-    private long processDefinitionCode;
+interface PreTaskCodesReq {
+  preTaskCodes: string
+}
 
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
+interface PostTaskCodesReq {
+  postTaskCodes: string
+}
 
-    public long getProcessDefinitionCode() {
-        return this.processDefinitionCode;
-    }
+interface TaskCodeReq {
+  taskCode: string
+}
 
-    @Override
-    public boolean checkParameters() {
-        return this.processDefinitionCode > 0;
-    }
+interface SaveReq extends WorkflowDefinitionCodeReq, ProjectCodeReq {
+  postTaskCode: string
+  preTaskCode: string
+}
 
+export {
+  ProjectCodeReq,
+  WorkflowDefinitionCodeReq,
+  PreTaskCodesReq,
+  PostTaskCodesReq,
+  TaskCodeReq,
+  SaveReq
 }

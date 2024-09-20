@@ -100,7 +100,7 @@ public class TaskDefinitionServiceImplTest {
     private ProcessService processService;
 
     @Mock
-    private WorkflowDefinitionLogMapper processDefineLogMapper;
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
@@ -119,9 +119,6 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
-
-    @Mock
-    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     private static final String TASK_PARAMETER =
             "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";;
@@ -289,12 +286,12 @@ public class TaskDefinitionServiceImplTest {
         TaskDefinitionLog taskDefinitionLog = getTaskDefinitionLog();
         ArrayList<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
         taskDefinitionLogs.add(taskDefinitionLog);
-        Integer version = 1;
+        int version = 1;
         when(workflowDefinitionMapper.queryByCode(isA(long.class))).thenReturn(workflowDefinition);
 
         // saveWorkflowDefine
-        when(processDefineLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
-        when(processDefineLogMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
+        when(workflowDefinitionLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
+        when(workflowDefinitionLogMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
         when(workflowDefinitionMapper.insert(isA(WorkflowDefinitionLog.class))).thenReturn(1);
         int insertVersion =
                 processServiceImpl.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
@@ -304,7 +301,7 @@ public class TaskDefinitionServiceImplTest {
 
         // saveTaskRelation
         List<WorkflowTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
-        when(workflowTaskRelationMapper.queryByProcessCode(eq(workflowDefinition.getCode())))
+        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(eq(workflowDefinition.getCode())))
                 .thenReturn(workflowTaskRelationList);
         when(workflowTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
         when(workflowTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
@@ -455,7 +452,7 @@ public class TaskDefinitionServiceImplTest {
 
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(PROJECT_CODE);
-        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation.setPreTaskCode(TASK_CODE);
         workflowTaskRelation.setPostTaskCode(TASK_CODE + 1L);
 
@@ -479,7 +476,7 @@ public class TaskDefinitionServiceImplTest {
 
     private void fillProcessTaskRelation(WorkflowTaskRelation workflowTaskRelation) {
         workflowTaskRelation.setProjectCode(PROJECT_CODE);
-        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation.setPreTaskCode(TASK_CODE);
         workflowTaskRelation.setPostTaskCode(TASK_CODE + 1L);
     }
@@ -489,7 +486,7 @@ public class TaskDefinitionServiceImplTest {
 
         WorkflowTaskRelationLog processTaskRelationLog = new WorkflowTaskRelationLog();
         processTaskRelationLog.setProjectCode(PROJECT_CODE);
-        processTaskRelationLog.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelationLog.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         processTaskRelationLog.setPreTaskCode(TASK_CODE);
         processTaskRelationLog.setPostTaskCode(TASK_CODE + 1L);
 
@@ -502,7 +499,7 @@ public class TaskDefinitionServiceImplTest {
 
         WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
         workflowTaskRelation.setProjectCode(PROJECT_CODE);
-        workflowTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation.setPreTaskCode(TASK_CODE);
         workflowTaskRelation.setPostTaskCode(TASK_CODE + 1L);
 
@@ -510,7 +507,7 @@ public class TaskDefinitionServiceImplTest {
 
         WorkflowTaskRelation workflowTaskRelation2 = new WorkflowTaskRelation();
         workflowTaskRelation2.setProjectCode(PROJECT_CODE);
-        workflowTaskRelation2.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        workflowTaskRelation2.setWorkflowDefinitionCode(PROCESS_DEFINITION_CODE);
         workflowTaskRelation2.setPreTaskCode(TASK_CODE - 1);
         workflowTaskRelation2.setPostTaskCode(TASK_CODE);
         workflowTaskRelationList.add(workflowTaskRelation2);

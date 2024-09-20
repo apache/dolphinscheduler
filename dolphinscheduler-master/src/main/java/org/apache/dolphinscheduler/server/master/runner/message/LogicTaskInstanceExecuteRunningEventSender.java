@@ -43,7 +43,7 @@ public class LogicTaskInstanceExecuteRunningEventSender
     public TaskExecutionRunningEvent buildMessage(@NonNull TaskExecutionContext taskExecutionContext) {
         TaskExecutionRunningEvent taskExecuteRunningMessage = new TaskExecutionRunningEvent();
         taskExecuteRunningMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        taskExecuteRunningMessage.setWorkflowInstanceId(taskExecutionContext.getProcessInstanceId());
+        taskExecuteRunningMessage.setWorkflowInstanceId(taskExecutionContext.getWorkflowInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());
         taskExecuteRunningMessage.setLogPath(taskExecutionContext.getLogPath());
         taskExecuteRunningMessage.setWorkflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost());

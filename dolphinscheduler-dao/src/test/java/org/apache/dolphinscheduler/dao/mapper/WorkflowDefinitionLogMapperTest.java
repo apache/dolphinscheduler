@@ -140,19 +140,19 @@ public class WorkflowDefinitionLogMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionVersionsPaging() {
+    public void testQueryWorkflowDefinitionVersionsPaging() {
         insertOne();
         Page<WorkflowDefinitionLog> page = new Page(1, 3);
         IPage<WorkflowDefinitionLog> processDefinitionLogs =
-                workflowDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
+                workflowDefinitionLogMapper.queryWorkflowDefinitionVersionsPaging(page, 1L, 1L);
         Assertions.assertNotEquals(0, processDefinitionLogs.getTotal());
     }
 
     @Test
-    public void testDeleteByProcessDefinitionCodeAndVersion() {
+    public void testDeleteByWorkflowDefinitionCodeAndVersion() {
         insertOne();
         Page<WorkflowDefinitionLog> page = new Page(1, 3);
-        int processDefinitionLogs = workflowDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(1L, 1);
+        int processDefinitionLogs = workflowDefinitionLogMapper.deleteByWorkflowDefinitionCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(0, processDefinitionLogs);
     }
 
