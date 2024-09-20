@@ -31,7 +31,7 @@ bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 # Install the target version schema and upgrade it
 export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_${DATABASE_VERSION}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
 docker run -v "./ds_schema_check_test/mysql-connector-java-8.0.16.jar:/opt/dolphinscheduler/tools/libs/mysql-connector-java-8.0.16.jar" \
---network schema-test -it apache/dolphinscheduler-tools:${DS_VERSION} -c \
+--network schema-test apache/dolphinscheduler-tools:${DS_VERSION} -c \
 'export DATABASE="mysql"; \
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"; \
 export SPRING_DATASOURCE_USERNAME="root"; \
