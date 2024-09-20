@@ -289,7 +289,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
                             .anySatisfy(workflowInstance -> {
                                 Assertions
                                         .assertThat(workflowInstance.getState())
-                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                                        .isEqualTo(WorkflowExecutionStatus.PAUSE);
                                 Assertions
                                         .assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
@@ -469,7 +469,7 @@ public class WorkflowInstanceFailoverIT extends AbstractMasterIntegrationTest {
                             .anySatisfy(workflowInstance -> {
                                 Assertions
                                         .assertThat(workflowInstance.getState())
-                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                                        .isEqualTo(WorkflowExecutionStatus.STOP);
                                 Assertions
                                         .assertThat(workflowInstance.getName())
                                         .isEqualTo("workflow_with_one_fake_task_success-20240816071251690");
