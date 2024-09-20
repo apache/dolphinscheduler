@@ -37,7 +37,6 @@ for base_dir in ds_schema_check_test/dev; do
     for d in alert-server api-server master-server worker-server tools; do
       cp ds_schema_check_test/${MYSQL_JDBC_JAR} ${base_dir}/${d}/libs
     done
-  fi
 done
 docker compose -f .github/workflows/schema-check/mysql/docker-compose-base.yaml up -d --wait
 docker exec -i mysql mysql -uroot -pmysql -e "create database dolphinscheduler_${DATABASE_VERSION}";
