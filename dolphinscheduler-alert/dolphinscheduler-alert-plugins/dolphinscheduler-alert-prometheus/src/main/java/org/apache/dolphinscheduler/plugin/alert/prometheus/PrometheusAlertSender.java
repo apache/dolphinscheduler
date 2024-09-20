@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -67,7 +68,7 @@ public class PrometheusAlertSender {
             log.error("Send prometheus alert manager alert error", e);
             alertResult = new AlertResult();
             alertResult.setSuccess(false);
-            alertResult.setMessage(e.getMessage());
+            alertResult.setMessage(ExceptionUtils.getMessage(e));
         }
         return alertResult;
     }
