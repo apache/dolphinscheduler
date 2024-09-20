@@ -146,12 +146,11 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - uses: actions/cache/restore@v4
-        name: Download Binary Package Cache
+      - name: Download Binary Package
+        uses: actions/download-artifact@v4
         with:
-          path: /tmp/${{ matrix.version }}
-          key: apache-dolphinscheduler-${{ matrix.version }}-bin
-          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
+          name: binary-package-8
+          path: ds_schema_check_test/dev
       - name: Running Schema Check
         run: |
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
