@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.alert.voice;
+
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertChannelFactory;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
