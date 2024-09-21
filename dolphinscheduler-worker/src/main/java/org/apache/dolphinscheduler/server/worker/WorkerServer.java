@@ -85,6 +85,7 @@ public class WorkerServer implements IStoppable {
 
     @PostConstruct
     public void run() {
+        ServerLifeCycleManager.toRunning();
         this.workerRpcServer.start();
         TaskPluginManager.loadTaskPlugin();
         DataSourceProcessorProvider.initialize();
