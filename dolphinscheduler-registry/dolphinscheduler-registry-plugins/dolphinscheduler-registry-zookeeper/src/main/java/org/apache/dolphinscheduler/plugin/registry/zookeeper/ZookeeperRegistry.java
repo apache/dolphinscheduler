@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.commons.lang3.time.DurationUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
@@ -101,13 +102,18 @@ final class ZookeeperRegistry implements Registry {
 
     @Override
     public void start() {
+        final StopWatch stopWatch = StopWatch.createStarted();
         client.start();
         try {
             if (!client.blockUntilConnected(DurationUtils.toMillisInt(properties.getBlockUntilConnected()),
                     MILLISECONDS)) {
                 client.close();
-                throw new RegistryException("zookeeper connect failed in : " + properties.getConnectString() + "ms");
+                throw new RegistryException(
+                        "zookeeper connect failed to: " + properties.getConnectString() + " in : "
+                                + properties.getBlockUntilConnected() + "ms");
             }
+            stopWatch.stop();
+            log.info("ZookeeperRegistry started at: {}/ms", stopWatch.getTime());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("Zookeeper registry start failed", e);

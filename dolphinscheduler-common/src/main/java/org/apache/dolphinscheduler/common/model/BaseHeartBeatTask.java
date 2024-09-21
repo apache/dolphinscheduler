@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.model;
 
-import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 
 import lombok.extern.slf4j.Slf4j;
@@ -54,11 +53,6 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
     public void run() {
         while (runningFlag) {
             try {
-                if (!ServerLifeCycleManager.isRunning()) {
-                    log.info("The current server status is {}, will not write heartBeatInfo into registry",
-                            ServerLifeCycleManager.getServerStatus());
-                    continue;
-                }
                 T heartBeat = getHeartBeat();
                 // if first time or heartBeat status changed, write heartBeatInfo into registry
                 if (System.currentTimeMillis() - lastWriteTime >= heartBeatInterval

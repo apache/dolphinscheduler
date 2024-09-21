@@ -19,12 +19,9 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 
-import org.apache.curator.test.TestingServer;
-
-import javax.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 
 /**
@@ -32,19 +29,11 @@ import org.springframework.test.annotation.DirtiesContext;
  * <p> Used to create a text environment to test master server.
  * <p> In order to separate the environment for each text case, the context will be dirtied before each test method.
  */
+@Slf4j
 @SpringBootTest(classes = {
         MasterServer.class,
         DaoConfiguration.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public abstract class AbstractMasterIntegrationTest {
+public abstract class AbstractMasterIntegrationTestCase {
 
-    @Configuration
-    public static class RegistryServer {
-
-        @PostConstruct
-        public void startEmbedRegistryServer() throws Exception {
-            final TestingServer server = new TestingServer(true);
-            System.setProperty("registry.zookeeper.connect-string", server.getConnectString());
-        }
-    }
 }

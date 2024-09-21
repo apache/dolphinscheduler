@@ -134,7 +134,7 @@ public class WorkerRegistryClient implements AutoCloseable {
             workerHeartBeatTask.shutdown();
         }
         registryClient.close();
-        log.info("Worker registry client closed");
+        log.info("Closed WorkerRegistryClient");
     }
 
     public boolean isAvailable() {

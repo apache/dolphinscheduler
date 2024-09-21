@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it;
+package org.apache.dolphinscheduler.server.master.integration;
 
 import java.io.InputStream;
 
@@ -26,13 +26,13 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlFactory {
 
     @SneakyThrows
-    public static WorkflowITContext load(final String yamlRelativePath) {
+    public static WorkflowTestCaseContext load(final String yamlRelativePath) {
         final Yaml yaml = new Yaml();
         try (InputStream fis = YamlFactory.class.getResourceAsStream(yamlRelativePath)) {
             if (fis == null) {
                 throw new IllegalArgumentException("Cannot find the file: " + yamlRelativePath + " under classpath");
             }
-            return yaml.loadAs(fis, WorkflowITContext.class);
+            return yaml.loadAs(fis, WorkflowTestCaseContext.class);
         }
     }
 

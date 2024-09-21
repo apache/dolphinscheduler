@@ -39,7 +39,7 @@ import org.springframework.validation.Validator;
 @Configuration
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 @ConfigurationProperties(prefix = "registry")
-class ZookeeperRegistryProperties implements Validator {
+public class ZookeeperRegistryProperties implements Validator {
 
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 

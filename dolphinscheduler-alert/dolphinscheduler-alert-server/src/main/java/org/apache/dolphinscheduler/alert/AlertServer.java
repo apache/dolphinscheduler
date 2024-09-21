@@ -56,6 +56,7 @@ public class AlertServer {
 
     @PostConstruct
     public void run() {
+        ServerLifeCycleManager.toRunning();
         log.info("AlertServer is staring ...");
         alertBootstrapService.start();
         log.info("AlertServer is started ...");

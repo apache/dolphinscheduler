@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
@@ -80,7 +79,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class TaskGroupCoordinator extends BaseDaemonThread {
+public class TaskGroupCoordinator extends BaseDaemonThread implements AutoCloseable {
 
     @Autowired
     private RegistryClient registryClient;
@@ -97,6 +96,8 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
 
+    private boolean flag = true;
+
     private static int DEFAULT_LIMIT = 1000;
 
     public TaskGroupCoordinator() {
@@ -106,17 +107,15 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
     @Override
     public synchronized void start() {
         log.info("TaskGroupCoordinator starting...");
+        flag = true;
         super.start();
         log.info("TaskGroupCoordinator started...");
     }
 
     @Override
     public void run() {
-        while (!ServerLifeCycleManager.isStopped()) {
+        while (flag) {
             try {
-                if (!ServerLifeCycleManager.isRunning()) {
-                    continue;
-                }
                 registryClient.getLock(RegistryNodeType.MASTER_TASK_GROUP_COORDINATOR_LOCK.getRegistryPath());
                 try {
                     StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
@@ -488,4 +487,9 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
         log.info("Success release TaskGroupQueue: {}", taskGroupQueue);
     }
 
+    @Override
+    public void close() throws Exception {
+        flag = false;
+        log.info("TaskGroupCoordinator closed");
+    }
 }
