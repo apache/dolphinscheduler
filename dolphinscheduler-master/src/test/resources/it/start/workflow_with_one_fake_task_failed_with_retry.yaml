@@ -53,8 +53,8 @@ tasks:
 
 taskRelations:
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 1
