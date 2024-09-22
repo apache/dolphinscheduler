@@ -655,6 +655,9 @@
                             <file>${maven.multiModuleProjectDirectory}/style/spotless_dolphinscheduler_formatter.xml</file>
                         </eclipse>
                         <removeUnusedImports />
+                        <licenseHeader>
+                            <file>${maven.multiModuleProjectDirectory}/style/license-header</file>
+                        </licenseHeader>
                         <importOrder>
                             <file>${maven.multiModuleProjectDirectory}/style/eclipse.importorder</file>
                         </importOrder>
@@ -686,6 +689,10 @@
                             <include>dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/**/*.java</include>
                             <include>dolphinscheduler-api-test/dolphinscheduler-api-test-core/src/main/java/**/*.java</include>
                         </includes>
+                        <excludes>
+                            <!-- Using customer license -->
+                            <exclude>src/main/java/org/apache/dolphinscheduler/common/utils/CodeGenerateUtils.java</exclude>
+                        </excludes>
                     </java>
                     <pom>
                         <sortPom>
