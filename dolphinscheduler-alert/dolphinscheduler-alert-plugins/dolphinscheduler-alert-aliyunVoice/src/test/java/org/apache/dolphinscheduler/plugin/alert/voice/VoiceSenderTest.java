@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.alert.voice;
+
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.plugin.alert.voice.VoiceParam;
-import org.apache.dolphinscheduler.plugin.alert.voice.VoiceSender;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
