@@ -29,8 +29,14 @@ export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
 # Install the target version schema and upgrade it
+docker run --network schema-test apache/dolphinscheduler-tools:${DS_VERSION} -c \
+'export DATABASE="postgresql"; \
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver"; \
+export SPRING_DATASOURCE_USERNAME="postgres"; \
+export SPRING_DATASOURCE_PASSWORD="postgres"; \
+export SPRING_DATASOURCE_URL='jdbc:postgresql://postgres:5432/dolphinscheduler_${DATABASE_VERSION}'; \
+bash tools/bin/upgrade-schema.sh'
 export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_${DATABASE_VERSION}"
-bash ds_schema_check_test/${DS_VERSION}/tools/bin/upgrade-schema.sh
 bash ds_schema_check_test/dev/tools/bin/upgrade-schema.sh
 
 # Compare the schema

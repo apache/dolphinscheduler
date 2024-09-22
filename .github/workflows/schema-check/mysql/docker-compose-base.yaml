@@ -28,8 +28,14 @@ services:
       MYSQL_DATABASE: dolphinscheduler_dev
     ports:
       - "3306:3306"
+    networks:
+      - schema-test
     healthcheck:
       test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
       interval: 5s
       timeout: 60s
       retries: 120
+
+networks:
+  schema-test:
+    name: schema-test
