@@ -30,7 +30,6 @@ import {
   StopOutlined,
   IssuesCloseOutlined,
   SendOutlined,
-  HistoryOutlined,
   HourglassOutlined
 } from '@vicons/antd'
 import { format, parseISO } from 'date-fns'
