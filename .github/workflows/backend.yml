@@ -59,6 +59,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 30720
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
@@ -78,10 +91,7 @@ jobs:
           ./mvnw -B clean install \
                  -Prelease \
                  -Dmaven.test.skip=true \
-                 -Dspotless.skip=true \
-                 -Dhttp.keepAlive=false \
-                 -Dmaven.wagon.http.pool=false \
-                 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+                 -Dspotless.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v4

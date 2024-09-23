@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
-import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

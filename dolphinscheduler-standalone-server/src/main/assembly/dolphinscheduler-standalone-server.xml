@@ -26,23 +26,6 @@
     <baseDirectory>standalone-server</baseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server/libs</directory>
-            <outputDirectory>libs/alert-server</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-api/target/api-server/libs</directory>
-            <outputDirectory>libs/api-server</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-master/target/master-server/libs</directory>
-            <outputDirectory>libs/master-server</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-worker/target/worker-server/libs</directory>
-            <outputDirectory>libs/worker-server</outputDirectory>
-        </fileSet>
-
-        <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <includes>
                 <include>*.yaml</include>
@@ -110,7 +93,7 @@
     <dependencySets>
         <dependencySet>
             <useTransitiveDependencies>false</useTransitiveDependencies>
-            <outputDirectory>libs/standalone-server</outputDirectory>
+            <outputDirectory>libs</outputDirectory>
         </dependencySet>
     </dependencySets>
 </assembly>

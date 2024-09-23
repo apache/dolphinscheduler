@@ -15,16 +15,19 @@
 # limitations under the License.
 #
 
-FROM eclipse-temurin:8-jre
+FROM eclipse-temurin:8-jdk
 
-ENV DOCKER true
-ENV TZ Asia/Shanghai
-ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
+ENV DOCKER=true
+ENV TZ=Asia/Shanghai
+ENV DOLPHINSCHEDULER_HOME=/opt/dolphinscheduler
+
+RUN apt update ; \
+    apt install -y sudo ; \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-ADD ./target/master-server $DOLPHINSCHEDULER_HOME
+# see doc: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/upgrade.html
+ADD ./target/apache-dolphinscheduler-*-bin $DOLPHINSCHEDULER_HOME
 
-EXPOSE 5678 5679
-
-CMD [ "/bin/bash", "./bin/start.sh" ]
+ENTRYPOINT [ "/bin/bash" ]

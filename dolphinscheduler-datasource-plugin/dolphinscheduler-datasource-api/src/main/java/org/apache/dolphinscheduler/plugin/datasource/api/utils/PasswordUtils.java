@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_ENABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_SALT;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 

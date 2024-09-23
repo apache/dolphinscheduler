@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.tools.lineage;
 
-import org.apache.dolphinscheduler.tools.resource.MigrateResource;
-
 import java.sql.SQLException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class MigrateLineage {
 
     public static void main(String[] args) {
-        SpringApplication.run(MigrateResource.class, args);
+        SpringApplication.run(MigrateLineage.class, args);
     }
 
     @Component

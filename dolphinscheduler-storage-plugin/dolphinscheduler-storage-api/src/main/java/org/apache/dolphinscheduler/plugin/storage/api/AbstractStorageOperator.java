@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +64,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler");
+        return PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler");
     }
 
     @Override

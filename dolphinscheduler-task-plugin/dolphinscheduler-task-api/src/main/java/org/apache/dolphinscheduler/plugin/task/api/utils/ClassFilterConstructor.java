@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import lombok.extern.slf4j.Slf4j;
 

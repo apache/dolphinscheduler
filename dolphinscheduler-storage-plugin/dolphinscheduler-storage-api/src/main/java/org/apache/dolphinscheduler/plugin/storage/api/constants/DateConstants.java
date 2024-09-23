@@ -15,26 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.utils;
+package org.apache.dolphinscheduler.plugin.storage.api.constants;
 
-import java.util.Optional;
+import lombok.experimental.UtilityClass;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+@UtilityClass
+public class DateConstants {
 
-public class JsonPathUtilsTest {
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
-    @Test
-    public void read() {
-        String json = "{\"taskInstanceId\":\"123\",\"taskInstanceFinished\":true}";
-        Optional<Boolean> optionalBoolean = JsonPathUtils.read(json, "$.taskInstanceFinished");
-        Assertions.assertTrue(optionalBoolean.get());
-    }
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
 
-    @Test
-    public void exist() {
-        String json = "{\"taskInstanceId\":\"123\",\"taskInstanceFinished\":true}";
-        Assertions.assertTrue(JsonPathUtils.exist(json, "$.[?(@.taskInstanceFinished == true)]"));
-        Assertions.assertFalse(JsonPathUtils.exist(json, "$.[?(@.taskInstanceFinished == false)]"));
-    }
+    public static final String YYYYMMDD = "yyyyMMdd";
+
+    /**
+     * system date(yyyyMMddHHmmss)
+     */
+    public static final String PARAMETER_DATETIME = "system.datetime";
+
+    /**
+     * system date(yyyymmdd) today
+     */
+    public static final String PARAMETER_CURRENT_DATE = "system.biz.curdate";
+
+    /**
+     * system date(yyyymmdd) yesterday
+     */
+    public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
+
 }

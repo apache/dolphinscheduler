@@ -22,10 +22,11 @@ RUN apt update ; \
 
 COPY ./apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
 RUN tar -zxvf /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz -C ~
+RUN rm -f /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz
 
 RUN mv /root/apache-dolphinscheduler-*-SNAPSHOT-bin /root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
-ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-test-SNAPSHOT-bin
+ENV DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
 #Setting dolphinscheduler_env.sh
 COPY .github/workflows/cluster-test/postgresql_with_postgresql_registry/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh

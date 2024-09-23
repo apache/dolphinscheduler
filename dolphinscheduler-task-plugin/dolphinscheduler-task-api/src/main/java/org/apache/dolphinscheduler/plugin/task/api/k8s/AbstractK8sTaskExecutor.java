@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import org.apache.dolphinscheduler.common.utils.ClassFilterConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ClassFilterConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 
 import java.util.HashMap;

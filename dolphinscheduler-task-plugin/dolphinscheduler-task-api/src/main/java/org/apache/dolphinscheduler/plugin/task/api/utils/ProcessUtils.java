@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
-import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
@@ -33,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
 import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManager;
 import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManagerContext;
 import org.apache.dolphinscheduler.plugin.task.api.am.YarnApplicationManagerContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.commons.collections4.CollectionUtils;

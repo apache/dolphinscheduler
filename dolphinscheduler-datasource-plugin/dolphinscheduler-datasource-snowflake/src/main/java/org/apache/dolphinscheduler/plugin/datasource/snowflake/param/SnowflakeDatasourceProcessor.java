@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -37,6 +37,7 @@ import java.sql.SQLException;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.auto.service.AutoService;
+
 @AutoService(DataSourceProcessor.class)
 @Slf4j
 public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
