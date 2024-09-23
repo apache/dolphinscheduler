@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Arrays;
@@ -257,7 +258,7 @@ public class ResourcePermissionCheckServiceImpl
         private final EnvironmentMapper environmentMapper;
 
         @Autowired
-        private ProcessService processService;
+        private UserDao userDao;
 
         public EnvironmentResourcePermissionCheck(EnvironmentMapper environmentMapper) {
             this.environmentMapper = environmentMapper;
@@ -270,7 +271,11 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            User user = processService.getUserById(userId);
+            User user = userDao.queryById(userId);
+            if (user == null) {
+                logger.error("User does not exist, userId:{}.", userId);
+                return false;
+            }
             if (user.getUserType() != UserType.ADMIN_USER) {
                 return false;
             }
