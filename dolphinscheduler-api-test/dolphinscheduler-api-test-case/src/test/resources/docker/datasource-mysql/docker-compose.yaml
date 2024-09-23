@@ -28,7 +28,7 @@ services:
       - api-test
     volumes:
       - ./download-mysql.sh:/tmp/download-mysql.sh
-    entrypoint: [ 'bash', '-c', '/bin/bash /tmp/download-mysql.sh && /opt/dolphinscheduler/bin/start.sh && tail -f /dev/null' ]
+    entrypoint: [ 'bash', '-c', '/bin/bash /tmp/download-mysql.sh && /bin/bash /opt/dolphinscheduler/standalone-server/bin/start.sh && tail -f /dev/null' ]
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s

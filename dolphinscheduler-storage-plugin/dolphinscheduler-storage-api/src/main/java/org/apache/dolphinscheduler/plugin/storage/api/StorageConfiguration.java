@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants.RESOURCE_STORAGE_TYPE;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
