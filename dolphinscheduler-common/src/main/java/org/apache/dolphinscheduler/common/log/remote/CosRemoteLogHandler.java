@@ -70,11 +70,11 @@ public class CosRemoteLogHandler implements RemoteLogHandler, Closeable {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
 
         try {
-            log.info("send remote log {} to COS {}", logPath, objectName);
+            log.info("send remote log from {} to tencent cos {}", logPath, objectName);
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, new File(logPath));
             cosClient.putObject(putObjectRequest);
         } catch (Exception e) {
-            log.error("error while sending remote log {} to COS {}", logPath, objectName, e);
+            log.error("error while sending remote log from {} to tencent cos {}, reason:", logPath, objectName, e);
         }
     }
 
@@ -83,10 +83,10 @@ public class CosRemoteLogHandler implements RemoteLogHandler, Closeable {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
 
         try {
-            log.info("get remote log on COS {} to {}", objectName, logPath);
+            log.info("get remote log from tencent cos {} to {}", objectName, logPath);
             cosClient.getObject(new GetObjectRequest(bucketName, objectName), new File(logPath));
         } catch (Exception e) {
-            log.error("error while getting remote log on COS {} to {}", objectName, logPath, e);
+            log.error("error while sending remote log from {} to tencent cos {}, reason:", objectName, logPath, e);
         }
     }
 
@@ -104,9 +104,9 @@ public class CosRemoteLogHandler implements RemoteLogHandler, Closeable {
         boolean existsBucket = cosClient.doesBucketExist(bucketName);
         if (!existsBucket) {
             throw new IllegalArgumentException(
-                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+                    "bucketName: " + bucketName + " does not exists, you should create it first");
         }
 
-        log.info("Tencent COS bucket '{}' has been found for remote logging", bucketName);
+        log.debug("tencent cos bucket {} has been found for remote logging", bucketName);
     }
 }

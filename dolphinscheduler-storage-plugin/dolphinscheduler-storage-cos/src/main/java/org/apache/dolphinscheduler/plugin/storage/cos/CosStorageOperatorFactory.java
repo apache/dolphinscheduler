@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.storage.cos;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class CosStorageOperatorFactory implements StorageOperatorFactory {
                 .accessKeySecret(cosPropertiesMap.get(CosStorageConstants.TENCENT_CLOUD_ACCESS_KEY_SECRET))
                 .bucketName(cosPropertiesMap.get(CosStorageConstants.TENCENT_CLOUD_COS_BUCKET_NAME))
                 .resourceUploadPath(
-                        cosPropertiesMap.getOrDefault(Constants.RESOURCE_UPLOAD_PATH,
+                        cosPropertiesMap.getOrDefault(StorageConstants.RESOURCE_UPLOAD_PATH,
                                 CosStorageConstants.DEFAULT_COS_RESOURCE_UPLOAD_PATH))
                 .build();
     }

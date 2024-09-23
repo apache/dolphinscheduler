@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.storage.cos;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -108,9 +108,12 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (resourceBaseAbsolutePath.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in cos", Constants.RESOURCE_UPLOAD_PATH,
-                    resourceBaseAbsolutePath);
+        if (resourceBaseAbsolutePath.startsWith(File.separator)) {
+            String warnMessage =
+                    String.format("%s -> %s should not start with %s in tencent cos",
+                            StorageConstants.RESOURCE_UPLOAD_PATH,
+                            resourceBaseAbsolutePath, File.separator);
+            log.warn(warnMessage);
             return resourceBaseAbsolutePath.substring(1);
         }
         return resourceBaseAbsolutePath;
@@ -224,7 +227,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
         ListObjectsRequest request = new ListObjectsRequest();
         request.setBucketName(bucketName);
         request.setPrefix(resourceAbsolutePath);
-        request.setDelimiter("/");
+        request.setDelimiter(File.separator);
 
         ObjectListing result = cosClient.listObjects(request);
 
@@ -279,7 +282,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
 
     public void ensureBucketSuccessfullyCreated(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
-            throw new IllegalArgumentException("resource.tencent.cloud.cos.bucket.name is empty");
+            throw new IllegalArgumentException(CosStorageConstants.TENCENT_CLOUD_COS_BUCKET_NAME + " is empty");
         }
 
         if (!cosClient.doesBucketExist(bucketName)) {
@@ -311,16 +314,16 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
     private String transformAbsolutePathToCOSKey(String absolutePath) {
         ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
         if (resourceMetaData.isDirectory()) {
-            return FileUtils.concatFilePath(absolutePath, "/");
+            return FileUtils.concatFilePath(absolutePath, File.separator);
         }
         return absolutePath;
     }
 
-    private String transformCOSKeyToAbsolutePath(String s3Key) {
-        if (s3Key.endsWith("/")) {
-            return s3Key.substring(0, s3Key.length() - 1);
+    private String transformCOSKeyToAbsolutePath(String cosKey) {
+        if (cosKey.endsWith(File.separator)) {
+            return cosKey.substring(0, cosKey.length() - 1);
         }
-        return s3Key;
+        return cosKey;
     }
 
     private TransferManager getCosTransferManager() {
