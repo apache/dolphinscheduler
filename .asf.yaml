@@ -47,6 +47,7 @@ github:
           - Docs
           - Frontend Build
           - "E2E-K8S-Result"
+          - "API-Test-Result"
           - "Mergeable: milestone-label-check"
           - "Title Validator"
       required_pull_request_reviews:

@@ -22,22 +22,24 @@ RUN apt update ; \
 
 COPY ./apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
 RUN tar -zxvf /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz -C ~
+RUN rm -f /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz
 
 RUN mv /root/apache-dolphinscheduler-*-SNAPSHOT-bin /root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
-ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-test-SNAPSHOT-bin
+ENV DOLPHINSCHEDULER_HOME=/root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
 #Setting dolphinscheduler_env.sh
 COPY .github/workflows/cluster-test/mysql_with_zookeeper_registry/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
 #Download mysql jar
-ENV MYSQL_URL "https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
-ENV MYSQL_DRIVER "mysql-connector-java-8.0.16.jar"
-RUN wget -O $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $MYSQL_URL ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/api-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/master-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/worker-server/libs/$MYSQL_DRIVER ; \
-cp $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/tools/libs/$MYSQL_DRIVER
+ENV MYSQL_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
+ENV MYSQL_DRIVER="mysql-connector-java-8.0.16.jar"
+RUN wget -O $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $MYSQL_URL
+RUN cp $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/tools/libs/$MYSQL_DRIVER; \
+    cp $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/api-server/libs/$MYSQL_DRIVER ; \
+    cp $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/master-server/libs/$MYSQL_DRIVER ; \
+    cp $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/worker-server/libs/$MYSQL_DRIVER ; \
+    cp $DOLPHINSCHEDULER_HOME/libs/$MYSQL_DRIVER $DOLPHINSCHEDULER_HOME/alert-server/libs/$MYSQL_DRIVER
 
 #Deploy
 COPY .github/workflows/cluster-test/mysql_with_zookeeper_registry/deploy.sh /root/deploy.sh

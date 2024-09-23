@@ -17,9 +17,9 @@
 
 FROM eclipse-temurin:8-jdk
 
-ENV DOCKER true
-ENV TZ Asia/Shanghai
-ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
+ENV DOCKER=true
+ENV TZ=Asia/Shanghai
+ENV DOLPHINSCHEDULER_HOME=/opt/dolphinscheduler
 
 RUN apt update ; \
     apt install -y sudo ; \
@@ -27,8 +27,8 @@ RUN apt update ; \
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-ADD ./target/worker-server $DOLPHINSCHEDULER_HOME
+ADD ./target/apache-dolphinscheduler-*-bin $DOLPHINSCHEDULER_HOME
 
-EXPOSE 1235
+EXPOSE 12345 25333
 
-CMD [ "/bin/bash", "./bin/start.sh" ]
+CMD [ "/bin/bash", "/opt/dolphinscheduler/api-server/bin/start.sh" ]
