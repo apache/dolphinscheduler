@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.java;
 import static com.google.common.truth.Truth.assertThat;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
-import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.*;
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_FAT_JAR;
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_NORMAL_JAR;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
