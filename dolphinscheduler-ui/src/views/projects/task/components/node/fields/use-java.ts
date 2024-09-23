@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources, useJavaTaskMainJar } from '.'
 import type { IJsonItem } from '../types'
