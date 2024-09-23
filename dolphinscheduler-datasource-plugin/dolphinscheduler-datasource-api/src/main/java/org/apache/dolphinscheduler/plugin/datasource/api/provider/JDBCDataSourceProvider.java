@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -54,7 +53,7 @@ public class JDBCDataSourceProvider {
         dataSource.setUsername(properties.getUser());
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
-        Boolean isOneSession = PropertyUtils.getBoolean(Constants.SUPPORT_HIVE_ONE_SESSION, false);
+        Boolean isOneSession = PropertyUtils.getBoolean(DataSourceConstants.SUPPORT_HIVE_ONE_SESSION, false);
         dataSource.setMinimumIdle(
                 isOneSession ? 1 : PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
         dataSource.setMaximumPoolSize(

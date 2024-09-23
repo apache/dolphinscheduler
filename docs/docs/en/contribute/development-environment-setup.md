@@ -80,7 +80,6 @@ cd dolphinscheduler
        -Dmaven.test.skip \
        -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
-       -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
        -Pdocker,release

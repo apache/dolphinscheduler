@@ -49,26 +49,31 @@ jobs:
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 30720
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
       - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Build Image
         run: |
           ./mvnw -B clean package \
-          -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
+          -Dmaven.test.skip=true \
+          -Dmaven.javadoc.skip=true \
           -Dspotless.skip=true \
-          -Dmaven.checkstyle.skip \
-          -Dmaven.deploy.skip \
-          -Ddocker.push.skip=true \
-          -Pdocker,release -Ddocker.tag=ci \
-          -pl org.apache.dolphinscheduler:dolphinscheduler-alert-server \
-          -pl dolphinscheduler-tools \
-          -pl dolphinscheduler-api \
-          -pl dolphinscheduler-master \
-          -pl dolphinscheduler-worker -am
+          -Pdocker,release -Ddocker.tag=ci
       - name: Create k8s Kind Cluster
         run: |
           # install kubectl
