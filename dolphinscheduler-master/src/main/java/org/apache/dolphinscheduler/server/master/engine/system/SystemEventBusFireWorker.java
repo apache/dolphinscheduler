@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class SystemEventBusFireWorker extends BaseDaemonThread {
+public class SystemEventBusFireWorker extends BaseDaemonThread implements AutoCloseable {
 
     @Autowired
     private SystemEventBus systemEventBus;
@@ -49,19 +49,22 @@ public class SystemEventBusFireWorker extends BaseDaemonThread {
     @Autowired
     private List<ISystemEventHandler> systemEventHandlers;
 
+    private static boolean flag = false;
+
     public SystemEventBusFireWorker() {
         super("SystemEventBusFireWorker");
     }
 
     @Override
     public void start() {
+        flag = true;
         super.start();
         log.info("SystemEventBusFireWorker started");
     }
 
     @Override
     public void run() {
-        while (!ServerLifeCycleManager.isStopped()) {
+        while (flag) {
             final AbstractSystemEvent systemEvent;
             try {
                 systemEvent = systemEventBus.take();
@@ -98,5 +101,11 @@ public class SystemEventBusFireWorker extends BaseDaemonThread {
         matchedSystemEventHandlers.forEach(systemEventHandler -> systemEventHandler.handle(systemEvent));
         stopWatch.stop();
         log.info("Fire SystemEvent: {} cost: {} ms", systemEvent, stopWatch.getTime());
+    }
+
+    @Override
+    public void close() {
+        flag = false;
+        log.info("SystemEventBusFireWorker closed");
     }
 }

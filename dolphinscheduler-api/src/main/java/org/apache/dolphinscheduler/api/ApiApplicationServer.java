@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api;
 
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.PluginDao;
@@ -59,6 +60,7 @@ public class ApiApplicationServer {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
+        ServerLifeCycleManager.toRunning();
         log.info("Received spring application context ready event will load taskPlugin and write to DB");
         DataSourceProcessorProvider.initialize();
         TaskPluginManager.loadTaskPlugin();

@@ -26,8 +26,8 @@ project:
 workflowInstance:
   id: 1
   name: workflow_with_two_serial_fake_task_success-20240816071251690
-  processDefinitionCode: 1
-  processDefinitionVersion: 1
+  workflowDefinitionCode: 1
+  workflowDefinitionVersion: 1
   projectCode: 1
   state: FAILURE
   recovery: NO
@@ -39,7 +39,7 @@ workflowInstance:
   commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
   taskDependType: TASK_POST
   commandStartTime: 2024-08-16 07:12:52
-  isSubProcess: NO
+  isSubWorkflow: NO
   executorId: 1
   historyCmd: START_PROCESS
   workerGroup: default
@@ -51,8 +51,8 @@ taskInstances:
   - id: 1
     name: A
     taskType: LogicFakeTask
-    processInstanceId: 1
-    processInstanceName: workflow_with_two_parallel_fake_task_success-20240816071251690
+    workflowInstanceId: 1
+    workflowInstanceName: workflow_with_two_parallel_fake_task_success-20240816071251690
     projectCode: 1
     taskCode: 1
     taskDefinitionVersion: 1
@@ -111,8 +111,8 @@ tasks:
 
 taskRelations:
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 1
@@ -120,8 +120,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 1
     preTaskVersion: 1
     postTaskCode: 2

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it;
+package org.apache.dolphinscheduler.server.master.integration;
 
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -81,8 +81,8 @@ public class WorkflowOperator {
                 .startParamList(workflowBackfillDTO.getBackfillWorkflowCommandParam().getCommandParams())
                 .backfillTimeList(workflowBackfillDTO.getBackfillWorkflowCommandParam().getBackfillTimeList())
                 .build();
-        final WorkflowBackfillTriggerResponse backfillTriggerResponse =
-                workflowInstanceController.backfillTriggerWorkflow(backfillTriggerRequest);
+        final WorkflowBackfillTriggerResponse backfillTriggerResponse = workflowInstanceController
+                .backfillTriggerWorkflow(backfillTriggerRequest);
 
         Assertions.assertThat(backfillTriggerResponse.isSuccess()).isTrue();
     }

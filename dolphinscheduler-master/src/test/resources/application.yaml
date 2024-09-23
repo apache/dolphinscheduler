@@ -42,18 +42,7 @@ mybatis-plus:
     banner: false
 
 registry:
-  type: zookeeper
-  zookeeper:
-    namespace: dolphinscheduler
-    connect-string: localhost:2181
-    retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
-      max-retries: 5
-    session-timeout: 30s
-    connection-timeout: 9s
-    block-until-connected: 600ms
-    digest: ~
+  type: jdbc
 
 master:
   listen-port: 5678

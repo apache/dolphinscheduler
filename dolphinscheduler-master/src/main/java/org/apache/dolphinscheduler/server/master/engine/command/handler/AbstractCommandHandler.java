@@ -91,8 +91,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     protected void assembleWorkflowInstanceLifecycleListeners(
                                                               final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        workflowExecuteContextBuilder.setWorkflowInstanceLifecycleListeners(
-                workflowExecuteContextBuilder.getWorkflowInstanceLifecycleListeners());
+        workflowExecuteContextBuilder.setWorkflowInstanceLifecycleListeners(workflowLifecycleListeners);
     }
 
     protected void assembleWorkflowDefinition(

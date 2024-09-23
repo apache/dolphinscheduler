@@ -21,7 +21,6 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -83,6 +82,8 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
 
     private ExecutorService commandHandleThreadPool;
 
+    private boolean flag = false;
+
     protected CommandEngine() {
         super("MasterCommandLoopThread");
     }
@@ -92,6 +93,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         log.info("MasterSchedulerBootstrap starting..");
         this.commandHandleThreadPool = ThreadUtils.newDaemonFixedThreadExecutor("MasterCommandHandleThreadPool",
                 Runtime.getRuntime().availableProcessors());
+        flag = true;
         super.start();
         log.info("MasterSchedulerBootstrap started...");
     }
@@ -99,20 +101,15 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     @Override
     public void close() throws Exception {
         log.info("MasterSchedulerBootstrap stopping...");
-
+        flag = false;
         log.info("MasterSchedulerBootstrap stopped...");
     }
 
     @Override
     public void run() {
         MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
-        while (!ServerLifeCycleManager.isStopped()) {
+        while (flag) {
             try {
-                if (!ServerLifeCycleManager.isRunning()) {
-                    // the current server is not at running status, cannot consume command.
-                    log.warn("The current server is not at running status, cannot consumes commands.");
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
                 if (serverLoadProtection.isOverload(systemMetrics)) {

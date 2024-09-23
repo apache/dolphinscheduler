@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it.cases;
+package org.apache.dolphinscheduler.server.master.integration.cases;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -26,12 +26,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
+import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.it.Repository;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContext;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContextFactory;
-import org.apache.dolphinscheduler.server.master.it.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.Repository;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import java.time.Duration;
 import java.util.List;
@@ -44,10 +44,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * The integration test for pausing a workflow instance.
  */
-public class WorkflowInstanceRecoverStopIT extends AbstractMasterIntegrationTest {
+public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrationTestCase {
 
     @Autowired
-    private WorkflowITContextFactory workflowITContextFactory;
+    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
 
     @Autowired
     private WorkflowOperator workflowOperator;
@@ -62,7 +62,7 @@ public class WorkflowInstanceRecoverStopIT extends AbstractMasterIntegrationTest
     @DisplayName("Test recover a workflow which is stopped with one sub workflow task")
     public void testRecoverStoppedWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/recover_stopped/workflow_with_sub_workflow_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()

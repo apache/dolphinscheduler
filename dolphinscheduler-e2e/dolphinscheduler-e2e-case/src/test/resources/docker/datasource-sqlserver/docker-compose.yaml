@@ -36,13 +36,16 @@ services:
       sqlserver:
         condition: service_healthy
   sqlserver:
-    image: alexk002/sqlserver2019_demo:1
+    image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
       - "1433:1433"
+    environment:
+      - MSSQL_SA_PASSWORD=OcP2020123
+      - ACCEPT_EULA=Y
     networks:
       - e2e
     healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P OcP2020123 -Q "SELECT 1"
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P OcP2020123 -Q "SELECT 1" -C
       interval: 5s
       timeout: 5s
       retries: 120

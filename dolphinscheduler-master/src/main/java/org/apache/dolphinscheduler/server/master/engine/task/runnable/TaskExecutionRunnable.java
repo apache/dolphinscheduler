@@ -126,6 +126,7 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
                 .withTaskInstance(taskInstance)
                 .build();
         initializeTaskExecutionContext();
+
         getWorkflowEventBus().publish(TaskStartLifecycleEvent.of(this));
     }
 

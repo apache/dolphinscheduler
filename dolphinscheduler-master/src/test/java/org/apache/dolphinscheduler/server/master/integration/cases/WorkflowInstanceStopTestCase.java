@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.it.cases;
+package org.apache.dolphinscheduler.server.master.integration.cases;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -27,12 +27,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTest;
+import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.it.Repository;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContext;
-import org.apache.dolphinscheduler.server.master.it.WorkflowITContextFactory;
-import org.apache.dolphinscheduler.server.master.it.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.Repository;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
+import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import java.time.Duration;
 
@@ -44,10 +44,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * The integration test for stopping a workflow instance.
  */
-public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
+public class WorkflowInstanceStopTestCase extends AbstractMasterIntegrationTestCase {
 
     @Autowired
-    private WorkflowITContextFactory workflowITContextFactory;
+    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
 
     @Autowired
     private WorkflowOperator workflowOperator;
@@ -62,7 +62,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test stop a workflow with one success task")
     public void testStopWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -111,7 +111,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test stop a workflow with one failed task")
     public void testStopWorkflow_with_oneFailedTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_failed.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -160,7 +160,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test stop a workflow with three parallel three fake tasks(A1->A2->A3, B1->B2->B3, C1->C2->C3) success")
     public void testStopWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/stop/workflow_with_three_parallel_three_fake_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -214,7 +214,7 @@ public class WorkflowInstanceStopIT extends AbstractMasterIntegrationTest {
     @DisplayName("Test stop a workflow with one sub workflow task")
     public void testStopWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/stop/workflow_with_sub_workflow_task_success.yaml";
-        final WorkflowITContext context = workflowITContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflows().get(0);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
