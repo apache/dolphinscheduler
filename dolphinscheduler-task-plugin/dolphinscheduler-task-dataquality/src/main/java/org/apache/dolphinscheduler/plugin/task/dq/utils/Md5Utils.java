@@ -21,17 +21,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Md5Utils
- */
 @Slf4j
-public class Md5Utils {
-
-    private Md5Utils() {
-        throw new IllegalStateException("Utility class");
-    }
+@UtilityClass
+public final class Md5Utils {
 
     public static String getMd5(String src, boolean isUpper) {
         String md5 = "";

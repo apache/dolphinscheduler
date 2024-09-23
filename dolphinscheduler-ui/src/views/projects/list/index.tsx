@@ -30,6 +30,7 @@ import Card from '@/components/card'
 import Search from '@/components/input-search'
 import ProjectModal from './components/project-modal'
 import WorkerGroupModal from '@/views/projects/list/components/worker-group-modal'
+import totalCount from '@/utils/tableTotalCount'
 
 const list = defineComponent({
   name: 'list',
@@ -161,6 +162,8 @@ const list = defineComponent({
                 show-quick-jumper
                 onUpdatePage={this.requestData}
                 onUpdatePageSize={this.handleChangePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

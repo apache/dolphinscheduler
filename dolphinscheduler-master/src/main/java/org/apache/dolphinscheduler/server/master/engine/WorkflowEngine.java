@@ -59,7 +59,8 @@ public class WorkflowEngine implements AutoCloseable {
         try (
                 final CommandEngine commandEngine1 = commandEngine;
                 final WorkflowEventBusCoordinator workflowEventBusCoordinator1 = workflowEventBusCoordinator;
-                final MasterTaskExecutorBootstrap masterTaskExecutorBootstrap1 = masterTaskExecutorBootstrap;) {
+                final MasterTaskExecutorBootstrap masterTaskExecutorBootstrap1 = masterTaskExecutorBootstrap;
+                final TaskGroupCoordinator taskGroupCoordinator1 = taskGroupCoordinator) {
             // closed the resource
         }
     }

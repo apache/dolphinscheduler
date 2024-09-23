@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,6 +107,7 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void initialized() {
+        ServerLifeCycleManager.toRunning();
         final long startupTime = System.currentTimeMillis();
 
         // init rpc server
@@ -150,11 +152,11 @@ public class MasterServer implements IStoppable {
         log.info("MasterServer initialized successfully in {} ms", System.currentTimeMillis() - startupTime);
     }
 
-    /**
-     * gracefully close
-     *
-     * @param cause close cause
-     */
+    @PreDestroy
+    public void shutdown() {
+        close("MasterServer shutdown");
+    }
+
     public void close(String cause) {
         // set stop signal is true
         // execute only once
@@ -165,6 +167,7 @@ public class MasterServer implements IStoppable {
         // thread sleep 3 seconds for thread quietly stop
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
         try (
+                SystemEventBusFireWorker systemEventBusFireWorker1 = systemEventBusFireWorker;
                 WorkflowEngine workflowEngine1 = workflowEngine;
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterRpcServer closedRpcServer = masterRPCServer;
