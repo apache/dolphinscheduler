@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.common.exception;
 
-/**
- * exception for store
- */
 public class StorageOperateNoConfiguredException extends RuntimeException {
 
     public StorageOperateNoConfiguredException() {
