@@ -41,7 +41,29 @@ public class SwitchTaskUtils {
     private static final NashornSandbox sandbox;
     private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
     public static final String NASHORN_POLYFILL_ARRAY_PROTOTYPE_INCLUDES =
-            "if (!Array.prototype.includes) { Object.defineProperty(Array.prototype, 'includes', { value: function(valueToFind, fromIndex) { if (this == null) { throw new TypeError('\"this\" is null or not defined'); } var o = Object(this); var len = o.length >>> 0; if (len === 0) { return false; } var n = fromIndex | 0; var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0); function sameValueZero(x, y) { return x === y || (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y)); } while (k < len) { if (sameValueZero(o[k], valueToFind)) { return true; } k++; } return false; } }); }";
+            "if (!Array.prototype.includes) {" +
+                    "   Object.defineProperty(Array.prototype, 'includes', {" +
+                    "       value: function(valueToFind, fromIndex) {" +
+                    "           if (this == null) {" +
+                    "               throw new TypeError('\"this\" is null or not defined');" +
+                    "           }" +
+                    "           var o = Object(this);" +
+                    "           var len = o.length >>> 0;" +
+                    "           if (len === 0) { return false; }" +
+                    "           var n = fromIndex | 0;" +
+                    "           var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);" +
+                    "           function sameValueZero(x, y) {" +
+                    "               return x === y || (typeof x === 'number' && " +
+                    "                   typeof y === 'number' && isNaN(x) && isNaN(y));" +
+                    "           }" +
+                    "           while (k < len) {" +
+                    "               if (sameValueZero(o[k], valueToFind)) { return true; }" +
+                    "               k++;" +
+                    "           }" +
+                    "           return false;" +
+                    "       }" +
+                    "   });" +
+                    "}";
 
     static {
         sandbox = NashornSandboxes.create();
