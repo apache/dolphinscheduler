@@ -85,8 +85,8 @@ public class ProcessUtilsTest {
     }
 
     @Test
-    public void tetRemoveK8sClientCache(){
-        Assertions.assertDoesNotThrow(()-> {
+    public void tetRemoveK8sClientCache() {
+        Assertions.assertDoesNotThrow(() -> {
             ProcessUtils.removeK8sClientCache("a");
         });
 
