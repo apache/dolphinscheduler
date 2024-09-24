@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-docker
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
       - name: Set environment variables
         run: |
@@ -87,7 +87,6 @@ jobs:
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
           -Dspotless.skip=true \
-          -Dmaven.deploy.skip \
           -Ddocker.tag=${{ env.DOCKER_TAG }} \
           -Ddocker.hub=${{ env.HUB }} \
           -Pdocker,release

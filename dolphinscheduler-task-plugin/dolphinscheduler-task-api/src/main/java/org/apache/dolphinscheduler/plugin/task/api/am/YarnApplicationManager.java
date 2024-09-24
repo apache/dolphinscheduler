@@ -18,9 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -96,14 +97,14 @@ public class YarnApplicationManager implements ApplicationManager {
         log.info("get kerberos init command");
         StringBuilder kerberosCommandBuilder = new StringBuilder();
         boolean hadoopKerberosState =
-                PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+                PropertyUtils.getBoolean(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
         if (hadoopKerberosState) {
             kerberosCommandBuilder.append("export KRB5_CONFIG=")
-                    .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                    .append(PropertyUtils.getString(TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH))
                     .append("\n\n")
                     .append(String.format("kinit -k -t %s %s || true",
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
+                            PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_PATH),
+                            PropertyUtils.getString(TaskConstants.LOGIN_USER_KEY_TAB_USERNAME)))
                     .append("\n\n");
             log.info("kerberos init command: {}", kerberosCommandBuilder);
         }

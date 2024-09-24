@@ -32,6 +32,10 @@ public class ServerLifeCycleManager {
         return serverStartupTime;
     }
 
+    public static void toRunning() {
+        serverStatus = ServerStatus.RUNNING;
+    }
+
     public static boolean isRunning() {
         return serverStatus == ServerStatus.RUNNING;
     }
@@ -81,6 +85,7 @@ public class ServerLifeCycleManager {
         if (serverStatus == ServerStatus.STOPPED) {
             return false;
         }
+        log.info("The current server status changed from {} to {}", serverStatus, ServerStatus.STOPPED);
         serverStatus = ServerStatus.STOPPED;
         return true;
     }
