@@ -30,14 +30,21 @@ export function useDependencies() {
         workFlowCode: workflowCode,
         taskCode: taskCode
       } as DependentTaskReq
-      const res = await queryDependentTasks(projectCode, dependentTaskReq)
-      res
-        .filter((item: any) => item.workflowDefinitionCode !== workflowCode)
-        .forEach((item: any) => {
-          tasks.push(
-            item.workflowDefinitionName + '->' + item.taskDefinitionName
-          )
-        })
+      await queryDependentTasks(projectCode, dependentTaskReq).then(
+        (res: any) => {
+          if (res?.data?.length > 0) {
+            res.data
+              .filter(
+                (item: any) => item.workflowDefinitionCode !== workflowCode
+              )
+              .forEach((item: any) => {
+                tasks.push(
+                  item.workflowDefinitionName + '->' + item.taskDefinitionName
+                )
+              })
+          }
+        }
+      )
     }
     return tasks
   }
@@ -51,14 +58,21 @@ export function useDependencies() {
       const dependentTaskReq = {
         workFlowCode: workflowCode
       } as DependentTaskReq
-      const res = await queryDependentTasks(projectCode, dependentTaskReq)
-      res
-        .filter((item: any) => item.workflowDefinitionCode !== workflowCode)
-        .forEach((item: any) => {
-          tasks.push(
-            item.workflowDefinitionName + '->' + item.taskDefinitionName
-          )
-        })
+      await queryDependentTasks(projectCode, dependentTaskReq).then(
+        (res: any) => {
+          if (res?.data?.length > 0) {
+            res.data
+              .filter(
+                (item: any) => item.workflowDefinitionCode !== workflowCode
+              )
+              .forEach((item: any) => {
+                tasks.push(
+                  item.workflowDefinitionName + '->' + item.taskDefinitionName
+                )
+              })
+          }
+        }
+      )
     }
     return tasks
   }
@@ -110,25 +124,29 @@ export function useDependencies() {
     if (workflowCode && projectCode) {
       await queryDependentTasks(projectCode, dependentTaskReq).then(
         (res: any) => {
-          res.data
-            .filter((item: any) => {
-              if (item.workflowDefinitionCode) {
-                return item.workflowDefinitionCode !== workflowCode
-              } else {
-                return false
-              }
-            })
-            .forEach((item: any) => {
-              dependentTaskLinks.push({
-                text:
-                  item.workflowDefinitionName + '->' + item.taskDefinitionName,
-                show: true,
-                action: () => {
-                  const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
-                  window.open(url, '_blank')
+          if (res?.data?.length > 0) {
+            res.data
+              .filter((item: any) => {
+                if (item.workflowDefinitionCode) {
+                  return item.workflowDefinitionCode !== workflowCode
+                } else {
+                  return false
                 }
               })
-            })
+              .forEach((item: any) => {
+                dependentTaskLinks.push({
+                  text:
+                    item.workflowDefinitionName +
+                    '->' +
+                    item.taskDefinitionName,
+                  show: true,
+                  action: () => {
+                    const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
+                    window.open(url, '_blank')
+                  }
+                })
+              })
+          }
         }
       )
     }
@@ -148,19 +166,25 @@ export function useDependencies() {
     if (workflowCode && projectCode) {
       await queryDependentTasks(projectCode, dependentTaskReq).then(
         (res: any) => {
-          res
-            .filter((item: any) => item.workflowDefinitionCode !== workflowCode)
-            .forEach((item: any) => {
-              dependentTaskLinks.push({
-                text:
-                  item.workflowDefinitionName + '->' + item.taskDefinitionName,
-                show: true,
-                action: () => {
-                  const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
-                  window.open(url, '_blank')
-                }
+          if (res?.data?.length > 0) {
+            res.data
+              .filter(
+                (item: any) => item.workflowDefinitionCode !== workflowCode
+              )
+              .forEach((item: any) => {
+                dependentTaskLinks.push({
+                  text:
+                    item.workflowDefinitionName +
+                    '->' +
+                    item.taskDefinitionName,
+                  show: true,
+                  action: () => {
+                    const url = `/projects/${item.projectCode}/workflow/definitions/${item.workflowDefinitionCode}`
+                    window.open(url, '_blank')
+                  }
+                })
               })
-            })
+          }
         }
       )
     }
