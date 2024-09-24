@@ -30,6 +30,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.google.common.truth.Truth;
 
@@ -46,7 +47,7 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig, Mockito.mock(WorkerMessageSender.class));
         // submit totalTaskCount task, the thread pool size is execThreadCount, reject policy is CONTINUE
         // after submit execThreadCount task, the thread pool is overload
         for (int i = 1; i <= totalTaskCount; i++) {
@@ -67,7 +68,7 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig, Mockito.mock(WorkerMessageSender.class));
         // submit totalTaskCount task, the thread pool size is execThreadCount, reject policy is CONTINUE
         // all task will be submitted success
         for (int i = 1; i <= totalTaskCount; i++) {
@@ -83,7 +84,7 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.REJECT);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig, Mockito.mock(WorkerMessageSender.class));
         // submit totalTaskCount task, the thread pool size is execThreadCount, reject policy is REJECT
         // only the front execThreadCount task will be submitted success
         for (int i = 1; i <= totalTaskCount; i++) {
@@ -104,7 +105,7 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         final WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig, Mockito.mock(WorkerMessageSender.class));
 
         Truth.assertThat(workerTaskExecutorThreadPool.getWaitingTaskExecutorSize()).isEqualTo(0);
         for (int i = 1; i <= totalTaskCount; i++) {
@@ -126,7 +127,7 @@ class WorkerTaskExecutorThreadPoolTest {
         final int totalTaskCount = RandomUtils.nextInt(1, 10000);
         WorkerConfig workerConfig = createWorkerConfig(execThreadCount, TaskExecuteThreadsFullPolicy.CONTINUE);
         WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool =
-                new WorkerTaskExecutorThreadPool(workerConfig, new WorkerMessageSender());
+                new WorkerTaskExecutorThreadPool(workerConfig, Mockito.mock(WorkerMessageSender.class));
 
         Truth.assertThat(workerTaskExecutorThreadPool.getRunningTaskExecutorSize()).isEqualTo(0);
         for (int i = 1; i <= totalTaskCount; i++) {

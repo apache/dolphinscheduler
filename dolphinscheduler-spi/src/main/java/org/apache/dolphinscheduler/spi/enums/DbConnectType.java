@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum DbConnectType {
 
     ORACLE_SERVICE_NAME(0, "Oracle Service Name"),
@@ -30,13 +33,5 @@ public enum DbConnectType {
     private final int code;
 
     private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 
 }

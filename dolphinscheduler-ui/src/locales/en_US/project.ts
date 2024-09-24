@@ -40,7 +40,8 @@ export default {
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
     all_permission: 'All Permission',
-    assign_worker_group: 'Worker Group'
+    assign_worker_group: 'Worker Group',
+    total_items: 'Total Item is'
   },
   workflow: {
     on_line: 'Online',
@@ -232,6 +233,7 @@ export default {
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     ready_to_block: 'Ready to block',
     block: 'Block',
+    wait_to_run: 'Wait to run',
     want_to_set_timing: 'Would you like to set the workflow timing?',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',
@@ -822,11 +824,11 @@ export default {
     dvc_load_save_data_path: 'Data Path In Worker',
     dvc_store_url: 'Store Url',
     dvc_empty_tips: 'This parameter cannot be empty',
-    send_email: 'Send Email',
+    send_alarm: 'Send Alarm',
     log_display: 'Log display',
     rows_of_result: 'rows of result',
     title: 'Title',
-    title_tips: 'Please enter the title of email',
+    title_tips: 'Please enter the title of alarm',
     alarm_group: 'Alarm group',
     alarm_group_tips: 'Alarm group required',
     integer_tips: 'Please enter a positive integer',
