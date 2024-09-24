@@ -84,4 +84,15 @@ public class ProcessUtilsTest {
         Assertions.assertEquals(exceptPidsStr3, actualPidsStr3);
     }
 
+    @Test
+    public void tetRemoveK8sClientCache(){
+        Assertions.assertDoesNotThrow(()-> {
+            ProcessUtils.removeK8sClientCache("a");
+        });
+
+        Assertions.assertThrows(Exception.class, () -> {
+            ProcessUtils.removeK8sClientCache(null);
+        });
+    }
+
 }
