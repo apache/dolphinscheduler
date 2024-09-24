@@ -14,6 +14,9 @@ If you want to deploy DolphinScheduler in production, we recommend you follow [c
 - JDK：download [JDK][jdk] (1.8 or 11), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
 - Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/<version>).  <!-- markdown-link-check-disable-line -->
 
+## Download Plugin Dependencies
+Please refer to the [Download Plugin Dependencies](../installation/pseudo-cluster.md) in pseudo-cluster deployment.
+
 ### Configure User Exemption and Permissions
 
 Create a deployment user, and make sure to configure `sudo` without password. Here make an example to create user `dolphinscheduler`:
