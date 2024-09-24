@@ -46,21 +46,43 @@
             <outputDirectory>worker-server</outputDirectory>
         </fileSet>
 
+        <!-- plugins -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-plugins</directory>
+            <includes>
+                <include>dolphinscheduler-alert-*/target/dolphinscheduler-alert-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/alert-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-datasource-*/target/dolphinscheduler-datasource-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/datasource-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-task-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-task-*/target/dolphinscheduler-task-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/task-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-storage-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-storage-*/target/dolphinscheduler-storage-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/storage-plugins</outputDirectory>
+        </fileSet>
+        <!-- plugins -->
+
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
             <outputDirectory>standalone-server</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-                <exclude>bin/</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/libs/standalone-server</directory>
-            <outputDirectory>standalone-server/libs/standalone-server</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server/bin</directory>
-            <outputDirectory>standalone-server/bin</outputDirectory>
         </fileSet>
 
         <fileSet>
