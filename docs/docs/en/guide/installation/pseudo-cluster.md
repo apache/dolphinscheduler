@@ -16,7 +16,6 @@ Pseudo-cluster deployment of DolphinScheduler requires external software support
   - `pstree` for macOS
   - `psmisc` for Fedora/Red/Hat/CentOS/Ubuntu/Debian
 
-
 ## Download Plugins Dependencies
 
 Starting from version 3.3.0, the binary package no longer provides plugin dependencies, and users need to download them by themselves. The plugin dependency package download address: [Plugin Dependency Package](https://repo.maven.apache.org/maven2/org/apache/dolphinscheduler)

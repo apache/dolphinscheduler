@@ -26,6 +26,7 @@ bash ./bin/install-plugins.sh 3.3.0
 ```
 
 通常你并不需要所有的连接器插件，可以通过配置 `conf/plugins_config` 来指定你所需要的插件，例如，你只需要 `dolphinscheduler-task-shell` 插件，那么您可以修改配置文件如下：
+
 ```
 --task-plugins--
 dolphinscheduler-task-shell

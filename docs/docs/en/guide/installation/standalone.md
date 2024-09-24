@@ -15,6 +15,7 @@ If you want to deploy DolphinScheduler in production, we recommend you follow [c
 - Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/<version>).  <!-- markdown-link-check-disable-line -->
 
 ## Download Plugin Dependencies
+
 Please refer to the [Download Plugin Dependencies](../installation/pseudo-cluster.md) in pseudo-cluster deployment.
 
 ### Configure User Exemption and Permissions

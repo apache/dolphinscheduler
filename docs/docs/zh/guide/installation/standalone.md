@@ -13,6 +13,7 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 - 二进制包：在[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)下载 DolphinScheduler 二进制包  <!-- markdown-link-check-disable-line -->
 
 ## 下载插件依赖
+
 请参考伪集群部署的[下载插件依赖](../installation/pseudo-cluster.md#下载插件依赖)
 
 ## 配置用户免密及权限
