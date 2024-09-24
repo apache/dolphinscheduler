@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.base.Functions;
 
+@Getter
 public enum DbType {
 
     MYSQL(0, "mysql", "mysql"),
@@ -82,18 +85,6 @@ public enum DbType {
     public static DbType ofName(String name) {
         return Arrays.stream(DbType.values()).filter(e -> e.name().equals(name)).findFirst()
                 .orElseThrow(() -> new NoSuchElementException("no such db type"));
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescp() {
-        return descp;
     }
 
     public boolean isHive() {
