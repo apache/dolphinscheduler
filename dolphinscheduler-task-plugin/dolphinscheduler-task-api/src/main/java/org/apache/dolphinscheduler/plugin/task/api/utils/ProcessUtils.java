@@ -243,4 +243,10 @@ public final class ProcessUtils {
                 .getPodLogWatcher(
                         new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, containerName));
     }
+
+    public static void removeK8sClientCache(String taskAppId) {
+        KubernetesApplicationManager applicationManager =
+                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
+        applicationManager.removeCache(taskAppId);
+    }
 }
