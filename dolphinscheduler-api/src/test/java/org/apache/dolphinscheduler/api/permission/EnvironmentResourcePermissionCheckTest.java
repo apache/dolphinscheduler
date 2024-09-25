@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.api.permission;
 
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,7 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,8 +40,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EnvironmentResourcePermissionCheckTest {
@@ -53,7 +53,6 @@ public class EnvironmentResourcePermissionCheckTest {
 
     @Mock
     private EnvironmentMapper environmentMapper;
-
 
     @Test
     public void testPermissionCheck() {
