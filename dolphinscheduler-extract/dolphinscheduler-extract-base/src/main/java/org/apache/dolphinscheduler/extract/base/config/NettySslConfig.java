@@ -15,24 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.rpc;
+package org.apache.dolphinscheduler.extract.base.config;
 
-import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
-import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
-import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import lombok.Data;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-import org.springframework.stereotype.Component;
+@Configuration
+@ConfigurationProperties(prefix = "rpc.ssl")
+@Data
+public class NettySslConfig {
 
-@Component
-@Slf4j
-public class MasterRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
+    public boolean enabled;
 
-    public MasterRpcServer(MasterConfig masterConfig, NettySslConfig nettySslConfig) {
-        super(NettyServerConfig.builder().serverName("MasterRpcServer").listenPort(masterConfig.getListenPort())
-                .build(), nettySslConfig);
-    }
+    public String certFilePath;
+
+    public String keyFilePath;
 
 }

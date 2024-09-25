@@ -48,7 +48,7 @@ public class ClientsTest {
                 .listenPort(listenPort)
                 .build();
         serverAddress = "localhost:" + listenPort;
-        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
+        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig,null);
         springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new IServiceImpl());
         springServerMethodInvokerDiscovery.start();
     }

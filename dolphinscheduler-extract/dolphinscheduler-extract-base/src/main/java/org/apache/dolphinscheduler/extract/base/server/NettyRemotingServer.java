@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.extract.base.server;
 
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +45,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+
+import javax.net.ssl.SSLException;
 
 /**
  * remoting netty server
@@ -66,7 +72,20 @@ class NettyRemotingServer {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    NettyRemotingServer(final NettyServerConfig serverConfig) {
+    private SslContext sslContext = null;
+
+    private NettySslConfig nettySslConfig;
+
+    public NettyRemotingServer(final NettyServerConfig serverConfig, final NettySslConfig nettySslConfig) {
+        this.nettySslConfig = nettySslConfig;
+        if (nettySslConfig.isEnabled()) {
+            try {
+                sslContext = SslContextBuilder.forServer(new File(nettySslConfig.getCertFilePath()),
+                        new File(nettySslConfig.getKeyFilePath())).build();
+            } catch (SSLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         this.serverConfig = serverConfig;
         this.serverName = serverConfig.getServerName();
         this.methodInvokerExecutor = ThreadUtils.newDaemonFixedThreadExecutor(
@@ -130,6 +149,10 @@ class NettyRemotingServer {
      * @param ch socket channel
      */
     private void initNettyChannel(SocketChannel ch) {
+        if (nettySslConfig.isEnabled()) {
+            ch.pipeline().addLast("ssl", sslContext.newHandler(ch.alloc()));
+
+        }
         ch.pipeline()
                 .addLast("encoder", new TransporterEncoder())
                 .addLast("decoder", new TransporterDecoder())

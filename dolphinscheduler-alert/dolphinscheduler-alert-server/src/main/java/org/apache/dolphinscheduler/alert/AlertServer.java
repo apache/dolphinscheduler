@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 
 import javax.annotation.PostConstruct;
@@ -40,7 +41,8 @@ import org.springframework.context.annotation.Import;
 @Slf4j
 @Import({CommonConfiguration.class,
         DaoConfiguration.class,
-        RegistryConfiguration.class})
+        RegistryConfiguration.class,
+        NettySslConfig.class})
 @SpringBootApplication
 public class AlertServer {
 

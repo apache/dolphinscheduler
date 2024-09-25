@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
@@ -55,7 +56,8 @@ import org.springframework.context.annotation.Import;
 @Slf4j
 @Import({CommonConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class})
+        RegistryConfiguration.class,
+        NettySslConfig.class})
 @SpringBootApplication
 public class WorkerServer implements IStoppable {
 
@@ -71,6 +73,8 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private MetricsProvider metricsProvider;
 
+    @Autowired
+    NettySslConfig nettySslConfig;
     /**
      * worker server startup, not use web service
      *
@@ -85,6 +89,7 @@ public class WorkerServer implements IStoppable {
 
     @PostConstruct
     public void run() {
+//        SingletonJdkDynamicRpcClientProxyFactory.loadInstance(nettySslConfig);
         ServerLifeCycleManager.toRunning();
         this.workerRpcServer.start();
         TaskPluginManager.loadTaskPlugin();

@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import java.lang.reflect.Method;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 /**
  * The RpcServer based on Netty. The server will register the method invoker and provide the service to the client.
@@ -39,8 +40,8 @@ public class RpcServer implements ServerMethodInvokerRegistry, AutoCloseable {
 
     private final NettyRemotingServer nettyRemotingServer;
 
-    public RpcServer(NettyServerConfig nettyServerConfig) {
-        this.nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(nettyServerConfig);
+    public RpcServer(NettyServerConfig nettyServerConfig, NettySslConfig nettySslConfig) {
+        this.nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(nettyServerConfig,nettySslConfig);
     }
 
     public void start() {
