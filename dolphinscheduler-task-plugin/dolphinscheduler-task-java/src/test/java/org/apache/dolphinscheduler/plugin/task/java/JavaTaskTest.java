@@ -56,11 +56,11 @@ public class JavaTaskTest {
     @Test
     public void buildNormalJarCommand() {
         JavaTask javaTask = runNormalJarType();
-        try{
-        assertThat(javaTask.buildNormalJarCommand())
-                .isEqualTo("${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar HelloWorldWithGuava -host 127.0.0.1 -port 8080 -xms:50m");
-                        }
-        catch(Exception e){
+        try {
+            assertThat(javaTask.buildNormalJarCommand())
+                    .isEqualTo(
+                            "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar HelloWorldWithGuava -host 127.0.0.1 -port 8080 -xms:50m");
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -98,7 +98,6 @@ public class JavaTaskTest {
         javaParameters.setMainJar(mainJar);
         return javaParameters;
     }
-
 
     /**
      * Add the fat jar parameters

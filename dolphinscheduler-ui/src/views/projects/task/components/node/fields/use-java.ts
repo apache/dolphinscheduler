@@ -17,7 +17,7 @@
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources, useJavaTaskMainJar } from '.'
 import type { IJsonItem } from '../types'
-import {useJavaTaskNormalJar} from "@/views/projects/task/components/node/fields/use-java-task-normal-jar";
+import { useJavaTaskNormalJar } from '@/views/projects/task/components/node/fields/use-java-task-normal-jar'
 
 export function useJava(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -71,5 +71,4 @@ export const RUN_TYPES = [
     label: 'NORMAL_JAR',
     value: 'NORMAL_JAR'
   }
-
 ]

@@ -35,9 +35,10 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilder
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 
 import java.io.File;
-import lombok.extern.slf4j.Slf4j;
-import com.google.common.base.Preconditions;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.base.Preconditions;
 
 @Slf4j
 public class JavaTask extends AbstractTask {
@@ -56,7 +57,6 @@ public class JavaTask extends AbstractTask {
      * task execution context
      */
     private TaskExecutionContext taskRequest;
-
 
     public JavaTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
@@ -88,9 +88,11 @@ public class JavaTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // Step 1: judge if is java or jar run type.
-            // Step 2 case1: the fat jar run type builds the command directly, adding resource to the java -jar class when
+            // Step 2 case1: the fat jar run type builds the command directly, adding resource to the java -jar class
+            // when
             // building the command
-            // Step 2 case2: the normal jar run type builds the command directly, adding resource to the java -cp class when
+            // Step 2 case2: the normal jar run type builds the command directly, adding resource to the java -cp class
+            // when
             // building the command
             // Step 3: to run the command
             String command = null;
@@ -129,7 +131,6 @@ public class JavaTask extends AbstractTask {
         }
     }
 
-
     /**
      * Construct a shell command for the java -jar Run mode
      *
@@ -151,7 +152,6 @@ public class JavaTask extends AbstractTask {
         return builder.toString();
     }
 
-
     /**
      * Construct a shell command for the java -cp run mode
      *
@@ -163,11 +163,10 @@ public class JavaTask extends AbstractTask {
                 javaParameters.getMainJar()
                         .getResourceName())
                 .getResourceAbsolutePathInLocal();
-        String mainJarName=null;
-        try{
+        String mainJarName = null;
+        try {
             mainJarName = MainClassExtractor.getMainClassName(mainJarAbsolutePathInLocal);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         StringBuilder builder = new StringBuilder();
@@ -220,7 +219,6 @@ public class JavaTask extends AbstractTask {
         return builder.toString();
     }
 
-
     /**
      * Gets the operating system absolute path to the Java command
      *
@@ -229,6 +227,5 @@ public class JavaTask extends AbstractTask {
     private String getJavaCommandPath() {
         return JAVA_HOME_VAR + File.separator + "bin" + File.separator;
     }
-
 
 }
