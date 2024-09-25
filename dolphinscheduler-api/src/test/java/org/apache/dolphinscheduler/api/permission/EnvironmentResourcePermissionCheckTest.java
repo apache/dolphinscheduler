@@ -51,7 +51,7 @@ public class EnvironmentResourcePermissionCheckTest {
 
     @Test
     public void testPermissionCheck() {
-        User user = getLoginUser();
+        User user = getLoginAdminUser();
         Assertions.assertTrue(environmentResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
 
@@ -78,6 +78,13 @@ public class EnvironmentResourcePermissionCheckTest {
     private User getLoginUser() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("test");
+        loginUser.setId(1);
+        return loginUser;
+    }
+    private User getLoginAdminUser() {
+        User loginUser = new User();
+        loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setUserName("test");
         loginUser.setId(1);
         return loginUser;
