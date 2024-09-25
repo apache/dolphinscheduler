@@ -77,6 +77,10 @@ public class SwitchTaskUtilsTest {
         String content = "['abc','def'].includes('abc')";
         boolean result = SwitchTaskUtils.evaluate(content);
         Assertions.assertTrue(result);
+
+        SwitchTaskUtils.evaluate(SwitchTaskUtils.NASHORN_POLYFILL_ARRAY_PROTOTYPE_INCLUDES);
+        result = SwitchTaskUtils.evaluate(content);
+        Assertions.assertTrue(result);
     }
 
 }
