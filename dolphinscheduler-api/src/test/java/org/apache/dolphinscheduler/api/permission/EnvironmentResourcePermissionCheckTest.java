@@ -29,15 +29,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EnvironmentResourcePermissionCheckTest {
@@ -47,11 +49,16 @@ public class EnvironmentResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.EnvironmentResourcePermissionCheck environmentResourcePermissionCheck;
 
     @Mock
+    private UserDao userDao;
+
+    @Mock
     private EnvironmentMapper environmentMapper;
+
 
     @Test
     public void testPermissionCheck() {
         User user = getLoginAdminUser();
+        when(userDao.queryById(user.getId())).thenReturn(user);
         Assertions.assertTrue(environmentResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
 
@@ -69,7 +76,7 @@ public class EnvironmentResourcePermissionCheckTest {
         ids.add(environment.getId());
         List<Environment> environments = Arrays.asList(environment);
 
-        Mockito.when(environmentMapper.queryAllEnvironmentList()).thenReturn(environments);
+        when(environmentMapper.queryAllEnvironmentList()).thenReturn(environments);
 
         Assertions.assertEquals(ids,
                 environmentResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));

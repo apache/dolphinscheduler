@@ -241,11 +241,11 @@ public class ResourcePermissionCheckServiceImpl
 
         private final EnvironmentMapper environmentMapper;
 
-        @Autowired
-        private UserDao userDao;
+        private final UserDao userDao;
 
-        public EnvironmentResourcePermissionCheck(EnvironmentMapper environmentMapper) {
+        public EnvironmentResourcePermissionCheck(EnvironmentMapper environmentMapper, UserDao userDao) {
             this.environmentMapper = environmentMapper;
+            this.userDao = userDao;
         }
 
         @Override
