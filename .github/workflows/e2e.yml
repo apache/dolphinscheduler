@@ -159,6 +159,12 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
+          restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
