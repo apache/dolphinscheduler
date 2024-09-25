@@ -37,7 +37,7 @@ fi
 
 echo "Install Dolphinscheduler plugins, usage version is ${version}"
 
-# create the connectors directory
+# create the plugins directory
 if [ ! -d ${DOLPHINSCHEDULER_HOME}/plugins ]; then
       mkdir -p ${DOLPHINSCHEDULER_HOME}/plugins
 fi
