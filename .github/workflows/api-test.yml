@@ -91,7 +91,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
-          name: standalone-image
+          name: standalone-image-api-test
           path: /tmp/standalone-image.tar
           retention-days: 1
   api-test:
@@ -131,16 +131,10 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
-          restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
-          name: standalone-image
+          name: standalone-image-api-test
           path: /tmp
       - name: Load Docker Images
         run: |
