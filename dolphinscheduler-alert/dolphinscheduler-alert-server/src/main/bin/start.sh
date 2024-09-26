@@ -58,7 +58,9 @@ alert-plugins
 )
 
 for plugin in ${PLUGINS_PATH[@]}; do
-  CP=$CP:"$DOLPHINSCHEDULER_HOME/plugins/$plugin/*"
+  if [ -d "$DOLPHINSCHEDULER_HOME/plugins/$plugin" ]; then
+    CP=$CP:"$DOLPHINSCHEDULER_HOME/plugins/$plugin/*"
+  fi
 done
 
 

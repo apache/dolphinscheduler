@@ -12,6 +12,10 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 - JDK：下载[JDK][jdk] (1.8 or 11)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 - 二进制包：在[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)下载 DolphinScheduler 二进制包  <!-- markdown-link-check-disable-line -->
 
+## 下载插件依赖
+
+请参考伪集群部署的[下载插件依赖](../installation/pseudo-cluster.md#下载插件依赖)
+
 ## 配置用户免密及权限
 
 创建部署用户，并且一定要配置 `sudo` 免密。以创建 dolphinscheduler 用户为例

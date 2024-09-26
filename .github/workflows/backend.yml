@@ -89,7 +89,7 @@ jobs:
       - name: Build and Package on ${{ matrix.java }}
         run: |
           ./mvnw -B clean install \
-                 -Prelease \
+                 -Pstaging \
                  -Dmaven.test.skip=true \
                  -Dspotless.skip=true
       - name: Check dependency license

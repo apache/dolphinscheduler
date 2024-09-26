@@ -28,6 +28,10 @@ RUN apt update ; \
 WORKDIR $DOLPHINSCHEDULER_HOME
 
 # see doc: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/upgrade.html
-ADD ./target/apache-dolphinscheduler-*-bin $DOLPHINSCHEDULER_HOME
+COPY ./target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
+RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz ; \
+    rm -rf apache-dolphinscheduler-*-bin.tar.gz ; \
+    mv apache-dolphinscheduler-*-bin/* . ; \
+    rm -rf apache-dolphinscheduler-*-bin
 
 ENTRYPOINT [ "/bin/bash" ]

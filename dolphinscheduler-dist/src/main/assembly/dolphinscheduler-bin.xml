@@ -108,6 +108,21 @@
         </fileSet>
 
         <fileSet>
+            <directory>${basedir}/../config</directory>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/.././</directory>
+            <includes>
+                <include>mvnw</include>
+                <include>mvnw.cmd</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${basedir}/release-docs</directory>
             <outputDirectory>.</outputDirectory>
         </fileSet>

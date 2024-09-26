@@ -72,7 +72,8 @@ Execution result:
 
 #### Upgrade version restriction
 
-After version 3.3.X and later, we only support upgrading from 3.0.0. For versions lower than this, please download the historical version and upgrade to 3.0.0.
+- After version 3.3.X and later, we only support upgrading from 3.0.0. For versions lower than this, please download the historical version and upgrade to 3.0.0.
+- After version 3.3.X and later, binary packages no longer provide plugins dependencies by default, so when you use them for the first time, you need to download and install them yourself. For more information, please refer to [Pseudo-Cluster](../installation/pseudo-cluster.md).
 
 #### Precautions after the upgrade
 
