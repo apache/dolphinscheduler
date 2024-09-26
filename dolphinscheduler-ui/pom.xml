@@ -35,54 +35,49 @@
         <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>${frontend-maven-plugin.version}</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${build.ui.skip}</skip>
+                    <pnpmInheritsProxyConfigFromMaven>false</pnpmInheritsProxyConfigFromMaven>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install node and pnpm</id>
+                        <goals>
+                            <goal>install-node-and-pnpm</goal>
+                        </goals>
                         <configuration>
-                            <skip>${build.ui.skip}</skip>
-                            <pnpmInheritsProxyConfigFromMaven>false</pnpmInheritsProxyConfigFromMaven>
+                            <nodeVersion>${node.version}</nodeVersion>
+                            <pnpmVersion>${pnpm.version}</pnpmVersion>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>install node and pnpm</id>
-                                <goals>
-                                    <goal>install-node-and-pnpm</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>${node.version}</nodeVersion>
-                                    <pnpmVersion>${pnpm.version}</pnpmVersion>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>pnpm install</id>
-                                <goals>
-                                    <goal>pnpm</goal>
-                                </goals>
-                                <phase>generate-resources</phase>
-                                <configuration>
-                                    <arguments>install</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>pnpm run build:prod</id>
-                                <goals>
-                                    <goal>pnpm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build:prod</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
+                    </execution>
+                    <execution>
+                        <id>pnpm install</id>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pnpm run build:prod</id>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build:prod</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
-            </build>
-        </profile>
-    </profiles>
+    </build>
 </project>
