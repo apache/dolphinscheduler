@@ -74,7 +74,6 @@
             </then>
         </if>
         <appender-ref ref="TASKLOGFILE"/>
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="MASTERLOGFILE"/>
     </root>
 </configuration>

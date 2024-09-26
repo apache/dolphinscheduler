@@ -16,17 +16,17 @@
 #
 spring:
   profiles:
-    active: mysql
+    active: postgresql
   banner:
     charset: UTF-8
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://10.244.11.111:5555/dolphinscheduler322
-    username: dolphin
-    password: Dolphin!@#123
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+    username: root
+    password: root
     hikari:
       connection-test-query: select 1
       pool-name: DolphinScheduler
@@ -153,18 +153,16 @@ rpc:
     enabled: false
     cert-file-path: /path/cert.crt
     key-file-path: /path/private.pem
-
 ---
 spring:
   config:
     activate:
       on-profile: mysql
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://10.244.11.111:5555/dolphinscheduler322
-    username: dolphin
-    password: Dolphin!@#123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+    username: root
+    password: root
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-
