@@ -31,7 +31,8 @@ import org.springframework.stereotype.Service;
 public class AlertRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
 
     public AlertRpcServer(AlertConfig alertConfig, NettySslConfig nettySslConfig) {
-        super(NettyServerConfig.builder().serverName("AlertRpcServer").listenPort(alertConfig.getPort()).build(),nettySslConfig);
+        super(NettyServerConfig.builder().serverName("AlertRpcServer").listenPort(alertConfig.getPort()).build(),
+                nettySslConfig);
     }
 
 }

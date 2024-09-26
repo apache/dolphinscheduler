@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.extract.base.server;
 
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 import lombok.experimental.UtilityClass;
-import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 @UtilityClass
 class NettyRemotingServerFactory {

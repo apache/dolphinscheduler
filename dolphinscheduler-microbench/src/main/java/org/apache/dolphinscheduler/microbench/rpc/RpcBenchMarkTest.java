@@ -54,7 +54,8 @@ public class RpcBenchMarkTest extends AbstractBaseBenchmark {
     public void before() {
         NettyServerConfig nettyServerConfig =
                 NettyServerConfig.builder().serverName("NettyRemotingServer").listenPort(12345).build();
-        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig,new NettySslConfig());
+        springServerMethodInvokerDiscovery =
+                new SpringServerMethodInvokerDiscovery(nettyServerConfig, new NettySslConfig());
         springServerMethodInvokerDiscovery.postProcessAfterInitialization(new IServiceImpl(), "iServiceImpl");
         springServerMethodInvokerDiscovery.start();
         iService = Clients

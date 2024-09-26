@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 class WorkerRpcServerTest {
 
-    private final WorkerRpcServer workerRpcServer = new WorkerRpcServer(new WorkerConfig(),new NettySslConfig());
+    private final WorkerRpcServer workerRpcServer = new WorkerRpcServer(new WorkerConfig(), new NettySslConfig());
 
     @Test
     void testStart() {

@@ -89,7 +89,7 @@ public class WorkerServer implements IStoppable {
 
     @PostConstruct
     public void run() {
-//        SingletonJdkDynamicRpcClientProxyFactory.loadInstance(nettySslConfig);
+        // SingletonJdkDynamicRpcClientProxyFactory.loadInstance(nettySslConfig);
         ServerLifeCycleManager.toRunning();
         this.workerRpcServer.start();
         TaskPluginManager.loadTaskPlugin();

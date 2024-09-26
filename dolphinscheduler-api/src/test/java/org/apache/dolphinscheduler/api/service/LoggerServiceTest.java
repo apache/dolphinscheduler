@@ -104,7 +104,8 @@ public class LoggerServiceTest {
         }
 
         springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(
-                NettyServerConfig.builder().serverName("TestLogServer").listenPort(nettyServerPort).build(),new NettySslConfig());
+                NettyServerConfig.builder().serverName("TestLogServer").listenPort(nettyServerPort).build(),
+                new NettySslConfig());
         springServerMethodInvokerDiscovery.start();
         springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new ILogService() {
 

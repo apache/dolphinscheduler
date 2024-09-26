@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
 import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
@@ -45,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.net.ssl.SSLException;
+
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -56,9 +56,9 @@ import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.timeout.IdleStateHandler;
-
-import javax.net.ssl.SSLException;
 
 @Slf4j
 public class NettyRemotingClient implements AutoCloseable {
@@ -78,12 +78,13 @@ public class NettyRemotingClient implements AutoCloseable {
 
     private final NettyClientHandler clientHandler;
 
-    public NettyRemotingClient(final NettyClientConfig clientConfig , final NettySslConfig nettySslConfig) {
+    public NettyRemotingClient(final NettyClientConfig clientConfig, final NettySslConfig nettySslConfig) {
         this.clientConfig = clientConfig;
         this.nettySslConfig = nettySslConfig;
-        if(nettySslConfig.isEnabled()){
+        if (nettySslConfig.isEnabled()) {
             try {
-                sslContext = SslContextBuilder.forClient().trustManager(new File(nettySslConfig.getCertFilePath())).build();
+                sslContext =
+                        SslContextBuilder.forClient().trustManager(new File(nettySslConfig.getCertFilePath())).build();
             } catch (SSLException e) {
                 throw new IllegalArgumentException("Initialize SslContext error, please check the cert-file", e);
             }
@@ -113,7 +114,7 @@ public class NettyRemotingClient implements AutoCloseable {
 
                     @Override
                     public void initChannel(SocketChannel ch) {
-                        if(nettySslConfig.isEnabled()){
+                        if (nettySslConfig.isEnabled()) {
                             ch.pipeline().addLast(sslContext.newHandler(ch.alloc()));
                         }
                         ch.pipeline()

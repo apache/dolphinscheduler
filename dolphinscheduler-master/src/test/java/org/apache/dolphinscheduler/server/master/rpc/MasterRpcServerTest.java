@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 class MasterRpcServerTest {
 
-    private final MasterRpcServer masterRpcServer = new MasterRpcServer(new MasterConfig(),new NettySslConfig());
+    private final MasterRpcServer masterRpcServer = new MasterRpcServer(new MasterConfig(), new NettySslConfig());
 
     @Test
     void testStart() {
