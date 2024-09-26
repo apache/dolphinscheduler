@@ -7,6 +7,28 @@ We here use MySQL as an example to illustrate how to configure an external datab
 > NOTE: If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
 > which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
 
+<details>
+  <summary>How to do this on Ubuntu / Debian machines..</summary>
+  For example, on most linux machines you can do the following:
+  
+  ```
+  # Download & install the .deb package
+  sudo wget {download link for version you want} && sudo apt install ./{file}.deb
+  # Get the location of the mysql-connector-java-X.X.X.jar after it's installed
+  sudo dpkg -L mysql-connector-j
+  # >> /usr/share/doc/mysql-connector-j/README
+  # >> ... 
+  # >> /usr/share/java/mysql-connector-j-8.4.0.jar
+  # >> /usr/share/java/mysql-connector-java-8.4.0.jar <-- You want this one (with *-java*)
+  # Then, link each in the server directories (Make sure you're in the install directory)
+  sudo ln -s /usr/share/java/mysql-connector-java-X.X.X.jar ./api-server/libs/mysql-connector-java-X.X.X.jar
+  sudo ln -s /usr/share/java/mysql-connector-java-X.X.X.jar ./alert-server/libs/mysql-connector-java-X.X.X.jar
+  sudo ln -s /usr/share/java/mysql-connector-java-X.X.X.jar ./master-server/libs/mysql-connector-java-X.X.X.jar
+  sudo ln -s /usr/share/java/mysql-connector-java-X.X.X.jar ./worker-server/libs/mysql-connector-java-X.X.X.jar
+  # After that, be sure to stop the server and restart it.
+  ```
+</details>
+
 * First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 * Set the following environment variables in your terminal or modify the `bin/env/dolphinscheduler_env.sh` with your database username and password for `{user}` and `{password}`:
 
