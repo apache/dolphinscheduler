@@ -123,7 +123,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HI
 
 ## Initialize the Database
 
-Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
+Follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 
 ## Start DolphinScheduler
 
