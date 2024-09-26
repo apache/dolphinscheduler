@@ -260,10 +260,7 @@ public class ResourcePermissionCheckServiceImpl
                 logger.error("User does not exist, userId:{}.", userId);
                 return false;
             }
-            if (user.getUserType() != UserType.ADMIN_USER) {
-                return false;
-            }
-            return true;
+            return user.getUserType() == UserType.ADMIN_USER;
         }
 
         @Override

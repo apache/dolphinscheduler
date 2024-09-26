@@ -60,6 +60,12 @@ public class EnvironmentResourcePermissionCheckTest {
         when(userDao.queryById(user.getId())).thenReturn(user);
         Assertions.assertTrue(environmentResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
+    @Test
+    public void testPermissionCheckFail() {
+        User user = getLoginAdminUser();
+        when(userDao.queryById(user.getId())).thenReturn(null);
+        Assertions.assertFalse(environmentResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
+    }
 
     @Test
     public void testAuthorizationTypes() {
