@@ -6,7 +6,7 @@
 
 > 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
 
-* 首先，参照 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
+* 首先，参照 `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 * 在你的命令行设定下列环境变量，将 `{address}`, `{user}` 和 `{password}` 改为你数据库的地址, 用户名和密码
 
 ```shell

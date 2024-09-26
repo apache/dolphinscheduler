@@ -508,6 +508,14 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                     {
+                        title: 'General Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: 'Datasource Setting',
+                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
                         title: 'integration',
                         children: [
                             {
@@ -711,23 +719,6 @@ export default {
                         title: 'DSIP',
                         link: '/en-us/docs/dev/user_doc/DSIP.html',
                     },
-                ],
-            },
-            {
-                title: 'FAQ',
-                children: [
-                    {
-                        title: 'General Setting',
-                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
-                    },
-                    {
-                        title: 'Datasource Setting',
-                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
-                    },
-                    {
-                        title: 'Others',
-                        link: '/en-us/docs/release/faq.html',
-                    }
                 ],
             },
             {
@@ -1216,6 +1207,14 @@ export default {
                         link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                     {
+                        title: '通用设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                    },
+                    {
+                        title: '数据源设置',
+                        link: '/zh-cn/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                    },
+                    {
                         title: '集成',
                         children: [
                             {
@@ -1418,23 +1417,6 @@ export default {
                     {
                         title: 'DSIP',
                         link: '/zh-cn/docs/dev/user_doc/DSIP.html',
-                    },
-                ],
-            },
-            {
-                title: 'FAQ',
-                children: [
-                    {
-                        title: '通用设置',
-                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
-                    },
-                    {
-                        title: '数据源设置',
-                        link: '/zh-cn/docs/dev/user_doc/guide/howto/datasource-setting.html',
-                    },
-                    {
-                        title: '其他',
-                        link: '/zh-cn/docs/release/faq.html',
                     },
                 ],
             },

@@ -62,7 +62,7 @@ import docs317Config from '../../../site_config/docs3-1-7';
 import docs318Config from '../../../site_config/docs3-1-8';
 import docs319Config from '../../../site_config/docs3-1-9';
 import docs320Config from '../../../site_config/docs3-2-0';
-import docs310Config from '../../../site_config/docs3-2-1';
+import docs321Config from '../../../site_config/docs3-2-1';
 import docs322Config from '../../../site_config/docs3-2-2';
 import docsDevConfig from '../../../site_config/docsdev';
 
