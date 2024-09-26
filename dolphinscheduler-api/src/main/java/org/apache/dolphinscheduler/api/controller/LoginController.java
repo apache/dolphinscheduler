@@ -158,7 +158,8 @@ public class LoginController extends BaseController {
             if (session.getAttribute(Constants.SSO_LOGIN_USER_STATE) == null) {
                 session.setAttribute(Constants.SSO_LOGIN_USER_STATE, randomState);
             }
-            return Result.success(((AbstractSsoAuthenticator) authenticator).getSignInUrl(randomState));
+            return Result.success(((AbstractSsoAuthenticator) authenticator)
+                    .getSignInUrl(session.getAttribute(Constants.SSO_LOGIN_USER_STATE).toString()));
         }
         return Result.success();
     }
