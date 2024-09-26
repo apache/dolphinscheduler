@@ -17,6 +17,8 @@
 #
 set -xeo pipefail
 
+PLUGINS_ASSEMBLY_SKIP=$1
+
 DIST_DIR="$(pwd)/target"
 BIN_TAR_FILE="$DIST_DIR/apache-dolphinscheduler-*-bin.tar.gz"
 if [ ! -f $BIN_TAR_FILE ]; then
@@ -36,12 +38,16 @@ storage-plugins
 task-plugins
 )
 
-for plugin_path in ${PLUGINS_PATH[@]}
-do
-  cd $BIN_DIR/plugins/$plugin_path
-  find ./* -name "*.jar" | xargs -I {} mv {} ./
-  ls -d */ | xargs -I {} rm -rf {}
-done
+if [ $PLUGINS_ASSEMBLY_SKIP == "true" ]; then
+  rm -rf $BIN_DIR/plugins/*
+else
+  for plugin_path in ${PLUGINS_PATH[@]}
+  do
+    cd $BIN_DIR/plugins/$plugin_path
+    find ./* -name "*.jar" | xargs -I {} mv {} ./
+    ls -d */ | xargs -I {} rm -rf {}
+  done
+fi
 
 # move *-server/libs/*.jar to libs/ and create symbolic link in *-server/libs/
 MODULES_PATH=(
