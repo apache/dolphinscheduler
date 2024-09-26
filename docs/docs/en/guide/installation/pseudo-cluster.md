@@ -16,9 +16,26 @@ Pseudo-cluster deployment of DolphinScheduler requires external software support
   - `pstree` for macOS
   - `psmisc` for Fedora/Red/Hat/CentOS/Ubuntu/Debian
 
-> **_Note:_** DolphinScheduler itself does not depend on Hadoop, Hive, Spark, but if you need to run tasks that depend on them, you need to have the corresponding environment support.
+## Download Plugins Dependencies
+
+Starting from version 3.3.0, the binary package no longer provides plugin dependencies, and users need to download them by themselves. The plugin dependency package download address: [Plugin Dependency Package](https://repo.maven.apache.org/maven2/org/apache/dolphinscheduler)
+You can also execute the following command to install plugin dependencies:
+
+```shell
+bash ./bin/install-plugins.sh 3.3.0
+```
+
+Usually, you do not need all connector plugins, you can specify the plugins you need by configuring `conf/plugins_config`. For example, if you only need the `dolphinscheduler-task-shell` plugin, you can modify the configuration file as follows:
+
+```
+--task-plugins--
+dolphinscheduler-task-shell
+--end--
+```
 
 ## DolphinScheduler Startup Environment
+
+> **_Note:_** DolphinScheduler itself does not depend on Hadoop, Hive, Spark, but if you need to run tasks that depend on them, you need to have the corresponding environment support.
 
 ### Configure User Exemption and Permissions
 
