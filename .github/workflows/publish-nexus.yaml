@@ -18,8 +18,6 @@
 name: Publish Snapshot
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
   release:
     types:
       - released
