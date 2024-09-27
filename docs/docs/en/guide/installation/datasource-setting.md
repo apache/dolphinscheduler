@@ -7,7 +7,7 @@ We here use MySQL as an example to illustrate how to configure an external datab
 > NOTE: If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler
 > which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
 
-* First of all, follow the instructions in [datasource-setting](datasource-setting.md) `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
+* First of all, follow the instructions in `Pseudo-Cluster/Cluster Initialize the Database` section to create and initialize database
 * Set the following environment variables in your terminal with your database address, username and password for `{address}`, `{user}` and `{password}`:
 
 ```shell
