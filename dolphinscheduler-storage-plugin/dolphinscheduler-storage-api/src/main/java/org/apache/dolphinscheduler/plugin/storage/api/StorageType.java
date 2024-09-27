@@ -29,7 +29,11 @@ public enum StorageType {
 
     ABS(5, "ABS"),
 
-    OBS(6, "OBS");
+    OBS(6, "OBS"),
+
+    COS(7, "COS"),
+
+    ;
 
     private final int code;
     private final String name;
