@@ -123,6 +123,7 @@
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
+        <jraft.version>1.3.14</jraft.version>
     </properties>
 
     <dependencyManagement>
@@ -978,6 +979,13 @@
                 <groupId>org.javadelight</groupId>
                 <artifactId>delight-nashorn-sandbox</artifactId>
                 <version>${nashorn-sandbox.version}</version>
+            </dependency>
+
+            <!-- jraft -->
+            <dependency>
+                <groupId>com.alipay.sofa</groupId>
+                <artifactId>jraft-rheakv-core</artifactId>
+                <version>${jraft.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
