@@ -61,7 +61,6 @@ DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Do
 cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip=true \
        -Ddocker.tag=<TAG> \
        -Pdocker,release
@@ -75,7 +74,6 @@ cd dolphinscheduler
 cd dolphinscheduler
 ./mvnw -B clean deploy \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \

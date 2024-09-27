@@ -181,7 +181,7 @@
                                     <environmentVariables>
                                         <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
                                     </environmentVariables>
-                                    <executable>docker</executable>
+                                    <executable>bash</executable>
                                     <workingDirectory>${project.basedir}</workingDirectory>
                                     <arguments>
                                         <argument>src/main/docker/docker-push.sh</argument>
