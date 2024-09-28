@@ -1,7 +1,7 @@
 # 资源中心配置详情
 
 - 资源中心通常用于上传文件以及任务组管理等操作。
-- 资源中心可以对接分布式的文件存储系统，如[Hadoop](https://hadoop.apache.org/docs/r2.7.0/)（2.6+）或者[MinIO](https://github.com/minio/minio)集群，也可以对接远端的对象存储，如[AWS S3](https://aws.amazon.com/s3/)或者[阿里云 OSS](https://www.aliyun.com/product/oss)，[华为云 OBS](https://support.huaweicloud.com/obs/index.html) 等。
+- 资源中心可以对接分布式的文件存储系统，如[Hadoop](https://hadoop.apache.org/docs/r2.7.0/)（2.6+）或者[MinIO](https://github.com/minio/minio)集群，也可以对接远端的对象存储，如[AWS S3](https://aws.amazon.com/s3/)或者[阿里云 OSS](https://www.aliyun.com/product/oss)，[华为云 OBS](https://support.huaweicloud.com/obs/index.html)，[腾讯云 COS](https://cloud.tencent.com/product/cos) 等。
 - 资源中心也可以直接对接本地文件系统。在单机模式下，您无需依赖`Hadoop`或`S3`一类的外部存储系统，可以方便地对接本地文件系统进行体验。
 - 除此之外，对于集群模式下的部署，您可以通过使用[S3FS-FUSE](https://github.com/s3fs-fuse/s3fs-fuse)将`S3`挂载到本地，或者使用[JINDO-FUSE](https://help.aliyun.com/document_detail/187410.html)将`OSS`挂载到本地等，再用资源中心对接本地文件系统方式来操作远端对象存储中的文件。
 
@@ -89,4 +89,31 @@ resource.huawei.cloud.obs.endpoint=obs.cn-southwest-2.huaweicloud.com
 > * 如果只配置了 `api-server/conf/common.properties` 的文件，则只是开启了资源上传的操作，并不能满足正常使用。如果想要在工作流中执行相关文件则需要额外配置 `worker-server/conf/common.properties`。
 > * 如果用到资源上传的功能，那么[安装部署](../installation/standalone.md)中，部署用户需要有这部分的操作权限。
 > * 如果 Hadoop 集群的 NameNode 配置了 HA 的话，需要开启 HDFS 类型的资源上传，同时需要将 Hadoop 集群下的 `core-site.xml` 和 `hdfs-site.xml` 复制到 `worker-server/conf` 以及 `api-server/conf`，非 NameNode HA 跳过此步骤。
+
+## 对接腾讯云 COS
+
+如果需要使用到资源中心的 COS 上传资源，我们需要对以下路径的进行配置：`api-server/conf/resource-center.yaml` 和 `worker-server/conf/resource-center.yaml`。可参考如下：
+
+```yaml
+resource:
+  # 腾讯云 COS 配置
+  tencent:
+    cloud:
+      access:
+        key:
+          id: <your-access-key-id>
+          secret: <your-access-key-secret>
+      cos:
+        # COS 区域代码可参考: https://cloud.tencent.com/document/product/436/6224
+        region: ap-nanjing
+        bucket:
+          name: dolphinscheduler
+
+```
+
+为了激活腾讯云存储 COS，还需要对以下路径的进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`。可参考如下：
+
+```properties
+resource.storage.type=COS
+```
 
