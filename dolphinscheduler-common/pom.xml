@@ -107,6 +107,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-blob</artifactId>
             <exclusions>
