@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -202,16 +201,16 @@ public class LogUtils {
 
     public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
                                                        Integer taskInstanceId) {
-        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
-        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
+        MDC.put(TaskConstants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
+        MDC.put(TaskConstants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
     }
 
     public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
-        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
+        MDC.put(TaskConstants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
     }
 
     public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
-        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
+        MDC.put(TaskConstants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
     }
 
     public static void removeWorkflowAndTaskInstanceIdMDC() {
@@ -220,11 +219,11 @@ public class LogUtils {
     }
 
     public static void removeWorkflowInstanceIdMDC() {
-        MDC.remove(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY);
+        MDC.remove(TaskConstants.WORKFLOW_INSTANCE_ID_MDC_KEY);
     }
 
     public static void removeTaskInstanceIdMDC() {
-        MDC.remove(Constants.TASK_INSTANCE_ID_MDC_KEY);
+        MDC.remove(TaskConstants.TASK_INSTANCE_ID_MDC_KEY);
     }
 
     @AllArgsConstructor

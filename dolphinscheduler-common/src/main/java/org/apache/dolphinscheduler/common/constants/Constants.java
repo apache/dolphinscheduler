@@ -36,6 +36,7 @@ public final class Constants {
 
     public static final String REMOTE_LOGGING_YAML_PATH = "/remote-logging.yaml";
     public static final String AWS_YAML_PATH = "/aws.yaml";
+    public static final String RESOURCE_CENTER_YAML_PATH = "/resource-center.yaml";
 
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
@@ -680,6 +681,17 @@ public final class Constants {
     public static final String REMOTE_LOGGING_ABS_ACCOUNT_NAME = "remote.logging.abs.account.name";
     public static final String REMOTE_LOGGING_ABS_ACCOUNT_KEY = "remote.logging.abs.account.key";
     public static final String REMOTE_LOGGING_ABS_CONTAINER_NAME = "remote.logging.abs.container.name";
+
+    /**
+     * remote logging for COS
+     */
+    public static final String REMOTE_LOGGING_COS_ACCESS_KEY_ID = "remote.logging.cos.access.key.id";
+
+    public static final String REMOTE_LOGGING_COS_ACCESS_KEY_SECRET = "remote.logging.cos.access.key.secret";
+
+    public static final String REMOTE_LOGGING_COS_BUCKET_NAME = "remote.logging.cos.bucket.name";
+
+    public static final String REMOTE_LOGGING_COS_REGION = "remote.logging.cos.region";
 
     /**
      * data quality

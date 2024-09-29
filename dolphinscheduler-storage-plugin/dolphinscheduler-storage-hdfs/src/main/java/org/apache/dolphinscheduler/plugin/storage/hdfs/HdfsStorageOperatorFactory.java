@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FS_DEFAULT_FS;
-import static org.apache.dolphinscheduler.common.constants.Constants.HDFS_ROOT_USER;
+import static org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants.FS_DEFAULT_FS;
+import static org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants.HDFS_ROOT_USER;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class HdfsStorageOperatorFactory implements StorageOperatorFactory {
                 .user(PropertyUtils.getString(HDFS_ROOT_USER))
                 .defaultFS(PropertyUtils.getString(FS_DEFAULT_FS))
                 .configurationProperties(configurationProperties)
-                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .resourceUploadPath(PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
                 .build();
     }
 

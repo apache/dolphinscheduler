@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.enums;
 
+import lombok.Getter;
+
 /**
  * have_script
  * have_file
@@ -25,6 +27,7 @@ package org.apache.dolphinscheduler.spi.enums;
  * have_map_variables
  * have_alert
  */
+@Getter
 public enum Flag {
 
     /**
@@ -42,11 +45,4 @@ public enum Flag {
     private final int code;
     private final String descp;
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }

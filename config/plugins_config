@@ -1,0 +1,110 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# This mapping is used to resolve the Jar package name without version (or call artifactId)
+#
+# corresponding to the module in the user Config, helping Dolphinscheduler to load the correct Jar package.
+# Don't modify the delimiter " -- ", just select the plugin you need
+
+--alert-plugins--
+dolphinscheduler-alert-aliyunVoice
+dolphinscheduler-alert-dingtalk
+dolphinscheduler-alert-email
+dolphinscheduler-alert-feishu
+dolphinscheduler-alert-http
+dolphinscheduler-alert-pagerduty
+dolphinscheduler-alert-prometheus
+dolphinscheduler-alert-script
+dolphinscheduler-alert-slack
+dolphinscheduler-alert-telegram
+dolphinscheduler-alert-webexteams
+dolphinscheduler-alert-wechat
+--end--
+
+--datasource-plugins--
+dolphinscheduler-datasource-aliyunserverlessspark
+dolphinscheduler-datasource-athena
+dolphinscheduler-datasource-azure-sql
+dolphinscheduler-datasource-clickhouse
+dolphinscheduler-datasource-dameng
+dolphinscheduler-datasource-databend
+dolphinscheduler-datasource-db2
+dolphinscheduler-datasource-doris
+dolphinscheduler-datasource-hana
+dolphinscheduler-datasource-hive
+dolphinscheduler-datasource-k8s
+dolphinscheduler-datasource-kyuubi
+dolphinscheduler-datasource-mysql
+dolphinscheduler-datasource-oceanbase
+dolphinscheduler-datasource-oracle
+dolphinscheduler-datasource-postgresql
+dolphinscheduler-datasource-presto
+dolphinscheduler-datasource-redshift
+dolphinscheduler-datasource-sagemaker
+dolphinscheduler-datasource-snowflake
+dolphinscheduler-datasource-spark
+dolphinscheduler-datasource-sqlserver
+dolphinscheduler-datasource-ssh
+dolphinscheduler-datasource-starrocks
+dolphinscheduler-datasource-trino
+dolphinscheduler-datasource-vertica
+dolphinscheduler-datasource-zeppelin
+--end--
+
+--storage-plugins--
+dolphinscheduler-storage-abs
+dolphinscheduler-storage-gcs
+dolphinscheduler-storage-hdfs
+dolphinscheduler-storage-obs
+dolphinscheduler-storage-oss
+dolphinscheduler-storage-s3
+--end--
+
+--task-plugins--
+dolphinscheduler-task-aliyunserverlessspark
+dolphinscheduler-task-chunjun
+dolphinscheduler-task-datafactory
+dolphinscheduler-task-dataquality
+dolphinscheduler-task-datasync
+dolphinscheduler-task-datax
+dolphinscheduler-task-dinky
+dolphinscheduler-task-dms
+dolphinscheduler-task-dvc
+dolphinscheduler-task-emr
+dolphinscheduler-task-flink
+dolphinscheduler-task-flink-stream
+dolphinscheduler-task-hivecli
+dolphinscheduler-task-http
+dolphinscheduler-task-java
+dolphinscheduler-task-jupyter
+dolphinscheduler-task-k8s
+dolphinscheduler-task-kubeflow
+dolphinscheduler-task-linkis
+dolphinscheduler-task-mlflow
+dolphinscheduler-task-mr
+dolphinscheduler-task-openmldb
+dolphinscheduler-task-procedure
+dolphinscheduler-task-python
+dolphinscheduler-task-pytorch
+dolphinscheduler-task-remoteshell
+dolphinscheduler-task-sagemaker
+dolphinscheduler-task-seatunnel
+dolphinscheduler-task-shell
+dolphinscheduler-task-spark
+dolphinscheduler-task-sql
+dolphinscheduler-task-sqoop
+dolphinscheduler-task-zeppelin
+--end--

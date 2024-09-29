@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.storage.oss;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.factory.OssClientFactory;
-import org.apache.dolphinscheduler.common.model.OssConnection;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -107,23 +104,23 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
     }
 
     protected String readOssAccessKeyID() {
-        return PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
+        return PropertyUtils.getString(OssConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
     }
 
     protected String readOssAccessKeySecret() {
-        return PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
+        return PropertyUtils.getString(OssConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
     }
 
     protected String readOssRegion() {
-        return PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_REGION);
+        return PropertyUtils.getString(OssConstants.ALIBABA_CLOUD_REGION);
     }
 
     protected String readOssBucketName() {
-        return PropertyUtils.getString(Constants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
+        return PropertyUtils.getString(StorageConstants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
     }
 
     protected String readOssEndPoint() {
-        return PropertyUtils.getString(Constants.ALIBABA_CLOUD_OSS_END_POINT);
+        return PropertyUtils.getString(StorageConstants.ALIBABA_CLOUD_OSS_END_POINT);
     }
 
     protected OssConnection buildOssConnection() {
@@ -134,7 +131,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
         if (resourceBaseAbsolutePath.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in Oss", Constants.RESOURCE_UPLOAD_PATH,
+            log.warn("{} -> {} should not start with / in Oss", StorageConstants.RESOURCE_UPLOAD_PATH,
                     resourceBaseAbsolutePath);
             return resourceBaseAbsolutePath.substring(1);
         }
