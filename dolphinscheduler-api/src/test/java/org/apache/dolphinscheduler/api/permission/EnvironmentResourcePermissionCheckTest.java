@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.api.permission;
 
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +49,22 @@ public class EnvironmentResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.EnvironmentResourcePermissionCheck environmentResourcePermissionCheck;
 
     @Mock
+    private UserDao userDao;
+
+    @Mock
     private EnvironmentMapper environmentMapper;
 
     @Test
     public void testPermissionCheck() {
-        User user = getLoginUser();
+        User user = getLoginAdminUser();
+        when(userDao.queryById(user.getId())).thenReturn(user);
         Assertions.assertTrue(environmentResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
+    }
+    @Test
+    public void testPermissionCheckFail() {
+        User user = getLoginAdminUser();
+        when(userDao.queryById(user.getId())).thenReturn(null);
+        Assertions.assertFalse(environmentResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
 
     @Test
@@ -69,7 +81,7 @@ public class EnvironmentResourcePermissionCheckTest {
         ids.add(environment.getId());
         List<Environment> environments = Arrays.asList(environment);
 
-        Mockito.when(environmentMapper.queryAllEnvironmentList()).thenReturn(environments);
+        when(environmentMapper.queryAllEnvironmentList()).thenReturn(environments);
 
         Assertions.assertEquals(ids,
                 environmentResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
@@ -78,6 +90,13 @@ public class EnvironmentResourcePermissionCheckTest {
     private User getLoginUser() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("test");
+        loginUser.setId(1);
+        return loginUser;
+    }
+    private User getLoginAdminUser() {
+        User loginUser = new User();
+        loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setUserName("test");
         loginUser.setId(1);
         return loginUser;
