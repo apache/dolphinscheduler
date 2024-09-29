@@ -83,7 +83,6 @@ jobs:
         run: |
           ./mvnw -B clean install \
           -Dmaven.test.skip=true \
-          -Dmaven.javadoc.skip=true \
           -Dspotless.skip=true \
           -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images

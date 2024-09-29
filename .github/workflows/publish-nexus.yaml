@@ -72,4 +72,5 @@ jobs:
           -s ${{ env.SETTINGS_PATH }} \
           -Dmaven.test.skip=true \
           -Dspotless.skip=true \
+          -Dmaven.deploy.skip=false \
           -Pstaging

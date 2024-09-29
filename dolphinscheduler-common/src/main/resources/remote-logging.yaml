@@ -15,29 +15,27 @@
 # limitations under the License.
 #
 
-remote-logging:
-  # Whether to enable remote logging
-  enable: false
-  # if remote-logging.enable = true, set the target of remote logging
+remote.logging:
+  # if remote.logging.enable = true, set the target of remote logging
   target: OSS
-  # if remote-logging.enable = true, set the log base directory
+  # if remote.logging.enable = true, set the log base directory
   base.dir: logs
-  # if remote-logging.enable = true, set the number of threads to send logs to remote storage
+  # if remote.logging.enable = true, set the number of threads to send logs to remote storage
   thread.pool.size: 10
-  # required if you set remote-logging.target=OSS
+  # required if you set remote.logging.target=OSS
   oss:
-    # oss access key id, required if you set remote-logging.target=OSS
+    # oss access key id, required if you set remote.logging.target=OSS
     access.key.id: <access.key.id>
-    # oss access key secret, required if you set remote-logging.target=OSS
+    # oss access key secret, required if you set remote.logging.target=OSS
     access.key.secret: <access.key.secret>
-    # oss bucket name, required if you set remote-logging.target=OSS
+    # oss bucket name, required if you set remote.logging.target=OSS
     bucket.name: <bucket.name>
-    # oss endpoint, required if you set remote-logging.target=OSS
+    # oss endpoint, required if you set remote.logging.target=OSS
     endpoint: <endpoint>
   google.cloud.storage:
-    # the location of the google cloud credential, required if you set remote-logging.target=GCS
+    # the location of the google cloud credential, required if you set remote.logging.target=GCS
     credential: /path/to/credential
-    # gcs bucket name, required if you set remote-logging.target=GCS
+    # gcs bucket name, required if you set remote.logging.target=GCS
     bucket.name: <your-bucket>
   abs:
     # abs account name, required if you set resource.storage.type=ABS
@@ -46,4 +44,12 @@ remote-logging:
     account.key: <your-account-key>
     # abs container name, required if you set resource.storage.type=ABS
     container.name: <your-container-name>
-
+  cos:
+    # cos access key id, required if you set remote-logging.target=COS
+    access.key.id: <access.key.id>
+    # cos access key secret, required if you set remote-logging.target=COS
+    access.key.secret: <access.key.secret>
+    # cos bucket name, required if you set remote-logging.target=COS
+    bucket.name: <bucket.name>
+    # cos region, required if you set remote-logging.target=COS
+    region: <region>
