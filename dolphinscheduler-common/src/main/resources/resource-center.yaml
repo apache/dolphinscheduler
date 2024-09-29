@@ -1,0 +1,80 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+resource:
+  # Tencent Cloud Storage (COS) setup, required if you set resource.storage.type=COS
+  tencent:
+    cloud:
+      access:
+        key:
+          id: <your-access-key-id>
+          secret: <your-access-key-secret>
+      cos:
+        # predefined region code: https://cloud.tencent.com/document/product/436/6224
+        region: ap-nanjing
+        bucket:
+          name: dolphinscheduler
+
+  # Microsoft Azure Storage (ABS) setup, required if you set resource.storage.type=ABS
+  azure:
+    client:
+      id: minioadmin
+      secret: minioadmin
+    subId: minioadmin
+    tenant:
+      id:  minioadmin
+    blob:
+      storage:
+        connection:
+          string: <your-connection-string>
+        account:
+          name: <your-account-name>
+        container:
+          name: <your-container>
+
+  # Alibaba Cloud Storage (OSS) setup, required if you set resource.storage.type=OSS
+  alibaba:
+    cloud:
+      access:
+        key:
+          id: <your-access-key-id>
+          secret: <your-access-key-secret>
+      region: cn-hangzhou
+      oss:
+        bucket:
+          name: dolphinscheduler
+        endpoint: https://oss-cn-hangzhou.aliyuncs.com
+
+  # Google Cloud Storage (GCS) setup, required if you set resource.storage.type=GCS
+  google:
+    cloud:
+      storage:
+        credential: /path/to/credential
+        bucket:
+          name: <your-bucket>
+
+  # Huawei Cloud Storage (OBS), required if you set resource.storage.type=OBS
+  huawei:
+    cloud:
+      access:
+        key:
+          id: <your-access-key-id>
+          secret: <your-access-key-secret>
+      obs:
+        bucket:
+          name: dolphinscheduler
+        endpoint: obs.cn-southwest-2.huaweicloud.com
