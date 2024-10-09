@@ -27,8 +27,14 @@ services:
       POSTGRES_DB: dolphinscheduler_dev
     ports:
       - "5432:5432"
+    networks:
+      - schema-test
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 60s
       retries: 120
+
+networks:
+  schema-test:
+    name: schema-test

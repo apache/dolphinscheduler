@@ -54,6 +54,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 30720
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:
@@ -62,15 +75,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - name: Build Image
         run: |
           ./mvnw -B clean install \
-          -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
+          -Dmaven.test.skip=true \
           -Dspotless.skip=true \
-          -Pdocker,release -Ddocker.tag=ci
+          -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
@@ -78,7 +90,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
-          name: standalone-image
+          name: standalone-image-api-test
           path: /tmp/standalone-image.tar
           retention-days: 1
   api-test:
@@ -122,12 +134,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
-          name: standalone-image
+          name: standalone-image-api-test
           path: /tmp
       - name: Load Docker Images
         run: |

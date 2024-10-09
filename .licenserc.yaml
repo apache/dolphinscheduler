@@ -25,7 +25,6 @@ header:
     - NOTICE
     - LICENSE
     - DISCLAIMER
-    - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/ScriptRunner.java
     - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/CodeGenerateUtils.java
     - mvnw.cmd
     - dolphinscheduler-dao/src/main/resources/sql/soft_version
@@ -49,6 +48,7 @@ header:
     - 'org.mockito.plugins.MockMaker'
     - tools/dependencies/known-dependencies.txt
     - '**/banner.txt'
+    - '**/*-banner.txt'
     - '.terraform.lock.hcl'
     - deploy/kubernetes/dolphinscheduler/README.md.gotmpl
     - .idea/vcs.xml

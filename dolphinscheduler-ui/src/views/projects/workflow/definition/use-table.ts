@@ -62,6 +62,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
+    totalCount: ref(0),
     timingType: ref('create'),
     timingState: ref('OFFLINE'),
     showRef: ref(false),
@@ -564,6 +565,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }

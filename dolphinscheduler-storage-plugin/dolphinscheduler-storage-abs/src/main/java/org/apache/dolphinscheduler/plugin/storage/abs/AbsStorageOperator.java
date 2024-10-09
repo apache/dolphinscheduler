@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.plugin.storage.abs;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -74,7 +74,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
         if (getStorageBaseDirectory().startsWith("/")) {
-            log.warn("{} -> {} should not start with / in abs", Constants.RESOURCE_UPLOAD_PATH,
+            log.warn("{} -> {} should not start with / in abs", StorageConstants.RESOURCE_UPLOAD_PATH,
                     getStorageBaseDirectory());
             return getStorageBaseDirectory().substring(1);
         }

@@ -79,10 +79,9 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         doNothing().when(taskDispatcher).dispatchTask(any());
 
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
-        globalTaskDispatchWaitingQueueLooper.start();
+        globalTaskDispatchWaitingQueueLooper.doDispatch();
         await().during(ofSeconds(1))
                 .untilAsserted(() -> verify(taskDispatchFactory, never()).getTaskDispatcher(taskInstance));
-        globalTaskDispatchWaitingQueueLooper.close();
     }
 
     @Test
@@ -99,12 +98,11 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         doNothing().when(taskDispatcher).dispatchTask(any());
 
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
-        globalTaskDispatchWaitingQueueLooper.start();
+        globalTaskDispatchWaitingQueueLooper.doDispatch();
         await().atMost(ofSeconds(1)).untilAsserted(() -> {
             verify(taskDispatchFactory, atLeastOnce()).getTaskDispatcher(any(TaskInstance.class));
             verify(taskDispatcher, atLeastOnce()).dispatchTask(any(ITaskExecutionRunnable.class));
         });
-        globalTaskDispatchWaitingQueueLooper.close();
 
     }
 

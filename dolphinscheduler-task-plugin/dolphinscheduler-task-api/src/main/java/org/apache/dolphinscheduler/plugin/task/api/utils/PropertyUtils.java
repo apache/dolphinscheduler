@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
 /**
  * property utils
  */
@@ -47,14 +44,12 @@ public class PropertyUtils {
     public static List<Property> startParamsTransformPropertyList(String startParams) {
         List<Property> startParamList = null;
         if (startParams != null) {
-            JsonElement jsonElement = JsonParser.parseString(startParams);
-            boolean isJson = jsonElement.isJsonObject();
-            if (isJson) {
+            try {
                 Map<String, String> startParamMap = JSONUtils.toMap(startParams);
                 startParamList = startParamMap.entrySet().stream()
                         .map(entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue()))
                         .collect(Collectors.toList());
-            } else {
+            } catch (Exception ignore) {
                 startParamList = JSONUtils.toList(startParams, Property.class);
             }
         }

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
-import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 
 public interface ApplicationManager {
 

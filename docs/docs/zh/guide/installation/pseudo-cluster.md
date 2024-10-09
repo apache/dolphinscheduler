@@ -16,9 +16,26 @@
   - macOS 安装`pstree`
   - Fedora/Red/Hat/CentOS/Ubuntu/Debian 安装`psmisc`
 
-> **_注意:_** DolphinScheduler 本身不依赖 Hadoop、Hive、Spark，但如果你运行的任务需要依赖他们，就需要有对应的环境支持
+## 下载插件依赖
+
+从 3.3.0 版本开始，二进制包不再提供插件依赖，需要用户自行下载。插件依赖包下载地址：[插件依赖包](https://repo.maven.apache.org/maven2/org/apache/dolphinscheduler)
+你也可以执行以下命令来安装插件依赖:
+
+```shell
+bash ./bin/install-plugins.sh 3.3.0
+```
+
+通常你并不需要所有的连接器插件，可以通过配置 `conf/plugins_config` 来指定你所需要的插件，例如，你只需要 `dolphinscheduler-task-shell` 插件，那么您可以修改配置文件如下：
+
+```
+--task-plugins--
+dolphinscheduler-task-shell
+--end--
+```
 
 ## 准备 DolphinScheduler 启动环境
+
+> **_注意:_** DolphinScheduler 本身不依赖 Hadoop、Hive、Spark，但如果你运行的任务需要依赖他们，就需要有对应的环境支持
 
 ### 配置用户免密及权限
 
@@ -104,7 +121,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HI
 
 ## 初始化数据库
 
-请参考 [数据源配置] `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
+请参考 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 
 ## 启动 DolphinScheduler
 

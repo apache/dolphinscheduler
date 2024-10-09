@@ -319,6 +319,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             Thread.currentThread().interrupt();
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
+        } finally {
+            ProcessUtils.removeK8sClientCache(taskRequest.getTaskAppId());
         }
         return result;
     }

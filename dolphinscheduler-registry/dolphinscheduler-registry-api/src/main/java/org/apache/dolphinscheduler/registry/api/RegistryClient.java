@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.registry.api;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
@@ -48,8 +46,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
 
 @Component
 @Slf4j
@@ -164,26 +160,6 @@ public class RegistryClient {
                 .anyMatch(it -> it.contains(host));
     }
 
-    public Collection<String> getMasterNodesDirectly() {
-        return getChildrenKeys(RegistryNodeType.MASTER.getRegistryPath());
-    }
-
-    /**
-     * get host ip:port, path format: parentPath/ip:port
-     *
-     * @param path path
-     * @return host ip:port, string format: parentPath/ip:port
-     */
-    public String getHostByEventDataPath(String path) {
-        checkArgument(!Strings.isNullOrEmpty(path), "path cannot be null or empty");
-
-        final String[] pathArray = path.split(Constants.SINGLE_SLASH);
-
-        checkArgument(pathArray.length >= 1, "cannot parse path: %s", path);
-
-        return pathArray[pathArray.length - 1];
-    }
-
     public void close() throws IOException {
         registry.close();
     }
@@ -213,6 +189,9 @@ public class RegistryClient {
     }
 
     public boolean getLock(String key) {
+        if (!registry.isConnected()) {
+            throw new IllegalStateException("The registry is not connected");
+        }
         return registry.acquireLock(key);
     }
 
@@ -226,14 +205,6 @@ public class RegistryClient {
 
     public IStoppable getStoppable() {
         return stoppable;
-    }
-
-    public boolean isMasterPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH);
-    }
-
-    public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public Collection<String> getChildrenKeys(final String key) {
