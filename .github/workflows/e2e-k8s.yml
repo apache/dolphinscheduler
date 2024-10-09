@@ -71,9 +71,8 @@ jobs:
         run: |
           ./mvnw -B clean package \
           -Dmaven.test.skip=true \
-          -Dmaven.javadoc.skip=true \
           -Dspotless.skip=true \
-          -Pdocker,release -Ddocker.tag=ci
+          -Pdocker,staging -Ddocker.tag=ci
       - name: Create k8s Kind Cluster
         run: |
           # install kubectl

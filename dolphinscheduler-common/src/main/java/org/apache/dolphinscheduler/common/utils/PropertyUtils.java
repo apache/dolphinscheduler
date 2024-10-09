@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import static org.apache.dolphinscheduler.common.constants.Constants.AWS_YAML_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.REMOTE_LOGGING_YAML_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_CENTER_YAML_PATH;
 
 import org.apache.dolphinscheduler.common.config.ImmutablePriorityPropertyDelegate;
 import org.apache.dolphinscheduler.common.config.ImmutablePropertyDelegate;
@@ -43,7 +44,7 @@ public class PropertyUtils {
     private final ImmutablePriorityPropertyDelegate propertyDelegate =
             new ImmutablePriorityPropertyDelegate(
                     new ImmutablePropertyDelegate(COMMON_PROPERTIES_PATH),
-                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH, AWS_YAML_PATH));
+                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH, AWS_YAML_PATH, RESOURCE_CENTER_YAML_PATH));
 
     public static String getString(String key) {
         return propertyDelegate.get(key.trim());
