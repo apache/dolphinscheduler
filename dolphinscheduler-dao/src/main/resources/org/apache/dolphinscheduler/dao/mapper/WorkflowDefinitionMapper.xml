@@ -200,10 +200,14 @@
             project_code as projectCode
             ,count(*) as count
         from t_ds_workflow_definition
-        where project_code in
-        <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
-            #{i}
-        </foreach>
+        <where>
+            <if test="projectCodes != null and projectCodes.size() != 0">
+                project_code in
+                <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                    #{i}
+                </foreach>
+            </if>
+        </where>
         group by project_code
     </select>
 </mapper>
