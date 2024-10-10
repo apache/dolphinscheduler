@@ -91,7 +91,7 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                         AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus;
                         if (taskExecutionContext.getDryRun() == DRY_RUN_FLAG_YES) {
                             log.info(
-                                    "The current execute mode is dry run, will stop the logic task and set the taskInstance status to success");
+                                    "The current execute mode is dry run check again, will stop the logic task and set the taskInstance status to success");
                             asyncTaskExecutionStatus = AsyncTaskExecuteFunction.AsyncTaskExecutionStatus.SUCCESS;
                         } else {
                             asyncTaskExecutionStatus = asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();

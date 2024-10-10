@@ -193,7 +193,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
-    @DisplayName("Test start a workflow with one sub workflow task(A) dry run success")
+    @DisplayName("Test start a workflow with one sub workflow task(A) dry run, will not execute")
     public void testStartWorkflow_with_subWorkflowTask_dryRunSuccess() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
@@ -223,25 +223,12 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             repository.queryWorkflowInstance(context.getWorkflows().get(1));
                     Assertions
                             .assertThat(subWorkflowInstance)
-                            .hasSize(1)
-                            .satisfiesExactly(workflowInstance -> {
-                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
-                                assertThat(workflowInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
-                            });
+                            .isEmpty();
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
-                            });
-
-                    Assertions
-                            .assertThat(repository.queryTaskInstance(subWorkflowInstance.get(0).getId()))
-                            .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("fake_task");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                                 assertThat(taskInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
                             });

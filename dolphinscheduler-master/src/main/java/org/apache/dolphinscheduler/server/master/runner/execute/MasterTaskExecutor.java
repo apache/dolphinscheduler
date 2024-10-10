@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
+import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -100,6 +101,15 @@ public abstract class MasterTaskExecutor implements Runnable {
             TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
+            if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
+                taskExecutionContext.setEndTime(System.currentTimeMillis());
+                MasterTaskExecutorHolder.removeMasterTaskExecutor(taskExecutionContext.getTaskInstanceId());
+                logicTaskInstanceExecutionEventSenderManager.successEventSender().sendMessage(taskExecutionContext);
+                log.info(
+                        "The current execute mode is dry run, will stop the logic task and set the taskInstance status to success");
+                return;
+            }
             TaskInstanceLogHeader.printLoadTaskInstancePluginHeader();
             beforeExecute();
 
