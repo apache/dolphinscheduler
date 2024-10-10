@@ -21,8 +21,8 @@ You can create new token in [create token](https://docs.github.com/en/authentica
 it is only need all permission under `repo`
 
 ```shell
-export GH_ACCESS_TOKEN="<YOUR-GITHUB-TOKEN-WITH-REPO-ACCESS>"
-export GH_REPO_MILESTONE="<YOUR-MILESTONE>"
+export GH_ACCESS_TOKEN=$(grep GH_ACCESS_TOKEN .env.txt | cut -d '=' -f 2)
+export GH_REPO_MILESTONE=$(grep GH_REPO_MILESTONE .env.txt | cut -d '=' -f 2)
 ```
 
 ### Help
