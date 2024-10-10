@@ -81,9 +81,8 @@ jobs:
         run: |
           ./mvnw -B clean install \
           -Dmaven.test.skip=true \
-          -Dmaven.javadoc.skip=true \
           -Dspotless.skip=true \
-          -Pdocker,release -Ddocker.tag=ci
+          -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
@@ -91,7 +90,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
-          name: standalone-image
+          name: standalone-image-api-test
           path: /tmp/standalone-image.tar
           retention-days: 1
   api-test:
@@ -140,7 +139,7 @@ jobs:
       - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
-          name: standalone-image
+          name: standalone-image-api-test
           path: /tmp
       - name: Load Docker Images
         run: |

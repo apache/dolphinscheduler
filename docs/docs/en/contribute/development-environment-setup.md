@@ -64,7 +64,6 @@ DolphinScheduler will release new Docker images after it released, you could fin
 cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Pdocker,release
@@ -78,7 +77,6 @@ When the command is finished you could find them by command `docker images`.
 cd dolphinscheduler
 ./mvnw -B clean deploy \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \

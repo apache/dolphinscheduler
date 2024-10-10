@@ -27,6 +27,10 @@
     <artifactId>dolphinscheduler-dist</artifactId>
     <name>${project.artifactId}</name>
 
+    <properties>
+        <assembly.skipAssembly>${build.assembly.skip}</assembly.skipAssembly>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -73,71 +77,70 @@
 
     <build>
         <finalName>apache-dolphinscheduler-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>dolphinscheduler-bin</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dolphinscheduler-bin.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>true</appendAssemblyId>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>src</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>true</appendAssemblyId>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${build.assembly.skip}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assembly-plugins</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <executable>bash</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <arguments>
+                                <argument>src/main/assembly/assembly-plugins.sh</argument>
+                                <argument>${build.plugins.skip}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>dolphinscheduler-bin</id>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <phase>package</phase>
-
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-bin.xml</descriptor>
-                                    </descriptors>
-                                    <appendAssemblyId>true</appendAssemblyId>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>src</id>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
-                                    </descriptors>
-                                    <appendAssemblyId>true</appendAssemblyId>
-                                </configuration>
-                            </execution>
-
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>${exec-maven-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>assembly-plugins</id>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <executable>bash</executable>
-                                    <workingDirectory>${project.basedir}</workingDirectory>
-                                    <arguments>
-                                        <argument>src/main/assembly/assembly-plugins.sh</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>docker</id>
             <build>
@@ -178,7 +181,7 @@
                                     <environmentVariables>
                                         <DOCKER_BUILDKIT>1</DOCKER_BUILDKIT>
                                     </environmentVariables>
-                                    <executable>docker</executable>
+                                    <executable>bash</executable>
                                     <workingDirectory>${project.basedir}</workingDirectory>
                                     <arguments>
                                         <argument>src/main/docker/docker-push.sh</argument>

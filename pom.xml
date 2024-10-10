@@ -95,8 +95,11 @@
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
         <skipDepCheck>true</skipDepCheck>
-        <build.ui.skip>false</build.ui.skip>
+        <build.ui.skip>true</build.ui.skip>
+        <build.plugins.skip>false</build.plugins.skip>
+        <build.assembly.skip>true</build.assembly.skip>
         <spotless.skip>false</spotless.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
 
         <skipUT>false</skipUT>
     </properties>
@@ -777,7 +780,36 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>apache.releases.https</id>
+            <name>Apache Release Distribution Repository</name>
+            <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>apache.snapshots.https</id>
+            <name>Apache Development Snapshot Repository</name>
+            <url>https://repository.apache.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <profiles>
+        <profile>
+            <id>release</id>
+            <properties>
+                <build.ui.skip>false</build.ui.skip>
+                <build.plugins.skip>true</build.plugins.skip>
+                <build.assembly.skip>false</build.assembly.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>staging</id>
+            <properties>
+                <build.ui.skip>false</build.ui.skip>
+                <build.plugins.skip>false</build.plugins.skip>
+                <build.assembly.skip>false</build.assembly.skip>
+            </properties>
+        </profile>
         <profile>
             <id>docker</id>
             <properties>
