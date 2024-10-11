@@ -85,9 +85,7 @@ jobs:
         run: |
           ./mvnw -B clean deploy \
           -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
           -Dspotless.skip=true \
-          -Dmaven.deploy.skip \
           -Ddocker.tag=${{ env.DOCKER_TAG }} \
           -Ddocker.hub=${{ env.HUB }} \
           -Pdocker,release

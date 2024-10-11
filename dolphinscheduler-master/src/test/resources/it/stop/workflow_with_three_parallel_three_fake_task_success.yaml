@@ -139,8 +139,8 @@ tasks:
 
 taskRelations:
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 1
@@ -148,8 +148,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 1
     preTaskVersion: 1
     postTaskCode: 4
@@ -157,8 +157,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 4
     preTaskVersion: 1
     postTaskCode: 7
@@ -166,8 +166,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 2
@@ -175,8 +175,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 2
     preTaskVersion: 1
     postTaskCode: 5
@@ -184,8 +184,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 5
     preTaskVersion: 1
     postTaskCode: 8
@@ -193,8 +193,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 3
@@ -202,8 +202,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 3
     preTaskVersion: 1
     postTaskCode: 6
@@ -211,8 +211,8 @@ taskRelations:
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
   - projectCode: 1
-    processDefinitionCode: 1
-    processDefinitionVersion: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
     preTaskCode: 6
     preTaskVersion: 1
     postTaskCode: 9

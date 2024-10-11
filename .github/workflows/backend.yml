@@ -59,6 +59,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 30720
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
@@ -76,12 +89,9 @@ jobs:
       - name: Build and Package on ${{ matrix.java }}
         run: |
           ./mvnw -B clean install \
-                 -Prelease \
+                 -Pstaging \
                  -Dmaven.test.skip=true \
-                 -Dspotless.skip=true \
-                 -Dhttp.keepAlive=false \
-                 -Dmaven.wagon.http.pool=false \
-                 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+                 -Dspotless.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v4
@@ -124,39 +134,9 @@ jobs:
       - name: Running cluster test
         run: |
           /bin/bash ${{ matrix.case.script }}
-  schema-check-prepare:
-    name: schema-check-prepare-${{ matrix.version }}
-    needs: paths-filter
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        version: [ "3.1.9", "3.2.0" ]
-    steps:
-      - uses: actions/cache/restore@v4
-        name: Download Binary Package Cache
-        with:
-          path: /tmp/${{ matrix.version }}
-          key: apache-dolphinscheduler-${{ matrix.version }}-bin
-          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
-      - name: Download Binary Package if not cached
-        run: |
-          if [ ! -f /tmp/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz ]; then
-            echo "Binary package not found in cache, downloading..."
-            mkdir -p /tmp/${{ matrix.version }}
-            wget https://mirrors.tuna.tsinghua.edu.cn/apache/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P /tmp/${{ matrix.version }}
-          else
-            echo "Binary package found in cache, skipping download."
-          fi
-      - uses: actions/cache/save@v4
-        name: Upload Binary Package Cache
-        with:
-          path: /tmp/${{ matrix.version }}
-          key: apache-dolphinscheduler-${{ matrix.version }}-bin
   schema-check:
     name: ${{ matrix.case.name }}-${{ matrix.version }}
-    needs: [ build, schema-check-prepare]
+    needs: [ build ]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -181,12 +161,6 @@ jobs:
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev
-      - uses: actions/cache/restore@v4
-        name: Download Binary Package Cache
-        with:
-          path: /tmp/${{ matrix.version }}
-          key: apache-dolphinscheduler-${{ matrix.version }}-bin
-          restore-keys: apache-dolphinscheduler-${{ matrix.version }}-bin
       - name: Running Schema Check
         run: |
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}

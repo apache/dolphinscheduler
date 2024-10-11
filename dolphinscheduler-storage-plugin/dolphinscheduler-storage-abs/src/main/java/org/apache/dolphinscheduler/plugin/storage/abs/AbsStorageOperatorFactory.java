@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.storage.abs;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import com.google.auto.service.AutoService;
 
@@ -36,10 +36,10 @@ public class AbsStorageOperatorFactory implements StorageOperatorFactory {
 
     private AbsStorageProperties getAbsStorageProperties() {
         return AbsStorageProperties.builder()
-                .containerName(PropertyUtils.getString(Constants.AZURE_BLOB_STORAGE_CONTAINER_NAME))
-                .connectionString(PropertyUtils.getString(Constants.AZURE_BLOB_STORAGE_CONNECTION_STRING))
-                .storageAccountName(PropertyUtils.getString(Constants.AZURE_BLOB_STORAGE_ACCOUNT_NAME))
-                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .containerName(PropertyUtils.getString(StorageConstants.AZURE_BLOB_STORAGE_CONTAINER_NAME))
+                .connectionString(PropertyUtils.getString(StorageConstants.AZURE_BLOB_STORAGE_CONNECTION_STRING))
+                .storageAccountName(PropertyUtils.getString(StorageConstants.AZURE_BLOB_STORAGE_ACCOUNT_NAME))
+                .resourceUploadPath(PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
                 .build();
     }
 

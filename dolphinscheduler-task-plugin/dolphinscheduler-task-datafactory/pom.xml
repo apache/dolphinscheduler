@@ -27,31 +27,50 @@
     <artifactId>dolphinscheduler-task-datafactory</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <plugin.name>task.datafactory</plugin.name>
+    </properties>
+
     <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.azure.resourcemanager</groupId>
             <artifactId>azure-resourcemanager-datafactory</artifactId>
             <version>1.0.0-beta.19</version>
         </dependency>
+
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

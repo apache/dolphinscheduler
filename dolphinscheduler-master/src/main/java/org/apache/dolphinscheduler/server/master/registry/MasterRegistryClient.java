@@ -76,7 +76,13 @@ public class MasterRegistryClient implements AutoCloseable {
     @Override
     public void close() {
         // TODO unsubscribe MasterRegistryDataListener
-        deregister();
+        if (masterHeartBeatTask != null) {
+            masterHeartBeatTask.shutdown();
+        }
+        if (registryClient.isConnected()) {
+            deregister();
+        }
+        log.info("Closed MasterRegistryClient");
     }
 
     /**
