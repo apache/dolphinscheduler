@@ -75,6 +75,11 @@ alert:
   max-heartbeat-interval: 60s
   # The maximum number of alerts that can be processed in parallel
   sender-parallelism: 100
+  rpc:
+    ssl:
+      enabled: false
+      cert-file-path: /path/cert.crt
+      key-file-path: /path/private.pem
 
 registry:
   type: zookeeper

@@ -26,6 +26,7 @@ import java.time.Duration;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -46,6 +47,8 @@ public final class AlertConfig implements Validator {
     private int senderParallelism = 100;
 
     private String alertServerAddress;
+
+    private NettySslConfig nettySslConfig;
 
     @Override
     public boolean supports(Class<?> clazz) {

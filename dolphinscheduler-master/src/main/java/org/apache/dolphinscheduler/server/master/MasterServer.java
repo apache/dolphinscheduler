@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
@@ -60,7 +61,8 @@ import org.springframework.context.annotation.Import;
         ServiceConfiguration.class,
         CommonConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class})
+        RegistryConfiguration.class,
+        NettySslConfig.class})
 @SpringBootApplication
 public class MasterServer implements IStoppable {
 
@@ -93,6 +95,9 @@ public class MasterServer implements IStoppable {
 
     @Autowired
     private SystemEventBusFireWorker systemEventBusFireWorker;
+
+    @Autowired
+    NettySslConfig nettySslConfig;
 
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);

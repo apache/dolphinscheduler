@@ -68,6 +68,11 @@ worker:
     auto-create-tenant-enabled: true
     # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`.
     default-tenant-enabled: false
+  rpc:
+    ssl:
+      enabled: false
+      cert-file-path: /path/cert.crt
+      key-file-path: /path/private.pem
 
 server:
   port: 1235

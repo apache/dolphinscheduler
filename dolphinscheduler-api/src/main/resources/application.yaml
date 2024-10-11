@@ -164,6 +164,11 @@ api:
     # Close each active connection of socket server if python program not active after x milliseconds. Define value is
     # (0 = infinite), and socket server would never close even though no requests accept
     read-timeout: 0
+  rpc:
+    ssl:
+      enabled: false
+      cert-file-path: /path/cert.crt
+      key-file-path: /path/private.pem
 
 metrics:
   enabled: true

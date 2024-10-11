@@ -121,6 +121,11 @@ master:
       memory-usage-weight: 30
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 40
+  rpc:
+    ssl:
+      enabled: false
+      cert-file-path: /path/cert.crt
+      key-file-path: /path/private.pem
 
 server:
   port: 5679
