@@ -101,6 +101,9 @@ public abstract class MasterTaskExecutor implements Runnable {
             TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
+            TaskInstanceLogHeader.printLoadTaskInstancePluginHeader();
+            beforeExecute();
+            
             if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
@@ -110,9 +113,6 @@ public abstract class MasterTaskExecutor implements Runnable {
                         "The current execute mode is dry run, will stop the logic task and set the taskInstance status to success");
                 return;
             }
-            TaskInstanceLogHeader.printLoadTaskInstancePluginHeader();
-            beforeExecute();
-
             TaskInstanceLogHeader.printExecuteTaskHeader();
             executeTask();
 

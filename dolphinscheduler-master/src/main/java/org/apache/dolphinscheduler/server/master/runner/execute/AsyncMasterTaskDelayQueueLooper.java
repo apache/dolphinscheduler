@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
-
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -88,14 +86,8 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                     try {
                         LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
                         LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
-                        AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus;
-                        if (taskExecutionContext.getDryRun() == DRY_RUN_FLAG_YES) {
-                            log.info(
-                                    "The current execute mode is dry run check again, will stop the logic task and set the taskInstance status to success");
-                            asyncTaskExecutionStatus = AsyncTaskExecuteFunction.AsyncTaskExecutionStatus.SUCCESS;
-                        } else {
-                            asyncTaskExecutionStatus = asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();
-                        }
+                        AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus =
+                                asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();
                         switch (asyncTaskExecutionStatus) {
                             case RUNNING:
                                 // If the task status is running, means the task real status is not finished. We
