@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
@@ -117,7 +116,6 @@ public class WorkerGroupController extends BaseController {
                                              @RequestParam("pageSize") Integer pageSize,
                                              @RequestParam(value = "searchVal", required = false) String searchVal) {
         checkPageParams(pageNo, pageSize);
-        searchVal = ParameterUtils.handleEscapes(searchVal);
         return workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
     }
 
