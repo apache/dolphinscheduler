@@ -391,18 +391,20 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
         }
+        if (CollectionUtils.isEmpty(projectList)) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
         List<User> userList = userMapper.selectByIds(projectList.stream()
                 .map(Project::getUserId).distinct().collect(Collectors.toList()));
         Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
         List<Long> projectCodes = projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList());
-        Map<Long, Integer> projectWorkflowDefinitionCountMap = Collections.emptyMap();
-        if (CollectionUtils.isNotEmpty(projectCodes)) {
-            projectWorkflowDefinitionCountMap = workflowDefinitionMapper
-                    .queryProjectWorkflowDefinitionCountByProjectCodes(projectCodes)
-                    .stream()
-                    .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,
-                            ProjectWorkflowDefinitionCount::getCount));
-        }
+        Map<Long, Integer> projectWorkflowDefinitionCountMap = workflowDefinitionMapper
+                .queryProjectWorkflowDefinitionCountByProjectCodes(projectCodes)
+                .stream()
+                .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,
+                        ProjectWorkflowDefinitionCount::getCount));
         for (Project project : projectList) {
             project.setUserName(userMap.get(project.getUserId()));
             project.setDefCount(projectWorkflowDefinitionCountMap.getOrDefault(project.getCode(), 0));

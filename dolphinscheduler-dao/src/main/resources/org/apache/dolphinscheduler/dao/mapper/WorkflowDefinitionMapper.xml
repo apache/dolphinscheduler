@@ -189,19 +189,10 @@
         select
         code
         from t_ds_workflow_definition
-        <where>
-            <choose>
-                <when test="projectCodes != null and projectCodes.size() != 0">
-                    project_code in
-                    <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
-                        #{i}
-                    </foreach>
-                </when>
-                <otherwise>
-                    project_code = 0
-                </otherwise>
-            </choose>
-        </where>
+        where project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
     </select>
 
     <select id="queryProjectWorkflowDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount">
@@ -209,19 +200,10 @@
             project_code as projectCode
             ,count(*) as count
         from t_ds_workflow_definition
-        <where>
-            <choose>
-                <when test="projectCodes != null and projectCodes.size() != 0">
-                    project_code in
-                    <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
-                        #{i}
-                    </foreach>
-                </when>
-                <otherwise>
-                    project_code = 0
-                </otherwise>
-            </choose>
-        </where>
+        where project_code in
+        <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
         group by project_code
     </select>
 </mapper>
