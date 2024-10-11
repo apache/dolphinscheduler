@@ -26,6 +26,7 @@ from github.pull_request import PullRequest
 from github.user import User
 
 
+
 def get_changelog(access_token: str, milestone: str) -> str:
     """Get changelog in specific milestone from GitHub Restful API."""
     pr = PullRequest(token=access_token)
