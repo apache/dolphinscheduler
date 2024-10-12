@@ -45,7 +45,8 @@ import org.springframework.context.event.EventListener;
         CommonConfiguration.class,
         ServiceConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class})
+        RegistryConfiguration.class,
+        NettySslConfig.class})
 @ServletComponentScan
 @SpringBootApplication
 public class ApiApplicationServer {
