@@ -509,11 +509,11 @@ export default {
                     },
                     {
                         title: 'General Setting',
-                        link: '/en-us/docs/dev/user_doc/guide/howto/general-setting.html',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/general-setting.html',
                     },
                     {
                         title: 'Datasource Setting',
-                        link: '/en-us/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/datasource-setting.html',
                     },
                     {
                         title: 'integration',
@@ -1208,11 +1208,11 @@ export default {
                     },
                     {
                         title: '通用设置',
-                        link: '/zh-cn/docs/dev/user_doc/guide/howto/general-setting.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/general-setting.html',
                     },
                     {
                         title: '数据源设置',
-                        link: '/zh-cn/docs/dev/user_doc/guide/howto/datasource-setting.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/datasource-setting.html',
                     },
                     {
                         title: '集成',
@@ -1346,10 +1346,6 @@ export default {
                     {
                         title: '设计文档',
                         children: [
-                            // TODO not support multiply level for now
-                            // {
-                            // title: 'SPI',
-                            // children: [
                             {
                                 title: '架构设计',
                                 link: '/zh-cn/docs/dev/user_doc/contribute/architecture-design.html',
