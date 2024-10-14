@@ -159,21 +159,12 @@
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.logging.log4j</groupId>
-<<<<<<< HEAD
                         <artifactId>log4j-api</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.logging.log4j</groupId>
                         <artifactId>log4j-to-slf4j</artifactId>
                     </exclusion>
-=======
-                        <artifactId>log4j-to-slf4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
->>>>>>> optimize-branch
                 </exclusions>
             </dependency>
             <dependency>
