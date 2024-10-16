@@ -288,7 +288,6 @@ spring-boot-configuration-processor-2.6.1.jar
 spring-boot-starter-2.7.3.jar
 spring-boot-starter-actuator-2.7.3.jar
 spring-boot-starter-aop-2.7.3.jar
-spring-boot-starter-cache-2.7.3.jar
 spring-boot-starter-jdbc-2.7.3.jar
 spring-boot-starter-jetty-2.7.3.jar
 spring-boot-starter-json-2.7.3.jar
