@@ -579,6 +579,10 @@ export default {
                         title: 'Join',
                         children: [
                             {
+                                title: 'Security model',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/security-model.html',
+                            },
+                            {
                                 title: 'Security Report',
                                 link: '/en-us/docs/dev/user_doc/contribute/join/security.html',
                             },
@@ -1277,6 +1281,10 @@ export default {
                     {
                         title: '如何参与',
                         children: [
+                            {
+                                title: '安全模型',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/security-model.html',
+                            },
                             {
                                 title: '报告安全问题',
                                 link: '/zh-cn/docs/dev/user_doc/contribute/join/security.html',
