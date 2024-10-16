@@ -48,7 +48,7 @@ export function useJava({
     timeoutNotifyStrategy: ['WARN'],
     timeout: 30,
     mainJar: undefined,
-    runType: 'JAVA',
+    runType: 'FAT_JAR',
     mainArgs: '',
     jvmArgs: '',
     programType: 'JAVA'

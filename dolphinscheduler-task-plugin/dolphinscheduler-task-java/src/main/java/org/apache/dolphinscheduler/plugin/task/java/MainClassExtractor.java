@@ -15,29 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
+package org.apache.dolphinscheduler.plugin.task.java;
 
-import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
+import java.io.File;
+import java.io.IOException;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
-import org.openqa.selenium.WebDriver;
+public class MainClassExtractor {
 
-public class JavaTaskForm extends TaskNodeForm {
-
-    private CodeEditor codeEditor;
-
-    private WebDriver driver;
-
-    public JavaTaskForm(WorkflowForm parent) {
-        super(parent);
-
-        this.codeEditor = new CodeEditor(parent.driver());
-
-        this.driver = parent.driver();
-    }
-
-    public JavaTaskForm script(String script) {
-        codeEditor.content(script);
-        return this;
+    public static String getMainClassName(String jarFilePath) throws IOException {
+        JarFile jarFile = new JarFile(new File(jarFilePath));
+        Manifest manifest = jarFile.getManifest();
+        String mainClassName = manifest.getMainAttributes().getValue("Main-Class");
+        jarFile.close();
+        return mainClassName;
     }
 }

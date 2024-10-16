@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
@@ -86,8 +85,6 @@ public final class WorkflowForm {
                 return (T) new SwitchTaskForm(this);
             case HTTP:
                 return (T) new HttpTaskForm(this);
-            case JAVA:
-                return (T) new JavaTaskForm(this);
             case PYTHON:
                 return (T) new PythonTaskForm(this);
         }
@@ -128,7 +125,6 @@ public final class WorkflowForm {
         SUB_WORKFLOW,
         SWITCH,
         HTTP,
-        JAVA,
         PYTHON
     }
 }

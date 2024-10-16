@@ -30,11 +30,6 @@ import lombok.Data;
 public class JavaParameters extends AbstractParameters {
 
     /**
-     * origin java script
-     */
-    private String rawScript;
-
-    /**
      * run in jar file
      */
     private ResourceInfo mainJar;
@@ -67,11 +62,11 @@ public class JavaParameters extends AbstractParameters {
     /**
      * Check that the parameters are valid
      *
-     * @returnboolean
+     * @return boolean
      */
     @Override
     public boolean checkParameters() {
-        return runType != null && (StringUtils.isNotBlank(rawScript) || mainJar != null);
+        return StringUtils.isNotEmpty(runType);
     }
 
     /**
