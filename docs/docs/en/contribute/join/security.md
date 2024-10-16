@@ -8,4 +8,4 @@ Please pay attention to report the security issue on the security email before d
 
 ## Note
 
-Before you commit, check whether the issue is a security bug by following the Apache DolphinScheduler [security-model.md](https://github.com/apache/dolphinscheduler/tree/dev/docs/docs/zh/security-model.md).
+Before you commit, check whether the issue is a security bug by following the Apache DolphinScheduler [security-model.md](https://github.com/apache/dolphinscheduler/tree/dev/docs/docs/en/contribute/join/security-model.md).
