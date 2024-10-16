@@ -6,3 +6,6 @@ If you have apprehensions regarding DolphinScheduler’s security or you discove
 
 Please pay attention to report the security issue on the security email before disclosing it on public domain.
 
+## Note
+
+Before you commit, check whether the issue is a security bug by following the Apache DolphinScheduler [security-model.md](https://github.com/apache/dolphinscheduler/tree/dev/docs/docs/en/contribute/join/security-model.md).

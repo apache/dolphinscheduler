@@ -6,3 +6,6 @@ Apache Software Foundation在消除其软件项目中的安全性问题方面采
 
 在公共领域公开该安全电子邮件之前，请注意在安全电子邮件中报告该安全问题。
 
+## 注意
+
+在您提交之前，请先按照Apache DolphinScheduler[安全模型](https://github.com/apache/dolphinscheduler/tree/dev/docs/docs/zh/contribute/join/security-model.md)检查该问题是否属于安全漏洞。
