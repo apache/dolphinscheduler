@@ -123,7 +123,7 @@ master:
       task-thread-pool-usage-weight: 40
   rpc:
     ssl:
-      enabled: true
+      enabled: false
       cert-file-path: /path/cert.crt
       key-file-path: /path/private.pem
 
