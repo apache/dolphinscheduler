@@ -941,10 +941,6 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
                             },
                             {
-                                title: 'Vertica',
-                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/vertica.html',
-                            },
-                            {
                                 title: 'Remote Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
@@ -1057,7 +1053,11 @@ export default {
                             {
                                 title: 'Doris',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/doris.html',
-                            }
+                            },
+                            {
+                                title: 'Vertica',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/vertica.html',
+                            },
                         ],
                     },
                     {
