@@ -112,7 +112,8 @@ public class FlinkArgsUtils {
 
         String others = flinkParameters.getOthers();
         if (StringUtils.isNotEmpty(others)) {
-            args.add(others);
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            args.add(ParameterUtils.convertParameterPlaceholders(others, ParameterUtils.convert(paramsMap)));
         }
         return args;
     }
@@ -271,7 +272,8 @@ public class FlinkArgsUtils {
 
         // -s -yqu -yat -yD -D
         if (StringUtils.isNotEmpty(others)) {
-            args.add(others);
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            args.add(ParameterUtils.convertParameterPlaceholders(others, ParameterUtils.convert(paramsMap)));
         }
 
         // determine yarn queue
