@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.cases.tasks;
+package org.apache.dolphinscheduler.e2e.cases.ssl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +42,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-@DolphinScheduler(composeFiles = "docker/gluster-test/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/ssl-test/docker-compose.yaml")
 @DisableIfTestFails
 public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
 
