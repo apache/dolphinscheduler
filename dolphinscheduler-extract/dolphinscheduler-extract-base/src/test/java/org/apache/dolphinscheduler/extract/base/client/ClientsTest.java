@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 
@@ -48,7 +49,8 @@ public class ClientsTest {
                 .listenPort(listenPort)
                 .build();
         serverAddress = "localhost:" + listenPort;
-        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
+        springServerMethodInvokerDiscovery =
+                new SpringServerMethodInvokerDiscovery(nettyServerConfig, getNettySslConfig());
         springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new IServiceImpl());
         springServerMethodInvokerDiscovery.start();
     }
@@ -111,5 +113,9 @@ public class ClientsTest {
             System.out.println("void method");
         }
     }
-
+    private NettySslConfig getNettySslConfig() {
+        NettySslConfig info = new NettySslConfig();
+        info.setEnabled(false);
+        return info;
+    }
 }

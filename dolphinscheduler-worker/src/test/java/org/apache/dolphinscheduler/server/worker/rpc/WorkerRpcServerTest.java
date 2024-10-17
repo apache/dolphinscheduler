@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 class WorkerRpcServerTest {
 
-    private final WorkerRpcServer workerRpcServer = new WorkerRpcServer(new WorkerConfig());
+    private final WorkerRpcServer workerRpcServer = new WorkerRpcServer(new WorkerConfig(), new NettySslConfig());
 
     @Test
     void testStart() {

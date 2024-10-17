@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NettyRemotingClientFactory {
 
-    public NettyRemotingClient buildNettyRemotingClient(NettyClientConfig nettyClientConfig) {
-        return new NettyRemotingClient(nettyClientConfig);
+    public NettyRemotingClient buildNettyRemotingClient(NettyClientConfig nettyClientConfig,
+                                                        NettySslConfig nettySslConfig) {
+        return new NettyRemotingClient(nettyClientConfig, nettySslConfig);
     }
 }

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.extract.base.server;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 import java.lang.reflect.Method;
 
@@ -39,8 +40,9 @@ public class RpcServer implements ServerMethodInvokerRegistry, AutoCloseable {
 
     private final NettyRemotingServer nettyRemotingServer;
 
-    public RpcServer(NettyServerConfig nettyServerConfig) {
-        this.nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(nettyServerConfig);
+    public RpcServer(NettyServerConfig nettyServerConfig, NettySslConfig nettySslConfig) {
+        this.nettyRemotingServer =
+                NettyRemotingServerFactory.buildNettyRemotingServer(nettyServerConfig, nettySslConfig);
     }
 
     public void start() {

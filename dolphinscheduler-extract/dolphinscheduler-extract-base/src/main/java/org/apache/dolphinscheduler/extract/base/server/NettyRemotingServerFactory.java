@@ -18,13 +18,15 @@
 package org.apache.dolphinscheduler.extract.base.server;
 
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class NettyRemotingServerFactory {
 
-    NettyRemotingServer buildNettyRemotingServer(NettyServerConfig nettyServerConfig) {
-        return new NettyRemotingServer(nettyServerConfig);
+    public NettyRemotingServer buildNettyRemotingServer(NettyServerConfig nettyServerConfig,
+                                                        NettySslConfig nettySslConfig) {
+        return new NettyRemotingServer(nettyServerConfig, nettySslConfig);
     }
 }

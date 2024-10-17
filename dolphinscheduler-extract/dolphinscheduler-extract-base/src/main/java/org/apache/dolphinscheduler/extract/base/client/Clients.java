@@ -36,7 +36,7 @@ public class Clients {
     private static final JdkDynamicRpcClientProxyFactory jdkDynamicRpcClientProxyFactory =
             new JdkDynamicRpcClientProxyFactory(
                     NettyRemotingClientFactory.buildNettyRemotingClient(
-                            new NettyClientConfig()));
+                            new NettyClientConfig(), null));
 
     public static <T> JdkDynamicRpcClientProxyBuilder<T> withService(Class<T> serviceClazz) {
         return new JdkDynamicRpcClientProxyBuilder<>(serviceClazz);

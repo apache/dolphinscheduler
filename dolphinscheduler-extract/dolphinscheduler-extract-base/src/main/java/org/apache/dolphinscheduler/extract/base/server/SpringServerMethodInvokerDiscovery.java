@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.extract.base.server;
 
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,8 +32,8 @@ import org.springframework.lang.Nullable;
 @Slf4j
 public class SpringServerMethodInvokerDiscovery extends RpcServer implements BeanPostProcessor {
 
-    public SpringServerMethodInvokerDiscovery(NettyServerConfig nettyServerConfig) {
-        super(nettyServerConfig);
+    public SpringServerMethodInvokerDiscovery(NettyServerConfig nettyServerConfig, NettySslConfig nettySslConfig) {
+        super(nettyServerConfig, nettySslConfig);
     }
 
     @Nullable
