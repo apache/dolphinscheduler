@@ -9,6 +9,7 @@
 集群部署(Cluster)使用的脚本和配置文件与[伪集群部署](pseudo-cluster.md)中的配置一样，所以所需要的步骤也与伪集群部署大致一样。区别就是伪集群部署针对的是一台机器，而集群部署(Cluster)需要针对多台机器，且两者“修改相关配置”步骤区别较大
 
 ### 开启SSL（可选）
+
 在集群部署中，你可以开启SSL认证。Secure Sockets Layer，缩写作 SSL，是一种安全协议，能够加密传输的数据，确保在数据传输过程中，信息不会被窃听或篡改，此外还可以对服务器进行身份验证以及保障数据的完整性。
 
 开启SLL认证，你有两件事要做。 首先你需要生成`cert.crt`和`private.pem`文件。
@@ -36,6 +37,7 @@ sudo yum install openssl
 ```bash
 openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 ```
+
 此命令会生成一个 2048 位的 RSA 私钥，并将其保存为 private.pem 文件。
 
 步骤 3：生成证书签署请求（CSR）
@@ -45,6 +47,7 @@ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 ```bash
 openssl req -new -key private.pem -out request.csr
 ```
+
 此命令会提示您输入一些信息，例如国家、州/省、组织名等。您输入的信息将会嵌入到生成的证书中。
 
 步骤 4：生成自签名证书（cert.crt）
@@ -54,9 +57,11 @@ openssl req -new -key private.pem -out request.csr
 ```bash
 openssl x509 -req -days 365 -in request.csr -signkey private.pem -out cert.crt
 ```
+
 此命令会生成一个有效期为 365 天的自签名证书，并将其保存为 cert.crt 文件。
 
 然后修改`dolphinscheduler-master`、`dolphinscheduler-worker`、`dolphinscheduler-api`模块中的`application.yaml`文件。
+
 ```yaml
 rpc:
   ssl:
@@ -64,8 +69,8 @@ rpc:
     cert-file-path: /path/cert.crt
     key-file-path: /path/private.pem
 ```
-您需要将`enabled`改为`true`，同时将配置`cert-file-path`和`key-file-path`的文件路劲。
 
+您需要将`enabled`改为`true`，同时将配置`cert-file-path`和`key-file-path`的文件路劲。
 
 ### 前置准备工作 && 准备 DolphinScheduler 启动环境
 
