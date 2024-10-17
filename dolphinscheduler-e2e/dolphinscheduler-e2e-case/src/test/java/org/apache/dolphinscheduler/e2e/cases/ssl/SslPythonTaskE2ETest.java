@@ -22,27 +22,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
+import org.apache.dolphinscheduler.e2e.models.environment.PythonEnvironment;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
-@TestMethodOrder(MethodOrderer.MethodName.class)
-@DolphinScheduler(composeFiles = "docker/ssl-test/docker-compose.yml")
+@DolphinScheduler(composeFiles = "docker/ssl-task/docker-compose.yml")
 @DisableIfTestFails
-public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
+public class SslPythonTaskE2ETest extends BaseWorkflowE2ETest {
+
+    private static final PythonEnvironment pythonEnvironment = new PythonEnvironment();
 
     @BeforeAll
     public static void setup() {
@@ -60,6 +62,13 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                     .goToTab(UserPage.class)
                     .update(adminUser);
         }
+        tenantPage
+                .goToNav(SecurityPage.class)
+                .goToTab(EnvironmentPage.class)
+                .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
+                        pythonEnvironment.getEnvironmentConfig(),
+                        pythonEnvironment.getEnvironmentDesc(),
+                        pythonEnvironment.getEnvironmentWorkerGroup());
 
         tenantPage
                 .goToNav(ProjectPage.class)
@@ -67,7 +76,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_SuccessCase() {
+    @Order(10)
+    void testRunPythonTasks_SuccessCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -75,12 +85,13 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
-        String workflowName = "SslSuccessCase";
-        String taskName = "SslShellSuccess";
+        String workflowName = "SslPythonSuccessCase";
+        String taskName = "SslPythonSuccessTask";
+        String pythonScripts = "print(\"success\")";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("echo hello world\n")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .submit()
 
