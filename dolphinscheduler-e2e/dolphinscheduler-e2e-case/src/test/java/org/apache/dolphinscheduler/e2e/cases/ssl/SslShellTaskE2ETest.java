@@ -42,7 +42,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-@DolphinScheduler(composeFiles = "docker/ssl-test/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/ssl-test/docker-compose.yml")
 @DisableIfTestFails
 public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
 
