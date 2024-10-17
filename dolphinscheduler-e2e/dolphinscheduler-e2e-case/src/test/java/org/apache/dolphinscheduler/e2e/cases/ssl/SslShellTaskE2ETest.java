@@ -77,8 +77,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
-        String workflowName = "SuccessCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "SslSuccessCase";
+        String taskName = "SslShellSuccess";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -112,8 +112,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
-        String workflowName = "WorkflowParamsCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "SslWorkflowParamsCase";
+        String taskName = "SslShellSuccess";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -147,8 +147,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "LocalParamsCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "SslLocalParamsCase";
+        String taskName = "SslShellSuccess";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -182,8 +182,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "LocalParamsOverrideWorkflowParamsCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "SslLocalParamsOverrideWorkflowParamsCase";
+        String taskName = "SslShellSuccess";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -224,8 +224,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "UsingResourceFile";
-        String taskName = "ShellSuccess";
+        String workflowName = "SslUsingResourceFile";
+        String taskName = "SslShellSuccess";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -259,8 +259,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "FailedCase";
-        String taskName = "ShellFailed";
+        String workflowName = "SslFailedCase";
+        String taskName = "SslShellFailed";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
