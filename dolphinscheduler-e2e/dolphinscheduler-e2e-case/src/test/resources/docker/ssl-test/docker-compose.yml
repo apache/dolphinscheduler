@@ -53,7 +53,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-schema-initializer:
-    image: ${HUB}/dolphinscheduler-tools:ci
+    image: apache/dolphinscheduler-tools:ci
     env_file: .env
     profiles: ["schema"]
     command: [ tools/bin/upgrade-schema.sh ]
@@ -68,7 +68,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-api:
-    image: ${HUB}/dolphinscheduler-api:ci
+    image: apache/dolphinscheduler-api:ci
     ports:
       - "12345:12345"
       - "25333:25333"
@@ -93,7 +93,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-alert:
-    image: ${HUB}/dolphinscheduler-alert-server:ci
+    image: apache/dolphinscheduler-alert-server:ci
     profiles: ["all"]
     env_file: .env
     healthcheck:
@@ -110,7 +110,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-master:
-    image: ${HUB}/dolphinscheduler-master:ci
+    image: apache/dolphinscheduler-master:ci
     profiles: ["all"]
     env_file: .env
     healthcheck:
@@ -131,7 +131,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-worker:
-    image: ${HUB}/dolphinscheduler-worker:ci
+    image: apache/dolphinscheduler-worker:ci
     profiles: ["all"]
     env_file: .env
     healthcheck:
