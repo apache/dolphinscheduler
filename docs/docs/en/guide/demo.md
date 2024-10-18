@@ -19,7 +19,7 @@ Start all services of dolphinscheduler according to your deployment method. If y
 
 ### Database Configuration
 
-Initializing the workflow demo needs to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [datasource-setting](howto/datasource-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database.
+Initializing the workflow demo needs to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [datasource-setting](installation/datasource-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database.
 
 ### Tenant Configuration
 
