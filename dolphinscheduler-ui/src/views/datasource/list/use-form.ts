@@ -75,6 +75,9 @@ export function useForm(id?: number) {
     showAccessKeySecret: false,
     showRegionId: false,
     showEndpoint: false,
+    showAliyunAccessKeyId: false,
+    showAliyunAccessKeySecret: false,
+    showAliyunRegionId: false,
     rules: {
       name: {
         trigger: ['input'],
@@ -126,7 +129,8 @@ export function useForm(id?: number) {
             !state.detailForm.userName &&
             state.detailForm.type !== 'AZURESQL' &&
             state.detailForm.type !== 'K8S' &&
-            state.detailForm.type !== 'ALIYUN_SERVERLESS_SPARK'
+            state.detailForm.type !== 'ALIYUN_SERVERLESS_SPARK' &&
+            state.detailForm.type !== 'ADBSPARK'
           ) {
             return new Error(t('datasource.user_name_tips'))
           }
@@ -274,7 +278,8 @@ export function useForm(id?: number) {
       type === 'ZEPPELIN' ||
       type === 'SAGEMAKER' ||
       type === 'K8S' ||
-      type === 'ALIYUN_SERVERLESS_SPARK'
+      type === 'ALIYUN_SERVERLESS_SPARK' ||
+      type === 'ADBSPARK'
     ) {
       state.showDataBaseName = false
       state.requiredDataBase = false
@@ -291,7 +296,8 @@ export function useForm(id?: number) {
       if (
         type === 'SAGEMAKER' ||
         type === 'K8S' ||
-        type == 'ALIYUN_SERVERLESS_SPARK'
+        type == 'ALIYUN_SERVERLESS_SPARK' ||
+        type === 'ADBSPARK'
       ) {
         state.showHost = false
         state.showPort = false
@@ -305,6 +311,11 @@ export function useForm(id?: number) {
         state.showAccessKeySecret = true
         state.showRegionId = true
         state.showEndpoint = true
+      }
+      if (type === 'ADBSPARK') {
+        state.showAliyunAccessKeyId = true
+        state.showAliyunAccessKeySecret = true
+        state.showAliyunRegionId = true
       }
     } else {
       state.showDataBaseName = true
@@ -478,6 +489,11 @@ export const datasourceType: IDataBaseOptionKeys = {
   ALIYUN_SERVERLESS_SPARK: {
     value: 'ALIYUN_SERVERLESS_SPARK',
     label: 'ALIYUN_SERVERLESS_SPARK',
+    defaultPort: 0
+  },
+  ADBSPARK: {
+    value: 'ADBSPARK',
+    label: 'ADBSPARK',
     defaultPort: 0
   }
 }

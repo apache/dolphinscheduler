@@ -899,7 +899,21 @@ export default {
     spark_submit_parameters: 'spark submit parameters',
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
-    is_production_tips: 'is production'
+    is_production_tips: 'is production',
+    aliyun_access_key_id: '阿里云Access Key ID',
+    aliyun_access_key_id_tips: '请输入阿里云Access Key ID',
+    aliyun_access_key_secret: '阿里云Access Key Secret',
+    aliyun_access_key_secret_tips: '请输入阿里云Aliyun Access Key Secret',
+    aliyun_region_id: '阿里云Region ID',
+    aliyun_region_id_tips: '请输入阿里云Region ID',
+    adb_cluster_id: "阿里云ADB集群ID",
+    adb_cluster_id_tips: "请输入阿里云ADB集群ID",
+    adb_resource_group_name: "阿里云ADB资源组名称",
+    adb_resource_group_name_tips: "请输入阿里云ADB资源组名称",
+    adb_spark_app_type: "阿里云ADB Spark应用类型",
+    adb_spark_app_type_tips: "请输入阿里云ADB Spark应用类型",
+    adb_spark_data: "阿里云ADB Spark应用配置",
+    adb_spark_data_tips: "请输入阿里云ADB Spark应用配置"
   },
   menu: {
     fav: '收藏组件',

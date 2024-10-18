@@ -159,6 +159,11 @@ export function useDatasource(
       disabled: false
     },
     {
+      id: 26,
+      code: 'ADBSPARK',
+      disabled: false
+    },
+    {
       id: 27,
       code: 'ALIYUN_SERVERLESS_SPARK',
       disabled: false

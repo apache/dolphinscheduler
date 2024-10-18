@@ -102,5 +102,11 @@ export default {
   region_id: 'Region Id',
   region_id_tips: '请输入Region Id',
   endpoint: 'endpoint',
-  endpoint_tips: '请输入endpoint'
+  endpoint_tips: '请输入endpoint',
+  aliyun_access_key_id: '阿里云Access Key ID',
+  aliyun_access_key_id_tips: '请输入阿里云Access Key ID',
+  aliyun_access_key_secret: '阿里云Access Key Secret',
+  aliyun_access_key_secret_tips: '请输入阿里云Access Key Secret',
+  aliyun_region_id: '阿里云Region ID',
+  aliyun_region_id_tips: '请输入阿里云 Region ID'
 }

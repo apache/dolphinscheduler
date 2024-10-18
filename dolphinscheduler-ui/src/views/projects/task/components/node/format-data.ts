@@ -503,6 +503,15 @@ export function formatParams(data: INodeData): {
     taskParams.listParameters = data.listParameters
   }
 
+  if (data.type === 'ADBSPARK') {
+    taskParams.dbClusterId = data.dbClusterId
+    taskParams.resourceGroupName = data.resourceGroupName
+    taskParams.appType = data.appType
+    taskParams.data = data.data
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {

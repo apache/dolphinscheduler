@@ -36,6 +36,7 @@ task:
     - 'DMS'
     - 'DATA_FACTORY'
     - 'ALIYUN_SERVERLESS_SPARK'
+    - 'ADBSPARK'
   logic:
     - 'SUB_WORKFLOW'
     - 'DEPENDENT'
