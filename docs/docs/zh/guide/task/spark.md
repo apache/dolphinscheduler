@@ -4,9 +4,9 @@
 
 Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支持两个不同类型的 spark 命令提交任务：
 
-(1) `spark submit` 方式提交任务。更多详情查看 [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit)。
+(1) `spark submit` 方式提交任务。更多详情查看 [spark-submit](https://archive.apache.org/dist/spark/docs/3.2.1/#running-the-examples-and-shell)。
 
-(2) `spark sql` 方式提交任务。更多详情查看 [spark sql](https://spark.apache.org/docs/3.2.1/sql-ref-syntax.html)。
+(2) `spark sql` 方式提交任务。更多详情查看 [spark sql](https://archive.apache.org/dist/spark/docs/3.2.1/api/sql/index.html)。
 
 ## 创建任务
 

@@ -19,7 +19,7 @@
 ### 数据库配置
 
 初始化工作流 demo 服务需要使用 MySQL 或 PostgreSQL 等其他数据库作为其元数据存储数据，因此必须更改一些配置。
-请参考[数据源配置](howto/datasource-setting.md) `Standalone 切换元数据库`创建并初始化数据库 ，然后运行 demo 服务启动脚本。
+请参考[数据源配置](installation/datasource-setting.md) `Standalone 切换元数据库`创建并初始化数据库 ，然后运行 demo 服务启动脚本。
 
 ### 租户配置
 
