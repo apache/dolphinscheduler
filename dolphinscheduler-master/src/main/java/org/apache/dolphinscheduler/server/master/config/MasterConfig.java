@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
@@ -78,6 +79,8 @@ public class MasterConfig implements Validator {
      * The registry path for the master server in the format '/nodes/master/ip:listenPort'.
      */
     private String masterRegistryPath;
+
+    private NettySslConfig nettySslConfig;
 
     @Override
     public boolean supports(Class<?> clazz) {

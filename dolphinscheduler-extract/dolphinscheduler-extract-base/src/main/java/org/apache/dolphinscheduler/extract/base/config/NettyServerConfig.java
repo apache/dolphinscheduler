@@ -79,4 +79,6 @@ public class NettyServerConfig {
      */
     private int listenPort;
 
+    @Builder.Default
+    private NettySslConfig nettySslConfig = new NettySslConfig();
 }

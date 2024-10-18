@@ -76,4 +76,7 @@ public class NettyClientConfig {
     @Builder.Default
     private int defaultRpcTimeoutMillis = 10_000;
 
+    @Builder.Default
+    private NettySslConfig nettySslConfig = new NettySslConfig();
+
 }

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,6 +47,8 @@ public final class AlertConfig implements Validator {
     private int senderParallelism = 100;
 
     private String alertServerAddress;
+
+    private NettySslConfig nettySslConfig;
 
     @Override
     public boolean supports(Class<?> clazz) {

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -47,7 +48,7 @@ public class WorkerConfig implements Validator {
     private int hostWeight = 100;
     private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
-
+    private NettySslConfig nettySslConfig;
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
      */
