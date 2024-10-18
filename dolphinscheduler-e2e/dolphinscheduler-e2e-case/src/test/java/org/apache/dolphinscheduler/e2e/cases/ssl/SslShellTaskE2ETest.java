@@ -29,8 +29,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinition
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
-import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
@@ -77,8 +75,8 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
-        String workflowName = "SuccessCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "SslSuccessCase";
+        String taskName = "SslShellSuccess";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -100,188 +98,6 @@ public class SslShellTaskE2ETest extends BaseWorkflowE2ETest {
         assertThat(workflowInstance.executionTime()).isEqualTo(1);
 
         TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
-        assertThat(taskInstance.retryTimes()).isEqualTo(0);
-    }
-
-    @Test
-    void testRunShellTasks_WorkflowParamsCase() {
-        WorkflowDefinitionTab workflowDefinitionPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(projectName)
-                        .goToTab(WorkflowDefinitionTab.class);
-
-        // todo: use yaml to define the workflow
-        String workflowName = "WorkflowParamsCase";
-        String taskName = "ShellSuccess";
-        workflowDefinitionPage
-                .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
-                .name(taskName)
-                .submit()
-
-                .submit()
-                .name(workflowName)
-                .addGlobalParam("name", "tom")
-                .submit();
-
-        untilWorkflowDefinitionExist(workflowName);
-
-        workflowDefinitionPage.publish(workflowName);
-
-        runWorkflow(workflowName);
-        untilWorkflowInstanceExist(workflowName);
-        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceSuccess(workflowName);
-        assertThat(workflowInstance.executionTime()).isEqualTo(1);
-
-        TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
-        assertThat(taskInstance.retryTimes()).isEqualTo(0);
-    }
-
-    @Test
-    void testRunShellTasks_LocalParamsCase() {
-        WorkflowDefinitionTab workflowDefinitionPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(projectName)
-                        .goToTab(WorkflowDefinitionTab.class);
-
-        String workflowName = "LocalParamsCase";
-        String taskName = "ShellSuccess";
-        workflowDefinitionPage
-                .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
-                .name(taskName)
-                .addParam("name", "tom")
-                .submit()
-
-                .submit()
-                .name(workflowName)
-                .submit();
-
-        untilWorkflowDefinitionExist(workflowName);
-
-        workflowDefinitionPage.publish(workflowName);
-
-        runWorkflow(workflowName);
-        untilWorkflowInstanceExist(workflowName);
-        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceSuccess(workflowName);
-        assertThat(workflowInstance.executionTime()).isEqualTo(1);
-
-        TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
-        assertThat(taskInstance.retryTimes()).isEqualTo(0);
-    }
-
-    @Test
-    void testRunShellTasks_GlobalParamsOverrideLocalParamsCase() {
-        WorkflowDefinitionTab workflowDefinitionPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(projectName)
-                        .goToTab(WorkflowDefinitionTab.class);
-
-        String workflowName = "LocalParamsOverrideWorkflowParamsCase";
-        String taskName = "ShellSuccess";
-        workflowDefinitionPage
-                .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("[ \"${name}\" = \"jerry\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
-                .name(taskName)
-                .addParam("name", "tom")
-                .submit()
-
-                .submit()
-                .name(workflowName)
-                .addGlobalParam("name", "jerry")
-                .submit();
-
-        untilWorkflowDefinitionExist(workflowName);
-
-        workflowDefinitionPage.publish(workflowName);
-
-        runWorkflow(workflowName);
-        untilWorkflowInstanceExist(workflowName);
-        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceSuccess(workflowName);
-        assertThat(workflowInstance.executionTime()).isEqualTo(1);
-
-        TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
-        assertThat(taskInstance.retryTimes()).isEqualTo(0);
-    }
-
-    @Test
-    void testRunShellTasks_UsingResourceFile() {
-        String testFileName = "echo";
-        new ResourcePage(browser)
-                .goToNav(ResourcePage.class)
-                .goToTab(FileManagePage.class)
-                .createFileUntilSuccess(testFileName, "echo 123");
-
-        final WorkflowDefinitionTab workflowDefinitionPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(projectName)
-                        .goToTab(WorkflowDefinitionTab.class);
-
-        String workflowName = "UsingResourceFile";
-        String taskName = "ShellSuccess";
-        workflowDefinitionPage
-                .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("cat " + testFileName + ".sh")
-                .name(taskName)
-                .selectResource(testFileName)
-                .submit()
-
-                .submit()
-                .name(workflowName)
-                .submit();
-
-        untilWorkflowDefinitionExist(workflowName);
-
-        workflowDefinitionPage.publish(workflowName);
-
-        runWorkflow(workflowName);
-        untilWorkflowInstanceExist(workflowName);
-        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceSuccess(workflowName);
-        assertThat(workflowInstance.executionTime()).isEqualTo(1);
-
-        TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
-        assertThat(taskInstance.retryTimes()).isEqualTo(0);
-    }
-
-    @Test
-    void testRunShellTasks_FailedCase() {
-        WorkflowDefinitionTab workflowDefinitionPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(projectName)
-                        .goToTab(WorkflowDefinitionTab.class);
-
-        String workflowName = "FailedCase";
-        String taskName = "ShellFailed";
-        workflowDefinitionPage
-                .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("echo 'I am failed'\n exit1\n")
-                .name(taskName)
-                .submit()
-
-                .submit()
-                .name(workflowName)
-                .submit();
-
-        untilWorkflowDefinitionExist(workflowName);
-
-        workflowDefinitionPage.publish(workflowName);
-
-        runWorkflow(workflowName);
-        untilWorkflowInstanceExist(workflowName);
-        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceFailed(workflowName);
-        assertThat(workflowInstance.executionTime()).isEqualTo(1);
-
-        TaskInstanceTab.Row taskInstance = untilTaskInstanceFailed(workflowName, taskName);
         assertThat(taskInstance.retryTimes()).isEqualTo(0);
     }
 

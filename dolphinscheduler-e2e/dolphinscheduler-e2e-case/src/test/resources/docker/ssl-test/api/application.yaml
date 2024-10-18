@@ -166,7 +166,7 @@ api:
     read-timeout: 0
   rpc:
     ssl:
-      enabled: false
+      enabled: true
       cert-file-path: /path/cert.crt
       key-file-path: /path/private.pem
 
