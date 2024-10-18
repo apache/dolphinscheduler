@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -34,17 +36,20 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Configuration
 @Slf4j
 public class LdapService {
+
+    public static final String ATTRIBUTE_EMAIL = "email";
+    public static final String ATTRIBUTE_USER_TYPE = "userType";
 
     @Value("${security.authentication.ldap.user.admin:#{null}}")
     private String adminUserId;
@@ -67,6 +72,9 @@ public class LdapService {
     @Value("${security.authentication.ldap.user.email-attribute:#{null}}")
     private String ldapEmailAttribute;
 
+    @Value("${security.authentication.ldap.user.admin-filter:#{null}}")
+    private String ldapAdminUserFilter;
+
     @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
     private String ldapUserNotExistAction;
 
@@ -81,11 +89,18 @@ public class LdapService {
 
     /***
      * get user type by configured admin userId
-     * @param userId login userId
+     * @param ldapAttributes login userI ldap attributes (i.e. userId, email, etc...)
      * @return user type
      */
-    public UserType getUserType(String userId) {
-        return adminUserId.equalsIgnoreCase(userId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
+    public UserType getUserType(Map<String, String> ldapAttributes) {
+
+        if (ldapAttributes.containsKey(ATTRIBUTE_USER_TYPE)) {
+            String userType = ldapAttributes.get(ATTRIBUTE_USER_TYPE);
+
+            return UserType.valueOf(userType);
+        }
+
+        return UserType.GENERAL_USER;
     }
 
     /**
@@ -95,9 +110,11 @@ public class LdapService {
      * @param userPwd user login password
      * @return user email
      */
-    public String ldapLogin(String userId, String userPwd) {
+    public Map<String, String> ldapLogin(String userId, String userPwd) {
+        Map<String, String> ldapAttributeMap = new HashMap<>();
         Properties searchEnv = getManagerLdapEnv();
         LdapContext ctx = null;
+
         try {
             // Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
             ctx = new InitialLdapContext(searchEnv, null);
@@ -106,10 +123,13 @@ public class LdapService {
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
             EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
             NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
+
+            // Get all requested attributes
             if (results.hasMore()) {
                 // get the users DN (distinguishedName) from the result
                 SearchResult result = results.next();
                 NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
+
                 while (attrs.hasMore()) {
                     // Open another connection to the LDAP server with the found DN and the password
                     searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
@@ -120,10 +140,28 @@ public class LdapService {
                         log.warn("invalid ldap credentials or ldap search error", e);
                         return null;
                     }
+
                     Attribute attr = attrs.next();
                     if (attr.getID().equals(ldapEmailAttribute)) {
-                        return (String) attr.get();
+                        String value = (String) attr.get();
+
+                        ldapAttributeMap.put(ATTRIBUTE_EMAIL, value);
                     }
+                }
+            }
+
+            // Check for admin role
+            UserType userType =
+                    userId.equalsIgnoreCase(adminUserId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
+
+            ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, userType.toString());
+
+            if (ldapAdminUserFilter != null) {
+                results = ctx.search(ldapBaseDn, ldapAdminUserFilter, new Object[]{userId}, sc);
+
+                if (results.hasMore()) {
+                    // found the users with or part of the admin context
+                    ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, UserType.ADMIN_USER.toString());
                 }
             }
         } catch (NamingException e) {
@@ -139,7 +177,7 @@ public class LdapService {
             }
         }
 
-        return null;
+        return ldapAttributeMap;
     }
 
     /***

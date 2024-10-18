@@ -109,7 +109,8 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     @Test
     public void testAuthenticate() {
-        when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
+        Map<String, String> ldapAttributes = Map.of(LdapService.ATTRIBUTE_EMAIL, ldapEmail);
+        when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapAttributes);
         when(sessionService.createSessionIfAbsent(Mockito.any(User.class))).thenReturn(mockSession);
 
         // test username pwd correct and user not exist, config user not exist action deny, so login denied
