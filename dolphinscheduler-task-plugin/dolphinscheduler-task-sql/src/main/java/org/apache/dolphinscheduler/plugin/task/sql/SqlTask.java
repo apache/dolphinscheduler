@@ -58,7 +58,9 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 @Slf4j
 public class SqlTask extends AbstractTask {
@@ -253,9 +255,18 @@ public class SqlTask extends AbstractTask {
                 : JSONUtils.toJsonString(resultJSONArray);
 
         if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
+            resultJSONArray.forEach(row -> {
+                row.fields().forEachRemaining(field -> {
+                    if (field.getValue() instanceof NullNode) {
+                        field.setValue(new TextNode("null"));
+                    }
+                });
+            });
+            String sendResult = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
+                    : JSONUtils.toJsonString(resultJSONArray);
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", result);
+                    : taskExecutionContext.getTaskName() + " query result sets", sendResult);
         }
         log.debug("execute sql result : {}", result);
         return result;
