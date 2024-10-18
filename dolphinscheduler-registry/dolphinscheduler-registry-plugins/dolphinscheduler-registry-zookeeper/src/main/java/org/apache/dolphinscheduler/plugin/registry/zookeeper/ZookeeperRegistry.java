@@ -53,8 +53,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import com.google.common.base.Strings;
-
 @Slf4j
 final class ZookeeperRegistry implements Registry {
 
@@ -81,9 +79,10 @@ final class ZookeeperRegistry implements Registry {
                         .sessionTimeoutMs(DurationUtils.toMillisInt(properties.getSessionTimeout()))
                         .connectionTimeoutMs(DurationUtils.toMillisInt(properties.getConnectionTimeout()));
 
-        final String digest = properties.getDigest();
-        if (!Strings.isNullOrEmpty(digest)) {
-            builder.authorization("digest", digest.getBytes(StandardCharsets.UTF_8))
+        if (properties.getAuthorization().size() > 0) {
+            final String schema = properties.getAuthorization().keySet().stream().findFirst().get();
+            final String schemaValue = properties.getAuthorization().get(schema);
+            builder.authorization(schema.toLowerCase(), schemaValue.getBytes(StandardCharsets.UTF_8))
                     .aclProvider(new ACLProvider() {
 
                         @Override
@@ -97,6 +96,7 @@ final class ZookeeperRegistry implements Registry {
                         }
                     });
         }
+
         client = builder.build();
     }
 

@@ -28,4 +28,4 @@ registry:
     connection-timeout: 9s
     block-until-connected: 3s
     authorization:
-      digest: ~
+      x509: "CN=localhost,OU=ZooKeeper,O=Apache,L=Unknown,ST=Unknown,C=Unknown"
