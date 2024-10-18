@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -497,10 +496,6 @@ public class UsersController extends BaseController {
                                        @RequestParam(value = "userPassword") String userPassword,
                                        @RequestParam(value = "repeatPassword") String repeatPassword,
                                        @RequestParam(value = "email") String email) throws Exception {
-        userName = ParameterUtils.handleEscapes(userName);
-        userPassword = ParameterUtils.handleEscapes(userPassword);
-        repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
-        email = ParameterUtils.handleEscapes(email);
         Result<Object> verifyRet = usersService.verifyUserName(userName);
         if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
             return verifyRet;
@@ -523,7 +518,6 @@ public class UsersController extends BaseController {
     @ApiException(UPDATE_USER_ERROR)
     public Result<Object> activateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "userName") String userName) {
-        userName = ParameterUtils.handleEscapes(userName);
         Map<String, Object> result = usersService.activateUser(loginUser, userName);
         return returnDataList(result);
     }
@@ -542,9 +536,7 @@ public class UsersController extends BaseController {
     @ApiException(UPDATE_USER_ERROR)
     public Result<Object> batchActivateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestBody List<String> userNames) {
-        List<String> formatUserNames =
-                userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
-        Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
+        Map<String, Object> result = usersService.batchActivateUser(loginUser, userNames);
         return returnDataList(result);
     }
 }

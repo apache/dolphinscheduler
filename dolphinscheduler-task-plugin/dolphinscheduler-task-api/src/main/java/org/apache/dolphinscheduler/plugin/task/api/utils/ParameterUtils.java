@@ -314,15 +314,18 @@ public class ParameterUtils {
     /**
      * handle escapes
      *
-     * @param inputString input string
+     * @param str input string
      * @return string filter escapes
      */
-    public static String handleEscapes(String inputString) {
-
-        if (!StringUtils.isEmpty(inputString)) {
-            return inputString.replace("%", "////%").replaceAll("[\n|\r\t]", "_");
+    public static String handleEscapes(String str) {
+        str = StringUtils.trim(str);
+        if (StringUtils.isNotBlank(str)) {
+            str = str.replace("\\", "\\\\");
+            str = str.replace("_", "\\_");
+            str = str.replace("%", "\\%");
+            str = str.replaceAll("[\n|\r\t]", "");
         }
-        return inputString;
+        return str;
     }
 
     /**

@@ -50,7 +50,6 @@ import org.apache.dolphinscheduler.api.vo.ResourceItemVO;
 import org.apache.dolphinscheduler.api.vo.resources.FetchFileContentResponse;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -261,7 +260,7 @@ public class ResourcesController extends BaseController {
                 .loginUser(loginUser)
                 .resourceAbsolutePath(resourceAbsolutePath)
                 .resourceType(resourceType)
-                .resourceNameKeyWord(StringUtils.trim(ParameterUtils.handleEscapes(resourceNameKeyWord)))
+                .resourceNameKeyWord(StringUtils.trim(resourceNameKeyWord))
                 .pageNo(pageNo)
                 .pageSize(pageSize)
                 .build();

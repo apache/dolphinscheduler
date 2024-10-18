@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +75,6 @@ public class WorkflowLineageController extends BaseController {
     public Result<List<WorkFlowRelationDetail>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                            @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName) {
-        workflowDefinitionName = ParameterUtils.handleEscapes(workflowDefinitionName);
         List<WorkFlowRelationDetail> workFlowLineages =
                 workflowLineageService.queryWorkFlowLineageByName(projectCode, workflowDefinitionName);
         return Result.success(workFlowLineages);
