@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.integration;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -61,6 +62,7 @@ public class WorkflowOperator {
                 .workflowDefinitionVersion(workflowTriggerDTO.workflowDefinition.getVersion())
                 .startNodes(workflowTriggerDTO.getRunWorkflowCommandParam().getStartNodes())
                 .startParamList(workflowTriggerDTO.getRunWorkflowCommandParam().getCommandParams())
+                .dryRun(workflowTriggerDTO.dryRun)
                 .build();
 
         final WorkflowManualTriggerResponse manualTriggerWorkflowResponse =
@@ -139,6 +141,9 @@ public class WorkflowOperator {
         private final WorkflowDefinition workflowDefinition;
 
         private final RunWorkflowCommandParam runWorkflowCommandParam;
+
+        @Builder.Default
+        private Flag dryRun = Flag.NO;
     }
 
     @Data
