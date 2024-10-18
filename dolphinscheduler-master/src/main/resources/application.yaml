@@ -80,7 +80,8 @@ registry:
     session-timeout: 60s
     connection-timeout: 15s
     block-until-connected: 15s
-    digest: ~
+    authorization:
+      digest: ~
 
 master:
   listen-port: 5678
