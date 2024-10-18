@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -72,7 +73,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     protected Map<String, String> getProperties() {
-        return taskExecutionContext.getDefinedParams();
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     @Override

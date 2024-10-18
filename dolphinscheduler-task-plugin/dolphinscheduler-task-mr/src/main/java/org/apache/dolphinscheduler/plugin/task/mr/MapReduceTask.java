@@ -93,7 +93,7 @@ public class MapReduceTask extends AbstractYarnTask {
 
     @Override
     protected Map<String, String> getProperties() {
-        return taskExecutionContext.getDefinedParams();
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     @Override
