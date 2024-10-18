@@ -10,27 +10,10 @@ Cluster deployment uses the same scripts and configuration files as [pseudo-clus
 
 ## Enable SSL (optional)
 
-In cluster deployment, you can enable SSL authentication. Secure Sockets Layer, SSL, abbreviated as SSL, is a secure protocol that encrypts transmitted data to ensure that information is not eavesdropped or tampered with during transmission. In addition, it can authenticate servers and ensure data integrity.
-
+In cluster deployment, you can enable SSL for secure internal communication. The DolphinScheduler cluster can be configured to use secured communication with internal authentication of the nodes in the cluster.
 To enable SLL authentication, you have two things to do. Firstly, you need to generate `cert.crt` and `private.pem` files.
 
-Step 1: Install OpenSSL
-
-Firstly, ensure that you have installed OpenSSL. In most Linux distributions, OpenSSL is usually pre installed. If not, you can install it using the following command:
-
-On Ubuntu/Debian:
-
-```bash
-sudo apt-get install openssl
-```
-
-On CentOS/RHEL:
-
-```bash
-sudo yum install openssl
-```
-
-Step 2: Generate private key (private.pem)
+Step 1: Generate private key (private.pem)
 
 Open the terminal and run the following command to generate a private key:
 
@@ -40,7 +23,7 @@ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 
 This command will generate a 2048 bit RSA private key and save it as a private.pem file.
 
-Step 3: Generate Certificate Signing Request (CSR)
+Step 2: Generate Certificate Signing Request (CSR)
 
 Before generating a certificate, you need to generate a Certificate Signing Request (CSR). Run the following command:
 
@@ -50,7 +33,7 @@ openssl req -new -key private.pem -out request.csr
 
 This command will prompt you to enter some information, such as country, state/province, organization name, etc. The information you input will be embedded into the generated certificate.
 
-Step 4: Generate a self signed certificate (cert.crt)
+Step 3: Generate a self signed certificate (cert.crt)
 
 Use CSR to generate self signed certificates. Run the following command:
 
@@ -60,7 +43,7 @@ openssl x509 -req -days 365 -in request.csr -signkey private.pem -out cert.crt
 
 This command will generate a self signed certificate with a validity period of 365 days and save it as a cert.crt file.
 
-Then modify the `application.yaml` file in the `dolphinscheduler-master`, `dolphinscheduler-worker`, and `dolphinscheduler-api` modules.
+Then modify the `application.yaml` file in the `dolphinscheduler-master`, `dolphinscheduler-worker`, `dolphinscheduler-api` and `dolphinscheduler-alert-server` modules.
 
 ```yaml
 rpc:

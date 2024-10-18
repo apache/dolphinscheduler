@@ -143,7 +143,6 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
           - name: HiveDataSourceE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
-
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

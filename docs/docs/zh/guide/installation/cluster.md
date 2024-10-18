@@ -10,27 +10,11 @@
 
 ### 开启SSL（可选）
 
-在集群部署中，你可以开启SSL认证。Secure Sockets Layer，缩写作 SSL，是一种安全协议，能够加密传输的数据，确保在数据传输过程中，信息不会被窃听或篡改，此外还可以对服务器进行身份验证以及保障数据的完整性。
+在集群部署中，您可以启用SSL以实现安全的内部通信。DolphinScheduler集群可以配置为使用安全通信，并对集群中的节点进行内部身份验证。
 
 开启SLL认证，你有两件事要做。 首先你需要生成`cert.crt`和`private.pem`文件。
 
-步骤1：安装 OpenSSL
-
-首先，确保您已经安装了 OpenSSL。在大多数 Linux 发行版中，OpenSSL 通常已预装。如果没有，您可以通过以下命令安装它：
-
-在 Ubuntu/Debian 上：
-
-```bash
-sudo apt-get install openssl
-```
-
-在 CentOS/RHEL 上：
-
-```bash
-sudo yum install openssl
-```
-
-步骤 2：生成私钥（private.pem）
+步骤 1：生成私钥（private.pem）
 
 打开终端并运行以下命令生成私钥：
 
@@ -40,7 +24,7 @@ openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 
 此命令会生成一个 2048 位的 RSA 私钥，并将其保存为 private.pem 文件。
 
-步骤 3：生成证书签署请求（CSR）
+步骤 2：生成证书签署请求（CSR）
 
 在生成证书之前，您需要生成一个证书签署请求（CSR）。运行以下命令：
 
@@ -50,7 +34,7 @@ openssl req -new -key private.pem -out request.csr
 
 此命令会提示您输入一些信息，例如国家、州/省、组织名等。您输入的信息将会嵌入到生成的证书中。
 
-步骤 4：生成自签名证书（cert.crt）
+步骤 3：生成自签名证书（cert.crt）
 
 使用 CSR 来生成自签名证书。运行以下命令：
 
@@ -60,7 +44,7 @@ openssl x509 -req -days 365 -in request.csr -signkey private.pem -out cert.crt
 
 此命令会生成一个有效期为 365 天的自签名证书，并将其保存为 cert.crt 文件。
 
-然后修改`dolphinscheduler-master`、`dolphinscheduler-worker`、`dolphinscheduler-api`模块中的`application.yaml`文件。
+然后修改`dolphinscheduler-master`、`dolphinscheduler-worker`、`dolphinscheduler-api`、`dolphinscheduler-alert-server`模块中的`application.yaml`文件。
 
 ```yaml
 rpc:
