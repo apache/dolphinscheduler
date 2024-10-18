@@ -6,7 +6,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ## 创建数据源
 
-可参考 [数据源配置](../howto/datasource-setting.md) `数据源中心`。
+可参考 [数据源配置](../installation/datasource-setting.md) `数据源中心`。
 
 ## 创建任务
 
