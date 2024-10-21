@@ -20,7 +20,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|      **Parameter**      | **Description**                                                                                                                                                                                                                                                         |
+|      **Parameter**      |                                                                                                                             **Description**                                                                                                                             |
 |-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Program type            | Support Java, Scala, Python and SQL four languages.                                                                                                                                                                                                                     |
 | Class of main function  | The **full path** of Main Class, the entry point of the Flink program.                                                                                                                                                                                                  |
@@ -37,7 +37,7 @@ Flink task type, used to execute Flink programs. For Flink nodes:
 | Parallelism             | Used to set the degree of parallelism for executing Flink tasks.                                                                                                                                                                                                        |
 | Yarn queue              | Used to set the yarn queue, use `default` queue by default.                                                                                                                                                                                                             |
 | Main program parameters | Set the input parameters for the Flink program and support the substitution of custom parameter variables.                                                                                                                                                              |
-| Optional parameters     | Set the flink command options, such as `-D`, `-C`, `-yt`, and support the substitution of custom parameter variables.                                                                                                                                                   |
+| Optional parameters     | Set the flink command options, such as `-D`, `-C`, `-yt`, and support the substitution of custom parameter variables, such as `-Dyarn.application.name=${job_name}` custom parameter job _name will be replaced.                                                        |
 | Custom parameter        | It is a local user-defined parameter for Flink, and will replace the content with `${variable}` in the script.                                                                                                                                                          |
 
 ## Task Example
