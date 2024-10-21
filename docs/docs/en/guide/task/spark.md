@@ -4,9 +4,9 @@
 
 Spark task type for executing Spark application. When executing the Spark task, the worker will submits a job to the Spark cluster by following commands:
 
-(1) `spark submit` method to submit tasks. See [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit) for more details.
+(1) `spark submit` method to submit tasks. See [spark-submit](https://archive.apache.org/dist/spark/docs/3.2.1/#running-the-examples-and-shell) for more details.
 
-(2) `spark sql` method to submit tasks. See [spark sql](https://spark.apache.org/docs/3.2.1/sql-ref-syntax.html) for more details.
+(2) `spark sql` method to submit tasks. See [spark sql](https://archive.apache.org/dist/spark/docs/3.2.1/api/sql/index.html) for more details.
 
 ## Create Task
 
