@@ -125,6 +125,8 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 在 Intellij IDEA 找到并启动类 `org.apache.dolphinscheduler.StandaloneServer` 即可完成后端启动
 
+> 注意：启动前请在启动配置里将 `Add dependencies with "provided" scope to classpath` 选项勾选上，这样可以避免启动时找不到依赖的问题
+
 ### 启动前端
 
 安装前端依赖并运行前端组件
