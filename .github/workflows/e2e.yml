@@ -87,13 +87,16 @@ jobs:
           -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
-          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
-          && du -sh /tmp/standalone-image.tar
+          components=("master" "worker" "api" "tools" "alert-server" "standalone-server")
+                            for component in "${components[@]}"; do
+                              docker save apache/dolphinscheduler-${component}:ci -o /tmp/${component}-image.tar \
+                              && du -sh /tmp/${component}-image.tar
+                            done
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
           name: standalone-image-e2e
-          path: /tmp/standalone-image.tar
+          path: /tmp/*.tar
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
@@ -173,7 +176,7 @@ jobs:
           path: /tmp
       - name: Load Docker Images
         run: |
-          docker load -i /tmp/standalone-image.tar
+          docker load -i /tmp/*.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
