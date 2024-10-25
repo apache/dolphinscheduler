@@ -31,10 +31,13 @@ services:
       retries: 120
     networks:
       - dolphinscheduler
-#    command: [ "/bin/bash", "/opt/bitnami/zookeeper/bin/zkServer.sh"]
+    command: [ "/bin/bash", "/opt/bitnami/zookeeper/bin/zkServer.sh"]
 
   dolphinscheduler-api:
     image: apache/dolphinscheduler-api:ci
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -55,10 +58,13 @@ services:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/api-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/api-server/bin/start.sh" ]
 
   dolphinscheduler-alert:
     image: apache/dolphinscheduler-alert-server:ci
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -74,10 +80,13 @@ services:
         condition: service_completed_successfully
     volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
 
   dolphinscheduler-master:
     image: apache/dolphinscheduler-master:ci
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -94,10 +103,13 @@ services:
     volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
 
   dolphinscheduler-worker:
     image: apache/dolphinscheduler-worker:ci
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -116,7 +128,7 @@ services:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/worker-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/worker-server/bin/start.sh" ]
 
 networks:
   dolphinscheduler:
