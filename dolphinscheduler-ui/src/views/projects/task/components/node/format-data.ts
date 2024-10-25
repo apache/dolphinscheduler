@@ -205,7 +205,9 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SEATUNNEL') {
     taskParams.startupScript = data.startupScript
     taskParams.useCustom = data.useCustom
-    taskParams.rawScript = data.rawScript
+    if (!data.useCustom) {
+      taskParams.rawScript = ''
+    }
     if (data.startupScript?.includes('flink')) {
       taskParams.runMode = data.runMode
       taskParams.others = data.others
