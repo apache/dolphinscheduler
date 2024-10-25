@@ -130,6 +130,8 @@ Use different Git branch to develop different codes
 
 Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
 
+> Note: Please check the option `Add dependencies with "provided" scope to classpath` in the startup configuration before starting, so as to avoid the problem that no dependencies can be found during startup.
+
 ### Start frontend server
 
 Install frontend dependencies and run it.
