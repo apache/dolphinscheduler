@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -118,6 +119,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
                 .taskInstance(taskInstance)
                 .workflowExecutionGraph(new WorkflowExecutionGraph())
                 .workflowDefinition(new WorkflowDefinition())
+                .project(new Project())
                 .taskDefinition(new TaskDefinition())
                 .workflowEventBus(new WorkflowEventBus())
                 .build();

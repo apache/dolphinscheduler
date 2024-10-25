@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -57,6 +58,8 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     @Getter
     private final WorkflowDefinition workflowDefinition;
     @Getter
+    private final Project project;
+    @Getter
     private final WorkflowInstance workflowInstance;
     @Getter
     private TaskInstance taskInstance;
@@ -70,6 +73,7 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
         this.workflowExecutionGraph = checkNotNull(taskExecutionRunnableBuilder.getWorkflowExecutionGraph());
         this.workflowEventBus = checkNotNull(taskExecutionRunnableBuilder.getWorkflowEventBus());
         this.workflowDefinition = checkNotNull(taskExecutionRunnableBuilder.getWorkflowDefinition());
+        this.project = checkNotNull(taskExecutionRunnableBuilder.getProject());
         this.workflowInstance = checkNotNull(taskExecutionRunnableBuilder.getWorkflowInstance());
         this.taskDefinition = checkNotNull(taskExecutionRunnableBuilder.getTaskDefinition());
         this.taskInstance = taskExecutionRunnableBuilder.getTaskInstance();
@@ -144,6 +148,7 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
         checkState(isTaskInstanceInitialized(), "The task instance is null, can't initialize TaskExecutionContext.");
         final TaskExecutionContextCreateRequest request = TaskExecutionContextCreateRequest.builder()
                 .workflowDefinition(workflowDefinition)
+                .project(project)
                 .workflowInstance(workflowInstance)
                 .taskDefinition(taskDefinition)
                 .taskInstance(taskInstance)

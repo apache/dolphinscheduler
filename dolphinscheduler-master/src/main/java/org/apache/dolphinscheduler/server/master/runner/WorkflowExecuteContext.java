@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
@@ -39,6 +40,8 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
     private final Command command;
 
     private final WorkflowDefinition workflowDefinition;
+
+    private final Project project;
 
     private final WorkflowInstance workflowInstance;
 
@@ -72,6 +75,8 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
         private List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
 
+        private Project project;
+
         public WorkflowExecuteContextBuilder withCommand(Command command) {
             this.command = command;
             return this;
@@ -81,6 +86,7 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
             return new WorkflowExecuteContext(
                     command,
                     workflowDefinition,
+                    project,
                     workflowInstance,
                     workflowGraph,
                     workflowExecutionGraph,

@@ -76,11 +76,15 @@ public interface CuringParamsService {
      * @param parameters
      * @param taskInstance
      * @param workflowInstance
+     * @param projectName
+     * @param workflowDefinitionName
      * @return
      */
     Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                   @NonNull AbstractParameters parameters,
-                                                  @NonNull WorkflowInstance workflowInstance);
+                                                  @NonNull WorkflowInstance workflowInstance,
+                                                  String projectName,
+                                                  String workflowDefinitionName);
 
     /**
      * Parse workflow star parameter
