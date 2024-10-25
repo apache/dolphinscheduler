@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -37,6 +38,7 @@ public class TaskExecutionRunnableBuilder {
 
     private final IWorkflowExecutionGraph workflowExecutionGraph;
     private final WorkflowDefinition workflowDefinition;
+    private final Project project;
     private final WorkflowInstance workflowInstance;
     private final TaskDefinition taskDefinition;
     private final TaskInstance taskInstance;

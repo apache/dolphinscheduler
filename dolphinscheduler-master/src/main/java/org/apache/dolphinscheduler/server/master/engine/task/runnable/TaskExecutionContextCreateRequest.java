@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -35,5 +36,6 @@ public class TaskExecutionContextCreateRequest {
     private WorkflowInstance workflowInstance;
     private TaskDefinition taskDefinition;
     private TaskInstance taskInstance;
+    private Project project;
 
 }

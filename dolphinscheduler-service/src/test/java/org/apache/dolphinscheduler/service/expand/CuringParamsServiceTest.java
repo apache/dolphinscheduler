@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.service.expand;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -209,6 +210,10 @@ public class CuringParamsServiceTest {
         workflowDefinition.setProjectCode(3000001L);
         workflowDefinition.setCode(200001L);
 
+        Project project = new Project();
+        project.setName("ProjectName");
+        project.setCode(3000001L);
+
         workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
         workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
         taskInstance.setTaskCode(taskDefinition.getCode());
@@ -221,7 +226,8 @@ public class CuringParamsServiceTest {
         Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
 
         Map<String, Property> propertyMap =
-                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, workflowInstance);
+                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, workflowInstance,
+                        project.getName(), workflowDefinition.getName());
         Assertions.assertNotNull(propertyMap);
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_INSTANCE_ID).getValue(),
                 String.valueOf(taskInstance.getId()));
