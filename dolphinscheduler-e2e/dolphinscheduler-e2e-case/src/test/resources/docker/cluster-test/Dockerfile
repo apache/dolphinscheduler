@@ -32,7 +32,3 @@ RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz ; \
     rm -rf apache-dolphinscheduler-*-bin.tar.gz ; \
     mv apache-dolphinscheduler-*-bin/* . ; \
     rm -rf apache-dolphinscheduler-*-bin
-
-EXPOSE 12345 25333
-
-CMD [ "/bin/bash", "/opt/dolphinscheduler/standalone-server/bin/start.sh" ]
