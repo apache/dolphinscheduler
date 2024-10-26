@@ -27,7 +27,7 @@ RUN apt update ; \
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-COPY ./target/dolphinscheduler-dist/target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
+COPY /tmp/dist/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
 RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz ; \
     rm -rf apache-dolphinscheduler-*-bin.tar.gz ; \
     mv apache-dolphinscheduler-*-bin/* . ; \
