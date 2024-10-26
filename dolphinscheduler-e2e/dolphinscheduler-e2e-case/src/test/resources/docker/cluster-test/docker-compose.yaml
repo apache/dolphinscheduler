@@ -35,6 +35,9 @@ services:
 
   dolphinscheduler-api:
     image: apache/dolphinscheduler-api:ci
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -59,6 +62,9 @@ services:
 
   dolphinscheduler-alert:
     image: apache/dolphinscheduler-alert-server:ci
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -78,6 +84,9 @@ services:
 
   dolphinscheduler-master:
     image: apache/dolphinscheduler-master:ci
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
@@ -98,6 +107,9 @@ services:
 
   dolphinscheduler-worker:
     image: apache/dolphinscheduler-worker:ci
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
