@@ -34,6 +34,9 @@ services:
 #    command: [ "/bin/bash", "/opt/bitnami/zookeeper/bin/zkServer.sh"]
 
   dolphinscheduler-api:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
     image: apache/dolphinscheduler-api:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
@@ -77,6 +80,9 @@ services:
 #    command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
 
   dolphinscheduler-master:
+    build:
+      context: .
+      dockerfile: ./master/Dockerfile
     image: apache/dolphinscheduler-master:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
@@ -97,6 +103,9 @@ services:
 #    command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
 
   dolphinscheduler-worker:
+    build:
+      context: .
+      dockerfile: ./worker/Dockerfile
     image: apache/dolphinscheduler-worker:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
