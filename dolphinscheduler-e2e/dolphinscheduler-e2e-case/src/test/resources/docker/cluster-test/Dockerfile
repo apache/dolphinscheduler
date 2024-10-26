@@ -27,11 +27,11 @@ RUN apt update ; \
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
-COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz $DOLPHINSCHEDULER_HOME
-RUN tar -zxvf ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz ; \
-    rm -rf ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz ; \
-    mv ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin/* . ; \
-    rm -rf ./dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin
+COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
+RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz ; \
+    rm -rf apache-dolphinscheduler-*-bin.tar.gz ; \
+    mv apache-dolphinscheduler-*-bin/* . ; \
+    rm -rf apache-dolphinscheduler-*-bin
 
 EXPOSE 12345 25333
 
