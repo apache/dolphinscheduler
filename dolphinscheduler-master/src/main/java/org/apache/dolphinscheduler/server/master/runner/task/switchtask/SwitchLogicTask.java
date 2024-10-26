@@ -25,7 +25,9 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
@@ -50,18 +52,36 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
     private final IWorkflowExecutionRunnable workflowExecutionRunnable;
     private final TaskInstance taskInstance;
 
+    private final SwitchParameters switchParameters;
+    private final IWorkflowGraph workflowGraph;
+
+    // Primary constructor
     public SwitchLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
                            TaskExecutionContext taskExecutionContext) {
         super(workflowExecutionRunnable,
                 taskExecutionContext,
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {
-                }));
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {}));
+
         this.workflowExecutionRunnable = workflowExecutionRunnable;
         this.taskInstance = workflowExecutionRunnable
                 .getWorkflowExecuteContext()
                 .getWorkflowExecutionGraph()
                 .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
                 .getTaskInstance();
+        this.switchParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {});
+        this.workflowGraph = (IWorkflowGraph) workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
+
+    }
+
+    // Overloaded constructor
+    public SwitchLogicTask(SwitchParameters switchParameters,
+                           TaskExecutionContext taskExecutionContext,
+                           IWorkflowGraph workflowGraph){
+        super(null, taskExecutionContext, switchParameters);
+        this.switchParameters = switchParameters;
+        this.workflowGraph = workflowGraph;
+        this.workflowExecutionRunnable = null;
+        this.taskInstance = null;
     }
 
     @Override

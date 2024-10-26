@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
@@ -33,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
 
-    @Getter
     private final IWorkflowExecuteContext workflowExecuteContext;
 
     @Getter
@@ -42,6 +42,14 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder) {
         this.workflowExecuteContext = workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder().build();
         this.workflowInstanceLifecycleListeners = workflowExecuteContext.getWorkflowInstanceLifecycleListeners();
+        if (this.workflowExecuteContext == null) {
+            throw new IllegalStateException("WorkflowExecuteContext is not initialized in WorkflowExecutionRunnable.");
+        }
+    }
+
+    @Override
+    public IWorkflowExecuteContext getWorkflowExecuteContext() {
+        return workflowExecuteContext;
     }
 
     @Override
@@ -63,6 +71,15 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     public void registerWorkflowInstanceLifecycleListener(IWorkflowLifecycleListener listener) {
         checkArgument(listener != null, "listener cannot be null");
         workflowInstanceLifecycleListeners.add(listener);
+    }
+
+    public IWorkflowExecutionGraph getWorkflowExecutionGraph() {
+        IWorkflowExecuteContext context = getWorkflowExecuteContext();
+        System.out.println(context);
+        if (context == null) {
+            throw new IllegalStateException("WorkflowExecuteContext is not initialized.");
+        }
+        return context.getWorkflowExecutionGraph();
     }
 
     @Override

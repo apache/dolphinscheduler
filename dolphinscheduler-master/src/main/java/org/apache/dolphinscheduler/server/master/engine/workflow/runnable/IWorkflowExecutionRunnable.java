@@ -71,7 +71,7 @@ public interface IWorkflowExecutionRunnable {
     /**
      * Get the WorkflowExecuteContext belongs to the WorkflowExecutionRunnable.
      */
-    IWorkflowExecuteContext getWorkflowExecuteContext();
+    public IWorkflowExecuteContext getWorkflowExecuteContext();
 
     /**
      * Get the WorkflowInstance belongs to the WorkflowExecutionRunnable.
@@ -97,9 +97,8 @@ public interface IWorkflowExecutionRunnable {
     /**
      * Get the WorkflowExecutionGraph belongs to the Workflow instance.
      */
-    default IWorkflowExecutionGraph getWorkflowExecutionGraph() {
-        return getWorkflowExecuteContext().getWorkflowExecutionGraph();
-    }
+     IWorkflowExecutionGraph getWorkflowExecutionGraph();
+
 
     /**
      * Get the WorkflowInstanceLifecycleListeners belongs to the Workflow instance.

@@ -17,12 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 
+import lombok.*;
+import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import org.springframework.context.ApplicationContext;
 
@@ -32,8 +29,24 @@ import org.springframework.context.ApplicationContext;
 @NoArgsConstructor
 public class WorkflowExecutionRunnableBuilder {
 
+    @Getter
     private WorkflowExecuteContext.WorkflowExecuteContextBuilder workflowExecuteContextBuilder;
 
     private ApplicationContext applicationContext;
+
+    public WorkflowExecutionRunnableBuilder setWorkflowExecuteContextBuilder(
+            WorkflowExecuteContext.WorkflowExecuteContextBuilder contextBuilder) {
+        this.workflowExecuteContextBuilder = contextBuilder;
+        return this;
+    }
+
+    public WorkflowExecutionRunnable build() {
+        // Ensure workflowExecuteContext is properly built
+        IWorkflowExecuteContext context = workflowExecuteContextBuilder.build();
+        if (context == null) {
+            throw new IllegalStateException("WorkflowExecuteContext cannot be null when building WorkflowExecutionRunnable.");
+        }
+        return new WorkflowExecutionRunnable(this);
+    }
 
 }
