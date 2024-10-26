@@ -55,6 +55,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_completed_successfully
     volumes:
+      - /tmp:/tmp
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
@@ -79,6 +80,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_completed_successfully
     volumes:
+      - /tmp:/tmp
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
 
@@ -101,6 +103,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_completed_successfully
     volumes:
+      - /tmp:/tmp
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
     command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
@@ -124,6 +127,7 @@ services:
       dolphinscheduler-zookeeper:
         condition: service_completed_successfully
     volumes:
+      - /tmp:/tmp
       - dolphinscheduler-worker-data:/tmp/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
