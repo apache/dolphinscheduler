@@ -31,12 +31,9 @@ services:
       retries: 120
     networks:
       - dolphinscheduler
-#    command: [ "/bin/bash", "/opt/bitnami/zookeeper/bin/zkServer.sh"]
+    command: [ "/bin/bash", "/opt/bitnami/zookeeper/bin/zkServer.sh"]
 
   dolphinscheduler-api:
-    build:
-      context: .
-      dockerfile: ./api/Dockerfile
     image: apache/dolphinscheduler-api:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
@@ -58,7 +55,7 @@ services:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/api-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/api-server/bin/start.sh" ]
 
   dolphinscheduler-alert:
     image: apache/dolphinscheduler-alert-server:ci
@@ -77,12 +74,9 @@ services:
         condition: service_completed_successfully
     volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
 
   dolphinscheduler-master:
-    build:
-      context: .
-      dockerfile: ./master/Dockerfile
     image: apache/dolphinscheduler-master:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
@@ -100,12 +94,9 @@ services:
     volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
 
   dolphinscheduler-worker:
-    build:
-      context: .
-      dockerfile: ./worker/Dockerfile
     image: apache/dolphinscheduler-worker:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
@@ -125,7 +116,7 @@ services:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
-#    command: [ "/bin/bash", "/opt/dolphinscheduler/worker-server/bin/start.sh" ]
+    command: [ "/bin/bash", "/opt/dolphinscheduler/worker-server/bin/start.sh" ]
 
 networks:
   dolphinscheduler:
