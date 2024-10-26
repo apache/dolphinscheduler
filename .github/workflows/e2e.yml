@@ -87,7 +87,7 @@ jobs:
           -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
-          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standaloneto-image.tar \
+          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
           && du -sh /tmp/standalone-image.tar && ls apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz && ls /home/runner/work/dolphinscheduler/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
