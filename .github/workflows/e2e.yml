@@ -88,12 +88,18 @@ jobs:
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
-          && du -sh /tmp/standalone-image.tar && cp /home/runner/work/dolphinscheduler/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz /tmp/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
+          && du -sh /tmp/standalone-image.tar
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
           name: standalone-image-e2e
           path: /tmp/standalone-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload dist file
+        with:
+          name: bin-tar
+          path: /home/runner/work/dolphinscheduler/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
           retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
@@ -170,6 +176,11 @@ jobs:
         name: Download Docker Images
         with:
           name: standalone-image-e2e
+          path: /tmp
+      - uses: actions/download-artifact@v4
+        name: Download dist file
+        with:
+          name: bin-tar
           path: /tmp
       - name: Load Docker Images
         run: |
