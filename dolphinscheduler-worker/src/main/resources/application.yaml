@@ -92,7 +92,3 @@ management:
 
 metrics:
   enabled: true
-
-
-
-

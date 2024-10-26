@@ -52,10 +52,7 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
     private final IWorkflowExecutionRunnable workflowExecutionRunnable;
     private final TaskInstance taskInstance;
 
-    private final SwitchParameters switchParameters;
-    private final IWorkflowGraph workflowGraph;
 
-    // Primary constructor
     public SwitchLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
                            TaskExecutionContext taskExecutionContext) {
         super(workflowExecutionRunnable,
@@ -68,20 +65,6 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                 .getWorkflowExecutionGraph()
                 .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
                 .getTaskInstance();
-        this.switchParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {});
-        this.workflowGraph = (IWorkflowGraph) workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
-
-    }
-
-    // Overloaded constructor
-    public SwitchLogicTask(SwitchParameters switchParameters,
-                           TaskExecutionContext taskExecutionContext,
-                           IWorkflowGraph workflowGraph){
-        super(null, taskExecutionContext, switchParameters);
-        this.switchParameters = switchParameters;
-        this.workflowGraph = workflowGraph;
-        this.workflowExecutionRunnable = null;
-        this.taskInstance = null;
     }
 
     @Override
