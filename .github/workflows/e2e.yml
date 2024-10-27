@@ -87,7 +87,7 @@ jobs:
           -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
-          components=("master" "worker" "api" "tools" "alert-server","standalone")
+          components=("master" "worker" "api" "tools" "alert-server" "standalone")
                    for component in "${components[@]}"; do
                      docker save apache/dolphinscheduler-${component}:ci -o /tmp/${component}-image.tar \
                      && du -sh /tmp/${component}-image.tar
@@ -236,7 +236,7 @@ jobs:
           retention-days: 1
       - name: Load Docker Images
         run: |
-          components=("master" "worker" "api" "tools" "alert-server","standalone")
+          components=("master" "worker" "api" "tools" "alert-server" "standalone")
           for component in "${components[@]}"; do
             docker load -i /tmp/${component}/${component}-image.tar
           done
