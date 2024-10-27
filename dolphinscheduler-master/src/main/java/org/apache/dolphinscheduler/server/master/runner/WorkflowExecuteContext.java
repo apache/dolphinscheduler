@@ -78,10 +78,6 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
         }
 
         public WorkflowExecuteContext build() {
-            if (workflowInstance == null || workflowEventBus == null || command == null || workflowDefinition == null
-            || workflowGraph == null || workflowExecutionGraph == null || workflowInstanceLifecycleListeners == null) {
-                throw new IllegalStateException("Required fields missing in WorkflowExecuteContextBuilder");
-            }
             return new WorkflowExecuteContext(
                     command,
                     workflowDefinition,

@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
 import org.springframework.context.ApplicationContext;
 
 @Slf4j
-@Data
 public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
 
     @Getter
@@ -43,18 +42,9 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Getter
     private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
 
-    public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder
-    ) {
-        if(workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder() == null){
-            System.out.println("print null");
-        }
+    public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder) {
         this.workflowExecuteContext = workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder().build();
         this.workflowInstanceLifecycleListeners = workflowExecuteContext.getWorkflowInstanceLifecycleListeners();
-    }
-
-    @Override
-    public IWorkflowExecuteContext getWorkflowExecuteContext() {
-        return workflowExecuteContext;
     }
 
     @Override

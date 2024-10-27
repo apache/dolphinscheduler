@@ -24,8 +24,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 import org.springframework.context.ApplicationContext;
 
 @Data
@@ -34,23 +32,8 @@ import org.springframework.context.ApplicationContext;
 @NoArgsConstructor
 public class WorkflowExecutionRunnableBuilder {
 
-
     private WorkflowExecuteContext.WorkflowExecuteContextBuilder workflowExecuteContextBuilder;
 
     private ApplicationContext applicationContext;
 
-    public WorkflowExecutionRunnableBuilder setWorkflowExecuteContextBuilder(
-            WorkflowExecuteContext.WorkflowExecuteContextBuilder contextBuilder) {
-        this.workflowExecuteContextBuilder = contextBuilder;
-        return this;
-    }
-
-    public WorkflowExecutionRunnable build() {
-        // Ensure workflowExecuteContext is properly built
-        return new WorkflowExecutionRunnable(this);
-    }
-
-    public WorkflowExecuteContext.WorkflowExecuteContextBuilder getWorkflowExecuteContextBuilder() {
-        return new WorkflowExecuteContext.WorkflowExecuteContextBuilder();
-    }
 }
