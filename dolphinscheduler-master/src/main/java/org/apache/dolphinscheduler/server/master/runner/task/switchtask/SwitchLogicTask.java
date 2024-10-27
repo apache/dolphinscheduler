@@ -57,8 +57,8 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                            TaskExecutionContext taskExecutionContext) {
         super(workflowExecutionRunnable,
                 taskExecutionContext,
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>()
-                {}));
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SwitchParameters>() {
+                }));
 
         this.workflowExecutionRunnable = workflowExecutionRunnable;
         this.taskInstance = workflowExecutionRunnable
