@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
@@ -49,6 +50,8 @@ class SwitchLogicTaskTest {
 
         switchLogicTask = new SwitchLogicTask(workflowExecutionRunnable, taskExecutionContext);
         switchParameters = new SwitchParameters();
+
+        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
 
 
         when(taskExecutionContext.getTaskParams()).thenReturn("{}");

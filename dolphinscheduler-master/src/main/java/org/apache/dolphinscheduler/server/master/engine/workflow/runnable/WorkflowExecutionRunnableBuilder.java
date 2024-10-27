@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationContext;
 @NoArgsConstructor
 public class WorkflowExecutionRunnableBuilder {
 
-    @Getter
+
     private WorkflowExecuteContext.WorkflowExecuteContextBuilder workflowExecuteContextBuilder;
 
     private ApplicationContext applicationContext;
@@ -42,11 +42,10 @@ public class WorkflowExecutionRunnableBuilder {
 
     public WorkflowExecutionRunnable build() {
         // Ensure workflowExecuteContext is properly built
-        IWorkflowExecuteContext context = workflowExecuteContextBuilder.build();
-        if (context == null) {
-            throw new IllegalStateException("WorkflowExecuteContext cannot be null when building WorkflowExecutionRunnable.");
-        }
         return new WorkflowExecutionRunnable(this);
     }
 
+    public WorkflowExecuteContext.WorkflowExecuteContextBuilder getWorkflowExecuteContextBuilder() {
+        return new WorkflowExecuteContext.WorkflowExecuteContextBuilder();
+    }
 }
