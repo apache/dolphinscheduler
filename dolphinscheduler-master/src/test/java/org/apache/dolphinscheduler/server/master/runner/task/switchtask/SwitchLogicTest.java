@@ -9,8 +9,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 class SwitchLogicTaskTest {
@@ -39,7 +45,6 @@ class SwitchLogicTaskTest {
     @Mock
     private IWorkflowExecutionRunnable workflowExecutionRunnable;
 
-
     private SwitchLogicTask switchLogicTask;
 
     private SwitchParameters switchParameters;
@@ -48,87 +53,91 @@ class SwitchLogicTaskTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        switchLogicTask = new SwitchLogicTask(workflowExecutionRunnable, taskExecutionContext);
-        switchParameters = new SwitchParameters();
-
-        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-
-
-        when(taskExecutionContext.getTaskParams()).thenReturn("{}");
-        when(taskExecutionContext.getPrepareParamsMap()).thenReturn(new HashMap<>());
-
+        // Mocking WorkflowExecutionContext and Graph
         IWorkflowExecuteContext mockContext = mock(IWorkflowExecuteContext.class);
         IWorkflowExecutionGraph mockGraph = mock(IWorkflowExecutionGraph.class);
-        when(mockContext.getWorkflowExecutionGraph()).thenReturn(mockGraph);
-        when(workflowExecutionRunnable.getWorkflowExecuteContext()).thenReturn(mockContext);
+        given(mockContext.getWorkflowExecutionGraph()).willReturn(mockGraph);
+
+        workflowExecutionRunnable = mock(WorkflowExecutionRunnable.class);
+        given(workflowExecutionRunnable.getWorkflowExecuteContext()).willReturn(mockContext);
+
+        // Initializing taskExecutionContext and setting expected behaviors
+        taskExecutionContext = mock(TaskExecutionContext.class);
+        given(taskExecutionContext.getTaskParams()).willReturn("{}");
+        given(taskExecutionContext.getPrepareParamsMap()).willReturn(new HashMap<>());
+
+        // Mocking task execution runnable and task instance
+        ITaskExecutionRunnable mockTaskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        TaskInstance mockTaskInstance = mock(TaskInstance.class);
+        given(mockTaskExecutionRunnable.getTaskInstance()).willReturn(mockTaskInstance);
+        given(mockGraph.getTaskExecutionRunnableById(anyInt())).willReturn(mockTaskExecutionRunnable);
+
+        // Mock SwitchParameters and set up a basic SwitchResult
+        switchParameters = mock(SwitchParameters.class);
+        List<SwitchResultVo> switchResultVoList = new ArrayList<>();
+        switchResultVoList.add(new SwitchResultVo("someCondition", 123L));
+        SwitchParameters.SwitchResult switchResult = new SwitchParameters.SwitchResult(switchResultVoList, 999L);
+        given(switchParameters.getSwitchResult()).willReturn(switchResult);
+
+        // Initializing the SwitchLogicTask
+        switchLogicTask = new SwitchLogicTask(workflowExecutionRunnable, taskExecutionContext);
+        switchLogicTask.setSwitchParameters(switchParameters);  // Ensure switchParameters is set
     }
+
 
     @Test
     void testHandle_ShouldReturnSuccess_WhenConditionMatches() throws MasterTaskExecuteException {
-        // Set up switch parameters with matching branch condition
+        // Given
         List<SwitchResultVo> switchResultVoList = new ArrayList<>();
-        SwitchResultVo switchResultVo = new SwitchResultVo();
-        switchResultVo.setCondition("true"); // simple condition that matches
-        switchResultVo.setNextNode(123L); // mock next branch node
+        SwitchResultVo switchResultVo = new SwitchResultVo("true", 123L);
         switchResultVoList.add(switchResultVo);
-
         switchParameters.setSwitchResult(new SwitchParameters.SwitchResult(switchResultVoList, 999L));
 
-        // Mock the task instance and context setup
         Map<String, Property> globalParams = new HashMap<>();
-        when(taskExecutionContext.getPrepareParamsMap()).thenReturn(globalParams);
+        given(taskExecutionContext.getPrepareParamsMap()).willReturn(globalParams);
 
-        // Execute the handle method
+        // When
         switchLogicTask.handle();
 
-        // Verify the task status
-        assertEquals(TaskExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
+        // Then
+        then(taskExecutionContext).should().setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
     }
 
     @Test
     void testHandle_DefaultBranch_WhenNoConditionMatches() throws MasterTaskExecuteException {
-        // Set up switch parameters with no matching branch condition
+        // Given
         List<SwitchResultVo> switchResultVoList = new ArrayList<>();
-        SwitchResultVo switchResultVo = new SwitchResultVo();
-        switchResultVo.setCondition("false"); // condition that doesn't match
-        switchResultVo.setNextNode(123L); // mock next branch node
+        SwitchResultVo switchResultVo = new SwitchResultVo("false", 123L);
         switchResultVoList.add(switchResultVo);
-
         switchParameters.setSwitchResult(new SwitchParameters.SwitchResult(switchResultVoList, 999L));
 
-        // Execute the handle method
+        // When
         switchLogicTask.handle();
 
-        // Verify the task params and status
-        verify(taskExecutionContext).setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
-        assertEquals(999L, switchParameters.getNextBranch()); // Default branch should be selected
+        // Then
+        then(taskExecutionContext).should().setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
+        assertThat(switchParameters.getNextBranch()).isEqualTo(999L); // Default branch should be selected
     }
 
     @Test
     void testHandle_ThrowsException_WhenBranchDoesNotExist() {
-        // Mock the scenario where the branch does not exist in the workflow graph
-        when(workflowGraph.getTaskNodeByCode(anyLong())).thenReturn(null);
+        // Given
+        given(workflowGraph.getTaskNodeByCode(anyLong())).willReturn(null);
 
-        // Execute the handle method and expect an exception
-        MasterTaskExecuteException thrown = assertThrows(MasterTaskExecuteException.class, () -> {
-            switchLogicTask.handle();
-        });
-
-        // Verify that the exception message is as expected
-        assertTrue(thrown.getMessage().contains("please check the switch task configuration"));
+        // When/Then
+        assertThatThrownBy(() -> switchLogicTask.handle())
+                .isInstanceOf(MasterTaskExecuteException.class)
+                .hasMessageContaining("please check the switch task configuration");
     }
 
     @Test
     void testHandle_ThrowsException_WhenDefaultBranchIsMissing() {
-        // Set up switch parameters without a default branch
+        // Given
         switchParameters.setSwitchResult(new SwitchParameters.SwitchResult(new ArrayList<>(), null));
 
-        // Execute the handle method and expect an IllegalArgumentException
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            switchLogicTask.handle();
-        });
-
-        // Verify that the exception message is as expected
-        assertTrue(thrown.getMessage().contains("please check the switch task configuration"));
+        // When/Then
+        assertThatThrownBy(() -> switchLogicTask.handle())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("please check the switch task configuration");
     }
 }
