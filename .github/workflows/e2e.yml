@@ -182,6 +182,9 @@ jobs:
         with:
           name: bin-tar
           path: /tmp
+      - name: untar dist file
+        run:
+          tar -zxvf apache-dolphinscheduler-*-bin.tar.gz
       - name: Load Docker Images
         run: |
           docker load -i /tmp/standalone-image.tar
