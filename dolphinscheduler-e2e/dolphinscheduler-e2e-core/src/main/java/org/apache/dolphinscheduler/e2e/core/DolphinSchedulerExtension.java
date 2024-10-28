@@ -130,7 +130,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private void runInDockerContainer(ExtensionContext context) {
         compose = createDockerCompose(context);
         compose.start();
-
+        compose.getContainerByServiceName(serviceName).get().getLogs();
         address =
                 HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, DOCKER_PORT));
         rootPath = "/dolphinscheduler/ui/";
@@ -226,9 +226,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                 .withExposedService(
                         serviceName,
                         DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
-                .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
+                .withLogConsumer(serviceName, outputFrame -> log.debug(outputFrame.getUtf8String()))
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
-
         return compose;
     }
 }

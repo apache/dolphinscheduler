@@ -34,13 +34,17 @@ services:
       retries: 120
     networks:
       - e2e
+
   dolphinscheduler-schema-initializer:
-    image: ${HUB}/dolphinscheduler-tools:${TAG}
+    image: apache/dolphinscheduler-standalone-server:ci
     command: [ tools/bin/upgrade-schema.sh ]
+    environment:
+      DOLPHINSCHEDULER_HOME: /opt/dolphinscheduler/tools
     depends_on:
       dolphinscheduler-postgresql:
         condition: service_healthy
     volumes:
+      - /home/runner/work/dolphinscheduler/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin:/opt/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
