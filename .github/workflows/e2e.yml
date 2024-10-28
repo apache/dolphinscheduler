@@ -96,7 +96,7 @@ jobs:
         name: Upload Docker Images
         with:
           name: standalone-image-e2e
-          path: /tmp/standalone-image.tar
+          path: /tmp/standalone-server-image.tar
           retention-days: 1
       - uses: actions/upload-artifact@v4
         name: Upload master Docker Images
@@ -209,7 +209,7 @@ jobs:
         name: Download Docker Images
         with:
           name: standalone-image-e2e
-          path: /tmp/standalone
+          path: /tmp/standalone-server
       - uses: actions/download-artifact@v4
         name: download master Docker Images
         with:
