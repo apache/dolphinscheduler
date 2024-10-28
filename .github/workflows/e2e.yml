@@ -184,7 +184,7 @@ jobs:
           path: /tmp
       - name: untar dist file
         run:
-          tar -zxvf /tmp/apache-dolphinscheduler-*-bin.tar.gz
+          tar -zxvf /tmp/apache-dolphinscheduler-*-bin.tar.gz && pwd
       - name: Load Docker Images
         run: |
           docker load -i /tmp/standalone-image.tar
