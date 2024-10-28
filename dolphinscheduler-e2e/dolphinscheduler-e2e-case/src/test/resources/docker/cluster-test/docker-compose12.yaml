@@ -31,17 +31,20 @@ services:
       test: [ "CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/5432" ]
       interval: 5s
       timeout: 60s
-      retries: 10
+      retries: 120
     networks:
       - e2e
 
   dolphinscheduler-schema-initializer:
-    image: apache/dolphinscheduler-tools:ci
+    image: apache/dolphinscheduler-standalone-server:ci
     command: [ tools/bin/upgrade-schema.sh ]
+    environment:
+      DOLPHINSCHEDULER_HOME: /opt/dolphinscheduler/tools
     depends_on:
       dolphinscheduler-postgresql:
         condition: service_healthy
     volumes:
+      - /home/runner/work/dolphinscheduler/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin:/opt/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
@@ -59,15 +62,16 @@ services:
       test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181"]
       interval: 5s
       timeout: 60s
-      retries: 10
+      retries: 120
     networks:
       - e2e
 
   dolphinscheduler-api:
-    image: apache/dolphinscheduler-api:ci
+    image: apache/dolphinscheduler-standalone-server:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
+      DOLPHINSCHEDULER_HOME: /opt/dolphinscheduler/api-server
     ports:
       - "12345:12345"
       - "25333:25333"
@@ -77,71 +81,78 @@ services:
       test: [ "CMD", "curl", "http://127.0.0.1:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 120
     depends_on:
       dolphinscheduler-zookeeper:
         condition: service_healthy
     volumes:
+      - /home/runner/work/dolphinscheduler/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin:/opt/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler
     command: [ "/bin/bash", "/opt/dolphinscheduler/api-server/bin/start.sh" ]
 
   dolphinscheduler-alert:
-    image: apache/dolphinscheduler-alert-server:ci
+    image: apache/dolphinscheduler-standalone-server:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
+      DOLPHINSCHEDULER_HOME: /opt/dolphinscheduler/alert-server
     networks:
       - e2e
     healthcheck:
       test: [ "CMD", "curl", "http://127.0.0.1:50053/actuator/health" ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 120
     depends_on:
       dolphinscheduler-zookeeper:
         condition: service_healthy
     volumes:
+      - /home/runner/work/dolphinscheduler/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin:/opt/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     command: [ "/bin/bash", "/opt/dolphinscheduler/alert-server/bin/start.sh" ]
 
   dolphinscheduler-master:
-    image: apache/dolphinscheduler-master:ci
+    image: apache/dolphinscheduler-standalone-server:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
+      DOLPHINSCHEDULER_HOME: /opt/dolphinscheduler/master-server
     networks:
       - e2e
     healthcheck:
       test: [ "CMD", "curl", "http://127.0.0.1:5679/actuator/health" ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 120
     depends_on:
       dolphinscheduler-zookeeper:
         condition: service_healthy
     volumes:
+      - /home/runner/work/dolphinscheduler/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin:/opt/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
     command: [ "/bin/bash", "/opt/dolphinscheduler/master-server/bin/start.sh" ]
 
   dolphinscheduler-worker:
-    image: apache/dolphinscheduler-worker:ci
+    image: apache/dolphinscheduler-standalone-server:ci
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
+      DOLPHINSCHEDULER_HOME: /opt/dolphinscheduler/worker-server
     networks:
       - e2e
     healthcheck:
       test: [ "CMD", "curl", "http://127.0.0.1:1235/actuator/health" ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 120
     depends_on:
       dolphinscheduler-zookeeper:
         condition: service_completed_successfully
     volumes:
+      - /home/runner/work/dolphinscheduler/dolphinscheduler/apache-dolphinscheduler-dev-SNAPSHOT-bin:/opt/dolphinscheduler
       - dolphinscheduler-worker-data:/tmp/dolphinscheduler
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft

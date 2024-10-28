@@ -87,13 +87,46 @@ jobs:
           -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
-          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
-          && du -sh /tmp/standalone-image.tar
+          components=("master" "worker" "api" "tools" "alert-server" "standalone")
+                   for component in "${components[@]}"; do
+                     docker save apache/dolphinscheduler-${component}:ci -o /tmp/${component}-image.tar \
+                     && du -sh /tmp/${component}-image.tar
+                   done
       - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
           name: standalone-image-e2e
           path: /tmp/standalone-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload master Docker Images
+        with:
+          name: master-image-e2e
+          path: /tmp/master-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload worker Docker Images
+        with:
+          name: worker-image-e2e
+          path: /tmp/worker-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload api Docker Images
+        with:
+          name: api-image-e2e
+          path: /tmp/api-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload tools Docker Images
+        with:
+          name: tools-image-e2e
+          path: /tmp/tools-image.tar
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload alert-server Docker Images
+        with:
+          name: alert-server-image-e2e
+          path: /tmp/alert-server-image.tar
           retention-days: 1
       - uses: actions/upload-artifact@v4
         name: Upload dist file
@@ -176,7 +209,37 @@ jobs:
         name: Download Docker Images
         with:
           name: standalone-image-e2e
-          path: /tmp
+          path: /tmp/standalone
+      - uses: actions/download-artifact@v4
+        name: download master Docker Images
+        with:
+          name: master-image-e2e
+          path: /tmp/master
+          retention-days: 1
+      - uses: actions/download-artifact@v4
+        name: download worker Docker Images
+        with:
+          name: worker-image-e2e
+          path: /tmp/worker
+          retention-days: 1
+      - uses: actions/download-artifact@v4
+        name: download api Docker Images
+        with:
+          name: api-image-e2e
+          path: /tmp/api
+          retention-days: 1
+      - uses: actions/download-artifact@v4
+        name: download tools Docker Images
+        with:
+          name: tools-image-e2e
+          path: /tmp/tools
+          retention-days: 1
+      - uses: actions/download-artifact@v4
+        name: download alert-server Docker Images
+        with:
+          name: alert-server-image-e2e
+          path: /tmp/alert-server
+          retention-days: 1
       - uses: actions/download-artifact@v4
         name: Download dist file
         with:
@@ -187,7 +250,10 @@ jobs:
           tar -zxvf /tmp/apache-dolphinscheduler-*-bin.tar.gz && pwd
       - name: Load Docker Images
         run: |
-          docker load -i /tmp/standalone-image.tar
+          components=("master" "worker" "api" "tools" "alert-server")
+          for component in "${components[@]}"; do
+            docker load -i /tmp/${component}/${component}-image.tar
+          done
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
