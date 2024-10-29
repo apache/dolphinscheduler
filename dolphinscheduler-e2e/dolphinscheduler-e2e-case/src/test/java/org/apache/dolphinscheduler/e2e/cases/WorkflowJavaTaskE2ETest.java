@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
@@ -62,7 +63,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisableIfTestFails
@@ -118,7 +118,7 @@ public class WorkflowJavaTaskE2ETest {
                 .create(project);
 
         ProjectPage projectPage = new ProjectPage(browser);
-        Awaitility.await().untilAsserted(() -> assertThat(projectPage.projectList())
+        await().untilAsserted(() -> assertThat(projectPage.projectList())
                 .as("The project list should include newly created projects.")
                 .anyMatch(it -> it.getText().contains(project)));
 
@@ -171,6 +171,11 @@ public class WorkflowJavaTaskE2ETest {
 
     private static void getJar() {
         compileJavaFlow();
+        await().atMost(Duration.ofMinutes(5))
+                .pollInterval(Duration.ofSeconds(2))
+                .until(() -> Files.exists(Paths.get("/tmp/common/Fat.class")) &&
+                        Files.exists(Paths.get("/tmp/common/Normal1.class")) &&
+                        Files.exists(Paths.get("/tmp/common/Normal2.class")));
         createJar("Fat.class",
                 "common/Fat.class",
                 "common.Fat",
@@ -230,16 +235,11 @@ public class WorkflowJavaTaskE2ETest {
         String workflowName = "compile";
         String taskName = "compile";
         String context =
-                "\n" +
-                        "$JAVA_HOME/bin/javac -d /tmp Fat.java\n" +
-                        "\n" +
+                "$JAVA_HOME/bin/javac -d /tmp Fat.java \n" +
                         "$JAVA_HOME/bin/javac -d /tmp Normal1.java Normal2.java \n" +
-                        "\n" +
-                        "$JAVA_HOME/bin/javac -d /tmp Normal2.java \n"; /*
-                                                                         * + "\n" + "ls \n" + "echo '%%%%%%%%%' \n" +
-                                                                         * "\n" + "ls /tmp \n" + "echo '%%%%%%%%%' \n" +
-                                                                         * "\n" + "ls /tmp/common \n";
-                                                                         */
+                        "$JAVA_HOME/bin/javac -d /tmp Normal2.java \n"
+                        + "echo '####当前目录 ####'\n" + "ls\n"
+                        + "echo '#### /tmp/common 目录 ####'\n" + "ls /tmp/common\n";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -253,7 +253,7 @@ public class WorkflowJavaTaskE2ETest {
                 .name(workflowName)
                 .submit();
 
-        Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(it -> it.getText().contains(workflowName)));
 
@@ -286,6 +286,8 @@ public class WorkflowJavaTaskE2ETest {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='fat.jar']")));
 
+        file.delete("Fat.java").delete("Normal1.java").delete("Normal2.java");
+
         ProjectPage projectPage = new NavBarPage(browser)
                 .goToNav(ProjectPage.class);
 
@@ -299,8 +301,8 @@ public class WorkflowJavaTaskE2ETest {
         workflow1.<JavaTaskForm>addTask(WorkflowForm.TaskType.JAVA)
                 .selectRunType("FAT_JAR")
                 .selectMainPackage("fat.jar")
-                .selectResource("fat.jar")
-                .selectResource("fat.jar")
+                .selectJavaResource("fat.jar")
+                .selectJavaResource("fat.jar")
                 .name("test-1")
                 .selectEnv(environmentName)
                 .submit()
@@ -308,7 +310,7 @@ public class WorkflowJavaTaskE2ETest {
                 .name(workflow)
                 .submit();
 
-        Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(it -> it.getText().contains(workflow)));
 
@@ -331,7 +333,7 @@ public class WorkflowJavaTaskE2ETest {
                 .run(workflow)
                 .submit();
 
-        Awaitility.await()
+        await()
                 .atMost(Duration.ofMinutes(5))
                 .untilAsserted(() -> {
                     browser.navigate().refresh();
@@ -377,9 +379,9 @@ public class WorkflowJavaTaskE2ETest {
                 .<JavaTaskForm>addTask(WorkflowForm.TaskType.JAVA)
                 .selectRunType("NORMAL_JAR")
                 .selectMainPackage("normal1.jar")
-                .selectResource("normal1.jar")
-                .selectResource("normal1.jar")
-                .selectResource("normal2.jar")
+                .selectJavaResource("normal1.jar")
+                .selectJavaResource("normal1.jar")
+                .selectJavaResource("normal2.jar")
                 .name("test-2")
                 .selectEnv(environmentName)
                 .submit()
@@ -387,7 +389,7 @@ public class WorkflowJavaTaskE2ETest {
                 .name(workflow2)
                 .submit();
 
-        Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(it -> it.getText().contains(workflow2)));
 
@@ -410,7 +412,7 @@ public class WorkflowJavaTaskE2ETest {
                 .run(workflow2)
                 .submit();
 
-        Awaitility.await()
+        await()
                 .atMost(Duration.ofMinutes(5))
                 .untilAsserted(() -> {
                     browser.navigate().refresh();
