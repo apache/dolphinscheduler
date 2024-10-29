@@ -19,6 +19,6 @@
 
 ## Native Supported
 
-No, you need to import the OceanBase jdbc driver [oceanbase-client](https://mvnrepository.com/artifact/com.oceanbase/oceanbase-client) first, refer to the section example in [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section.
+No, you need to import the OceanBase jdbc driver [oceanbase-client](https://mvnrepository.com/artifact/com.oceanbase/oceanbase-client) first, refer to the section example in [datasource-setting](../installation/datasource-setting.md) `DataSource Center` section.
 
 The compatible mode of the datasource can be 'mysql' or 'oracle', if you only use OceanBase with 'mysql' mode, you can also treat OceanBase as MySQL and manage the datasource referring to [mysql datasource](mysql.md)

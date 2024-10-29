@@ -23,9 +23,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,7 +30,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * workflow definition log mapper interface
  */
-@CacheConfig(cacheNames = "processDefinition", keyGenerator = "cacheKeyGenerator")
+
 public interface WorkflowDefinitionLogMapper extends BaseMapper<WorkflowDefinitionLog> {
 
     /**
@@ -43,7 +40,7 @@ public interface WorkflowDefinitionLogMapper extends BaseMapper<WorkflowDefiniti
      * @param version version number
      * @return the workflow definition version info
      */
-    @Cacheable(sync = true)
+
     WorkflowDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**

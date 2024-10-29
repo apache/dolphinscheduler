@@ -18,5 +18,5 @@
 
 ## Native Supported
 
-No, you need to import Mysql jdbc driver first, read section example in [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section to import Mysql JDBC Driver.
+No, you need to import Mysql jdbc driver first, read section example in [datasource-setting](../installation/datasource-setting.md) `DataSource Center` section to import Mysql JDBC Driver.
 

@@ -17,7 +17,7 @@
 
 ## Native Supported
 
-- No, read section example in [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section to activate this datasource.
+- No, read section example in [datasource-setting](../installation/datasource-setting.md) `DataSource Center` section to activate this datasource.
 - JDBC driver configuration reference document [athena-connect-with-jdbc](https://docs.amazonaws.cn/athena/latest/ug/connect-with-jdbc.html)
 - Driver download link [SimbaAthenaJDBC-2.0.31.1000/AthenaJDBC42.jar](https://s3.cn-north-1.amazonaws.com.cn/athena-downloads-cn/drivers/JDBC/SimbaAthenaJDBC-2.0.31.1000/AthenaJDBC42.jar)
 
