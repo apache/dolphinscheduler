@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.switchtask;
 
-import lombok.Setter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -50,9 +49,6 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
     private final IWorkflowExecutionRunnable workflowExecutionRunnable;
     private final TaskInstance taskInstance;
-
-    @Setter
-    private SwitchParameters switchParameters;
 
     public SwitchLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
                            TaskExecutionContext taskExecutionContext) {

@@ -101,7 +101,6 @@ public interface IWorkflowExecutionRunnable {
         return getWorkflowExecuteContext().getWorkflowExecutionGraph();
     }
 
-
     /**
      * Get the WorkflowInstanceLifecycleListeners belongs to the Workflow instance.
      */

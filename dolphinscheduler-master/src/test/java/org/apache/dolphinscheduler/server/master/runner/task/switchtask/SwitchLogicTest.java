@@ -77,7 +77,7 @@ class SwitchLogicTaskTest {
 
         // Initializing the SwitchLogicTask
         switchLogicTask = new SwitchLogicTask(workflowExecutionRunnable, taskExecutionContext);
-        switchLogicTask.setSwitchParameters(switchParameters);  // Ensure switchParameters is set
+//        switchLogicTask.setSwitchParameters(switchParameters);  // Ensure switchParameters is set
     }
 
 
