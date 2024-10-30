@@ -93,7 +93,7 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String environmentWorkerGroup = "default";
 
-    private static final String filePath = "/tmp";
+    private static final String filePath = "/tmp/dolphinscheduler/runner/resources/";
 
     private static RemoteWebDriver browser;
 
@@ -146,9 +146,9 @@ public class WorkflowJavaTaskE2ETest {
     }
     private static void createJar(String classFile, String entryName, String mainPackage, String jarName) {
 
-        String classFilePath = "/tmp/common/" + classFile;
+        String classFilePath = "/tmp/dolphinscheduler/runner/resources/" + classFile;
 
-        String jarFilePath = "/tmp/" + jarName;
+        String jarFilePath = "/tmp/dolphinscheduler/runner/resources/" + jarName;
 
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
@@ -171,23 +171,17 @@ public class WorkflowJavaTaskE2ETest {
 
     private static void getJar() {
         compileJavaFlow();
-        await().atMost(Duration.ofMinutes(5))
-                .pollInterval(Duration.ofSeconds(2))
-                .until(() -> Files.exists(Paths.get("/tmp/common/Fat.class")) &&
-                        Files.exists(Paths.get("/tmp/common/Normal1.class")) &&
-                        Files.exists(Paths.get("/tmp/common/Normal2.class")));
-        createJar("Fat.class",
-                "common/Fat.class",
-                "common.Fat",
-                "fat.jar");
-        createJar("Normal1.class",
-                "common/Normal1.class",
-                "common.Normal1",
-                "normal1.jar");
-        createJar("Normal2.class",
-                "common/Normal2.class",
-                "common.Normal2",
-                "normal2.jar");
+
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException e) {
+            log.error("Interrupted :", e);
+        }
+
+        /*
+         * createJar("Fat.class", "Fat.class", "Fat", "fat.jar"); createJar("Normal1.class", "Normal1.class", "Normal1",
+         * "normal1.jar"); createJar("Normal2.class", "Normal2.class", "Normal2", "normal2.jar");
+         */
 
     }
 
@@ -211,17 +205,17 @@ public class WorkflowJavaTaskE2ETest {
         FileManagePage file = new NavBarPage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
-                .uploadFile(getJavaPath("common/Fat.java"));
+                .uploadFile(getJavaPath("Fat.java"));
 
         WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Fat.java']")));
 
-        file.uploadFile(getJavaPath("common/Normal1.java"));
+        file.uploadFile(getJavaPath("Normal1.java"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Normal1.java']")));
 
-        file.uploadFile(getJavaPath("common/Normal2.java"));
+        file.uploadFile(getJavaPath("Normal2.java"));
 
         ProjectPage projectPage = new NavBarPage(browser)
                 .goToNav(ProjectPage.class);
@@ -235,11 +229,13 @@ public class WorkflowJavaTaskE2ETest {
         String workflowName = "compile";
         String taskName = "compile";
         String context =
-                "$JAVA_HOME/bin/javac -d /tmp Fat.java \n" +
-                        "$JAVA_HOME/bin/javac -d /tmp Normal1.java Normal2.java \n" +
-                        "$JAVA_HOME/bin/javac -d /tmp Normal2.java \n"
-                        + "echo '####当前目录 ####'\n" + "ls\n"
-                        + "echo '#### /tmp/common 目录 ####'\n" + "ls /tmp/common\n";
+                "$JAVA_HOME/bin/javac Fat.java \n" +
+                        "$JAVA_HOME/bin/jar cvf fat.jar Fat.class\n" +
+                        "$JAVA_HOME/bin/javac Normal1.java Normal2.java \n" +
+                        "$JAVA_HOME/bin/jar cvf normal1.jar Normal1.class\n" +
+                        "$JAVA_HOME/bin/javac Normal2.java \n" +
+                        "$JAVA_HOME/bin/jar cvf normal2.jar Normal2.class\n"
+                        + "mv *.jar /tmp/dolphinscheduler/runner/resources";
         workflowDefinitionPage
                 .createWorkflow()
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
@@ -280,7 +276,7 @@ public class WorkflowJavaTaskE2ETest {
         FileManagePage file = new NavBarPage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
-                .uploadFile(filePath + "/fat.jar");
+                .uploadFile(filePath + "fat.jar");
 
         WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
 
@@ -356,13 +352,13 @@ public class WorkflowJavaTaskE2ETest {
         FileManagePage file = new NavBarPage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
-                .uploadFile(filePath + "/normal2.jar");
+                .uploadFile(filePath + "normal2.jar");
 
         WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='normal2.jar']")));
 
-        file.uploadFile(filePath + "/normal1.jar");
+        file.uploadFile(filePath + "normal1.jar");
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='normal1.jar']")));
 
