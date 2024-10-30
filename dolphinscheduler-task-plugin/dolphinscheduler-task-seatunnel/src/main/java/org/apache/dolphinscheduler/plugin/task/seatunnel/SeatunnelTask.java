@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -160,8 +161,9 @@ public class SeatunnelTask extends AbstractRemoteTask {
             scriptContent = buildCustomConfigContent();
         } else {
             String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
             scriptContent = FileUtils.readFileToString(
-                    new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                    new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                     StandardCharsets.UTF_8);
         }
         String filePath = buildConfigFilePath();
