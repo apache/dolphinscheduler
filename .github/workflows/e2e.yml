@@ -51,7 +51,7 @@ jobs:
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -87,7 +87,7 @@ jobs:
           -Pdocker,staging -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
-          components=("master" "worker" "api" "tools" "alert-server" "standalone")
+          components=("master" "worker" "api" "tools" "alert-server" "standalone-server")
                    for component in "${components[@]}"; do
                      docker save apache/dolphinscheduler-${component}:ci -o /tmp/${component}-image.tar \
                      && du -sh /tmp/${component}-image.tar
@@ -96,7 +96,7 @@ jobs:
         name: Upload Docker Images
         with:
           name: standalone-image-e2e
-          path: /tmp/standalone-image.tar
+          path: /tmp/standalone-server-image.tar
           retention-days: 1
       - uses: actions/upload-artifact@v4
         name: Upload master Docker Images
@@ -128,6 +128,11 @@ jobs:
           name: alert-server-image-e2e
           path: /tmp/alert-server-image.tar
           retention-days: 1
+      - uses: actions/upload-artifact@v4
+        name: Upload dist file
+        with:
+            name: bin-tar
+            path: /home/runner/work/dolphinscheduler/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
@@ -203,7 +208,7 @@ jobs:
         name: Download Docker Images
         with:
           name: standalone-image-e2e
-          path: /tmp/standalone
+          path: /tmp/standalone-server
       - uses: actions/download-artifact@v4
         name: download master Docker Images
         with:
@@ -234,9 +239,17 @@ jobs:
           name: alert-server-image-e2e
           path: /tmp/alert-server
           retention-days: 1
+      - uses: actions/download-artifact@v4
+        name: Download dist file
+        with:
+          name: bin-tar
+          path: /tmp
+      - name: untar dist file
+        run:
+            tar -zxvf /tmp/apache-dolphinscheduler-*-bin.tar.gz && pwd
       - name: Load Docker Images
         run: |
-          components=("master" "worker" "api" "tools" "alert-server" "standalone")
+          components=("master" "worker" "api" "tools" "alert-server" "standalone-server")
           for component in "${components[@]}"; do
             docker load -i /tmp/${component}/${component}-image.tar
           done
