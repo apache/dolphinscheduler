@@ -53,7 +53,7 @@ const DetailModal = defineComponent({
   props,
   emits: ['cancel', 'update'],
   setup(props, ctx) {
-    const { t,locale  } = useI18n()
+    const { t, locale } = useI18n()
 
     const rules = ref<IFormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
@@ -96,27 +96,27 @@ const DetailModal = defineComponent({
 
     function isJSON(str: string): boolean {
       try {
-        const parsed = JSON.parse(str);
-        return typeof parsed === 'object' && parsed !== null;
+        const parsed = JSON.parse(str)
+        return typeof parsed === 'object' && parsed !== null
       } catch (e) {
-        return false;
+        return false
       }
     }
 
     function updatePlaceholder(mergedItem: any) {
-      const {props} = mergedItem;
-      if (!props || !props.placeholder) return;
+      const { props } = mergedItem
+      if (!props || !props.placeholder) return
 
-      const placeholder = props.placeholder;
-      if (!isJSON(placeholder)) return;
+      const placeholder = props.placeholder
+      if (!isJSON(placeholder)) return
 
-      const msgMap = JSON.parse(placeholder);
+      const msgMap = JSON.parse(placeholder)
       const localeMap = {
         zh_CN: msgMap.zhMsg,
         en_US: msgMap.enMsg
-      };
+      }
 
-      props.placeholder = localeMap[locale.value];
+      props.placeholder = localeMap[locale.value]
     }
 
     watch(
