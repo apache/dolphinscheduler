@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -46,7 +47,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
 
         InputParam url = InputParam.newBuilder(HttpAlertConstants.NAME_URL, HttpAlertConstants.URL)
-                .setPlaceholder(AlertInputTips.URL.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.URL)))
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -54,7 +55,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
 
         InputParam headerParams =
                 InputParam.newBuilder(HttpAlertConstants.NAME_HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
-                        .setPlaceholder(AlertInputTips.HEADER.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.HEADER)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false)
                                 .build())
@@ -75,7 +76,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
 
         InputParam bodyParams =
                 InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
-                        .setPlaceholder(AlertInputTips.JSON_BODY.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.JSON_BODY)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false)
                                 .build())

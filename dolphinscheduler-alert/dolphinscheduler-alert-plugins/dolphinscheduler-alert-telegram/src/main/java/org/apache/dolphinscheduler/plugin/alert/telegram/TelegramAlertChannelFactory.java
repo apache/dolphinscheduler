@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.STRING_YES;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -60,7 +61,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
-                .setPlaceholder(AlertInputTips.WEBHOOK.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.WEBHOOK)))
                 .build();
 
         InputParam botTokenParam = InputParam
@@ -68,7 +69,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
-                .setPlaceholder(AlertInputTips.BOT_TOKEN.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.BOT_TOKEN)))
                 .build();
 
         InputParam chatIdParam = InputParam
@@ -76,7 +77,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
-                .setPlaceholder(AlertInputTips.CHANNEL_ID.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.CHANNEL_ID)))
                 .build();
 
         SelectParam parseMode = SelectParam
@@ -135,7 +136,7 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
-                .setPlaceholder("if enable use authentication, you need input password")
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.PASSWORD)))
                 .setType("password")
                 .build();
 

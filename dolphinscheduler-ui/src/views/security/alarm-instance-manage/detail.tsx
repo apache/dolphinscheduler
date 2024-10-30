@@ -53,7 +53,7 @@ const DetailModal = defineComponent({
   props,
   emits: ['cancel', 'update'],
   setup(props, ctx) {
-    const { t } = useI18n()
+    const { t,locale  } = useI18n()
 
     const rules = ref<IFormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
@@ -94,6 +94,31 @@ const DetailModal = defineComponent({
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
+    function isJSON(str: string): boolean {
+      try {
+        const parsed = JSON.parse(str);
+        return typeof parsed === 'object' && parsed !== null;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function updatePlaceholder(mergedItem: any) {
+      const {props} = mergedItem;
+      if (!props || !props.placeholder) return;
+
+      const placeholder = props.placeholder;
+      if (!isJSON(placeholder)) return;
+
+      const msgMap = JSON.parse(placeholder);
+      const localeMap = {
+        zh_CN: msgMap.zhMsg,
+        en_US: msgMap.enMsg
+      };
+
+      props.placeholder = localeMap[locale.value];
+    }
+
     watch(
       () => props.show,
       async () => {
@@ -109,6 +134,7 @@ const DetailModal = defineComponent({
           mergedItem.name = t(
             'security.alarm_instance' + '.' + mergedItem.field
           )
+          updatePlaceholder(mergedItem)
         })
         const { rules: fieldsRules, elements: fieldsElements } =
           getElementByJson(state.json, state.detailForm)

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.slack;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -46,14 +47,14 @@ public final class SlackAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
-                .setPlaceholder(AlertInputTips.WEBHOOK.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.WEBHOOK)))
                 .build();
 
         InputParam botName = InputParam.newBuilder(SlackParamsConstants.SLACK_BOT_NAME, SlackParamsConstants.SLACK_BOT)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
-                .setPlaceholder(AlertInputTips.BOT_NAME.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.BOT_NAME)))
                 .build();
 
         paramsList.add(webHookParam);
