@@ -132,7 +132,7 @@ jobs:
         name: Upload dist file
         with:
             name: bin-tar
-            path: /home/runner/work/dolphinscheduler/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
+            path: /tmp/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
