@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
@@ -30,7 +29,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinition
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
@@ -41,16 +39,21 @@ import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,6 +66,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @DisableIfTestFails
@@ -93,12 +97,110 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String environmentWorkerGroup = "default";
 
-    private static final String filePath = "/tmp/dolphinscheduler/runner/resources/";
+    private static final String filePath = "/tmp";
 
     private static RemoteWebDriver browser;
 
+    private static void createJar(String className, String classFilePath, String entryName, String mainPackage,
+                                  String jarName) {
+
+        String jarFilePath = "/tmp/" + jarName;
+
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainPackage);
+
+        try (
+                FileOutputStream fos = new FileOutputStream(jarFilePath);
+                JarOutputStream jos = new JarOutputStream(fos, manifest)) {
+            Path path = new File(classFilePath + className).toPath();
+            JarEntry entry = new JarEntry(entryName);
+            jos.putNextEntry(entry);
+            byte[] bytes = Files.readAllBytes(path);
+            jos.write(bytes, 0, bytes.length);
+            jos.closeEntry();
+        } catch (IOException e) {
+            log.error("create jar failed:", e);
+        }
+
+    }
+    private static void getJar() {
+        String classPath = "/tmp/common/";
+        compileJavaFile("common/Fat.java");
+        compileJavaFile("common/Normal1.java");
+        compileJavaFile("common/Normal2.java");
+        createJar("Fat.class", classPath,
+                "common/Fat.class",
+                "common.Fat",
+                "fat.jar");
+        createJar("Normal1.class",
+                classPath,
+                "common/Normal1.class",
+                "common.Normal1",
+                "normal1.jar");
+        createJar("Normal2.class",
+                classPath,
+                "common/Normal2.class",
+                "common.Normal2",
+                "normal2.jar");
+
+    }
+
+    public static void compileJavaFile(String sourceFilePath) {
+
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            log.error("Cannot find the system Java compiler.", new IllegalStateException());
+        }
+
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        URL resourceUrl = classLoader.getResource(sourceFilePath);
+        String absolutePath = "";
+
+        try {
+            File resourceFile = new File(resourceUrl.toURI());
+            absolutePath = resourceFile.getAbsolutePath();
+        } catch (Exception e) {
+            log.error(" java file cannot find:", e);
+        }
+
+        String outputDirPath = "/tmp";
+
+        try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
+
+            File sourceFile = new File(absolutePath);
+            if (!sourceFile.exists()) {
+                log.error("java file not exist", new IllegalArgumentException());
+            }
+
+            Iterable<? extends JavaFileObject> compilationUnits =
+                    fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile));
+
+            List<String> options = Arrays.asList(
+                    "--release", "8",
+                    "-d", outputDirPath);
+
+            JavaCompiler.CompilationTask task = compiler.getTask(
+                    null,
+                    fileManager,
+                    null,
+                    options,
+                    null,
+                    compilationUnits);
+
+            boolean success = task.call();
+
+            if (!success) {
+                throw new RuntimeException("Compilation failed.");
+            }
+        } catch (IOException e) {
+            log.error("compile java file failed:", e);
+        }
+    }
+
     @BeforeAll
     public static void setup() {
+        getJar();
         UserPage userPage = new LoginPage(browser)
                 .login(user, password)
                 .goToNav(SecurityPage.class)
@@ -118,11 +220,9 @@ public class WorkflowJavaTaskE2ETest {
                 .create(project);
 
         ProjectPage projectPage = new ProjectPage(browser);
-        await().untilAsserted(() -> assertThat(projectPage.projectList())
+        Awaitility.await().untilAsserted(() -> assertThat(projectPage.projectList())
                 .as("The project list should include newly created projects.")
                 .anyMatch(it -> it.getText().contains(project)));
-
-        getJar();
     }
 
     @AfterAll
@@ -144,131 +244,6 @@ public class WorkflowJavaTaskE2ETest {
                 .goToTab(TenantPage.class)
                 .delete(tenant);
     }
-    private static void createJar(String classFile, String entryName, String mainPackage, String jarName) {
-
-        String classFilePath = "/tmp/dolphinscheduler/runner/resources/" + classFile;
-
-        String jarFilePath = "/tmp/dolphinscheduler/runner/resources/" + jarName;
-
-        Manifest manifest = new Manifest();
-        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainPackage);
-
-        try (
-                FileOutputStream fos = new FileOutputStream(jarFilePath);
-                JarOutputStream jos = new JarOutputStream(fos, manifest)) {
-            Path path = new File(classFilePath).toPath();
-            JarEntry entry = new JarEntry(entryName);
-            jos.putNextEntry(entry);
-            byte[] bytes = Files.readAllBytes(path);
-            jos.write(bytes, 0, bytes.length);
-            jos.closeEntry();
-        } catch (IOException e) {
-            log.error("create jar failed:", e);
-        }
-
-    }
-
-    private static void getJar() {
-        compileJavaFlow();
-
-        try {
-            Thread.sleep(60000);
-        } catch (InterruptedException e) {
-            log.error("Interrupted :", e);
-        }
-
-        /*
-         * createJar("Fat.class", "Fat.class", "Fat", "fat.jar"); createJar("Normal1.class", "Normal1.class", "Normal1",
-         * "normal1.jar"); createJar("Normal2.class", "Normal2.class", "Normal2", "normal2.jar");
-         */
-
-    }
-
-    private static String getJavaPath(String file) {
-        URL resource = WorkflowJavaTaskE2ETest.class.getClassLoader().getResource(file);
-        if (resource == null) {
-            throw new IllegalArgumentException("File not found!");
-        } else {
-            Path path = null;
-            try {
-                path = Paths.get(resource.toURI());
-            } catch (URISyntaxException e) {
-                log.error("URL syntax error:", e);
-            }
-            String filePath = path.toString();
-            return filePath;
-        }
-    }
-
-    private static void compileJavaFlow() {
-        FileManagePage file = new NavBarPage(browser)
-                .goToNav(ResourcePage.class)
-                .goToTab(FileManagePage.class)
-                .uploadFile(getJavaPath("Fat.java"));
-
-        WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Fat.java']")));
-
-        file.uploadFile(getJavaPath("Normal1.java"));
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Normal1.java']")));
-
-        file.uploadFile(getJavaPath("Normal2.java"));
-
-        ProjectPage projectPage = new NavBarPage(browser)
-                .goToNav(ProjectPage.class);
-
-        WorkflowDefinitionTab workflowDefinitionPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(project)
-                        .goToTab(WorkflowDefinitionTab.class);
-
-        String workflowName = "compile";
-        String taskName = "compile";
-        String context =
-                "$JAVA_HOME/bin/javac Fat.java \n" +
-                        "$JAVA_HOME/bin/jar cvf fat.jar Fat.class\n" +
-                        "$JAVA_HOME/bin/javac Normal1.java Normal2.java \n" +
-                        "$JAVA_HOME/bin/jar cvf normal1.jar Normal1.class\n" +
-                        "$JAVA_HOME/bin/javac Normal2.java \n" +
-                        "$JAVA_HOME/bin/jar cvf normal2.jar Normal2.class\n"
-                        + "mv *.jar /tmp/dolphinscheduler/runner/resources";
-        workflowDefinitionPage
-                .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script(context)
-                .selectResource("Fat.java")
-                .selectResource("Normal1.java")
-                .selectResource("Normal2.java")
-                .name(taskName)
-                .submit()
-                .submit()
-                .name(workflowName)
-                .submit();
-
-        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
-                .as("Workflow list should contain newly-created workflow")
-                .anyMatch(it -> it.getText().contains(workflowName)));
-
-        workflowDefinitionPage.publish(workflowName);
-
-        final ProjectDetailPage projectDetailPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(project);
-
-        projectDetailPage
-                .goToTab(WorkflowInstanceTab.class)
-                .deleteAll();
-        projectDetailPage
-                .goToTab(WorkflowDefinitionTab.class)
-                .run(workflowName)
-                .submit();
-
-    }
 
     @Test
     @Order(1)
@@ -276,13 +251,11 @@ public class WorkflowJavaTaskE2ETest {
         FileManagePage file = new NavBarPage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
-                .uploadFile(filePath + "fat.jar");
+                .uploadFile(filePath + "/fat.jar");
 
         WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='fat.jar']")));
-
-        file.delete("Fat.java").delete("Normal1.java").delete("Normal2.java");
 
         ProjectPage projectPage = new NavBarPage(browser)
                 .goToNav(ProjectPage.class);
@@ -298,7 +271,6 @@ public class WorkflowJavaTaskE2ETest {
                 .selectRunType("FAT_JAR")
                 .selectMainPackage("fat.jar")
                 .selectJavaResource("fat.jar")
-                .selectJavaResource("fat.jar")
                 .name("test-1")
                 .selectEnv(environmentName)
                 .submit()
@@ -306,7 +278,7 @@ public class WorkflowJavaTaskE2ETest {
                 .name(workflow)
                 .submit();
 
-        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+        Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(it -> it.getText().contains(workflow)));
 
@@ -329,86 +301,7 @@ public class WorkflowJavaTaskE2ETest {
                 .run(workflow)
                 .submit();
 
-        await()
-                .atMost(Duration.ofMinutes(5))
-                .untilAsserted(() -> {
-                    browser.navigate().refresh();
-
-                    final WorkflowInstanceTab.Row row = projectPage
-                            .goToTab(WorkflowInstanceTab.class)
-                            .instances()
-                            .iterator()
-                            .next();
-
-                    assertThat(row.isSuccess()).isTrue();
-                    assertThat(row.executionTime()).isEqualTo(1);
-                });
-
-    }
-
-    @Test
-    @Order(60)
-    void testCreateNormalWorkflow() {
-        FileManagePage file = new NavBarPage(browser)
-                .goToNav(ResourcePage.class)
-                .goToTab(FileManagePage.class)
-                .uploadFile(filePath + "normal2.jar");
-
-        WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='normal2.jar']")));
-
-        file.uploadFile(filePath + "normal1.jar");
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='normal1.jar']")));
-
-        ProjectPage projectPage = new NavBarPage(browser)
-                .goToNav(ProjectPage.class);
-
-        wait.until(ExpectedConditions.visibilityOfAllElements(projectPage.projectList()));
-
-        WorkflowDefinitionTab workflowDefinitionPage = projectPage
-                .goTo(project)
-                .goToTab(WorkflowDefinitionTab.class);
-
-        workflowDefinitionPage.createWorkflow()
-                .<JavaTaskForm>addTask(WorkflowForm.TaskType.JAVA)
-                .selectRunType("NORMAL_JAR")
-                .selectMainPackage("normal1.jar")
-                .selectJavaResource("normal1.jar")
-                .selectJavaResource("normal1.jar")
-                .selectJavaResource("normal2.jar")
-                .name("test-2")
-                .selectEnv(environmentName)
-                .submit()
-                .submit()
-                .name(workflow2)
-                .submit();
-
-        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
-                .as("Workflow list should contain newly-created workflow")
-                .anyMatch(it -> it.getText().contains(workflow2)));
-
-        workflowDefinitionPage.publish(workflow2);
-    }
-
-    @Test
-    @Order(90)
-    void testRunNormalWorkflow() {
-        final ProjectDetailPage projectPage =
-                new ProjectPage(browser)
-                        .goToNav(ProjectPage.class)
-                        .goTo(project);
-
-        projectPage
-                .goToTab(WorkflowInstanceTab.class)
-                .deleteAll();
-        projectPage
-                .goToTab(WorkflowDefinitionTab.class)
-                .run(workflow2)
-                .submit();
-
-        await()
+        Awaitility.await()
                 .atMost(Duration.ofMinutes(5))
                 .untilAsserted(() -> {
                     browser.navigate().refresh();

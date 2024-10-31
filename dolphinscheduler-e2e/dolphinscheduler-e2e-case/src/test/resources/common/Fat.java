@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
+package common;
 
-
-public class Normal1 {
+public class Fat {
 
     public static void main(String[] args) {
-        Normal2 s1 = new Normal2();
-        s1.test();
+        System.out.println("Hello world-----FAT");
     }
 }
