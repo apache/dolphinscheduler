@@ -128,12 +128,6 @@ jobs:
           name: alert-server-image-e2e
           path: /tmp/alert-server-image.tar
           retention-days: 1
-      - uses: actions/upload-artifact@v4
-        name: Upload dist file
-        with:
-          name: bin-tar
-          path: /home/runner/work/dolphinscheduler/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz
-          retention-days: 1
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
@@ -240,14 +234,6 @@ jobs:
           name: alert-server-image-e2e
           path: /tmp/alert-server
           retention-days: 1
-      - uses: actions/download-artifact@v4
-        name: Download dist file
-        with:
-          name: bin-tar
-          path: /tmp
-      - name: untar dist file
-        run:
-          tar -zxvf /tmp/apache-dolphinscheduler-*-bin.tar.gz && pwd
       - name: Load Docker Images
         run: |
           components=("master" "worker" "api" "tools" "alert-server" "standalone-server")
