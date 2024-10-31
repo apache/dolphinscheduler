@@ -170,11 +170,11 @@ public class SeatunnelTask extends AbstractRemoteTask {
         String filePath = buildConfigFilePath();
         createConfigFileIfNotExists(scriptContent, filePath);
         args.add(filePath);
-        args.addAll(generateTunnelTaskParameters());
+        args.addAll(generateTaskParameters());
         return args;
     }
 
-    private List<String> generateTunnelTaskParameters() {
+    private List<String> generateTaskParameters() {
         Map<String, String> variables = new HashMap<>();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
