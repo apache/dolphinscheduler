@@ -45,9 +45,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -175,7 +175,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private List<String> generateTunnelTaskParameters() {
-        Map<String, String> variables = new ConcurrentHashMap<>();
+        Map<String, String> variables = new HashMap<>();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
         if (propertyList != null && !propertyList.isEmpty()) {
@@ -195,14 +195,6 @@ public class SeatunnelTask extends AbstractRemoteTask {
             parameters.add(String.format("%s='%s'", k, v));
         });
         return parameters;
-    }
-
-    protected String buildCustomConfigCommand() throws Exception {
-        String config = buildCustomConfigContent();
-        String filePath = buildConfigFilePath();
-        createConfigFileIfNotExists(config, filePath);
-
-        return filePath;
     }
 
     private String buildCustomConfigContent() {
