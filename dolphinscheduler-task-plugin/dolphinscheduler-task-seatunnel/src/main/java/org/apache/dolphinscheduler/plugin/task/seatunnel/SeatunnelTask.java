@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -169,7 +170,39 @@ public class SeatunnelTask extends AbstractRemoteTask {
         String filePath = buildConfigFilePath();
         createConfigFileIfNotExists(scriptContent, filePath);
         args.add(filePath);
+        args.addAll(generateTunnelTaskParameters());
         return args;
+    }
+
+    private List<String> generateTunnelTaskParameters() {
+        Map<String, String> variables = new ConcurrentHashMap<>();
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
+        if (propertyList != null && !propertyList.isEmpty()) {
+            for (Property property : propertyList) {
+                variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+            }
+        }
+        List<Property> localParams = this.seatunnelParameters.getLocalParams();
+        if (localParams != null && !localParams.isEmpty()) {
+            for (Property property : localParams) {
+                variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+            }
+        }
+        List<String> parameters = new ArrayList<>();
+        variables.forEach((k, v) -> {
+            parameters.add("-i");
+            parameters.add(String.format("%s='%s'", k, v));
+        });
+        return parameters;
+    }
+
+    protected String buildCustomConfigCommand() throws Exception {
+        String config = buildCustomConfigContent();
+        String filePath = buildConfigFilePath();
+        createConfigFileIfNotExists(config, filePath);
+
+        return filePath;
     }
 
     private String buildCustomConfigContent() {
