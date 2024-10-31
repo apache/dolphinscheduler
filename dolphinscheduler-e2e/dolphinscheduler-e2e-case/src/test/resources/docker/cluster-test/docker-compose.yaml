@@ -37,7 +37,9 @@ services:
 
   dolphinscheduler-schema-initializer:
     image: apache/dolphinscheduler-tools:ci
-    command: [ bin/upgrade-schema.sh ]
+    env_file: .env
+    profiles: [ "schema" ]
+    command: [ tools/bin/upgrade-schema.sh ]
     depends_on:
       dolphinscheduler-postgresql:
         condition: service_healthy
