@@ -111,12 +111,11 @@ const DetailModal = defineComponent({
       if (!isJSON(placeholder)) return
 
       const msgMap = JSON.parse(placeholder)
-      const localeMap = {
-        zh_CN: msgMap.zhMsg,
-        en_US: msgMap.enMsg
+      if (locale.value === 'zh_CN') {
+        props.placeholder = msgMap.zhMsg
+      } else if (locale.value === 'en_US') {
+        props.placeholder = msgMap.enMsg
       }
-
-      props.placeholder = localeMap[locale.value]
     }
 
     watch(
