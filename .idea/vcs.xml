@@ -12,9 +12,5 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/.github/actions/auto-assign-action" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/.github/actions/comment-on-issue" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/.github/actions/translate-on-issue" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/.github/actions/workflow-telemetry-action" vcs="Git" />
   </component>
 </project>
