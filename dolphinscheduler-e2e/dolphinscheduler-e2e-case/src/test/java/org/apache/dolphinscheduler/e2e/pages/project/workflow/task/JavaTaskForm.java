@@ -89,7 +89,7 @@ public class JavaTaskForm extends TaskNodeForm {
         }
 
         if (!found) {
-            throw new RuntimeException("Cannot Found: " + resourceName);
+            throw new RuntimeException("File " + resourceName + " can not be found.");
         }
 
         driver.switchTo().activeElement().sendKeys(Keys.ESCAPE);

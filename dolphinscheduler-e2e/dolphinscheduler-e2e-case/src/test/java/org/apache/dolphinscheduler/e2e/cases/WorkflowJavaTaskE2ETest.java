@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
@@ -97,14 +98,14 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String environmentWorkerGroup = "default";
 
-    private static final String filePath = "/tmp";
+    private static final String filePath = Constants.HOST_TMP_PATH.toString();
 
     private static RemoteWebDriver browser;
 
     private static void createJar(String className, String classFilePath, String entryName, String mainPackage,
                                   String jarName) {
 
-        String jarFilePath = "/tmp/" + jarName;
+        String jarFilePath = Constants.HOST_TMP_PATH + "/" + jarName;
 
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
@@ -120,15 +121,15 @@ public class WorkflowJavaTaskE2ETest {
             jos.write(bytes, 0, bytes.length);
             jos.closeEntry();
         } catch (IOException e) {
-            log.error("create jar failed:", e);
+            throw new RuntimeException("Create jar failed:", e);
         }
 
     }
-    private static void getJar() {
-        String classPath = "/tmp/common/";
-        compileJavaFile("common/Fat.java");
-        compileJavaFile("common/Normal1.java");
-        compileJavaFile("common/Normal2.java");
+    private static void createAndBuildJars() {
+        String classPath = Constants.HOST_TMP_PATH + "/docker/java-task/";
+        compileJavaFile("docker/java-task/Fat.java");
+        compileJavaFile("docker/java-task/Normal1.java");
+        compileJavaFile("docker/java-task/Normal2.java");
         createJar("Fat.class", classPath,
                 "common/Fat.class",
                 "common.Fat",
@@ -161,10 +162,10 @@ public class WorkflowJavaTaskE2ETest {
             File resourceFile = new File(resourceUrl.toURI());
             absolutePath = resourceFile.getAbsolutePath();
         } catch (Exception e) {
-            log.error(" java file cannot find:", e);
+            throw new RuntimeException("Java file cannot find:", e);
         }
 
-        String outputDirPath = "/tmp";
+        String outputDirPath = Constants.HOST_TMP_PATH.toString();
 
         try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
 
@@ -191,16 +192,16 @@ public class WorkflowJavaTaskE2ETest {
             boolean success = task.call();
 
             if (!success) {
-                throw new RuntimeException("Compilation failed.");
+                throw new RuntimeException("Jar compilation failed.");
             }
         } catch (IOException e) {
-            log.error("compile java file failed:", e);
+            throw new RuntimeException("Compile java file failed:", e);
         }
     }
 
     @BeforeAll
     public static void setup() {
-        getJar();
+        createAndBuildJars();
         UserPage userPage = new LoginPage(browser)
                 .login(user, password)
                 .goToNav(SecurityPage.class)
@@ -247,7 +248,7 @@ public class WorkflowJavaTaskE2ETest {
 
     @Test
     @Order(1)
-    void testCreateFatWorkflow() {
+    void testCreateFatJarWorkflow() {
         FileManagePage file = new NavBarPage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
@@ -287,7 +288,7 @@ public class WorkflowJavaTaskE2ETest {
 
     @Test
     @Order(30)
-    void testRunFatWorkflow() {
+    void testRunFatJarWorkflow() {
         final ProjectDetailPage projectPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -302,7 +303,7 @@ public class WorkflowJavaTaskE2ETest {
                 .submit();
 
         Awaitility.await()
-                .atMost(Duration.ofMinutes(5))
+                .atMost(Duration.ofMinutes(2))
                 .untilAsserted(() -> {
                     browser.navigate().refresh();
 
