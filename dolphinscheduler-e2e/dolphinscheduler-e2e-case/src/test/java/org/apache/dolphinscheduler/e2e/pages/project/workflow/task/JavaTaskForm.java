@@ -72,27 +72,18 @@ public class JavaTaskForm extends TaskNodeForm {
     public JavaTaskForm selectJavaResource(String resourceName) {
         WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver());
         wait.until(ExpectedConditions.elementToBeClickable(selectResource));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true); arguments[0].click();",
-                selectResource);
-        By optionsLocator = By.className("n-tree-node-content__text");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
-
-        List<WebElement> options = driver.findElements(optionsLocator);
-        boolean found = false;
-        for (WebElement option : options) {
-            if (option.getText().trim().startsWith(resourceName)) {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true); arguments[0].click();",
-                        option);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            throw new RuntimeException("File " + resourceName + " can not be found.");
-        }
-
-        driver.switchTo().activeElement().sendKeys(Keys.ESCAPE);
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectResource);
+        final By optionsLocator = By.className("n-tree-node-content__text");
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+        parent().driver()
+                .findElements(optionsLocator)
+                .stream()
+                .filter(it -> it.getText().startsWith(resourceName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such resource: " + resourceName))
+                .click();
+        driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         return this;
     }
 

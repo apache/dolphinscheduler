@@ -44,6 +44,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -102,6 +103,10 @@ public class WorkflowJavaTaskE2ETest {
 
     private static RemoteWebDriver browser;
 
+    public static void main(String[] args) {
+        createAndBuildJars();
+    }
+
     private static void createJar(String className, String classFilePath, String entryName, String mainPackage,
                                   String jarName) {
 
@@ -126,76 +131,64 @@ public class WorkflowJavaTaskE2ETest {
 
     }
     private static void createAndBuildJars() {
-        String classPath = Constants.HOST_TMP_PATH + "/docker/java-task/";
-        compileJavaFile("docker/java-task/Fat.java");
-        compileJavaFile("docker/java-task/Normal1.java");
-        compileJavaFile("docker/java-task/Normal2.java");
+        String classPath = Constants.HOST_TMP_PATH + "/";
+        compileJavaFile(Arrays.asList("docker/java-task/Fat.java"));
+        compileJavaFile(Arrays.asList("docker/java-task/Normal1.java", "docker/java-task/Normal2.java"));
+        compileJavaFile(Arrays.asList("docker/java-task/Normal2.java"));
         createJar("Fat.class", classPath,
-                "common/Fat.class",
-                "common.Fat",
+                "Fat.class",
+                "Fat",
                 "fat.jar");
-        createJar("Normal1.class",
-                classPath,
-                "common/Normal1.class",
-                "common.Normal1",
+        createJar("Normal1.class", classPath,
+                "Normal1.class",
+                "Normal1",
                 "normal1.jar");
-        createJar("Normal2.class",
-                classPath,
-                "common/Normal2.class",
-                "common.Normal2",
+        createJar("Normal2.class", classPath,
+                "Normal2.class",
+                "Normal2",
                 "normal2.jar");
 
     }
 
-    public static void compileJavaFile(String sourceFilePath) {
-
+    public static void compileJavaFile(List<String> sourceFilePaths) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
             log.error("Cannot find the system Java compiler.", new IllegalStateException());
-        }
-
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        URL resourceUrl = classLoader.getResource(sourceFilePath);
-        String absolutePath = "";
-
-        try {
-            File resourceFile = new File(resourceUrl.toURI());
-            absolutePath = resourceFile.getAbsolutePath();
-        } catch (Exception e) {
-            throw new RuntimeException("Java file cannot find:", e);
+            return;
         }
 
         String outputDirPath = Constants.HOST_TMP_PATH.toString();
 
         try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
+            List<File> sourceFiles = new ArrayList<>();
+            for (String sourceFilePath : sourceFilePaths) {
+                URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(sourceFilePath);
+                if (resourceUrl == null) {
+                    log.error("Java file not found: " + sourceFilePath, new IllegalArgumentException());
+                    continue;
+                }
 
-            File sourceFile = new File(absolutePath);
-            if (!sourceFile.exists()) {
-                log.error("java file not exist", new IllegalArgumentException());
+                File resourceFile = new File(resourceUrl.toURI());
+                if (!resourceFile.exists()) {
+                    log.error("Java file does not exist: " + resourceFile.getAbsolutePath(),
+                            new IllegalArgumentException());
+                    continue;
+                }
+                sourceFiles.add(resourceFile);
             }
 
-            Iterable<? extends JavaFileObject> compilationUnits =
-                    fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile));
+            Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(sourceFiles);
+            List<String> options = Arrays.asList("--release", "8", "-d", outputDirPath);
 
-            List<String> options = Arrays.asList(
-                    "--release", "8",
-                    "-d", outputDirPath);
-
-            JavaCompiler.CompilationTask task = compiler.getTask(
-                    null,
-                    fileManager,
-                    null,
-                    options,
-                    null,
-                    compilationUnits);
-
+            JavaCompiler.CompilationTask task =
+                    compiler.getTask(null, fileManager, null, options, null, compilationUnits);
             boolean success = task.call();
 
             if (!success) {
-                throw new RuntimeException("Jar compilation failed.");
+                throw new RuntimeException("Java compilation failed.");
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Compile java file failed:", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Compile java files failed:", e);
         }
     }
 
@@ -319,4 +312,83 @@ public class WorkflowJavaTaskE2ETest {
 
     }
 
+    @Test
+    @Order(60)
+    void testCreateNormalJarWorkflow() {
+        FileManagePage file = new NavBarPage(browser)
+                .goToNav(ResourcePage.class)
+                .goToTab(FileManagePage.class)
+                .delete("fat.jar")
+                .uploadFile(filePath + "/normal2.jar");
+
+        WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(browser);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='normal2.jar']")));
+
+        file.uploadFile(filePath + "/normal1.jar");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='normal1.jar']")));
+
+        ProjectPage projectPage = new NavBarPage(browser)
+                .goToNav(ProjectPage.class);
+
+        wait.until(ExpectedConditions.visibilityOfAllElements(projectPage.projectList()));
+
+        WorkflowDefinitionTab workflowDefinitionPage = projectPage
+                .goTo(project)
+                .goToTab(WorkflowDefinitionTab.class);
+
+        workflowDefinitionPage.createWorkflow()
+                .<JavaTaskForm>addTask(WorkflowForm.TaskType.JAVA)
+                .selectRunType("NORMAL_JAR")
+                .selectMainPackage("normal1.jar")
+                .selectResource("normal1.jar")
+                .selectResource("normal1.jar")
+                .selectResource("normal2.jar")
+                .name("test-2")
+                .selectEnv(environmentName)
+                .submit()
+                .submit()
+                .name(workflow2)
+                .submit();
+
+        Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+                .as("Workflow list should contain newly-created workflow")
+                .anyMatch(it -> it.getText().contains(workflow2)));
+
+        workflowDefinitionPage.publish(workflow2);
+    }
+
+    @Test
+    @Order(90)
+    void testRunNormalJarWorkflow() {
+        final ProjectDetailPage projectPage =
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(project);
+
+        projectPage
+                .goToTab(WorkflowInstanceTab.class)
+                .deleteAll();
+        projectPage
+                .goToTab(WorkflowDefinitionTab.class)
+                .run(workflow2)
+                .submit();
+
+        Awaitility.await()
+                .atMost(Duration.ofMinutes(2))
+                .untilAsserted(() -> {
+                    browser.navigate().refresh();
+
+                    final WorkflowInstanceTab.Row row = projectPage
+                            .goToTab(WorkflowInstanceTab.class)
+                            .instances()
+                            .iterator()
+                            .next();
+
+                    assertThat(row.isSuccess()).isTrue();
+                    assertThat(row.executionTime()).isEqualTo(1);
+                });
+
+    }
 }

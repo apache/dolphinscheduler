@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package common;
+
 
 public class Fat {
 

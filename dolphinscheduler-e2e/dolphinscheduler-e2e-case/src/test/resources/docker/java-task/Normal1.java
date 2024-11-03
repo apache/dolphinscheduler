@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-package common;
 
 public class Normal1 {
 
