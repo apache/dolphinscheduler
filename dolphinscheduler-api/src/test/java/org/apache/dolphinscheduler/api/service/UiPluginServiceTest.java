@@ -91,7 +91,9 @@ public class UiPluginServiceTest {
         String pluginParams = data.getPluginParams();
         ArrayNode arrayNode = JSONUtils.parseArray(pluginParams);
         String placeholder = arrayNode.path(0).path("props").path("placeholder").asText();
-        Assertions.assertEquals(2, JSONUtils.toMap(placeholder).size());
+        Map<String, String> placeholderMap = JSONUtils.toMap(placeholder);
+        Assertions.assertEquals("请输入收件人", placeholderMap.get("zhMsg"));
+        Assertions.assertEquals("pleaseinputreceivers", placeholderMap.get("enMsg"));
     }
 
 }
