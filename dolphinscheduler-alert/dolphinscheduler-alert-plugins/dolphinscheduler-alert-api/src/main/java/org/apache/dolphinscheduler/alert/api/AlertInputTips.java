@@ -77,7 +77,7 @@ public enum AlertInputTips {
     }
 
     public static Map<String, String> getAllMsg(AlertInputTips alertInputTips) {
-        HashMap<String, String> allMsgMap = new HashMap<>(16);
+        Map<String, String> allMsgMap = new HashMap<>();
         allMsgMap.put("zhMsg", alertInputTips.zhMsg);
         allMsgMap.put("enMsg", alertInputTips.enMsg);
         return allMsgMap;
