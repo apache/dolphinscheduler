@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -154,26 +155,21 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     protected List<String> buildOptions() throws Exception {
         List<String> args = new ArrayList<>();
+        args.add(CONFIG_OPTIONS);
+        String scriptContent;
         if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
-            args.add(CONFIG_OPTIONS);
-            args.add(buildCustomConfigCommand());
+            scriptContent = buildCustomConfigContent();
         } else {
-            seatunnelParameters.getResourceList().forEach(resourceInfo -> {
-                args.add(CONFIG_OPTIONS);
-                // TODO: Need further check for refactored resource center
-                // TODO Currently resourceName is `/xxx.sh`, it has more `/` and needs to be optimized
-                args.add(resourceInfo.getResourceName().replaceFirst(".*:", ""));
-            });
+            String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            scriptContent = FileUtils.readFileToString(
+                    new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
+                    StandardCharsets.UTF_8);
         }
-        return args;
-    }
-
-    protected String buildCustomConfigCommand() throws Exception {
-        String config = buildCustomConfigContent();
         String filePath = buildConfigFilePath();
-        createConfigFileIfNotExists(config, filePath);
-
-        return filePath;
+        createConfigFileIfNotExists(scriptContent, filePath);
+        args.add(filePath);
+        return args;
     }
 
     private String buildCustomConfigContent() {
