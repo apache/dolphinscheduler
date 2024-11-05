@@ -40,5 +40,5 @@ export default {
   ready_block: '准备阻断',
   block: '阻断',
   wait_to_run: '等待执行',
-  failover: '故障转移'
+  failover: '恢复容错'
 }
