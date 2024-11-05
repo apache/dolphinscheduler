@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -54,7 +55,7 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
         InputParam receivesParam = InputParam
                 .newBuilder(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS,
                         MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS)
-                .setPlaceholder(AlertInputTips.RECEIVERS.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.RECEIVERS)))
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -93,12 +94,12 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                         .build();
 
         InputParam mailUser = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_USER, MailParamsConstants.MAIL_USER)
-                .setPlaceholder(AlertInputTips.USERNAME.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.USERNAME)))
                 .build();
 
         InputParam mailPassword =
                 InputParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
-                        .setPlaceholder(AlertInputTips.PASSWORD.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.PASSWORD)))
                         .setType("password")
                         .build();
 
