@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -186,7 +187,9 @@ public class SeatunnelTask extends AbstractRemoteTask {
         List<Property> localParams = this.seatunnelParameters.getLocalParams();
         if (localParams != null && !localParams.isEmpty()) {
             for (Property property : localParams) {
-                variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+                if (property.getDirect().equals(Direct.IN)) {
+                    variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+                }
             }
         }
         List<String> parameters = new ArrayList<>();
