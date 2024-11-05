@@ -80,7 +80,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
             // If dispatch failed, will put the task back to the queue
             // The task will be dispatched after waiting time.
             // the waiting time will increase multiple of times, but will not exceed 60 seconds
-            long waitingTimeMills = Math.max(
+            long waitingTimeMills = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
             globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
                     waitingTimeMills);
