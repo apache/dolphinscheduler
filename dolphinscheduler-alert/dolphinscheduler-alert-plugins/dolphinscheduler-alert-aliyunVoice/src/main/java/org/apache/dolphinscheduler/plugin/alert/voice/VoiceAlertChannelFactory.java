@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.voice;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -42,7 +43,7 @@ public final class VoiceAlertChannelFactory implements AlertChannelFactory {
 
         InputParam calledNumber =
                 InputParam.newBuilder(VoiceAlertConstants.NAME_CALLED_NUMBER, VoiceAlertConstants.CALLED_NUMBER)
-                        .setPlaceholder(AlertInputTips.CALLED_NUMBER.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.CALLED_NUMBER)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
@@ -50,21 +51,21 @@ public final class VoiceAlertChannelFactory implements AlertChannelFactory {
 
         InputParam calledShowNumber = InputParam
                 .newBuilder(VoiceAlertConstants.NAME_CALLED_SHOW_NUMBER, VoiceAlertConstants.CALLED_SHOW_NUMBER)
-                .setPlaceholder(AlertInputTips.CALLED_SHOW_NUMBER.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.CALLED_SHOW_NUMBER)))
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
                 .build();
 
         InputParam ttsCode = InputParam.newBuilder(VoiceAlertConstants.NAME_TTS_CODE, VoiceAlertConstants.TTS_CODE)
-                .setPlaceholder(AlertInputTips.TTS_CODE.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.TTS_CODE)))
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
                 .build();
 
         InputParam address = InputParam.newBuilder(VoiceAlertConstants.NAME_ADDRESS, VoiceAlertConstants.ADDRESS)
-                .setPlaceholder(AlertInputTips.ALIYUN_VIICE_ADDRESS.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.ALIYUN_VIICE_ADDRESS)))
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
@@ -72,14 +73,16 @@ public final class VoiceAlertChannelFactory implements AlertChannelFactory {
 
         InputParam accessKeyId =
                 InputParam.newBuilder(VoiceAlertConstants.NAME_ACCESS_KEY_ID, VoiceAlertConstants.ACCESS_KEY_ID)
-                        .setPlaceholder(AlertInputTips.ALIYUN_VIICE_ACCESSKEYID.getMsg())
+                        .setPlaceholder(JSONUtils
+                                .toJsonString(AlertInputTips.getAllMsg(AlertInputTips.ALIYUN_VIICE_ACCESSKEYID)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false)
                                 .build())
                         .build();
         InputParam accessKeySecret =
                 InputParam.newBuilder(VoiceAlertConstants.NAME_ACCESS_KEY_SECRET, VoiceAlertConstants.ACCESS_KEY_SECRET)
-                        .setPlaceholder(AlertInputTips.ALIYUN_VIICE_ACCESSKEY_SECRET.getMsg())
+                        .setPlaceholder(JSONUtils
+                                .toJsonString(AlertInputTips.getAllMsg(AlertInputTips.ALIYUN_VIICE_ACCESSKEY_SECRET)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false)
                                 .build())

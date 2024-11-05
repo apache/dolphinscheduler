@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.UiPluginServiceImpl;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
@@ -34,6 +35,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * ui plugin service test
@@ -51,7 +54,8 @@ public class UiPluginServiceTest {
 
     @BeforeEach
     public void before() {
-        String pluginParams = "[{\"field\":\"receivers\",\"props\":null,\"type\"}]";
+        String pluginParams =
+                "[{\"field\":\"receivers\",\"props\":{\"placeholder\":\"{\\\"zhMsg\\\": \\\"请输入收件人\\\",\\\"enMsg\\\": \\\"pleaseinputreceivers\\\"}\"},\"type\":\"input\"}]";
         pluginDefine = new PluginDefine("email-alert", "alert", pluginParams);
     }
 
@@ -82,6 +86,14 @@ public class UiPluginServiceTest {
         Mockito.when(pluginDefineMapper.queryDetailById(1)).thenReturn(pluginDefine);
         result = uiPluginService.queryUiPluginDetailById(1);
         Assertions.assertEquals(Status.SUCCESS, result.get("status"));
+
+        PluginDefine data = (PluginDefine) result.get("data");
+        String pluginParams = data.getPluginParams();
+        ArrayNode arrayNode = JSONUtils.parseArray(pluginParams);
+        String placeholder = arrayNode.path(0).path("props").path("placeholder").asText();
+        Map<String, String> placeholderMap = JSONUtils.toMap(placeholder);
+        Assertions.assertEquals("请输入收件人", placeholderMap.get("zhMsg"));
+        Assertions.assertEquals("pleaseinputreceivers", placeholderMap.get("enMsg"));
     }
 
 }
