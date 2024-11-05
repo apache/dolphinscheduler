@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -45,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -169,7 +171,33 @@ public class SeatunnelTask extends AbstractRemoteTask {
         String filePath = buildConfigFilePath();
         createConfigFileIfNotExists(scriptContent, filePath);
         args.add(filePath);
+        args.addAll(generateTaskParameters());
         return args;
+    }
+
+    private List<String> generateTaskParameters() {
+        Map<String, String> variables = new HashMap<>();
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
+        if (propertyList != null && !propertyList.isEmpty()) {
+            for (Property property : propertyList) {
+                variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+            }
+        }
+        List<Property> localParams = this.seatunnelParameters.getLocalParams();
+        if (localParams != null && !localParams.isEmpty()) {
+            for (Property property : localParams) {
+                if (property.getDirect().equals(Direct.IN)) {
+                    variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+                }
+            }
+        }
+        List<String> parameters = new ArrayList<>();
+        variables.forEach((k, v) -> {
+            parameters.add("-i");
+            parameters.add(String.format("%s='%s'", k, v));
+        });
+        return parameters;
     }
 
     private String buildCustomConfigContent() {

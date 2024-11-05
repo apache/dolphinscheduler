@@ -19,12 +19,17 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import org.apache.commons.io.FileUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -96,6 +101,35 @@ public class SeatunnelTaskTest {
         seatunnelTask.setSeatunnelParameters(seatunnelParameters);
         String command = String.join(" ", seatunnelTask.buildOptions());
         String expectedCommand = String.format("--config %s/seatunnel_%s.conf", EXECUTE_PATH, taskId);
+        Assertions.assertEquals(expectedCommand, command);
+    }
+
+    @Test
+    public void testParameterPass() throws Exception {
+        String taskId = "3456";
+        SeatunnelParameters seatunnelParameters = new SeatunnelParameters();
+        seatunnelParameters.setUseCustom(false);
+        ResourceInfo resourceInfo = new ResourceInfo();
+        resourceInfo.setResourceName(RESOURCE_SCRIPT_PATH);
+        List<Property> localParam = new ArrayList<>();
+        Property property = new Property("key1", Direct.IN, DataType.VARCHAR, "value1");
+        localParam.add(property);
+        seatunnelParameters.setLocalParams(localParam);
+        seatunnelParameters.setResourceList(Collections.singletonList(resourceInfo));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setExecutePath(EXECUTE_PATH);
+        taskExecutionContext.setTaskAppId(taskId);
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(seatunnelParameters));
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(new ResourceContext.ResourceItem(RESOURCE_SCRIPT_PATH, RESOURCE_SCRIPT_PATH));
+        taskExecutionContext.setResourceContext(resourceContext);
+        taskExecutionContext.setPrepareParamsMap(Collections.singletonMap("key1", property));
+
+        SeatunnelTask seatunnelTask = new SeatunnelTask(taskExecutionContext);
+        seatunnelTask.setSeatunnelParameters(seatunnelParameters);
+        String command = String.join(" ", seatunnelTask.buildOptions());
+        String expectedCommand = String.format("--config %s/seatunnel_%s.conf -i key1='value1'", EXECUTE_PATH, taskId);
         Assertions.assertEquals(expectedCommand, command);
     }
 
