@@ -21,7 +21,7 @@
 const isJson = (str: string) => {
   try {
     const obj = JSON.parse(str)
-    return !!(typeof obj === 'object' && obj && !Array.isArray(obj));
+    return !!(typeof obj === 'object' && obj && !Array.isArray(obj))
   } catch (e) {
     return false
   }
