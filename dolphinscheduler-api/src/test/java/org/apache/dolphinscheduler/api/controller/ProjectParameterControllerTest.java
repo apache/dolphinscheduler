@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectParameterServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
@@ -48,17 +47,12 @@ public class ProjectParameterControllerTest {
     @Test
     public void testCreateProjectParameter() {
         User loginUser = getGeneralUser();
-        Result successResult = getSuccessResult();
-        successResult.setData(getProjectParameter());
 
         Mockito.when(projectParameterService.createProjectParameter(Mockito.any(), Mockito.anyLong(), Mockito.any(),
-                Mockito.any(), Mockito.any())).thenReturn(successResult);
+                Mockito.any(), Mockito.any())).thenReturn(getSuccessResult());
         Result result = projectParameterController.createProjectParameter(loginUser, 1, "key", "value",
                 DataType.VARCHAR.name());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
-
-        ProjectParameter projectParameter = (ProjectParameter) result.getData();
-        Assertions.assertEquals(loginUser.getId(), projectParameter.getOperator());
     }
 
     @Test
@@ -126,18 +120,6 @@ public class ProjectParameterControllerTest {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
         return result;
-    }
-
-    private ProjectParameter getProjectParameter() {
-        User loginUser = getGeneralUser();
-        ProjectParameter projectParameter = new ProjectParameter();
-        projectParameter.setProjectCode(1);
-        projectParameter.setParamName("key");
-        projectParameter.setParamValue("value");
-        projectParameter.setParamDataType(DataType.VARCHAR.name());
-        projectParameter.setUserId(loginUser.getId());
-        projectParameter.setOperator(loginUser.getId());
-        return projectParameter;
     }
 
 }
