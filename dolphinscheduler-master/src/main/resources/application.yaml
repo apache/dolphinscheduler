@@ -16,19 +16,19 @@
 #
 spring:
   profiles:
-    active: postgresql
+    active: mysql
   banner:
     charset: UTF-8
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
-    username: root
-    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: dolphinscheduler_user
+    password: StrongPassword123!
     hikari:
-      connection-test-query: select 1
+      connection-test-query: SELECT 1
       pool-name: DolphinScheduler
   quartz:
     job-store-type: jdbc
@@ -49,7 +49,8 @@ spring:
       org.quartz.jobStore.misfireThreshold: 60000
       org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
-      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      # Use StdJDBCDelegate for MySQL
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
   cloud.discovery.client.composite-indicator.enabled: false
 
@@ -149,15 +150,15 @@ metrics:
 # Override by profile
 
 ---
-spring:
-  config:
-    activate:
-      on-profile: mysql
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
-  quartz:
-    properties:
-      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+#spring:
+#  config:
+#    activate:
+#      on-profile: mysql
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+#    username: dolphinscheduler_user
+#    password: StrongPassword123!
+#  quartz:
+#    properties:
+#      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
