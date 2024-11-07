@@ -26,13 +26,16 @@
 - SEATUNNEL_ENGINE
 - 部署方式：指定部署模式，`cluster` `local`
 
-          > 点击 [这里](https://seatunnel.apache.org/docs/2.3.3/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
+  > 点击 [这里](https://seatunnel.apache.org/docs/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
 
 - 自定义配置：支持自定义配置或从资源中心选择配置文件
 
-  > 点击 [这里](https://seatunnel.apache.org/docs/2.3.3/concept/config) 获取更多关于`Apache SeaTunnel config` 文件介绍
+  > 点击 [这里](https://seatunnel.apache.org/docs/concept/config) 获取更多关于`Apache SeaTunnel config` 文件介绍
 
 - 脚本：在任务节点那自定义配置信息，包括四部分：`env` `source` `transform` `sink`
+- 自定义参数/全局参数: 当定义了自定义参数/全局参数时, 会将该参数传递给SeaTunnel任务, 可以在SeaTunnel任务中通过`${}`引用该参数, 从而在任务运行时动态替换参数值.
+
+  > 点击 [这里](https://seatunnel.apache.org/docs/concept/config/#config-variable-substitution) 获取更多关于`Apache SeaTunnel 变量替换` 使用的信息
 
 ## 任务样例
 
