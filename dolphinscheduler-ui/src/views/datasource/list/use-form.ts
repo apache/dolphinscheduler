@@ -269,6 +269,15 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
+
+    state.showRestEndpoint = false
+    state.showNamespace = false
+    state.showKubeConfig = false
+    state.showAccessKeyId = false
+    state.showAccessKeySecret = false
+    state.showRegionId = false
+    state.showEndpoint = false
+
     if (
       type === 'SSH' ||
       type === 'ZEPPELIN' ||
