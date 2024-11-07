@@ -58,7 +58,7 @@ public class ProjectParameterControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         ProjectParameter projectParameter = (ProjectParameter) result.getData();
-        Assertions.assertEquals(1, projectParameter.getOperator());
+        Assertions.assertEquals(loginUser.getId(), projectParameter.getOperator());
     }
 
     @Test
