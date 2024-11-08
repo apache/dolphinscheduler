@@ -114,6 +114,9 @@ public class ProjectParameterServiceTest {
         result = projectParameterService.createProjectParameter(loginUser, projectCode, "key1", "value",
                 DataType.VARCHAR.name());
         assertEquals(Status.SUCCESS.getCode(), result.getCode());
+
+        ProjectParameter projectParameter = (ProjectParameter) result.getData();
+        assertEquals(loginUser.getId(), projectParameter.getOperator());
     }
 
     @Test
