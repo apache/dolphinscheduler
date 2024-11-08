@@ -270,14 +270,6 @@ export function useForm(id?: number) {
       state.showPrincipal = false
     }
 
-    state.showRestEndpoint = false
-    state.showNamespace = false
-    state.showKubeConfig = false
-    state.showAccessKeyId = false
-    state.showAccessKeySecret = false
-    state.showRegionId = false
-    state.showEndpoint = false
-
     if (
       type === 'SSH' ||
       type === 'ZEPPELIN' ||
@@ -296,6 +288,8 @@ export function useForm(id?: number) {
         state.showHost = false
         state.showPort = false
         state.showRestEndpoint = true
+      } else {
+        state.showRestEndpoint = false
       }
       if (
         type === 'SAGEMAKER' ||
@@ -308,18 +302,33 @@ export function useForm(id?: number) {
       if (type === 'K8S') {
         state.showNamespace = true
         state.showKubeConfig = true
+      } else {
+        state.showNamespace = false
+        state.showKubeConfig = false
       }
       if (type === 'ALIYUN_SERVERLESS_SPARK') {
         state.showAccessKeyId = true
         state.showAccessKeySecret = true
         state.showRegionId = true
         state.showEndpoint = true
+      } else {
+        state.showAccessKeyId = false
+        state.showAccessKeySecret = false
+        state.showRegionId = false
+        state.showEndpoint = false
       }
     } else {
       state.showDataBaseName = true
       state.requiredDataBase = true
       state.showJDBCConnectParameters = true
       state.showPublicKey = false
+      state.showRestEndpoint = false
+      state.showNamespace = false
+      state.showKubeConfig = false
+      state.showAccessKeyId = false
+      state.showAccessKeySecret = false
+      state.showRegionId = false
+      state.showEndpoint = false
     }
   }
 
