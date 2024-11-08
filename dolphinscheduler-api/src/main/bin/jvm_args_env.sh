@@ -22,7 +22,7 @@
 -XX:+IgnoreUnrecognizedVMOptions
 -XX:+PrintGCDateStamps
 -XX:+PrintGCDetails
--Xloggc:gc.log
+-Xloggc:gc-%t.log
 
 -XX:-OmitStackTraceInFastThrow
 -XX:+ExitOnOutOfMemoryError
