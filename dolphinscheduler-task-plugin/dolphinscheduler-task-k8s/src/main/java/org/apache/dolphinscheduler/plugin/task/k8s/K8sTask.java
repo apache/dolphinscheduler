@@ -79,6 +79,7 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());
         k8sTaskParameters.setKubeConfig(kubeConfig);
         k8sTaskExecutionContext.setConfigYaml(kubeConfig);
+        k8sTaskExecutionContext.setNamespace(k8sConnectionParam.getNamespace());
         taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
         log.info("Initialize k8s task params:{}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
     }
