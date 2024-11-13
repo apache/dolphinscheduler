@@ -32,5 +32,5 @@ This document records the incompatible updates between each version. You need to
 * Remove the `Pigeon` from the `Task Plugin` ([#16218])(https://github.com/apache/dolphinscheduler/pull/16218)
 * Uniformly name `process` in code as `workflow` ([#16515])(https://github.com/apache/dolphinscheduler/pull/16515)
 * Deprecated upgrade code of 1.x and 2.x ([#16543])(https://github.com/apache/dolphinscheduler/pull/16543)
-* Remove the `Data Quality` module ([#])()
+* Remove the `Data Quality` module ([#16794])(https://github.com/apache/dolphinscheduler/pull/16794)
 

@@ -30,5 +30,5 @@
 * 从 `任务插件` 中移除了 `Pigeon` 类型 ([#16218])(https://github.com/apache/dolphinscheduler/pull/16218)
 * 统一代码中的 `process` 为 `workflow` ([#16515])(https://github.com/apache/dolphinscheduler/pull/16515)
 * 在 3.3.0-release 中废弃了从 1.x 至 2.x 的升级代码  ([#16543])(https://github.com/apache/dolphinscheduler/pull/16543)
-* 在 3.3.0-release 中移除了 `数据质量` 模块  ([#])()
+* 在 3.3.0-release 中移除了 `数据质量` 模块  ([#16794])(https://github.com/apache/dolphinscheduler/pull/16794)
 
