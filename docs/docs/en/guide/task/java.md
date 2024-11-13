@@ -1,6 +1,6 @@
 # Overview
 
-This node is used to execute Java tasks and supports using both fat and normal JAR packages as program entry points.
+This node is used to execute tasks of the `Java` type and supports running `jar` packages of the `FAT_JAR` and `NORMAL_JAR` types.
 
 # Create Tasks
 
@@ -41,16 +41,17 @@ As shown in the figure.
 
 ![java_task](../../../../img/tasks/demo/java_fat.png)
 
-Since a fat-type JAR includes both dependencies and code within the same JAR, you only need to select this one JAR.
+`FAT_JAR` is also known as `uber-jar`, where the dependencies and code are contained within the same `jar`. You only need to select this one `jar`.
 
 - NORMAL_JAR
 
 ![java_task](../../../../img/tasks/demo/java_normal.png)
 
-normal1.jar serves as the entry point for the program, while normal2.jar is a required dependency. You need to specify the program's entry point using the main program package and select all dependency and entry JAR files in the resource files to ensure correct execution.normal1.jar serves as the entry point for the program, while normal2.jar is a required dependency. You need to specify the program's entry point using the main program package and select all dependency and entry JAR files in the resource files to ensure correct execution.
+`normal1.jar` is the entry point of the program, and `normal2.jar` contains the required dependencies. The entry point of the program must be specified in the main program package, and all the dependencies along with the program entry `jar` files should be selected in the resource file to ensure correct execution.
 
 ## Note
 
-When using these two execution modes, you must select both the main program package and the corresponding resource files; otherwise, the task will fail immediately. This is because the main program package determines where the program starts running, and after selecting the resource files, they will be included when the program is executed.
+1. When using the `FAT_JAR` run type, you must select the main program package along with the corresponding resource file, otherwise, the task will fail immediately.
+2. When using the `NORMAL_JAR` run type, you must select the main program package and the corresponding resource file, otherwise, the task will fail immediately. The main program package determines where the program starts, and after selecting the resource file, it will be called using the `-cp` option when running the program.
+3. For security reasons, when executing JAVA tasks, please use the environment management module to configure the JDK environment, such as `JAVA_HOME` and other environment variables.
 
-For security reasons, when executing JAVA tasks, please use the environment management module to configure the JDK environment, such as `JAVA_HOME` and other environment variables.
