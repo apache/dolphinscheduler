@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 @Getter
 public enum AuthorizationType {

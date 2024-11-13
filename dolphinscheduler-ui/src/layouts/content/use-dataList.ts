@@ -43,9 +43,6 @@ import {
   KeyOutlined,
   SafetyOutlined,
   GroupOutlined,
-  ContainerOutlined,
-  ApartmentOutlined,
-  BarsOutlined,
   CloudServerOutlined,
   ClusterOutlined
 } from '@vicons/antd'

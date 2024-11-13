@@ -35,13 +35,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * common utils

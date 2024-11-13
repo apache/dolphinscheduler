@@ -535,7 +535,6 @@ public final class Constants {
     public static final int DRY_RUN_FLAG_NO = 0;
     public static final int DRY_RUN_FLAG_YES = 1;
 
-
     /**
      * use for k8s
      */
