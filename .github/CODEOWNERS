@@ -26,7 +26,6 @@
 /dolphinscheduler-common/ @SbloodyS
 /dolphinscheduler-dao/  @SbloodyS @ruanwenjun
 /dolphinscheduler-dao-plugin/ @SbloodyS @ruanwenjun
-/dolphinscheduler-data-quality/ @SbloodyS
 /dolphinscheduler-datasource-plugin/ @SbloodyS
 /dolphinscheduler-dist/ @SbloodyS
 /dolphinscheduler-e2e/ @SbloodyS

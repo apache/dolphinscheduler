@@ -56,7 +56,6 @@ export default {
   task_group_manage: 'Task Group Manage',
   task_group_option: 'Task Group Option',
   task_group_queue: 'Task Group Queue',
-  data_quality: 'Data Quality',
   task_result: 'Task Result',
   rule: 'Rule management',
   ui_setting: 'UI Setting'

@@ -25,10 +25,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -117,14 +113,6 @@ public interface ProcessService {
 
     List<TaskNode> transformTask(List<WorkflowTaskRelation> taskRelationList,
                                  List<TaskDefinitionLog> taskDefinitionLogs);
-
-    DqRule getDqRule(int ruleId);
-
-    List<DqRuleInputEntry> getRuleInputEntry(int ruleId);
-
-    List<DqRuleExecuteSql> getDqExecuteSql(int ruleId);
-
-    DqComparisonType getComparisonTypeById(int id);
 
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
                                             String taskName,

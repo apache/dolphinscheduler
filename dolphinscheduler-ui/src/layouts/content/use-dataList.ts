@@ -194,24 +194,6 @@ export function useDataList() {
       },
       {
         label: () =>
-          h(NEllipsis, null, { default: () => t('menu.data_quality') }),
-        key: 'data-quality',
-        icon: renderIcon(ContainerOutlined),
-        children: [
-          {
-            label: t('menu.task_result'),
-            key: '/data-quality/task-result',
-            icon: renderIcon(ApartmentOutlined)
-          },
-          {
-            label: t('menu.rule'),
-            key: '/data-quality/rule',
-            icon: renderIcon(BarsOutlined)
-          }
-        ]
-      },
-      {
-        label: () =>
           h(NEllipsis, null, { default: () => t('menu.datasource') }),
         key: 'datasource',
         icon: renderIcon(DatabaseOutlined),

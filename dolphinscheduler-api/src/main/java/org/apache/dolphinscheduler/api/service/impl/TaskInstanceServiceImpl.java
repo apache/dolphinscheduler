@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
@@ -99,9 +98,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
-    private DqExecuteResultDao dqExecuteResultDao;
 
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
@@ -375,7 +371,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             }
         }
 
-        dqExecuteResultDao.deleteByWorkflowInstanceId(workflowInstanceId);
         taskGroupQueueService.deleteByWorkflowInstanceId(workflowInstanceId);
         taskInstanceDao.deleteByWorkflowInstanceId(workflowInstanceId);
     }
