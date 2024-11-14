@@ -235,10 +235,12 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
             if (!fs.exists(path)) {
                 continue;
             }
-            RemoteIterator<LocatedFileStatus> remoteIterator = fs.listFiles(path, true);
-            while (remoteIterator.hasNext()) {
-                LocatedFileStatus locatedFileStatus = remoteIterator.next();
-                result.add(transformFileStatusToResourceMetadata(locatedFileStatus));
+            FileStatus[] fileStatuses = fs.listStatus(path);
+            for (FileStatus fileStatus : fileStatuses) {
+                if (fileStatus.isDirectory()) {
+                    foldersToFetch.addLast(fileStatus.getPath().toString());
+                }
+                result.add(transformFileStatusToResourceMetadata(fileStatus));
             }
         }
         return result;
