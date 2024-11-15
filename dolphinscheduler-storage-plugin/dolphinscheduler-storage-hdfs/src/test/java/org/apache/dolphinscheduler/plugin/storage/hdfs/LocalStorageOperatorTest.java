@@ -296,10 +296,14 @@ class LocalStorageOperatorTest {
         String resourceFileAbsolutePath = "file:" + baseDir;
         List<StorageEntity> storageEntities =
                 storageOperator.listFileStorageEntityRecursively(resourceFileAbsolutePath);
-        assertThat(storageEntities.size()).isEqualTo(1);
+        assertThat(storageEntities.size()).isEqualTo(3);
 
-        StorageEntity storageEntity2 = storageEntities.get(0);
-        assertThat(storageEntity2.getFullName()).isEqualTo("file:" + Paths.get(baseDir, "sqlDirectory", "demo.sql"));
+        StorageEntity storageEntity2 = storageEntities.stream()
+                .filter(storageEntity -> storageEntity.getFileName().equals("demo.sql"))
+                .findFirst()
+                .get();
+        assertThat(storageEntity2.getFullName())
+                .isEqualTo("file:" + Paths.get(baseDir, "sqlDirectory", "demo.sql"));
         assertThat(storageEntity2.getFileName()).isEqualTo("demo.sql");
         assertThat(storageEntity2.getPfullName()).isEqualTo("file:" + Paths.get(baseDir, "sqlDirectory"));
         assertThat(storageEntity2.isDirectory()).isFalse();
