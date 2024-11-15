@@ -32,7 +32,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.SneakyThrows;
 
@@ -299,18 +298,16 @@ class LocalStorageOperatorTest {
                 storageOperator.listFileStorageEntityRecursively(resourceFileAbsolutePath);
         assertThat(storageEntities.size()).isEqualTo(3);
 
-        AtomicReference<StorageEntity> storageEntity2 = new AtomicReference<>();
-
-        storageEntities.stream()
+        StorageEntity storageEntity2 = storageEntities.stream()
                 .filter(storageEntity -> storageEntity.getFileName().equals("demo.sql"))
                 .findFirst()
-                .ifPresent(storageEntity2::set);;
-        assertThat(storageEntity2.get().getFullName())
+                .get();
+        assertThat(storageEntity2.getFullName())
                 .isEqualTo("file:" + Paths.get(baseDir, "sqlDirectory", "demo.sql"));
-        assertThat(storageEntity2.get().getFileName()).isEqualTo("demo.sql");
-        assertThat(storageEntity2.get().getPfullName()).isEqualTo("file:" + Paths.get(baseDir, "sqlDirectory"));
-        assertThat(storageEntity2.get().isDirectory()).isFalse();
-        assertThat(storageEntity2.get().getType()).isEqualTo(ResourceType.FILE);
+        assertThat(storageEntity2.getFileName()).isEqualTo("demo.sql");
+        assertThat(storageEntity2.getPfullName()).isEqualTo("file:" + Paths.get(baseDir, "sqlDirectory"));
+        assertThat(storageEntity2.isDirectory()).isFalse();
+        assertThat(storageEntity2.getType()).isEqualTo(ResourceType.FILE);
     }
 
     @SneakyThrows
