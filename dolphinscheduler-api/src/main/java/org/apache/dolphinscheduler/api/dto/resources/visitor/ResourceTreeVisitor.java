@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.dto.resources.Directory;
 import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
@@ -31,7 +30,6 @@ import java.util.Objects;
 /**
  * resource tree visitor
  */
-@Slf4j
 public class ResourceTreeVisitor implements Visitor {
 
     /**
