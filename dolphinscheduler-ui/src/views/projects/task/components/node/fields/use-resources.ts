@@ -23,7 +23,7 @@ import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
 import { NButton, NIcon, NTag } from 'naive-ui'
 import { CopyOutlined } from '@vicons/antd'
-import useClipboard from 'vue-clipboard3'
+import { useClipboard } from '@vueuse/core'
 
 export function useResources(
   span: number | Ref<number> = 24,
@@ -45,7 +45,8 @@ export function useResources(
 
   const taskStore = useTaskNodeStore()
 
-  const { toClipboard } = useClipboard()
+  const source = ref('Hello')
+  const { copy, isSupported } = useClipboard({ source })
 
   const getResources = async () => {
     if (taskStore.resources.length) {
@@ -122,13 +123,11 @@ export function useResources(
   }
 
   const copyResourceName = async (name: string) => {
-    try {
+    if (isSupported.value) {
       event?.stopPropagation()
-      // eslint-disable-next-line no-console
-      console.log('copyResourceName:', name)
-      await toClipboard(name)
+      await copy(name)
       window.$message.success(t('project.node.copy_success'))
-    } catch (e) {
+    } else {
       window.$message.error(t('project.node.copy_failed'))
     }
   }

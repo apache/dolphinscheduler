@@ -46,6 +46,7 @@ specifiers:
   vue-i18n: ^9.2.2
   vue-router: ^4.1.5
   vue-tsc: ^0.40.13
+  vue3-clipboard: ^1.0.0
 
 dependencies:
   '@antv/layout': 0.1.31
@@ -70,6 +71,7 @@ dependencies:
   vue-clipboard3: registry.npmmirror.com/vue-clipboard3/2.0.0
   vue-i18n: 9.2.2_vue@3.3.4
   vue-router: 4.2.2_vue@3.3.4
+  vue3-clipboard: registry.npmmirror.com/vue3-clipboard/1.0.0_vue@3.3.4
 
 devDependencies:
   '@types/js-cookie': 3.0.3
@@ -3755,4 +3757,16 @@ packages:
     version: 2.0.0
     dependencies:
       clipboard: registry.npmmirror.com/clipboard/2.0.11
+    dev: false
+
+  registry.npmmirror.com/vue3-clipboard/1.0.0_vue@3.3.4:
+    resolution: {integrity: sha512-GUqKh1oO79xDpq0z+cCv/NDVTpcJGNDzeNgT3PmTdTp/WJh3gcTrDqIYKycKhzMFOtIFJ7hO/+usgyWtT+fNhA==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vue3-clipboard/-/vue3-clipboard-1.0.0.tgz}
+    id: registry.npmmirror.com/vue3-clipboard/1.0.0
+    name: vue3-clipboard
+    version: 1.0.0
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      clipboard: registry.npmmirror.com/clipboard/2.0.11
+      vue: 3.3.4
     dev: false
