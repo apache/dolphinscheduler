@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, Ref, isRef } from 'vue'
+import { ref, onMounted, Ref, isRef, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
+import { NButton, NIcon, NTag } from 'naive-ui'
+import { CopyOutlined } from '@vicons/antd'
+import useClipboard from 'vue-clipboard3'
 
 export function useResources(
   span: number | Ref<number> = 24,
@@ -41,6 +44,8 @@ export function useResources(
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
+
+  const { toClipboard } = useClipboard()
 
   const getResources = async () => {
     if (taskStore.resources.length) {
@@ -116,6 +121,18 @@ export function useResources(
     }
   }
 
+  const copyResourceName = async (name: string) => {
+    try {
+      event?.stopPropagation()
+      // eslint-disable-next-line no-console
+      console.log('copyResourceName:', name)
+      await toClipboard(name)
+      window.$message.success(t('project.node.copy_success'))
+    } catch (e) {
+      window.$message.error(t('project.node.copy_failed'))
+    }
+  }
+
   onMounted(() => {
     getResources()
   })
@@ -139,7 +156,44 @@ export function useResources(
       keyField: 'fullName',
       labelField: 'name',
       disabledField: 'disable',
-      loading: resourcesLoading
+      loading: resourcesLoading,
+      'render-tag': ({
+        option,
+        handleClose
+      }: {
+        option: any
+        handleClose: any
+      }) => {
+        return h(
+          NTag,
+          {
+            type: 'success',
+            closable: true,
+            onClose: () => {
+              handleClose()
+            }
+          },
+          {
+            default: () => option.name,
+            avatar: () =>
+              h(
+                NButton,
+                {
+                  tag: 'div',
+                  type: 'info',
+                  size: 'tiny',
+                  onClick: () => copyResourceName(option.name)
+                },
+                {
+                  icon: () =>
+                    h(NIcon, null, {
+                      default: () => h(CopyOutlined)
+                    })
+                }
+              )
+          }
+        )
+      }
     },
     validate: {
       trigger: ['blur'],
