@@ -59,18 +59,18 @@ const ListCommandTable = defineComponent({
           ...COLUMN_WIDTH_CONFIG['index']
         },
         {
-          title: 'Command Type',
+          title: t('monitor.statistics.command_type'),
           key: 'commandType',
-          ...COLUMN_WIDTH_CONFIG['userName']
+          ...COLUMN_WIDTH_CONFIG['name']
         },
         {
-          title: 'Command Param',
+          title: t('monitor.statistics.command_param'),
           key: 'commandParam',
           ...COLUMN_WIDTH_CONFIG['linkName']
         },
 
         {
-          title: 'Task Info',
+          title: t('monitor.statistics.task_info'),
           key: 'id',
           width: 300,
           render: (row: any) => {
@@ -87,7 +87,7 @@ const ListCommandTable = defineComponent({
         },
 
         {
-          title: 'Task Params',
+          title: t('monitor.statistics.task_params'),
           key: 'id',
           width: 300,
           render: (row: any) => {
@@ -104,7 +104,7 @@ const ListCommandTable = defineComponent({
         },
 
         {
-          title: 'Worker Info',
+          title: t('monitor.statistics.worker_info'),
           key: 'id',
           width: 220,
           render: (row: any) => {
@@ -119,7 +119,7 @@ const ListCommandTable = defineComponent({
         },
 
         {
-          title: 'Warning Info',
+          title: t('monitor.statistics.warning_info'),
           key: 'id',
           width: 200,
           render: (row: any) => {
@@ -131,12 +131,12 @@ const ListCommandTable = defineComponent({
           }
         },
         {
-          title: 'Executor Id',
+          title: t('monitor.statistics.executor_id'),
           key: 'executorId',
           ...COLUMN_WIDTH_CONFIG['type']
         },
         {
-          title: 'Time',
+          title: t('monitor.statistics.time'),
           key: 'startTime',
           width: 280,
           render: (row: any) => {

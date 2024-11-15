@@ -59,8 +59,17 @@ export default {
     db_no_data_result_desc: '目前没有任何DB节点，请先创建DB节点，再访问该页面'
   },
   statistics: {
-    command_number_of_waiting_for_running: '待执行的命令数',
-    failure_command_number: '执行失败的命令数'
+    command_statistics_list: '命令统计列表',
+    failure_command_statistics_list: '失败命令统计列表',
+    command_type: '命令类型',
+    command_param: '命令参数',
+    task_info: '任务信息',
+    task_params: '任务参数',
+    worker_info: 'Worker信息',
+    warning_info: '警告信息',
+    executor_id: '执行用户Id',
+    message: '错误信息',
+    time: '时间'
   },
   audit_log: {
     user_name: '用户名称',
