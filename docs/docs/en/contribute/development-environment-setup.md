@@ -128,7 +128,7 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA and clikc run main function to startup.
 
 > Note: Please check the option `Add dependencies with "provided" scope to classpath` in the startup configuration before starting, so as to avoid the problem that no dependencies can be found during startup.
 
@@ -176,7 +176,7 @@ Following steps will guide how to start the DolphinScheduler backend service
 
 ##### Backend Start Prepare
 
-- Open project: Use IDE open the project, here we use Intellij IDEA as an example, after opening it will take a while for Intellij IDEA to complete the dependent download
+- Open project: Use IDE open the project, here we use IntelliJ IDEA as an example, after opening it will take a while for IntelliJ IDEA to complete the dependent download
 
 - File change
 
@@ -211,15 +211,15 @@ spring:
   </root>
   ```
 
-> **_Note:_** Only DolphinScheduler 2.0 and later versions need to inatall plugin before start server. It not need before version 2.0.
+> **_Note:_** Only DolphinScheduler 2.0 and later versions need to install plugin before start server. It doesn't need it before version 2.0.
 
 ##### Server start
 
 There are three services that need to be started, including MasterServer, WorkerServer, ApiApplicationServer.
 
-- MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by Intellij IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-- WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by Intellij IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-- ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by Intellij IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
+- MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by IntelliJ IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
+- WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by IntelliJ IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
+- ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by IntelliJ IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > The `mysql` in the VM Options `-Dspring.profiles.active=mysql` means specified configuration file
 

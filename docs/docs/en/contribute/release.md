@@ -287,7 +287,7 @@ If there is any problem in gpg signature, `Close` will fail, but you can see the
 
 #### Checkout Dolphinscheduler Release Directory
 
-We need too checkout Dolphinscheduler dev release directory to local, and
+We need to checkout Dolphinscheduler dev release directory to local, and
 
 ```shell
 SVN_DIR_DEV="${SVN_DIR}/dolphinscheduler/dev"
@@ -305,8 +305,8 @@ svn --username="${A_USERNAME}" update "${SVN_DIR_DEV}"
 
 #### Export New GPG Key to KEYS(Optional)
 
-Only if the first time you release with this gpg KEY, including it is you first release, or you change your KEY. You should
-change working directory to another one because this step need checkout and change KEYS in release directory.
+Only if the first time you release with this gpg KEY, including it is your first release, or you change your KEY. You should
+change the working directory to another one because this step needs checkout and change KEYS in the release directory.
 
 ```shell
 # Optional, only if the SVN root path not exists.
