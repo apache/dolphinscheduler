@@ -173,7 +173,7 @@ export function useResources(
             }
           },
           {
-            default: () => option.name,
+            default: () => option.currentDir,
             avatar: () =>
               h(
                 NButton,
@@ -181,7 +181,7 @@ export function useResources(
                   tag: 'div',
                   type: 'info',
                   size: 'tiny',
-                  onClick: () => copyResourceName(option.name)
+                  onClick: () => copyResourceName(option.currentDir)
                 },
                 {
                   icon: () =>

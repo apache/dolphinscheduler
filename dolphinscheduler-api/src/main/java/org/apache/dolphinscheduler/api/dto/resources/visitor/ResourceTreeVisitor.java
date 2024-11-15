@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.dto.resources.Directory;
 import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import java.util.Objects;
 /**
  * resource tree visitor
  */
+@Slf4j
 public class ResourceTreeVisitor implements Visitor {
 
     /**
@@ -123,9 +126,12 @@ public class ResourceTreeVisitor implements Visitor {
             tempResourceComponent = new FileLeaf();
         }
 
+        String currentDir = resource.getFullName().split(Constants.RESOURCE_TYPE_FILE)[1].substring(1);
+
         tempResourceComponent.setName(resource.getFileName());
         tempResourceComponent.setFullName(resource.getFullName());
         tempResourceComponent.setType(resource.getType());
+        tempResourceComponent.setCurrentDir(currentDir);
         return tempResourceComponent;
     }
 
