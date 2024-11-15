@@ -124,7 +124,10 @@ public class ResourceTreeVisitor implements Visitor {
             tempResourceComponent = new FileLeaf();
         }
 
-        String currentDir = resource.getFullName().split(Constants.RESOURCE_TYPE_FILE)[1].substring(1);
+        String currentDir = "";
+        if (resource.getFullName().contains(Constants.RESOURCE_TYPE_FILE)) {
+            currentDir = resource.getFullName().split(Constants.RESOURCE_TYPE_FILE)[1].substring(1);
+        }
 
         tempResourceComponent.setName(resource.getFileName());
         tempResourceComponent.setFullName(resource.getFullName());
