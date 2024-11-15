@@ -18,7 +18,11 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
+import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
+import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
+import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -26,6 +30,7 @@ import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
+import org.apache.dolphinscheduler.registry.api.ha.AbstractServerStatusChangeListener;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -45,6 +50,18 @@ import org.springframework.context.annotation.Import;
 public class AlertServer {
 
     @Autowired
+    private AlertRpcServer alertRpcServer;
+
+    @Autowired
+    private AlertPluginManager alertPluginManager;
+
+    @Autowired
+    private AlertRegistryClient alertRegistryClient;
+
+    @Autowired
+    private AlertHAServer alertHAServer;
+
+    @Autowired
     private AlertBootstrapService alertBootstrapService;
 
     public static void main(String[] args) {
@@ -58,7 +75,25 @@ public class AlertServer {
     public void run() {
         ServerLifeCycleManager.toRunning();
         log.info("AlertServer is staring ...");
-        alertBootstrapService.start();
+        alertPluginManager.start();
+        alertRpcServer.start();
+        alertRegistryClient.start();
+
+        alertHAServer.addServerStatusChangeListener(new AbstractServerStatusChangeListener() {
+
+            @Override
+            public void changeToActive() {
+                alertBootstrapService.start();
+            }
+
+            @Override
+            public void changeToStandBy() {
+                close();
+            }
+        });
+
+        alertHAServer.start();
+
         log.info("AlertServer is started ...");
     }
 
@@ -73,7 +108,12 @@ public class AlertServer {
                 return;
             }
             log.info("AlertServer is stopping, cause: {}", cause);
-            alertBootstrapService.close();
+            try (
+                    final AlertRpcServer ignore = alertRpcServer;
+                    final AlertRegistryClient ignore1 = alertRegistryClient;
+                    final AlertHAServer ignore2 = alertHAServer;
+                    final AlertBootstrapService ignore3 = alertBootstrapService;) {
+            }
             // thread sleep 3 seconds for thread quietly stop
             ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
             log.info("AlertServer stopped, cause: {}", cause);

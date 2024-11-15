@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.registry.api.ha;
 
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,38 +33,41 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final Registry registry;
 
-    private final String serverPath;
+    private final String selectorPath;
+
+    private final String serverIdentify;
 
     private ServerStatus serverStatus;
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
-    public AbstractHAServer(Registry registry, String serverPath) {
+    public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
-        this.serverPath = serverPath;
+        this.selectorPath = checkNotNull(selectorPath);
+        this.serverIdentify = checkNotNull(serverIdentify);
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }
 
     @Override
     public void start() {
-        registry.subscribe(serverPath, event -> {
+        registry.subscribe(selectorPath, event -> {
             if (Event.Type.REMOVE.equals(event.type())) {
-                if (isActive() && !participateElection()) {
+                if (serverIdentify.equals(event.data())) {
                     statusChange(ServerStatus.STAND_BY);
+                } else {
+                    if (participateElection()) {
+                        statusChange(ServerStatus.ACTIVE);
+                    }
                 }
             }
         });
-        ScheduledExecutorService electionSelectionThread =
-                ThreadUtils.newSingleDaemonScheduledExecutorService("election-selection-thread");
-        electionSelectionThread.schedule(() -> {
-            if (isActive()) {
-                return;
-            }
-            if (participateElection()) {
-                statusChange(ServerStatus.ACTIVE);
-            }
-        }, 10, TimeUnit.SECONDS);
+
+        if (participateElection()) {
+            statusChange(ServerStatus.ACTIVE);
+        } else {
+            log.info("Server {} is standby", serverIdentify);
+        }
     }
 
     @Override
@@ -75,7 +77,22 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public boolean participateElection() {
-        return registry.acquireLock(serverPath, 3_000);
+        final String electionLock = selectorPath + "-lock";
+        try {
+            if (registry.acquireLock(electionLock)) {
+                if (!registry.exists(selectorPath)) {
+                    registry.put(selectorPath, serverIdentify, true);
+                    return true;
+                }
+                return serverIdentify.equals(registry.get(selectorPath));
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("participate election error", e);
+            return false;
+        } finally {
+            registry.releaseLock(electionLock);
+        }
     }
 
     @Override
@@ -88,18 +105,15 @@ public abstract class AbstractHAServer implements HAServer {
         return serverStatus;
     }
 
-    @Override
-    public void shutdown() {
-        if (isActive()) {
-            registry.releaseLock(serverPath);
-        }
-    }
-
     private void statusChange(ServerStatus targetStatus) {
+        final ServerStatus originStatus = serverStatus;
+        serverStatus = targetStatus;
         synchronized (this) {
-            ServerStatus originStatus = serverStatus;
-            serverStatus = targetStatus;
-            serverStatusChangeListeners.forEach(listener -> listener.change(originStatus, serverStatus));
+            try {
+                serverStatusChangeListeners.forEach(listener -> listener.change(originStatus, serverStatus));
+            } catch (Exception ex) {
+                log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
+            }
         }
     }
 }
