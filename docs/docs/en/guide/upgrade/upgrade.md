@@ -63,14 +63,6 @@ Execution result:
 - Migrate lineage data to new table `t_ds_workflow_task_lineage`.
 - This script only performs upsert operations, not deletes. You can delete it manually if you need to.
 
-### Drop Data-Quality Related Table
-
-Execute script: `sh ./tools/bin/drop-table.sh`.
-
-Execution result:
-
-- This script only performs `drop table` operations.
-
 ### Upgrade Service
 
 - If you deploy with Pseudo-Cluster deployment, change it according to [Pseudo-Cluster](../installation/pseudo-cluster.md) section "Modify Configuration".

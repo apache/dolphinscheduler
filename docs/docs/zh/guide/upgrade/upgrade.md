@@ -62,14 +62,6 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 - 原血缘数据迁移至新血缘表 `t_ds_workflow_task_lineage`。
 - 此脚本仅执行 upsert 操作，不执行删除操作，如果需要删除，您可以手动删除。
 
-### 删除数据质量相关表
-
-执行脚本：`sh ./tools/bin/drop-table.sh`。
-
-执行结果：
-
-- 此脚本仅执行 `drop table` 操作。
-
 ### 服务升级
 
 #### 修改配置内容

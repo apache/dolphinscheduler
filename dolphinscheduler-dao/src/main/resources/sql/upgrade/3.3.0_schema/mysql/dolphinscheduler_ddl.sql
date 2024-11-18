@@ -202,3 +202,19 @@ delimiter ;
 CALL rename_tables_and_fields_from_process_to_workflow;
 DROP PROCEDURE rename_tables_and_fields_from_process_to_workflow;
 
+-- Drop data quality tables
+DROP PROCEDURE if EXISTS drop_data_quality_tables;
+delimiter d//
+CREATE PROCEDURE drop_data_quality_tables()
+BEGIN
+
+DROP TABLE IF EXISTS t_ds_dq_comparison_type;
+DROP TABLE IF EXISTS t_ds_dq_rule_execute_sql;
+DROP TABLE IF EXISTS t_ds_dq_rule_input_entry;
+DROP TABLE IF EXISTS t_ds_dq_task_statistics_value;
+
+END;
+d//
+delimiter ;
+CALL drop_data_quality_tables;
+DROP PROCEDURE drop_data_quality_tables;
