@@ -331,6 +331,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         storageEntity.setType(resourceMetaData.getResourceType());
         storageEntity.setDirectory(resourceMetaData.isDirectory());
         storageEntity.setSize(ossObject.getObjectMetadata().getContentLength());
+        storageEntity.setRelativePath(resourceMetaData.getResourceRelativePath());
         storageEntity.setCreateTime(ossObject.getObjectMetadata().getLastModified());
         storageEntity.setUpdateTime(ossObject.getObjectMetadata().getLastModified());
         return storageEntity;

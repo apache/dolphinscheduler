@@ -268,7 +268,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
         Path fileStatusPath = fileStatus.getPath();
         String fileAbsolutePath = fileStatusPath.toString();
         ResourceMetadata resourceMetaData = getResourceMetaData(fileAbsolutePath);
-
         return StorageEntity.builder()
                 .fileName(fileStatusPath.getName())
                 .fullName(fileAbsolutePath)
@@ -276,6 +275,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
                 .type(resourceMetaData.getResourceType())
                 .isDirectory(fileStatus.isDirectory())
                 .size(fileStatus.getLen())
+                .relativePath(resourceMetaData.getResourceRelativePath())
                 .createTime(new Date(fileStatus.getModificationTime()))
                 .updateTime(new Date(fileStatus.getModificationTime()))
                 .build();
