@@ -29,11 +29,21 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.Test;
 
-public class JavaTaskTest {
+@Slf4j
+class JavaTaskTest {
 
     /**
      * Construct a java -jar command
@@ -58,7 +68,7 @@ public class JavaTaskTest {
         JavaTask javaTask = runNormalJarType();
         assertThat(javaTask.buildNormalJarCommand())
                 .isEqualTo(
-                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar HelloWorldWithGuava -host 127.0.0.1 -port 8080 -xms:50m");
+                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar Test -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -159,6 +169,7 @@ public class JavaTaskTest {
      * @return JavaTask
      */
     private JavaTask runNormalJarType() {
+        packageTestJar();
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createNormalJarJavaParameters(RUN_TYPE_NORMAL_JAR)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
@@ -181,4 +192,30 @@ public class JavaTaskTest {
         javaTask.init();
         return javaTask;
     }
+
+    /**
+     * Package the class to Jar
+     */
+    private void packageTestJar() {
+        Manifest manifest = new Manifest();
+        Attributes attributes = manifest.getMainAttributes();
+        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        attributes.put(Attributes.Name.MAIN_CLASS, "Test");
+        String jarDirPath = "/tmp/dolphinscheduler/test/executepath/opt/share/jar";
+        File jarDir = new File(jarDirPath);
+        if (!jarDir.exists() && jarDir.mkdirs()) {
+            log.info("Created directory: {}", jarDirPath);
+        } else if (!jarDir.exists()) {
+            throw new RuntimeException("Failed to create directory: " + jarDirPath);
+        }
+        File jarFile = new File(jarDirPath, "main.jar");
+        try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarFile.toPath()), manifest)) {
+            jos.putNextEntry(new JarEntry("META-INF/"));
+            jos.closeEntry();
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while creating the JAR file.", e);
+        }
+        log.info("main.jar created: {}", jarFile.getAbsolutePath());
+    }
+
 }
