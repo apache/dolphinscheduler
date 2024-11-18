@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.alert.service;
 
-import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 
@@ -32,39 +31,21 @@ import org.springframework.stereotype.Service;
 @Service
 public final class AlertBootstrapService implements AutoCloseable {
 
-    private final AlertRpcServer alertRpcServer;
-
-    private final AlertRegistryClient alertRegistryClient;
-
-    private final AlertPluginManager alertPluginManager;
-
-    private final AlertHAServer alertHAServer;
-
     private final AlertEventFetcher alertEventFetcher;
 
     private final AlertEventLoop alertEventLoop;
 
     public AlertBootstrapService(AlertRpcServer alertRpcServer,
                                  AlertRegistryClient alertRegistryClient,
-                                 AlertPluginManager alertPluginManager,
                                  AlertHAServer alertHAServer,
                                  AlertEventFetcher alertEventFetcher,
                                  AlertEventLoop alertEventLoop) {
-        this.alertRpcServer = alertRpcServer;
-        this.alertRegistryClient = alertRegistryClient;
-        this.alertPluginManager = alertPluginManager;
-        this.alertHAServer = alertHAServer;
         this.alertEventFetcher = alertEventFetcher;
         this.alertEventLoop = alertEventLoop;
     }
 
     public void start() {
         log.info("AlertBootstrapService starting...");
-        alertPluginManager.start();
-        alertRpcServer.start();
-        alertRegistryClient.start();
-        alertHAServer.start();
-
         alertEventFetcher.start();
         alertEventLoop.start();
         log.info("AlertBootstrapService started...");
@@ -73,15 +54,8 @@ public final class AlertBootstrapService implements AutoCloseable {
     @Override
     public void close() {
         log.info("AlertBootstrapService stopping...");
-        try (
-                AlertRpcServer closedAlertRpcServer = alertRpcServer;
-                AlertRegistryClient closedAlertRegistryClient = alertRegistryClient) {
-            // close resource
-            alertEventFetcher.shutdown();
-
-            alertEventLoop.shutdown();
-            alertHAServer.shutdown();
-        }
+        alertEventFetcher.shutdown();
+        alertEventLoop.shutdown();
         log.info("AlertBootstrapService stopped...");
     }
 }
