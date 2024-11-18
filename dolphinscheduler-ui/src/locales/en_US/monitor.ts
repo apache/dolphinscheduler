@@ -60,9 +60,17 @@ export default {
       'Currently, there are no DB nodes exist, please create a DB node and refresh this page'
   },
   statistics: {
-    command_number_of_waiting_for_running:
-      'Command Number Of Waiting For Running',
-    failure_command_number: 'Failure Command Number'
+    command_statistics_list: 'Command Statistics List',
+    failure_command_statistics_list: 'Failure Command Statistics List',
+    command_type: 'Command Type',
+    command_param: 'Command Param',
+    task_info: 'Task Info',
+    task_params: 'Task Params',
+    worker_info: 'Worker Info',
+    warning_info: 'Warning Info',
+    executor_id: 'Executor Id',
+    message: 'Message',
+    time: 'Time'
   },
   audit_log: {
     user_name: 'User Name',
