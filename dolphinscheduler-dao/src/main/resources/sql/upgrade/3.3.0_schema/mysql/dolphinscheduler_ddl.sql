@@ -212,6 +212,8 @@ DROP TABLE IF EXISTS t_ds_dq_comparison_type;
 DROP TABLE IF EXISTS t_ds_dq_rule_execute_sql;
 DROP TABLE IF EXISTS t_ds_dq_rule_input_entry;
 DROP TABLE IF EXISTS t_ds_dq_task_statistics_value;
+DROP TABLE IF EXISTS t_ds_dq_execute_result;
+DROP TABLE IF EXISTS t_ds_dq_rule;
 
 END;
 d//
