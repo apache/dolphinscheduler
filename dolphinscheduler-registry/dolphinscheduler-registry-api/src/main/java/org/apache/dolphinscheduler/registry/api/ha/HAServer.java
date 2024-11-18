@@ -21,7 +21,7 @@ package org.apache.dolphinscheduler.registry.api.ha;
  * Interface for HA server, used to select a active server from multiple servers.
  * In HA mode, there are multiple servers, only one server is active, others are standby.
  */
-public interface HAServer {
+public interface HAServer extends AutoCloseable {
 
     /**
      * Start the server.
@@ -57,7 +57,8 @@ public interface HAServer {
     /**
      * Shutdown the server, release resources.
      */
-    void shutdown();
+    @Override
+    void close();
 
     enum ServerStatus {
         ACTIVE,
