@@ -43,8 +43,6 @@ public final class Constants {
     public static final String FORMAT_S_S_COLON = "%s:%s";
     public static final String FOLDER_SEPARATOR = "/";
 
-    public static final String RESOURCE_TYPE_FILE = "resources";
-
     public static final String EMPTY_STRING = "";
 
     /**

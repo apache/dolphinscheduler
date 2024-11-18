@@ -294,6 +294,7 @@ public class S3StorageOperator extends AbstractStorageOperator implements Closea
         entity.setDirectory(resourceMetaData.isDirectory());
         entity.setType(resourceMetaData.getResourceType());
         entity.setSize(object.getObjectMetadata().getContentLength());
+        entity.setRelativePath(resourceMetaData.getResourceRelativePath());
         entity.setCreateTime(object.getObjectMetadata().getLastModified());
         entity.setUpdateTime(object.getObjectMetadata().getLastModified());
         return entity;
