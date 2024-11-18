@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
@@ -86,7 +85,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         String resourceBaseDirectory;
         switch (resourceType) {
             case FILE:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, Constants.RESOURCE_TYPE_FILE);
+                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, StorageOperator.FILE_FOLDER_NAME);
                 break;
             case ALL:
                 resourceBaseDirectory = tenantBaseDirectory;

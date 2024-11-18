@@ -24,6 +24,8 @@ import java.util.List;
 
 public interface StorageOperator {
 
+    String FILE_FOLDER_NAME = "resources";
+
     ResourceMetadata getResourceMetaData(String resourceAbsolutePath);
 
     /**

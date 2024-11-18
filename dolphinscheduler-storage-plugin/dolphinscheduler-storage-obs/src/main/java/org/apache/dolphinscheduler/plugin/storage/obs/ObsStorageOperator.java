@@ -260,6 +260,7 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
                 .type(resourceMetaData.getResourceType())
                 .isDirectory(StringUtils.isEmpty(fileExtension))
                 .size(metadata.getContentLength())
+                .relativePath(resourceMetaData.getResourceRelativePath())
                 .createTime(metadata.getLastModified())
                 .updateTime(metadata.getLastModified())
                 .build();
