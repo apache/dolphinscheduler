@@ -103,10 +103,6 @@ public class WorkflowJavaTaskE2ETest {
 
     private static RemoteWebDriver browser;
 
-    public static void main(String[] args) {
-        createAndBuildJars();
-    }
-
     private static void createJar(String className, String classFilePath, String entryName, String mainPackage,
                                   String jarName) {
 
@@ -130,6 +126,7 @@ public class WorkflowJavaTaskE2ETest {
         }
 
     }
+
     private static void createAndBuildJars() {
         String classPath = Constants.HOST_TMP_PATH + "/";
         compileJavaFile(Arrays.asList("docker/java-task/Fat.java"));

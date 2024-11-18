@@ -36,7 +36,6 @@ public class MainClassExtractor {
             mainClassName = manifest.getMainAttributes().getValue("Main-Class");
 
         } catch (Exception e) {
-            log.error("get mainJarName failed:", e);
             throw new RuntimeException("get mainJarName failed:", e);
         }
         return mainClassName;
