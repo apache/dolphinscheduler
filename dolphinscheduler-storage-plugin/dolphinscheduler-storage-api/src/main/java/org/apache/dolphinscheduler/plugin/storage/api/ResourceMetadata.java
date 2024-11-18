@@ -38,4 +38,5 @@ public class ResourceMetadata {
     private String resourceRelativePath;
     private String resourceParentAbsolutePath;
     private boolean isDirectory;
+
 }
