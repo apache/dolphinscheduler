@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.alert.service;
 
+import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractHAServer;
@@ -29,8 +30,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class AlertHAServer extends AbstractHAServer {
 
-    public AlertHAServer(Registry registry) {
-        super(registry, RegistryNodeType.ALERT_LOCK.getRegistryPath());
+    public AlertHAServer(final Registry registry, final AlertConfig alertConfig) {
+        super(registry, RegistryNodeType.ALERT_HA_LEADER.getRegistryPath(), alertConfig.getAlertServerAddress());
     }
 
+    @Override
+    public void start() {
+        super.start();
+        log.info("AlertHAServer started...");
+    }
+
+    @Override
+    public void close() {
+        log.info("AlertHAServer shutdown...");
+    }
 }
