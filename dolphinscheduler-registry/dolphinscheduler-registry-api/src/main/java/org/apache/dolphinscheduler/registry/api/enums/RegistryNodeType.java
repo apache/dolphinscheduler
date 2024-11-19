@@ -24,6 +24,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RegistryNodeType {
 
+    FAILOVER_FINISH_NODES("FailoverFinishNodes", "/nodes/failover-finish-nodes"),
+
     MASTER("Master", "/nodes/master"),
     MASTER_FAILOVER_LOCK("MasterFailoverLock", "/lock/master-failover"),
     MASTER_TASK_GROUP_COORDINATOR_LOCK("TaskGroupCoordinatorLock", "/lock/master-task-group-coordinator"),

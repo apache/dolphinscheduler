@@ -67,9 +67,6 @@ master:
       memory-usage-weight: 40
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 30
-  registry-disconnect-strategy:
-    # The disconnect strategy: stop, waiting
-    strategy: stop
   worker-group-refresh-interval: 10s
   command-fetch-strategy:
     type: ID_SLOT_BASED

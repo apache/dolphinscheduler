@@ -31,4 +31,5 @@
 * 统一代码中的 `process` 为 `workflow` ([#16515])(https://github.com/apache/dolphinscheduler/pull/16515)
 * 废弃从 1.x 至 2.x 的升级代码  ([#16543])(https://github.com/apache/dolphinscheduler/pull/16543)
 * 移除 `数据质量` 模块  ([#16794])(https://github.com/apache/dolphinscheduler/pull/16794)
+* 在`application.yaml`中移除`registry-disconnect-strategy`配置 ([#16821])(https://github.com/apache/dolphinscheduler/pull/16821)
 

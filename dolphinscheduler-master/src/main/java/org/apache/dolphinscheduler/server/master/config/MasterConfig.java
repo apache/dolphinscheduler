@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
 
@@ -59,8 +58,6 @@ public class MasterConfig implements Validator {
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
 
     private MasterServerLoadProtection serverLoadProtection = new MasterServerLoadProtection();
-
-    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
 
@@ -120,7 +117,6 @@ public class MasterConfig implements Validator {
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  server-load-protection -> " + serverLoadProtection +
-                        "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +
                         "\n  master-address -> " + masterAddress +
                         "\n  master-registry-path: " + masterRegistryPath +
                         "\n  worker-group-refresh-interval: " + workerGroupRefreshInterval +
