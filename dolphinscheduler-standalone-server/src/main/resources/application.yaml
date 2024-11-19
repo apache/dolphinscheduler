@@ -95,8 +95,8 @@ security:
       username: cn=read-only-admin,dc=example,dc=com
       password: password
       user:
-        # admin userId when you use LDAP login
-        admin: read-only-admin
+        # admin username when you use LDAP login
+        admin-username: admin
         identity-attribute: uid
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)

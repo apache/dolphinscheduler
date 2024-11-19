@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Properties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.stereotype.Component;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -33,21 +35,19 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.ldap.filter.EqualsFilter;
-import org.springframework.stereotype.Component;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 @Configuration
 @Slf4j
 public class LdapService {
 
-    @Value("${security.authentication.ldap.user.admin:#{null}}")
-    private String adminUserId;
+    @Value("${security.authentication.ldap.user.admin-username:#{null}}")
+    private String ldapAdminUserName;
+
+    @Value("${security.authentication.ldap.user.admin-user-filter:#{null}}")
+    private String ldapAdminUserFilter;
 
     @Value("${security.authentication.ldap.urls:#{null}}")
     private String ldapUrls;
@@ -85,13 +85,13 @@ public class LdapService {
      * @return user type
      */
     public UserType getUserType(String userId) {
-        return adminUserId.equalsIgnoreCase(userId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
+        return ldapAdminUserName.equalsIgnoreCase(userId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
     }
 
     /**
      * login by userId and return user email
      *
-     * @param userId user identity id
+     * @param userId  user identity id
      * @param userPwd user login password
      * @return user email
      */
@@ -104,28 +104,31 @@ public class LdapService {
             SearchControls sc = new SearchControls();
             sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
-            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
-            if (results.hasMore()) {
-                // get the users DN (distinguishedName) from the result
-                SearchResult result = results.next();
-                NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
-                while (attrs.hasMore()) {
-                    // Open another connection to the LDAP server with the found DN and the password
-                    searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
-                    searchEnv.put(Context.SECURITY_CREDENTIALS, userPwd);
-                    try {
-                        new InitialDirContext(searchEnv);
-                    } catch (Exception e) {
-                        log.warn("invalid ldap credentials or ldap search error", e);
-                        return null;
-                    }
-                    Attribute attr = attrs.next();
-                    if (attr.getID().equals(ldapEmailAttribute)) {
-                        return (String) attr.get();
-                    }
-                }
-            }
+            EqualsFilter userFilter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
+
+            List<String> userSearchResult = ldapSearch(ctx, userId, userPwd, userFilter.toString(), sc, searchEnv);
+            List<String> adminSearchResult = ldapSearch(ctx, userId, userPwd, ldapAdminUserFilter, sc, searchEnv);
+//            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
+//            if (results.hasMore()) {
+//                // get the users DN (distinguishedName) from the result
+//                SearchResult result = results.next();
+//                NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
+//                while (attrs.hasMore()) {
+//                    // Open another connection to the LDAP server with the found DN and the password
+//                    searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
+//                    searchEnv.put(Context.SECURITY_CREDENTIALS, userPwd);
+//                    try {
+//                        new InitialDirContext(searchEnv);
+//                    } catch (Exception e) {
+//                        log.warn("invalid ldap credentials or ldap search error", e);
+//                        return null;
+//                    }
+//                    Attribute attr = attrs.next();
+//                    if (attr.getID().equals(ldapEmailAttribute)) {
+//                        return (String) attr.get();
+//                    }
+//                }
+//            }
         } catch (NamingException e) {
             log.error("ldap search error", e);
             return null;
@@ -162,6 +165,35 @@ public class LdapService {
             }
         }
         return env;
+    }
+
+    private List<String> ldapSearch(LdapContext ctx,
+                                    String userId,
+                                    String userPwd,
+                                    String filter,
+                                    SearchControls sc,
+                                    Properties searchEnv) throws NamingException {
+        NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter, sc);
+        if (results.hasMore()) {
+            // get the users DN (distinguishedName) from the result
+            SearchResult result = results.next();
+            NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
+            while (attrs.hasMore()) {
+                // Open another connection to the LDAP server with the found DN and the password
+                searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
+                searchEnv.put(Context.SECURITY_CREDENTIALS, userPwd);
+                try {
+                    new InitialDirContext(searchEnv);
+                } catch (Exception e) {
+                    log.warn("invalid ldap credentials or ldap search error", e);
+                    return null;
+                }
+                Attribute attr = attrs.next();
+                if (attr.getID().equals(ldapEmailAttribute)) {
+                    return (String) attr.get();
+                }
+            }
+        }
     }
 
     public LdapUserNotExistActionType getLdapUserNotExistAction() {
