@@ -27,8 +27,14 @@ public abstract class AbstractSystemEvent extends AbstractDelayEvent {
         super(delayTime);
     }
 
+    /**
+     * The event happen time.
+     */
     public abstract Date getEventTime();
 
+    /**
+     * The event type.
+     */
     public abstract SystemEventType getEventType();
 
 }

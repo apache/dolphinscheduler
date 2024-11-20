@@ -15,11 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.registry.api;
+package org.apache.dolphinscheduler.registry.api.utils;
 
-public enum StrategyType {
+import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
-    STOP,
-    WAITING,
-    ;
+public class RegistryUtils {
+
+    public static String getFailoverFinishedNodePath(final BaseHeartBeat baseHeartBeat) {
+        return getFailoverFinishedNodePath(baseHeartBeat.getHost() + ":" + baseHeartBeat.getPort(),
+                baseHeartBeat.getStartupTime());
+    }
+
+    public static String getFailoverFinishedNodePath(final String masterAddress, final long masterStartupTime) {
+        return RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + "/" + masterAddress + "-" + masterStartupTime;
+    }
 }

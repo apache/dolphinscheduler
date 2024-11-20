@@ -46,7 +46,6 @@ import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -61,10 +60,6 @@ public class WorkerRegistryClient implements AutoCloseable {
 
     @Autowired
     private RegistryClient registryClient;
-
-    @Autowired
-    @Lazy
-    private WorkerConnectStrategy workerConnectStrategy;
 
     @Autowired
     private MetricsProvider metricsProvider;
@@ -83,8 +78,7 @@ public class WorkerRegistryClient implements AutoCloseable {
     public void start() {
         try {
             registry();
-            registryClient.addConnectionStateListener(
-                    new WorkerConnectionStateListener(workerConfig, workerConnectStrategy));
+            registryClient.addConnectionStateListener(new WorkerConnectionStateListener(registryClient));
         } catch (Exception ex) {
             throw new RegistryException("Worker registry client start up error", ex);
         }

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.server.master.engine.system.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
+
 import java.util.Date;
 
 import lombok.Getter;
@@ -26,20 +28,23 @@ import lombok.Getter;
 @Getter
 public class MasterFailoverEvent extends AbstractSystemEvent {
 
-    private final String masterAddress;
+    private final MasterServerMetadata masterServerMetadata;
     private final Date eventTime;
 
-    private MasterFailoverEvent(final String masterAddress,
-                                final Date eventTime) {
-        super(eventTime.getTime());
-        this.masterAddress = masterAddress;
+    private MasterFailoverEvent(final MasterServerMetadata masterServerMetadata,
+                                final Date eventTime,
+                                final long delayTime) {
+        super(delayTime);
+        this.masterServerMetadata = masterServerMetadata;
         this.eventTime = eventTime;
     }
 
-    public static MasterFailoverEvent of(final String masterAddress, final Date eventTime) {
-        checkNotNull(masterAddress);
+    public static MasterFailoverEvent of(final MasterServerMetadata masterServerMetadata,
+                                         final Date eventTime,
+                                         final long delayTime) {
+        checkNotNull(masterServerMetadata);
         checkNotNull(eventTime);
-        return new MasterFailoverEvent(masterAddress, eventTime);
+        return new MasterFailoverEvent(masterServerMetadata, eventTime, delayTime);
     }
 
     @Override
@@ -50,8 +55,9 @@ public class MasterFailoverEvent extends AbstractSystemEvent {
     @Override
     public String toString() {
         return "MasterFailoverEvent{" +
-                "masterAddress='" + masterAddress + '\'' +
+                "masterServerMetadata='" + masterServerMetadata + '\'' +
                 ", eventTime=" + eventTime +
+                ", delayTime=" + delayTime +
                 '}';
     }
 }

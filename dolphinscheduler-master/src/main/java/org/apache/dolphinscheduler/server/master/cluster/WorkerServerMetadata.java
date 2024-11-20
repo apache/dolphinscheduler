@@ -38,8 +38,9 @@ public class WorkerServerMetadata extends BaseServerMetadata {
 
     private final double taskThreadPoolUsage;
 
-    public static WorkerServerMetadata parseFromHeartBeat(WorkerHeartBeat workerHeartBeat) {
+    public static WorkerServerMetadata parseFromHeartBeat(final WorkerHeartBeat workerHeartBeat) {
         return WorkerServerMetadata.builder()
+                .serverStartupTime(workerHeartBeat.getStartupTime())
                 .address(workerHeartBeat.getHost() + ":" + workerHeartBeat.getPort())
                 .cpuUsage(workerHeartBeat.getCpuUsage())
                 .memoryUsage(workerHeartBeat.getMemoryUsage())

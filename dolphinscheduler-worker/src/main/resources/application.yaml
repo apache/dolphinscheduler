@@ -59,9 +59,6 @@ worker:
     max-system-memory-usage-percentage-thresholds: 0.7
     # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
     max-disk-usage-percentage-thresholds: 0.7
-  registry-disconnect-strategy:
-    # The disconnect strategy: stop, waiting
-    strategy: stop
   task-execute-threads-full-policy: REJECT
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.

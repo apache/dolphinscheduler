@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -51,6 +52,11 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     @Override
     public List<WorkerServerMetadata> getServers() {
         return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.values()));
+    }
+
+    @Override
+    public Optional<WorkerServerMetadata> getServer(final String address) {
+        return Optional.ofNullable(workerMapping.get(address));
     }
 
     public List<String> getWorkerServerAddressByGroup(String workerGroup) {

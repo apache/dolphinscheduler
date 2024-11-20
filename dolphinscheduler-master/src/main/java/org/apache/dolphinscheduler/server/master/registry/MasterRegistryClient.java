@@ -53,9 +53,6 @@ public class MasterRegistryClient implements AutoCloseable {
     @Autowired
     private MetricsProvider metricsProvider;
 
-    @Autowired
-    private MasterConnectStrategy masterConnectStrategy;
-
     private MasterHeartBeatTask masterHeartBeatTask;
 
     public void start() {
@@ -63,7 +60,7 @@ public class MasterRegistryClient implements AutoCloseable {
             this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, metricsProvider, registryClient);
             // master registry
             registry();
-            registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConnectStrategy));
+            registryClient.addConnectionStateListener(new MasterConnectionStateListener(registryClient));
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
         }

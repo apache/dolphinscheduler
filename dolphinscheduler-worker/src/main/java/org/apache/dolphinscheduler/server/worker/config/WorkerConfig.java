@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +45,6 @@ public class WorkerConfig implements Validator {
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
     private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
-    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
@@ -90,7 +88,6 @@ public class WorkerConfig implements Validator {
                         "\n  host-weight -> " + hostWeight +
                         "\n  tenantConfig -> " + tenantConfig +
                         "\n  server-load-protection -> " + serverLoadProtection +
-                        "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +
                         "\n  task-execute-threads-full-policy: " + taskExecuteThreadsFullPolicy +
                         "\n  address -> " + workerAddress +
                         "\n  registry-path: " + workerRegistryPath +
