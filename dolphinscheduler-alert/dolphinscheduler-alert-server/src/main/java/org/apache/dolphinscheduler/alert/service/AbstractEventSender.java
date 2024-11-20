@@ -83,10 +83,10 @@ public abstract class AbstractEventSender<T> implements EventSender<T> {
             alertSendStatuses.add(alertSendStatus);
         }
         long failureCount = alertSendStatuses.stream()
-                .map(alertSendStatus -> alertSendStatus.getSendStatus() == AlertStatus.EXECUTION_FAILURE)
+                .filter(alertSendStatus -> alertSendStatus.getSendStatus() == AlertStatus.EXECUTION_FAILURE)
                 .count();
         long successCount = alertSendStatuses.stream()
-                .map(alertSendStatus -> alertSendStatus.getSendStatus() == AlertStatus.EXECUTION_SUCCESS)
+                .filter(alertSendStatus -> alertSendStatus.getSendStatus() == AlertStatus.EXECUTION_SUCCESS)
                 .count();
         if (successCount == 0) {
             onError(event, JSONUtils.toJsonString(alertSendStatuses));
