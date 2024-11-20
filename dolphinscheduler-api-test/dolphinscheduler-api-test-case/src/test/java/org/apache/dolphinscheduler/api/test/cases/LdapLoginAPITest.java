@@ -31,16 +31,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @DolphinScheduler(composeFiles = "docker/ldap-login/docker-compose.yaml")
 @Slf4j
+@DisableIfTestFails
 public class LdapLoginAPITest {
 
     private static String sessionId;
 
     @Test
     @Order(10)
-    public void testAdminUserLogin() {
+    public void testAdminUserLoginSuccess() {
         final String username = "admin_user01";
 
         final String password = "123";
@@ -59,7 +61,7 @@ public class LdapLoginAPITest {
 
     @Test
     @Order(20)
-    public void testAdminUserFilterLogin() {
+    public void testAdminUserFilterLoginSuccess() {
         final String username = "admin_user03";
 
         final String password = "123";
@@ -78,7 +80,7 @@ public class LdapLoginAPITest {
 
     @Test
     @Order(30)
-    public void testGeneralUserLogin() {
+    public void testGeneralUserLoginSuccess() {
         final String username = "general_user02";
 
         final String password = "123";
@@ -93,5 +95,18 @@ public class LdapLoginAPITest {
                 JSONUtils.convertValue(getUserInfoHttpResponse.getBody().getData(), GetUserInfoResponseData.class);
         Assertions.assertEquals(username, getUserInfoResponseData.getUserName());
         Assertions.assertEquals(UserType.GENERAL_USER, getUserInfoResponseData.getUserType());
+    }
+
+    @Test
+    @Order(40)
+    public void testGeneralUserLoginFailed() {
+        final String username = "general_user02";
+
+        final String password = "1";
+
+        LoginPage loginPage = new LoginPage();
+        HttpResponse loginHttpResponse = loginPage.login(username, password);
+        Boolean loginResult = loginHttpResponse.getBody().getSuccess();
+        Assertions.assertFalse(loginResult);
     }
 }

@@ -90,14 +90,14 @@ security:
     # IF you set type `LDAP`, below config will be effective
     ldap:
       # ldap server config
-      url: ldap://openldap:10389/
+      url: ldap://openldap:1389/
       base-dn: ou=users,dc=example,dc=org
       username: cn=admin,dc=example,dc=org
       password: adminpassword
       user:
         # admin username when you use LDAP login
         admin-username: admin_user01
-        admin-user-filter: (&(cn={0})(sn=Bar2))
+        admin-user-filter: (&(cn={0})(sn=Bar3))
         identity-attribute: cn
         email-attribute: uid
         # action when ldap user is not exist (supported types: CREATE,DENY)

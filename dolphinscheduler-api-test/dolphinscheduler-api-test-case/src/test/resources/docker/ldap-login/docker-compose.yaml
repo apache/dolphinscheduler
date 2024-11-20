@@ -24,6 +24,8 @@ services:
       WORKER_TENANT_AUTO_CREATE: 'true'
     ports:
       - "12345:12345"
+    volumes:
+      - ./application.yaml:/opt/dolphinscheduler/standalone-server/conf/application.yaml
     networks:
       - api-test
     healthcheck:
@@ -31,13 +33,14 @@ services:
       interval: 5s
       timeout: 60s
       retries: 120
+    depends_on:
+      - openldap
   openldap:
-    container_name: openldap
     hostname: openldap
     image: bitnami/openldap:2.6
     ports:
-      - '10389:1389'
-      - '10636:1636'
+      - '1389:1389'
+      - '1636:1636'
     environment:
       - LDAP_ADMIN_USERNAME=admin
       - LDAP_ADMIN_PASSWORD=adminpassword
