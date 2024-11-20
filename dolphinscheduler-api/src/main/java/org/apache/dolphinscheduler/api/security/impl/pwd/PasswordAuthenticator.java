@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 public class PasswordAuthenticator extends AbstractAuthenticator {
 
     @Override
-    public User login(String userId, String password) {
-        return userService.queryUser(userId, password);
+    public User login(String userName, String password) {
+        return userService.queryUser(userName, password);
     }
 }

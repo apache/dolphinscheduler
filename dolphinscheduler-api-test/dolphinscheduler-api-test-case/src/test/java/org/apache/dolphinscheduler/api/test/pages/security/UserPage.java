@@ -15,21 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api.test.pages.security;
 
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.api.test.core.Constants;
+import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class LdapLoginResult {
+public class UserPage {
 
-    boolean success;
-    String ldapEmail;
-    UserType userType;
-    String userName;
+    public HttpResponse getUserInfo(String sessionId) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+
+        return requestClient.get("/users/get-user-info", headers, new HashMap<>());
+    }
 }

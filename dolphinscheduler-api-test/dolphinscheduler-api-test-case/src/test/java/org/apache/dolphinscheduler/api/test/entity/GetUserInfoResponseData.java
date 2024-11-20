@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api.test.entity;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
+
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,10 +28,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LdapLoginResult {
+public class GetUserInfoResponseData {
 
-    boolean success;
-    String ldapEmail;
-    UserType userType;
-    String userName;
+    private Integer id;
+    private String userName;
+    private String userPassword;
+    private String email;
+    private Integer phone;
+    private UserType userType;
+    private Integer tenantId;
+    private Integer state;
+    private String tenantCode;
+    private String queueName;
+    private String alertGroup;
+    private String queue;
+    private String timeZone;
+    private Date createTime;
+    private Date updateTime;
 }
