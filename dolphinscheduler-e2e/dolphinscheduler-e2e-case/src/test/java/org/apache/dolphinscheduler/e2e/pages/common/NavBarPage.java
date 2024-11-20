@@ -43,9 +43,6 @@ public class NavBarPage {
     @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Resources')]")
     private WebElement resourceTab;
 
-    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Data Quality')]")
-    private WebElement dataQualityTab;
-
     @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Datasource')]")
     private WebElement dataSourceTab;
 

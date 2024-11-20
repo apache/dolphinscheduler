@@ -35,7 +35,6 @@ type TaskType =
   | 'DATAX'
   | 'SQOOP'
   | 'CONDITIONS'
-  | 'DATA_QUALITY'
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'

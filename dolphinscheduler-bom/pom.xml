@@ -94,7 +94,6 @@
         <gson.version>2.9.1</gson.version>
         <dropwizard.metrics-version>4.2.11</dropwizard.metrics-version>
         <snappy.version>1.1.10.1</snappy.version>
-        <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.33</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
@@ -770,18 +769,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.12</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.module</groupId>
-                        <artifactId>jackson-module-scala_2.11</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-sftp</artifactId>
                 <version>${sshd.version}</version>
@@ -790,42 +777,6 @@
                 <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-scp</artifactId>
                 <version>${sshd.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.12</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-hive_2.12</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-httpclient</groupId>
-                        <artifactId>commons-httpclient</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.jackson</groupId>
-                        <artifactId>jackson-core-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.jackson</groupId>
-                        <artifactId>jackson-mapper-asl</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>

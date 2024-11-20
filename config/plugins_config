@@ -77,7 +77,6 @@ dolphinscheduler-storage-s3
 dolphinscheduler-task-aliyunserverlessspark
 dolphinscheduler-task-chunjun
 dolphinscheduler-task-datafactory
-dolphinscheduler-task-dataquality
 dolphinscheduler-task-datasync
 dolphinscheduler-task-datax
 dolphinscheduler-task-dinky

@@ -45,10 +45,6 @@ import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -65,10 +61,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
@@ -86,7 +78,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
-import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
@@ -101,7 +92,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
-import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
@@ -188,18 +178,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private TenantMapper tenantMapper;
-
-    @Autowired
-    private DqRuleMapper dqRuleMapper;
-
-    @Autowired
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
-
-    @Autowired
-    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
-
-    @Autowired
-    private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -1356,26 +1334,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public DqRule getDqRule(int ruleId) {
-        return dqRuleMapper.selectById(ruleId);
-    }
-
-    @Override
-    public List<DqRuleInputEntry> getRuleInputEntry(int ruleId) {
-        return DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(ruleId));
-    }
-
-    @Override
-    public List<DqRuleExecuteSql> getDqExecuteSql(int ruleId) {
-        return dqRuleExecuteSqlMapper.getExecuteSqlList(ruleId);
-    }
-
-    @Override
-    public DqComparisonType getComparisonTypeById(int id) {
-        return dqComparisonTypeMapper.selectById(id);
-    }
-
-    @Override
     public TaskGroupQueue insertIntoTaskGroupQueue(Integer taskInstanceId,
                                                    String taskName,
                                                    Integer taskGroupId,
@@ -1397,13 +1355,6 @@ public class ProcessServiceImpl implements ProcessService {
                 .build();
         taskGroupQueueMapper.insert(taskGroupQueue);
         return taskGroupQueue;
-    }
-
-    protected void deleteCommandWithCheck(int commandId) {
-        int delete = this.commandMapper.deleteById(commandId);
-        if (delete != 1) {
-            throw new ServiceException("delete command fail, id:" + commandId);
-        }
     }
 
     /**

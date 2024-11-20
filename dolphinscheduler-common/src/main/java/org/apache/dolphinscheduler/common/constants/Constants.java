@@ -536,11 +536,6 @@ public final class Constants {
     public static final int DRY_RUN_FLAG_YES = 1;
 
     /**
-     * data.quality.error.output.path
-     */
-    public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
-
-    /**
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
@@ -596,7 +591,6 @@ public final class Constants {
     public static final String TYPE_DATA_INTEGRATION = "DataIntegration";
     public static final String TYPE_CLOUD = "Cloud";
     public static final String TYPE_LOGIC = "Logic";
-    public static final String TYPE_DATA_QUALITY = "DataQuality";
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
 
@@ -691,9 +685,6 @@ public final class Constants {
 
     public static final String REMOTE_LOGGING_COS_REGION = "remote.logging.cos.region";
 
-    /**
-     * data quality
-     */
     public static final String DATABASES_QUERY = "show databases";
     public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
 

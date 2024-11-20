@@ -458,10 +458,6 @@ export default {
                         ],
                     },
                     {
-                        title: 'Data Quality',
-                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
-                    },
-                    {
                         title: 'Remote Logging',
                         link: '/en-us/docs/dev/user_doc/guide/remote-logging.html',
                     },
@@ -1159,10 +1155,6 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
-                    },
-                    {
-                        title: '数据质量',
-                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: '远程日志存储',

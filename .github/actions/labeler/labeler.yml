@@ -23,7 +23,6 @@ backend:
   - 'dolphinscheduler-common/**/*'
   - 'dolphinscheduler-dao/**/*'
   - 'dolphinscheduler-dao-plugin/**/*'
-  - 'dolphinscheduler-data-quality/**/*'
   - 'dolphinscheduler-datasource-plugin/**/*'
   - 'dolphinscheduler-dist/**/*'
   - 'dolphinscheduler-extract/**/*'
