@@ -131,8 +131,6 @@ public class TaskExecutionContext implements Serializable {
 
     private Map<String, Property> paramsMap;
 
-    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
-
     private Integer cpuQuota;
 
     private Integer memoryMax;

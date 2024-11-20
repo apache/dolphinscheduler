@@ -26,10 +26,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowAlertContent;
@@ -37,7 +34,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -322,107 +318,6 @@ public class WorkflowAlertManager {
         alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.CLOSE_ALERT);
         alertDao.addAlert(alert);
-    }
-
-    /**
-     * send workflow timeout alert
-     *
-     * @param workflowInstance workflow instance
-     * @param projectUser     projectUser
-     */
-    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
-        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser);
-    }
-
-    /**
-     * send data quality task alert
-     */
-    public void sendDataQualityTaskExecuteResultAlert(DqExecuteResult result, WorkflowInstance workflowInstance) {
-        Alert alert = new Alert();
-        String state = DqTaskState.of(result.getState()).getDescription();
-        alert.setTitle("DataQualityResult [" + result.getTaskName() + "] " + state);
-        String content = getDataQualityAlterContent(result);
-        alert.setContent(content);
-        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
-        alert.setCreateTime(new Date());
-        alert.setProjectCode(result.getProjectCode());
-        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
-        alert.setWorkflowInstanceId(workflowInstance.getId());
-        // might need to change to data quality status
-        alert.setAlertType(workflowInstance.getState().isSuccess() ? AlertType.WORKFLOW_INSTANCE_SUCCESS
-                : AlertType.WORKFLOW_INSTANCE_FAILURE);
-        alertDao.addAlert(alert);
-    }
-
-    /**
-     * send data quality task error alert
-     */
-    public void sendTaskErrorAlert(TaskInstance taskInstance, WorkflowInstance workflowInstance) {
-        Alert alert = new Alert();
-        alert.setTitle("Task [" + taskInstance.getName() + "] Failure Warning");
-        String content = getTaskAlterContent(taskInstance);
-        alert.setContent(content);
-        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
-        alert.setCreateTime(new Date());
-        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
-        alert.setWorkflowInstanceId(workflowInstance.getId());
-        alert.setAlertType(AlertType.TASK_FAILURE);
-        alertDao.addAlert(alert);
-    }
-
-    /**
-     * getDataQualityAlterContent
-     * @param result DqExecuteResult
-     * @return String String
-     */
-    public String getDataQualityAlterContent(DqExecuteResult result) {
-
-        DqExecuteResultAlertContent content = DqExecuteResultAlertContent.newBuilder()
-                .processDefinitionId(result.getWorkflowDefinitionId())
-                .processDefinitionName(result.getWorkflowDefinitionName())
-                .processInstanceId(result.getProcessInstanceId())
-                .processInstanceName(result.getProcessInstanceName())
-                .taskInstanceId(result.getTaskInstanceId())
-                .taskName(result.getTaskName())
-                .ruleType(result.getRuleType())
-                .ruleName(result.getRuleName())
-                .statisticsValue(result.getStatisticsValue())
-                .comparisonValue(result.getComparisonValue())
-                .checkType(result.getCheckType())
-                .threshold(result.getThreshold())
-                .operator(result.getOperator())
-                .failureStrategy(result.getFailureStrategy())
-                .userId(result.getUserId())
-                .userName(result.getUserName())
-                .state(result.getState())
-                .errorDataPath(result.getErrorOutputPath())
-                .build();
-
-        return JSONUtils.toJsonString(content);
-    }
-
-    /**
-     * getTaskAlterContent
-     * @param taskInstance TaskInstance
-     * @return String String
-     */
-    public String getTaskAlterContent(TaskInstance taskInstance) {
-
-        TaskAlertContent content = TaskAlertContent.builder()
-                .processInstanceName(taskInstance.getWorkflowInstanceName())
-                .processInstanceId(taskInstance.getWorkflowInstanceId())
-                .taskInstanceId(taskInstance.getId())
-                .taskName(taskInstance.getName())
-                .taskType(taskInstance.getTaskType())
-                .state(taskInstance.getState())
-                .startTime(taskInstance.getStartTime())
-                .endTime(taskInstance.getEndTime())
-                .host(taskInstance.getHost())
-                .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
-                .logPath(taskInstance.getLogPath())
-                .build();
-
-        return JSONUtils.toJsonString(content);
     }
 
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,

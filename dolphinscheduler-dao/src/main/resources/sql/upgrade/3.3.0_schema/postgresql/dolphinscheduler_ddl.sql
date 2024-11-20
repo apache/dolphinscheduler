@@ -204,3 +204,24 @@ d//
 select rename_tables_and_fields_from_process_to_workflow();
 DROP FUNCTION IF EXISTS rename_tables_and_fields_from_process_to_workflow();
 
+
+-- Drop data quality tables
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_data_quality_tables() RETURNS void AS $$
+BEGIN
+
+DROP TABLE IF EXISTS t_ds_dq_comparison_type;
+DROP TABLE IF EXISTS t_ds_dq_rule_execute_sql;
+DROP TABLE IF EXISTS t_ds_dq_rule_input_entry;
+DROP TABLE IF EXISTS t_ds_dq_task_statistics_value;
+DROP TABLE IF EXISTS t_ds_dq_execute_result;
+DROP TABLE IF EXISTS t_ds_dq_rule;
+DROP TABLE IF EXISTS t_ds_relation_rule_input_entry;
+DROP TABLE IF EXISTS t_ds_relation_rule_execute_sql;
+
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_data_quality_tables();
+DROP FUNCTION IF EXISTS drop_data_quality_tables();

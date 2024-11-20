@@ -43,9 +43,6 @@ import {
   KeyOutlined,
   SafetyOutlined,
   GroupOutlined,
-  ContainerOutlined,
-  ApartmentOutlined,
-  BarsOutlined,
   CloudServerOutlined,
   ClusterOutlined
 } from '@vicons/antd'
@@ -189,24 +186,6 @@ export function useDataList() {
                 key: '/resource/task-group-queue'
               }
             ]
-          }
-        ]
-      },
-      {
-        label: () =>
-          h(NEllipsis, null, { default: () => t('menu.data_quality') }),
-        key: 'data-quality',
-        icon: renderIcon(ContainerOutlined),
-        children: [
-          {
-            label: t('menu.task_result'),
-            key: '/data-quality/task-result',
-            icon: renderIcon(ApartmentOutlined)
-          },
-          {
-            label: t('menu.rule'),
-            key: '/data-quality/rule',
-            icon: renderIcon(BarsOutlined)
           }
         ]
       },

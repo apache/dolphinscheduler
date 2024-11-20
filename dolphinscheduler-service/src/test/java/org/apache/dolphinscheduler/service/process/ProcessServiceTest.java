@@ -27,10 +27,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -39,9 +35,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
@@ -53,16 +46,10 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.spi.params.base.FormType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,15 +107,6 @@ public class ProcessServiceTest {
 
     @Mock
     private TaskGroupQueueMapper taskGroupQueueMapper;
-
-    @Mock
-    private DqRuleMapper dqRuleMapper;
-
-    @Mock
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
-
-    @Mock
-    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
     @Mock
     CuringParamsService curingGlobalParamsService;
@@ -204,104 +182,6 @@ public class ProcessServiceTest {
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
         Assertions.assertEquals(0, processService.switchVersion(workflowDefinition, processDefinitionLog));
-    }
-
-    @Test
-    public void getDqRule() {
-        when(dqRuleMapper.selectById(1)).thenReturn(new DqRule());
-        Assertions.assertNotNull(processService.getDqRule(1));
-    }
-
-    @Test
-    public void getRuleInputEntry() {
-        when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Assertions.assertNotNull(processService.getRuleInputEntry(1));
-    }
-
-    @Test
-    public void getDqExecuteSql() {
-        when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
-        Assertions.assertNotNull(processService.getDqExecuteSql(1));
-    }
-
-    private List<DqRuleInputEntry> getRuleInputEntryList() {
-        List<DqRuleInputEntry> list = new ArrayList<>();
-
-        DqRuleInputEntry srcConnectorType = new DqRuleInputEntry();
-        srcConnectorType.setTitle("源数据类型");
-        srcConnectorType.setField("src_connector_type");
-        srcConnectorType.setType(FormType.SELECT.getFormType());
-        srcConnectorType.setCanEdit(true);
-        srcConnectorType.setIsShow(true);
-        srcConnectorType.setData("JDBC");
-        srcConnectorType.setPlaceholder("Please select the source connector type");
-        srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        srcConnectorType
-                .setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
-        srcConnectorType.setInputType(InputType.DEFAULT.getCode());
-        srcConnectorType.setDataType(DataType.NUMBER.getCode());
-        srcConnectorType.setIsEmit(true);
-
-        DqRuleInputEntry statisticsName = new DqRuleInputEntry();
-        statisticsName.setTitle("统计值名");
-        statisticsName.setField("statistics_name");
-        statisticsName.setType(FormType.INPUT.getFormType());
-        statisticsName.setCanEdit(true);
-        statisticsName.setIsShow(true);
-        statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
-        statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        statisticsName.setInputType(InputType.DEFAULT.getCode());
-        statisticsName.setDataType(DataType.STRING.getCode());
-        statisticsName.setIsEmit(false);
-
-        DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
-        statisticsExecuteSql.setTitle("统计值计算SQL");
-        statisticsExecuteSql.setField("statistics_execute_sql");
-        statisticsExecuteSql.setType(FormType.TEXTAREA.getFormType());
-        statisticsExecuteSql.setCanEdit(true);
-        statisticsExecuteSql.setIsShow(true);
-        statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
-        statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        statisticsExecuteSql.setDataType(DataType.LIKE_SQL.getCode());
-        statisticsExecuteSql.setIsEmit(false);
-
-        list.add(srcConnectorType);
-        list.add(statisticsName);
-        list.add(statisticsExecuteSql);
-
-        return list;
-    }
-
-    private List<DqRuleExecuteSql> getRuleExecuteSqlList() {
-        List<DqRuleExecuteSql> list = new ArrayList<>();
-
-        DqRuleExecuteSql executeSqlDefinition = new DqRuleExecuteSql();
-        executeSqlDefinition.setIndex(0);
-        executeSqlDefinition.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
-        executeSqlDefinition.setTableAlias("total_count");
-        executeSqlDefinition.setType(ExecuteSqlType.COMPARISON.getCode());
-        list.add(executeSqlDefinition);
-
-        return list;
-    }
-
-    public DqExecuteResult getExecuteResult() {
-        DqExecuteResult dqExecuteResult = new DqExecuteResult();
-        dqExecuteResult.setId(1);
-        dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
-
-        return dqExecuteResult;
-    }
-
-    public List<DqExecuteResult> getExecuteResultList() {
-
-        List<DqExecuteResult> list = new ArrayList<>();
-        DqExecuteResult dqExecuteResult = new DqExecuteResult();
-        dqExecuteResult.setId(1);
-        dqExecuteResult.setState(DqTaskState.FAILURE.getCode());
-        list.add(dqExecuteResult);
-
-        return list;
     }
 
     @Test

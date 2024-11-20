@@ -16,7 +16,6 @@
  */
 
 import crontab from '@/locales/zh_CN/crontab'
-import data_quality from '@/locales/zh_CN/data-quality'
 import datasource from '@/locales/zh_CN/datasource'
 import home from '@/locales/zh_CN/home'
 import input_search from '@/locales/zh_CN/input-search'
@@ -49,7 +48,6 @@ export default {
   project,
   security,
   datasource,
-  data_quality,
   crontab,
   ui_setting,
   input_search
