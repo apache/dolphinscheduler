@@ -63,8 +63,6 @@ public class WorkerRegistryClientTest {
     @Mock
     private WorkerTaskExecutorThreadPool workerManagerThread;
     @Mock
-    private WorkerConnectStrategy workerConnectStrategy;
-    @Mock
     private IStoppable stoppable;
 
     @Test

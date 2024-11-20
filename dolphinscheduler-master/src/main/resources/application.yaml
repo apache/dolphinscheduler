@@ -102,9 +102,6 @@ master:
     max-system-memory-usage-percentage-thresholds: 0.7
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
     max-disk-usage-percentage-thresholds: 0.7
-  registry-disconnect-strategy:
-    # The disconnect strategy: stop, waiting
-    strategy: stop
   worker-group-refresh-interval: 10s
   command-fetch-strategy:
     type: ID_SLOT_BASED

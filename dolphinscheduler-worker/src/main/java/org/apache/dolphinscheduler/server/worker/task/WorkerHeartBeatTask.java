@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
@@ -81,14 +82,25 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
     }
 
     @Override
-    public void writeHeartBeat(WorkerHeartBeat workerHeartBeat) {
+    public void writeHeartBeat(final WorkerHeartBeat workerHeartBeat) {
+        final String failoverNodePath = RegistryUtils.getFailoverFinishedNodePath(workerHeartBeat);
+        if (registryClient.exists(failoverNodePath)) {
+            log.warn("The worker: {} is under {}, means it has been failover will close myself",
+                    workerHeartBeat,
+                    failoverNodePath);
+            registryClient
+                    .getStoppable()
+                    .stop("The worker exist: " + failoverNodePath + ", means it has been failover will close myself");
+            return;
+        }
         String workerHeartBeatJson = JSONUtils.toJsonString(workerHeartBeat);
         String workerRegistryPath = workerConfig.getWorkerRegistryPath();
         registryClient.persistEphemeral(workerRegistryPath, workerHeartBeatJson);
         WorkerServerMetrics.incWorkerHeartbeatCount();
         log.debug(
                 "Success write worker group heartBeatInfo into registry, workerRegistryPath: {} workerHeartBeatInfo: {}",
-                workerRegistryPath, workerHeartBeatJson);
+                workerRegistryPath,
+                workerHeartBeatJson);
     }
 
     private ServerStatus getServerStatus(SystemMetrics systemMetrics,

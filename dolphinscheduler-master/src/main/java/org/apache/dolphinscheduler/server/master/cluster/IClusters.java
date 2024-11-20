@@ -20,10 +20,13 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IClusters<S extends IClusters.IServerMetadata> {
 
     List<S> getServers();
+
+    Optional<S> getServer(final String address);
 
     void registerListener(IClustersChangeListener<S> listener);
 

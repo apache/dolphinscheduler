@@ -20,11 +20,16 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@ToString
 @SuperBuilder
 public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
+
+    // The server startup time in milliseconds.
+    private final long serverStartupTime;
 
     private final String address;
 
