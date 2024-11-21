@@ -23,6 +23,7 @@
 -XX:+PrintGCDateStamps
 -XX:+PrintGCDetails
 -Xloggc:gc-%t.log
+-XX:ErrorFile=java_error-%p.log
 
 -XX:-OmitStackTraceInFastThrow
 -XX:+ExitOnOutOfMemoryError
