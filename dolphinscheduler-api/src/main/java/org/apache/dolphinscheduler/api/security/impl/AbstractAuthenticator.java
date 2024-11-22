@@ -59,16 +59,16 @@ public abstract class AbstractAuthenticator implements Authenticator {
     /**
      * user login and return user in db
      *
-     * @param userId user identity field
+     * @param userName user identity field
      * @param password user login password
      * @return user object in databse
      */
-    public abstract User login(@NonNull String userId, String password);
+    public abstract User login(@NonNull String userName, String password);
 
     @Override
-    public Result<Map<String, String>> authenticate(@NonNull String userId, String password, @NonNull String ip) {
+    public Result<Map<String, String>> authenticate(@NonNull String userName, String password, @NonNull String ip) {
         Result<Map<String, String>> result = new Result<>();
-        User user = login(userId, password);
+        User user = login(userName, password);
         if (user == null) {
             if (Objects.equals(securityConfig.getType(), AuthenticationType.CASDOOR_SSO.name())) {
                 log.error("State or code entered incorrectly.");

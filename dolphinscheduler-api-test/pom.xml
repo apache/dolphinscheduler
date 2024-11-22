@@ -36,7 +36,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.version>5.7.2</junit.version>
-        <selenium.version>3.141.59</selenium.version>
+        <selenium.version>4.21.0</selenium.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
         <lombok.version>1.18.24</lombok.version>
         <assertj-core.version>3.23.1</assertj-core.version>
         <awaitility.version>4.1.0</awaitility.version>
@@ -133,7 +134,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>1.18.1</version>
+                <version>${testcontainers.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
