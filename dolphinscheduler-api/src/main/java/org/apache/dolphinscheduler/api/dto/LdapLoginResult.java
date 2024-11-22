@@ -27,9 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LdapLoginResult {
-
-    boolean success;
-    String ldapEmail;
-    UserType userType;
-    String userName;
+    private boolean success;
+    private String ldapEmail;
+    private UserType userType;
+    private String userName;
 }
