@@ -28,6 +28,11 @@ public interface IJdbcRegistryDataManager {
     boolean existKey(String key);
 
     /**
+     * Get all the {@link JdbcRegistryDataDTO}.
+     */
+    List<JdbcRegistryDataDTO> getAllJdbcRegistryData();
+
+    /**
      * Get the {@link JdbcRegistryDataDTO} by key.
      */
     Optional<JdbcRegistryDataDTO> getRegistryDataByKey(String key);
