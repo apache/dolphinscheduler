@@ -15,15 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security.impl.pwd;
+package org.apache.dolphinscheduler.api.test.pages.security;
 
-import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.api.test.core.Constants;
+import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 
-public class PasswordAuthenticator extends AbstractAuthenticator {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Override
-    public User login(String userName, String password) {
-        return userService.queryUser(userName, password);
+public class UserPage {
+
+    public HttpResponse getUserInfo(String sessionId) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+
+        return requestClient.get("/users/get-user-info", headers, new HashMap<>());
     }
 }

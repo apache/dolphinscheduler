@@ -86,23 +86,22 @@ registry:
 security:
   authentication:
     # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
-    type: PASSWORD
+    type: LDAP
     # IF you set type `LDAP`, below config will be effective
     ldap:
       # ldap server config
-      url: ldap://ldap.forumsys.com:389/
-      base-dn: dc=example,dc=com
-      username: admin,dc=example,dc=com
-      password: password
+      url: ldap://openldap:1389/
+      base-dn: ou=users,dc=example,dc=org
+      username: cn=admin,dc=example,dc=org
+      password: adminpassword
       user:
         # admin username when you use LDAP login
-        admin-username: ldap-admin
-        # user search filter to find admin user
-        admin-user-filter: (&(cn={0}))
-        identity-attribute: uid
-        email-attribute: mail
+        admin-username: admin_user01
+        admin-user-filter: (&(cn={0})(sn=Bar3))
+        identity-attribute: cn
+        email-attribute: uid
         # action when ldap user is not exist (supported types: CREATE,DENY)
-        not-exist-action: DENY
+        not-exist-action: CREATE
       ssl:
         enable: false
         # jks file absolute path && password

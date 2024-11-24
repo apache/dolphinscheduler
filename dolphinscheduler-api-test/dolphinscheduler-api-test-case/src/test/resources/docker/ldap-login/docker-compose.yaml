@@ -1,0 +1,63 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: "3.8"
+
+services:
+  dolphinscheduler:
+    image: apache/dolphinscheduler-standalone-server:ci
+    environment:
+      WORKER_TENANT_AUTO_CREATE: 'true'
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./application.yaml:/opt/dolphinscheduler/standalone-server/conf/application.yaml
+    networks:
+      - api-test
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+    depends_on:
+      - openldap
+  openldap:
+    hostname: openldap
+    image: bitnami/openldap:2.6
+    ports:
+      - '1389:1389'
+      - '1636:1636'
+    environment:
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=adminpassword
+      - LDAP_USERS=admin_user01,general_user02,admin_user03
+      - LDAP_PASSWORDS=123,123,123
+      - LDAP_ROOT=dc=example,dc=org
+      - LDAP_ADMIN_DN=cn=admin,dc=example,dc=org
+    networks:
+      - api-test
+    tty: true
+    stdin_open: true
+    restart: always
+    healthcheck:
+      test: ldapsearch -x -H 'ldap://127.0.0.1:1389' -D 'cn=admin,dc=example,dc=org' -w adminpassword -b 'ou=users,dc=example,dc=org' '(cn=admin_user01)'
+      interval: 5s
+      timeout: 60s
+      retries: 120
+
+networks:
+  api-test:
