@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -23,11 +23,26 @@ import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChann
 import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.shell.ShellTaskChannelFactory;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-class TaskPluginManagerTest {
+@ExtendWith(MockitoExtension.class)
+public class TaskDispatchFactoryTest {
+
+    @InjectMocks
+    private TaskDispatchFactory taskDispatchFactory;
+
+    @Mock
+    private MasterTaskDispatcher masterTaskDispatcher;
+
+    @Mock
+    private WorkerTaskDispatcher workerTaskDispatcher;
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -35,8 +50,13 @@ class TaskPluginManagerTest {
             DependentLogicTaskChannelFactory.NAME,
             SubWorkflowLogicTaskChannelFactory.NAME,
             SwitchLogicTaskChannelFactory.NAME})
-    void testGetTaskChannel_logicTaskChannel(String type) {
-        assertThat(TaskPluginManager.getTaskChannel(type)).isNotNull();
+    public void getTaskDispatcher_withLogicTask(String taskType) {
+        assertThat(taskDispatchFactory.getTaskDispatcher(taskType)).isSameInstanceAs(masterTaskDispatcher);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {ShellTaskChannelFactory.NAME})
+    public void getTaskDispatcher_withWorkerTask(String taskType) {
+        assertThat(taskDispatchFactory.getTaskDispatcher(taskType)).isSameInstanceAs(workerTaskDispatcher);
+    }
 }

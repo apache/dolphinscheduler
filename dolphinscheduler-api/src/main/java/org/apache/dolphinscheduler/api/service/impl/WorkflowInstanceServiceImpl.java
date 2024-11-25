@@ -484,10 +484,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
-        if (!TaskTypeUtils.isDynamicTask(taskInstance.getTaskType())) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_DYNAMIC_TASK, taskInstance.getName());
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
-        }
         List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
                 .queryAllSubWorkflowInstance((long) taskInstance.getWorkflowInstanceId(),
                         taskInstance.getTaskCode());
