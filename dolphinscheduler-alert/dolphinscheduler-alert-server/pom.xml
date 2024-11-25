@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert-all</artifactId>
+            <artifactId>dolphinscheduler-alert-api</artifactId>
         </dependency>
 
         <dependency>

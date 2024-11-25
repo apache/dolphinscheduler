@@ -66,7 +66,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.facebook.presto.jdbc.internal.guava.base.Strings;
+import com.google.common.base.Strings;
 
 @Service
 @Slf4j
