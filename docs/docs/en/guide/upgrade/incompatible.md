@@ -35,4 +35,5 @@ This document records the incompatible updates between each version. You need to
 * Remove the `Data Quality` module ([#16794])(https://github.com/apache/dolphinscheduler/pull/16794)
 * Remove the `registry-disconnect-strategy` in `application.yaml` ([#16821])(https://github.com/apache/dolphinscheduler/pull/16821)
 * Remove `exec-threads` in worker's `application.yaml`, please use `physical-task-config`;Remove `master-async-task-executor-thread-pool-size` in master's `application.yaml`, please use `logic-task-config` ([#16790])(https://github.com/apache/dolphinscheduler/pull/16790)
+* Remove the `Dynamic` from the `Task Plugin` ([#16482])(https://github.com/apache/dolphinscheduler/pull/16842)
 
