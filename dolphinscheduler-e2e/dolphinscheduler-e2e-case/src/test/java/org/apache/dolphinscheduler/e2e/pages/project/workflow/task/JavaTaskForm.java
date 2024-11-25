@@ -72,10 +72,19 @@ public class JavaTaskForm extends TaskNodeForm {
     public JavaTaskForm selectJavaResource(String resourceName) {
         WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver());
         wait.until(ExpectedConditions.elementToBeClickable(selectResource));
+
         ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectResource);
         final By optionsLocator = By.className("n-tree-node-content__text");
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+        wait.until(s -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        });
         parent().driver()
                 .findElements(optionsLocator)
                 .stream()

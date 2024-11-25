@@ -221,6 +221,14 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         driver.setFileDetector(new LocalFileDetector());
 
         uploadFileBox().buttonUpload().sendKeys(filePath);
+        WebDriverWaitFactory.createWebDriverWait(driver).until(s -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        });
         uploadFileBox().buttonSubmit().click();
 
         return this;
