@@ -306,6 +306,12 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-all</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
