@@ -84,29 +84,11 @@ public class FileUtils {
     /**
      * directory of process execution
      *
-     * @param tenant               tenant
-     * @param projectCode          project code
-     * @param processDefineCode    process definition Code
-     * @param processDefineVersion process definition version
-     * @param processInstanceId    process instance id
      * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
-    public static String getTaskInstanceWorkingDirectory(String tenant,
-                                                         long projectCode,
-                                                         long processDefineCode,
-                                                         int processDefineVersion,
-                                                         int processInstanceId,
-                                                         int taskInstanceId) {
-        return String.format(
-                "%s/exec/process/%s/%d/%d_%d/%d/%d",
-                DATA_BASEDIR,
-                tenant,
-                projectCode,
-                processDefineCode,
-                processDefineVersion,
-                processInstanceId,
-                taskInstanceId);
+    public static String getTaskInstanceWorkingDirectory(int taskInstanceId) {
+        return String.format("%s/exec/process/%d", DATA_BASEDIR, taskInstanceId);
     }
 
     /**

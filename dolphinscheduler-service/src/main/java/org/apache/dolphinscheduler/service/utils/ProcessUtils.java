@@ -54,13 +54,8 @@ public class ProcessUtils {
                 taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getTaskInstanceWorkingDirectory(
-                                    taskExecutionContext.getTenantCode(),
-                                    taskExecutionContext.getProjectCode(),
-                                    taskExecutionContext.getWorkflowDefinitionCode(),
-                                    taskExecutionContext.getWorkflowDefinitionVersion(),
-                                    taskExecutionContext.getWorkflowInstanceId(),
-                                    taskExecutionContext.getTaskInstanceId()));
+                            .setExecutePath(FileUtils
+                                    .getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createDirectoryWith755(Paths.get(taskExecutionContext.getExecutePath()));
                 org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(taskExecutionContext);
