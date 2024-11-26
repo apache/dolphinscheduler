@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractR
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionContextCreateRequest;
@@ -53,8 +52,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.zaxxer.hikari.HikariDataSource;
-
 @Slf4j
 @Component
 public class TaskExecutionContextFactory {
@@ -67,9 +64,6 @@ public class TaskExecutionContextFactory {
 
     @Autowired
     private MasterConfig masterConfig;
-
-    @Autowired
-    private HikariDataSource hikariDataSource;
 
     public TaskExecutionContext createTaskExecutionContext(TaskExecutionContextCreateRequest request) {
         TaskInstance taskInstance = request.getTaskInstance();
@@ -150,13 +144,6 @@ public class TaskExecutionContextFactory {
                 K8sTaskParameters k8sTaskParameters =
                         JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
                 namespace = k8sTaskParameters.getNamespace();
-                break;
-            case "SPARK":
-                SparkParameters sparkParameters =
-                        JSONUtils.parseObject(taskInstance.getTaskParams(), SparkParameters.class);
-                if (StringUtils.isNotEmpty(sparkParameters.getNamespace())) {
-                    namespace = sparkParameters.getNamespace();
-                }
                 break;
             default:
                 break;

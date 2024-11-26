@@ -28,7 +28,6 @@
     <name>${project.artifactId}</name>
     <dependencies>
         <!-- dolphinscheduler -->
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-meter</artifactId>
@@ -36,7 +35,13 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-all</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -58,6 +63,7 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
         </dependency>
+        <!-- dolphinscheduler -->
 
         <dependency>
             <groupId>com.google.guava</groupId>
