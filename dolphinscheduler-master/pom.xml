@@ -42,14 +42,17 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- dolphinscheduler -->
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-meter</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-service</artifactId>
@@ -71,7 +74,19 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-all</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-all</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -94,6 +109,14 @@
             <artifactId>dolphinscheduler-eventbus</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-worker</artifactId>
+            <scope>test</scope>
+            <!-- master should never depend on worker, this is only for tests -->
+        </dependency>
+        <!-- dolphinscheduler -->
 
         <dependency>
             <groupId>org.codehaus.janino</groupId>
@@ -290,13 +313,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-worker</artifactId>
-            <scope>test</scope>
-            <!-- master should never depend on worker, this is only for tests -->
-        </dependency>
-
-        <dependency>
             <groupId>org.javadelight</groupId>
             <artifactId>delight-nashorn-sandbox</artifactId>
         </dependency>
@@ -305,12 +321,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-all</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
