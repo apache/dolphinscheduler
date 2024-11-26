@@ -48,6 +48,7 @@
         <jackson.version>2.13.2</jackson.version>
         <checkstyle.version>3.1.2</checkstyle.version>
         <junit-pioneer.version>2.2.0</junit-pioneer.version>
+        <http.components.version>4.5.13</http.components.version>
     </properties>
 
     <dependencies>
@@ -74,6 +75,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${http.components.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
