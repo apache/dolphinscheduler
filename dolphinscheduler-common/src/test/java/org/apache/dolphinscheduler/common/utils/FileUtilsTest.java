@@ -48,8 +48,8 @@ public class FileUtilsTest {
 
     @Test
     public void testGetProcessExecDir() {
-        String dir = FileUtils.getTaskInstanceWorkingDirectory("test", 1L, 2L, 1, 3, 4);
-        Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/test/1/2_1/3/4", dir);
+        String dir = FileUtils.getTaskInstanceWorkingDirectory(4);
+        Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/4", dir);
     }
 
     @Test
