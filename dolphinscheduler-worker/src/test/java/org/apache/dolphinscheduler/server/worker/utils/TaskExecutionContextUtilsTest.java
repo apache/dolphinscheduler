@@ -39,13 +39,8 @@ class TaskExecutionContextUtilsTest {
         taskExecutionContext.setWorkflowInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
 
-        String taskWorkingDirectory = FileUtils.getTaskInstanceWorkingDirectory(
-                taskExecutionContext.getTenantCode(),
-                taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getWorkflowDefinitionCode(),
-                taskExecutionContext.getWorkflowDefinitionVersion(),
-                taskExecutionContext.getWorkflowInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+        String taskWorkingDirectory =
+                FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
         try {
             // Test if the working directory is exist
             // will delete it and recreate

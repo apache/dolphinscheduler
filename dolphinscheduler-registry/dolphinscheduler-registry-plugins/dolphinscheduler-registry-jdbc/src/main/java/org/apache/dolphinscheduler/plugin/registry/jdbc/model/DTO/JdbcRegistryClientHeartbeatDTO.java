@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryClientHeartbeat;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +37,6 @@ public class JdbcRegistryClientHeartbeatDTO {
 
     private Long id;
 
-    // clientName
     private String clientName;
 
     private Long lastHeartbeatTime;
@@ -90,7 +90,7 @@ public class JdbcRegistryClientHeartbeatDTO {
     public static class ClientConfig {
 
         @Builder.Default
-        private long sessionTimeout = 60 * 1000L;
+        private long sessionTimeout = TimeUnit.SECONDS.toMillis(60);
 
     }
 

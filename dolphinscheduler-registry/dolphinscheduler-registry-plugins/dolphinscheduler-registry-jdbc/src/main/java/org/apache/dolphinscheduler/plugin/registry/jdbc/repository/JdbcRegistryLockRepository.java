@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryLo
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,6 +36,13 @@ public class JdbcRegistryLockRepository {
 
     @Autowired
     private JdbcRegistryLockMapper jdbcRegistryLockMapper;
+
+    public List<JdbcRegistryLockDTO> queryAll() {
+        return jdbcRegistryLockMapper.selectList(null)
+                .stream()
+                .map(JdbcRegistryLockDTO::fromJdbcRegistryLock)
+                .collect(Collectors.toList());
+    }
 
     public void deleteByClientIds(List<Long> clientIds) {
         if (CollectionUtils.isEmpty(clientIds)) {

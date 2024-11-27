@@ -33,11 +33,13 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryL
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -100,25 +102,22 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
             // The server is already started or stopped, will not start again.
             return;
         }
-        // Purge the previous client to avoid the client is still in the registry.
-        purgePreviousJdbcRegistryClient();
         // Start the Purge thread
-        // The Purge thread will remove the client from the registry, and remove it's related data and lock.
-        // Connect to the database, load the data and lock.
-        purgeDeadJdbcRegistryClient();
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor()
-                .scheduleWithFixedDelay(this::purgeDeadJdbcRegistryClient,
-                        jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
-                        jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
-                        TimeUnit.MILLISECONDS);
+        // The Purge thread will clear the invalidated data
+        purgeInvalidJdbcRegistryMetadata();
+        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+                this::purgeInvalidJdbcRegistryMetadata,
+                jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
+                jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
+                TimeUnit.MILLISECONDS);
         jdbcRegistryDataManager.start();
         jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
         doTriggerOnConnectedListener();
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor()
-                .scheduleWithFixedDelay(this::refreshClientsHeartbeat,
-                        0,
-                        jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
-                        TimeUnit.MILLISECONDS);
+        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+                this::refreshClientsHeartbeat,
+                0,
+                jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
+                TimeUnit.MILLISECONDS);
     }
 
     @SneakyThrows
@@ -139,9 +138,8 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 .lastHeartbeatTime(System.currentTimeMillis())
                 .build();
 
-        while (jdbcRegistryClientDTOMap.containsKey(jdbcRegistryClientIdentify)) {
-            log.warn("The client {} is already exist the registry.", jdbcRegistryClientIdentify.getClientId());
-            Thread.sleep(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis());
+        if (jdbcRegistryClientDTOMap.containsKey(jdbcRegistryClientIdentify)) {
+            throw new IllegalArgumentException("The client is already registered: " + jdbcRegistryClientIdentify);
         }
         jdbcRegistryClientRepository.insert(registryClientDTO);
         jdbcRegistryClients.add(jdbcRegistryClient);
@@ -260,34 +258,47 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         jdbcRegistryClientDTOMap.clear();
     }
 
-    private void purgePreviousJdbcRegistryClient() {
+    private void purgeInvalidJdbcRegistryMetadata() {
+        final StopWatch stopWatch = StopWatch.createStarted();
         if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
             return;
         }
-        List<Long> previousJdbcRegistryClientIds = jdbcRegistryClientRepository.queryAll()
-                .stream()
-                .filter(jdbcRegistryClientHeartbeat -> jdbcRegistryClientHeartbeat.getClientName()
-                        .equals(jdbcRegistryProperties.getJdbcRegistryClientName()))
-                .map(JdbcRegistryClientHeartbeatDTO::getId)
-                .collect(Collectors.toList());
-        doPurgeJdbcRegistryClientInDB(previousJdbcRegistryClientIds);
-
-    }
-
-    private void purgeDeadJdbcRegistryClient() {
-        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
-            return;
-        }
-        List<Long> deadJdbcRegistryClientIds = jdbcRegistryClientRepository.queryAll()
+        // remove the client which is already dead from the registry, and remove it's related data and lock.
+        final List<JdbcRegistryClientHeartbeatDTO> jdbcRegistryClients = jdbcRegistryClientRepository.queryAll();
+        final List<Long> deadJdbcRegistryClientIds = jdbcRegistryClients
                 .stream()
                 .filter(JdbcRegistryClientHeartbeatDTO::isDead)
                 .map(JdbcRegistryClientHeartbeatDTO::getId)
                 .collect(Collectors.toList());
         doPurgeJdbcRegistryClientInDB(deadJdbcRegistryClientIds);
 
+        // remove the data and lock which client is not exist.
+        final Set<Long> existJdbcRegistryClientIds = jdbcRegistryClients
+                .stream()
+                .map(JdbcRegistryClientHeartbeatDTO::getId)
+                .collect(Collectors.toSet());
+        jdbcRegistryDataManager.getAllJdbcRegistryData()
+                .stream()
+                .filter(jdbcRegistryDataDTO -> !existJdbcRegistryClientIds.contains(jdbcRegistryDataDTO.getClientId()))
+                .filter(jdbcRegistryDataDTO -> DataType.EPHEMERAL.name().equals(jdbcRegistryDataDTO.getDataType()))
+                .forEach(jdbcRegistryData -> {
+                    log.info("Remove the JdbcRegistryData: {} which client is not exist in the registry",
+                            jdbcRegistryData);
+                    jdbcRegistryDataManager.deleteJdbcRegistryDataByKey(jdbcRegistryData.getDataKey());
+                });
+        jdbcRegistryLockRepository.queryAll()
+                .stream()
+                .filter(jdbcRegistryLockDTO -> !existJdbcRegistryClientIds.contains(jdbcRegistryLockDTO.getClientId()))
+                .forEach(jdbcRegistryLockDTO -> {
+                    log.info("Remove the JdbcRegistryLock: {} which client is not exist in the registry",
+                            jdbcRegistryLockDTO);
+                    jdbcRegistryLockRepository.deleteById(jdbcRegistryLockDTO.getId());
+                });
+        stopWatch.stop();
+        log.debug("Success purge invalid jdbcRegistryMetadata, cost: {} ms", stopWatch.getTime());
     }
 
-    private void doPurgeJdbcRegistryClientInDB(List<Long> jdbcRegistryClientIds) {
+    private void doPurgeJdbcRegistryClientInDB(final List<Long> jdbcRegistryClientIds) {
         if (CollectionUtils.isEmpty(jdbcRegistryClientIds)) {
             return;
         }
