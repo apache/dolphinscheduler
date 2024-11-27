@@ -55,6 +55,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
       - run: sudo npm install -g markdown-link-check@3.11.2
       - run: sudo apt install plocate -y
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
