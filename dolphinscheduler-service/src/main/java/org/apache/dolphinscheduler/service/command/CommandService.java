@@ -18,9 +18,6 @@
 package org.apache.dolphinscheduler.service.command;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 
 /**
  * Command Service
@@ -50,16 +47,4 @@ public interface CommandService {
      */
     boolean verifyIsNeedCreateCommand(Command command);
 
-    /**
-     * create sub work process command
-     * @param parentWorkflowInstance parent process instance
-     * @param childInstance child process instance
-     * @param instanceMap process instance map
-     * @param task task instance
-     * @return command
-     */
-    Command createSubProcessCommand(WorkflowInstance parentWorkflowInstance,
-                                    WorkflowInstance childInstance,
-                                    WorkflowInstanceRelation instanceMap,
-                                    TaskInstance task);
 }
