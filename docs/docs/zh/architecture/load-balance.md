@@ -48,13 +48,8 @@ eg：master.host.selector=random（不区分大小写）
 
 该算法每隔一段时间会向注册中心上报自己的负载信息。我们主要根据两个信息来进行判断
 
-* load 平均值（默认是 CPU 核数 *2）
-* 可用物理内存（默认是 0.3，单位是 G）
+* load 平均值（默认是 CPU 核数 * 2）
+* 可用物理内存（默认是 70%，单位是百分比）
 
 如果两者任何一个低于配置项，那么这台 worker 将不参与负载。（即不分配流量）
-
-你可以在 worker.properties 修改下面的属性来自定义配置
-
-* worker.max.cpu.load.avg=-1 (worker最大cpu load均值，只有高于系统cpu load均值时，worker服务才能被派发任务. 默认值为-1: cpu cores * 2)
-* worker.reserved.memory=0.3 (worker预留内存，只有低于系统可用内存时，worker服务才能被派发任务，单位为百分比)
 
