@@ -37,8 +37,6 @@ public class TaskRunningLifecycleEvent extends AbstractTaskLifecycleEvent {
 
     private final String logPath;
 
-    private final String runtimeContext;
-
     private final Date startTime;
 
     @Override

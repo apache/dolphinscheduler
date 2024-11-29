@@ -169,7 +169,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                                   final ITaskExecutionRunnable taskExecutionRunnable,
                                   final TaskFailedLifecycleEvent taskFailedEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskFailedEvent);
+        super.failedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskFailedEvent);
     }
 
     @Override

@@ -35,5 +35,4 @@ public interface IWorkflowRepository {
 
     void remove(int workflowInstanceId);
 
-    void clear();
 }

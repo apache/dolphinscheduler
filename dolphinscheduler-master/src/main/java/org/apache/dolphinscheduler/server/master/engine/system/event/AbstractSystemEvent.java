@@ -23,6 +23,10 @@ import java.util.Date;
 
 public abstract class AbstractSystemEvent extends AbstractDelayEvent {
 
+    public AbstractSystemEvent() {
+        super();
+    }
+
     public AbstractSystemEvent(long delayTime) {
         super(delayTime);
     }

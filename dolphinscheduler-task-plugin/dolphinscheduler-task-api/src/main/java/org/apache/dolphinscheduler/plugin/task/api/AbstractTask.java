@@ -140,14 +140,13 @@ public abstract class AbstractTask {
      * @return exit status
      */
     public TaskExecutionStatus getExitStatus() {
-        switch (getExitStatusCode()) {
-            case TaskConstants.EXIT_CODE_SUCCESS:
-                return TaskExecutionStatus.SUCCESS;
-            case TaskConstants.EXIT_CODE_KILL:
-                return TaskExecutionStatus.KILL;
-            default:
-                return TaskExecutionStatus.FAILURE;
+        if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
+            return TaskExecutionStatus.SUCCESS;
         }
+        if (exitStatusCode == TaskConstants.EXIT_CODE_KILL || exitStatusCode == TaskConstants.EXIT_CODE_HARD_KILL) {
+            return TaskExecutionStatus.KILL;
+        }
+        return TaskExecutionStatus.FAILURE;
     }
 
     /**
@@ -167,8 +166,8 @@ public abstract class AbstractTask {
     /**
      * regular expressions match the contents between two specified strings
      *
-     * @param content content
-     * @param sqlParamsMap sql params map
+     * @param content        content
+     * @param sqlParamsMap   sql params map
      * @param paramsPropsMap params props map
      */
     public void setSqlParamsMap(String content, Map<Integer, Property> sqlParamsMap,

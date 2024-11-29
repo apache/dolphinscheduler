@@ -29,7 +29,7 @@ public class GlobalMasterFailoverEvent extends AbstractSystemEvent {
     private final Date eventTime;
 
     public GlobalMasterFailoverEvent(Date eventTime) {
-        super(eventTime.getTime());
+        super();
         this.eventTime = eventTime;
     }
 

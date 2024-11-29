@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.extract.common;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
-import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -34,9 +32,6 @@ public interface ILogService {
 
     @RpcMethod
     TaskInstanceLogPageQueryResponse pageQueryTaskInstanceLog(TaskInstanceLogPageQueryRequest taskInstanceLogPageQueryRequest);
-
-    @RpcMethod
-    GetAppIdResponse getAppId(GetAppIdRequest getAppIdRequest);
 
     @RpcMethod
     void removeTaskInstanceLog(String taskInstanceLogAbsolutePath);

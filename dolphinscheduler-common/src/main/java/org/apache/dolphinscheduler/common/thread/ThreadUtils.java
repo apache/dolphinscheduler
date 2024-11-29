@@ -31,6 +31,12 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class ThreadUtils {
 
+    /**
+     * Create a daemon fixed thread pool, the thread name will be formatted with the given name.
+     *
+     * @param threadNameFormat the thread name format, e.g. "DemonThread-%d"
+     * @param threadsNum       the number of threads in the pool
+     */
     public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadNameFormat, int threadsNum) {
         return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, newDaemonThreadFactory(threadNameFormat));
     }
@@ -43,9 +49,10 @@ public class ThreadUtils {
      * Create a daemon scheduler thread pool, the thread name will be formatted with the given name.
      *
      * @param threadNameFormat the thread name format, e.g. "DemonThread-%d"
-     * @param threadsNum the number of threads in the pool
+     * @param threadsNum       the number of threads in the pool
      */
-    public static ScheduledExecutorService newDaemonScheduledExecutorService(String threadNameFormat, int threadsNum) {
+    public static ScheduledExecutorService newDaemonScheduledExecutorService(final String threadNameFormat,
+                                                                             final int threadsNum) {
         return Executors.newScheduledThreadPool(threadsNum, newDaemonThreadFactory(threadNameFormat));
     }
 

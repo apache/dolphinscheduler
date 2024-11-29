@@ -25,12 +25,12 @@ import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,9 +38,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-/**
- * json serialize or deserialize
- */
 @Slf4j
 public class JsonSerializer {
 
@@ -60,13 +57,6 @@ public class JsonSerializer {
 
     }
 
-    /**
-     * serialize to byte
-     *
-     * @param obj object
-     * @param <T> object type
-     * @return byte array
-     */
     public static <T> byte[] serialize(T obj) {
         if (obj == null) {
             return null;
@@ -79,44 +69,14 @@ public class JsonSerializer {
         }
     }
 
-    /**
-     * serialize to string
-     *
-     * @param obj object
-     * @param <T> object type
-     * @return string
-     */
-    public static <T> String serializeToString(T obj) {
-        String json = "";
-        try {
-            json = objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            log.error("serializeToString exception!", e);
-        }
-
-        return json;
-    }
-
-    /**
-     * deserialize
-     *
-     * @param src   byte array
-     * @param clazz class
-     * @param <T>   deserialize type
-     * @return deserialize type
-     */
+    @SneakyThrows
     public static <T> T deserialize(byte[] src, Class<T> clazz) {
         if (src == null) {
             return null;
         }
 
         String json = new String(src, StandardCharsets.UTF_8);
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (IOException e) {
-            log.error("deserialize exception!", e);
-            return null;
-        }
+        return objectMapper.readValue(json, clazz);
     }
 
 }
