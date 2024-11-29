@@ -70,9 +70,9 @@ public class WorkerGroupChangeNotifier {
         listeners.add(listener);
     }
 
-    void detectWorkerGroupChanges() {
+    public synchronized void detectWorkerGroupChanges() {
         try {
-            MapComparator<String, WorkerGroup> mapComparator = detectChangedWorkerGroups();
+            final MapComparator<String, WorkerGroup> mapComparator = detectChangedWorkerGroups();
             triggerListeners(mapComparator);
             workerGroupMap = mapComparator.getNewMap();
         } catch (Exception ex) {
