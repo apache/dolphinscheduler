@@ -46,7 +46,7 @@ public class WorkflowInstanceStopTestCase extends AbstractMasterIntegrationTestC
     public void testStopWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -91,7 +91,7 @@ public class WorkflowInstanceStopTestCase extends AbstractMasterIntegrationTestC
     public void testStopWorkflow_with_oneFailedTask() {
         final String yaml = "/it/stop/workflow_with_one_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -136,7 +136,7 @@ public class WorkflowInstanceStopTestCase extends AbstractMasterIntegrationTestC
     public void testStopWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/stop/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -153,7 +153,7 @@ public class WorkflowInstanceStopTestCase extends AbstractMasterIntegrationTestC
 
         // make sure the task has been dispatched to the executor
         ThreadUtils.sleep(2_000);
-        assertThat(workflowOperator.stopWorkflowInstance(workflowInstanceId).isSuccess());
+        assertThat(workflowOperator.stopWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -187,7 +187,7 @@ public class WorkflowInstanceStopTestCase extends AbstractMasterIntegrationTestC
     public void testStopWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/stop/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)

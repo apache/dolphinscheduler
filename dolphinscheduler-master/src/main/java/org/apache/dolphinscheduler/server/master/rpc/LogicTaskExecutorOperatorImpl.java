@@ -49,7 +49,7 @@ public class LogicTaskExecutorOperatorImpl implements ILogicTaskExecutorOperator
         try (
                 final TaskExecutorMDCUtils.MDCAutoClosable ignore =
                         TaskExecutorMDCUtils.logWithMDC(taskExecutionContext.getTaskInstanceId())) {
-            log.info("Receive TaskExecutorDispatchRequest: {}", taskExecutorDispatchRequest);
+            log.info("Receive  {}", taskExecutorDispatchRequest);
             try {
                 logicTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
                 log.info("Handle {} success", taskExecutorDispatchRequest);
@@ -81,7 +81,7 @@ public class LogicTaskExecutorOperatorImpl implements ILogicTaskExecutorOperator
     public void ackTaskExecutorLifecycleEvent(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
         final int taskExecutorId = taskExecutorLifecycleEventAck.getTaskExecutorId();
         try (final TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskExecutorId)) {
-            log.info("Receive TaskExecutorLifecycleEventAck: {}", taskExecutorLifecycleEventAck);
+            log.info("Receive : {}", taskExecutorLifecycleEventAck);
             logicTaskEngineDelegator.ackLogicTaskExecutionEvent(taskExecutorLifecycleEventAck);
         }
     }
@@ -90,13 +90,13 @@ public class LogicTaskExecutorOperatorImpl implements ILogicTaskExecutorOperator
     public TaskExecutorKillResponse killTask(final TaskExecutorKillRequest taskKillRequest) {
         final int taskInstanceId = taskKillRequest.getTaskInstanceId();
         try (final TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskInstanceId)) {
-            log.info("Receive TaskExecutorKillRequest: {}", taskKillRequest);
+            log.info("Receive  {}", taskKillRequest);
             try {
                 logicTaskEngineDelegator.killLogicTask(taskInstanceId);
-                log.info("Handle TaskExecutorKillRequest: {} success", taskKillRequest);
+                log.info("Handle  {} success", taskKillRequest);
                 return TaskExecutorKillResponse.success();
             } catch (Throwable throwable) {
-                log.error("Handle TaskExecutorKillRequest: {} failed", taskKillRequest, throwable);
+                log.error("Handle  {} failed", taskKillRequest, throwable);
                 return TaskExecutorKillResponse.fail(ExceptionUtils.getMessage(throwable));
             }
         }

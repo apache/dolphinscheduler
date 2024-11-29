@@ -78,7 +78,7 @@ public class MasterContainer {
         assertThat(executorContainer.getTaskExecutorAssignmentTable()).matches(TaskExecutorAssignmentTable::isEmpty);
 
         final TaskExecutorWorkers taskExecutorWorkers = executorContainer.getTaskExecutorWorkers();
-        assertThat(taskExecutorWorkers.getTaskExecutorWorkers())
+        assertThat(taskExecutorWorkers.getWorkers())
                 .allMatch(taskExecutorWorker -> taskExecutorWorker.getRegisteredTaskExecutorSize() == 0)
                 .allMatch(taskExecutorWorker -> taskExecutorWorker.getFiredTaskExecutorSize() == 0);
 

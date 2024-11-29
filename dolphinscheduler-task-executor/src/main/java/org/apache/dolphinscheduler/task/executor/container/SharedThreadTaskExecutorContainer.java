@@ -36,7 +36,7 @@ public class SharedThreadTaskExecutorContainer extends AbstractTaskExecutorConta
 
     @Override
     protected Optional<TaskExecutorWorker> getTaskExecutorWorkerCandidate(final ITaskExecutor taskExecutor) {
-        return Optional.of(taskExecutorWorkers.getRandomTaskExecutorWorker());
+        return Optional.of(taskExecutorWorkers.roundRobinSelectWorker());
     }
 
 }

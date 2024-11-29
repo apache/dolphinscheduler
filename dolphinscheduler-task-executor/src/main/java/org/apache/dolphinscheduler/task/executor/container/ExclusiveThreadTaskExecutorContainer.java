@@ -37,7 +37,7 @@ public class ExclusiveThreadTaskExecutorContainer extends AbstractTaskExecutorCo
 
     @Override
     protected Optional<TaskExecutorWorker> getTaskExecutorWorkerCandidate(final ITaskExecutor taskExecutor) {
-        return taskExecutorWorkers.getIdleTaskExecutorWorker();
+        return taskExecutorWorkers.selectIdleWorker();
     }
 
 }

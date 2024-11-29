@@ -57,7 +57,6 @@ public class TaskExecutorWorker extends AbstractTaskExecutorWorker {
     @Override
     public void start() {
         while (true) {
-            final long now = System.currentTimeMillis();
             long minNextTrackDelay = 100;
             for (final ITaskExecutor taskExecutor : activeTaskExecutors.values()) {
                 try (final MDCAutoClosable closable = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {

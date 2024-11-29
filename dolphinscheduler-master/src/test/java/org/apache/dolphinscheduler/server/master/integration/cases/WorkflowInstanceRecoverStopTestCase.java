@@ -46,7 +46,7 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
     public void testRecoverStoppedWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/recover_stopped/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)

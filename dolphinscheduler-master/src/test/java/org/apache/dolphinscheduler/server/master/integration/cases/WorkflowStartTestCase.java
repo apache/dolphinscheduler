@@ -57,7 +57,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -91,7 +91,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneSuccessTaskDryRun() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -126,7 +126,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
@@ -181,7 +181,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_subWorkflowTask_dryRunSuccess() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
@@ -225,7 +225,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_subWorkflowTask_failed() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
@@ -277,7 +277,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_usingWorkflowParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -313,7 +313,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_usingCommandParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
@@ -357,7 +357,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneFailedTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -387,7 +387,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneFailedTaskWithRetry() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -439,7 +439,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoSerialSuccessTask() {
         String yaml = "/it/start/workflow_with_two_serial_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -477,7 +477,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoSerialFailedTask() {
         final String yaml = "/it/start/workflow_with_two_serial_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -507,7 +507,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -544,7 +544,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoParallelFailedTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -582,7 +582,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -648,7 +648,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflowFromStartNodes_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .startNodes(Lists.newArrayList(6L))
@@ -689,7 +689,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_usingWorkflowBuiltInParam() {
         final String yaml = "/it/start/workflow_with_built_in_param.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)

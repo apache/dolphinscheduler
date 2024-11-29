@@ -75,7 +75,7 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
             throw new IllegalStateException(
                     "The taskExecutor: " + taskExecutor.getId() + " is not registered to any worker");
         }
-        final TaskExecutorWorker taskExecutorWorker = taskExecutorWorkers.getTaskExecutorWorkerById(workerId);
+        final TaskExecutorWorker taskExecutorWorker = taskExecutorWorkers.getWorkerById(workerId);
         taskExecutorWorker.fireTaskExecutor(taskExecutor);
     }
 
@@ -93,7 +93,7 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
     public void finalize(final ITaskExecutor taskExecutor) {
         if (taskExecutorAssignmentTable.isTaskExecutorRegistered(taskExecutor)) {
             final Integer taskExecutorWorkerId = taskExecutorAssignmentTable.getTaskExecutorWorkerId(taskExecutor);
-            taskExecutorWorkers.getTaskExecutorWorkerById(taskExecutorWorkerId).unRegisterTaskExecutor(taskExecutor);
+            taskExecutorWorkers.getWorkerById(taskExecutorWorkerId).unRegisterTaskExecutor(taskExecutor);
             taskExecutorAssignmentTable.unregisterTaskExecutor(taskExecutor);
         }
         log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
@@ -102,7 +102,7 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
 
     @Override
     public double slotUsage() {
-        final List<TaskExecutorWorker> allWorkers = taskExecutorWorkers.getTaskExecutorWorkers();
+        final List<TaskExecutorWorker> allWorkers = taskExecutorWorkers.getWorkers();
         final long activeWorkerCount = allWorkers
                 .stream()
                 .filter(taskExecutorWorker -> taskExecutorWorker.getRegisteredTaskExecutorSize() != 0)
@@ -121,7 +121,7 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
     }
 
     private void startAllThreadTaskExecutorWorker() {
-        for (final TaskExecutorWorker taskExecutorWorker : taskExecutorWorkers.getTaskExecutorWorkers()) {
+        for (final TaskExecutorWorker taskExecutorWorker : taskExecutorWorkers.getWorkers()) {
             taskExecutorThreadPool.submit(taskExecutorWorker::start);
         }
     }

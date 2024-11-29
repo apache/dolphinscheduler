@@ -17,36 +17,40 @@
 
 package org.apache.dolphinscheduler.task.executor.worker;
 
-import org.apache.commons.lang3.RandomUtils;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TaskExecutorWorkers {
 
     private final List<TaskExecutorWorker> taskExecutorWorkers;
 
+    private final LongAdder longAdder = new LongAdder();
+
     public TaskExecutorWorkers(final int workerSize) {
-        this.taskExecutorWorkers = new ArrayList<>();
-        for (int i = 0; i < workerSize; i++) {
-            taskExecutorWorkers.add(new TaskExecutorWorker(i));
-        }
+        this.taskExecutorWorkers = IntStream
+                .range(0, workerSize)
+                .mapToObj(TaskExecutorWorker::new)
+                .collect(Collectors.toList());
     }
 
-    public List<TaskExecutorWorker> getTaskExecutorWorkers() {
+    public List<TaskExecutorWorker> getWorkers() {
         return taskExecutorWorkers;
     }
 
-    public TaskExecutorWorker getTaskExecutorWorkerById(final int workerId) {
+    public TaskExecutorWorker getWorkerById(final int workerId) {
         return taskExecutorWorkers.get(workerId);
     }
 
-    public TaskExecutorWorker getRandomTaskExecutorWorker() {
-        return taskExecutorWorkers.get(RandomUtils.nextInt(0, taskExecutorWorkers.size()));
+    public TaskExecutorWorker roundRobinSelectWorker() {
+        int workerIndex = (int) (longAdder.longValue() % taskExecutorWorkers.size());
+        longAdder.increment();
+        return taskExecutorWorkers.get(workerIndex);
     }
 
-    public Optional<TaskExecutorWorker> getIdleTaskExecutorWorker() {
+    public Optional<TaskExecutorWorker> selectIdleWorker() {
         for (TaskExecutorWorker taskExecutorWorker : taskExecutorWorkers) {
             if (taskExecutorWorker.getRegisteredTaskExecutorSize() == 0) {
                 return Optional.of(taskExecutorWorker);

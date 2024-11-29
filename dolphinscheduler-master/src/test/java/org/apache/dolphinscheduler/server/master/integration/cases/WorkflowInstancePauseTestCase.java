@@ -46,7 +46,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
     public void testPauseWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/pause/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -92,7 +92,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
     public void testPauseWorkflow_with_oneFailedTask() {
         final String yaml = "/it/pause/workflow_with_one_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -117,7 +117,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
                                     });
                 });
 
-        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess());
+        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -140,7 +140,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
     public void testPauseWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/pause/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -149,7 +149,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
-                .pollInterval(Duration.ofMillis(100))
+                .pollInterval(Duration.ofMillis(50))
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(workflowInstanceId))
@@ -157,6 +157,12 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
                                 assertThat(workflowInstance.getState())
                                         .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                             });
+                });
+
+        await()
+                .pollInterval(Duration.ofMillis(50))
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A1");
@@ -172,7 +178,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
                             });
                 });
 
-        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess());
+        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -216,7 +222,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
     public void testPauseWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/pause/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -253,7 +259,7 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
                             });
                 });
 
-        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess());
+        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
 
         await()
                 .atMost(Duration.ofMinutes(1))
