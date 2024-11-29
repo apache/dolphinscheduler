@@ -46,10 +46,7 @@ Each worker has two weights parameters, weight (which remains constant after war
 
 ### Linear Weighting (Default Algorithm)
 
-This algorithm reports its own load information to the registry at regular intervals. Make decision on two main pieces of information:
-
-- load average (default is the number of CPU cores * 2)
-- available physical memory (default is 70%, in percentage)
+This algorithm reports its own load information to the registry at regular intervals. We mainly judge by CPU usage, memory usage and worker slot usage.
 
 If either of these is lower than the configured item, then this worker will not participate in the load. (no traffic will be allocated)
 
