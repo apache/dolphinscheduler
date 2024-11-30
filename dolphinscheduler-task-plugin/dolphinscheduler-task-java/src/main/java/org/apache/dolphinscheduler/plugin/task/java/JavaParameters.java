@@ -55,6 +55,11 @@ public class JavaParameters extends AbstractParameters {
     private boolean isModulePath;
 
     /**
+     * full main class name
+     **/
+    private String mainClass;
+
+    /**
      * resource list
      */
     private List<ResourceInfo> resourceList;
@@ -66,7 +71,7 @@ public class JavaParameters extends AbstractParameters {
      */
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(runType);
+        return StringUtils.isNotEmpty(runType) && mainJar != null;
     }
 
     /**

@@ -23,7 +23,7 @@ import type { IJsonItem, ProgramType, IMainJar } from '../types'
 
 export function useJavaTaskNormalJar(model: {
   [field: string]: any
-}): IJsonItem {
+}): IJsonItem[] {
   const { t } = useI18n()
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
@@ -55,29 +55,51 @@ export function useJavaTaskNormalJar(model: {
     }
   )
 
-  return {
-    type: 'tree-select',
-    field: 'mainJar',
-    name: t('project.node.main_package'),
-    span: mainJarSpan,
-    props: {
-      checkable: true,
-      cascade: true,
-      showPath: true,
-      checkStrategy: 'child',
-      placeholder: t('project.node.main_package_tips'),
-      keyField: 'fullName',
-      labelField: 'name'
-    },
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      validator(validate: any, value: string) {
-        if (!value) {
-          return new Error(t('project.node.main_package_tips'))
+  return [
+    {
+      type: 'input',
+      field: 'mainClass',
+      name: t('project.node.main_class'),
+      span: mainJarSpan,
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.main_class_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(_: any, value: string) {
+          if (value && !/^([A-Za-z_$][A-Za-z\d_$]*\.)*[A-Za-z_$][A-Za-z\d_$]*$/.test(value.trim())) {
+            return new Error(t('project.node.main_class_invalid'))
+          }
+          return true
         }
       }
-    },
-    options: mainJarOptions
-  }
+    }, {
+      type: 'tree-select',
+      field: 'mainJar',
+      name: t('project.node.main_package'),
+      span: mainJarSpan,
+      props: {
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        checkStrategy: 'child',
+        placeholder: t('project.node.main_package_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(_: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.main_package_tips'))
+          }
+          return true
+        }
+      },
+      options: mainJarOptions
+    }
+  ]
+
 }

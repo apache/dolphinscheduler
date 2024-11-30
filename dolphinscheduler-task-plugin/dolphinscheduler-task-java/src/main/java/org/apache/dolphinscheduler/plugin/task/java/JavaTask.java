@@ -164,8 +164,15 @@ public class JavaTask extends AbstractTask {
                 javaParameters.getMainJar()
                         .getResourceName())
                 .getResourceAbsolutePathInLocal();
-        String mainJarName = MainClassExtractor.getMainClassName(mainJarAbsolutePathInLocal);
+        String mainClassName = javaParameters.getMainClass();
+        String mainJarName;
+        if (mainClassName == null) {
+            mainJarName = MainClassExtractor.getMainClassName(mainJarAbsolutePathInLocal);
+        } else {
 
+            mainJarName = mainClassName;
+
+        }
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(Constants.SPACE)

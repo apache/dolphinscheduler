@@ -51,6 +51,7 @@ export function useJava({
     runType: 'FAT_JAR',
     mainArgs: '',
     jvmArgs: '',
+    mainClass: '',
     programType: 'JAVA'
   } as unknown as INodeData)
 
