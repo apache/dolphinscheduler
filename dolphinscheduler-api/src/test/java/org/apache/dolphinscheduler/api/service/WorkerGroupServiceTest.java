@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -243,7 +244,7 @@ public class WorkerGroupServiceTest {
         List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
         workflowInstances.add(workflowInstance);
         Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
-                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+                WorkflowExecutionStatus.getNotTerminalStatus()))
                 .thenReturn(workflowInstances);
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
@@ -261,7 +262,7 @@ public class WorkerGroupServiceTest {
         WorkerGroup workerGroup = getWorkerGroup(1);
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
         Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
-                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(null);
+                WorkflowExecutionStatus.getNotTerminalStatus())).thenReturn(null);
 
         Mockito.when(workerGroupMapper.deleteById(1)).thenReturn(1);
 

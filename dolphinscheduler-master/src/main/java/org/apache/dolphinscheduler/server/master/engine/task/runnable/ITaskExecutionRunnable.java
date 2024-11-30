@@ -32,6 +32,14 @@ public interface ITaskExecutionRunnable
         extends
             Comparable<ITaskExecutionRunnable> {
 
+    /**
+     * Get the task instance id.
+     * <p> Need to know the id might change since the task instance might be regenerated.
+     */
+    default int getId() {
+        return getTaskInstance().getId();
+    }
+
     default String getName() {
         return getTaskDefinition().getName();
     }

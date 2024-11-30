@@ -46,7 +46,11 @@ registry:
 
 master:
   listen-port: 5678
-  workflow-event-bus-fire-thread-count: 10
+    # The number of workflow event bus fire worker used to fire the workflow event, default is 2*CPU core + 1.
+  workflow-event-bus-fire-thread-count: 4
+  logic-task-config:
+    # The number of threads used to execute logic task.
+    task-executor-thread-count: 4
   max-heartbeat-interval: 10s
   server-load-protection:
     # If set true, will open master overload protection

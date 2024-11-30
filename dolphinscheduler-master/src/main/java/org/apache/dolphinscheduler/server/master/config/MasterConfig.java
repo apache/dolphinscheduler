@@ -48,10 +48,8 @@ public class MasterConfig implements Validator {
 
     private int workflowEventBusFireThreadCount = Runtime.getRuntime().availableProcessors() * 2 + 1;
 
-    // todo: change to sync thread pool/ async thread pool ?
-    private int masterSyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
+    private LogicTaskConfig logicTaskConfig = new LogicTaskConfig();
 
-    private int masterAsyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
     /**
      * Master heart beat task execute interval.
      */
@@ -115,6 +113,7 @@ public class MasterConfig implements Validator {
                 "\n****************************Master Configuration**************************************" +
                         "\n  listen-port -> " + listenPort +
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
+                        "\n  logic-task-config -> " + logicTaskConfig +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  master-address -> " + masterAddress +

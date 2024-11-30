@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.server.master.engine.executor.plugin.condition.ConditionLogicTask;
+import org.apache.dolphinscheduler.server.master.engine.executor.plugin.switchtask.SwitchLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.task.condition.ConditionLogicTask;
-import org.apache.dolphinscheduler.server.master.runner.task.switchtask.SwitchLogicTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 

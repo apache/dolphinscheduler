@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -191,7 +192,7 @@ public class TenantServiceTest {
                 baseServiceLogger)).thenReturn(true);
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
         when(workflowInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
-                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+                WorkflowExecutionStatus.getNotTerminalStatus()))
                         .thenReturn(getInstanceList());
         when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
         when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());

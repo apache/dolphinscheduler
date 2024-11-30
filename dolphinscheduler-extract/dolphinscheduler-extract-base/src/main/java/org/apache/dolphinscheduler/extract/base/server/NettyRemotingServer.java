@@ -70,12 +70,12 @@ class NettyRemotingServer {
         this.serverConfig = serverConfig;
         this.serverName = serverConfig.getServerName();
         this.methodInvokerExecutor = ThreadUtils.newDaemonFixedThreadExecutor(
-                serverName + "MethodInvoker-%d", Runtime.getRuntime().availableProcessors() * 2 + 1);
+                serverName + "-methodInvoker-%d", Runtime.getRuntime().availableProcessors() * 2 + 1);
         this.channelHandler = new JdkDynamicServerHandler(methodInvokerExecutor);
         ThreadFactory bossThreadFactory =
-                ThreadUtils.newDaemonThreadFactory(serverName + "BossThread-%d");
+                ThreadUtils.newDaemonThreadFactory(serverName + "-boss-%d");
         ThreadFactory workerThreadFactory =
-                ThreadUtils.newDaemonThreadFactory(serverName + "WorkerThread-%d");
+                ThreadUtils.newDaemonThreadFactory(serverName + "-worker-%d");
         if (Epoll.isAvailable()) {
             this.bossGroup = new EpollEventLoopGroup(1, bossThreadFactory);
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);

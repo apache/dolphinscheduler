@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -39,6 +40,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -677,6 +682,26 @@ public class DagHelperTest {
         WorkflowDag workflowDag = DagHelper.getWorkflowDag(taskNodeList);
         DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(workflowDag);
         Assertions.assertNotNull(dag);
+    }
+
+    @Data
+    @NoArgsConstructor
+    private static class ProcessData {
+
+        @EqualsAndHashCode.Include
+        private List<TaskNode> tasks;
+
+        @EqualsAndHashCode.Include
+        private List<Property> globalParams;
+
+        private int timeout;
+
+        private int tenantId;
+
+        public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
+            this.tasks = tasks;
+            this.globalParams = globalParams;
+        }
     }
 
 }

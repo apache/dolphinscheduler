@@ -39,6 +39,10 @@ public enum TaskLifecycleEventType implements ILifecycleEventType {
      */
     RUNNING,
     /**
+     * The task instance's runtime context changed.
+     */
+    RUNTIME_CONTEXT_CHANGED,
+    /**
      * Do Timeout strategy of the task instance.
      */
     TIMEOUT,

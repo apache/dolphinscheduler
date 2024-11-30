@@ -1060,9 +1060,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // check workflow instances is already running
-        List<WorkflowInstance> workflowInstances = workflowInstanceService
-                .queryByWorkflowDefinitionCodeAndStatus(workflowDefinition.getCode(),
-                        org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
+        List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowDefinitionCodeAndStatus(
+                workflowDefinition.getCode(), WorkflowExecutionStatus.getNotTerminalStatus());
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }

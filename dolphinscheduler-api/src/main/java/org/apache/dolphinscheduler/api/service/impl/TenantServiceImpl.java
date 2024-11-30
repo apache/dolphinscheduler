@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -255,8 +256,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     }
 
     private List<WorkflowInstance> getWorkflowInstancesByTenant(Tenant tenant) {
-        return workflowInstanceMapper.queryByTenantCodeAndStatus(tenant.getTenantCode(),
-                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
+        return workflowInstanceMapper.queryByTenantCodeAndStatus(
+                tenant.getTenantCode(),
+                WorkflowExecutionStatus.getNotTerminalStatus());
     }
 
     /**

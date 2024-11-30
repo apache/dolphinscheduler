@@ -208,33 +208,6 @@ public class DagHelper {
     }
 
     /**
-     * generate dag by start nodes and recovery nodes
-     *
-     * @param totalTaskNodeList    totalTaskNodeList
-     * @param startNodeNameList    startNodeNameList
-     * @param recoveryNodeCodeList recoveryNodeCodeList
-     * @param depNodeType          depNodeType
-     * @return workflow dag
-     * @throws Exception if error throws Exception
-     */
-    public static WorkflowDag generateFlowDag(List<TaskNode> totalTaskNodeList,
-                                              List<Long> startNodeNameList,
-                                              List<Long> recoveryNodeCodeList,
-                                              TaskDependType depNodeType) throws Exception {
-
-        List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(totalTaskNodeList, startNodeNameList,
-                recoveryNodeCodeList, depNodeType);
-        if (destTaskNodeList.isEmpty()) {
-            return null;
-        }
-        List<TaskNodeRelation> taskNodeRelations = generateRelationListByFlowNodes(destTaskNodeList);
-        WorkflowDag workflowDag = new WorkflowDag();
-        workflowDag.setEdges(taskNodeRelations);
-        workflowDag.setNodes(destTaskNodeList);
-        return workflowDag;
-    }
-
-    /**
      * find node by node code
      *
      * @param nodeDetails nodeDetails

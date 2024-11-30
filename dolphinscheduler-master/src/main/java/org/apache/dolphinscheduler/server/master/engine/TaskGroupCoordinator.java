@@ -98,7 +98,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
 
     private boolean flag = true;
 
-    private static int DEFAULT_LIMIT = 1000;
+    private static final int DEFAULT_LIMIT = 1000;
 
     public TaskGroupCoordinator() {
         super("TaskGroupCoordinator");
@@ -126,7 +126,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
                     dealWithWaitingTaskGroupQueue();
 
                     taskGroupCoordinatorRoundCost.stop();
-                    log.info("TaskGroupCoordinator round cost: {}/ms", taskGroupCoordinatorRoundCost.getTime());
+                    log.debug("TaskGroupCoordinator round cost: {}/ms", taskGroupCoordinatorRoundCost.getTime());
                 } finally {
                     registryClient.releaseLock(RegistryNodeType.MASTER_TASK_GROUP_COORDINATOR_LOCK.getRegistryPath());
                 }
@@ -183,7 +183,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
             }
             minTaskGroupQueueId = taskGroupQueues.get(taskGroupQueues.size() - 1).getId();
         }
-        log.info("Success amend TaskGroupQueue status cost: {}/ms", taskGroupCoordinatorRoundTimeCost.getTime());
+        log.debug("Success amend TaskGroupQueue status cost: {}/ms", taskGroupCoordinatorRoundTimeCost.getTime());
     }
 
     /**
@@ -237,7 +237,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
             }
             minTaskGroupQueueId = taskGroupQueues.get(taskGroupQueues.size() - 1).getId();
         }
-        log.info("Success deal with force start TaskGroupQueue cost: {}/ms",
+        log.debug("Success deal with force start TaskGroupQueue cost: {}/ms",
                 taskGroupCoordinatorRoundTimeCost.getTime());
     }
 

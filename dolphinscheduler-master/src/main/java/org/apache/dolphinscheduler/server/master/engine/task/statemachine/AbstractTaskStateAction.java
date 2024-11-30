@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRetryLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRunningLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskInstanceFactories;
@@ -110,15 +111,23 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         taskInstanceDao.updateById(taskInstance);
     }
 
+    @Override
+    public void runtimeContextChangedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                 final ITaskExecutionRunnable taskExecutionRunnable,
+                                                 final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent) {
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        if (StringUtils.isNotEmpty(taskRuntimeContextChangedEvent.getRuntimeContext())) {
+            taskInstance.setAppLink(taskRuntimeContextChangedEvent.getRuntimeContext());
+        }
+        taskInstanceDao.updateById(taskInstance);
+    }
+
     protected void persistentTaskInstanceStartedEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
                                                           final TaskRunningLifecycleEvent taskRunningEvent) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(taskRunningEvent.getStartTime());
         taskInstance.setLogPath(taskRunningEvent.getLogPath());
-        if (StringUtils.isNotEmpty(taskRunningEvent.getRuntimeContext())) {
-            taskInstance.setAppLink(taskRunningEvent.getRuntimeContext());
-        }
         taskInstanceDao.updateById(taskInstance);
     }
 

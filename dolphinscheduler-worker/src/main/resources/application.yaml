@@ -42,8 +42,6 @@ registry:
 worker:
   # worker listener port
   listen-port: 1234
-  # worker execute thread number to limit task instances in parallel
-  exec-threads: 100
   # worker heartbeat interval
   max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
@@ -60,6 +58,9 @@ worker:
     # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
     max-disk-usage-percentage-thresholds: 0.7
   task-execute-threads-full-policy: REJECT
+  physical-task-config:
+    # The number of threads in the Physical task engine that used to execute tasks
+    task-executor-thread-size: 100
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     auto-create-tenant-enabled: true
