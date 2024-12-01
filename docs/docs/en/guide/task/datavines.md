@@ -14,7 +14,7 @@ it will call `Datavines API` to trigger datavines job. Click [here](https://data
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-| **Parameter**     | **Description**                                                                                       |
+|   **Parameter**   |                                            **Description**                                            |
 |-------------------|-------------------------------------------------------------------------------------------------------|
 | Datavines Address | The URL for the Datavines service, e.g., http://localhost:5600.                                       |
 | Datavines Job ID  | The unique job id for a datavines job.                                                                |
