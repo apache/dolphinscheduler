@@ -25,7 +25,7 @@
 
 这个示例展示了如何创建 Datavines 任务节点：
 
-![demo-datavines](../../../../img/tasks/demo/datavines.png)
+![demo-datavines](../../../../img/tasks/demo/datavines_task.png)
 
 ![demo-get-datavines-job-id](../../../../img/tasks/demo/datavines_job_id.png)
 

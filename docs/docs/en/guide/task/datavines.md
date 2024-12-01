@@ -25,6 +25,6 @@ it will call `Datavines API` to trigger datavines job. Click [here](https://data
 
 This example illustrates how to create a datavines task node.
 
-![demo-datavines](../../../../img/tasks/demo/datavines.png)
+![demo-datavines](../../../../img/tasks/demo/datavines_task.png)
 
 ![demo-get-datavines-job-id](../../../../img/tasks/demo/datavines_job_id.png)
