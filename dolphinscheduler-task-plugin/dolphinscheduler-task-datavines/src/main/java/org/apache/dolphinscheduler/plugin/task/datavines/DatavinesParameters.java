@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.datavines;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Collections;
 import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

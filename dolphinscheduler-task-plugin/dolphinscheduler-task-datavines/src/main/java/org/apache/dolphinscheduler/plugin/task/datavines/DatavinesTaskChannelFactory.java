@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.datavines;
 
-import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+
+import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class DatavinesTaskChannelFactory implements TaskChannelFactory {

@@ -17,15 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.datavines;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import lombok.extern.slf4j.Slf4j;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -39,7 +35,13 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 @Slf4j
 public class DatavinesTask extends AbstractRemoteTask {
@@ -118,7 +120,8 @@ public class DatavinesTask extends AbstractRemoteTask {
             String apiResultDataKey = DatavinesTaskConstants.API_RESULT_DATA;
             boolean finishFlag = false;
             while (!finishFlag) {
-                JsonNode jobExecutionStatus = getJobExecutionStatus(address, jobExecutionId, this.datavinesParameters.getToken());
+                JsonNode jobExecutionStatus =
+                        getJobExecutionStatus(address, jobExecutionId, this.datavinesParameters.getToken());
                 if (!checkResult(jobExecutionStatus)) {
                     break;
                 }
@@ -126,7 +129,8 @@ public class DatavinesTask extends AbstractRemoteTask {
                 switch (jobExecutionStatusStr) {
                     case DatavinesTaskConstants.STATUS_SUCCESS:
                         setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address, this.jobExecutionId));
-                        JsonNode jobExecutionResult = getJobExecutionResult(address, jobExecutionId, this.datavinesParameters.getToken());
+                        JsonNode jobExecutionResult =
+                                getJobExecutionResult(address, jobExecutionId, this.datavinesParameters.getToken());
                         if (!checkResult(jobExecutionResult)) {
                             break;
                         }
@@ -138,7 +142,8 @@ public class DatavinesTask extends AbstractRemoteTask {
                         }
 
                         setExitStatusCode(mapStatusToExitCode(checkResult));
-                        log.info("datavines task finished, execution status is {} and check result is {}", jobExecutionStatusStr, jobExecutionResultStr);
+                        log.info("datavines task finished, execution status is {} and check result is {}",
+                                jobExecutionStatusStr, jobExecutionResultStr);
                         finishFlag = true;
                         break;
                     case DatavinesTaskConstants.STATUS_FAILURE:
@@ -177,7 +182,8 @@ public class DatavinesTask extends AbstractRemoteTask {
         if (result instanceof MissingNode || result instanceof NullNode) {
             errorHandle(DatavinesTaskConstants.API_ERROR_MSG);
             isCorrect = false;
-        } else if (result.get(DatavinesTaskConstants.API_RESULT_CODE).asInt() != DatavinesTaskConstants.API_RESULT_CODE_SUCCESS) {
+        } else if (result.get(DatavinesTaskConstants.API_RESULT_CODE)
+                .asInt() != DatavinesTaskConstants.API_RESULT_CODE_SUCCESS) {
             errorHandle(result.get(DatavinesTaskConstants.API_RESULT_MSG));
             isCorrect = false;
         }
