@@ -35,6 +35,8 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilde
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 
 import lombok.extern.slf4j.Slf4j;
@@ -166,12 +168,10 @@ public class JavaTask extends AbstractTask {
                 .getResourceAbsolutePathInLocal();
         String mainClassName = javaParameters.getMainClass();
         String mainJarName;
-        if (mainClassName == null) {
+        if (mainClassName == null || StringUtils.isEmpty(mainClassName)) {
             mainJarName = MainClassExtractor.getMainClassName(mainJarAbsolutePathInLocal);
         } else {
-
             mainJarName = mainClassName;
-
         }
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
