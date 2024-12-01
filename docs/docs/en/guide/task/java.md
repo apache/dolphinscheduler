@@ -20,6 +20,7 @@ This node is used to execute tasks of the `Java` type and supports running `jar`
 | Module Path        | pick Java 9 + 's modularity feature, put all resources into-module-path, and require that the JDK version in your worker supports modularity. |
 | Main Parameter     | Java program main method entry parameter.                                                                                                     |
 | Java VM Parameters | JVM startup parameters.                                                                                                                       |
+| Main Class Name    | Fully Qualified Name of the Main Class (Optional)                                                                                             |
 | Main Package       | Select the main program package to run the application.                                                                                       |
 | Resources          | External JAR packages or other resource files that are added to the classpath or module path and can be easily retrieved in your JAVA script. |
 
@@ -51,7 +52,6 @@ As shown in the figure.
 
 ## Note
 
-1. When using the `FAT_JAR` run type, you must select the main program package along with the corresponding resource file, otherwise, the task will fail immediately.
-2. When using the `NORMAL_JAR` run type, you must select the main program package and the corresponding resource file, otherwise, the task will fail immediately. The main program package determines where the program starts, and after selecting the resource file, it will be called using the `-cp` option when running the program.
-3. For security reasons, when executing JAVA tasks, please use the environment management module to configure the JDK environment, such as `JAVA_HOME` and other environment variables.
+1. For security reasons, when executing JAVA tasks, please use the environment management module to configure the JDK environment, such as `JAVA_HOME` and other environment variables.
+2. NORMAL_JAR should provide the main class name (optional), while FAT_JAR does not need to provide the main class name.
 
