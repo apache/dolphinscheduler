@@ -142,7 +142,6 @@ public class DynamicAsyncTaskExecuteFunction {
 
         List<Property> taskPropertyList = new ArrayList<>(JSONUtils.toList(taskInstance.getVarPool(), Property.class));
         taskPropertyList.add(property);
-        // logicTask.getTaskParameters().setVarPool(JSONUtils.toJsonString(taskPropertyList));
 
         log.info("set property: {}", property);
     }

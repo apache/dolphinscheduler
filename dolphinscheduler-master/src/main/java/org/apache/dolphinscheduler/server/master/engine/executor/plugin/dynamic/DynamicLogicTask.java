@@ -17,14 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.dynamic;
 
-import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
@@ -100,85 +97,6 @@ public class DynamicLogicTask extends AbstractLogicTask<DynamicParameters> {
 
         this.workflowInstance = workflowInstanceDao.queryById(taskExecutionContext.getWorkflowInstanceId());
         this.taskInstance = taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
-    }
-
-    // public AsyncTaskExecuteFunction getAsyncTaskExecuteFunction() throws MasterTaskExecuteException {
-    // List<Map<String, String>> parameterGroup = generateParameterGroup();
-    //
-    // if (parameterGroup.size() > dynamicParameters.getMaxNumOfSubWorkflowInstances()) {
-    // log.warn("the number of sub process instances [{}] exceeds the maximum limit [{}]", parameterGroup.size(),
-    // dynamicParameters.getMaxNumOfSubWorkflowInstances());
-    // parameterGroup = parameterGroup.subList(0, dynamicParameters.getMaxNumOfSubWorkflowInstances());
-    // }
-    //
-    // // if already exists sub process instance, do not generate again
-    // List<WorkflowInstance> existsSubWorkflowInstanceList =
-    // subWorkflowService.getAllDynamicSubWorkflow(workflowInstance.getId(), taskInstance.getTaskCode());
-    // if (CollectionUtils.isEmpty(existsSubWorkflowInstanceList)) {
-    // generateSubWorkflowInstance(parameterGroup);
-    // } else {
-    // resetProcessInstanceStatus(existsSubWorkflowInstanceList);
-    // }
-    // return new DynamicAsyncTaskExecuteFunction(taskExecutionContext, workflowInstance, taskInstance, this,
-    // commandMapper,
-    // subWorkflowService, dynamicParameters.getDegreeOfParallelism());
-    // }
-
-    public void resetProcessInstanceStatus(List<WorkflowInstance> existsSubWorkflowInstanceList) {
-        switch (workflowInstance.getCommandType()) {
-            case REPEAT_RUNNING:
-                existsSubWorkflowInstanceList.forEach(processInstance -> {
-                    processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    workflowInstanceDao.updateById(processInstance);
-                });
-                break;
-            case START_FAILURE_TASK_PROCESS:
-            case RECOVER_TOLERANCE_FAULT_PROCESS:
-                List<WorkflowInstance> failedWorkflowInstances =
-                        subWorkflowService.filterFailedProcessInstances(existsSubWorkflowInstanceList);
-                failedWorkflowInstances.forEach(processInstance -> {
-                    processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    workflowInstanceDao.updateById(processInstance);
-                });
-                break;
-        }
-    }
-
-    public void generateSubWorkflowInstance(List<Map<String, String>> parameterGroup) throws MasterTaskExecuteException {
-        List<WorkflowInstance> workflowInstanceList = new ArrayList<>();
-        WorkflowDefinition subWorkflowDefinition =
-                workflowDefinitionMapper.queryByCode(taskParameters.getWorkflowDefinitionCode());
-        for (Map<String, String> parameters : parameterGroup) {
-            String dynamicStartParams = JSONUtils.toJsonString(parameters);
-            Command command = DynamicCommandUtils.createCommand(workflowInstance, subWorkflowDefinition.getCode(),
-                    subWorkflowDefinition.getVersion(), parameters);
-            // todo: set id to -1? we use command to generate sub process instance, but the generate method will use the
-            // command id to do
-            // somethings
-            command.setId(-1);
-            DynamicCommandUtils.addDataToCommandParam(command, CommandKeyConstants.CMD_DYNAMIC_START_PARAMS,
-                    dynamicStartParams);
-            WorkflowInstance subWorkflowInstance = createSubProcessInstance(command);
-            subWorkflowInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-            workflowInstanceDao.insert(subWorkflowInstance);
-            command.setWorkflowInstanceId(subWorkflowInstance.getId());
-            workflowInstanceList.add(subWorkflowInstance);
-        }
-
-        List<RelationSubWorkflow> relationSubWorkflowList = new ArrayList<>();
-        for (WorkflowInstance subWorkflowInstance : workflowInstanceList) {
-            RelationSubWorkflow relationSubWorkflow = new RelationSubWorkflow();
-            relationSubWorkflow.setParentWorkflowInstanceId(Long.valueOf(workflowInstance.getId()));
-            relationSubWorkflow.setParentTaskCode(taskInstance.getTaskCode());
-            relationSubWorkflow.setSubWorkflowInstanceId(Long.valueOf(subWorkflowInstance.getId()));
-            relationSubWorkflowList.add(relationSubWorkflow);
-        }
-
-        log.info("Expected number of runs : {}, actual number of runs : {}", parameterGroup.size(),
-                workflowInstanceList.size());
-
-        int insertN = subWorkflowService.batchInsertRelationSubWorkflow(relationSubWorkflowList);
-        log.info("insert {} relation sub workflow", insertN);
     }
 
     public WorkflowInstance createSubProcessInstance(Command command) throws MasterTaskExecuteException {
