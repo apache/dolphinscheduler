@@ -86,10 +86,9 @@ master:
   listen-port: 5678
   # The number of workflow event bus fire worker used to fire the workflow event, default is 2*CPU core + 1.
   #  workflow-event-bus-fire-thread-count: 10
-  # The number of threads used to execute sync logic task e.g. Switch/Condition, default is CPU core.
-  #  master-sync-task-executor-thread-pool-size: 10
-  # The number of threads used to execute async logic task e.g. Dependent/SubWorkflow default is CPU core.
-  #  master-async-task-executor-thread-pool-size: 10
+  # logic-task-config:
+    # The number of threads used to execute logic task.
+    # task-executor-thread-count: 10
   max-heartbeat-interval: 10s
   server-load-protection:
     # If set true, will open master overload protection

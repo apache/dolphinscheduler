@@ -65,8 +65,6 @@ public class TaskExecutionContext implements Serializable {
 
     private String appInfoPath;
 
-    private String taskJson;
-
     private int processId;
 
     private Long workflowDefinitionCode;
@@ -105,6 +103,8 @@ public class TaskExecutionContext implements Serializable {
 
     private Map<String, Property> prepareParamsMap;
 
+    // Please use task instanceId
+    @Deprecated
     private String taskAppId;
 
     private TaskTimeoutStrategy taskTimeoutStrategy;
@@ -113,6 +113,7 @@ public class TaskExecutionContext implements Serializable {
 
     private String workerGroup;
 
+    @Deprecated
     private TaskExecutionStatus currentExecutionStatus;
 
     private ResourceParametersHelper resourceParametersHelper;

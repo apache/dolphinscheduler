@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMaste
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
+import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -166,6 +167,7 @@ public class MasterServer implements IStoppable {
         }
         // thread sleep 3 seconds for thread quietly stop
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
+        MasterThreadFactory.getDefaultSchedulerThreadExecutor().shutdownNow();
         try (
                 SystemEventBusFireWorker systemEventBusFireWorker1 = systemEventBusFireWorker;
                 WorkflowEngine workflowEngine1 = workflowEngine;
@@ -176,7 +178,7 @@ public class MasterServer implements IStoppable {
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext) {
 
-            log.info("Master server is stopping, current cause : {}", cause);
+            log.info("MasterServer is stopping, current cause : {}", cause);
         } catch (Exception e) {
             log.error("MasterServer stop failed, current cause: {}", cause, e);
             return;

@@ -21,27 +21,57 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
-import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseResponse;
+import org.apache.dolphinscheduler.extract.master.ILogicTaskExecutorOperator;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskKillException;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
+import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchResponse;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResponse;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorPauseRequest;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorPauseResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDelegator {
 
-    @Override
-    public void dispatch(final ITaskExecutionRunnable taskExecutionRunnable) {
+    @Autowired
+    private MasterConfig masterConfig;
 
+    @Override
+    public void dispatch(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException {
+        final String logicTaskExecutorAddress = masterConfig.getMasterAddress();
+        final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
+
+        taskExecutionContext.setHost(logicTaskExecutorAddress);
+        taskExecutionRunnable.getTaskInstance().setHost(logicTaskExecutorAddress);
+
+        final TaskExecutorDispatchResponse logicTaskDispatchResponse = Clients
+                .withService(ILogicTaskExecutorOperator.class)
+                .withHost(logicTaskExecutorAddress)
+                .dispatchTask(TaskExecutorDispatchRequest.of(taskExecutionContext));
+        if (!logicTaskDispatchResponse.isDispatchSuccess()) {
+            throw new TaskDispatchException(
+                    String.format("Dispatch LogicTask to %s failed, response is: %s",
+                            taskExecutionContext.getHost(), logicTaskDispatchResponse));
+        }
+    }
+
+    @Override
+    public boolean reassignMasterHost(final ITaskExecutionRunnable taskExecutionRunnable) {
+        // The Logic Task doesn't support take-over, since the logic task is not executed on the worker.
+        return false;
     }
 
     @Override
@@ -51,10 +81,10 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
         final String taskName = taskInstance.getName();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 
-        final LogicTaskPauseResponse pauseResponse = Clients
-                .withService(ILogicTaskInstanceOperator.class)
+        final TaskExecutorPauseResponse pauseResponse = Clients
+                .withService(ILogicTaskExecutorOperator.class)
                 .withHost(taskInstance.getHost())
-                .pauseLogicTask(new LogicTaskPauseRequest(taskInstance.getId()));
+                .pauseTask(TaskExecutorPauseRequest.of(taskInstance.getId()));
         if (pauseResponse.isSuccess()) {
             log.info("Pause task {} on executor {} successfully", taskName, executorHost);
         } else {
@@ -69,14 +99,29 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
         final String taskName = taskInstance.getName();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 
-        final LogicTaskKillResponse killResponse = Clients
-                .withService(ILogicTaskInstanceOperator.class)
+        final TaskExecutorKillResponse killResponse = Clients
+                .withService(ILogicTaskExecutorOperator.class)
                 .withHost(taskInstance.getHost())
-                .killLogicTask(new LogicTaskKillRequest(taskInstance.getId()));
+                .killTask(TaskExecutorKillRequest.of(taskInstance.getId()));
         if (killResponse.isSuccess()) {
             log.info("Kill task {} on executor {} successfully", taskName, executorHost);
         } else {
             log.warn("Kill task {} on executor {} failed with response {}", taskName, executorHost, killResponse);
         }
     }
+
+    @Override
+    public void ackTaskExecutorLifecycleEvent(
+                                              final ITaskExecutionRunnable taskExecutionRunnable,
+                                              final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        final String executorHost = taskInstance.getHost();
+        checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
+
+        Clients
+                .withService(ILogicTaskExecutorOperator.class)
+                .withHost(taskInstance.getHost())
+                .ackTaskExecutorLifecycleEvent(taskExecutorLifecycleEventAck);
+    }
+
 }

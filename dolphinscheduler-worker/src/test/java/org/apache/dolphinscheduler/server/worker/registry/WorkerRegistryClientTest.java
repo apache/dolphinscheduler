@@ -28,7 +28,9 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
+import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutorContainerProvider;
+import org.apache.dolphinscheduler.task.executor.container.ExclusiveThreadTaskExecutorContainer;
+import org.apache.dolphinscheduler.task.executor.container.TaskExecutorContainerConfig;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -42,8 +44,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * worker registry test
@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 @ExtendWith(MockitoExtension.class)
 public class WorkerRegistryClientTest {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
     @InjectMocks
     private WorkerRegistryClient workerRegistryClient;
     @Mock
@@ -61,12 +60,20 @@ public class WorkerRegistryClientTest {
     @Mock
     private MetricsProvider metricsProvider;
     @Mock
-    private WorkerTaskExecutorThreadPool workerManagerThread;
+    private PhysicalTaskExecutorContainerProvider physicalTaskExecutorContainerDelegator;
     @Mock
     private IStoppable stoppable;
 
     @Test
     public void testWorkerRegistryClientbasic() {
+
+        final TaskExecutorContainerConfig containerConfig = TaskExecutorContainerConfig.builder()
+                .taskExecutorThreadPoolSize(10)
+                .containerName("test")
+                .build();
+        final ExclusiveThreadTaskExecutorContainer container =
+                new ExclusiveThreadTaskExecutorContainer(containerConfig);
+        given(physicalTaskExecutorContainerDelegator.getExecutorContainer()).willReturn(container);
 
         given(workerConfig.getWorkerAddress()).willReturn(NetUtils.getAddr(1234));
         given(workerConfig.getMaxHeartbeatInterval()).willReturn(Duration.ofSeconds(1));

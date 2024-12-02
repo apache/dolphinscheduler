@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.integration.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -29,10 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -40,7 +39,6 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,15 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCase {
 
     @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
-    private WorkflowOperator workflowOperator;
-
-    @Autowired
-    private Repository repository;
-
-    @Autowired
     private ScheduleMapper scheduleMapper;
 
     @Test
@@ -68,7 +57,7 @@ public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCas
     public void testSchedulingWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/scheduling/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final Schedule schedule = Schedule.builder()
                 .workflowDefinitionCode(workflow.getCode())
@@ -89,7 +78,7 @@ public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCas
 
         WorkflowOperator.WorkflowSchedulingDTO workflowSchedulingDTO = WorkflowOperator.WorkflowSchedulingDTO.builder()
                 .project(context.getProject())
-                .workflow(context.getWorkflows().get(0))
+                .workflow(context.getOneWorkflow())
                 .schedule(schedule)
                 .build();
 
@@ -98,19 +87,25 @@ public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCas
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
+                    assertThat(repository.queryWorkflowInstance(workflow))
                             .areAtLeast(3,
                                     new Condition<>(instance -> instance.getState() == WorkflowExecutionStatus.SUCCESS,
                                             "Workflow instance should be success"));
-                    Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
+                });
+
+        workflowOperator.unSchedulingWorkflow(workflowSchedulingDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryTaskInstance(workflow))
                             .areAtLeast(3,
                                     new Condition<>(
                                             taskInstance -> taskInstance.getState() == TaskExecutionStatus.SUCCESS,
                                             "Task instance should be A"));
                 });
 
+        masterContainer.assertAllResourceReleased();
     }
 
 }

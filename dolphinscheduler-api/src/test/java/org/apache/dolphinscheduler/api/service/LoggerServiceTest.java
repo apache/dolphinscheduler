@@ -43,8 +43,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
-import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
-import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -129,11 +127,6 @@ public class LoggerServiceTest {
                 }
 
                 return new TaskInstanceLogPageQueryResponse();
-            }
-
-            @Override
-            public GetAppIdResponse getAppId(GetAppIdRequest getAppIdRequest) {
-                return new GetAppIdResponse();
             }
 
             @Override

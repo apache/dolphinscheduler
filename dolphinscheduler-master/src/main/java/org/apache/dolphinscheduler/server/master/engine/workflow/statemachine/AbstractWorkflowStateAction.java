@@ -106,7 +106,6 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
                                   final WorkflowExecutionStatus workflowExecutionStatus) {
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         workflowInstance.setEndTime(new Date());
-        workflowInstance.setState(workflowExecutionStatus);
         transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
         workflowExecutionRunnable.getWorkflowEventBus()
                 .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecutionRunnable));

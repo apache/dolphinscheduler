@@ -43,7 +43,7 @@ tasks:
     projectCode: 1
     userId: 1
     taskType: LogicFakeTask
-    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 5"}'
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 10"}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
@@ -76,7 +76,7 @@ tasks:
     projectCode: 1
     userId: 1
     taskType: LogicFakeTask
-    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 5"}'
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 10"}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
@@ -109,7 +109,7 @@ tasks:
     projectCode: 1
     userId: 1
     taskType: LogicFakeTask
-    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 5"}'
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 10"}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
