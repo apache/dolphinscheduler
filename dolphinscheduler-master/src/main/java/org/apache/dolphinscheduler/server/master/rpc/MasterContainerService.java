@@ -15,41 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.server.master.rpc;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@TableName("t_ds_worker_group")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkerGroup {
+@Slf4j
+@Component
+public class MasterContainerService implements IMasterContainerService {
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    @Autowired
+    private WorkerGroupChangeNotifier workerGroupChangeNotifier;
 
-    private String name;
-
-    private String addrList;
-
-    private Date createTime;
-
-    private Date updateTime;
-
-    private String description;
-
-    @TableField(exist = false)
-    private boolean systemDefault;
-
+    @Override
+    public void refreshWorkerGroup() {
+        workerGroupChangeNotifier.detectWorkerGroupChanges();
+    }
 }

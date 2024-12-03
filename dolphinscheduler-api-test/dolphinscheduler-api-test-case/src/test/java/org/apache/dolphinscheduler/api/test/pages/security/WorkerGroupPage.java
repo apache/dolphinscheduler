@@ -32,15 +32,13 @@ public class WorkerGroupPage {
 
     private String sessionId;
 
-    public HttpResponse saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
-                                        String otherParamsJson) {
+    public HttpResponse saveWorkerGroup(User loginUser, int id, String name, String addrList, String description) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("id", id);
         params.put("name", name);
         params.put("addrList", addrList);
         params.put("description", description);
-        params.put("otherParamsJson", otherParamsJson);
 
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);

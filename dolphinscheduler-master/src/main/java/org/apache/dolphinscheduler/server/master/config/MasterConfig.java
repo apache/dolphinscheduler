@@ -57,7 +57,7 @@ public class MasterConfig implements Validator {
 
     private MasterServerLoadProtection serverLoadProtection = new MasterServerLoadProtection();
 
-    private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
+    private Duration workerGroupRefreshInterval = Duration.ofMinutes(5);
 
     private CommandFetchStrategy commandFetchStrategy = new CommandFetchStrategy();
 

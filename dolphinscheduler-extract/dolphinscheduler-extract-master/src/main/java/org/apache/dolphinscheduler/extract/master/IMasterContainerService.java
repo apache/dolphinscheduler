@@ -15,41 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.extract.master;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+@RpcService
+public interface IMasterContainerService {
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-@TableName("t_ds_worker_group")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkerGroup {
-
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    private String name;
-
-    private String addrList;
-
-    private Date createTime;
-
-    private Date updateTime;
-
-    private String description;
-
-    @TableField(exist = false)
-    private boolean systemDefault;
+    @RpcMethod
+    void refreshWorkerGroup();
 
 }

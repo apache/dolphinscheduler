@@ -926,7 +926,6 @@ CREATE TABLE t_ds_worker_group (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   description text  DEFAULT NULL,
-  other_params_json text  DEFAULT NULL,
   PRIMARY KEY (id) ,
   CONSTRAINT name_unique UNIQUE (name)
 ) ;
