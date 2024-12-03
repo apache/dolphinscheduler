@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterStateMonitors;
+import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEngine;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBusFireWorker;
@@ -95,6 +96,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private SystemEventBusFireWorker systemEventBusFireWorker;
 
+    @Autowired
+    private MasterCoordinator masterCoordinator;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -121,6 +125,8 @@ public class MasterServer implements IStoppable {
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
+
+        this.masterCoordinator.start();
 
         this.clusterManager.start();
         this.clusterStateMonitors.start();
@@ -173,6 +179,7 @@ public class MasterServer implements IStoppable {
                 WorkflowEngine workflowEngine1 = workflowEngine;
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterRpcServer closedRpcServer = masterRPCServer;
+                MasterCoordinator closeMasterCoordinator = masterCoordinator;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc

@@ -37,8 +37,6 @@ import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcqui
 import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcquireSuccessNotifyResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.utils.TaskGroupUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -47,6 +45,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -79,10 +78,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class TaskGroupCoordinator extends BaseDaemonThread implements AutoCloseable {
-
-    @Autowired
-    private RegistryClient registryClient;
+public class TaskGroupCoordinator implements AutoCloseable {
 
     @Autowired
     private TaskGroupDao taskGroupDao;
@@ -98,38 +94,42 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
 
     private boolean flag = true;
 
+    private Thread internalThread;
+
     private static final int DEFAULT_LIMIT = 1000;
 
-    public TaskGroupCoordinator() {
-        super("TaskGroupCoordinator");
-    }
-
-    @Override
     public synchronized void start() {
         log.info("TaskGroupCoordinator starting...");
+        if (flag) {
+            throw new IllegalStateException("TaskGroupCoordinator is already started");
+        }
+        if (internalThread != null) {
+            throw new IllegalStateException("InternalThread is already started");
+        }
         flag = true;
-        super.start();
+        internalThread = new BaseDaemonThread(this::doStart) {
+        };
+        internalThread.start();
         log.info("TaskGroupCoordinator started...");
     }
 
-    @Override
-    public void run() {
+    private void doStart() {
+        // Sleep 1 minutes here to make sure the previous task group slot has been released.
+        // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
+        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
+
         while (flag) {
             try {
-                registryClient.getLock(RegistryNodeType.MASTER_TASK_GROUP_COORDINATOR_LOCK.getRegistryPath());
-                try {
-                    StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
+                final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
-                    amendTaskGroupUseSize();
-                    amendTaskGroupQueueStatus();
-                    dealWithForceStartTaskGroupQueue();
-                    dealWithWaitingTaskGroupQueue();
+                //
+                amendTaskGroupUseSize();
+                amendTaskGroupQueueStatus();
+                dealWithForceStartTaskGroupQueue();
+                dealWithWaitingTaskGroupQueue();
 
-                    taskGroupCoordinatorRoundCost.stop();
-                    log.debug("TaskGroupCoordinator round cost: {}/ms", taskGroupCoordinatorRoundCost.getTime());
-                } finally {
-                    registryClient.releaseLock(RegistryNodeType.MASTER_TASK_GROUP_COORDINATOR_LOCK.getRegistryPath());
-                }
+                taskGroupCoordinatorRoundCost.stop();
+                log.debug("TaskGroupCoordinator round cost: {}/ms", taskGroupCoordinatorRoundCost.getTime());
             } catch (Throwable e) {
                 log.error("TaskGroupCoordinator error", e);
             } finally {
@@ -212,7 +212,6 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
                 log.warn("The TaskInstance: {} state: {} finished, will release the TaskGroupQueue: {}",
                         taskInstance.getName(), taskInstance.getState(), taskGroupQueue);
                 deleteTaskGroupQueueSlot(taskGroupQueue);
-                continue;
             }
         }
     }
@@ -226,7 +225,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
         while (true) {
-            List<TaskGroupQueue> taskGroupQueues =
+            final List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(minTaskGroupQueueId, limit);
             if (CollectionUtils.isEmpty(taskGroupQueues)) {
                 break;
@@ -245,7 +244,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
         // Find the force start task group queue(Which is inQueue and forceStart is YES)
         // Notify the related waiting task instance
         // Set the taskGroupQueue status to RELEASE and remove it from queue
-        for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
+        for (final TaskGroupQueue taskGroupQueue : taskGroupQueues) {
             try {
                 LogUtils.setTaskInstanceIdMDC(taskGroupQueue.getTaskId());
                 // notify the waiting task instance
@@ -488,8 +487,21 @@ public class TaskGroupCoordinator extends BaseDaemonThread implements AutoClosea
     }
 
     @Override
-    public void close() throws Exception {
+    public synchronized void close() {
+        if (!flag) {
+            log.error("TaskGroupCoordinator is already closed");
+            return;
+        }
         flag = false;
+        try {
+            if (internalThread != null) {
+                internalThread.interrupt();
+                internalThread.join();
+            }
+        } catch (Exception ex) {
+            log.error("Close internalThread failed", ex);
+        }
+        internalThread = null;
         log.info("TaskGroupCoordinator closed");
     }
 }

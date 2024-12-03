@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,11 +54,15 @@ public class MasterRegistryClient implements AutoCloseable {
     @Autowired
     private MetricsProvider metricsProvider;
 
+    @Autowired
+    private MasterCoordinator masterCoordinator;
+
     private MasterHeartBeatTask masterHeartBeatTask;
 
     public void start() {
         try {
-            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, metricsProvider, registryClient);
+            this.masterHeartBeatTask =
+                    new MasterHeartBeatTask(masterConfig, metricsProvider, registryClient, masterCoordinator);
             // master registry
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(registryClient));
