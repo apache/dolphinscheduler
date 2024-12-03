@@ -427,7 +427,8 @@ CREATE TABLE `t_ds_workflow_definition` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `workflow_unique` (`name`,`project_code`) USING BTREE
+  UNIQUE KEY `workflow_unique` (`name`,`project_code`) USING BTREE,
+  KEY `idx_project_code` (`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
@@ -454,7 +455,8 @@ CREATE TABLE `t_ds_workflow_definition_log` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_idx_code_version` (`code`,`version`) USING BTREE
+  UNIQUE KEY `uniq_idx_code_version` (`code`,`version`) USING BTREE,
+  KEY `idx_project_code` (`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

@@ -222,3 +222,6 @@ d//
 delimiter ;
 CALL drop_data_quality_tables;
 DROP PROCEDURE drop_data_quality_tables;
+
+ALTER TABLE `t_ds_workflow_definition` ADD KEY `idx_project_code` (`project_code`) USING BTREE;
+ALTER TABLE `t_ds_workflow_definition_log` ADD KEY `idx_project_code` (`project_code`) USING BTREE;
