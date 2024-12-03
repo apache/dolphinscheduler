@@ -225,3 +225,6 @@ d//
 
 select drop_data_quality_tables();
 DROP FUNCTION IF EXISTS drop_data_quality_tables();
+
+create index workflow_definition_index_project_code on t_ds_workflow_definition (project_code);
+create index workflow_definition_log_index_project_code on t_ds_workflow_definition_log (project_code);
