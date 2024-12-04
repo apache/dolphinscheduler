@@ -125,9 +125,9 @@ public class RegistryClient {
                     log.warn("unknown registry node type: {}", registryNodeType);
             }
 
-            server.setResInfo(heartBeatJson);
+            server.setHeartBeatInfo(heartBeatJson);
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
-            server.setZkDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
+            server.setServerDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
             serverList.add(server);
         }
         return serverList;

@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.List;
 import java.util.Map;
 
-/**
- * the service of project and worker group
- */
 public interface ProjectWorkerGroupRelationService {
 
     /**

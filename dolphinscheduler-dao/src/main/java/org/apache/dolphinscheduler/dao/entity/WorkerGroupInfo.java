@@ -15,27 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
-
-import java.util.Date;
+package org.apache.dolphinscheduler.dao.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Server {
+@NoArgsConstructor
+public class WorkerGroupInfo extends WorkerGroup {
+    private WorkerGroupSource source;
 
-    private int id;
-
-    private String host;
-
-    private int port;
-
-    private String serverDirectory;
-
-    private String heartBeatInfo;
-
-    private Date createTime;
-
-    private Date lastHeartbeatTime;
-
+    public WorkerGroupInfo(WorkerGroup workerGroup) {
+        this.setId(workerGroup.getId());
+        this.setName(workerGroup.getName());
+        this.setAddrList(workerGroup.getAddrList());
+        this.setCreateTime(workerGroup.getCreateTime());
+        this.setUpdateTime(workerGroup.getUpdateTime());
+        this.setDescription(workerGroup.getDescription());
+        this.setSystemDefault(workerGroup.isSystemDefault());
+        this.setOtherParamsJson(workerGroup.getOtherParamsJson());
+    }
 }

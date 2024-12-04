@@ -64,6 +64,7 @@ export default {
     group_name_tips: 'Please enter your group name',
     worker_addresses: 'Worker Addresses',
     worker_addresses_tips: 'Please select worker addresses',
+    source: 'Source',
     create_time: 'Create Time',
     update_time: 'Update Time'
   },

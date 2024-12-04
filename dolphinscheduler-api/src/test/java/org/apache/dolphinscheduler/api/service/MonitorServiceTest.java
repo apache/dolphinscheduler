@@ -131,7 +131,7 @@ public class MonitorServiceTest {
         Server server = new Server();
         server.setId(1);
         server.setHost("127.0.0.1");
-        server.setZkDirectory("ws/server");
+        server.setServerDirectory("ws/server");
         server.setPort(123);
         server.setCreateTime(new Date());
         server.setLastHeartbeatTime(new Date());

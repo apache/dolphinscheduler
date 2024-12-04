@@ -79,6 +79,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .serverStatus(serverStatus)
                 .host(NetUtils.getHost())
                 .port(workerConfig.getListenPort())
+                .workerGroup(workerConfig.getGroup())
                 .build();
     }
 

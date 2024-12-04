@@ -95,11 +95,6 @@ public class ProjectWorkerGroupRelationServiceTest {
                 getWorkerGroups());
         Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
 
-        // worker group is empty
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                Collections.emptyList());
-        Assertions.assertEquals(Status.WORKER_GROUP_TO_PROJECT_IS_EMPTY.getCode(), result.getCode());
-
         // project not exists
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(null);
         result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,

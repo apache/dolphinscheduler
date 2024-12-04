@@ -15,27 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.dao.repository;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 
-import lombok.Data;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
-@Data
-public class Server {
+public interface ProjectWorkerGroupDao extends IDao<ProjectWorkerGroup> {
 
-    private int id;
+    boolean deleteByProjectCode(Long projectCode);
 
-    private String host;
+    Set<String> queryAssignedWorkerGroupNamesByProjectCode(Long projectCode);
 
-    private int port;
+    boolean deleteByProjectCodeAndWorkerGroups(Long projectCode, List<String> workerGroups);
 
-    private String serverDirectory;
-
-    private String heartBeatInfo;
-
-    private Date createTime;
-
-    private Date lastHeartbeatTime;
-
+    List<ProjectWorkerGroup> queryByProjectCode(Long projectCode);
 }

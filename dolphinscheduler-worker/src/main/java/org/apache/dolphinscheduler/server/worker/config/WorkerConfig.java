@@ -44,6 +44,7 @@ public class WorkerConfig implements Validator {
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
     private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
+    private String group;
 
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort

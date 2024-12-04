@@ -46,6 +46,8 @@ worker:
   max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
+  # worker group name
+  group: default
   server-load-protection:
     # If set true, will open worker overload protection
     enabled: true
