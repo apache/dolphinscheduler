@@ -923,10 +923,10 @@ CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
   name varchar(255) NOT NULL ,
   addr_list text DEFAULT NULL ,
-  source bigint NOT NULL DEFAULT 0,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  description text  DEFAULT NULL,
+  description text DEFAULT NULL,
+  source bigint NOT NULL DEFAULT 0,
   PRIMARY KEY (id) ,
   CONSTRAINT name_unique UNIQUE (name)
 ) ;

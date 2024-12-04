@@ -31,4 +31,6 @@ public interface WorkerGroupDao extends IDao<WorkerGroup> {
     List<String> queryAllWorkerGroupNames();
 
     List<WorkerGroup> queryAllWorkerGroup();
+
+    List<WorkerGroup> queryWorkerGroupByName(String name);
 }

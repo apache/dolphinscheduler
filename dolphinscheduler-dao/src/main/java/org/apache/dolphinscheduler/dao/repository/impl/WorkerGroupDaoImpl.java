@@ -74,4 +74,9 @@ public class WorkerGroupDaoImpl extends BaseDao<WorkerGroup, WorkerGroupMapper> 
     public List<WorkerGroup> queryAllWorkerGroup() {
         return mybatisMapper.queryAllWorkerGroup();
     }
+
+    @Override
+    public List<WorkerGroup> queryWorkerGroupByName(String name) {
+        return mybatisMapper.queryWorkerGroupByName(name);
+    }
 }
