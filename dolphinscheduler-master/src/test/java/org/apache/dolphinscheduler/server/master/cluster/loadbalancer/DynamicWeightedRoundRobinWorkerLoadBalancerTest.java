@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 
@@ -28,11 +29,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 
 class DynamicWeightedRoundRobinWorkerLoadBalancerTest {
+
+    WorkerGroupDao workerGroupDao = Mockito.mock(WorkerGroupDao.class);
 
     @Test
     void select_defaultWorkerGroup() {
@@ -107,7 +111,7 @@ class DynamicWeightedRoundRobinWorkerLoadBalancerTest {
                         .cpuUsage(0.8)
                         .memoryUsage(0.8)
                         .build());
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         DynamicWeightedRoundRobinWorkerLoadBalancer dynamicWeightedRoundRobinWorkerLoadBalancer =
                 new DynamicWeightedRoundRobinWorkerLoadBalancer(workerClusters,
                         new WorkerLoadBalancerConfigurationProperties.DynamicWeightConfigProperties());

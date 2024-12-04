@@ -17,24 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
-import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.MapComparator;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroupInfo;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,21 +92,6 @@ public class WorkerGroupChangeNotifier {
         Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
                 .stream()
                 .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
-
-        List<Server> activeWorkerNodes = registryClient.getServerList(RegistryNodeType.WORKER);
-        Map<String, String> configWorkerGroups = activeWorkerNodes.stream()
-                .collect(Collectors.groupingBy(activeWorkerNode -> JSONUtils.parseObject(activeWorkerNode.getHeartBeatInfo(), WorkerHeartBeat.class).getWorkerGroup(),
-                        Collectors.mapping(Server::getHost, Collectors.joining(Constants.COMMA))));
-        for (Server activeWorkerNode : activeWorkerNodes) {
-            WorkerGroup configWorkerGroup = new WorkerGroup();
-            WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(activeWorkerNode.getHeartBeatInfo(), WorkerHeartBeat.class);
-            configWorkerGroup.setName(workerHeartBeat.getWorkerGroup());
-            configWorkerGroup.setAddrList(configWorkerGroups.get(workerHeartBeat.getWorkerGroup()));
-            configWorkerGroup.setCreateTime(DateUtils.timeStampToDate(workerHeartBeat.getStartupTime()));
-            configWorkerGroup.setUpdateTime(DateUtils.timeStampToDate(workerHeartBeat.getReportTime()));
-            tmpWorkerGroupMap.put(configWorkerGroup.getName(), configWorkerGroup);
-        }
-
         return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
     }
 

@@ -31,12 +31,13 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -64,10 +66,10 @@ public class ProjectWorkerGroupRelationServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private ProjectWorkerGroupMapper projectWorkerGroupMapper;
+    private ProjectWorkerGroupDao projectWorkerGroupDao;
 
     @Mock
-    private WorkerGroupMapper workerGroupMapper;
+    private WorkerGroupDao workerGroupDao;
 
     @Mock
     private ProjectService projectService;
@@ -105,35 +107,37 @@ public class ProjectWorkerGroupRelationServiceTest {
         WorkerGroup workerGroup = new WorkerGroup();
         workerGroup.setName("test");
         Mockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject());
-        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(Collections.singletonList(workerGroup));
+        Mockito.when(workerGroupDao.queryAllWorkerGroup()).thenReturn(Collections.singletonList(workerGroup));
         result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                 getDiffWorkerGroups());
         Assertions.assertEquals(Status.WORKER_GROUP_NOT_EXIST.getCode(), result.getCode());
 
         // db insertion fail
-        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(Collections.singletonList(workerGroup));
-        Mockito.when(projectWorkerGroupMapper.insert(Mockito.any())).thenReturn(-1);
+        Mockito.when(workerGroupDao.queryAllWorkerGroup()).thenReturn(Collections.singletonList(workerGroup));
+        Mockito.when(projectWorkerGroupDao.insert(Mockito.any())).thenReturn(-1);
         AssertionsHelper.assertThrowsServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR,
                 () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                         getWorkerGroups()));
 
         // success
-        Mockito.when(projectWorkerGroupMapper.insert(Mockito.any())).thenReturn(1);
+        Mockito.when(projectWorkerGroupDao.insert(Mockito.any())).thenReturn(1);
 
         result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                 getWorkerGroups());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // success when there is diff between current wg and assigned wg
-        Mockito.when(projectWorkerGroupMapper.selectList(Mockito.any()))
-                .thenReturn(Collections.singletonList(getDiffProjectWorkerGroup()));
-        Mockito.when(projectWorkerGroupMapper.delete(Mockito.any())).thenReturn(1);
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
+                .thenReturn(Sets.newHashSet(getDiffProjectWorkerGroup().getWorkerGroup()));
+        Mockito.when(projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(getProjectWorkerGroup().getProjectCode(),
+                Collections.singletonList(getDiffProjectWorkerGroup().getWorkerGroup()))).thenReturn(true);
         result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                 getWorkerGroups());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // db deletion fail
-        Mockito.when(projectWorkerGroupMapper.delete(Mockito.any())).thenReturn(-1);
+        Mockito.when(projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(Mockito.any(), Mockito.any()))
+                .thenReturn(false);
         AssertionsHelper.assertThrowsServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR,
                 () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                         getWorkerGroups()));
@@ -164,8 +168,8 @@ public class ProjectWorkerGroupRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode))
                 .thenReturn(getProject());
 
-        Mockito.when(projectWorkerGroupMapper.selectList(Mockito.any()))
-                .thenReturn(Lists.newArrayList(getProjectWorkerGroup()));
+        Mockito.when(projectWorkerGroupDao.queryByProjectCode(Mockito.any()))
+                .thenReturn(Collections.singletonList(getProjectWorkerGroup()));
 
         Mockito.when(taskDefinitionMapper.queryAllDefinitionList(Mockito.anyLong()))
                 .thenReturn(new ArrayList<>());
@@ -177,7 +181,7 @@ public class ProjectWorkerGroupRelationServiceTest {
 
         ProjectWorkerGroup[] actualValue =
                 ((List<ProjectWorkerGroup>) result.get(Constants.DATA_LIST)).toArray(new ProjectWorkerGroup[0]);
-
+        System.out.println(Arrays.toString(actualValue));
         Assertions.assertEquals(actualValue[0].getWorkerGroup(), getProjectWorkerGroup().getWorkerGroup());
     }
 

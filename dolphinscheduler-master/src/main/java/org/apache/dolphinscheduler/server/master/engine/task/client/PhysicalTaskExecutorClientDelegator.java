@@ -65,7 +65,8 @@ public class PhysicalTaskExecutorClientDelegator implements ITaskExecutorClientD
                 .map(Host::getAddress)
                 .orElseThrow(() -> new TaskDispatchException(
                         String.format("Cannot find the host to dispatch Task[id=%s, name=%s, workerGroup=%s]",
-                                taskExecutionContext.getTaskInstanceId(), taskName, taskExecutionContext.getWorkerGroup())));
+                                taskExecutionContext.getTaskInstanceId(), taskName,
+                                taskExecutionContext.getWorkerGroup())));
 
         taskExecutionContext.setHost(physicalTaskExecutorAddress);
         taskExecutionRunnable.getTaskInstance().setHost(physicalTaskExecutorAddress);

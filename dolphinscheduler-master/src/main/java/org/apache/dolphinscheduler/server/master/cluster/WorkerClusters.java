@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
@@ -35,10 +38,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServerMetadata>
         implements
             IClusters<WorkerServerMetadata>,
             WorkerGroupChangeNotifier.WorkerGroupListener {
+
+    private final WorkerGroupDao workerGroupDao;
 
     // WorkerIdentifier(workerAddress) -> worker
     private final Map<String, WorkerServerMetadata> workerMapping = new ConcurrentHashMap<>();
@@ -48,6 +56,10 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
 
     private final List<IClustersChangeListener<WorkerServerMetadata>> workerClusterChangeListeners =
             new CopyOnWriteArrayList<>();
+
+    public WorkerClusters(WorkerGroupDao workerGroupDao) {
+        this.workerGroupDao = workerGroupDao;
+    }
 
     @Override
     public List<WorkerServerMetadata> getServers() {
@@ -126,6 +138,22 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     @Override
     public void onServerAdded(WorkerServerMetadata workerServer) {
         workerMapping.put(workerServer.getAddress(), workerServer);
+        synchronized (workerGroupMapping) {
+            List<String> addWorkerGroupAddrList = workerGroupMapping.get(workerServer.getWorkerGroup());
+            if (addWorkerGroupAddrList == null) {
+                List<String> newWorkerGroupAddrList = new ArrayList<>();
+                newWorkerGroupAddrList.add(workerServer.getAddress());
+                workerGroupMapping.put(workerServer.getWorkerGroup(), newWorkerGroupAddrList);
+                workerGroupDao.upsertAddrListByWorkerGroupName(workerServer.getWorkerGroup(),
+                        String.join(Constants.COMMA, newWorkerGroupAddrList),
+                        WorkerGroupSource.CONFIG);
+            } else if (!addWorkerGroupAddrList.contains(workerServer.getAddress())) {
+                addWorkerGroupAddrList.add(workerServer.getAddress());
+                workerGroupDao.upsertAddrListByWorkerGroupName(workerServer.getWorkerGroup(),
+                        String.join(Constants.COMMA, addWorkerGroupAddrList),
+                        WorkerGroupSource.CONFIG);
+            }
+        }
         for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerAdded(workerServer);
         }
@@ -134,6 +162,21 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     @Override
     public void onServerRemove(WorkerServerMetadata workerServer) {
         workerMapping.remove(workerServer.getAddress(), workerServer);
+        synchronized (workerGroupMapping) {
+            List<String> removeWorkerGroupAddrList = workerGroupMapping.get(workerServer.getWorkerGroup());
+            if (removeWorkerGroupAddrList != null && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
+                removeWorkerGroupAddrList.remove(workerServer.getAddress());
+                if (removeWorkerGroupAddrList.isEmpty()) {
+                    workerGroupMapping.remove(workerServer.getWorkerGroup());
+                    workerGroupDao.deleteByWorkerGroupName(workerServer.getWorkerGroup());
+                } else {
+                    workerGroupMapping.put(workerServer.getWorkerGroup(), removeWorkerGroupAddrList);
+                    workerGroupDao.upsertAddrListByWorkerGroupName(workerServer.getWorkerGroup(),
+                            String.join(Constants.COMMA, removeWorkerGroupAddrList),
+                            WorkerGroupSource.CONFIG);
+                }
+            }
+        }
         for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerRemove(workerServer);
         }

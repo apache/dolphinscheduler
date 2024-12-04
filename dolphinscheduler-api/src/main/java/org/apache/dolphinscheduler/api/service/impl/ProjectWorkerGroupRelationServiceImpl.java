@@ -21,19 +21,16 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
-import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -41,7 +38,6 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,8 +52,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 @Service
 @Slf4j
@@ -81,7 +75,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     private ProjectService projectService;
 
     @Autowired
-    private WorkerGroupService workerGroupService;
+    private WorkerGroupDao workerGroupDao;
 
     /**
      * assign worker groups to a project
@@ -121,9 +115,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return result;
         }
 
-        Set<String> workerGroupNames =
-                workerGroupService.queryAllWorkerGroupList().stream().map(WorkerGroup::getName).collect(
-                        Collectors.toSet());
+        Set<String> workerGroupNames = new HashSet<>(workerGroupDao.queryAllWorkerGroupNames());
 
         workerGroupNames.add(WorkerGroupUtils.getDefaultWorkerGroup());
 
@@ -136,7 +128,8 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return result;
         }
 
-        Set<String> projectWorkerGroupNames = projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
+        Set<String> projectWorkerGroupNames =
+                projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
 
         difference = SetUtils.difference(projectWorkerGroupNames, assignedWorkerGroupNames);
 
@@ -148,7 +141,8 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
                         SetUtils.intersection(usedWorkerGroups, difference).toSet());
             }
 
-            boolean deleted = projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(projectCode, new ArrayList<>(difference));
+            boolean deleted =
+                    projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(projectCode, new ArrayList<>(difference));
             if (deleted) {
                 log.info("Success to delete worker groups [{}] for the project [{}] .", difference, project.getName());
             } else {

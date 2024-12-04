@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import lombok.Getter;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 @Getter
 public enum WorkerGroupSource {
-    CONFIG(0, "config"),
-    UI(1, "ui");
+
+    CONFIG(1, "config"),
+    UI(2, "ui");
 
     @EnumValue
     private final int code;

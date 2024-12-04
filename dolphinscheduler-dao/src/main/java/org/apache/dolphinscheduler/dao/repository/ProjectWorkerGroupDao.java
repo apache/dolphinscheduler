@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 

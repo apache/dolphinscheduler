@@ -21,17 +21,21 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
 
 class WorkerClustersTest {
 
+    WorkerGroupDao workerGroupDao = Mockito.mock(WorkerGroupDao.class);
+
     @Test
     void testOnWorkerGroupDelete() {
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
         workerClusters.onServerAdded(normalWorkerServerMetadata);
 
@@ -50,7 +54,7 @@ class WorkerClustersTest {
 
     @Test
     void testOnWorkerGroupAdd() {
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
         workerClusters.onServerAdded(normalWorkerServerMetadata);
 
@@ -65,7 +69,7 @@ class WorkerClustersTest {
 
     @Test
     void testOnWorkerGroupChange() {
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
         workerClusters.onServerAdded(normalWorkerServerMetadata);
 
@@ -91,7 +95,7 @@ class WorkerClustersTest {
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
         WorkerServerMetadata busyWorkerServerMetadata = getBusyWorkerServerMetadata();
 
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         workerClusters.onServerAdded(normalWorkerServerMetadata);
         workerClusters.onServerAdded(busyWorkerServerMetadata);
         assertThat(workerClusters.getWorkerServerAddressByGroup("default"))
@@ -105,7 +109,7 @@ class WorkerClustersTest {
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
         WorkerServerMetadata busyWorkerServerMetadata = getBusyWorkerServerMetadata();
 
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         workerClusters.onServerAdded(normalWorkerServerMetadata);
         workerClusters.onServerAdded(busyWorkerServerMetadata);
         workerClusters.onServerRemove(busyWorkerServerMetadata);
@@ -122,7 +126,7 @@ class WorkerClustersTest {
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
         WorkerServerMetadata busyWorkerServerMetadata = getBusyWorkerServerMetadata();
 
-        WorkerClusters workerClusters = new WorkerClusters();
+        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
         workerClusters.onServerAdded(normalWorkerServerMetadata);
         workerClusters.onServerAdded(busyWorkerServerMetadata);
 

@@ -17,18 +17,22 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import lombok.NonNull;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
 
+import lombok.NonNull;
+
+import org.springframework.stereotype.Repository;
+
 @Repository
-public class ProjectWorkerGroupDaoImpl extends BaseDao<ProjectWorkerGroup, ProjectWorkerGroupMapper> implements ProjectWorkerGroupDao {
+public class ProjectWorkerGroupDaoImpl extends BaseDao<ProjectWorkerGroup, ProjectWorkerGroupMapper>
+        implements
+            ProjectWorkerGroupDao {
 
     public ProjectWorkerGroupDaoImpl(@NonNull ProjectWorkerGroupMapper projectWorkerGroupMapper) {
         super(projectWorkerGroupMapper);

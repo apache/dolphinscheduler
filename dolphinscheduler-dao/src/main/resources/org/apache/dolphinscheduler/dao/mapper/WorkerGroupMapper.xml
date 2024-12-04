@@ -29,4 +29,14 @@
         where name = #{name}
     </select>
 
+    <update id="updateAddrListByWorkerGroupName">
+        update t_ds_worker_group
+        set addr_list = #{addrList}, source = #{source}
+        where name = #{name}
+    </update>
+
+    <delete id="deleteByWorkerGroupName">
+        delete from t_ds_worker_group
+        where name = #{name}
+    </delete>
 </mapper>

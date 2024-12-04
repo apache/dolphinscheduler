@@ -17,7 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
+import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
+import java.util.List;
+
 public interface WorkerGroupDao extends IDao<WorkerGroup> {
+
+    boolean upsertAddrListByWorkerGroupName(String workerGroupName, String addrList, WorkerGroupSource source);
+
+    boolean deleteByWorkerGroupName(String workerGroupName);
+
+    List<String> queryAllWorkerGroupNames();
+
+    List<WorkerGroup> queryAllWorkerGroup();
 }

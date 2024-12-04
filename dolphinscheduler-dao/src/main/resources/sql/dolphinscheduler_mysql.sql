@@ -1009,6 +1009,7 @@ CREATE TABLE `t_ds_worker_group` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `name` varchar(255) NOT NULL COMMENT 'worker group name',
   `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
+  `source` int(11) NOT NULL DEFAULT 0 COMMENT 'worker group source',
   `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
   `description` text NULL DEFAULT NULL COMMENT 'description',
