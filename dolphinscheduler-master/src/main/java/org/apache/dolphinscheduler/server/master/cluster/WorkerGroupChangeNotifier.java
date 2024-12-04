@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.utils.MapComparator;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
@@ -47,9 +46,6 @@ public class WorkerGroupChangeNotifier {
 
     @Autowired
     private MasterConfig masterConfig;
-
-    @Autowired
-    private RegistryClient registryClient;
 
     private final WorkerGroupDao workerGroupDao;
     private final List<WorkerGroupListener> listeners = new CopyOnWriteArrayList<>();
