@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
@@ -128,19 +127,10 @@ public abstract class AbstractEventSender<T> implements EventSender<T> {
         try {
             AlertResult alertResult;
             if (sendEventTimeout <= 0) {
-                if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
-                    alertResult = alertChannel.closeAlert(alertInfo);
-                } else {
-                    alertResult = alertChannel.process(alertInfo);
-                }
+                alertResult = alertChannel.process(alertInfo);
             } else {
-                CompletableFuture<AlertResult> future;
-                if (alertData.getAlertType() == AlertType.CLOSE_ALERT.getCode()) {
-                    future = CompletableFuture.supplyAsync(() -> alertChannel.closeAlert(alertInfo));
-                } else {
-                    future = CompletableFuture.supplyAsync(() -> alertChannel.process(alertInfo));
-                }
-                alertResult = future.get(sendEventTimeout, TimeUnit.MILLISECONDS);
+                alertResult = CompletableFuture.supplyAsync(() -> alertChannel.process(alertInfo)).get(sendEventTimeout,
+                        TimeUnit.MILLISECONDS);
             }
             checkNotNull(alertResult, "AlertResult cannot be null");
             return alertResult;
