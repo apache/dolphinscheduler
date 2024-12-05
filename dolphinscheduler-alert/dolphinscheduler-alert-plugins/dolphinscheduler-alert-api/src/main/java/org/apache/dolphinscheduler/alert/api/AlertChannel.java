@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
-import lombok.NonNull;
-
 /**
  * alert channel for sending alerts
  */
@@ -32,7 +30,4 @@ public interface AlertChannel {
      */
     AlertResult process(AlertInfo info);
 
-    default @NonNull AlertResult closeAlert(AlertInfo info) {
-        return new AlertResult(true, "no need to close alert");
-    }
 }

@@ -39,8 +39,7 @@ public enum AlertType {
     TASK_FAILURE(5, "task failure"),
     TASK_SUCCESS(6, "task success"),
     TASK_TIMEOUT(7, "task timeout"),
-
-    CLOSE_ALERT(8, "the workflow instance success, can close the before alert");
+    ;
 
     AlertType(int code, String descp) {
         this.code = code;
