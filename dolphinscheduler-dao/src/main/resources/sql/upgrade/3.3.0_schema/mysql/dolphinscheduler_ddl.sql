@@ -245,21 +245,3 @@ delimiter ;
 CALL drop_column_t_ds_worker_group_other_params_json;
 DROP PROCEDURE drop_column_t_ds_worker_group_other_params_json;
 
--- add_column_t_ds_worker_group source
-DROP PROCEDURE if EXISTS add_column_t_ds_worker_group;
-delimiter d//
-CREATE PROCEDURE add_column_t_ds_worker_group()
-BEGIN
-   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_worker_group'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='source')
-   THEN
-ALTER TABLE `t_ds_worker_group`
-ADD COLUMN `source` int(11) NOT NULL DEFAULT 0 COMMENT 'worker group source' after `addr_list`;
-END IF;
-END;
-d//
-delimiter ;
-CALL add_column_t_ds_worker_group;
-DROP PROCEDURE add_column_t_ds_worker_group;

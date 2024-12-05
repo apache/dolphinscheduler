@@ -44,8 +44,8 @@ export function useWorkerGroup(
       for (const workerGroup of res) {
         variables.model.workerGroupOptions.push({
           label: workerGroup,
-          value: workerGroup,
-          disabled: workerGroup === 'default'
+          value: workerGroup
+          // disabled: workerGroup === 'default'
         })
       }
     })

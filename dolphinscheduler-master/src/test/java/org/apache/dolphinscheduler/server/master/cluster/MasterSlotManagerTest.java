@@ -38,7 +38,6 @@ class MasterSlotManagerTest {
         clusterManager = new ClusterManager();
         masterConfig = new MasterConfig();
         masterConfig.setMasterAddress("127.0.0.1:5678");
-        clusterManager.init();
         masterSlotManager = new MasterSlotManager(clusterManager, masterConfig);
         MasterServerMetadata master1 = MasterServerMetadata.builder()
                 .cpuUsage(0.2)

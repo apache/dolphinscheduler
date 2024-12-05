@@ -42,8 +42,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Arrays;
@@ -273,10 +273,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class WorkerGroupResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final WorkerGroupMapper workerGroupMapper;
+        private final WorkerGroupDao workerGroupDao;
 
-        public WorkerGroupResourcePermissionCheck(WorkerGroupMapper workerGroupMapper) {
-            this.workerGroupMapper = workerGroupMapper;
+        public WorkerGroupResourcePermissionCheck(WorkerGroupDao workerGroupDao) {
+            this.workerGroupDao = workerGroupDao;
         }
 
         @Override
@@ -291,7 +291,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
+            List<WorkerGroup> workerGroups = workerGroupDao.queryAllWorkerGroup();
             return workerGroups.stream().map(WorkerGroup::getId).collect(Collectors.toSet());
         }
     }

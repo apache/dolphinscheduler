@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -28,10 +29,9 @@ import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
-import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -66,7 +66,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     private ProjectMapper projectMapper;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
@@ -77,16 +77,11 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     @Autowired
     private WorkerGroupDao workerGroupDao;
 
-    /**
-     * assign worker groups to a project
-     *
-     * @param loginUser the login user
-     * @param projectCode the project code
-     * @param workerGroups assigned worker group names
-     */
+    @Autowired
+    private WorkerGroupService workerGroupService;
+
     @Override
     public Result assignWorkerGroupsToProject(User loginUser, Long projectCode, List<String> workerGroups) {
-
         Result result = new Result();
 
         if (!isAdmin(loginUser)) {
@@ -115,24 +110,23 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return result;
         }
 
-        Set<String> workerGroupNames = new HashSet<>(workerGroupDao.queryAllWorkerGroupNames());
+        Set<String> allWorkerGroupNames = new HashSet<>(workerGroupDao.queryAllWorkerGroupNames());
+        workerGroupService.getConfigWorkerGroupPageDetail().forEach(
+                workerGroupPageDetail -> allWorkerGroupNames.add(workerGroupPageDetail.getName()));
+        Set<String> unauthorizedWorkerGroupNames = new HashSet<>(workerGroups);
 
-        workerGroupNames.add(WorkerGroupUtils.getDefaultWorkerGroup());
-
-        Set<String> assignedWorkerGroupNames = new HashSet<>(workerGroups);
-
-        Set<String> difference = SetUtils.difference(assignedWorkerGroupNames, workerGroupNames);
-
+        // check if assign worker group exists in the system
+        Set<String> difference = SetUtils.difference(unauthorizedWorkerGroupNames, allWorkerGroupNames);
         if (!difference.isEmpty()) {
             putMsg(result, Status.WORKER_GROUP_NOT_EXIST, difference.toString());
             return result;
         }
 
+        // check if assign worker group exists in the project
         Set<String> projectWorkerGroupNames =
                 projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
-
-        difference = SetUtils.difference(projectWorkerGroupNames, assignedWorkerGroupNames);
-
+        difference = SetUtils.difference(unauthorizedWorkerGroupNames, projectWorkerGroupNames);
+        Date now = new Date();
         if (CollectionUtils.isNotEmpty(difference)) {
             Set<String> usedWorkerGroups = getAllUsedWorkerGroups(project);
 
@@ -149,11 +143,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
                 log.error("Failed to delete worker groups [{}] for the project [{}].", difference, project.getName());
                 throw new ServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR);
             }
-        }
 
-        difference = SetUtils.difference(assignedWorkerGroupNames, projectWorkerGroupNames);
-        Date now = new Date();
-        if (CollectionUtils.isNotEmpty(difference)) {
             difference.forEach(workerGroupName -> {
                 ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
                 projectWorkerGroup.setProjectCode(projectCode);
@@ -176,13 +166,8 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         return result;
     }
 
-    /**
-     * query worker groups that assigned to the project
-     *
-     * @param projectCode project code
-     */
     @Override
-    public Map<String, Object> queryWorkerGroupsByProject(User loginUser, Long projectCode) {
+    public Map<String, Object> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
 
         Project project = projectMapper.queryByCode(projectCode);
@@ -212,9 +197,9 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     private Set<String> getAllUsedWorkerGroups(Project project) {
         Set<String> usedWorkerGroups = new TreeSet<>();
         // query all worker groups that tasks depend on
-        taskDefinitionMapper.queryAllDefinitionList(project.getCode()).stream().forEach(taskDefinition -> {
-            if (StringUtils.isNotEmpty(taskDefinition.getWorkerGroup())) {
-                usedWorkerGroups.add(taskDefinition.getWorkerGroup());
+        taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(project.getCode()).forEach(workerGroupName -> {
+            if (StringUtils.isNotEmpty(workerGroupName)) {
+                usedWorkerGroups.add(workerGroupName);
             }
         });
 

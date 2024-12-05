@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
-
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -44,8 +42,6 @@ public class WorkerGroup {
     private String name;
 
     private String addrList;
-
-    private WorkerGroupSource source;
 
     private Date createTime;
 

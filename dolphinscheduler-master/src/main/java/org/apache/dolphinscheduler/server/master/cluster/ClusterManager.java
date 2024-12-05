@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-
-import javax.annotation.PostConstruct;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,13 +42,9 @@ public class ClusterManager {
     @Autowired
     private RegistryClient registryClient;
 
-    @Autowired
-    private WorkerGroupDao workerGroupDao;
-
-    @PostConstruct
-    void init() {
+    public ClusterManager() {
         this.masterClusters = new MasterClusters();
-        this.workerClusters = new WorkerClusters(workerGroupDao);
+        this.workerClusters = new WorkerClusters();
     }
 
     public void start() {

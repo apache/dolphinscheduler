@@ -248,20 +248,3 @@ d//
 select drop_column_t_ds_worker_group_other_params_json();
 DROP FUNCTION IF EXISTS drop_column_t_ds_worker_group_other_params_json();
 
--- add_column_t_ds_worker_group source
-delimiter d//
-CREATE OR REPLACE FUNCTION add_column_t_ds_worker_group() RETURNS void AS $$
-BEGIN
-      IF NOT EXISTS (SELECT 1
-                  FROM information_schema.columns
-                  WHERE table_name = 't_ds_worker_group'
-                  AND column_name = 'source')
-      THEN
-ALTER TABLE "t_ds_worker_group" ADD COLUMN "source" bigint NOT NULL DEFAULT 0;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-
-select add_column_t_ds_worker_group();
-DROP FUNCTION IF EXISTS add_column_t_ds_worker_group();

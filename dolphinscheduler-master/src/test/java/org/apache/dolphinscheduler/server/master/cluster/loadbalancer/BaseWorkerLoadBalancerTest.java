@@ -19,19 +19,14 @@ package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 
 import java.util.List;
 
-import org.mockito.Mockito;
-
 import com.google.common.collect.Lists;
 
 public class BaseWorkerLoadBalancerTest {
-
-    WorkerGroupDao workerGroupDao = Mockito.mock(WorkerGroupDao.class);
 
     /**
      * "default" -> 127.0.0.1:1234, 127.0.0.2:1234, 127.0.0.3:1234, 127.0.0.4:1234
@@ -78,7 +73,7 @@ public class BaseWorkerLoadBalancerTest {
                         .memoryUsage(0.8)
                         .build());
 
-        WorkerClusters workerClusters = new WorkerClusters(workerGroupDao);
+        WorkerClusters workerClusters = new WorkerClusters();
         workerClusters.onWorkerGroupAdd(workerGroups);
         workerServers.forEach(workerClusters::onServerAdded);
         return workerClusters;

@@ -15,19 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 
-import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-public interface WorkerGroupDao extends IDao<WorkerGroup> {
+@EqualsAndHashCode(callSuper = true)
+@Data
+@NoArgsConstructor
+public class WorkerGroupPageDetail extends WorkerGroup {
 
-    boolean deleteByWorkerGroupName(String workerGroupName);
+    private WorkerGroupSource source;
 
-    List<String> queryAllWorkerGroupNames();
-
-    List<WorkerGroup> queryAllWorkerGroup();
-
-    List<WorkerGroup> queryWorkerGroupByName(String name);
+    public WorkerGroupPageDetail(WorkerGroup workerGroup) {
+        this.setId(workerGroup.getId());
+        this.setName(workerGroup.getName());
+        this.setAddrList(workerGroup.getAddrList());
+        this.setCreateTime(workerGroup.getCreateTime());
+        this.setUpdateTime(workerGroup.getUpdateTime());
+        this.setDescription(workerGroup.getDescription());
+        this.setSystemDefault(workerGroup.isSystemDefault());
+    }
 }
