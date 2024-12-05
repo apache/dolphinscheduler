@@ -423,20 +423,4 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return workerGroupPageDetails;
     }
 
-    @Override
-    public List<WorkerGroupPageDetail> getAllWorkerGroupPageDetail() {
-        List<WorkerGroupPageDetail> uiWorkerGroupPageDetails = workerGroupDao.queryAllWorkerGroup().stream()
-                .map(
-                        workerGroup -> {
-                            WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail(workerGroup);
-                            workerGroupPageDetail.setSource(WorkerGroupSource.UI);
-                            workerGroupPageDetail.setSystemDefault(false);
-                            return workerGroupPageDetail;
-                        })
-                .collect(Collectors.toList());
-        List<WorkerGroupPageDetail> configWorkerGroupPageDetails = getConfigWorkerGroupPageDetail();
-        configWorkerGroupPageDetails.addAll(uiWorkerGroupPageDetails);
-        return configWorkerGroupPageDetails;
-    }
-
 }

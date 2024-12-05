@@ -82,5 +82,4 @@ public interface WorkerGroupService {
 
     List<WorkerGroupPageDetail> getConfigWorkerGroupPageDetail();
 
-    List<WorkerGroupPageDetail> getAllWorkerGroupPageDetail();
 }
