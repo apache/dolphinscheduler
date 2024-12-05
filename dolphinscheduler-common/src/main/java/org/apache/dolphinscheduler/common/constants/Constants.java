@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.constants;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import java.time.Duration;
 import java.util.regex.Pattern;
 
@@ -26,8 +24,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public final class Constants {
-
-    public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
 
     /**
      * common properties path
@@ -38,7 +34,6 @@ public final class Constants {
     public static final String AWS_YAML_PATH = "/aws.yaml";
     public static final String RESOURCE_CENTER_YAML_PATH = "/resource-center.yaml";
 
-    public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
     public static final String FORMAT_S_S_COLON = "%s:%s";
     public static final String FOLDER_SEPARATOR = "/";
@@ -51,17 +46,6 @@ public final class Constants {
     public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
     /**
-     * hdfs defaultFS property name. Should be consistent with the property name in hdfs-site.xml
-     */
-    public static final String HDFS_DEFAULT_FS = "fs.defaultFS";
-
-    /**
-     * hdfs configuration
-     * resource.hdfs.root.user
-     */
-    public static final String HDFS_ROOT_USER = "resource.hdfs.root.user";
-
-    /**
      * hdfs/s3 configuration
      * resource.storage.upload.base.path
      */
@@ -71,16 +55,6 @@ public final class Constants {
      * data basedir path
      */
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
-
-    /**
-     * dolphinscheduler.env.path
-     */
-    public static final String DOLPHINSCHEDULER_ENV_PATH = "dolphinscheduler.env.path";
-
-    /**
-     * environment properties default path
-     */
-    public static final String ENV_PATH = "dolphinscheduler_env.sh";
 
     /**
      * resource.view.suffixs
@@ -107,28 +81,6 @@ public final class Constants {
 
     public static final String AWS_S3_BUCKET_NAME = "aws.s3.bucket.name";
 
-    public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
-    public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
-
-    public static final String GOOGLE_CLOUD_STORAGE_BUCKET_NAME = "resource.google.cloud.storage.bucket.name";
-
-    public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
-
-    public static final String AZURE_BLOB_STORAGE_CONNECTION_STRING = "resource.azure.blob.storage.connection.string";
-
-    public static final String AZURE_BLOB_STORAGE_CONTAINER_NAME = "resource.azure.blob.storage.container.name";
-
-    public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
-
-    public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
-    public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
-
-    /**
-     * fetch applicationId way
-     */
-    public static final String APPID_COLLECT = "appId.collect";
-    public static final String DEFAULT_COLLECT_WAY = "log";
-
     /**
      * comma ,
      */
@@ -138,16 +90,6 @@ public final class Constants {
      * COLON :
      */
     public static final String COLON = ":";
-
-    /**
-     * period .
-     */
-    public static final String PERIOD = ".";
-
-    /**
-     * QUESTION ?
-     */
-    public static final String QUESTION = "?";
 
     /**
      * SPACE " "
@@ -254,11 +196,6 @@ public final class Constants {
     public static final int ALL_PERMISSIONS = READ_PERMISSION | WRITE_PERMISSION | EXECUTE_PERMISSION;
 
     /**
-     * max task timeout
-     */
-    public static final int MAX_TASK_TIMEOUT = 24 * 3600;
-
-    /**
      * forbid running task
      */
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
@@ -288,11 +225,6 @@ public final class Constants {
      * sleep 1000ms
      */
     public static final long SLEEP_TIME_MILLIS = 1_000L;
-
-    /**
-     * short sleep 100ms
-     */
-    public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
 
     public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
 
@@ -346,24 +278,16 @@ public final class Constants {
      */
     public static final String UNDERLINE = "_";
 
-    public static final String PID = SystemUtils.IS_OS_WINDOWS ? "handle" : "pid";
-
     public static final String STAR = "*";
-    public static final char N = 'N';
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
     public static final String SUBWORKFLOW_INSTANCE_ID = "subWorkflowInstanceId";
     public static final String WORKFLOW_INSTANCE_STATE = "workflowInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
-    public static final String CONDITION_RESULT = "conditionResult";
-    public static final String SWITCH_RESULT = "switchResult";
-    public static final String WAIT_START_TIMEOUT = "waitStartTimeout";
     public static final String DEPENDENCE = "dependence";
     public static final String TASK_LIST = "taskList";
     public static final String QUEUE = "queue";
     public static final String QUEUE_NAME = "queueName";
-    public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
-    public static final int LOG_QUERY_LIMIT = 4096;
     public static final String DEPENDENT_SPLIT = ":||";
     public static final long DEPENDENT_ALL_TASK_CODE = -1;
     public static final long DEPENDENT_WORKFLOW_CODE = 0;
@@ -377,11 +301,6 @@ public final class Constants {
      * kerberos
      */
     public static final String KERBEROS = "kerberos";
-
-    /**
-     * kerberos expire time
-     */
-    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
 
     /**
      * java.security.krb5.conf
@@ -419,28 +338,7 @@ public final class Constants {
      */
     public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
 
-    public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
-
-    /**
-     * double brackets left
-     */
-    public static final String DOUBLE_BRACKETS_LEFT = "{{";
-
-    /**
-     * double brackets left
-     */
-    public static final String DOUBLE_BRACKETS_RIGHT = "}}";
-
-    /**
-     * double brackets left
-     */
-    public static final String DOUBLE_BRACKETS_LEFT_SPACE = "{ {";
-
-    /**
-     * double brackets left
-     */
-    public static final String DOUBLE_BRACKETS_RIGHT_SPACE = "} }";
 
     /**
      * status
@@ -451,11 +349,6 @@ public final class Constants {
      * message
      */
     public static final String MSG = "msg";
-
-    /**
-     * data total
-     */
-    public static final String COUNT = "count";
 
     /**
      * page size
@@ -501,8 +394,6 @@ public final class Constants {
      */
     public static final int SESSION_TIME_OUT = 7200;
 
-    public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
-
     public static final String CLASS = "class";
 
     /**
@@ -525,17 +416,6 @@ public final class Constants {
     public static final String SH = "sh";
 
     /**
-     * pstree, get pud and sub pid
-     */
-    public static final String PSTREE = "pstree";
-
-    /**
-     * dry run flag
-     */
-    public static final int DRY_RUN_FLAG_NO = 0;
-    public static final int DRY_RUN_FLAG_YES = 1;
-
-    /**
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
@@ -546,17 +426,11 @@ public final class Constants {
      * schedule timezone
      */
     public static final String SCHEDULE_TIMEZONE = "schedule_timezone";
-    public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 128;
 
     /**
      * tenant
      */
     public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
-
-    /**
-     * schedule time  the amount of date data is too large, affecting the memory, so set 100
-     */
-    public static final int SCHEDULE_TIME_MAX_LENGTH = 100;
 
     /**
      * password max and min LENGTH
@@ -577,12 +451,6 @@ public final class Constants {
     public static final String SECURITY_CONFIG_TYPE_PASSWORD = "PASSWORD";
 
     public static final String SECURITY_CONFIG_TYPE_LDAP = "LDAP";
-
-    /**
-     * test flag
-     */
-    public static final int TEST_FLAG_NO = 0;
-    public static final int TEST_FLAG_YES = 1;
 
     /**
      * Task Types
@@ -625,15 +493,6 @@ public final class Constants {
     /** string no */
     public static final String STRING_NO = "NO";
 
-    public static final String SMALL = "small";
-
-    public static final String CHANGE = "change";
-
-    /**
-     *  support hive datasource in one session
-     */
-    public static final String SUPPORT_HIVE_ONE_SESSION = "support.hive.oneSession";
-
     public static final Integer QUERY_ALL_ON_SYSTEM = 0;
     public static final Integer QUERY_ALL_ON_PROJECT = 1;
     public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
@@ -657,8 +516,6 @@ public final class Constants {
     public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = "remote.logging.oss.bucket.name";
 
     public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
-
-    public static final String REMOTE_LOGGING_S3_BUCKET_NAME = "remote.logging.s3.bucket.name";
 
     /**
      * remote logging for GCS
