@@ -89,8 +89,10 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
 
     @Override
     public void onWorkerGroupDelete(List<WorkerGroup> workerGroups) {
-        for (WorkerGroup workerGroup : workerGroups) {
-            workerGroupMapping.remove(workerGroup.getName());
+        synchronized (workerGroupMapping) {
+            for (WorkerGroup workerGroup : workerGroups) {
+                workerGroupMapping.remove(workerGroup.getName());
+            }
         }
     }
 
@@ -110,7 +112,9 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
                     .filter(Objects::nonNull)
                     .map(WorkerServerMetadata::getAddress)
                     .collect(Collectors.toList());
-            workerGroupMapping.put(workerGroup.getName(), activeWorkers);
+            synchronized (workerGroupMapping) {
+                workerGroupMapping.put(workerGroup.getName(), activeWorkers);
+            }
         }
     }
 
@@ -151,8 +155,6 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
                 removeWorkerGroupAddrList.remove(workerServer.getAddress());
                 if (removeWorkerGroupAddrList.isEmpty()) {
                     workerGroupMapping.remove(workerServer.getWorkerGroup());
-                } else {
-                    workerGroupMapping.put(workerServer.getWorkerGroup(), removeWorkerGroupAddrList);
                 }
             }
         }
