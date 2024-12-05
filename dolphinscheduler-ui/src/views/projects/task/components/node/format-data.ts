@@ -34,7 +34,7 @@ export function formatParams(data: INodeData): {
 } {
   const rdbmsSourceTypes = ref(['MYSQL', 'ORACLE', 'SQLSERVER', 'HANA'])
   const taskParams: ITaskParams = {}
-  if (data.taskType === 'SUB_WORKFLOW' || data.taskType === 'DYNAMIC') {
+  if (data.taskType === 'SUB_WORKFLOW') {
     taskParams.workflowDefinitionCode = data.workflowDefinitionCode
   }
 
@@ -452,14 +452,6 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'REMOTESHELL') {
     taskParams.type = data.type
     taskParams.datasource = data.datasource
-  }
-
-  if (data.taskType === 'DYNAMIC') {
-    taskParams.workflowDefinitionCode = data.workflowDefinitionCode
-    taskParams.maxNumOfSubWorkflowInstances = data.maxNumOfSubWorkflowInstances
-    taskParams.degreeOfParallelism = data.degreeOfParallelism
-    taskParams.filterCondition = data.filterCondition
-    taskParams.listParameters = data.listParameters
   }
 
   let timeoutNotifyStrategy = ''

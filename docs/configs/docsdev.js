@@ -102,10 +102,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sub-workflow.html',
                             },
                             {
-                                title: 'Dynamic',
-                                link: '/en-us/docs/dev/user_doc/guide/task/dynamic.html',
-                            },
-                            {
                                 title: 'Dependent',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dependent.html',
                             },
@@ -815,10 +811,6 @@ export default {
                             {
                                 title: 'SubWorkflow',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sub-workflow.html',
-                            },
-                            {
-                                title: 'Dynamic',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/dynamic.html',
                             },
                             {
                                 title: 'Dependent',

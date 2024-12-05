@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.subworkflow;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
@@ -82,13 +81,6 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     public List<WorkflowInstance> filterRunningProcessInstances(List<WorkflowInstance> workflowInstanceList) {
         return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().isRunning()).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<WorkflowInstance> filterWaitToRunProcessInstances(List<WorkflowInstance> workflowInstanceList) {
-        return workflowInstanceList.stream()
-                .filter(subProcessInstance -> subProcessInstance.getState().equals(WorkflowExecutionStatus.WAIT_TO_RUN))
-                .collect(Collectors.toList());
     }
 
     @Override

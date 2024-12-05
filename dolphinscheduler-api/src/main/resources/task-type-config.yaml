@@ -41,7 +41,6 @@ task:
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
-    - 'DYNAMIC'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'
