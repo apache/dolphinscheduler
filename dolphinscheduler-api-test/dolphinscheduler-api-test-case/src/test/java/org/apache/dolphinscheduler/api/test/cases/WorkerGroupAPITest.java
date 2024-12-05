@@ -126,7 +126,7 @@ public class WorkerGroupAPITest {
         Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
         Assertions.assertTrue(workerGroupsBeforeDelete.contains("test_worker_group"));
 
-        HttpResponse deleteWorkerGroupResponse = workerGroupPage.deleteWorkerGroupById(loginUser, 2);
+        HttpResponse deleteWorkerGroupResponse = workerGroupPage.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertTrue(deleteWorkerGroupResponse.getBody().getSuccess());
 
         queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
