@@ -38,11 +38,10 @@
         delete from t_ds_relation_project_worker_group
         where 1=1
         and project_code = #{projectCode}
-        and worker_group in (
-            <foreach collection="workerGroups" item="workerGroup" separator="," open="(" close=")">
-                #{workerGroup}
-            </foreach>
-        )
+        and worker_group in
+        <foreach collection="workerGroups" item="workerGroup" separator="," open="(" close=")">
+            #{workerGroup}
+        </foreach>
     </delete>
 
     <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup">

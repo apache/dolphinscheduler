@@ -54,6 +54,9 @@ public class ProjectWorkerGroupDaoImpl extends BaseDao<ProjectWorkerGroup, Proje
 
     @Override
     public boolean deleteByProjectCodeAndWorkerGroups(Long projectCode, List<String> workerGroups) {
+        if (mybatisMapper.queryAssignedWorkerGroupNamesByProjectCode(projectCode).isEmpty()) {
+            return true;
+        }
         int deleted = mybatisMapper.deleteByProjectCodeAndWorkerGroups(projectCode, workerGroups);
         return deleted > 0;
     }
