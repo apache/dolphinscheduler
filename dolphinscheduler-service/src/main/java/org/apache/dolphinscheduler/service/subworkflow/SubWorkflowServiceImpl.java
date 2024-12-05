@@ -85,13 +85,6 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     }
 
     @Override
-    public List<WorkflowInstance> filterWaitToRunProcessInstances(List<WorkflowInstance> workflowInstanceList) {
-        return workflowInstanceList.stream()
-                .filter(subProcessInstance -> subProcessInstance.getState().equals(WorkflowExecutionStatus.WAIT_TO_RUN))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<WorkflowInstance> filterFailedProcessInstances(List<WorkflowInstance> workflowInstanceList) {
         return workflowInstanceList.stream()
                 .filter(subProcessInstance -> subProcessInstance.getState().isFailure()).collect(Collectors.toList());
