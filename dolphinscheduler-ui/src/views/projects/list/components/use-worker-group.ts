@@ -45,7 +45,6 @@ export function useWorkerGroup(
         variables.model.workerGroupOptions.push({
           label: workerGroup,
           value: workerGroup
-          // disabled: workerGroup === 'default'
         })
       }
     })
