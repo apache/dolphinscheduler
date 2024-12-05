@@ -92,7 +92,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
 
-    private boolean flag = true;
+    private boolean flag = false;
 
     private Thread internalThread;
 
@@ -122,7 +122,6 @@ public class TaskGroupCoordinator implements AutoCloseable {
             try {
                 final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
-                //
                 amendTaskGroupUseSize();
                 amendTaskGroupQueueStatus();
                 dealWithForceStartTaskGroupQueue();
@@ -311,11 +310,12 @@ public class TaskGroupCoordinator implements AutoCloseable {
                     // next time.
                     notifyWaitingTaskInstance(taskGroupQueue);
 
-                    // Set the taskGroupQueue status to RUNNING and remove from queue
+                    // Set the taskGroupQueue status to ACQUIRE_SUCCESS and remove from WAITING queue
                     taskGroupQueue.setInQueue(Flag.YES.getCode());
                     taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
                     taskGroupQueue.setUpdateTime(new Date());
                     taskGroupQueueDao.updateById(taskGroupQueue);
+                    log.info("Success acquire TaskGroupSlot for TaskGroupQueue: {}", taskGroupQueue);
                 } catch (UnsupportedOperationException unsupportedOperationException) {
                     deleteTaskGroupQueueSlot(taskGroupQueue);
                     log.info(
@@ -336,7 +336,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
      * @param taskInstance task instance
      * @return true if the TaskInstance need to acquireTaskGroupSlot
      */
-    public boolean needAcquireTaskGroupSlot(TaskInstance taskInstance) {
+    public boolean needAcquireTaskGroupSlot(final TaskInstance taskInstance) {
         if (taskInstance == null) {
             throw new IllegalArgumentException("The TaskInstance is null");
         }
@@ -489,7 +489,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
     @Override
     public synchronized void close() {
         if (!flag) {
-            log.error("TaskGroupCoordinator is already closed");
+            log.warn("TaskGroupCoordinator is already closed");
             return;
         }
         flag = false;

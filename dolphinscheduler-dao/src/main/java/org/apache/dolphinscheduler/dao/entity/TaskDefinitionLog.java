@@ -70,6 +70,8 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
         this.setFlag(taskDefinition.getFlag());
         this.setModifyBy(taskDefinition.getModifyBy());
+        this.setTaskGroupId(taskDefinition.getTaskGroupId());
+        this.setTaskGroupPriority(taskDefinition.getTaskGroupPriority());
         this.setCpuQuota(taskDefinition.getCpuQuota());
         this.setMemoryMax(taskDefinition.getMemoryMax());
         this.setTaskExecuteType(taskDefinition.getTaskExecuteType());

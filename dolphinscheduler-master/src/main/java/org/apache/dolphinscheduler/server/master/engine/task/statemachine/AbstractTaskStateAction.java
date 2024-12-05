@@ -237,6 +237,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void tryToDispatchTask(final ITaskExecutionRunnable taskExecutionRunnable) {
         if (isTaskNeedAcquireTaskGroupSlot(taskExecutionRunnable)) {
             acquireTaskGroupSlot(taskExecutionRunnable);
+            log.info("Task{} using taskGroup, success acquire taskGroup slot", taskExecutionRunnable.getName());
             return;
         }
         taskExecutionRunnable.getWorkflowEventBus().publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractHAServer;
@@ -25,7 +27,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,27 +36,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class MasterCoordinator extends AbstractHAServer {
 
-    @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
+    private final TaskGroupCoordinator taskGroupCoordinator;
 
-    public MasterCoordinator(final Registry registry, final MasterConfig masterConfig) {
+    public MasterCoordinator(final Registry registry,
+                             final MasterConfig masterConfig,
+                             final TaskGroupCoordinator taskGroupCoordinator) {
         super(
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
                 masterConfig.getMasterAddress());
-
-        addServerStatusChangeListener(new AbstractServerStatusChangeListener() {
-
-            @Override
-            public void changeToActive() {
-                onActive();
-            }
-
-            @Override
-            public void changeToStandBy() {
-                onStandBy();
-            }
-        });
+        this.taskGroupCoordinator = taskGroupCoordinator;
+        addServerStatusChangeListener(new MasterCoordinatorListener(taskGroupCoordinator));
     }
 
     @Override
@@ -70,12 +61,23 @@ public class MasterCoordinator extends AbstractHAServer {
         log.info("MasterCoordinator shutdown...");
     }
 
-    private void onActive() {
-        taskGroupCoordinator.start();
-    }
+    public static class MasterCoordinatorListener extends AbstractServerStatusChangeListener {
 
-    private void onStandBy() {
-        taskGroupCoordinator.close();
+        private final TaskGroupCoordinator taskGroupCoordinator;
+
+        public MasterCoordinatorListener(TaskGroupCoordinator taskGroupCoordinator) {
+            this.taskGroupCoordinator = checkNotNull(taskGroupCoordinator);
+        }
+
+        @Override
+        public void changeToActive() {
+            taskGroupCoordinator.start();
+        }
+
+        @Override
+        public void changeToStandBy() {
+            taskGroupCoordinator.close();
+        }
     }
 
 }
