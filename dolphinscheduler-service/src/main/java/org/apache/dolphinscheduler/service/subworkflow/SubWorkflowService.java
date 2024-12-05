@@ -38,8 +38,6 @@ public interface SubWorkflowService {
 
     List<WorkflowInstance> filterRunningProcessInstances(List<WorkflowInstance> workflowInstanceList);
 
-    List<WorkflowInstance> filterWaitToRunProcessInstances(List<WorkflowInstance> workflowInstanceList);
-
     List<WorkflowInstance> filterFailedProcessInstances(List<WorkflowInstance> workflowInstanceList);
 
     List<Property> getWorkflowOutputParameters(WorkflowInstance workflowInstance);

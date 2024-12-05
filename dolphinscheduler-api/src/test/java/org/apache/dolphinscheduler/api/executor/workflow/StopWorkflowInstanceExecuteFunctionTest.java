@@ -50,8 +50,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
             "RUNNING_EXECUTION",
             "READY_PAUSE",
             "READY_STOP",
-            "SERIAL_WAIT",
-            "WAIT_TO_RUN"})
+            "SERIAL_WAIT"})
     void exceptionIfWorkflowInstanceCannotStop_canStop(WorkflowExecutionStatus workflowExecutionStatus) {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
@@ -65,8 +64,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
             "RUNNING_EXECUTION",
             "READY_PAUSE",
             "READY_STOP",
-            "SERIAL_WAIT",
-            "WAIT_TO_RUN"}, mode = EnumSource.Mode.EXCLUDE)
+            "SERIAL_WAIT"}, mode = EnumSource.Mode.EXCLUDE)
     void exceptionIfWorkflowInstanceCannotStop_canNotStop(WorkflowExecutionStatus workflowExecutionStatus) {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
@@ -81,8 +79,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
 
     @ParameterizedTest
     @EnumSource(value = WorkflowExecutionStatus.class, names = {
-            "SERIAL_WAIT",
-            "WAIT_TO_RUN"})
+            "SERIAL_WAIT"})
     void ifWorkflowInstanceCanDirectStopInDB_canDirectStopInDB(WorkflowExecutionStatus workflowExecutionStatus) {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
@@ -93,8 +90,7 @@ class StopWorkflowInstanceExecuteFunctionTest {
 
     @ParameterizedTest
     @EnumSource(value = WorkflowExecutionStatus.class, names = {
-            "SERIAL_WAIT",
-            "WAIT_TO_RUN"}, mode = EnumSource.Mode.EXCLUDE)
+            "SERIAL_WAIT"}, mode = EnumSource.Mode.EXCLUDE)
     void ifWorkflowInstanceCanDirectStopInDB_canNotDirectStopInDB(WorkflowExecutionStatus workflowExecutionStatus) {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("Workflow-1");
