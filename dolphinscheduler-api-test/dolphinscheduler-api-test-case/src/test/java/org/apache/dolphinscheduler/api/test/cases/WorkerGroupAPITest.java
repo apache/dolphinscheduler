@@ -75,8 +75,12 @@ public class WorkerGroupAPITest {
     @Test
     @Order(1)
     public void testSaveWorkerGroup() {
-        HttpResponse saveWorkerGroupHttpResponse = workerGroupPage
-                .saveWorkerGroup(loginUser, 1, "test_worker_group", "10.5.0.5:1234", "test", null);
+        HttpResponse saveWorkerGroupHttpResponse = workerGroupPage.saveWorkerGroup(
+                loginUser,
+                0,
+                "test_worker_group",
+                "10.5.0.5:1234",
+                "test");
         Assertions.assertTrue(saveWorkerGroupHttpResponse.getBody().getSuccess());
 
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
