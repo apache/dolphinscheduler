@@ -303,7 +303,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
         availableWorkerGroupList.addAll(configWorkerGroupNames);
-        result.put(Constants.DATA_LIST, availableWorkerGroupList);
+        result.put(Constants.DATA_LIST, availableWorkerGroupList.stream().distinct().collect(Collectors.toList()));
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -362,6 +362,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         workerGroupDao.deleteById(id);
+        boardCastToMasterThatWorkerGroupChanged();
 
         log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);

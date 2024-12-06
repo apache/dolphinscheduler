@@ -187,7 +187,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             projectWorkerGroup.setProjectCode(projectCode);
             projectWorkerGroup.setWorkerGroup(workerGroup);
             return projectWorkerGroup;
-        }).collect(Collectors.toList());
+        }).distinct().collect(Collectors.toList());
 
         result.put(Constants.DATA_LIST, projectWorkerGroups);
         putMsg(result, Status.SUCCESS);
