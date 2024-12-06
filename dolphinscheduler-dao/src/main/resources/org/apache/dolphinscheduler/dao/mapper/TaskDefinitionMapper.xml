@@ -43,12 +43,12 @@
         and td.code = ptr.post_task_code
         limit 1
     </select>
-    <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+    <select id="queryAllTaskDefinitionWorkerGroups" resultType="java.lang.String">
         select
-        <include refid="baseSql"/>
+            worker_group
         from t_ds_task_definition
         where project_code = #{projectCode}
-        order by create_time desc
+        group by worker_group
     </select>
 
     <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">

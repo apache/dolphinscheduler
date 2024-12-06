@@ -39,8 +39,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -76,7 +76,7 @@ public class WorkerGroupServiceTest {
     private WorkerGroupServiceImpl workerGroupService;
 
     @Mock
-    private WorkerGroupMapper workerGroupMapper;
+    private WorkerGroupDao workerGroupDao;
 
     @Mock
     private WorkflowInstanceMapper workflowInstanceMapper;
@@ -142,7 +142,7 @@ public class WorkerGroupServiceTest {
         serverMaps.put("localhost:0000", "");
 
         when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
-        when(workerGroupMapper.insert(Mockito.any())).thenThrow(DuplicateKeyException.class);
+        when(workerGroupDao.insert(Mockito.any())).thenThrow(DuplicateKeyException.class);
         assertThrowsServiceException(Status.NAME_EXIST, () -> {
             workerGroupService.saveWorkerGroup(loginUser, 0, GROUP_NAME, "localhost:0000", "test group");
         });
@@ -155,8 +155,8 @@ public class WorkerGroupServiceTest {
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        when(workerGroupMapper.selectById(1)).thenReturn(null);
-        when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
+        when(workerGroupDao.queryById(1)).thenReturn(null);
+        when(workerGroupDao.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost1:0000", "");
         when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
@@ -173,11 +173,11 @@ public class WorkerGroupServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
 
-        when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
+        when(workerGroupDao.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost:0000", "");
         when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
-        when(workerGroupMapper.insert(any())).thenReturn(1);
+        when(workerGroupDao.insert(any())).thenReturn(1);
         assertDoesNotThrow(() -> {
             workerGroupService.saveWorkerGroup(loginUser, 0, GROUP_NAME, "localhost:0000", "test group");
         });
@@ -192,7 +192,7 @@ public class WorkerGroupServiceTest {
         workerGroups.add(getWorkerGroup(1));
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP,
                 loginUser.getId(), serviceLogger)).thenReturn(ids);
-        when(workerGroupMapper.selectBatchIds(ids)).thenReturn(workerGroups);
+        when(workerGroupDao.queryByIds(ids)).thenReturn(workerGroups);
         Set<String> activeWorkerNodes = new HashSet<>();
         activeWorkerNodes.add("localhost:12345");
         activeWorkerNodes.add("localhost:23456");
@@ -206,7 +206,7 @@ public class WorkerGroupServiceTest {
     public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup(getLoginUser());
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
-        Assertions.assertEquals(workerGroups.size(), 1);
+        Assertions.assertEquals(workerGroups.size(), 0);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class WorkerGroupServiceTest {
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        when(workerGroupMapper.selectById(1)).thenReturn(null);
+        when(workerGroupDao.queryById(1)).thenReturn(null);
 
         Map<String, Object> notExistResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(),
@@ -231,7 +231,7 @@ public class WorkerGroupServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
-        when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
+        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(1);
         List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
@@ -253,11 +253,11 @@ public class WorkerGroupServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
-        when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
+        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
         when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.getNotTerminalStatus())).thenReturn(null);
 
-        when(workerGroupMapper.deleteById(1)).thenReturn(1);
+        when(workerGroupDao.deleteById(1)).thenReturn(true);
 
         when(environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName()))
                 .thenReturn(null);
@@ -275,8 +275,7 @@ public class WorkerGroupServiceTest {
     public void testQueryAllGroupWithDefault() {
         Map<String, Object> result = workerGroupService.queryAllGroup(getLoginUser());
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
-        Assertions.assertEquals(1, workerGroups.size());
-        Assertions.assertEquals("default", workerGroups.toArray()[0]);
+        Assertions.assertEquals(0, workerGroups.size());
     }
 
     /**

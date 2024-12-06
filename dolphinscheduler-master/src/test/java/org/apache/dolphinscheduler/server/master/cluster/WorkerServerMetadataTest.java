@@ -42,6 +42,7 @@ class WorkerServerMetadataTest {
                 .port(12345)
                 .workerHostWeight(2)
                 .threadPoolUsage(0.6)
+                .workerGroup("test")
                 .build();
         WorkerServerMetadata workerServerMetadata = WorkerServerMetadata.parseFromHeartBeat(workerHeartBeat);
         Truth.assertThat(workerServerMetadata.getCpuUsage()).isEqualTo(0.2);
@@ -50,5 +51,6 @@ class WorkerServerMetadataTest {
         Truth.assertThat(workerServerMetadata.getAddress()).isEqualTo("localhost:12345");
         Truth.assertThat(workerServerMetadata.getWorkerWeight()).isEqualTo(2);
         Truth.assertThat(workerServerMetadata.getTaskThreadPoolUsage()).isEqualTo(0.6);
+        Truth.assertThat(workerServerMetadata.getWorkerGroup()).isEqualTo("test");
     }
 }

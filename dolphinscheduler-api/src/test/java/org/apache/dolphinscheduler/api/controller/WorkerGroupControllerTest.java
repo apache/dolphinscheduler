@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -53,8 +53,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
-    @MockBean(name = "workerGroupMapper")
-    private WorkerGroupMapper workerGroupMapper;
+    @MockBean(name = "workerGroupDao")
+    private WorkerGroupDao workerGroupDao;
 
     @MockBean(name = "processInstanceMapper")
     private WorkflowInstanceMapper workflowInstanceMapper;
@@ -133,11 +133,11 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         WorkerGroup workerGroup = new WorkerGroup();
         workerGroup.setId(12);
         workerGroup.setName("测试");
-        Mockito.when(workerGroupMapper.selectById(12)).thenReturn(workerGroup);
+        Mockito.when(workerGroupDao.queryById(12)).thenReturn(workerGroup);
         Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus("测试",
                 WorkflowExecutionStatus.getNotTerminalStatus()))
                 .thenReturn(null);
-        Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
+        Mockito.when(workerGroupDao.deleteById(12)).thenReturn(true);
         Mockito.when(workflowInstanceMapper.updateWorkflowInstanceByWorkerGroupName("测试", "")).thenReturn(1);
 
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")

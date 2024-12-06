@@ -492,7 +492,8 @@ CREATE TABLE `t_ds_task_definition` (
   `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`)
+  PRIMARY KEY (`id`,`code`),
+  KEY `idx_project_code` (`project_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

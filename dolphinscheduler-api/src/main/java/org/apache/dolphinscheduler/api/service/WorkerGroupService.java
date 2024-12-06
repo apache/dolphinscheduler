@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 
 import java.util.List;
 import java.util.Map;
@@ -78,5 +79,7 @@ public interface WorkerGroupService {
      * @return worker group map
      */
     Map<Long, String> queryWorkerGroupByWorkflowDefinitionCodes(List<Long> workflowDefinitionCodeList);
+
+    List<WorkerGroupPageDetail> getConfigWorkerGroupPageDetail();
 
 }

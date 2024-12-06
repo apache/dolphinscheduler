@@ -15,27 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.common.enums;
 
-import java.util.Date;
+import lombok.Getter;
 
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-@Data
-public class Server {
+@Getter
+public enum WorkerGroupSource {
 
-    private int id;
+    CONFIG(1, "config"),
+    UI(2, "ui");
 
-    private String host;
+    @EnumValue
+    private final int code;
+    private final String desc;
 
-    private int port;
-
-    private String serverDirectory;
-
-    private String heartBeatInfo;
-
-    private Date createTime;
-
-    private Date lastHeartbeatTime;
+    WorkerGroupSource(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
 }

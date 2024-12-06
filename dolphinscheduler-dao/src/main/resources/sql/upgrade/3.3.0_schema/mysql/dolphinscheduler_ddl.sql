@@ -244,3 +244,5 @@ d//
 delimiter ;
 CALL drop_column_t_ds_worker_group_other_params_json;
 DROP PROCEDURE drop_column_t_ds_worker_group_other_params_json;
+
+ALTER TABLE `t_ds_task_definition` ADD INDEX `idx_project_code` USING BTREE (`project_code`);

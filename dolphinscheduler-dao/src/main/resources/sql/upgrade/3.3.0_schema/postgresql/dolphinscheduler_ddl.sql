@@ -247,3 +247,4 @@ d//
 
 select drop_column_t_ds_worker_group_other_params_json();
 DROP FUNCTION IF EXISTS drop_column_t_ds_worker_group_other_params_json();
+

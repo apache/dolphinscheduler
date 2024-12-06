@@ -15,31 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-public interface ProjectWorkerGroupRelationService {
+public interface ProjectWorkerGroupDao extends IDao<ProjectWorkerGroup> {
 
-    /**
-     * assign worker groups to a project
-     *
-     * @param loginUser the login user
-     * @param projectCode the project code
-     * @param workerGroups assigned worker group names
-     */
-    Result assignWorkerGroupsToProject(User loginUser, Long projectCode, List<String> workerGroups);
+    boolean deleteByProjectCode(Long projectCode);
 
-    /**
-     * query worker groups that assigned to the project
-     *
-     * @param loginUser the login user
-     * @param projectCode project code
-     */
-    Map<String, Object> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode);
+    Set<String> queryAssignedWorkerGroupNamesByProjectCode(Long projectCode);
 
+    boolean deleteByProjectCodeAndWorkerGroups(Long projectCode, List<String> workerGroups);
+
+    List<ProjectWorkerGroup> queryByProjectCode(Long projectCode);
 }

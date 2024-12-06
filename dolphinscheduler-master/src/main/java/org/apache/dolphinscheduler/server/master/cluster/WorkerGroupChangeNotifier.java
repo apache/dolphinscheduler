@@ -85,7 +85,7 @@ public class WorkerGroupChangeNotifier {
     }
 
     private MapComparator<String, WorkerGroup> detectChangedWorkerGroups() {
-        final Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
+        Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
                 .stream()
                 .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
         return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
