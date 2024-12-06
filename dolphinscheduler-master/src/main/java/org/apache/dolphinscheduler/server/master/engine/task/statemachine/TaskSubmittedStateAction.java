@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
@@ -52,9 +51,6 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
 
     @Autowired
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
-
-    @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;

@@ -30,17 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * The MasterCoordinator is singleton at the clusters, which is used to do some control work, e.g manage the {@link TaskGroupCoordinator}
+ * The MasterCoordinator is singleton at the clusters, which is used to do some control work, e.g manage the {@link ITaskGroupCoordinator}
  */
 @Slf4j
 @Component
 public class MasterCoordinator extends AbstractHAServer {
 
-    private final TaskGroupCoordinator taskGroupCoordinator;
+    private final ITaskGroupCoordinator taskGroupCoordinator;
 
     public MasterCoordinator(final Registry registry,
                              final MasterConfig masterConfig,
-                             final TaskGroupCoordinator taskGroupCoordinator) {
+                             final ITaskGroupCoordinator taskGroupCoordinator) {
         super(
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
@@ -63,9 +63,9 @@ public class MasterCoordinator extends AbstractHAServer {
 
     public static class MasterCoordinatorListener extends AbstractServerStatusChangeListener {
 
-        private final TaskGroupCoordinator taskGroupCoordinator;
+        private final ITaskGroupCoordinator taskGroupCoordinator;
 
-        public MasterCoordinatorListener(TaskGroupCoordinator taskGroupCoordinator) {
+        public MasterCoordinatorListener(ITaskGroupCoordinator taskGroupCoordinator) {
             this.taskGroupCoordinator = checkNotNull(taskGroupCoordinator);
         }
 

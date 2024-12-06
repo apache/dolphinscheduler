@@ -54,31 +54,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * The TaskGroupCoordinator use to manage the task group slot. The task group slot is used to limit the number of {@link TaskInstance} that can be run at the same time.
- * <p>
- * The {@link TaskGroupQueue} is used to represent the task group slot. When a {@link TaskGroupQueue} which inQueue is YES means the {@link TaskGroupQueue} is using by a {@link TaskInstance}.
- * <p>
- * When the {@link TaskInstance} need to use task group, we should use @{@link TaskGroupCoordinator#acquireTaskGroupSlot(TaskInstance)} to acquire the task group slot,
- * this method doesn't block should always acquire successfully, and you should directly stop dispatch the task instance.
- * When the task group slot is available, the TaskGroupCoordinator will wake up the waiting {@link TaskInstance} to dispatch.
- * <pre>
- *     if(needAcquireTaskGroupSlot(taskInstance)) {
- *         taskGroupCoordinator.acquireTaskGroupSlot(taskInstance);
- *         return;
- *     }
- * </pre>
- * <p>
- * When the {@link TaskInstance} is finished, we should use @{@link TaskGroupCoordinator#releaseTaskGroupSlot(TaskInstance)} to release the task group slot.
- * <pre>
- *     if(needToReleaseTaskGroupSlot(taskInstance)) {
- *         taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
- *     }
- * </pre>
- */
+import com.google.common.annotations.VisibleForTesting;
+
 @Slf4j
 @Component
-public class TaskGroupCoordinator implements AutoCloseable {
+public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseable {
 
     @Autowired
     private TaskGroupDao taskGroupDao;
@@ -111,6 +91,11 @@ public class TaskGroupCoordinator implements AutoCloseable {
         };
         internalThread.start();
         log.info("TaskGroupCoordinator started...");
+    }
+
+    @VisibleForTesting
+    boolean isStarted() {
+        return flag;
     }
 
     private void doStart() {
@@ -330,12 +315,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
         }
     }
 
-    /**
-     * If the {@link TaskInstance#getTaskGroupId()} > 0, and the TaskGroup flag is {@link Flag#YES} then the task instance need to use task group.
-     *
-     * @param taskInstance task instance
-     * @return true if the TaskInstance need to acquireTaskGroupSlot
-     */
+    @Override
     public boolean needAcquireTaskGroupSlot(final TaskInstance taskInstance) {
         if (taskInstance == null) {
             throw new IllegalArgumentException("The TaskInstance is null");
@@ -353,15 +333,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
         return Flag.YES.equals(taskGroup.getStatus());
     }
 
-    /**
-     * Acquire the task group slot for the given {@link TaskInstance}.
-     * <p>
-     * When taskInstance want to acquire a TaskGroup slot, should call this method. If acquire successfully, will create a TaskGroupQueue in db which is in queue and status is {@link TaskGroupQueueStatus#WAIT_QUEUE}.
-     * The TaskInstance shouldn't dispatch until there exist available slot, the taskGroupCoordinator notify it.
-     *
-     * @param taskInstance the task instance which want to acquire task group slot.
-     * @throws IllegalArgumentException if the taskInstance is null or the used taskGroup doesn't exist.
-     */
+    @Override
     public void acquireTaskGroupSlot(TaskInstance taskInstance) {
         if (taskInstance == null || taskInstance.getTaskGroupId() <= 0) {
             throw new IllegalArgumentException("The current TaskInstance does not use task group");
@@ -392,12 +364,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
         taskGroupQueueDao.insert(taskGroupQueue);
     }
 
-    /**
-     * If the TaskInstance is using TaskGroup then it need to release TaskGroupSlot.
-     *
-     * @param taskInstance taskInsatnce
-     * @return true if the TaskInstance need to release TaskGroupSlot
-     */
+    @Override
     public boolean needToReleaseTaskGroupSlot(TaskInstance taskInstance) {
         if (taskInstance == null) {
             throw new IllegalArgumentException("The TaskInstance is null");
@@ -409,15 +376,7 @@ public class TaskGroupCoordinator implements AutoCloseable {
         return true;
     }
 
-    /**
-     * Release the task group slot for the given {@link TaskInstance}.
-     * <p>
-     * When taskInstance want to release a TaskGroup slot, should call this method. The release method will delete the taskGroupQueue.
-     * This method is idempotent, this means that if the task group slot is already released, this method will do nothing.
-     *
-     * @param taskInstance the task instance which want to release task group slot.
-     * @throws IllegalArgumentException If the taskInstance is null or the task doesn't use task group.
-     */
+    @Override
     public void releaseTaskGroupSlot(TaskInstance taskInstance) {
         if (taskInstance == null) {
             throw new IllegalArgumentException("The TaskInstance is null");
@@ -496,7 +455,6 @@ public class TaskGroupCoordinator implements AutoCloseable {
         try {
             if (internalThread != null) {
                 internalThread.interrupt();
-                internalThread.join();
             }
         } catch (Exception ex) {
             log.error("Close internalThread failed", ex);
