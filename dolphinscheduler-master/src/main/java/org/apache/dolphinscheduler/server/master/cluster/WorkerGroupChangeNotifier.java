@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -45,19 +44,22 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 public class WorkerGroupChangeNotifier {
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
+    private final TransactionTemplate transactionTemplate;
 
     private final WorkerGroupDao workerGroupDao;
+
     private final List<WorkerGroupListener> listeners = new CopyOnWriteArrayList<>();
 
     private Map<String, WorkerGroup> workerGroupMap = new HashMap<>();
 
-    public WorkerGroupChangeNotifier(WorkerGroupDao workerGroupDao) {
+    public WorkerGroupChangeNotifier(final MasterConfig masterConfig,
+                                     final WorkerGroupDao workerGroupDao,
+                                     final TransactionTemplate transactionTemplate) {
+        this.masterConfig = masterConfig;
         this.workerGroupDao = workerGroupDao;
+        this.transactionTemplate = transactionTemplate;
     }
 
     public void start() {
