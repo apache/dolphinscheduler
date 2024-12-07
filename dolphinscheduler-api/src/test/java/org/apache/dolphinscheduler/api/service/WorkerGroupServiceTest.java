@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -36,11 +39,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +62,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -73,13 +76,10 @@ public class WorkerGroupServiceTest {
     private WorkerGroupServiceImpl workerGroupService;
 
     @Mock
-    private WorkerGroupMapper workerGroupMapper;
+    private WorkerGroupDao workerGroupDao;
 
     @Mock
     private WorkflowInstanceMapper workflowInstanceMapper;
-
-    @Mock
-    private ProcessService processService;
 
     @Mock
     private RegistryClient registryClient;
@@ -109,85 +109,78 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveNoPermission_whenSaveWorkerGroup_expectNoOperation() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(false);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(false);
-        Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(),
-                ((Status) result.get(Constants.STATUS)).getCode());
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> {
+            workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group");
+        });
     }
 
     @Test
     public void giveNullName_whenSaveWorkerGroup_expectNAME_NULL() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, "", "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.NAME_NULL.getCode(),
-                ((Status) result.get(Constants.STATUS)).getCode());
+        assertThrowsServiceException(Status.NAME_NULL, () -> {
+            workerGroupService.saveWorkerGroup(loginUser, 1, "", "localhost:0000", "test group");
+        });
     }
 
     @Test
     public void giveSameUserName_whenSaveWorkerGroup_expectNAME_EXIST() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
-        List<WorkerGroup> workerGroupList = new ArrayList<WorkerGroup>();
-        workerGroupList.add(getWorkerGroup(1));
-        Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(workerGroupList);
 
-        Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.NAME_EXIST.getCode(),
-                ((Status) result.get(Constants.STATUS)).getCode());
+        Map<String, String> serverMaps = new HashMap<>();
+        serverMaps.put("localhost:0000", "");
+
+        when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
+        when(workerGroupDao.insert(Mockito.any())).thenThrow(DuplicateKeyException.class);
+        assertThrowsServiceException(Status.NAME_EXIST, () -> {
+            workerGroupService.saveWorkerGroup(loginUser, 0, GROUP_NAME, "localhost:0000", "test group");
+        });
     }
 
     @Test
     public void giveInvalidAddress_whenSaveWorkerGroup_expectADDRESS_INVALID() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
-        Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
+        when(workerGroupDao.queryById(1)).thenReturn(null);
+        when(workerGroupDao.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost1:0000", "");
-        Mockito.when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
-
-        Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.WORKER_ADDRESS_INVALID.getCode(),
-                ((Status) result.get(Constants.STATUS)).getCode());
+        when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
+        assertThrowsServiceException(Status.WORKER_ADDRESS_INVALID, () -> {
+            workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group");
+        });
     }
 
     @Test
     public void giveValidWorkerGroup_whenSaveWorkerGroup_expectSuccess() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
 
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
-        Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
+        when(workerGroupDao.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost:0000", "");
-        Mockito.when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
-        Mockito.when(workerGroupMapper.insert(any())).thenReturn(1);
-
-        Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.SUCCESS.getCode(),
-                ((Status) result.get(Constants.STATUS)).getCode());
+        when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
+        when(workerGroupDao.insert(any())).thenReturn(1);
+        assertDoesNotThrow(() -> {
+            workerGroupService.saveWorkerGroup(loginUser, 0, GROUP_NAME, "localhost:0000", "test group");
+        });
     }
 
     @Test
@@ -197,13 +190,13 @@ public class WorkerGroupServiceTest {
         ids.add(1);
         List<WorkerGroup> workerGroups = new ArrayList<>();
         workerGroups.add(getWorkerGroup(1));
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP,
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP,
                 loginUser.getId(), serviceLogger)).thenReturn(ids);
-        Mockito.when(workerGroupMapper.selectBatchIds(ids)).thenReturn(workerGroups);
+        when(workerGroupDao.queryByIds(ids)).thenReturn(workerGroups);
         Set<String> activeWorkerNodes = new HashSet<>();
         activeWorkerNodes.add("localhost:12345");
         activeWorkerNodes.add("localhost:23456");
-        Mockito.when(registryClient.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(activeWorkerNodes);
+        when(registryClient.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(activeWorkerNodes);
 
         Result result = workerGroupService.queryAllGroupPaging(loginUser, 1, 1, null);
         Assertions.assertEquals(result.getCode(), Status.SUCCESS.getCode());
@@ -213,17 +206,17 @@ public class WorkerGroupServiceTest {
     public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup(getLoginUser());
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
-        Assertions.assertEquals(workerGroups.size(), 1);
+        Assertions.assertEquals(workerGroups.size(), 0);
     }
 
     @Test
     public void giveNotExistsWorkerGroup_whenDeleteWorkerGroupById_expectNotExists() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
+        when(workerGroupDao.queryById(1)).thenReturn(null);
 
         Map<String, Object> notExistResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(),
@@ -233,19 +226,19 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveRunningProcess_whenDeleteWorkerGroupById_expectFailed() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
+        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setId(1);
         List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
         workflowInstances.add(workflowInstance);
-        Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+        when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.getNotTerminalStatus()))
-                .thenReturn(workflowInstances);
+                        .thenReturn(workflowInstances);
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
@@ -255,23 +248,23 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveValidParams_whenDeleteWorkerGroupById_expectSuccess() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
-        Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
+        when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.getNotTerminalStatus())).thenReturn(null);
 
-        Mockito.when(workerGroupMapper.deleteById(1)).thenReturn(1);
+        when(workerGroupDao.deleteById(1)).thenReturn(true);
 
-        Mockito.when(environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName()))
+        when(environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName()))
                 .thenReturn(null);
 
-        Mockito.when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
+        when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
 
-        Mockito.when(scheduleMapper.selectList(Mockito.any())).thenReturn(null);
+        when(scheduleMapper.selectList(Mockito.any())).thenReturn(null);
 
         Map<String, Object> successResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(),
@@ -282,8 +275,7 @@ public class WorkerGroupServiceTest {
     public void testQueryAllGroupWithDefault() {
         Map<String, Object> result = workerGroupService.queryAllGroup(getLoginUser());
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
-        Assertions.assertEquals(1, workerGroups.size());
-        Assertions.assertEquals("default", workerGroups.toArray()[0]);
+        Assertions.assertEquals(0, workerGroups.size());
     }
 
     /**

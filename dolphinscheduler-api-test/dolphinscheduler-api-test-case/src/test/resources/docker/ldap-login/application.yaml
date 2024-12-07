@@ -190,6 +190,8 @@ worker:
   max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
+  # worker group name
+  group: default
   server-load-protection:
     enabled: true
     # Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks.

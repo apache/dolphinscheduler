@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
 public class ClusterManager {
 
     @Getter
-    private final MasterClusters masterClusters;
+    private MasterClusters masterClusters;
 
     @Getter
-    private final WorkerClusters workerClusters;
+    private WorkerClusters workerClusters;
 
     @Autowired
     private WorkerGroupChangeNotifier workerGroupChangeNotifier;

@@ -15,30 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common;
+package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 
-import org.apache.commons.lang3.SystemUtils;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+@EqualsAndHashCode(callSuper = true)
+@Data
+@NoArgsConstructor
+public class WorkerGroupPageDetail extends WorkerGroup {
 
-/**
- * Constants Test
- */
-public class ConstantsTest {
+    private WorkerGroupSource source;
 
-    /**
-     * Test PID via env
-     */
-    @Test
-    public void testPID() {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            Assertions.assertEquals(Constants.PID, "handle");
-        } else {
-            Assertions.assertEquals(Constants.PID, "pid");
-        }
+    public WorkerGroupPageDetail(WorkerGroup workerGroup) {
+        this.setId(workerGroup.getId());
+        this.setName(workerGroup.getName());
+        this.setAddrList(workerGroup.getAddrList());
+        this.setCreateTime(workerGroup.getCreateTime());
+        this.setUpdateTime(workerGroup.getUpdateTime());
+        this.setDescription(workerGroup.getDescription());
+        this.setSystemDefault(workerGroup.isSystemDefault());
     }
-
 }

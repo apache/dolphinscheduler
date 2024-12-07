@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 
 import lombok.Builder;
@@ -41,7 +42,8 @@ public class WorkerServerMetadata extends BaseServerMetadata {
     public static WorkerServerMetadata parseFromHeartBeat(final WorkerHeartBeat workerHeartBeat) {
         return WorkerServerMetadata.builder()
                 .serverStartupTime(workerHeartBeat.getStartupTime())
-                .address(workerHeartBeat.getHost() + ":" + workerHeartBeat.getPort())
+                .address(workerHeartBeat.getHost() + Constants.COLON + workerHeartBeat.getPort())
+                .workerGroup(workerHeartBeat.getWorkerGroup())
                 .cpuUsage(workerHeartBeat.getCpuUsage())
                 .memoryUsage(workerHeartBeat.getMemoryUsage())
                 .serverStatus(workerHeartBeat.getServerStatus())

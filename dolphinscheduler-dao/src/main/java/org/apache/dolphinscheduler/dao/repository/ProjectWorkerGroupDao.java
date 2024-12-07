@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.task;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 
-import com.google.auto.service.AutoService;
+import java.util.List;
+import java.util.Set;
 
-@AutoService(TaskChannelFactory.class)
-public class DynamicLogicTaskChannelFactory implements TaskChannelFactory {
+public interface ProjectWorkerGroupDao extends IDao<ProjectWorkerGroup> {
 
-    public static final String NAME = "DYNAMIC";
-    @Override
-    public String getName() {
-        return NAME;
-    }
+    boolean deleteByProjectCode(Long projectCode);
 
-    @Override
-    public TaskChannel create() {
-        return new DynamicLogicTaskChannel();
-    }
+    Set<String> queryAssignedWorkerGroupNamesByProjectCode(Long projectCode);
+
+    boolean deleteByProjectCodeAndWorkerGroups(Long projectCode, List<String> workerGroups);
+
+    List<ProjectWorkerGroup> queryByProjectCode(Long projectCode);
 }

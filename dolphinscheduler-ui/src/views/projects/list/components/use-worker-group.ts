@@ -44,8 +44,7 @@ export function useWorkerGroup(
       for (const workerGroup of res) {
         variables.model.workerGroupOptions.push({
           label: workerGroup,
-          value: workerGroup,
-          disabled: workerGroup === 'default'
+          value: workerGroup
         })
       }
     })
@@ -63,10 +62,8 @@ export function useWorkerGroup(
   initOptions()
 
   const handleValidate = () => {
-    if (variables.model?.assignedWorkerGroups.length > 0) {
-      submitModal()
-      ctx.emit('confirmModal', props.showModalRef)
-    }
+    submitModal()
+    ctx.emit('confirmModal', props.showModalRef)
   }
 
   const submitModal = async () => {

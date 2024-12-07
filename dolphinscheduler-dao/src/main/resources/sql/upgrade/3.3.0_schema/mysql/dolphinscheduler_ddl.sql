@@ -222,3 +222,27 @@ d//
 delimiter ;
 CALL drop_data_quality_tables;
 DROP PROCEDURE drop_data_quality_tables;
+
+ALTER TABLE `t_ds_workflow_definition` ADD KEY `idx_project_code` (`project_code`) USING BTREE;
+ALTER TABLE `t_ds_workflow_definition_log` ADD KEY `idx_project_code` (`project_code`) USING BTREE;
+
+-- drop_column_t_ds_worker_group other_params_json
+DROP PROCEDURE if EXISTS drop_column_t_ds_worker_group_other_params_json;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_worker_group_other_params_json()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_worker_group'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='other_params_json')
+   THEN
+ALTER TABLE `t_ds_worker_group`
+    DROP COLUMN `other_params_json`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_worker_group_other_params_json;
+DROP PROCEDURE drop_column_t_ds_worker_group_other_params_json;
+
+ALTER TABLE `t_ds_task_definition` ADD INDEX `idx_project_code` USING BTREE (`project_code`);

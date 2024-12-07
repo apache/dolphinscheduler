@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.task;
+package org.apache.dolphinscheduler.extract.master;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
 
-public class DynamicLogicTaskChannel extends AbstractLogicTaskChannel {
+@RpcService
+public interface IMasterContainerService {
 
-    @Override
-    public AbstractParameters parseParameters(String taskParams) {
-        return JSONUtils.parseObject(taskParams, DynamicParameters.class);
-    }
+    @RpcMethod
+    void refreshWorkerGroup();
+
 }

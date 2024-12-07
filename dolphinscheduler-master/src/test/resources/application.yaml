@@ -52,6 +52,7 @@ master:
     # The number of threads used to execute logic task.
     task-executor-thread-count: 4
   max-heartbeat-interval: 10s
+  group: default
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true

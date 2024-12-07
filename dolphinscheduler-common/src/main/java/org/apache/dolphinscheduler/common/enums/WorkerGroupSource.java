@@ -15,19 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.executor.plugin.dynamic;
+package org.apache.dolphinscheduler.common.enums;
 
-import java.util.Map;
+import lombok.Getter;
 
-import lombok.Data;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-@Data
-public class DynamicOutput {
+@Getter
+public enum WorkerGroupSource {
 
-    private Map<String, String> dynParams;
+    CONFIG(1, "config"),
+    UI(2, "ui");
 
-    private Map<String, String> outputValue;
+    @EnumValue
+    private final int code;
+    private final String desc;
 
-    private int mappedTimes;
+    WorkerGroupSource(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
 }

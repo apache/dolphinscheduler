@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -34,8 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -292,32 +288,6 @@ public class WorkflowAlertManager {
             default:
         }
         return sendWarning;
-    }
-
-    /**
-     * Send a close alert event, if the workflowInstance has sent alert before, then will insert a closed event.
-     *
-     * @param workflowInstance success workflow instance
-     */
-    public void closeAlert(WorkflowInstance workflowInstance) {
-        if (!PropertyUtils.getBoolean(Constants.AUTO_CLOSE_ALERT, false)) {
-            return;
-        }
-        List<Alert> alerts = alertDao.listAlerts(workflowInstance.getId());
-        if (CollectionUtils.isEmpty(alerts)) {
-            // no need to close alert
-            return;
-        }
-
-        Alert alert = new Alert();
-        alert.setAlertGroupId(workflowInstance.getWarningGroupId());
-        alert.setUpdateTime(new Date());
-        alert.setCreateTime(new Date());
-        alert.setProjectCode(workflowInstance.getWorkflowDefinition().getProjectCode());
-        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
-        alert.setWorkflowInstanceId(workflowInstance.getId());
-        alert.setAlertType(AlertType.CLOSE_ALERT);
-        alertDao.addAlert(alert);
     }
 
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,

@@ -350,6 +350,7 @@ CREATE TABLE t_ds_workflow_definition (
 ) ;
 
 create index workflow_definition_index on t_ds_workflow_definition (code,id);
+create index workflow_definition_index_project_code on t_ds_workflow_definition (project_code);
 
 --
 -- Table structure for table t_ds_workflow_definition_log
@@ -379,6 +380,7 @@ CREATE TABLE t_ds_workflow_definition_log (
 ) ;
 
 create UNIQUE index uniq_idx_code_version on t_ds_workflow_definition_log (code,version);
+create index workflow_definition_log_index_project_code on t_ds_workflow_definition_log (project_code);
 
 --
 -- Table structure for table t_ds_task_definition
@@ -923,8 +925,7 @@ CREATE TABLE t_ds_worker_group (
   addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  description text  DEFAULT NULL,
-  other_params_json text  DEFAULT NULL,
+  description text DEFAULT NULL,
   PRIMARY KEY (id) ,
   CONSTRAINT name_unique UNIQUE (name)
 ) ;

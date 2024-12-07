@@ -45,9 +45,6 @@ import org.springframework.stereotype.Repository;
 
 import com.google.common.collect.Lists;
 
-/**
- * Task Definition DAO Implementation
- */
 @Repository
 @Slf4j
 public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitionMapper> implements TaskDefinitionDao {
@@ -120,4 +117,8 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
         return mybatisMapper.queryByCode(taskCode);
     }
 
+    @Override
+    public List<String> queryAllTaskDefinitionWorkerGroups(long projectCode) {
+        return mybatisMapper.queryAllTaskDefinitionWorkerGroups(projectCode);
+    }
 }

@@ -13,9 +13,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-UPDATE t_ds_task_definition SET task_type = 'SUB_WORKFLOW' WHERE task_type = 'SUB_PROCESS';
-UPDATE t_ds_task_definition_log SET task_type = 'SUB_WORKFLOW' WHERE task_type = 'SUB_PROCESS';
-UPDATE t_ds_task_definition SET task_params = replace(task_params, 'processDefinitionCode', 'workflowDefinitionCode') where task_type = 'SUB_WORKFLOW';
-UPDATE t_ds_task_definition_log SET task_params = replace(task_params, 'processDefinitionCode', 'workflowDefinitionCode') where task_type = 'SUB_WORKFLOW';
+package org.apache.dolphinscheduler.server.master.rpc;
+
+import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+public class MasterContainerService implements IMasterContainerService {
+
+    @Autowired
+    private WorkerGroupChangeNotifier workerGroupChangeNotifier;
+
+    @Override
+    public void refreshWorkerGroup() {
+        workerGroupChangeNotifier.detectWorkerGroupChanges();
+    }
+}
