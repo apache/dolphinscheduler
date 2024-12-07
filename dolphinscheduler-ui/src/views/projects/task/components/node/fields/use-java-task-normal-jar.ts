@@ -68,13 +68,19 @@ export function useJavaTaskNormalJar(model: {
       validate: {
         trigger: ['input', 'blur'],
         validator(_: any, value: string) {
-          if (value && !/^([A-Za-z_$][A-Za-z\d_$]*\.)*[A-Za-z_$][A-Za-z\d_$]*$/.test(value.trim())) {
+          if (
+            value &&
+            !/^([A-Za-z_$][A-Za-z\d_$]*\.)*[A-Za-z_$][A-Za-z\d_$]*$/.test(
+              value.trim()
+            )
+          ) {
             return new Error(t('project.node.main_class_invalid'))
           }
           return true
         }
       }
-    }, {
+    },
+    {
       type: 'tree-select',
       field: 'mainJar',
       name: t('project.node.main_package'),
@@ -101,5 +107,4 @@ export function useJavaTaskNormalJar(model: {
       options: mainJarOptions
     }
   ]
-
 }
