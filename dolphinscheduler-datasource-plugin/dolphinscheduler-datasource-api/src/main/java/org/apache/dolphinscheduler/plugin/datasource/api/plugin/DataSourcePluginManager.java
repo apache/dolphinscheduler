@@ -21,9 +21,9 @@ import static java.lang.String.format;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,8 +34,8 @@ public class DataSourcePluginManager {
 
     private final Map<String, DataSourceChannel> datasourceChannelMap = new ConcurrentHashMap<>();
 
-    public Map<String, DataSourceChannel> getDataSourceChannelMap() {
-        return Collections.unmodifiableMap(datasourceChannelMap);
+    public DataSourceChannel getDataSourceChannel(final DbType dbType) {
+        return datasourceChannelMap.get(dbType.getName());
     }
 
     public void installPlugin() {
