@@ -22,12 +22,15 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Lists;
 
@@ -36,7 +39,10 @@ class WorkerGroupChangeNotifierTest {
     @Test
     void detectWorkerGroupChanges_addedWorkerGroup() {
         WorkerGroupDao workerGroupDao = Mockito.mock(WorkerGroupDao.class);
-        WorkerGroupChangeNotifier workerGroupChangeNotifier = new WorkerGroupChangeNotifier(workerGroupDao);
+        WorkerGroupChangeNotifier workerGroupChangeNotifier = new WorkerGroupChangeNotifier(
+                new MasterConfig(),
+                workerGroupDao,
+                new MockTransactionTemplate());
 
         WorkerGroup workerGroup1 = WorkerGroup.builder()
                 .name("workerGroup1")
@@ -74,7 +80,10 @@ class WorkerGroupChangeNotifierTest {
     @Test
     void detectWorkerGroupChanges_deleteWorkerGroup() {
         WorkerGroupDao workerGroupDao = Mockito.mock(WorkerGroupDao.class);
-        WorkerGroupChangeNotifier workerGroupChangeNotifier = new WorkerGroupChangeNotifier(workerGroupDao);
+        WorkerGroupChangeNotifier workerGroupChangeNotifier = new WorkerGroupChangeNotifier(
+                new MasterConfig(),
+                workerGroupDao,
+                new MockTransactionTemplate());
 
         WorkerGroup workerGroup1 = WorkerGroup.builder()
                 .name("workerGroup1")
@@ -115,7 +124,10 @@ class WorkerGroupChangeNotifierTest {
     @Test
     void detectWorkerGroupChanges_updateWorkerGroup() {
         WorkerGroupDao workerGroupDao = Mockito.mock(WorkerGroupDao.class);
-        WorkerGroupChangeNotifier workerGroupChangeNotifier = new WorkerGroupChangeNotifier(workerGroupDao);
+        WorkerGroupChangeNotifier workerGroupChangeNotifier = new WorkerGroupChangeNotifier(
+                new MasterConfig(),
+                workerGroupDao,
+                new MockTransactionTemplate());
 
         WorkerGroup workerGroup1 = WorkerGroup.builder()
                 .name("workerGroup1")
@@ -155,5 +167,12 @@ class WorkerGroupChangeNotifierTest {
         assertThat(workerGroupChanged.get()).isTrue();
         assertThat(workerGroupDeleted.get()).isFalse();
         assertThat(workerGroupChangeNotifier.getWorkerGroupMap()).containsEntry("workerGroup1", updatedWorkerGroup1);
+    }
+
+    public static class MockTransactionTemplate extends TransactionTemplate {
+
+        public <T> T execute(final TransactionCallback<T> action) {
+            return action.doInTransaction(null);
+        }
     }
 }

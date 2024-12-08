@@ -25,6 +25,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -40,7 +41,11 @@ public class AlertEventFetcher extends AbstractEventFetcher<Alert> {
     }
 
     @Override
+    @Transactional
     public List<Alert> fetchPendingEvent(int eventOffset) {
+        // We use transaction here to ensure that if mysql is configured at master/slave mode, this query will be routed
+        // to the master db.
+        // Avoid we query from the slave and find the data is not the latest.
         return alertDao.listPendingAlerts(eventOffset);
     }
 
