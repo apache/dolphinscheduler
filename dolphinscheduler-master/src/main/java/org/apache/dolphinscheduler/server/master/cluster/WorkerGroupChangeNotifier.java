@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Use to watch the worker group from database and notify the change.
@@ -44,16 +44,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkerGroupChangeNotifier {
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
+
+    private final TransactionTemplate transactionTemplate;
 
     private final WorkerGroupDao workerGroupDao;
+
     private final List<WorkerGroupListener> listeners = new CopyOnWriteArrayList<>();
 
     private Map<String, WorkerGroup> workerGroupMap = new HashMap<>();
 
-    public WorkerGroupChangeNotifier(WorkerGroupDao workerGroupDao) {
+    public WorkerGroupChangeNotifier(final MasterConfig masterConfig,
+                                     final WorkerGroupDao workerGroupDao,
+                                     final TransactionTemplate transactionTemplate) {
+        this.masterConfig = masterConfig;
         this.workerGroupDao = workerGroupDao;
+        this.transactionTemplate = transactionTemplate;
     }
 
     public void start() {
@@ -85,10 +91,15 @@ public class WorkerGroupChangeNotifier {
     }
 
     private MapComparator<String, WorkerGroup> detectChangedWorkerGroups() {
-        Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
-                .stream()
-                .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
-        return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
+        // We use transaction here to ensure that if mysql is configured at master/slave mode, this query will be routed
+        // to the master db.
+        // Avoid we query from the slave and find the data is not the latest.
+        return transactionTemplate.execute(status -> {
+            Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
+                    .stream()
+                    .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
+            return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
+        });
     }
 
     private void triggerListeners(MapComparator<String, WorkerGroup> mapComparator) {
