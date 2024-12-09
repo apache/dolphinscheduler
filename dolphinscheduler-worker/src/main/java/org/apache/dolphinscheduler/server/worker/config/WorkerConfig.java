@@ -56,6 +56,13 @@ public class WorkerConfig implements Validator {
 
     private PhysicalTaskConfig physicalTaskConfig = new PhysicalTaskConfig();
 
+    public String getGroup() {
+        if (StringUtils.isEmpty(group)) {
+            return "default";
+        }
+        return group;
+    }
+
     @Override
     public boolean supports(Class<?> clazz) {
         return WorkerConfig.class.isAssignableFrom(clazz);
