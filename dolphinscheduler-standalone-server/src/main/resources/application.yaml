@@ -194,7 +194,7 @@ worker:
   max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # worker group name
+  # worker group name. If it is not set, the default value is default.
   group: default
   server-load-protection:
     enabled: true

@@ -73,6 +73,11 @@ public class WorkerConfig implements Validator {
 
         workerConfig.setWorkerRegistryPath(
                 RegistryNodeType.WORKER.getRegistryPath() + "/" + workerConfig.getWorkerAddress());
+
+        if (StringUtils.isEmpty(group)) {
+            workerConfig.setGroup("default");
+        }
+
         printConfig();
     }
 
@@ -87,6 +92,7 @@ public class WorkerConfig implements Validator {
                         "\n  address -> " + workerAddress +
                         "\n  registry-path: " + workerRegistryPath +
                         "\n  physical-task-config -> " + physicalTaskConfig +
+                        "\n  group -> " + group +
                         "\n****************************Worker Configuration**************************************";
         log.info(config);
     }
