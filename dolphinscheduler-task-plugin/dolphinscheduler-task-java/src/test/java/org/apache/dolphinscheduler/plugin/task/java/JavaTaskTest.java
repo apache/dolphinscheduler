@@ -20,60 +20,30 @@ package org.apache.dolphinscheduler.plugin.task.java;
 import static com.google.common.truth.Truth.assertThat;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
-import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAR;
-import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAVA;
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_FAT_JAR;
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_NORMAL_JAR;
 
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
-import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
-import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
-import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
-import org.junit.jupiter.api.Assertions;
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Test;
 
-public class JavaTaskTest {
-
-    private TaskCallBack taskCallBack = new TaskCallBack() {
-
-        @Override
-        public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
-
-        }
-
-        @Override
-        public void updateTaskInstanceInfo(int taskInstanceId) {
-
-        }
-    };
-
-    @Test
-    public void testGetPubllicClassName() {
-        JavaTask javaTask = runJavaType();
-        Assertions.assertEquals(javaTask.getPublicClassName("import java.io.IOException;\n" +
-                "public class JavaTaskTest {\n" +
-                "    public static void main(String[] args) throws IOException {\n" +
-                "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" +
-                "        for (String arg : args) {\n" +
-                "            builder.append(arg).append(\" \");\n" +
-                "        }\n" +
-                "        System.out.println(builder);\n" +
-                "    }\n" +
-                "}\n"), "JavaTaskTest");
-    }
+@Slf4j
+class JavaTaskTest {
 
     /**
      * Construct a java -jar command
@@ -81,7 +51,7 @@ public class JavaTaskTest {
      * @return void
      **/
     @Test
-    public void buildJarCommand() {
+    void buildJarCommand() {
         JavaTask javaTask = runJarType();
         assertThat(javaTask.buildJarCommand())
                 .isEqualTo(
@@ -89,146 +59,38 @@ public class JavaTaskTest {
     }
 
     /**
-     * Construct the compile command
+     * Construct a java -cp command
      *
      * @return void
-     **/
+     */
     @Test
-    public void buildJavaCompileCommand() throws IOException {
-        JavaTask javaTask = runJavaType();
-        String sourceCode = javaTask.buildJavaSourceContent();
-        String publicClassName = javaTask.getPublicClassName(sourceCode);
-        Assertions.assertEquals("JavaTaskTest", publicClassName);
-        String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
-        try {
-            Path path = Paths.get(fileName);
-            if (Files.exists(path)) {
-                Files.delete(path);
-            }
-            assertThat(javaTask.buildJavaCompileCommand(sourceCode))
-                    .isEqualTo(
-                            "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java");
-        } finally {
-            Path path = Paths.get(fileName);
-            if (Files.exists(path)) {
-                Files.delete(path);
-            }
-        }
-
-    }
-
-    /**
-     * Construct java to run the command
-     *
-     * @return void
-     **/
-    @Test
-    public void buildJavaCommand() throws Exception {
-        JavaTask javaTask = runJavaType();
-        String sourceCode = javaTask.buildJavaSourceContent();
-        String publicClassName = javaTask.getPublicClassName(sourceCode);
-
-        Assertions.assertEquals("JavaTaskTest", publicClassName);
-
-        String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
-        Path path = Paths.get(fileName);
-        if (Files.exists(path)) {
-            Files.delete(path);
-        }
-        assertThat(javaTask.buildJavaCommand())
+    void buildNormalJarCommand() {
+        JavaTask javaTask = runNormalJarType();
+        assertThat(javaTask.buildNormalJarCommand())
                 .isEqualTo(
-                        "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
+                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar Test -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
-     * There is no exception to overwriting the Java source file
-     *
-     * @return void
-     * @throws IOException
-     **/
-    @Test
-    public void coverJavaSourceFileExistException() throws IOException {
-        JavaTask javaTask = runJavaType();
-        String sourceCode = javaTask.buildJavaSourceContent();
-        String publicClassName = javaTask.getPublicClassName(sourceCode);
-        Assertions.assertEquals("JavaTaskTest", publicClassName);
-        String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
-
-        Assertions.assertThrows(JavaSourceFileExistException.class, () -> {
-            try {
-                Path path = Paths.get(fileName);
-                if (!Files.exists(path)) {
-                    FileUtils.createDirectoryWith755(path);
-                }
-                javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
-            } finally {
-                Path path = Paths.get(fileName);
-                if (Files.exists(path)) {
-                    Files.delete(path);
-                }
-            }
-        });
-    }
-
-    /**
-     * The override class name could not find an exception
-     *
-     * @return void
-     **/
-    @Test
-    public void coverPublicClassNotFoundException() {
-        Assertions.assertThrows(PublicClassNotFoundException.class, () -> {
-            JavaTask javaTask = runJavaType();
-            javaTask.getPublicClassName("");
-        });
-    }
-
-    /**
-     * The override run mode could not find an exception
-     *
-     * @return void
-     * @throws Exception
-     **/
-    @Test
-    public void coverRunTypeNotFoundException() throws Exception {
-        JavaTask javaTask = runJavaType();
-        Field javaParameters = JavaTask.class.getDeclaredField("javaParameters");
-        javaParameters.setAccessible(true);
-        ((JavaParameters) (javaParameters.get(javaTask))).setRunType("");
-
-        Assertions.assertThrows(RunTypeNotFoundException.class, () -> {
-            javaTask.handle(taskCallBack);
-            javaTask.getPublicClassName("");
-        });
-    }
-
-    /**
-     * Create a Java task parameter mock object
+     * add the Normal Jar parameters
      *
      * @param runType
      * @return JavaParameters
-     **/
-    public JavaParameters createJavaParametersObject(String runType) {
+     */
+    private JavaParameters createNormalJarJavaParameters(String runType) {
         JavaParameters javaParameters = new JavaParameters();
         javaParameters.setRunType(runType);
         javaParameters.setModulePath(false);
         javaParameters.setJvmArgs("-xms:50m");
         javaParameters.setMainArgs("-host 127.0.0.1 -port 8080");
-        ResourceInfo resourceJar = new ResourceInfo();
-        resourceJar.setResourceName("/opt/share/jar/resource2.jar");
+        ResourceInfo resourceJar1 = new ResourceInfo();
+        resourceJar1.setResourceName("/opt/share/jar/resource2.jar");
+        ResourceInfo resourceJar2 = new ResourceInfo();
+        resourceJar2.setResourceName("/opt/share/jar/main.jar");
         ArrayList<ResourceInfo> resourceInfoArrayList = new ArrayList<>();
-        resourceInfoArrayList.add(resourceJar);
+        resourceInfoArrayList.add(resourceJar1);
+        resourceInfoArrayList.add(resourceJar2);
         javaParameters.setResourceList(resourceInfoArrayList);
-        javaParameters.setRawScript(
-                "import java.io.IOException;\n" +
-                        "public class JavaTaskTest {\n" +
-                        "    public static void main(String[] args) throws IOException {\n" +
-                        "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" +
-                        "        for (String arg : args) {\n" +
-                        "            builder.append(arg).append(\" \");\n" +
-                        "        }\n" + "        System.out.println(builder);\n" +
-                        "    }\n" +
-                        "}\n");
         ArrayList<Property> localParams = new ArrayList<>();
         Property property = new Property();
         property.setProp("name");
@@ -243,36 +105,33 @@ public class JavaTaskTest {
     }
 
     /**
-     * A Java task that constructs the Java runtime pattern
+     * Add the fat jar parameters
      *
-     * @return JavaTask
-     **/
-    public JavaTask runJavaType() {
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAVA)));
-        taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
-        taskExecutionContext.setTaskAppId("runJavaType");
-        ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
-        resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
-        resourceItem1
-                .setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar");
-
-        ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
-        resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
-        resourceItem2.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar");
-
-        ResourceContext.ResourceItem resourceItem3 = new ResourceContext.ResourceItem();
-        resourceItem3.setResourceAbsolutePathInStorage("/JavaTaskTest.java");
-        resourceItem3.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/JavaTaskTest.java");
-
-        ResourceContext resourceContext = new ResourceContext();
-        resourceContext.addResourceItem(resourceItem1);
-        resourceContext.addResourceItem(resourceItem2);
-        resourceContext.addResourceItem(resourceItem3);
-        taskExecutionContext.setResourceContext(resourceContext);
-        JavaTask javaTask = new JavaTask(taskExecutionContext);
-        javaTask.init();
-        return javaTask;
+     * @param runType
+     * @return JavaParameters
+     */
+    private JavaParameters createJavaParametersObject(String runType) {
+        JavaParameters javaParameters = new JavaParameters();
+        javaParameters.setRunType(runType);
+        javaParameters.setModulePath(false);
+        javaParameters.setJvmArgs("-xms:50m");
+        javaParameters.setMainArgs("-host 127.0.0.1 -port 8080");
+        ResourceInfo resourceJar = new ResourceInfo();
+        resourceJar.setResourceName("/opt/share/jar/resource2.jar");
+        ArrayList<ResourceInfo> resourceInfoArrayList = new ArrayList<>();
+        resourceInfoArrayList.add(resourceJar);
+        javaParameters.setResourceList(resourceInfoArrayList);
+        ArrayList<Property> localParams = new ArrayList<>();
+        Property property = new Property();
+        property.setProp("name");
+        property.setValue("zhangsan");
+        property.setDirect(IN);
+        property.setType(VARCHAR);
+        javaParameters.setLocalParams(localParams);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("/opt/share/jar/main.jar");
+        javaParameters.setMainJar(mainJar);
+        return javaParameters;
     }
 
     /**
@@ -282,7 +141,7 @@ public class JavaTaskTest {
      **/
     private JavaTask runJarType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAR)));
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_FAT_JAR)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
         ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
@@ -303,4 +162,60 @@ public class JavaTaskTest {
         javaTask.init();
         return javaTask;
     }
+
+    /**
+     * The Java task to construct the normal jar run mode
+     *
+     * @return JavaTask
+     */
+    private JavaTask runNormalJarType() {
+        packageTestJar();
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createNormalJarJavaParameters(RUN_TYPE_NORMAL_JAR)));
+        taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
+        taskExecutionContext.setTaskAppId("runJavaType");
+        ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
+        resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
+        resourceItem1
+                .setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar");
+
+        ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
+        resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
+        resourceItem2.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar");
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem1);
+        resourceContext.addResourceItem(resourceItem2);
+        taskExecutionContext.setResourceContext(resourceContext);
+
+        JavaTask javaTask = new JavaTask(taskExecutionContext);
+        javaTask.init();
+        return javaTask;
+    }
+
+    /**
+     * Package the class to Jar
+     */
+    private void packageTestJar() {
+        Manifest manifest = new Manifest();
+        Attributes attributes = manifest.getMainAttributes();
+        attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        attributes.put(Attributes.Name.MAIN_CLASS, "Test");
+        String jarDirPath = "/tmp/dolphinscheduler/test/executepath/opt/share/jar";
+        File jarDir = new File(jarDirPath);
+        if (!jarDir.exists() && jarDir.mkdirs()) {
+            log.info("Created directory: {}", jarDirPath);
+        } else if (!jarDir.exists()) {
+            throw new RuntimeException("Failed to create directory: " + jarDirPath);
+        }
+        File jarFile = new File(jarDirPath, "main.jar");
+        try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarFile.toPath()), manifest)) {
+            jos.putNextEntry(new JarEntry("META-INF/"));
+            jos.closeEntry();
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while creating the JAR file.", e);
+        }
+        log.info("main.jar created: {}", jarFile.getAbsolutePath());
+    }
+
 }

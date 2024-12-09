@@ -48,9 +48,10 @@ export function useJava({
     timeoutNotifyStrategy: ['WARN'],
     timeout: 30,
     mainJar: undefined,
-    runType: 'JAVA',
+    runType: 'FAT_JAR',
     mainArgs: '',
     jvmArgs: '',
+    mainClass: '',
     programType: 'JAVA'
   } as unknown as INodeData)
 

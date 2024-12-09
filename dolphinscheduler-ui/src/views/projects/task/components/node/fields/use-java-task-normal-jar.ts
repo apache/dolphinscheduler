@@ -21,12 +21,14 @@ import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, ProgramType, IMainJar } from '../types'
 
-export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
+export function useJavaTaskNormalJar(model: {
+  [field: string]: any
+}): IJsonItem[] {
   const { t } = useI18n()
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
-  const mainJarSpan = computed(() => (model.runType === 'FAT_JAR' ? 24 : 0))
+  const mainJarSpan = computed(() => (model.runType === 'NORMAL_JAR' ? 24 : 0))
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {
@@ -53,29 +55,56 @@ export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
     }
   )
 
-  return {
-    type: 'tree-select',
-    field: 'mainJar',
-    name: t('project.node.main_package'),
-    span: mainJarSpan,
-    props: {
-      checkable: true,
-      cascade: true,
-      showPath: true,
-      checkStrategy: 'child',
-      placeholder: t('project.node.main_package_tips'),
-      keyField: 'fullName',
-      labelField: 'name'
-    },
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      validator(validate: any, value: string) {
-        if (!value) {
-          return new Error(t('project.node.main_package_tips'))
+  return [
+    {
+      type: 'input',
+      field: 'mainClass',
+      name: t('project.node.main_class'),
+      span: mainJarSpan,
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.main_class_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(_: any, value: string) {
+          if (
+            value &&
+            !/^([A-Za-z_$][A-Za-z\d_$]*\.)*[A-Za-z_$][A-Za-z\d_$]*$/.test(
+              value.trim()
+            )
+          ) {
+            return new Error(t('project.node.main_class_invalid'))
+          }
+          return true
         }
       }
     },
-    options: mainJarOptions
-  }
+    {
+      type: 'tree-select',
+      field: 'mainJar',
+      name: t('project.node.main_package'),
+      span: mainJarSpan,
+      props: {
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        checkStrategy: 'child',
+        placeholder: t('project.node.main_package_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(_: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.main_package_tips'))
+          }
+          return true
+        }
+      },
+      options: mainJarOptions
+    }
+  ]
 }
