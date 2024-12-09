@@ -92,6 +92,7 @@ public class WorkerConfig implements Validator {
                         "\n  address -> " + workerAddress +
                         "\n  registry-path: " + workerRegistryPath +
                         "\n  physical-task-config -> " + physicalTaskConfig +
+                        "\n  group -> " + group +
                         "\n****************************Worker Configuration**************************************";
         log.info(config);
     }
