@@ -248,3 +248,117 @@ d//
 select drop_column_t_ds_worker_group_other_params_json();
 DROP FUNCTION IF EXISTS drop_column_t_ds_worker_group_other_params_json();
 
+-- drop_column_t_ds_task_definition is_cache
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_task_definition_is_cache() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_task_definition'
+                  AND column_name = 'is_cache')
+      THEN
+ALTER TABLE t_ds_task_definition
+DROP COLUMN "is_cache";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_task_definition_is_cache();
+DROP FUNCTION IF EXISTS drop_column_t_ds_task_definition_is_cache();
+
+-- drop_column_t_ds_task_definition cache_key
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_task_definition_cache_key() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_task_definition'
+                  AND column_name = 'cache_key')
+      THEN
+ALTER TABLE t_ds_task_definition
+DROP COLUMN "cache_key";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_task_definition_cache_key();
+DROP FUNCTION IF EXISTS drop_column_t_ds_task_definition_cache_key();
+
+-- drop_column_t_ds_task_definition_log is_cache
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_task_definition_log_is_cache() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_task_definition_log'
+                  AND column_name = 'is_cache')
+      THEN
+ALTER TABLE t_ds_task_definition_log
+DROP COLUMN "is_cache";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_task_definition_log_is_cache();
+DROP FUNCTION IF EXISTS drop_column_t_ds_task_definition_log_is_cache();
+
+-- drop_column_t_ds_task_definition_log cache_key
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_task_definition_log_cache_key() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_task_definition_log'
+                  AND column_name = 'cache_key')
+      THEN
+ALTER TABLE t_ds_task_definition_log
+DROP COLUMN "cache_key";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_task_definition_log_cache_key();
+DROP FUNCTION IF EXISTS drop_column_t_ds_task_definition_log_cache_key();
+
+-- drop_column_t_ds_task_instance is_cache
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_task_instance_is_cache() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_task_instance'
+                  AND column_name = 'is_cache')
+      THEN
+ALTER TABLE t_ds_task_instance
+DROP COLUMN "is_cache";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_task_instance_is_cache();
+DROP FUNCTION IF EXISTS drop_column_t_ds_task_instance_is_cache();
+
+-- drop_column_t_ds_task_instance cache_key
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_task_instance_cache_key() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_task_instance'
+                  AND column_name = 'cache_key')
+      THEN
+ALTER TABLE t_ds_task_instance
+DROP COLUMN "cache_key";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_task_instance_cache_key();
+DROP FUNCTION IF EXISTS drop_column_t_ds_task_instance_cache_key();
+

@@ -79,22 +79,6 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
      */
     List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer workflowInstanceId);
 
-    /**
-     * find task instance by cache_key
-     *
-     * @param cacheKey cache key
-     * @return task instance
-     */
-    TaskInstance queryByCacheKey(String cacheKey);
-
-    /**
-     * clear task instance cache by cache_key
-     *
-     * @param cacheKey cache key
-     * @return task instance
-     */
-    Boolean clearCacheByCacheKey(String cacheKey);
-
     void deleteByWorkflowInstanceId(int workflowInstanceId);
 
     List<TaskInstance> queryByWorkflowInstanceId(Integer workflowInstanceId);

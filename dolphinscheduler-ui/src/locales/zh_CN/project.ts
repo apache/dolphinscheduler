@@ -314,7 +314,6 @@ export default {
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
     please_choose: '请选择',
-    remove_task_cache: '清除缓存',
     delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务定义'
   },
   dag: {
@@ -361,7 +360,6 @@ export default {
     online: '已上线'
   },
   node: {
-    is_cache: '缓存执行',
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
