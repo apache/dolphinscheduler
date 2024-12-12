@@ -25,7 +25,11 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
+import java.util.Locale;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -34,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -44,6 +49,16 @@ class StopWorkflowInstanceExecuteFunctionTest {
 
     @InjectMocks
     private StopWorkflowInstanceExecutorDelegate stopWorkflowInstanceExecutorDelegate;
+
+    @BeforeAll
+    public static void setUp() {
+        LocaleContextHolder.setLocale(Locale.US);
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        LocaleContextHolder.resetLocaleContext();
+    }
 
     @ParameterizedTest
     @EnumSource(value = WorkflowExecutionStatus.class, names = {
