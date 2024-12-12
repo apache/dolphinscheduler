@@ -107,8 +107,8 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         purgeInvalidJdbcRegistryMetadata();
         JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
                 this::purgeInvalidJdbcRegistryMetadata,
-                jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
-                jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
+                jdbcRegistryProperties.getSessionTimeout().toMillis(),
+                jdbcRegistryProperties.getSessionTimeout().toMillis(),
                 TimeUnit.MILLISECONDS);
         jdbcRegistryDataManager.start();
         jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
@@ -149,13 +149,13 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     @Override
     public void deregisterClient(IJdbcRegistryClient jdbcRegistryClient) {
         checkNotNull(jdbcRegistryClient);
-        jdbcRegistryClients.remove(jdbcRegistryClient);
+        final JdbcRegistryClientIdentify clientIdentify = jdbcRegistryClient.getJdbcRegistryClientIdentify();
+        checkNotNull(clientIdentify);
+
+        jdbcRegistryClients.removeIf(client -> clientIdentify.equals(client.getJdbcRegistryClientIdentify()));
         jdbcRegistryClientDTOMap.remove(jdbcRegistryClient.getJdbcRegistryClientIdentify());
 
-        JdbcRegistryClientIdentify jdbcRegistryClientIdentify = jdbcRegistryClient.getJdbcRegistryClientIdentify();
-        checkNotNull(jdbcRegistryClientIdentify);
-
-        doPurgeJdbcRegistryClientInDB(Lists.newArrayList(jdbcRegistryClientIdentify.getClientId()));
+        doPurgeJdbcRegistryClientInDB(Lists.newArrayList(clientIdentify.getClientId()));
     }
 
     @Override

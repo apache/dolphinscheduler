@@ -80,4 +80,15 @@ public class ThreadUtils {
             log.error("Current thread sleep error", interruptedException);
         }
     }
+
+    public static void rethrowInterruptedException(InterruptedException interruptedException) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Current thread: " + Thread.currentThread().getName() + " is interrupted",
+                interruptedException);
+    }
+
+    public static void consumeInterruptedException(InterruptedException interruptedException) {
+        log.info("Current thread: {} is interrupted", Thread.currentThread().getName(), interruptedException);
+        Thread.currentThread().interrupt();
+    }
 }
