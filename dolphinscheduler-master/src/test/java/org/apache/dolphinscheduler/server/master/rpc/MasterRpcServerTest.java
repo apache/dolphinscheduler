@@ -27,12 +27,8 @@ class MasterRpcServerTest {
     private final MasterRpcServer masterRpcServer = new MasterRpcServer(new MasterConfig());
 
     @Test
-    void testStart() {
+    void testStartAndClose() {
         Assertions.assertDoesNotThrow(masterRpcServer::start);
-    }
-
-    @Test
-    void testClose() {
         Assertions.assertDoesNotThrow(masterRpcServer::close);
     }
 }

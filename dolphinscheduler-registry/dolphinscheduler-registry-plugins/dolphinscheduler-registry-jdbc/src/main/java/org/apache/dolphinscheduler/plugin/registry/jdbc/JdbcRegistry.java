@@ -58,8 +58,8 @@ public final class JdbcRegistry implements Registry {
     JdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties, IJdbcRegistryServer jdbcRegistryServer) {
         this.jdbcRegistryProperties = jdbcRegistryProperties;
         this.jdbcRegistryServer = jdbcRegistryServer;
-        this.jdbcRegistryClient = new JdbcRegistryClient(jdbcRegistryProperties, jdbcRegistryServer);
-        log.info("Initialize Jdbc Registry...");
+        this.jdbcRegistryClient = new JdbcRegistryClient(jdbcRegistryServer);
+        log.info("Initialized Jdbc Registry...");
     }
 
     @Override
@@ -259,13 +259,14 @@ public final class JdbcRegistry implements Registry {
 
     @Override
     public void close() {
-        log.info("Closing Jdbc Registry...");
+        log.info("Closing JdbcRegistry...");
         // remove the current Ephemeral node, if can connect to jdbc
-        try (JdbcRegistryClient closed1 = jdbcRegistryClient) {
-            JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().shutdownNow();
+        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().shutdownNow();
+        try (final JdbcRegistryClient closed1 = jdbcRegistryClient) {
+            // ignore
         } catch (Exception e) {
-            log.error("Close Jdbc Registry error", e);
+            log.error("Close JdbcRegistry error", e);
         }
-        log.info("Closed Jdbc Registry...");
+        log.info("Closed JdbcRegistry...");
     }
 }

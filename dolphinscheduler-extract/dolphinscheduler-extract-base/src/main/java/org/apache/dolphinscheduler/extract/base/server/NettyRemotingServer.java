@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -48,7 +49,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 @Slf4j
 class NettyRemotingServer {
 
-    private final ServerBootstrap serverBootstrap = new ServerBootstrap();
+    private Channel serverBootstrapChannel;
 
     @Getter
     private final String serverName;
@@ -87,7 +88,7 @@ class NettyRemotingServer {
 
     void start() {
         if (isStarted.compareAndSet(false, true)) {
-            this.serverBootstrap
+            ServerBootstrap serverBootstrap = new ServerBootstrap()
                     .group(this.bossGroup, this.workGroup)
                     .channel(NettyUtils.getServerSocketChannelClass())
                     .option(ChannelOption.SO_REUSEADDR, true)
@@ -104,23 +105,24 @@ class NettyRemotingServer {
                         }
                     });
 
-            ChannelFuture future;
             try {
-                future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
+                final ChannelFuture channelFuture = serverBootstrap.bind(serverConfig.getListenPort()).sync();
+                if (channelFuture.isSuccess()) {
+                    log.info("{} bind success at port: {}", serverConfig.getServerName(), serverConfig.getListenPort());
+                    this.serverBootstrapChannel = channelFuture.channel();
+                } else {
+                    throw new RemoteException(
+                            String.format("%s bind %s fail", serverConfig.getServerName(),
+                                    serverConfig.getListenPort()),
+                            channelFuture.cause());
+                }
+            } catch (InterruptedException it) {
+                ThreadUtils.rethrowInterruptedException(it);
             } catch (Exception e) {
                 throw new RemoteException(
                         String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()),
                         e);
             }
-
-            if (future.isSuccess()) {
-                log.info("{} bind success at port: {}", serverConfig.getServerName(), serverConfig.getListenPort());
-                return;
-            }
-
-            throw new RemoteException(
-                    String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()),
-                    future.cause());
         }
     }
 
@@ -144,18 +146,25 @@ class NettyRemotingServer {
 
     void close() {
         if (isStarted.compareAndSet(true, false)) {
+            log.info("{} closing", serverConfig.getServerName());
             try {
+                if (serverBootstrapChannel != null) {
+                    serverBootstrapChannel.close().sync();
+                    log.info("{} stop bind at port: {}", serverConfig.getServerName(), serverConfig.getListenPort());
+                }
                 if (bossGroup != null) {
                     this.bossGroup.shutdownGracefully();
                 }
                 if (workGroup != null) {
                     this.workGroup.shutdownGracefully();
                 }
-                methodInvokerExecutor.shutdown();
+                methodInvokerExecutor.shutdownNow();
+            } catch (InterruptedException it) {
+                ThreadUtils.consumeInterruptedException(it);
             } catch (Exception ex) {
-                log.error("netty server close exception", ex);
+                log.error("{} close failed", serverConfig.getServerName(), ex);
             }
-            log.info("netty server closed");
+            log.info("{} closed", serverConfig.getServerName());
         }
     }
 }

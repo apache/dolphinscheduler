@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -172,8 +173,8 @@ public abstract class RegistryTestCase<R extends Registry> {
         registry.put(master1, value, true);
         registry.put(master2, value, true);
         assertThat(registry.children("/nodes/children")).containsExactly("childGroup1");
-        assertThat(registry.children("/nodes/children/childGroup1")).containsExactly("127.0.0.1:8080",
-                "127.0.0.2:8080");
+        assertThat(registry.children("/nodes/children/childGroup1")).containsExactlyElementsIn(
+                Arrays.asList("127.0.0.1:8080", "127.0.0.2:8080"));
     }
 
     @Test
