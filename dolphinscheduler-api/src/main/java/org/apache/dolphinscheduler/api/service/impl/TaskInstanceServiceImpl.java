@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 
-import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -43,7 +41,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.worker.IPhysicalTaskExecutorOperator;
@@ -56,7 +53,6 @@ import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequ
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -323,31 +319,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     taskInstanceId);
         }
         return taskInstance;
-    }
-
-    @Override
-    public TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode,
-                                                                   Integer taskInstanceId) {
-        Result result = new Result();
-
-        Project project = projectMapper.queryByCode(projectCode);
-        projectService.checkProjectAndAuthThrowException(loginUser, project, INSTANCE_UPDATE);
-
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
-        if (taskInstance == null) {
-            log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
-                    taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
-            return new TaskInstanceRemoveCacheResponse(result);
-        }
-        String tagCacheKey = taskInstance.getCacheKey();
-        Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(tagCacheKey);
-        String cacheKey = taskIdAndCacheKey.getRight();
-        if (StringUtils.isNotEmpty(cacheKey)) {
-            taskInstanceDao.clearCacheByCacheKey(cacheKey);
-        }
-        putMsg(result, Status.SUCCESS);
-        return new TaskInstanceRemoveCacheResponse(result, cacheKey);
     }
 
     @Override

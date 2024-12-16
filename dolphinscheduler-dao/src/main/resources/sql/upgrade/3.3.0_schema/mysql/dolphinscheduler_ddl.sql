@@ -246,3 +246,118 @@ CALL drop_column_t_ds_worker_group_other_params_json;
 DROP PROCEDURE drop_column_t_ds_worker_group_other_params_json;
 
 ALTER TABLE `t_ds_task_definition` ADD INDEX `idx_project_code` USING BTREE (`project_code`);
+
+
+-- drop_column_t_ds_task_definition is_cache
+DROP PROCEDURE if EXISTS drop_column_t_ds_task_definition_is_cache;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_task_definition_is_cache()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='is_cache')
+   THEN
+ALTER TABLE `t_ds_task_definition`
+DROP COLUMN `is_cache`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_task_definition_is_cache;
+DROP PROCEDURE drop_column_t_ds_task_definition_is_cache;
+
+-- drop_column_t_ds_task_definition cache_key
+DROP PROCEDURE if EXISTS drop_column_t_ds_task_definition_cache_key;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_task_definition_cache_key()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='cache_key')
+   THEN
+ALTER TABLE `t_ds_task_definition`
+DROP COLUMN `cache_key`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_task_definition_cache_key;
+DROP PROCEDURE drop_column_t_ds_task_definition_cache_key;
+
+-- drop_column_t_ds_task_definition_log is_cache
+DROP PROCEDURE if EXISTS drop_column_t_ds_task_definition_log_is_cache;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_task_definition_log_is_cache()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_definition_log'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='is_cache')
+   THEN
+ALTER TABLE `t_ds_task_definition_log`
+DROP COLUMN `is_cache`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_task_definition_log_is_cache;
+DROP PROCEDURE drop_column_t_ds_task_definition_log_is_cache;
+
+-- drop_column_t_ds_task_definition_log cache_key
+DROP PROCEDURE if EXISTS drop_column_t_ds_task_definition_log_cache_key;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_task_definition_log_cache_key()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_definition_log'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='cache_key')
+   THEN
+ALTER TABLE `t_ds_task_definition_log`
+DROP COLUMN `cache_key`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_task_definition_log_cache_key;
+DROP PROCEDURE drop_column_t_ds_task_definition_log_cache_key;
+
+-- drop_column_t_ds_task_instance is_cache
+DROP PROCEDURE if EXISTS drop_column_t_ds_task_instance_is_cache;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_task_instance_is_cache()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='is_cache')
+   THEN
+ALTER TABLE `t_ds_task_instance`
+DROP COLUMN `is_cache`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_task_instance_is_cache;
+DROP PROCEDURE drop_column_t_ds_task_instance_is_cache;
+
+-- drop_column_t_ds_task_instance cache_key
+DROP PROCEDURE if EXISTS drop_column_t_ds_task_instance_cache_key;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_task_instance_cache_key()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='cache_key')
+   THEN
+ALTER TABLE `t_ds_task_instance`
+DROP COLUMN `cache_key`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_task_instance_cache_key;
+DROP PROCEDURE drop_column_t_ds_task_instance_cache_key;

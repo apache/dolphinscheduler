@@ -74,7 +74,6 @@ export function useJava({
       Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
-      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
