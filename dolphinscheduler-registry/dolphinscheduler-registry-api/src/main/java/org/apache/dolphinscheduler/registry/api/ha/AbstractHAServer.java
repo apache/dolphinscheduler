@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.registry.api.ha;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 
@@ -40,6 +41,10 @@ public abstract class AbstractHAServer implements HAServer {
     private ServerStatus serverStatus;
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
+
+    private static final long DEFAULT_RETRY_INTERVAL = 5_000;
+
+    private static final int DEFAULT_MAX_RETRY_TIMES = 20;
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
@@ -78,21 +83,30 @@ public abstract class AbstractHAServer implements HAServer {
     @Override
     public boolean participateElection() {
         final String electionLock = selectorPath + "-lock";
-        try {
-            if (registry.acquireLock(electionLock)) {
-                if (!registry.exists(selectorPath)) {
-                    registry.put(selectorPath, serverIdentify, true);
-                    return true;
+        // If meet exception during participate election, will retry.
+        // This can avoid the situation that the server is not elected as leader due to network jitter.
+        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES; i++) {
+            try {
+                try {
+                    if (registry.acquireLock(electionLock)) {
+                        if (!registry.exists(selectorPath)) {
+                            registry.put(selectorPath, serverIdentify, true);
+                            return true;
+                        }
+                        return serverIdentify.equals(registry.get(selectorPath));
+                    }
+                    return false;
+                } finally {
+                    registry.releaseLock(electionLock);
                 }
-                return serverIdentify.equals(registry.get(selectorPath));
+            } catch (Exception e) {
+                log.error("Participate election error, meet an exception, will retry after {}ms",
+                        DEFAULT_RETRY_INTERVAL, e);
+                ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
             }
-            return false;
-        } catch (Exception e) {
-            log.error("participate election error", e);
-            return false;
-        } finally {
-            registry.releaseLock(electionLock);
         }
+        throw new IllegalStateException(
+                "Participate election failed after retry " + DEFAULT_MAX_RETRY_TIMES + " times");
     }
 
     @Override

@@ -25,10 +25,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
@@ -41,7 +40,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskInstanceFactories;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
@@ -57,19 +55,13 @@ import com.google.common.collect.Lists;
 public abstract class AbstractTaskStateAction implements ITaskStateAction {
 
     @Autowired
-    protected TaskGroupCoordinator taskGroupCoordinator;
+    protected ITaskGroupCoordinator taskGroupCoordinator;
 
     @Autowired
     protected TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    protected TaskInstanceFactories taskInstanceFactories;
-
-    @Autowired
     protected IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private MasterConfig masterConfig;
 
     @Autowired
     protected ITaskExecutorClient taskExecutorClient;
@@ -237,6 +229,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void tryToDispatchTask(final ITaskExecutionRunnable taskExecutionRunnable) {
         if (isTaskNeedAcquireTaskGroupSlot(taskExecutionRunnable)) {
             acquireTaskGroupSlot(taskExecutionRunnable);
+            log.info("Task{} using taskGroup, success acquire taskGroup slot", taskExecutionRunnable.getName());
             return;
         }
         taskExecutionRunnable.getWorkflowEventBus().publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));

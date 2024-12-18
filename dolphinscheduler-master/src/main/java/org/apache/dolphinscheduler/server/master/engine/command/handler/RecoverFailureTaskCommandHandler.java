@@ -25,14 +25,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskInstanceFactories;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import java.util.ArrayList;
@@ -62,12 +60,6 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private TaskExecutionContextFactory taskExecutionContextFactory;
-
-    @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
 
     @Autowired
     private ApplicationContext applicationContext;

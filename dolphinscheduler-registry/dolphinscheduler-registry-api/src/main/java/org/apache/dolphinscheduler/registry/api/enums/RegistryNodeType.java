@@ -28,6 +28,7 @@ public enum RegistryNodeType {
 
     MASTER("Master", "/nodes/master"),
     MASTER_FAILOVER_LOCK("MasterFailoverLock", "/lock/master-failover"),
+    MASTER_COORDINATOR("MasterCoordinator", "/nodes/master-coordinator"),
     MASTER_TASK_GROUP_COORDINATOR_LOCK("TaskGroupCoordinatorLock", "/lock/master-task-group-coordinator"),
     MASTER_SERIAL_COORDINATOR_LOCK("SerialWorkflowCoordinator", "/lock/master-serial-workflow-coordinator"),
 

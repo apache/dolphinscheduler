@@ -122,6 +122,38 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow with one fake task(A) using task group")
+    public void testStartWorkflow_with_oneSuccessTaskUsingTaskGroup() {
+        final String yaml = "/it/start/workflow_with_one_fake_task_using_task_group.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .dryRun(Flag.YES)
+                .build();
+
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(2))
+                .atLeast(Duration.ofSeconds(20))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(4)
+                            .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState())
+                                    && taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with one sub workflow task(A) success")
     public void testStartWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";

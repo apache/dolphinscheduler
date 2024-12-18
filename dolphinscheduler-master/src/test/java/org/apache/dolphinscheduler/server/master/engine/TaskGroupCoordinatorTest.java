@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.taskgroup;
+package org.apache.dolphinscheduler.server.master.engine;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,9 +33,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 
 import java.util.List;
 
@@ -59,9 +56,6 @@ class TaskGroupCoordinatorTest {
     private TaskGroupCoordinator taskGroupCoordinator;
 
     @Mock
-    private RegistryClient registryClient;
-
-    @Mock
     private TaskGroupDao taskGroupDao;
 
     @Mock
@@ -74,15 +68,13 @@ class TaskGroupCoordinatorTest {
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Test
-    void start() throws InterruptedException {
+    void start() {
         // Get the Lock from Registry
         taskGroupCoordinator.start();
-        Thread.sleep(1_000);
-        verify(registryClient, Mockito.times(1))
-                .getLock(RegistryNodeType.MASTER_TASK_GROUP_COORDINATOR_LOCK.getRegistryPath());
-        verify(registryClient, Mockito.times(1))
-                .releaseLock(RegistryNodeType.MASTER_TASK_GROUP_COORDINATOR_LOCK.getRegistryPath());
+        assertTrue(taskGroupCoordinator.isStarted());
 
+        taskGroupCoordinator.close();
+        assertFalse(taskGroupCoordinator.isStarted());
     }
 
     @Test

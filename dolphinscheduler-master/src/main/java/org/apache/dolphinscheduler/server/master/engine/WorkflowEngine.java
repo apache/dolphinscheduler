@@ -31,9 +31,6 @@ import org.springframework.stereotype.Component;
 public class WorkflowEngine implements AutoCloseable {
 
     @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
-
-    @Autowired
     private WorkflowEventBusCoordinator workflowEventBusCoordinator;
 
     @Autowired
@@ -46,8 +43,6 @@ public class WorkflowEngine implements AutoCloseable {
     private LogicTaskEngineDelegator logicTaskEngineDelegator;
 
     public void start() {
-
-        taskGroupCoordinator.start();
 
         workflowEventBusCoordinator.start();
 
@@ -65,9 +60,7 @@ public class WorkflowEngine implements AutoCloseable {
         try (
                 final CommandEngine ignore1 = commandEngine;
                 final WorkflowEventBusCoordinator ignore2 = workflowEventBusCoordinator;
-                final GlobalTaskDispatchWaitingQueueLooper ignore3 =
-                        globalTaskDispatchWaitingQueueLooper;
-                final TaskGroupCoordinator ignore4 = taskGroupCoordinator;
+                final GlobalTaskDispatchWaitingQueueLooper ignore3 = globalTaskDispatchWaitingQueueLooper;
                 final LogicTaskEngineDelegator ignore5 = logicTaskEngineDelegator) {
             // closed the resource
         }
