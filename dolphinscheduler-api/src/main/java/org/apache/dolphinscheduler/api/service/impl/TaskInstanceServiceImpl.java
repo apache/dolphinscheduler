@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -55,10 +54,8 @@ import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResp
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -145,7 +142,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Date start = checkAndParseDateParameters(startDate);
         Date end = checkAndParseDateParameters(endDate);
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
-        PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
+        PageInfo<TaskInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<TaskInstance> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without workflow instance
@@ -178,9 +175,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     start,
                     end);
         }
-        Set<String> exclusionSet = new HashSet<>();
-        exclusionSet.add(Constants.CLASS);
-        exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
         List<Integer> executorIds =
                 taskInstanceList.stream().map(TaskInstance::getExecutorId).distinct().collect(Collectors.toList());
@@ -194,7 +188,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             }
         }
         pageInfo.setTotal((int) taskInstanceIPage.getTotal());
-        pageInfo.setTotalList(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
+        pageInfo.setTotalList(taskInstanceList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
