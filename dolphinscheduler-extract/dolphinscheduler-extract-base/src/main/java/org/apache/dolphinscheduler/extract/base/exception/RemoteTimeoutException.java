@@ -20,17 +20,17 @@ package org.apache.dolphinscheduler.extract.base.exception;
 /**
  *  timeout exception
  */
-public class RemotingTimeoutException extends RemotingException {
+public class RemoteTimeoutException extends RemoteException {
 
-    public RemotingTimeoutException(String message) {
+    public RemoteTimeoutException(String message) {
         super(message);
     }
 
-    public RemotingTimeoutException(String address, long timeoutMillis) {
+    public RemoteTimeoutException(String address, long timeoutMillis) {
         this(address, timeoutMillis, null);
     }
 
-    public RemotingTimeoutException(String address, long timeoutMillis, Throwable cause) {
+    public RemoteTimeoutException(String address, long timeoutMillis, Throwable cause) {
         super(String.format("wait response on the channel %s timeout %s", address, timeoutMillis), cause);
     }
 }
