@@ -259,10 +259,6 @@ public class TaskDefinition {
         return taskParamMap;
     }
 
-    public String getDependence() {
-        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
-    }
-
     public Integer getCpuQuota() {
         return cpuQuota == null ? -1 : cpuQuota;
     }

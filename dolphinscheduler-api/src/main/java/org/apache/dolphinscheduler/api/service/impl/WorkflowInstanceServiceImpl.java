@@ -245,7 +245,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                         workflowInstance.getWorkflowDefinitionVersion());
 
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}.", projectCode);
+            log.error("workflow definition does not exist, projectCode: {}.", projectCode);
             putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowInstanceId);
         } else {
             workflowInstance.setLocations(workflowDefinition.getLocations());

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.utils;
 
 import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters.DependentFailurePolicyEnum.DEPENDENT_FAILURE_WAITING;
 
+import lombok.Getter;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
@@ -84,6 +85,7 @@ public class DependentExecute {
     /**
      * depend result map
      */
+    @Getter
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
     /**
@@ -102,8 +104,10 @@ public class DependentExecute {
      */
     private final TaskDefinitionDao taskDefinitionDao = SpringApplicationContext.getBean(TaskDefinitionDao.class);
 
+    @Getter
     private Map<String, Property> dependTaskVarPoolPropertyMap = new HashMap<>();
 
+    @Getter
     private Map<String, Long> dependTaskVarPoolEndTimeMap = new HashMap<>();
 
     private Map<String, Property> dependItemVarPoolPropertyMap = new HashMap<>();
@@ -437,18 +441,6 @@ public class DependentExecute {
             return dependResultMap.get(key);
         }
         return getDependentResultForItem(item, currentTime, testFlag);
-    }
-
-    public Map<String, DependResult> getDependResultMap() {
-        return dependResultMap;
-    }
-
-    public Map<String, Property> getDependTaskVarPoolPropertyMap() {
-        return dependTaskVarPoolPropertyMap;
-    }
-
-    public Map<String, Long> getDependTaskVarPoolEndTimeMap() {
-        return dependTaskVarPoolEndTimeMap;
     }
 
     /**

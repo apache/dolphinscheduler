@@ -926,6 +926,22 @@ CREATE TABLE t_ds_task_instance
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_task_dependent_result
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_dependent_result`;
+CREATE TABLE `t_ds_task_dependent_result` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `task_instance_id` int(11) NOT NULL,
+    `project_code` bigint(20) NOT NULL,
+    `workflow_definition_code` bigint(20) NOT NULL,
+    `task_definition_code` bigint(20) NOT NULL,
+    `dependentResult` int(11) DEFAULT 0 NOT NULL COMMENT 'dependent result: 1 success, 2 failed',
+    `create_time` datetime NOT NULL,
+    `update_time` datetime NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
 -- Table structure for t_ds_tenant
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_tenant CASCADE;

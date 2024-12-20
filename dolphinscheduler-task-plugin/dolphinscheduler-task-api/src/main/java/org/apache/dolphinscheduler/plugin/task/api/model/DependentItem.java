@@ -45,4 +45,16 @@ public class DependentItem {
                 getDateValue());
     }
 
+    public DependentItem fromKey(String key) {
+        String[] parts = key.split("-");
+        if (parts.length != 4) {
+            throw new IllegalArgumentException("Invalid key format");
+        }
+        setDefinitionCode(Long.parseLong(parts[0]));
+        setDepTaskCode(Long.parseLong(parts[1]));
+        setCycle(parts[2]);
+        setDateValue(parts[3]);
+        return this;
+    }
+
 }
