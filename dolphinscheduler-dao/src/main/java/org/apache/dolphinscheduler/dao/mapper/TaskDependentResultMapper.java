@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.dolphinscheduler.common.enums.DependentResult;
 import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface TaskDependentResultMapper extends BaseMapper<TaskDependentResult> {
 
@@ -32,6 +34,8 @@ public interface TaskDependentResultMapper extends BaseMapper<TaskDependentResul
 
     TaskDependentResult queryTaskDependentResultByTaskDependentResult(@Param("taskDependentResult") TaskDependentResult taskDependentResult);
 
-    int updateDependentResultByTaskInstanceId(@Param("dependentResult") DependentResult dependentResult,
+    int updateDependentResultByTaskInstanceId(@Param("dependentResult") DependResult dependentResult,
                                               @Param("taskInstanceId") long taskInstanceId);
+
+    List<TaskDependentResult> batchQueryTaskDependentResultByTaskInstanceIds(@Param("taskInstanceIds") List<Integer> taskInstanceIds);
 }

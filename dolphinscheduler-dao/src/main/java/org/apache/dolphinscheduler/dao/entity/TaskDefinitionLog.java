@@ -19,10 +19,9 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * task definition log

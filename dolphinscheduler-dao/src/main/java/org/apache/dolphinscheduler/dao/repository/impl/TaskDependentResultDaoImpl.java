@@ -21,13 +21,18 @@ import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 import org.apache.dolphinscheduler.dao.mapper.TaskDependentResultMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
-import org.springframework.stereotype.Repository;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 @Repository
-public class TaskDependentResultDaoImpl extends BaseDao<TaskDependentResult, TaskDependentResultMapper> implements TaskDependentResultDao {
+public class TaskDependentResultDaoImpl extends BaseDao<TaskDependentResult, TaskDependentResultMapper>
+        implements
+            TaskDependentResultDao {
 
     public TaskDependentResultDaoImpl(TaskDependentResultMapper taskDependentResultMapper) {
         super(taskDependentResultMapper);
@@ -54,11 +59,21 @@ public class TaskDependentResultDaoImpl extends BaseDao<TaskDependentResult, Tas
         if (taskDependentResult == null) {
             return 0;
         }
-        TaskDependentResult dbTaskDependentResult = mybatisMapper.queryTaskDependentResultByTaskDependentResult(taskDependentResult);
+        TaskDependentResult dbTaskDependentResult =
+                mybatisMapper.queryTaskDependentResultByTaskDependentResult(taskDependentResult);
         if (dbTaskDependentResult == null) {
             return mybatisMapper.insert(taskDependentResult);
         } else {
-            return mybatisMapper.updateDependentResultByTaskInstanceId(taskDependentResult.getDependentResult(), taskDependentResult.getTaskInstanceId());
+            return mybatisMapper.updateDependentResultByTaskInstanceId(taskDependentResult.getDependentResult(),
+                    taskDependentResult.getTaskInstanceId());
         }
+    }
+
+    @Override
+    public List<TaskDependentResult> batchQueryTaskDependentResultByTaskInstanceIds(List<Integer> taskInstanceIds) {
+        if (CollectionUtils.isEmpty(taskInstanceIds)) {
+            return Collections.emptyList();
+        }
+        return mybatisMapper.batchQueryTaskDependentResultByTaskInstanceIds(taskInstanceIds);
     }
 }

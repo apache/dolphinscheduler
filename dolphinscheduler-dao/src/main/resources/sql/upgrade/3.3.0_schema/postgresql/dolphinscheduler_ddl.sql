@@ -362,3 +362,17 @@ d//
 select drop_column_t_ds_task_instance_cache_key();
 DROP FUNCTION IF EXISTS drop_column_t_ds_task_instance_cache_key();
 
+DROP TABLE IF EXISTS t_ds_task_dependent_result;
+CREATE TABLE t_ds_task_dependent_result (
+    id int NOT NULL AUTO_INCREMENT,
+    task_instance_id int NOT NULL,
+    project_code bigint NOT NULL,
+    workflow_definition_code bigint NOT NULL,
+    task_definition_code bigint NOT NULL,
+    dependent_result varchar(64) DEFAULT '' NOT NULL,
+    create_time timestamp NOT NULL,
+    update_time timestamp NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+create index idx_task_instance_id on t_ds_task_dependent_result (task_instance_id, project_code, workflow_definition_code, task_definition_code);

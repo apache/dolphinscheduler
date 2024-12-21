@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.dao.entity;
 
-public enum DependentRelation {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-    AND, OR;
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class TaskInstanceDependentResult extends TaskInstance {
+
+    private TaskDependentResult taskDependentResult;
+
 }

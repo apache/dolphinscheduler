@@ -29,13 +29,13 @@
             ,create_time
             ,update_time
         FROM
-        task_dependent_result
+        t_ds_task_dependent_result
         WHERE 1=1
         AND task_instance_id = #{taskInstanceId}
     </select>
 
     <delete id="deleteTaskDependentResultByTaskInstanceId">
-        DELETE FROM task_dependent_result
+        DELETE FROM t_ds_task_dependent_result
         WHERE task_instance_id = #{taskInstanceId}
     </delete>
 
@@ -50,7 +50,7 @@
             ,create_time
             ,update_time
         FROM
-        task_dependent_result
+        t_ds_task_dependent_result
         WHERE 1=1
         AND task_instance_id = #{taskDependentResult.taskInstanceId}
         AND project_code = #{taskDependentResult.projectCode}
@@ -59,11 +59,30 @@
     </select>
 
     <update id="updateDependentResultByTaskInstanceId">
-        UPDATE task_dependent_result
+        UPDATE t_ds_task_dependent_result
         SET
             dependent_result = #{dependentResult}
             ,update_time = now()
         WHERE 1=1
         AND task_instance_id = #{taskInstanceId}
     </update>
+
+    <select id="batchQueryTaskDependentResultByTaskInstanceIds" resultType="org.apache.dolphinscheduler.dao.entity.TaskDependentResult">
+        SELECT
+            id
+            ,task_instance_id
+            ,project_code
+            ,workflow_definition_code
+            ,task_definition_code
+            ,dependent_result
+            ,create_time
+            ,update_time
+        FROM
+        t_ds_task_dependent_result
+        WHERE 1=1
+        AND task_instance_id in
+        <foreach collection="taskInstanceIds" item="taskInstanceId" open="(" separator="," close=")">
+            #{taskInstanceId}
+        </foreach>
+    </select>
 </mapper>

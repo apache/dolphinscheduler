@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.utils;
 
 import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters.DependentFailurePolicyEnum.DEPENDENT_FAILURE_WAITING;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
@@ -56,6 +55,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -414,7 +414,7 @@ public class DependentExecute {
                 continue;
             }
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
-            if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
+            if (dependResult != DependResult.WAITING) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
                 if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
                     DependentUtils.addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap,

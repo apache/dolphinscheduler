@@ -57,7 +57,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -70,6 +72,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
@@ -96,6 +99,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -173,6 +177,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Autowired
     private CuringParamsService curingGlobalParamsService;
+
+    @Autowired
+    private TaskDependentResultDao taskDependentResultDao;
 
     /**
      * return top n SUCCESS workflow instance order by running time which started between startTime and endTime
@@ -460,13 +467,37 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
                         workflowInstance.getTestFlag());
+        List<TaskInstanceDependentResult> taskInstanceDependentResultList =
+                setTaskInstanceDependentResult(taskInstanceList);
+
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(WORKFLOW_INSTANCE_STATE, workflowInstance.getState().toString());
-        resultMap.put(TASK_LIST, taskInstanceList);
+        resultMap.put(TASK_LIST, taskInstanceDependentResultList);
         result.put(DATA_LIST, resultMap);
 
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private List<TaskInstanceDependentResult> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
+        List<TaskInstanceDependentResult> taskInstanceDependentResultList = taskInstanceList.stream()
+                .map(taskInstance -> {
+                    TaskInstanceDependentResult taskInstanceDependentResult = new TaskInstanceDependentResult();
+                    BeanUtils.copyProperties(taskInstance, taskInstanceDependentResult);
+                    return taskInstanceDependentResult;
+                }).collect(Collectors.toList());
+        List<Integer> taskInstanceIdList = taskInstanceList.stream()
+                .map(TaskInstance::getId).collect(Collectors.toList());
+        List<TaskDependentResult> taskDependentResultList =
+                taskDependentResultDao.batchQueryTaskDependentResultByTaskInstanceIds(taskInstanceIdList);
+        for (TaskInstanceDependentResult taskInstanceDependentResult : taskInstanceDependentResultList) {
+            for (TaskDependentResult taskDependentResult : taskDependentResultList) {
+                if (taskInstanceDependentResult.getId().equals(taskDependentResult.getTaskInstanceId())) {
+                    taskInstanceDependentResult.setTaskDependentResult(taskDependentResult);
+                }
+            }
+        }
+        return taskInstanceDependentResultList;
     }
 
     @Override

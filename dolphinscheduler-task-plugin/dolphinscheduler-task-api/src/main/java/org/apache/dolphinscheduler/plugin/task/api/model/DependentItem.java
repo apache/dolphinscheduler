@@ -18,23 +18,20 @@
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependentType;
 
 import lombok.Data;
 
-/**
- * dependent item
- */
 @Data
 public class DependentItem {
 
+    private DependentType dependentType;
     private long projectCode;
     private long definitionCode;
     private long depTaskCode;
     private String cycle;
     private String dateValue;
     private DependResult dependResult;
-    private TaskExecutionStatus status;
     private Boolean parameterPassing = false;
 
     public String getKey() {

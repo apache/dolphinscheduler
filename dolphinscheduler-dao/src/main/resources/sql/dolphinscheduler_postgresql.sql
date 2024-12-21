@@ -845,7 +845,7 @@ CREATE TABLE t_ds_task_dependent_result (
   project_code bigint NOT NULL,
   workflow_definition_code bigint NOT NULL,
   task_definition_code bigint NOT NULL,
-  dependentResult int DEFAULT '0' NOT NULL,
+  dependent_result varchar(64) DEFAULT '' NOT NULL,
   create_time timestamp NOT NULL,
   update_time timestamp NOT NULL,
   PRIMARY KEY (id)

@@ -77,17 +77,21 @@ export function useNodeStatus(options: Options) {
       window.$message.success(t('project.workflow.refresh_status_succeeded'))
       taskList.value = res.taskList
       if (taskList.value) {
-        const allDependentResult = {}
+        const taskDependentResult: { [key: string]: any } = {}
         taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
-          if (taskInstance.dependentResult) {
-            Object.assign(
-              allDependentResult,
-              JSON.parse(taskInstance.dependentResult)
-            )
+          if (taskInstance.taskDependentResult) {
+            const key =
+              taskInstance.taskDependentResult.projectCode +
+              '-' +
+              +taskInstance.taskDependentResult.workflowDefinitionCode +
+              '-' +
+              +taskInstance.taskDependentResult.taskDefinitionCode
+            taskDependentResult[key] =
+              taskInstance.taskDependentResult.dependentResult
           }
         })
-        nodeStore.updateDependentResult(allDependentResult)
+        nodeStore.updateDependentResult(taskDependentResult)
       }
     })
   }

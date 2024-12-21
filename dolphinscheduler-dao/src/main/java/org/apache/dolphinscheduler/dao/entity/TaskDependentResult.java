@@ -17,17 +17,20 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+
+import java.util.Date;
+
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import org.apache.dolphinscheduler.common.enums.DependentResult;
-
-import java.util.Date;
 
 @Data
 @TableName("t_ds_task_dependent_result")
 public class TaskDependentResult {
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -39,7 +42,7 @@ public class TaskDependentResult {
 
     private Long taskDefinitionCode;
 
-    private DependentResult dependentResult;
+    private DependResult dependentResult;
 
     private Date createTime;
 

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 
 import java.util.List;
@@ -29,4 +28,6 @@ public interface TaskDependentResultDao extends IDao<TaskDependentResult> {
     int deleteTaskDependentResultByTaskInstanceId(Integer taskInstanceId);
 
     int upsertTaskDependentResult(TaskDependentResult taskDependentResult);
+
+    List<TaskDependentResult> batchQueryTaskDependentResultByTaskInstanceIds(List<Integer> taskInstanceIds);
 }

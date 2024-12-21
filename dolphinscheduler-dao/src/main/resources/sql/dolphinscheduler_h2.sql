@@ -935,11 +935,11 @@ CREATE TABLE `t_ds_task_dependent_result` (
     `project_code` bigint(20) NOT NULL,
     `workflow_definition_code` bigint(20) NOT NULL,
     `task_definition_code` bigint(20) NOT NULL,
-    `dependentResult` int(11) DEFAULT 0 NOT NULL COMMENT 'dependent result: 1 success, 2 failed',
+    `dependent_result` varchar(64) DEFAULT '' NOT NULL,
     `create_time` datetime NOT NULL,
     `update_time` datetime NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+);
 
 -- ----------------------------
 -- Table structure for t_ds_tenant
