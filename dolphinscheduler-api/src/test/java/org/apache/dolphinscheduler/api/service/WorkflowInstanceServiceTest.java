@@ -45,7 +45,9 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResult;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -60,10 +62,12 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -90,6 +94,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.BeanUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -153,6 +158,9 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     private WorkflowInstanceMapDao workflowInstanceMapDao;
+
+    @Mock
+    private TaskDependentResultDao taskDependentResultDao;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -465,6 +473,17 @@ public class WorkflowInstanceServiceTest {
         taskInstance.setTaskType("SHELL");
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
+        List<TaskDependentResult> taskDependentResultList = new ArrayList<>();
+//        TaskInstanceDependentResult taskInstanceDependentResult = new TaskInstanceDependentResult();
+//        BeanUtils.copyProperties(taskInstance, taskInstanceDependentResult);
+        TaskDependentResult TaskDependentResult = new TaskDependentResult();
+        TaskDependentResult.setProjectCode(projectCode);
+        TaskDependentResult.setTaskInstanceId(0);
+        TaskDependentResult.setDependentResult(DependResult.SUCCESS);
+//        taskInstanceDependentResult.setTaskDependentResult(TaskDependentResult);
+//        taskInstanceDependentResultList.add(taskInstanceDependentResult);
+        List<Integer> taskInstanceIdList = new ArrayList<>();
+        taskInstanceIdList.add(0);
         Result res = new Result();
         res.setCode(Status.SUCCESS.ordinal());
         res.setData("xxx");
@@ -476,6 +495,7 @@ public class WorkflowInstanceServiceTest {
                 workflowInstance.getTestFlag()))
                         .thenReturn(taskInstanceList);
         when(loggerService.queryLog(loginUser, taskInstance.getId(), 0, 4098)).thenReturn(res);
+        when(taskDependentResultDao.batchQueryTaskDependentResultByTaskInstanceIds(taskInstanceIdList)).thenReturn(taskDependentResultList);
         Map<String, Object> successRes =
                 workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
