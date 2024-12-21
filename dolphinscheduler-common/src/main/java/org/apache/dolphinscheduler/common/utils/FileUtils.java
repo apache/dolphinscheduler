@@ -237,6 +237,10 @@ public class FileUtils {
     }
 
     public static void createFileWith755(@NonNull Path path) throws IOException {
+        final Path parent = path.getParent();
+        if (!parent.toFile().exists()) {
+            createDirectoryWith755(parent);
+        }
         if (SystemUtils.IS_OS_WINDOWS) {
             Files.createFile(path);
         } else {
