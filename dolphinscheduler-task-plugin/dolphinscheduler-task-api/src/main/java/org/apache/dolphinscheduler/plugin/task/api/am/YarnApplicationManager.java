@@ -18,13 +18,17 @@
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +37,10 @@ import com.google.auto.service.AutoService;
 
 @Slf4j
 @AutoService(ApplicationManager.class)
-public class YarnApplicationManager implements ApplicationManager {
+public class YarnApplicationManager implements ApplicationManager<YarnApplicationManagerContext> {
 
     @Override
-    public boolean killApplication(ApplicationManagerContext applicationManagerContext) throws TaskException {
-        YarnApplicationManagerContext yarnApplicationManagerContext =
-                (YarnApplicationManagerContext) applicationManagerContext;
+    public boolean killApplication(YarnApplicationManagerContext yarnApplicationManagerContext) throws TaskException {
         String executePath = yarnApplicationManagerContext.getExecutePath();
         String tenantCode = yarnApplicationManagerContext.getTenantCode();
         List<String> appIds = yarnApplicationManagerContext.getAppIds();
@@ -77,17 +79,19 @@ public class YarnApplicationManager implements ApplicationManager {
         sb.append("\n\n");
         sb.append(cmd);
 
-        File f = new File(commandFile);
+        final Path killCommandAbsolutePath = Paths.get(commandFile);
+        try {
+            FileUtils.createFileWith755(killCommandAbsolutePath);
+            Files.write(killCommandAbsolutePath, sb.toString().getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.APPEND);
 
-        if (!f.exists()) {
-            org.apache.commons.io.FileUtils.writeStringToFile(new File(commandFile), sb.toString(),
-                    StandardCharsets.UTF_8);
+            String runCmd = String.format("%s %s", Constants.SH, commandFile);
+            runCmd = org.apache.dolphinscheduler.common.utils.OSUtils.getSudoCmd(tenantCode, runCmd);
+            log.info("kill cmd:{}", runCmd);
+            org.apache.dolphinscheduler.common.utils.OSUtils.exeCmd(runCmd);
+        } finally {
+            Files.deleteIfExists(killCommandAbsolutePath);
         }
-
-        String runCmd = String.format("%s %s", Constants.SH, commandFile);
-        runCmd = org.apache.dolphinscheduler.common.utils.OSUtils.getSudoCmd(tenantCode, runCmd);
-        log.info("kill cmd:{}", runCmd);
-        org.apache.dolphinscheduler.common.utils.OSUtils.exeCmd(runCmd);
     }
 
     /**

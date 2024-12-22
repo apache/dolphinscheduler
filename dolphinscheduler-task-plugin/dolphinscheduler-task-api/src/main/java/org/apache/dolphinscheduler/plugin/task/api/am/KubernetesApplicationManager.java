@@ -48,7 +48,7 @@ import io.fabric8.kubernetes.client.dsl.PodResource;
 
 @Slf4j
 @AutoService(ApplicationManager.class)
-public class KubernetesApplicationManager implements ApplicationManager {
+public class KubernetesApplicationManager implements ApplicationManager<KubernetesApplicationManagerContext> {
 
     private static final String PENDING = "Pending";
     private static final String RUNNING = "Running";
@@ -64,9 +64,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private final Map<String, KubernetesClient> cacheClientMap = new ConcurrentHashMap<>();
 
     @Override
-    public boolean killApplication(ApplicationManagerContext applicationManagerContext) throws TaskException {
-        KubernetesApplicationManagerContext kubernetesApplicationManagerContext =
-                (KubernetesApplicationManagerContext) applicationManagerContext;
+    public boolean killApplication(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) throws TaskException {
 
         boolean isKill;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
