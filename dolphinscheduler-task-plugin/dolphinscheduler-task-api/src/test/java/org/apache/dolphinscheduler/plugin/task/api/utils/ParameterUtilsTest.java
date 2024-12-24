@@ -17,18 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import static org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils.replacePlaceholders;
+import static org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils.replacePlaceholders;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.dolphinscheduler.common.constants.DateConstants;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,8 +49,8 @@ public class ParameterUtilsTest {
                 JSONUtils.toJsonString(Lists.newArrayList(3.1415, 2.44, 3.44))));
         String sql = ParameterUtils.expandListParameter(params,
                 "select * from test where col1 in ('${col1}') and date='${date}' and col2 in ('${col2}')");
-        Assertions.assertEquals("select * from test where col1 in (?,?,?) and date=? and col2 in (?,?,?)", sql);
-        Assertions.assertEquals(7, params.size());
+        assertEquals("select * from test where col1 in (?,?,?) and date=? and col2 in (?,?,?)", sql);
+        assertEquals(7, params.size());
 
         Map<Integer, Property> params2 = new HashMap<>();
         params2.put(1,
@@ -60,8 +58,8 @@ public class ParameterUtilsTest {
         params2.put(2, new Property("date", Direct.IN, DataType.DATE, "2020-06-30"));
         String sql2 = ParameterUtils.expandListParameter(params2,
                 "select * from test where col1 in ('${col}') and date='${date}'");
-        Assertions.assertEquals("select * from test where col1 in (?) and date=?", sql2);
-        Assertions.assertEquals(2, params2.size());
+        assertEquals("select * from test where col1 in (?) and date=?", sql2);
+        assertEquals(2, params2.size());
 
     }
 
@@ -77,21 +75,14 @@ public class ParameterUtilsTest {
 
         // parameterString、parameterMap is not null
         String parameterString = "test_parameter";
-        Assertions.assertEquals(parameterString,
+        assertEquals(parameterString,
                 ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap));
 
         // replace variable ${} form
         parameterMap.put("testParameter2", "${testParameter}");
-        Assertions.assertEquals(parameterString,
-                PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true));
+        assertEquals(parameterString,
+                replacePlaceholders(parameterString, parameterMap, true));
 
-        // replace time $[...] form, eg. $[yyyyMMdd]
-        Date cronTime = new Date();
-        Assertions.assertEquals(parameterString, replacePlaceholders(parameterString, cronTime, true));
-
-        // replace time $[...] form, eg. $[yyyyMMdd]
-        Date cronTimeStr = DateUtils.stringToDate("2019-02-02 00:00:00");
-        Assertions.assertEquals(parameterString, replacePlaceholders(parameterString, cronTimeStr, true));
     }
 
     @Test
@@ -103,20 +94,30 @@ public class ParameterUtilsTest {
         parameterMap.put("user", "Kris");
         parameterMap.put(DateConstants.PARAMETER_DATETIME, "20201201123000");
         parameterString = ParameterUtils.convertParameterPlaceholders(parameterString, parameterMap);
-        Assertions.assertEquals(
+        assertEquals(
                 "Kris is userName, '$[1]' '20221201' '20181201' '20210301' '20200801' '20201215' '20201117'  '20201204'  '$[0]' '20201128' '143000' '113000' '123300' '122800'  '$[3]'",
                 parameterString);
+    }
+
+    @Test
+    public void convertParameterPlaceholdersWithPunct() {
+        final String sql = "get_json_object(json_array, '$[*].pageId')";
+        final Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("key", "value");
+
+        assertEquals("get_json_object(json_array, '$[*].pageId')",
+                ParameterUtils.convertParameterPlaceholders(sql, paramsMap));
     }
 
     /**
      * Test handleEscapes
      */
     @Test
-    public void testHandleEscapes() throws Exception {
+    public void testHandleEscapes() {
         Assertions.assertNull(ParameterUtils.handleEscapes(null));
-        Assertions.assertEquals("", ParameterUtils.handleEscapes(""));
-        Assertions.assertEquals("test Parameter", ParameterUtils.handleEscapes("test Parameter"));
-        Assertions.assertEquals("////%test////%Parameter", ParameterUtils.handleEscapes("%test%Parameter"));
+        assertEquals("", ParameterUtils.handleEscapes(""));
+        assertEquals("test Parameter", ParameterUtils.handleEscapes("test Parameter"));
+        assertEquals("////%test////%Parameter", ParameterUtils.handleEscapes("%test%Parameter"));
     }
 
 }
