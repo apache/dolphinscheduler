@@ -400,12 +400,6 @@ export function useTable() {
     variables.row = row
     if (data.releaseState === 'ONLINE') {
       release(data, variables.projectCode, row.code).then(() => {
-        variables.setTimingDialogShowRef = true
-        if (row?.schedule) {
-          variables.row = row.schedule
-          variables.timingType = 'update'
-          variables.timingState = row.scheduleReleaseState
-        }
         getTableData({
           pageSize: variables.pageSize,
           pageNo: variables.page,

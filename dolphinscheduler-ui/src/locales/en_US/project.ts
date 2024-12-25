@@ -232,7 +232,6 @@ export default {
     workflow_relation_no_data_result_desc:
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     wait_to_run: 'Wait to run',
-    want_to_set_timing: 'Would you like to set the workflow timing?',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',
     time_to_online: 'Confirm to make the Scheduler online?',
