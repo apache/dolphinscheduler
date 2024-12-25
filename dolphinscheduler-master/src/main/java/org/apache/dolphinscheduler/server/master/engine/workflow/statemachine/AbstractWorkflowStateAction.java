@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
@@ -87,6 +88,30 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
                 continue;
             }
             workflowEventBus.publish(TaskStartLifecycleEvent.of(readyTaskExecutionRunnable));
+        }
+    }
+
+    protected void killActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
+        try {
+            LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
+            workflowExecutionRunnable
+                    .getWorkflowExecutionGraph()
+                    .getActiveTaskExecutionRunnable()
+                    .forEach(ITaskExecutionRunnable::kill);
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
+        }
+    }
+
+    protected void pauseActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
+        try {
+            LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
+            workflowExecutionRunnable
+                    .getWorkflowExecutionGraph()
+                    .getActiveTaskExecutionRunnable()
+                    .forEach(ITaskExecutionRunnable::pause);
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
         }
     }
 
