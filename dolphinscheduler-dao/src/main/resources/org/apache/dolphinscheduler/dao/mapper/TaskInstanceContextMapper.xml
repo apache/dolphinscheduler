@@ -17,72 +17,53 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDependentResultMapper">
-    <select id="queryTaskDependentResultByTaskInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.TaskDependentResult">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskInstanceContextMapper">
+    <select id="queryListByTaskInstanceIdAndContextType" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstanceContext">
         SELECT
             id
             ,task_instance_id
-            ,project_code
-            ,workflow_definition_code
-            ,task_definition_code
-            ,dependent_result
+            ,context
+            ,context_type
             ,create_time
             ,update_time
         FROM
-        t_ds_task_dependent_result
+        t_ds_task_instance_context
         WHERE 1=1
         AND task_instance_id = #{taskInstanceId}
+        AND context_type = #{contextType}
     </select>
 
-    <delete id="deleteTaskDependentResultByTaskInstanceId">
-        DELETE FROM t_ds_task_dependent_result
+    <delete id="deleteByTaskInstanceIdAndContextType">
+        DELETE FROM t_ds_task_instance_context
         WHERE task_instance_id = #{taskInstanceId}
+        AND context_type = #{contextType}
     </delete>
 
-    <select id="queryTaskDependentResultByTaskDependentResult" resultType="org.apache.dolphinscheduler.dao.entity.TaskDependentResult">
-        SELECT
-            id
-            ,task_instance_id
-            ,project_code
-            ,workflow_definition_code
-            ,task_definition_code
-            ,dependent_result
-            ,create_time
-            ,update_time
-        FROM
-        t_ds_task_dependent_result
-        WHERE 1=1
-        AND task_instance_id = #{taskDependentResult.taskInstanceId}
-        AND project_code = #{taskDependentResult.projectCode}
-        AND workflow_definition_code = #{taskDependentResult.workflowDefinitionCode}
-        AND task_definition_code = #{taskDependentResult.taskDefinitionCode}
-    </select>
-
-    <update id="updateDependentResultByTaskInstanceId">
-        UPDATE t_ds_task_dependent_result
+    <update id="updateByTaskInstanceId">
+        UPDATE t_ds_task_instance_context
         SET
-            dependent_result = #{dependentResult}
+            context = #{context}
             ,update_time = now()
         WHERE 1=1
         AND task_instance_id = #{taskInstanceId}
+        AND context_type = #{contextType}
     </update>
 
-    <select id="batchQueryTaskDependentResultByTaskInstanceIds" resultType="org.apache.dolphinscheduler.dao.entity.TaskDependentResult">
+    <select id="batchQueryByTaskInstanceIdsAndContextType" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstanceContext">
         SELECT
             id
             ,task_instance_id
-            ,project_code
-            ,workflow_definition_code
-            ,task_definition_code
-            ,dependent_result
+            ,context
+            ,context_type
             ,create_time
             ,update_time
         FROM
-        t_ds_task_dependent_result
+        t_ds_task_instance_context
         WHERE 1=1
         AND task_instance_id in
         <foreach collection="taskInstanceIds" item="taskInstanceId" open="(" separator="," close=")">
             #{taskInstanceId}
         </foreach>
+        AND context_type = #{contextType}
     </select>
 </mapper>

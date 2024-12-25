@@ -362,17 +362,15 @@ d//
 select drop_column_t_ds_task_instance_cache_key();
 DROP FUNCTION IF EXISTS drop_column_t_ds_task_instance_cache_key();
 
-DROP TABLE IF EXISTS t_ds_task_dependent_result;
-CREATE TABLE t_ds_task_dependent_result (
+DROP TABLE IF EXISTS t_ds_task_instance_context;
+CREATE TABLE t_ds_task_instance_context (
     id int NOT NULL,
     task_instance_id int NOT NULL,
-    project_code bigint NOT NULL,
-    workflow_definition_code bigint NOT NULL,
-    task_definition_code bigint NOT NULL,
-    dependent_result varchar(64) DEFAULT '' NOT NULL,
+    context text NOT NULL,
+    context_type int NOT NULL,
     create_time timestamp NOT NULL,
     update_time timestamp NOT NULL,
     PRIMARY KEY (id)
 );
 
-create index idx_task_instance_id on t_ds_task_dependent_result (task_instance_id, project_code, workflow_definition_code, task_definition_code);
+create index idx_task_instance_id on t_ds_task_instance_context (task_instance_id, context_type);

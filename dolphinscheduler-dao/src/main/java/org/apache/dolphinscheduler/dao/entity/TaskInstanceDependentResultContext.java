@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 
-import java.util.List;
+import lombok.Data;
 
-public interface TaskDependentResultDao extends IDao<TaskDependentResult> {
+@Data
+public class TaskInstanceDependentResultContext {
 
-    List<TaskDependentResult> queryTaskDependentResultByTaskInstanceId(Integer taskInstanceId);
+    private Long projectCode;
 
-    int deleteTaskDependentResultByTaskInstanceId(Integer taskInstanceId);
+    private Long workflowDefinitionCode;
 
-    int upsertTaskDependentResult(TaskDependentResult taskDependentResult);
+    private Long taskDefinitionCode;
 
-    List<TaskDependentResult> batchQueryTaskDependentResultByTaskInstanceIds(List<Integer> taskInstanceIds);
+    private String dateCycle;
+
+    private DependResult dependentResult;
 }

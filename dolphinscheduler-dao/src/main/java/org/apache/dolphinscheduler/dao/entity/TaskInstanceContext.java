@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+import org.apache.dolphinscheduler.common.enums.ContextType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -28,23 +30,30 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
-@TableName("t_ds_task_dependent_result")
-public class TaskDependentResult {
+@TableName("t_ds_task_instance_context")
+public class TaskInstanceContext {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     private Integer taskInstanceId;
 
-    private Long projectCode;
+    private String context;
 
-    private Long workflowDefinitionCode;
-
-    private Long taskDefinitionCode;
-
-    private DependResult dependentResult;
+    private ContextType contextType;
 
     private Date createTime;
 
     private Date updateTime;
+
+    public List<TaskInstanceDependentResultContext> getTaskDependentResultContext() {
+        if (contextType == ContextType.DEPENDENT_RESULT && context != null) {
+            return JSONUtils.toList(context, TaskInstanceDependentResultContext.class);
+        }
+        return null;
+    }
+
+    public void setTaskDependentResultContext(List<TaskInstanceDependentResultContext> taskInstanceDependentResultContexts) {
+        this.context = JSONUtils.toJsonString(taskInstanceDependentResultContexts);
+    }
 }

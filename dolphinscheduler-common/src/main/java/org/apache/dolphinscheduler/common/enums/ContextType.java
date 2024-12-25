@@ -15,15 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.common.enums;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class TaskInstanceDependentResult extends TaskInstance {
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-    private TaskInstanceDependentResultContext taskInstanceDependentResult;
+@Getter
+public enum ContextType {
 
+    DEPENDENT_RESULT(1, "dependent task result");
+
+    @EnumValue
+    private final int code;
+    private final String desc;
+
+    ContextType(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 }

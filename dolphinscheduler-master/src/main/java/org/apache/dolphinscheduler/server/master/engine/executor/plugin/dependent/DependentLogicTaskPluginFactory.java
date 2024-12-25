@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.executor.plugin.depende
 
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -53,7 +53,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private TaskDependentResultDao taskDependentResultDao;
+    private TaskInstanceContextDao taskInstanceContextDao;
 
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
@@ -77,7 +77,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
                 taskInstanceDao,
                 workflowInstanceDao,
                 workflowExecutionRunnable,
-                taskDependentResultDao);
+                taskInstanceContextDao);
     }
 
     @Override

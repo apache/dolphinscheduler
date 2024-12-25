@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.executor.plugin.depende
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -50,7 +50,7 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
                               TaskInstanceDao taskInstanceDao,
                               WorkflowInstanceDao workflowInstanceDao,
                               IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              TaskDependentResultDao taskDependentResultDao) {
+                              TaskInstanceContextDao taskInstanceContextDao) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
         this.dependentTaskTracker = new DependentTaskTracker(
@@ -61,7 +61,7 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
                 taskDefinitionDao,
                 taskInstanceDao,
                 workflowInstanceDao,
-                taskDependentResultDao);
+                taskInstanceContextDao);
         onTaskRunning();
     }
 

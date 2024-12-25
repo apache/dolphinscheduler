@@ -926,16 +926,14 @@ CREATE TABLE t_ds_task_instance
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_task_dependent_result
+-- Table structure for t_ds_task_instance_context
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_task_dependent_result`;
-CREATE TABLE `t_ds_task_dependent_result` (
+DROP TABLE IF EXISTS `t_ds_task_instance_context`;
+CREATE TABLE `t_ds_task_instance_context` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `task_instance_id` int(11) NOT NULL,
-    `project_code` bigint(20) NOT NULL,
-    `workflow_definition_code` bigint(20) NOT NULL,
-    `task_definition_code` bigint(20) NOT NULL,
-    `dependent_result` varchar(64) DEFAULT '' NOT NULL,
+    `context` text NOT NULL,
+    `context_type` int(11) NOT NULL,
     `create_time` datetime NOT NULL,
     `update_time` datetime NOT NULL,
     PRIMARY KEY (`id`)

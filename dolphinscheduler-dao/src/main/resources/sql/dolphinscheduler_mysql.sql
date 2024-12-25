@@ -926,20 +926,18 @@ CREATE TABLE `t_ds_task_instance` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_task_dependent_result
+-- Table structure for t_ds_task_instance_context
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_task_dependent_result`;
-CREATE TABLE `t_ds_task_dependent_result` (
+DROP TABLE IF EXISTS `t_ds_task_instance_context`;
+CREATE TABLE `t_ds_task_instance_context` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `task_instance_id` int(11) NOT NULL,
-    `project_code` bigint(20) NOT NULL,
-    `workflow_definition_code` bigint(20) NOT NULL,
-    `task_definition_code` bigint(20) NOT NULL,
-    `dependent_result` varchar(64) DEFAULT '' NOT NULL,
+    `context` text NOT NULL,
+    `context_type` int(11) NOT NULL COMMENT 'context type, 1: dependent task result',
     `create_time` datetime NOT NULL,
     `update_time` datetime NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `task_instance_id` (`task_instance_id`,`project_code`,`workflow_definition_code`,`task_definition_code`) USING BTREE
+    KEY `task_instance_id` (`task_instance_id`,`context_type`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

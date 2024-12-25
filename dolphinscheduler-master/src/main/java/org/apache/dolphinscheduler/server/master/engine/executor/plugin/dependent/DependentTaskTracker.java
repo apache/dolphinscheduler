@@ -18,16 +18,18 @@
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.dependent;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResultContext;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -54,6 +56,8 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import com.google.common.collect.Lists;
+
 @Slf4j
 public class DependentTaskTracker {
 
@@ -63,7 +67,7 @@ public class DependentTaskTracker {
     private final WorkflowDefinitionDao workflowDefinitionDao;
     private final TaskDefinitionDao taskDefinitionDao;
     private final TaskInstanceDao taskInstanceDao;
-    private final TaskDependentResultDao taskDependentResultDao;
+    private final TaskInstanceContextDao taskInstanceContextDao;
 
     private final WorkflowInstance workflowInstance;
     private final Date dependentDate;
@@ -74,6 +78,7 @@ public class DependentTaskTracker {
     private Map<Long, WorkflowDefinition> processDefinitionMap;
     private Map<Long, TaskDefinition> taskDefinitionMap;
     private Map<Long, Project> projectCodeMap;
+    private TaskInstanceContext taskInstanceContext;
 
     public DependentTaskTracker(TaskExecutionContext taskExecutionContext,
                                 DependentParameters dependentParameters,
@@ -82,20 +87,21 @@ public class DependentTaskTracker {
                                 TaskDefinitionDao taskDefinitionDao,
                                 TaskInstanceDao taskInstanceDao,
                                 WorkflowInstanceDao workflowInstanceDao,
-                                TaskDependentResultDao taskDependentResultDao) {
+                                TaskInstanceContextDao taskInstanceContextDao) {
         this.taskExecutionContext = taskExecutionContext;
         this.dependentParameters = dependentParameters;
         this.projectDao = projectDao;
         this.workflowDefinitionDao = workflowDefinitionDao;
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
-        this.taskDependentResultDao = taskDependentResultDao;
+        this.taskInstanceContextDao = taskInstanceContextDao;
         this.workflowInstance =
                 workflowInstanceDao.queryById(taskExecutionContext.getWorkflowInstanceId());
         this.dependentDate = calculateDependentDate();
         this.dependentTaskList = initializeDependentTaskList();
         this.dependResultMap = new HashMap<>();
         this.dependVarPoolPropertyMap = new HashMap<>();
+        this.taskInstanceContext = new TaskInstanceContext();
         initTaskDependentResult();
     }
 
@@ -200,7 +206,12 @@ public class DependentTaskTracker {
     }
 
     private void initTaskDependentResult() {
-        taskDependentResultDao.deleteTaskDependentResultByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskInstanceContextDao.deleteByTaskInstanceIdAndContextType(taskExecutionContext.getTaskInstanceId(),
+                ContextType.DEPENDENT_RESULT);
+        taskInstanceContext.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT);
+        taskInstanceContext.setCreateTime(new Date());
+        taskInstanceContext.setUpdateTime(new Date());
     }
 
     private DependResult calculateDependResult() {
@@ -235,31 +246,38 @@ public class DependentTaskTracker {
                     DependentItem dependentItem = new DependentItem().fromKey(dependentKey);
                     WorkflowDefinition workflowDefinition = processDefinitionMap.get(dependentItem.getDefinitionCode());
                     Project project = projectCodeMap.get(workflowDefinition.getProjectCode());
-                    TaskDependentResult taskDependentResult = new TaskDependentResult();
-                    taskDependentResult.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                    taskDependentResult.setProjectCode(project.getCode());
-                    taskDependentResult.setWorkflowDefinitionCode(workflowDefinition.getCode());
-                    taskDependentResult.setDependentResult(dependResult);
-                    taskDependentResult.setCreateTime(new Date());
-                    taskDependentResult.setUpdateTime(new Date());
+                    TaskInstanceDependentResultContext taskInstanceDependentResultContext =
+                            new TaskInstanceDependentResultContext();
+                    taskInstanceDependentResultContext.setProjectCode(project.getCode());
+                    taskInstanceDependentResultContext.setWorkflowDefinitionCode(workflowDefinition.getCode());
+                    taskInstanceDependentResultContext.setDependentResult(dependResult);
                     if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                        taskDependentResult.setTaskDefinitionCode(Constants.DEPENDENT_ALL_TASK_CODE);
-                        taskDependentResultDao.upsertTaskDependentResult(taskDependentResult);
+                        taskInstanceDependentResultContext.setTaskDefinitionCode(Constants.DEPENDENT_ALL_TASK_CODE);
+                        taskInstanceDependentResultContext.setDateCycle(dependentItem.getDateValue());
+                        taskInstanceContext
+                                .setTaskDependentResultContext(Lists.newArrayList(taskInstanceDependentResultContext));
+                        taskInstanceContextDao.upsertTaskInstanceContext(taskInstanceContext);
                         log.info(
                                 "Dependent type all task check finished, DependentResult: {}, DependentDate: {}, ProjectName: {}, WorkflowName: {}, WorkflowCode: {}, DependentCycle: {}, DependentCycleDate: {}",
                                 dependResult, dependentDate, project.getName(), workflowDefinition.getName(),
                                 workflowDefinition.getCode(), dependentItem.getCycle(), dependentItem.getDateValue());
                     } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
-                        taskDependentResult.setTaskDefinitionCode(Constants.DEPENDENT_WORKFLOW_CODE);
-                        taskDependentResultDao.upsertTaskDependentResult(taskDependentResult);
+                        taskInstanceDependentResultContext.setTaskDefinitionCode(Constants.DEPENDENT_WORKFLOW_CODE);
+                        taskInstanceDependentResultContext.setDateCycle(dependentItem.getDateValue());
+                        taskInstanceContext
+                                .setTaskDependentResultContext(Lists.newArrayList(taskInstanceDependentResultContext));
+                        taskInstanceContextDao.upsertTaskInstanceContext(taskInstanceContext);
                         log.info(
                                 "Dependent type workflow task check finished, DependentResult: {}, DependentDate: {}, ProjectName: {}, WorkflowName: {}, WorkflowCode: {}, DependentCycle: {}, DependentCycleDate: {}",
                                 dependResult, dependentDate, project.getName(), workflowDefinition.getName(),
                                 workflowDefinition.getCode(), dependentItem.getCycle(), dependentItem.getDateValue());
                     } else {
                         TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
-                        taskDependentResult.setTaskDefinitionCode(taskDefinition.getCode());
-                        taskDependentResultDao.upsertTaskDependentResult(taskDependentResult);
+                        taskInstanceDependentResultContext.setTaskDefinitionCode(taskDefinition.getCode());
+                        taskInstanceDependentResultContext.setDateCycle(dependentItem.getDateValue());
+                        taskInstanceContext
+                                .setTaskDependentResultContext(Lists.newArrayList(taskInstanceDependentResultContext));
+                        taskInstanceContextDao.upsertTaskInstanceContext(taskInstanceContext);
                         log.info(
                                 "Dependent type task check finished, DependentResult: {}, DependentDate: {}, ProjectName: {}, WorkflowName: {}, WorkflowCode: {}, TaskName: {}, TaskCode: {}, DependentCycle: {}, DependentCycleDate: {}",
                                 dependResult, dependentDate, project.getName(), workflowDefinition.getName(),

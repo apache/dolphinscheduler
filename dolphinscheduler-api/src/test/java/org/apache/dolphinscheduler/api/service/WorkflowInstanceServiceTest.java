@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.impl.WorkflowInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -45,8 +46,9 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResultContext;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -61,7 +63,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
-import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
@@ -93,6 +95,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -158,7 +161,7 @@ public class WorkflowInstanceServiceTest {
     private WorkflowInstanceMapDao workflowInstanceMapDao;
 
     @Mock
-    private TaskDependentResultDao taskDependentResultDao;
+    private TaskInstanceContextDao taskInstanceContextDao;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -471,15 +474,16 @@ public class WorkflowInstanceServiceTest {
         taskInstance.setTaskType("SHELL");
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
-        List<TaskDependentResult> taskDependentResultList = new ArrayList<>();
-        // TaskInstanceDependentResult taskInstanceDependentResult = new TaskInstanceDependentResult();
-        // BeanUtils.copyProperties(taskInstance, taskInstanceDependentResult);
-        TaskDependentResult TaskDependentResult = new TaskDependentResult();
-        TaskDependentResult.setProjectCode(projectCode);
-        TaskDependentResult.setTaskInstanceId(0);
-        TaskDependentResult.setDependentResult(DependResult.SUCCESS);
-        // taskInstanceDependentResult.setTaskDependentResult(TaskDependentResult);
-        // taskInstanceDependentResultList.add(taskInstanceDependentResult);
+        List<TaskInstanceDependentResultContext> taskInstanceDependentResultContextList = new ArrayList<>();
+        TaskInstanceContext taskInstanceContext = new TaskInstanceContext();
+        taskInstanceContext.setTaskInstanceId(0);
+        taskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT);
+        TaskInstanceDependentResultContext taskInstanceDependentResultContext =
+                new TaskInstanceDependentResultContext();
+        taskInstanceDependentResultContext.setProjectCode(projectCode);
+        taskInstanceDependentResultContext.setDependentResult(DependResult.SUCCESS);
+        taskInstanceContext.setTaskDependentResultContext(
+                Lists.asList(taskInstanceDependentResultContext, new TaskInstanceDependentResultContext[0]));
         List<Integer> taskInstanceIdList = new ArrayList<>();
         taskInstanceIdList.add(0);
         Result res = new Result();
@@ -493,8 +497,9 @@ public class WorkflowInstanceServiceTest {
                 workflowInstance.getTestFlag()))
                         .thenReturn(taskInstanceList);
         when(loggerService.queryLog(loginUser, taskInstance.getId(), 0, 4098)).thenReturn(res);
-        when(taskDependentResultDao.batchQueryTaskDependentResultByTaskInstanceIds(taskInstanceIdList))
-                .thenReturn(taskDependentResultList);
+        when(taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
+                ContextType.DEPENDENT_RESULT))
+                        .thenReturn(Lists.asList(taskInstanceContext, new TaskInstanceContext[0]));
         Map<String, Object> successRes =
                 workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));

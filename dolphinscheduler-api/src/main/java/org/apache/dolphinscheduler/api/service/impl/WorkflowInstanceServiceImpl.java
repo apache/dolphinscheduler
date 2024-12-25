@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -57,9 +58,10 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDependentResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResult;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResultContext;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -72,7 +74,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
-import org.apache.dolphinscheduler.dao.repository.TaskDependentResultDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
@@ -179,7 +181,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     private CuringParamsService curingGlobalParamsService;
 
     @Autowired
-    private TaskDependentResultDao taskDependentResultDao;
+    private TaskInstanceContextDao taskInstanceContextDao;
 
     /**
      * return top n SUCCESS workflow instance order by running time which started between startTime and endTime
@@ -488,12 +490,17 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 }).collect(Collectors.toList());
         List<Integer> taskInstanceIdList = taskInstanceList.stream()
                 .map(TaskInstance::getId).collect(Collectors.toList());
-        List<TaskDependentResult> taskDependentResultList =
-                taskDependentResultDao.batchQueryTaskDependentResultByTaskInstanceIds(taskInstanceIdList);
-        for (TaskInstanceDependentResult taskInstanceDependentResult : taskInstanceDependentResultList) {
-            for (TaskDependentResult taskDependentResult : taskDependentResultList) {
-                if (taskInstanceDependentResult.getId().equals(taskDependentResult.getTaskInstanceId())) {
-                    taskInstanceDependentResult.setTaskDependentResult(taskDependentResult);
+        List<TaskInstanceContext> taskInstanceContextList =
+                taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
+                        ContextType.DEPENDENT_RESULT);
+        for (TaskInstanceContext taskInstanceContext : taskInstanceContextList) {
+            for (TaskInstanceDependentResultContext taskInstanceDependentResultContext : taskInstanceContext
+                    .getTaskDependentResultContext()) {
+                for (TaskInstanceDependentResult taskInstanceDependentResult : taskInstanceDependentResultList) {
+                    if (taskInstanceDependentResult.getId().equals(taskInstanceContext.getTaskInstanceId())) {
+                        taskInstanceDependentResult
+                                .setTaskInstanceDependentResult(taskInstanceDependentResultContext);
+                    }
                 }
             }
         }
