@@ -2124,11 +2124,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         long taskCode = CodeGenerateUtils.genCode();
                         taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
                         taskDefinitionLog.setCode(taskCode);
-                        if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())){
+                        if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())) {
                             final String taskParams = taskDefinitionLog.getTaskParams();
-                            final SwitchParameters switchParameters = JSONUtils.parseObject(taskParams, SwitchParameters.class);
+                            final SwitchParameters switchParameters =
+                                    JSONUtils.parseObject(taskParams, SwitchParameters.class);
                             if (switchParameters == null) {
-                                throw new IllegalArgumentException("Switch task params: " + taskParams + " is invalid.");
+                                throw new IllegalArgumentException(
+                                        "Switch task params: " + taskParams + " is invalid.");
                             }
                             SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
                             List<SwitchResultVo> dependTaskList = switchResult.getDependTaskList();
@@ -2138,8 +2140,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             switchResult.setDependTaskList(dependTaskList);
                             if (switchResult.getNextNode() != null) {
                                 switchResult.setNextNode(
-                                        taskCodeMap.get(switchResult.getNextNode())
-                                );
+                                        taskCodeMap.get(switchResult.getNextNode()));
                             }
                             taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParameters));
                         }
