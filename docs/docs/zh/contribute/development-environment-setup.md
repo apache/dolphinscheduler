@@ -5,7 +5,7 @@
 在搭建 DolphinScheduler 开发环境之前请确保你已经安装以下软件:
 
 * [Git](https://git-scm.com/downloads)
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (当前暂不支持 jdk 11)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
 * [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
 * [Pnpm](https://pnpm.io/installation): v6.x
@@ -110,7 +110,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 ## DolphinScheduler Standalone快速开发模式
 
-> **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database,Zookeeper Testing Server
+> **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database, Zookeeper Testing Server
 >
 > Standalone 仅在 DolphinScheduler 1.3.9 及以后的版本支持
 
@@ -174,10 +174,10 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
 
 * 必要的修改
 
-  * 如果使用 MySQL 作为元数据库，需要先修改 `dolphinscheduler/pom.xml`，将 `mysql-connector-java` 依赖的 `scope` 改为 `compile`，使用 PostgreSQL 则不需要
+  * 如果使用 MySQL 作为元数据库，需要先修改 `dolphinscheduler-bom/pom.xml`，将 `mysql-connector-j` 依赖的 `scope` 改为 `compile`，使用 PostgreSQL 则不需要
   * 修改 Master 数据库配置，修改 `dolphinscheduler-master/src/main/resources/application.yaml` 文件中的数据库配置
-  * 修改 Worker 数据库配置，修改 `dolphinscheduler-worker/src/main/resources/application.yaml` 文件中的数据库配置
   * 修改 Api 数据库配置，修改 `dolphinscheduler-api/src/main/resources/application.yaml` 文件中的数据库配置
+  * 修改 Alert 数据库配置，修改 `dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml` 文件中的数据库配置
 
   本样例以 MySQL 为例，其中数据库名为 dolphinscheduler，账户名密码均为 dolphinscheduler
 
@@ -189,28 +189,15 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
       username: dolphinscheduler
       password: dolphinscheduler
   ```
-* 修改日志级别：为以下配置增加一行内容 `<appender-ref ref="STDOUT"/>` 使日志能在命令行中显示
-
-  `dolphinscheduler-master/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-worker/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-api/src/main/resources/logback-spring.xml`
-
-  修改后的结果如下：
-
-  ```diff
-  <root level="INFO">
-  +  <appender-ref ref="STDOUT"/>
-    <appender-ref ref="APILOGFILE"/>
-  </root>
-  ```
 
 ##### 启动服务
 
 我们需要启动三个服务，包括 MasterServer，WorkerServer，ApiApplicationServer
 
-* MasterServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.server.master.MasterServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-* WorkerServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.server.worker.WorkerServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-* ApiApplicationServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.api.ApiApplicationServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`。启动完成可以浏览 Open API 文档，地址为 http://localhost:12345/dolphinscheduler/swagger-ui/index.html
+* MasterServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.server.master.MasterServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true -Dspring.profiles.active=mysql`
+* WorkerServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.server.worker.WorkerServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true`
+* AlertServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.alert.AlertServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true -Dspring.profiles.active=mysql`
+* ApiApplicationServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.api.ApiApplicationServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true -Dspring.profiles.active=mysql`。启动完成可以浏览 Open API 文档，地址为 http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > VM Options `-Dspring.profiles.active=mysql` 中 `mysql` 表示指定的配置文件
 
