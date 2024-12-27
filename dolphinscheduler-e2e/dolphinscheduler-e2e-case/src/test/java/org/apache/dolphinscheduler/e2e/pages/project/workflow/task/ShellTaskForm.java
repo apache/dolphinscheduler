@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
+import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import org.openqa.selenium.WebDriver;
 
@@ -39,7 +41,9 @@ public final class ShellTaskForm extends TaskNodeForm {
         this.driver = parent.driver();
     }
 
+    @SneakyThrows
     public ShellTaskForm script(String script) {
+        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
         codeEditor.content(script);
 
         return this;
