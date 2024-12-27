@@ -2133,11 +2133,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                         "Switch task params: " + taskParams + " is invalid.");
                             }
                             SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
-                            List<SwitchResultVo> dependTaskList = switchResult.getDependTaskList();
-                            dependTaskList.forEach(switchResultVo -> {
+                            switchResult.getDependTaskList().forEach(switchResultVo -> {
                                 switchResultVo.setNextNode(taskCodeMap.get(switchResultVo.getNextNode()));
                             });
-                            switchResult.setDependTaskList(dependTaskList);
                             if (switchResult.getNextNode() != null) {
                                 switchResult.setNextNode(
                                         taskCodeMap.get(switchResult.getNextNode()));
