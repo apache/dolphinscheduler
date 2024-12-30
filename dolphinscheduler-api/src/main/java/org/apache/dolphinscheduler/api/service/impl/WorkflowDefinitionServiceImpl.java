@@ -117,6 +117,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -2122,6 +2123,24 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         long taskCode = CodeGenerateUtils.genCode();
                         taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
                         taskDefinitionLog.setCode(taskCode);
+                        if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())) {
+                            final String taskParams = taskDefinitionLog.getTaskParams();
+                            final SwitchParameters switchParameters =
+                                    JSONUtils.parseObject(taskParams, SwitchParameters.class);
+                            if (switchParameters == null) {
+                                throw new IllegalArgumentException(
+                                        "Switch task params: " + taskParams + " is invalid.");
+                            }
+                            SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
+                            switchResult.getDependTaskList().forEach(switchResultVo -> {
+                                switchResultVo.setNextNode(taskCodeMap.get(switchResultVo.getNextNode()));
+                            });
+                            if (switchResult.getNextNode() != null) {
+                                switchResult.setNextNode(
+                                        taskCodeMap.get(switchResult.getNextNode()));
+                            }
+                            taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParameters));
+                        }
                     } catch (CodeGenerateException e) {
                         log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
                         putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);

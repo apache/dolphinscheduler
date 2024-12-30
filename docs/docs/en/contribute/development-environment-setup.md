@@ -5,7 +5,7 @@
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
 - [Git](https://git-scm.com/downloads)
-- [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)
+- [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 - [Maven](http://maven.apache.org/download.cgi): v3.5+
 - [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
 - [Pnpm](https://pnpm.io/installation): v6.x
@@ -180,10 +180,10 @@ Following steps will guide how to start the DolphinScheduler backend service
 
 - File change
 
-  - If you use MySQL as your metadata database, you need to modify `dolphinscheduler/pom.xml` and change the `scope` of the `mysql-connector-java` dependency to `compile`. This step is not necessary to use PostgreSQL
+  - If you use MySQL as your metadata database, you need to modify `dolphinscheduler-bom/pom.xml` and change the `scope` of the `mysql-connector-j` dependency to `compile`. This step is not necessary to use PostgreSQL
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-master/src/main/resources/application.yaml`
-  - Modify database configuration, modify the database configuration in the `dolphinscheduler-worker/src/main/resources/application.yaml`
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-api/src/main/resources/application.yaml`
+  - Modify database configuration, modify the database configuration in the `dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml`
 
 We here use MySQL with database, username, password named dolphinscheduler as an example
 
@@ -196,30 +196,14 @@ spring:
     password: dolphinscheduler
 ```
 
-- Log level: add a line `<appender-ref ref="STDOUT"/>` to the following configuration to enable the log to be displayed on the command line
-
-  `dolphinscheduler-master/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-worker/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-api/src/main/resources/logback-spring.xml`
-
-  here we add the result after modify as below:
-
-  ```diff
-  <root level="INFO">
-  +  <appender-ref ref="STDOUT"/>
-    <appender-ref ref="APILOGFILE"/>
-  </root>
-  ```
-
-> **_Note:_** Only DolphinScheduler 2.0 and later versions need to install plugin before start server. It doesn't need it before version 2.0.
-
 ##### Server start
 
 There are three services that need to be started, including MasterServer, WorkerServer, ApiApplicationServer.
 
-- MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by IntelliJ IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-- WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by IntelliJ IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-- ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by IntelliJ IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
+- MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true -Dspring.profiles.active=mysql`
+- WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true`
+- AlertServer：Execute function `main` in the class `org.apache.dolphinscheduler.alert.AlertServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true -Dspring.profiles.active=mysql`
+- ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true -Dspring.profiles.active=mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > The `mysql` in the VM Options `-Dspring.profiles.active=mysql` means specified configuration file
 

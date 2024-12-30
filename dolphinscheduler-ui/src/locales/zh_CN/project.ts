@@ -230,7 +230,6 @@ export default {
     workflow_relation_no_data_result_desc:
       '目前没有任何工作流，请先创建工作流，再访问该页面',
     wait_to_run: '等待执行',
-    want_to_set_timing: '现在想去配置该工作流定时?',
     confirm_to_online: '是否确定上线该工作流?',
     confirm_to_offline: '是否确定下线该工作流?',
     time_to_online: '是否确定上线该定时?',
