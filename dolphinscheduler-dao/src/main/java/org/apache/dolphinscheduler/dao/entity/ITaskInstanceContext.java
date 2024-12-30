@@ -19,14 +19,11 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.apache.dolphinscheduler.common.enums.ContextType;
 
-import java.util.List;
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "contextType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "contextType", include = JsonTypeInfo.As.EXISTING_PROPERTY, visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = DependentResultTaskInstanceContext.class, name = "DEPENDENT_RESULT_CONTEXT")
 })
 public interface ITaskInstanceContext {
-    ContextType getContextType();
+
 }

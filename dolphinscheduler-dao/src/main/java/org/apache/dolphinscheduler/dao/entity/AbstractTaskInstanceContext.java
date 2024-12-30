@@ -17,6 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-public abstract class AbstractTaskInstanceContext implements ITaskInstanceContext{
-    protected String contextType;
+import org.apache.dolphinscheduler.common.enums.ContextType;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public abstract class AbstractTaskInstanceContext implements ITaskInstanceContext {
+
+    private ContextType contextType;
 }

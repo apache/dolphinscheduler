@@ -43,12 +43,12 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
-import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -482,7 +482,7 @@ public class WorkflowInstanceServiceTest {
                 new DependentResultTaskInstanceContext();
         dependentResultTaskInstanceContext.setProjectCode(projectCode);
         dependentResultTaskInstanceContext.setDependentResult(DependResult.SUCCESS);
-        taskInstanceContext.setContext(
+        taskInstanceContext.setTaskInstanceContext(
                 Lists.asList(dependentResultTaskInstanceContext, new DependentResultTaskInstanceContext[0]));
         List<Integer> taskInstanceIdList = new ArrayList<>();
         taskInstanceIdList.add(0);

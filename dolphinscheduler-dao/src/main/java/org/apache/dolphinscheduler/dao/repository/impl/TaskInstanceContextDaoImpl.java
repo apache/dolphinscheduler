@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
-import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceContextMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
@@ -76,19 +76,19 @@ public class TaskInstanceContextDaoImpl extends BaseDao<TaskInstanceContext, Tas
             return mybatisMapper.insert(taskInstanceContext);
         } else {
             List<AbstractTaskInstanceContext> dbDependentResultTaskInstanceContextList =
-                    dbTaskInstanceContext.getContext();
-            dbDependentResultTaskInstanceContextList.addAll(taskInstanceContext.getContext());
+                    dbTaskInstanceContext.getTaskInstanceContext();
+            dbDependentResultTaskInstanceContextList.addAll(taskInstanceContext.getTaskInstanceContext());
             List<AbstractTaskInstanceContext> deduplicatedDependentResultTaskInstanceContextList =
                     dbDependentResultTaskInstanceContextList.stream()
                             .map(DependentResultTaskInstanceContext.class::cast)
                             .collect(Collectors.collectingAndThen(
                                     Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(
-                                                    o -> o.getProjectCode() + Constants.UNDERLINE
+                                            o -> o.getProjectCode() + Constants.UNDERLINE
                                                     + o.getWorkflowDefinitionCode() + Constants.UNDERLINE
                                                     + o.getTaskDefinitionCode() + Constants.UNDERLINE
                                                     + o.getDateCycle()))),
                                     ArrayList::new));
-            taskInstanceContext.setContext(deduplicatedDependentResultTaskInstanceContextList);
+            taskInstanceContext.setTaskInstanceContext(deduplicatedDependentResultTaskInstanceContextList);
             return mybatisMapper.updateTaskInstanceContextByTaskInstanceIdAndContextType(
                     taskInstanceContext.getTaskInstanceId(),
                     taskInstanceContext.getContextType(), JSONUtils.toJsonString(taskInstanceContext.getContext()));

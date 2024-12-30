@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master.engine.executor.plugin.depende
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
-import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -251,10 +251,12 @@ public class DependentTaskTracker {
                     dependentResultTaskInstanceContext.setProjectCode(project.getCode());
                     dependentResultTaskInstanceContext.setWorkflowDefinitionCode(workflowDefinition.getCode());
                     dependentResultTaskInstanceContext.setDependentResult(dependResult);
+                    dependentResultTaskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT_CONTEXT);
                     if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
                         dependentResultTaskInstanceContext.setTaskDefinitionCode(Constants.DEPENDENT_ALL_TASK_CODE);
                         dependentResultTaskInstanceContext.setDateCycle(dependentItem.getDateValue());
-                        taskInstanceContext.setContext(Lists.newArrayList(dependentResultTaskInstanceContext));
+                        taskInstanceContext
+                                .setTaskInstanceContext(Lists.newArrayList(dependentResultTaskInstanceContext));
                         taskInstanceContextDao.upsertTaskInstanceContext(taskInstanceContext);
                         log.info(
                                 "Dependent type all task check finished, DependentResult: {}, DependentDate: {}, ProjectName: {}, WorkflowName: {}, WorkflowCode: {}, DependentCycle: {}, DependentCycleDate: {}",
@@ -263,7 +265,8 @@ public class DependentTaskTracker {
                     } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
                         dependentResultTaskInstanceContext.setTaskDefinitionCode(Constants.DEPENDENT_WORKFLOW_CODE);
                         dependentResultTaskInstanceContext.setDateCycle(dependentItem.getDateValue());
-                        taskInstanceContext.setContext(Lists.newArrayList(dependentResultTaskInstanceContext));
+                        taskInstanceContext
+                                .setTaskInstanceContext(Lists.newArrayList(dependentResultTaskInstanceContext));
                         taskInstanceContextDao.upsertTaskInstanceContext(taskInstanceContext);
                         log.info(
                                 "Dependent type workflow task check finished, DependentResult: {}, DependentDate: {}, ProjectName: {}, WorkflowName: {}, WorkflowCode: {}, DependentCycle: {}, DependentCycleDate: {}",
@@ -273,7 +276,8 @@ public class DependentTaskTracker {
                         TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
                         dependentResultTaskInstanceContext.setTaskDefinitionCode(taskDefinition.getCode());
                         dependentResultTaskInstanceContext.setDateCycle(dependentItem.getDateValue());
-                        taskInstanceContext.setContext(Lists.newArrayList(dependentResultTaskInstanceContext));
+                        taskInstanceContext
+                                .setTaskInstanceContext(Lists.newArrayList(dependentResultTaskInstanceContext));
                         taskInstanceContextDao.upsertTaskInstanceContext(taskInstanceContext);
                         log.info(
                                 "Dependent type task check finished, DependentResult: {}, DependentDate: {}, ProjectName: {}, WorkflowName: {}, WorkflowCode: {}, TaskName: {}, TaskCode: {}, DependentCycle: {}, DependentCycleDate: {}",

@@ -21,6 +21,7 @@ import lombok.Getter;
 
 @Getter
 public enum ContextType {
+
     DEPENDENT_RESULT_CONTEXT, RUNTIME_CONTEXT;
 
     public static ContextType of(String name) {
