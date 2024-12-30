@@ -15,20 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-public enum ContextType {
-    DEPENDENT_RESULT_CONTEXT, RUNTIME_CONTEXT;
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class TaskInstanceDependentDetails extends TaskInstance {
 
-    public static ContextType of(String name) {
-        for (ContextType contextType : values()) {
-            if (contextType.name().equalsIgnoreCase(name)) {
-                return contextType;
-            }
-        }
-        return null;
-    }
+    private DependentResultTaskInstanceContext taskInstanceDependentResult;
+
 }

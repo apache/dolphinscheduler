@@ -48,7 +48,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
-import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResultContext;
+import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -474,16 +474,16 @@ public class WorkflowInstanceServiceTest {
         taskInstance.setTaskType("SHELL");
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
-        List<TaskInstanceDependentResultContext> taskInstanceDependentResultContextList = new ArrayList<>();
+        List<DependentResultTaskInstanceContext> dependentResultTaskInstanceContextList = new ArrayList<>();
         TaskInstanceContext taskInstanceContext = new TaskInstanceContext();
         taskInstanceContext.setTaskInstanceId(0);
-        taskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT);
-        TaskInstanceDependentResultContext taskInstanceDependentResultContext =
-                new TaskInstanceDependentResultContext();
-        taskInstanceDependentResultContext.setProjectCode(projectCode);
-        taskInstanceDependentResultContext.setDependentResult(DependResult.SUCCESS);
-        taskInstanceContext.setTaskDependentResultContext(
-                Lists.asList(taskInstanceDependentResultContext, new TaskInstanceDependentResultContext[0]));
+        taskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT_CONTEXT);
+        DependentResultTaskInstanceContext dependentResultTaskInstanceContext =
+                new DependentResultTaskInstanceContext();
+        dependentResultTaskInstanceContext.setProjectCode(projectCode);
+        dependentResultTaskInstanceContext.setDependentResult(DependResult.SUCCESS);
+        taskInstanceContext.setContext(
+                Lists.asList(dependentResultTaskInstanceContext, new DependentResultTaskInstanceContext[0]));
         List<Integer> taskInstanceIdList = new ArrayList<>();
         taskInstanceIdList.add(0);
         Result res = new Result();
@@ -498,7 +498,7 @@ public class WorkflowInstanceServiceTest {
                         .thenReturn(taskInstanceList);
         when(loggerService.queryLog(loginUser, taskInstance.getId(), 0, 4098)).thenReturn(res);
         when(taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
-                ContextType.DEPENDENT_RESULT))
+                ContextType.DEPENDENT_RESULT_CONTEXT))
                         .thenReturn(Lists.asList(taskInstanceContext, new TaskInstanceContext[0]));
         Map<String, Object> successRes =
                 workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1);

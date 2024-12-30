@@ -17,13 +17,32 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.common.enums.ContextType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+
+import lombok.Data;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TaskInstanceDependentResult extends TaskInstance {
+@NoArgsConstructor
+public class DependentResultTaskInstanceContext extends AbstractTaskInstanceContext {
 
-    private TaskInstanceDependentResultContext taskInstanceDependentResult;
+    private Long projectCode;
+
+    private Long workflowDefinitionCode;
+
+    private Long taskDefinitionCode;
+
+    private String dateCycle;
+
+    private DependResult dependentResult;
+
+    @Override
+    public ContextType getContextType() {
+        return ContextType.of(contextType);
+    }
 
 }

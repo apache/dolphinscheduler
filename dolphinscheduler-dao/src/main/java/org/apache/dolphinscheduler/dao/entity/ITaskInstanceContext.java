@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.dao.entity;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.apache.dolphinscheduler.common.enums.ContextType;
 
-@Getter
-public enum ContextType {
-    DEPENDENT_RESULT_CONTEXT, RUNTIME_CONTEXT;
+import java.util.List;
 
-    public static ContextType of(String name) {
-        for (ContextType contextType : values()) {
-            if (contextType.name().equalsIgnoreCase(name)) {
-                return contextType;
-            }
-        }
-        return null;
-    }
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "contextType")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DependentResultTaskInstanceContext.class, name = "DEPENDENT_RESULT_CONTEXT")
+})
+public interface ITaskInstanceContext {
+    ContextType getContextType();
 }

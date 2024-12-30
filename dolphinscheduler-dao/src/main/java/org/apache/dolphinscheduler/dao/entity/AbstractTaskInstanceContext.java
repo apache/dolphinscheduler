@@ -17,20 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-
-import lombok.Data;
-
-@Data
-public class TaskInstanceDependentResultContext {
-
-    private Long projectCode;
-
-    private Long workflowDefinitionCode;
-
-    private Long taskDefinitionCode;
-
-    private String dateCycle;
-
-    private DependResult dependentResult;
+public abstract class AbstractTaskInstanceContext implements ITaskInstanceContext{
+    protected String contextType;
 }

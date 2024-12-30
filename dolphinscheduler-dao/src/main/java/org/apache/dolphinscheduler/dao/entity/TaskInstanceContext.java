@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -38,22 +40,12 @@ public class TaskInstanceContext {
 
     private Integer taskInstanceId;
 
-    private String context;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<AbstractTaskInstanceContext> context;
 
     private ContextType contextType;
 
     private Date createTime;
 
     private Date updateTime;
-
-    public List<TaskInstanceDependentResultContext> getTaskDependentResultContext() {
-        if (contextType == ContextType.DEPENDENT_RESULT && context != null) {
-            return JSONUtils.toList(context, TaskInstanceDependentResultContext.class);
-        }
-        return null;
-    }
-
-    public void setTaskDependentResultContext(List<TaskInstanceDependentResultContext> taskInstanceDependentResultContexts) {
-        this.context = JSONUtils.toJsonString(taskInstanceDependentResultContexts);
-    }
 }

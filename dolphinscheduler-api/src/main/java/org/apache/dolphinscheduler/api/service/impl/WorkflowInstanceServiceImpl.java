@@ -54,14 +54,15 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
-import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResult;
-import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentResultContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
+import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -469,42 +470,41 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
                         workflowInstance.getTestFlag());
-        List<TaskInstanceDependentResult> taskInstanceDependentResultList =
+        List<TaskInstanceDependentDetails> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
 
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(WORKFLOW_INSTANCE_STATE, workflowInstance.getState().toString());
-        resultMap.put(TASK_LIST, taskInstanceDependentResultList);
+        resultMap.put(TASK_LIST, taskInstanceDependentDetailsList);
         result.put(DATA_LIST, resultMap);
 
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    private List<TaskInstanceDependentResult> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
-        List<TaskInstanceDependentResult> taskInstanceDependentResultList = taskInstanceList.stream()
+    private List<TaskInstanceDependentDetails> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
+        List<TaskInstanceDependentDetails> taskInstanceDependentDetailsList = taskInstanceList.stream()
                 .map(taskInstance -> {
-                    TaskInstanceDependentResult taskInstanceDependentResult = new TaskInstanceDependentResult();
-                    BeanUtils.copyProperties(taskInstance, taskInstanceDependentResult);
-                    return taskInstanceDependentResult;
+                    TaskInstanceDependentDetails taskInstanceDependentDetails = new TaskInstanceDependentDetails();
+                    BeanUtils.copyProperties(taskInstance, taskInstanceDependentDetails);
+                    return taskInstanceDependentDetails;
                 }).collect(Collectors.toList());
         List<Integer> taskInstanceIdList = taskInstanceList.stream()
                 .map(TaskInstance::getId).collect(Collectors.toList());
         List<TaskInstanceContext> taskInstanceContextList =
                 taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
-                        ContextType.DEPENDENT_RESULT);
+                        ContextType.DEPENDENT_RESULT_CONTEXT);
         for (TaskInstanceContext taskInstanceContext : taskInstanceContextList) {
-            for (TaskInstanceDependentResultContext taskInstanceDependentResultContext : taskInstanceContext
-                    .getTaskDependentResultContext()) {
-                for (TaskInstanceDependentResult taskInstanceDependentResult : taskInstanceDependentResultList) {
-                    if (taskInstanceDependentResult.getId().equals(taskInstanceContext.getTaskInstanceId())) {
-                        taskInstanceDependentResult
-                                .setTaskInstanceDependentResult(taskInstanceDependentResultContext);
+            for (AbstractTaskInstanceContext dependentResultTaskInstanceContext : taskInstanceContext.getContext()) {
+                for (TaskInstanceDependentDetails taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
+                    if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
+                        taskInstanceDependentDetails
+                                .setTaskInstanceDependentResult((DependentResultTaskInstanceContext) dependentResultTaskInstanceContext);
                     }
                 }
             }
         }
-        return taskInstanceDependentResultList;
+        return taskInstanceDependentDetailsList;
     }
 
     @Override

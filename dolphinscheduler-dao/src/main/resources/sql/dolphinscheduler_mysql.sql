@@ -933,7 +933,7 @@ CREATE TABLE `t_ds_task_instance_context` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `task_instance_id` int(11) NOT NULL,
     `context` text NOT NULL,
-    `context_type` int(11) NOT NULL COMMENT 'context type, 1: dependent task result',
+    `context_type` varchar(200) NOT NULL COMMENT 'context typ',
     `create_time` datetime NOT NULL,
     `update_time` datetime NOT NULL,
     PRIMARY KEY (`id`),
