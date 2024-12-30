@@ -367,7 +367,7 @@ CREATE TABLE t_ds_task_instance_context (
     id int NOT NULL,
     task_instance_id int NOT NULL,
     context text NOT NULL,
-    context_type varchar(255) NOT NULL,
+    context_type varchar(200) NOT NULL,
     create_time timestamp NOT NULL,
     update_time timestamp NOT NULL,
     PRIMARY KEY (id)
