@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.ContextType;
+import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 
 @Data
 @NoArgsConstructor
