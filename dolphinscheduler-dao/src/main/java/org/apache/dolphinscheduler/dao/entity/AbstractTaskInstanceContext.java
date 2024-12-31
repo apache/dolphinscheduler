@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ContextType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 
 @Data
 @NoArgsConstructor

@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.dao.model;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "contextType", include = JsonTypeInfo.As.EXISTING_PROPERTY, visible = true)
 @JsonSubTypes({

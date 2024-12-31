@@ -59,7 +59,7 @@ public class TaskInstanceContextDaoImpl extends BaseDao<TaskInstanceContext, Tas
     @Override
     public int deleteByTaskInstanceIdAndContextType(Integer taskInstanceId, ContextType contextType) {
         if (taskInstanceId == null) {
-            return 0;
+            throw new IllegalArgumentException("taskInstanceId cannot be null");
         }
         return mybatisMapper.deleteByTaskInstanceIdAndContextType(taskInstanceId, contextType);
     }
