@@ -34,4 +34,4 @@ This change added tests and can be verified as follows:
 ## Pull Request Notice
 [Pull Request Notice](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/join/pull-request.md)
 
-If your pull request contain incompatible change, you should also add it to `docs/docs/en/guide/upgrede/incompatible.md`
+If your pull request contains incompatible change, you should also add it to `docs/docs/en/guide/upgrade/incompatible.md`
