@@ -26,5 +26,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public abstract class AbstractTaskInstanceContext implements ITaskInstanceContext {
 
-    private ContextType contextType;
+    protected ContextType contextType;
 }
