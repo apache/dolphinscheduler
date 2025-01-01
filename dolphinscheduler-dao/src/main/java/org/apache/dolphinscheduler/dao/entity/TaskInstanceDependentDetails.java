@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TaskInstanceDependentDetails extends TaskInstance {
+public class TaskInstanceDependentDetails<T extends ITaskInstanceContext> extends TaskInstance {
 
-    private DependentResultTaskInstanceContext taskInstanceDependentResult;
+    private T taskInstanceDependentResult;
 
 }
