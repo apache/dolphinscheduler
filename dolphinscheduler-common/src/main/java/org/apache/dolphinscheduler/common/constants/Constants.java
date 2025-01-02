@@ -284,11 +284,13 @@ public final class Constants {
     public static final String SUBWORKFLOW_INSTANCE_ID = "subWorkflowInstanceId";
     public static final String WORKFLOW_INSTANCE_STATE = "workflowInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
-    public static final String DEPENDENCE = "dependence";
     public static final String TASK_LIST = "taskList";
     public static final String QUEUE = "queue";
     public static final String QUEUE_NAME = "queueName";
-    public static final String DEPENDENT_SPLIT = ":||";
+
+    /**
+     * dependent task
+     */
     public static final long DEPENDENT_ALL_TASK_CODE = -1;
     public static final long DEPENDENT_WORKFLOW_CODE = 0;
 

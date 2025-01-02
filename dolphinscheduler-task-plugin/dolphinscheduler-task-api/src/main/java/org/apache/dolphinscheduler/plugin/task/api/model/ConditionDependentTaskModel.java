@@ -15,9 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-public enum DependentRelation {
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 
-    AND, OR;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class ConditionDependentTaskModel {
+
+    private List<ConditionDependentItem> dependItemList;
+    private DependentRelation relation;
+
 }

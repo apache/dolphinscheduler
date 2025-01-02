@@ -361,3 +361,15 @@ d//
 delimiter ;
 CALL drop_column_t_ds_task_instance_cache_key;
 DROP PROCEDURE drop_column_t_ds_task_instance_cache_key;
+
+DROP TABLE IF EXISTS `t_ds_task_instance_context`;
+CREATE TABLE `t_ds_task_instance_context` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_instance_id` int(11) NOT NULL,
+  `context` text NOT NULL,
+  `context_type` varchar(255) NOT NULL COMMENT 'context type',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `task_instance_id` (`task_instance_id`,`context_type`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;

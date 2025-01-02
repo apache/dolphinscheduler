@@ -15,9 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-public enum DependentRelation {
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-    AND, OR;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class ConditionDependentItem extends DependentItem {
+
+    private TaskExecutionStatus status;
 }

@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -53,11 +54,14 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -70,6 +74,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
@@ -96,6 +102,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -174,6 +181,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Autowired
     private CuringParamsService curingGlobalParamsService;
 
+    @Autowired
+    private TaskInstanceContextDao taskInstanceContextDao;
+
     /**
      * return top n SUCCESS workflow instance order by running time which started between startTime and endTime
      */
@@ -184,7 +194,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check user access for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+                        WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -233,7 +243,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check user access for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+                        WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -245,7 +255,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                         workflowInstance.getWorkflowDefinitionVersion());
 
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}.", projectCode);
+            log.error("workflow definition does not exist, projectCode: {}.", projectCode);
             putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowInstanceId);
         } else {
             workflowInstance.setLocations(workflowDefinition.getLocations());
@@ -443,7 +453,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check user access for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+                        WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -460,13 +470,45 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
                         workflowInstance.getTestFlag());
+        List<TaskInstanceDependentDetails<ITaskInstanceContext>> taskInstanceDependentDetailsList =
+                setTaskInstanceDependentResult(taskInstanceList);
+
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(WORKFLOW_INSTANCE_STATE, workflowInstance.getState().toString());
-        resultMap.put(TASK_LIST, taskInstanceList);
+        resultMap.put(TASK_LIST, taskInstanceDependentDetailsList);
         result.put(DATA_LIST, resultMap);
 
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private List<TaskInstanceDependentDetails<ITaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
+        List<TaskInstanceDependentDetails<ITaskInstanceContext>> taskInstanceDependentDetailsList =
+                taskInstanceList.stream()
+                        .map(taskInstance -> {
+                            TaskInstanceDependentDetails<ITaskInstanceContext> taskInstanceDependentDetails =
+                                    new TaskInstanceDependentDetails<>();
+                            BeanUtils.copyProperties(taskInstance, taskInstanceDependentDetails);
+                            return taskInstanceDependentDetails;
+                        }).collect(Collectors.toList());
+        List<Integer> taskInstanceIdList = taskInstanceList.stream()
+                .map(TaskInstance::getId).collect(Collectors.toList());
+        List<TaskInstanceContext> taskInstanceContextList =
+                taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
+                        ContextType.DEPENDENT_RESULT_CONTEXT);
+        for (TaskInstanceContext taskInstanceContext : taskInstanceContextList) {
+            for (AbstractTaskInstanceContext dependentResultTaskInstanceContext : taskInstanceContext
+                    .getTaskInstanceContext()) {
+                for (TaskInstanceDependentDetails<ITaskInstanceContext> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
+                    if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
+                        taskInstanceDependentDetails
+                                .setTaskInstanceDependentResult(
+                                        dependentResultTaskInstanceContext);
+                    }
+                }
+            }
+        }
+        return taskInstanceDependentDetailsList;
     }
 
     @Override
@@ -488,7 +530,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 .queryAllSubWorkflowInstance((long) taskInstance.getWorkflowInstanceId(),
                         taskInstance.getTaskCode());
         List<Long> allSubWorkflowInstanceId = relationSubWorkflows.stream()
-                .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
+                .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(Collectors.toList());
         List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubWorkflowInstanceId);
 
         if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
@@ -539,7 +581,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check user access for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+                        WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -693,7 +735,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     "Update task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     projectCode, workflowDefinition.getCode(), insertVersion);
             putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, workflowDefinition);
+            result.put(DATA_LIST, workflowDefinition);
         } else {
             log.info(
                     "Update task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
@@ -750,7 +792,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check user access for project
         Map<String, Object> result =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+                        WORKFLOW_INSTANCE);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -824,7 +866,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (workflowInstance == null) {
             log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
                     workflowInstanceId);
-            putMsg(result, Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
+            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
             return result;
         }
 
@@ -918,7 +960,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (workflowInstance == null) {
             log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
                     workflowInstanceId);
-            putMsg(result, Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
+            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
             return result;
         }
 
