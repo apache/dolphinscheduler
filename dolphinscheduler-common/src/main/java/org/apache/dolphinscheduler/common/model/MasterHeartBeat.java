@@ -24,4 +24,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class MasterHeartBeat extends BaseHeartBeat implements HeartBeat {
 
+    private boolean isCoordinator;
+
 }

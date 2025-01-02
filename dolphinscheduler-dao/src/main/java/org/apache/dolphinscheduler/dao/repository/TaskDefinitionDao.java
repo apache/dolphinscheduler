@@ -56,4 +56,6 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
      * @return task definition
      */
     TaskDefinition queryByCode(long taskCode);
+
+    List<String> queryAllTaskDefinitionWorkerGroups(long projectCode);
 }

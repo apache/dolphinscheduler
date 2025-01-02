@@ -67,7 +67,8 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <!-- We use OFF here to avoid too many exception log in CI   -->
+    <root level="OFF">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="MASTERLOGFILE"/>

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.graph;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
@@ -252,7 +253,7 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     @Override
     public boolean isTaskExecutionRunnableForbidden(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return false;
+        return (taskExecutionRunnable.getTaskDefinition().getFlag() == Flag.NO);
     }
 
     /**

@@ -46,12 +46,16 @@ public class ClusterStateMonitors {
         log.info("ClusterStateMonitors started...");
     }
 
-    void masterRemoved(MasterServerMetadata masterServer) {
-        systemEventBus.publish(MasterFailoverEvent.of(masterServer.getAddress(), new Date()));
+    void masterRemoved(final MasterServerMetadata masterServer) {
+        // We set a delay of 30 seconds for the master failover event
+        // If the master can reconnect to registry within 30 seconds, the master will skip failover.
+        systemEventBus.publish(MasterFailoverEvent.of(masterServer, new Date(), 30_000));
     }
 
-    void workerRemoved(WorkerServerMetadata workerServer) {
-        systemEventBus.publish(WorkerFailoverEvent.of(workerServer.getAddress(), new Date()));
+    void workerRemoved(final WorkerServerMetadata workerServer) {
+        // We set a delay of 30 seconds for the worker failover event
+        // If the worker can reconnect to registry within 30 seconds, the worker will skip failover.
+        systemEventBus.publish(WorkerFailoverEvent.of(workerServer, new Date(), 30_000));
     }
 
 }

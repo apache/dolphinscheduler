@@ -46,10 +46,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance queryByInstanceIdAndCode(@Param("workflowInstanceId") int workflowInstanceId,
                                           @Param("taskCode") Long taskCode);
 
-    TaskInstance queryByCacheKey(@Param("cacheKey") String cacheKey);
-
-    Boolean clearCacheByCacheKey(@Param("cacheKey") String cacheKey);
-
     List<TaskInstance> queryByWorkflowInstanceIdsAndTaskCodes(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds,
                                                               @Param("taskCodes") List<Long> taskCodes);
 

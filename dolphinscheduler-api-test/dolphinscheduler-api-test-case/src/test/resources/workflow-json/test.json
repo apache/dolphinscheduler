@@ -53,7 +53,6 @@
     "taskParamList" : [ ],
     "taskParamMap" : null,
     "flag" : "YES",
-    "isCache" : "NO",
     "taskPriority" : "MEDIUM",
     "userName" : null,
     "projectName" : null,

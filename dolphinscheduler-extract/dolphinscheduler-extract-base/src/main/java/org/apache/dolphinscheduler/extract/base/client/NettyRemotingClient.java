@@ -19,10 +19,11 @@ package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
+import org.apache.dolphinscheduler.extract.base.RpcMethodRetryStrategy;
 import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
-import org.apache.dolphinscheduler.extract.base.exception.RemotingException;
-import org.apache.dolphinscheduler.extract.base.exception.RemotingTimeoutException;
+import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
+import org.apache.dolphinscheduler.extract.base.exception.RemoteTimeoutException;
 import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
 import org.apache.dolphinscheduler.extract.base.metrics.ClientSyncDurationMetrics;
 import org.apache.dolphinscheduler.extract.base.metrics.ClientSyncExceptionMetrics;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
@@ -110,59 +112,79 @@ public class NettyRemotingClient implements AutoCloseable {
         isStarted.compareAndSet(false, true);
     }
 
-    public IRpcResponse sendSync(SyncRequestDto syncRequestDto) throws RemotingException {
-        long start = System.currentTimeMillis();
-
+    public IRpcResponse sendSync(final SyncRequestDto syncRequestDto) throws RemoteException {
         final Host host = syncRequestDto.getServerHost();
         final Transporter transporter = syncRequestDto.getTransporter();
-        final long timeoutMillis = syncRequestDto.getTimeoutMillis() < 0 ? clientConfig.getConnectTimeoutMillis()
+        final long timeoutMillis = syncRequestDto.getTimeoutMillis() < 0 ? clientConfig.getDefaultRpcTimeoutMillis()
                 : syncRequestDto.getTimeoutMillis();
-        final long opaque = transporter.getHeader().getOpaque();
 
-        try {
-            final Channel channel = getOrCreateChannel(host);
-            if (channel == null) {
-                throw new RemotingException(String.format("connect to : %s fail", host));
-            }
-            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis);
-            channel.writeAndFlush(transporter).addListener(future -> {
-                if (future.isSuccess()) {
-                    responseFuture.setSendOk(true);
-                    return;
-                } else {
-                    responseFuture.setSendOk(false);
+        final RpcMethodRetryStrategy retryStrategy = syncRequestDto.getRetryStrategy();
+
+        int maxRetryTimes = retryStrategy.maxRetryTimes();
+        int currentExecuteTimes = 1;
+
+        while (true) {
+            final long start = System.currentTimeMillis();
+            try {
+                return doSendSync(transporter, host, timeoutMillis);
+            } catch (Exception ex) {
+                ClientSyncExceptionMetrics clientSyncExceptionMetrics =
+                        ClientSyncExceptionMetrics.of(syncRequestDto, ex);
+                RpcMetrics.recordClientSyncRequestException(clientSyncExceptionMetrics);
+
+                if (currentExecuteTimes < maxRetryTimes
+                        && Arrays.stream(retryStrategy.retryFor()).anyMatch(e -> e.isInstance(ex))) {
+                    currentExecuteTimes++;
+                    if (retryStrategy.retryInterval() > 0) {
+                        ThreadUtils.sleep(retryStrategy.retryInterval());
+                    }
+                    continue;
                 }
-                responseFuture.setCause(future.cause());
-                responseFuture.putResponse(null);
-                log.error("Send Sync request {} to host {} failed", transporter, host, responseFuture.getCause());
-            });
-            /*
-             * sync wait for result
-             */
-            IRpcResponse iRpcResponse = responseFuture.waitResponse();
-            if (iRpcResponse == null) {
-                if (responseFuture.isSendOK()) {
-                    throw new RemotingTimeoutException(host.toString(), timeoutMillis, responseFuture.getCause());
+
+                if (ex instanceof RemoteException) {
+                    throw (RemoteException) ex;
                 } else {
-                    throw new RemotingException(host.toString(), responseFuture.getCause());
+                    throw new RemoteException("Call method to " + host + " failed", ex);
                 }
+            } finally {
+                ClientSyncDurationMetrics clientSyncDurationMetrics = ClientSyncDurationMetrics
+                        .of(syncRequestDto)
+                        .withMilliseconds(System.currentTimeMillis() - start);
+                RpcMetrics.recordClientSyncRequestDuration(clientSyncDurationMetrics);
             }
-            return iRpcResponse;
-        } catch (Exception ex) {
-            ClientSyncExceptionMetrics clientSyncExceptionMetrics = ClientSyncExceptionMetrics
-                    .of(syncRequestDto)
-                    .withThrowable(ex);
-            RpcMetrics.recordClientSyncRequestException(clientSyncExceptionMetrics);
-            if (ex instanceof RemotingException) {
-                throw (RemotingException) ex;
+        }
+    }
+
+    private IRpcResponse doSendSync(final Transporter transporter,
+                                    final Host serverHost,
+                                    long timeoutMills) throws RemoteException, InterruptedException {
+        final Channel channel = getOrCreateChannel(serverHost);
+        if (channel == null) {
+            throw new RemoteException(String.format("connect to : %s fail", serverHost));
+        }
+        final ResponseFuture responseFuture = new ResponseFuture(transporter.getHeader().getOpaque(), timeoutMills);
+        channel.writeAndFlush(transporter).addListener(future -> {
+            if (future.isSuccess()) {
+                responseFuture.setSendOk(true);
+                return;
             } else {
-                throw new RemotingException(ex);
+                responseFuture.setSendOk(false);
             }
-        } finally {
-            ClientSyncDurationMetrics clientSyncDurationMetrics = ClientSyncDurationMetrics
-                    .of(syncRequestDto)
-                    .withMilliseconds(System.currentTimeMillis() - start);
-            RpcMetrics.recordClientSyncRequestDuration(clientSyncDurationMetrics);
+            responseFuture.setCause(future.cause());
+            responseFuture.putResponse(null);
+            log.error("Send Sync request {} to host {} failed", transporter, serverHost, responseFuture.getCause());
+        });
+        /*
+         * sync wait for result
+         */
+        final IRpcResponse iRpcResponse = responseFuture.waitResponse();
+        if (iRpcResponse != null) {
+            return iRpcResponse;
+        }
+        if (responseFuture.isSendOK()) {
+            throw new RemoteTimeoutException(serverHost.toString(), timeoutMills, responseFuture.getCause());
+        } else {
+            throw new RemoteException(serverHost.toString(), responseFuture.getCause());
         }
     }
 

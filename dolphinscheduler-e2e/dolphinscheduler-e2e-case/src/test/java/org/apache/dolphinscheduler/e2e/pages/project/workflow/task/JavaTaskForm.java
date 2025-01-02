@@ -17,27 +17,124 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
-import org.openqa.selenium.WebDriver;
+import java.util.List;
 
+import lombok.Getter;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+@Getter
 public class JavaTaskForm extends TaskNodeForm {
 
-    private CodeEditor codeEditor;
-
     private WebDriver driver;
+
+    @FindBys({
+            @FindBy(className = "resource-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectResource;
+
+    @FindBys({
+
+            @FindBy(className = "n-tree-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectMainPackage;
+
+    @FindBys({
+            @FindBy(xpath = "//div[contains(@class,'n-form-item') and .//span[text()='Run Type']]"),
+            @FindBy(className = "n-select"),
+            @FindBy(className = "n-base-selection")
+
+    })
+    private WebElement selectRunType;
 
     public JavaTaskForm(WorkflowForm parent) {
         super(parent);
 
-        this.codeEditor = new CodeEditor(parent.driver());
-
         this.driver = parent.driver();
+
+        PageFactory.initElements(driver, this);
     }
 
-    public JavaTaskForm script(String script) {
-        codeEditor.content(script);
+    public JavaTaskForm selectJavaResource(String resourceName) {
+        WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver());
+        wait.until(ExpectedConditions.elementToBeClickable(selectResource));
+
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectResource);
+        final By optionsLocator = By.className("n-tree-node-content__text");
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+        wait.until(s -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        });
+        parent().driver()
+                .findElements(optionsLocator)
+                .stream()
+                .filter(it -> it.getText().startsWith(resourceName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such resource: " + resourceName))
+                .click();
+        driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         return this;
     }
+
+    public JavaTaskForm selectRunType(String runType) {
+        WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver());
+
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(selectRunType));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true); arguments[0].click();",
+                dropdown);
+
+        By dropdownMenuLocator = By.xpath("//div[contains(@class, 'n-select-menu')]");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(dropdownMenuLocator));
+
+        String optionXPath = String.format(
+                "//div[contains(@class, 'n-select-menu')]//div[contains(@class, 'n-base-select-option') and normalize-space(text())='%s']",
+                runType);
+        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(optionXPath)));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true); arguments[0].click();", option);
+
+        return this;
+    }
+
+    public JavaTaskForm selectMainPackage(String packageName) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", selectMainPackage);
+
+        final By optionsLocator = By.className("n-tree-node-content__text");
+
+        WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver());
+        wait.until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> elements = driver.findElements(optionsLocator);
+
+        WebElement targetElement = elements.stream()
+                .filter(it -> it.getText().trim().equals(packageName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such package: " + packageName));
+
+        targetElement.click();
+
+        driver.switchTo().activeElement().sendKeys(Keys.ESCAPE);
+
+        return this;
+    }
+
 }

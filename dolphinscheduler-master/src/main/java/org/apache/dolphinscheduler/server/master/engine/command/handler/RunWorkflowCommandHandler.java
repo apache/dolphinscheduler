@@ -98,6 +98,7 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
                             .builder()
                             .workflowExecutionGraph(workflowExecutionGraph)
                             .workflowDefinition(workflowExecuteContextBuilder.getWorkflowDefinition())
+                            .project(workflowExecuteContextBuilder.getProject())
                             .workflowInstance(workflowExecuteContextBuilder.getWorkflowInstance())
                             .taskDefinition(workflowGraph.getTaskNodeByName(task))
                             .workflowEventBus(workflowExecuteContextBuilder.getWorkflowEventBus())

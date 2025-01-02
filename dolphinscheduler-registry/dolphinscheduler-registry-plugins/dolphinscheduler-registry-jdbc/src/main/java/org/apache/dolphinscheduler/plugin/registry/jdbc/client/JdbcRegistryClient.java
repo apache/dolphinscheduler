@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.client;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.ConnectionStateListener;
@@ -41,14 +40,11 @@ public class JdbcRegistryClient implements IJdbcRegistryClient {
 
     private static final String DEFAULT_CLIENT_NAME = NetUtils.getHost() + "_" + OSUtils.getProcessID();
 
-    private final JdbcRegistryProperties jdbcRegistryProperties;
-
     private final JdbcRegistryClientIdentify jdbcRegistryClientIdentify;
 
     private final IJdbcRegistryServer jdbcRegistryServer;
 
-    public JdbcRegistryClient(JdbcRegistryProperties jdbcRegistryProperties, IJdbcRegistryServer jdbcRegistryServer) {
-        this.jdbcRegistryProperties = jdbcRegistryProperties;
+    public JdbcRegistryClient(IJdbcRegistryServer jdbcRegistryServer) {
         this.jdbcRegistryServer = jdbcRegistryServer;
         this.jdbcRegistryClientIdentify =
                 new JdbcRegistryClientIdentify(CodeGenerateUtils.genCode(), DEFAULT_CLIENT_NAME);

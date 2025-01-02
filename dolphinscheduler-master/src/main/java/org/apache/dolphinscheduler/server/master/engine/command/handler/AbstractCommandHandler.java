@@ -21,10 +21,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
@@ -64,12 +66,16 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
     @Autowired
     protected List<IWorkflowLifecycleListener> workflowLifecycleListeners;
 
+    @Autowired
+    protected ProjectDao projectDao;
+
     @Override
     public WorkflowExecutionRunnable handleCommand(final Command command) {
         final WorkflowExecuteContextBuilder workflowExecuteContextBuilder = WorkflowExecuteContext.builder()
                 .withCommand(command);
 
         assembleWorkflowDefinition(workflowExecuteContextBuilder);
+        assembleProject(workflowExecuteContextBuilder);
         assembleWorkflowGraph(workflowExecuteContextBuilder);
         assembleWorkflowInstance(workflowExecuteContextBuilder);
         assembleWorkflowInstanceLifecycleListeners(workflowExecuteContextBuilder);
@@ -144,6 +150,14 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         return taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
                 workflowInstance.getId(),
                 workflowInstance.getTestFlag());
+    }
+
+    protected void assembleProject(
+                                   final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
+        final Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
+        checkArgument(project != null, "Cannot find the project code: " + workflowDefinition.getProjectCode());
+        workflowExecuteContextBuilder.setProject(project);
     }
 
 }

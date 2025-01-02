@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.registry.api;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
 
@@ -109,4 +110,7 @@ public interface Registry extends Closeable {
      * Release the lock of the prefix {@param key}
      */
     boolean releaseLock(String key);
+
+    @Override
+    void close() throws IOException;
 }

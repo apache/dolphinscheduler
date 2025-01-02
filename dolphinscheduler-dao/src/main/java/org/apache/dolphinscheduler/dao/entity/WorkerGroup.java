@@ -52,6 +52,4 @@ public class WorkerGroup {
     @TableField(exist = false)
     private boolean systemDefault;
 
-    private String otherParamsJson;
-
 }

@@ -72,44 +72,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TimePlaceholderUtils {
 
     /**
-     * Prefix of the position to be replaced
-     */
-    public static final String PLACEHOLDER_PREFIX = "$[";
-
-    /**
-     * The suffix of the position to be replaced
-     */
-    public static final String PLACEHOLDER_SUFFIX = "]";
-
-    /**
-     * Replaces all placeholders of format {@code ${name}} with the value returned
-     * from the supplied {@link PropertyPlaceholderHelper.PlaceholderResolver}.
-     *
-     * @param value                          the value containing the placeholders to be replaced
-     * @param date                           custom date
-     * @param ignoreUnresolvablePlaceholders ignore unresolvable placeholders
-     * @return the supplied value with placeholders replaced inline
-     */
-    public static String replacePlaceholders(String value, Date date, boolean ignoreUnresolvablePlaceholders) {
-        PropertyPlaceholderHelper strictHelper = getPropertyPlaceholderHelper(false);
-        PropertyPlaceholderHelper nonStrictHelper = getPropertyPlaceholderHelper(true);
-
-        PropertyPlaceholderHelper helper = (ignoreUnresolvablePlaceholders ? nonStrictHelper : strictHelper);
-        return helper.replacePlaceholders(value, new TimePlaceholderResolver(value, date));
-    }
-
-    /**
-     * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
-     *
-     * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-     *                                       be ignored ({@code true}) or cause an exception ({@code false})
-     */
-    private static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
-        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null,
-                ignoreUnresolvablePlaceholders);
-    }
-
-    /**
      * calculate expression's value
      *
      * @param expression expression
@@ -303,79 +265,35 @@ public class TimePlaceholderUtils {
     }
 
     /**
-     * Placeholder replacement resolver
-     */
-    private static class TimePlaceholderResolver
-            implements
-                PropertyPlaceholderHelper.PlaceholderResolver {
-
-        private final String value;
-
-        private final Date date;
-
-        public TimePlaceholderResolver(String value, Date date) {
-            this.value = value;
-            this.date = date;
-        }
-
-        @Override
-        public String resolvePlaceholder(String placeholderName) {
-            try {
-                return calculateTime(placeholderName, date);
-            } catch (Exception ex) {
-                log.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
-                return null;
-            }
-        }
-    }
-
-    /**
-     * return the formatted date according to the corresponding date format
+     * Format time expression with given date, the date cannot be null.
+     * <p> If the expression is not a time expression, return the original expression.
      *
-     * @param expression date expression
-     * @param date       date
-     * @return reformat date
      */
-    public static String getPlaceHolderTime(String expression, Date date) {
-        if (StringUtils.isBlank(expression)) {
-            throw new IllegalArgumentException("expression is null");
-        }
-        if (null == date) {
-            throw new IllegalArgumentException("date is null");
-        }
-        return calculateTime(expression, date);
-    }
-
-    /**
-     * calculate time
-     *
-     * @param date date
-     * @return calculate time
-     */
-    private static String calculateTime(String expression, Date date) {
+    public static String formatTimeExpression(final String timeExpression, final Date date,
+                                              final boolean ignoreInvalidExpression) {
         // After N years: $[add_months(yyyyMMdd,12*N)], the first N months: $[add_months(yyyyMMdd,-N)], etc
         if (date == null) {
-            throw new IllegalArgumentException("Cannot parse the expression: " + expression + ", date is null");
+            throw new IllegalArgumentException("Cannot parse the expression: " + timeExpression + ", date is null");
+        }
+        if (StringUtils.isEmpty(timeExpression)) {
+            if (ignoreInvalidExpression) {
+                return timeExpression;
+            }
+            throw new IllegalArgumentException("Cannot format the date" + date + " with null timeExpression");
         }
         try {
-            if (expression.startsWith(TIMESTAMP)) {
-                String timeExpression = expression.substring(TIMESTAMP.length() + 1, expression.length() - 1);
-
-                Map.Entry<Date, String> entry = calcTimeExpression(timeExpression, date);
-
-                String dateStr = DateUtils.format(entry.getKey(), entry.getValue());
-
-                Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
-
-                return String.valueOf(timestamp.getTime() / 1000);
+            if (timeExpression.startsWith(TIMESTAMP)) {
+                return calculateTimeStamp(timeExpression, date);
             }
-            if (expression.startsWith(YEAR_WEEK)) {
-                return calculateYearWeek(expression, date);
+            if (timeExpression.startsWith(YEAR_WEEK)) {
+                return calculateYearWeek(timeExpression, date);
             }
-            Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
-            return DateUtils.format(entry.getKey(), entry.getValue());
+            return calcTimeExpression(timeExpression, date);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Unsupported placeholder expression: " + expression, e);
+            if (ignoreInvalidExpression) {
+                return timeExpression;
+            }
+            throw new IllegalArgumentException("Unsupported placeholder expression: " + timeExpression, e);
         }
     }
 
@@ -385,7 +303,7 @@ public class TimePlaceholderUtils {
      * @param date       date
      * @return week of year
      */
-    public static String calculateYearWeek(String expression, Date date) {
+    private static String calculateYearWeek(final String expression, final Date date) {
 
         String dataFormat = expression.substring(YEAR_WEEK.length() + 1, expression.length() - 1);
 
@@ -465,6 +383,19 @@ public class TimePlaceholderUtils {
         return weekYearStr;
     }
 
+    private static String calculateTimeStamp(final String expression, final Date date) {
+        final String timeExpression = expression.substring(TIMESTAMP.length() + 1, expression.length() - 1);
+        final String calculatedTimeExpression = calcTimeExpression(timeExpression, date);
+        if (StringUtils.equals(expression, calculatedTimeExpression)) {
+            return expression;
+        }
+        final Date timestamp = DateUtils.parse(calculatedTimeExpression, PARAMETER_FORMAT_TIME);
+        if (timestamp == null) {
+            throw new IllegalArgumentException("Cannot parse the expression: " + expression + " with date: " + date);
+        }
+        return String.valueOf(timestamp.getTime() / 1000);
+    }
+
     /**
      * calculate time expresstion
      *
@@ -472,8 +403,8 @@ public class TimePlaceholderUtils {
      * @param date       date
      * @return map with date, date format
      */
-    public static Map.Entry<Date, String> calcTimeExpression(String expression, Date date) {
-        Map.Entry<Date, String> resultEntry;
+    private static String calcTimeExpression(final String expression, final Date date) {
+        final Map.Entry<Date, String> resultEntry;
 
         if (expression.startsWith(ADD_MONTHS)) {
             resultEntry = calcMonths(expression, date);
@@ -500,8 +431,9 @@ public class TimePlaceholderUtils {
         } else {
             resultEntry = calcMinutes(expression, date);
         }
-
-        return resultEntry;
+        final Date finalDate = resultEntry.getKey();
+        final String finalFormat = resultEntry.getValue();
+        return DateUtils.format(finalDate, finalFormat);
     }
 
     /**

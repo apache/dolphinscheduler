@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
 public class ClusterManager {
 
     @Getter
-    private final MasterClusters masterClusters;
+    private MasterClusters masterClusters;
 
     @Getter
-    private final WorkerClusters workerClusters;
+    private WorkerClusters workerClusters;
 
     @Autowired
     private WorkerGroupChangeNotifier workerGroupChangeNotifier;
@@ -51,6 +51,7 @@ public class ClusterManager {
         this.registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
         this.registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
         this.workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
+        this.workerGroupChangeNotifier.start();
         log.info("ClusterManager started...");
     }
 

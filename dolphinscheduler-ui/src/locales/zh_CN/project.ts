@@ -230,7 +230,6 @@ export default {
     workflow_relation_no_data_result_desc:
       '目前没有任何工作流，请先创建工作流，再访问该页面',
     wait_to_run: '等待执行',
-    want_to_set_timing: '现在想去配置该工作流定时?',
     confirm_to_online: '是否确定上线该工作流?',
     confirm_to_offline: '是否确定下线该工作流?',
     time_to_online: '是否确定上线该定时?',
@@ -314,7 +313,6 @@ export default {
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
     please_choose: '请选择',
-    remove_task_cache: '清除缓存',
     delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务定义'
   },
   dag: {
@@ -361,7 +359,6 @@ export default {
     online: '已上线'
   },
   node: {
-    is_cache: '缓存执行',
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
@@ -457,8 +454,9 @@ export default {
     expression_value_tips: '表达式值集(选填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
-    main_class: '主函数的Class',
-    main_class_tips: '请填写主函数的Class',
+    main_class: '主类名',
+    main_class_tips: '请填写完整主类名(可选)',
+    main_class_invalid: '主类名不合法',
     main_package: '主程序包',
     main_package_tips: '请选择主程序包',
     deploy_mode: '部署方式',
@@ -864,9 +862,6 @@ export default {
     filter_condition: '过滤条件',
     params_value: '取值参数',
     separator: '分隔符',
-    dynamic_name_tips: 'name(必填)',
-    dynamic_value_tips: 'params or value(必填)',
-    dynamic_separator_tips: '分隔符(必填)',
     child_node_definition: '子节点定义',
     child_node_instance: '子节点实例',
     yarn_queue: 'Yarn队列',
@@ -907,7 +902,6 @@ export default {
     cloud: '云',
     logic: '逻辑节点',
     di: '数据集成',
-    dq: '数据质量',
     ml: '机器学习',
     other: '其他'
   },

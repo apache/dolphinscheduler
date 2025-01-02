@@ -273,6 +273,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         entity.setDirectory(resourceMetaData.isDirectory());
         entity.setType(resourceMetaData.getResourceType());
         entity.setSize(blob.getSize());
+        entity.setRelativePath(resourceMetaData.getResourceRelativePath());
         entity.setCreateTime(Date.from(blob.getCreateTimeOffsetDateTime().toInstant()));
         entity.setUpdateTime(Date.from(blob.getUpdateTimeOffsetDateTime().toInstant()));
         return entity;

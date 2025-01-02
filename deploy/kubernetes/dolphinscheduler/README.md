@@ -131,7 +131,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
 | conf.common."aws.s3.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3, This configuration is required |
 | conf.common."conda.path" | string | `"/opt/anaconda3/etc/profile.d/conda.sh"` | set path of conda.sh |
-| conf.common."data-quality.jar.dir" | string | `nil` | data quality option |
 | conf.common."data.basedir.path" | string | `"/tmp/dolphinscheduler"` | user data local directory path, please make sure the directory exists and have read write permissions |
 | conf.common."datasource.encryption.enable" | bool | `false` | datasource encryption enable |
 | conf.common."datasource.encryption.salt" | string | `"!@#$%^&*"` | datasource encryption salt |

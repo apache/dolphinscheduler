@@ -23,9 +23,11 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTrigge
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
+import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutor;
+import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutorRepository;
+import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
+
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +39,7 @@ import org.springframework.stereotype.Component;
 public class StreamingTaskInstanceOperatorImpl implements IStreamingTaskInstanceOperator {
 
     @Autowired
-    private WorkerTaskExecutorThreadPool workerManager;
+    private PhysicalTaskExecutorRepository physicalTaskExecutorRepository;
 
     @Override
     public TaskInstanceTriggerSavepointResponse triggerSavepoint(TaskInstanceTriggerSavepointRequest taskInstanceTriggerSavepointRequest) {
@@ -46,12 +48,13 @@ public class StreamingTaskInstanceOperatorImpl implements IStreamingTaskInstance
         try {
             int taskInstanceId = taskInstanceTriggerSavepointRequest.getTaskInstanceId();
             LogUtils.setTaskInstanceIdMDC(taskInstanceId);
-            WorkerTaskExecutor workerTaskExecutor = WorkerTaskExecutorHolder.get(taskInstanceId);
-            if (workerTaskExecutor == null) {
+            final Optional<ITaskExecutor> taskExecutorOptional = physicalTaskExecutorRepository.get(taskInstanceId);
+            if (!taskExecutorOptional.isPresent()) {
                 log.error("Cannot find WorkerTaskExecutor for taskInstance: {}", taskInstanceId);
                 return TaskInstanceTriggerSavepointResponse.fail("Cannot find TaskExecutionContext");
             }
-            AbstractTask task = workerTaskExecutor.getTask();
+            final PhysicalTaskExecutor taskExecutor = (PhysicalTaskExecutor) taskExecutorOptional.get();
+            AbstractTask task = taskExecutor.getPhysicalTask();
             if (task == null) {
                 log.error("Cannot find StreamTask for taskInstance:{}", taskInstanceId);
                 return TaskInstanceTriggerSavepointResponse.fail("Cannot find StreamTask");

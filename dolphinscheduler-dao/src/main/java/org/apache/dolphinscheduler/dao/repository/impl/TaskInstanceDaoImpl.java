@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -153,25 +152,6 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
         WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
         return mybatisMapper.findValidTaskListByWorkflowInstanceId(workflowInstanceId, Flag.NO,
                 workflowInstance.getTestFlag());
-    }
-
-    @Override
-    public TaskInstance queryByCacheKey(String cacheKey) {
-        if (StringUtils.isEmpty(cacheKey)) {
-            return null;
-        }
-        return mybatisMapper.queryByCacheKey(cacheKey);
-    }
-
-    @Override
-    public Boolean clearCacheByCacheKey(String cacheKey) {
-        try {
-            mybatisMapper.clearCacheByCacheKey(cacheKey);
-            return true;
-        } catch (Exception e) {
-            log.error("clear cache by cacheKey failed", e);
-            return false;
-        }
     }
 
     @Override

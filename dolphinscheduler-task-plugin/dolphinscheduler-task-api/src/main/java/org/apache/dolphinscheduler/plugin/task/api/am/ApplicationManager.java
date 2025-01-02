@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.am;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 
-public interface ApplicationManager {
+public interface ApplicationManager<T extends ApplicationManagerContext> {
 
     /**
      * kill application by application manager context
@@ -27,7 +27,7 @@ public interface ApplicationManager {
      * @param applicationManagerContext
      * @return
      */
-    boolean killApplication(ApplicationManagerContext applicationManagerContext);
+    boolean killApplication(T applicationManagerContext);
 
     /**
      * get resource manager type

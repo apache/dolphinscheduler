@@ -17,20 +17,24 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@ToString(callSuper = true)
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public class MasterServerMetadata extends BaseServerMetadata implements Comparable<MasterServerMetadata> {
 
-    public static MasterServerMetadata parseFromHeartBeat(MasterHeartBeat masterHeartBeat) {
+    public static MasterServerMetadata parseFromHeartBeat(final MasterHeartBeat masterHeartBeat) {
         return MasterServerMetadata.builder()
-                .address(masterHeartBeat.getHost() + ":" + masterHeartBeat.getPort())
+                .serverStartupTime(masterHeartBeat.getStartupTime())
+                .address(masterHeartBeat.getHost() + Constants.COLON + masterHeartBeat.getPort())
                 .cpuUsage(masterHeartBeat.getCpuUsage())
                 .memoryUsage(masterHeartBeat.getMemoryUsage())
                 .serverStatus(masterHeartBeat.getServerStatus())
@@ -39,7 +43,7 @@ public class MasterServerMetadata extends BaseServerMetadata implements Comparab
 
     // Use the master address to sort the master server
     @Override
-    public int compareTo(MasterServerMetadata o) {
+    public int compareTo(final MasterServerMetadata o) {
         return this.getAddress().compareTo(o.getAddress());
     }
 

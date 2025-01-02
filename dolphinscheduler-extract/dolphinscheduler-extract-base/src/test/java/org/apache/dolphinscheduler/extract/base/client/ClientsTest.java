@@ -19,16 +19,22 @@ package org.apache.dolphinscheduler.extract.base.client;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcMethodRetryStrategy;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
+import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
+
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,6 +68,17 @@ public class ClientsTest {
     }
 
     @Test
+    public void testPingWithRetry() {
+        IService proxyClient = Clients
+                .withService(IService.class)
+                .withHost("localhost:1");
+        Awaitility.await()
+                .atMost(Duration.ofMinutes(1))
+                .atLeast(Duration.ofSeconds(3))
+                .untilAsserted(() -> assertThrows(RemoteException.class, () -> proxyClient.ping("ping")));
+    }
+
+    @Test
     public void testPing() {
         IService proxyClient = Clients
                 .withService(IService.class)
@@ -69,7 +86,7 @@ public class ClientsTest {
         assertEquals("pong", proxyClient.ping("ping"));
 
         MethodInvocationException methodInvocationException =
-                Assertions.assertThrows(MethodInvocationException.class, () -> proxyClient.ping(null));
+                assertThrows(MethodInvocationException.class, () -> proxyClient.ping(null));
         assertEquals("ping: null is illegal", methodInvocationException.getMessage());
     }
 
@@ -89,7 +106,7 @@ public class ClientsTest {
     @RpcService
     public interface IService {
 
-        @RpcMethod
+        @RpcMethod(retry = @RpcMethodRetryStrategy(maxRetryTimes = 4, retryInterval = 1_000))
         String ping(String ping);
 
         @RpcMethod

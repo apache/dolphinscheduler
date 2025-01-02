@@ -57,7 +57,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         result.setPid(originTaskInstance.getPid());
         result.setAppLink(originTaskInstance.getAppLink());
         result.setFlag(originTaskInstance.getFlag());
-        result.setIsCache(originTaskInstance.getIsCache());
         result.setMaxRetryTimes(originTaskInstance.getMaxRetryTimes());
         result.setRetryInterval(originTaskInstance.getRetryInterval());
         result.setTaskInstancePriority(originTaskInstance.getTaskInstancePriority());
@@ -83,7 +82,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setTaskType(taskDefinition.getTaskType());
         taskInstance.setTaskCode(taskDefinition.getCode());
         taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
-        taskInstance.setIsCache(taskDefinition.getIsCache());
         taskInstance.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskInstance.setRetryInterval(taskDefinition.getFailRetryInterval());
         taskInstance.setTaskInstancePriority(taskDefinition.getTaskPriority());

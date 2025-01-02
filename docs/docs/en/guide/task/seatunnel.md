@@ -26,17 +26,16 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 - SEATUNNEL_ENGINE
 - Deployment mode: specify the deployment mode, `cluster` `local`
 
-          > Click [here](https://seatunnel.apache.org/docs/2.3.3/command/usage) for more information on the usage of 
-
-`Apache SeaTunnel command`
+  > Click [here](https://seatunnel.apache.org/docs/command/usage) for more information on the usage of Apache SeaTunnel command`
 
 - Custom Configuration: Supports custom configuration or select configuration file from Resource Center
 
-  > Click [here](https://seatunnel.apache.org/docs/2.3.3/concept/config) for more information about `Apache
-  >
-  >> SeaTunnel config` file
+  > Click [here](https://seatunnel.apache.org/docs/concept/config) for more information about `Apache SeaTunnel config` file
 
 - Script: Customize configuration information on the task node, including four parts: `env` `source` `transform` `sink`
+- Custom Parameters/Global Parameters: When custom parameters/global parameters are defined, the parameters will be passed to the SeaTunnel task, and the parameter value can be dynamically replaced during task execution by referencing the parameter with `${}` in the SeaTunnel task.
+
+  > Click [here](https://seatunnel.apache.org/docs/concept/config/#config-variable-substitution) for more information on `Apache SeaTunnel variable substitution`
 
 ## Task Example
 

@@ -31,11 +31,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -45,7 +42,6 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
@@ -56,24 +52,12 @@ import com.google.common.collect.Lists;
  */
 public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
-    @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
-    private WorkflowOperator workflowOperator;
-
-    @Autowired
-    private IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private Repository repository;
-
     @Test
     @DisplayName("Test start a workflow with one fake task(A) success")
     public void testStartWorkflow_with_oneSuccessTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -99,7 +83,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -107,7 +91,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneSuccessTaskDryRun() {
         final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -134,7 +118,39 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one fake task(A) using task group")
+    public void testStartWorkflow_with_oneSuccessTaskUsingTaskGroup() {
+        final String yaml = "/it/start/workflow_with_one_fake_task_using_task_group.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .dryRun(Flag.YES)
+                .build();
+
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(2))
+                .atLeast(Duration.ofSeconds(20))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(4)
+                            .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState())
+                                    && taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+                });
+
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -142,7 +158,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
@@ -189,7 +205,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -197,7 +213,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_subWorkflowTask_dryRunSuccess() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
@@ -233,8 +249,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -242,7 +257,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_subWorkflowTask_failed() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition parentWorkflow = context.getWorkflows().get(0);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
@@ -286,7 +301,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -294,7 +309,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_usingWorkflowParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -322,7 +337,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
                 });
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -330,7 +345,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_usingCommandParam() {
         final String yaml = "/it/start/workflow_with_global_param.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
@@ -366,8 +381,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -375,7 +389,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneFailedTask() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -397,8 +411,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -406,7 +419,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_oneFailedTaskWithRetry() {
         final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -450,8 +463,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     assertThat(latestTaskInstance.getSubmitTime())
                             .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -459,7 +471,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoSerialSuccessTask() {
         String yaml = "/it/start/workflow_with_two_serial_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -489,8 +501,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -498,7 +509,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoSerialFailedTask() {
         final String yaml = "/it/start/workflow_with_two_serial_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -520,8 +531,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -529,7 +539,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -558,8 +568,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -567,7 +576,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_twoParallelFailedTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -597,8 +606,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -606,7 +614,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -664,8 +672,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
-
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -673,7 +680,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflowFromStartNodes_with_threeParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_three_parallel_three_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflows().get(0);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .startNodes(Lists.newArrayList(6L))
@@ -706,7 +713,41 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
+        masterContainer.assertAllResourceReleased();
+    }
 
-        assertThat(workflowRepository.getAll()).isEmpty();
+    @Test
+    @DisplayName("Test start a workflow which using workflow built in params")
+    public void testStartWorkflow_usingWorkflowBuiltInParam() {
+        final String yaml = "/it/start/workflow_with_built_in_param.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
     }
 }

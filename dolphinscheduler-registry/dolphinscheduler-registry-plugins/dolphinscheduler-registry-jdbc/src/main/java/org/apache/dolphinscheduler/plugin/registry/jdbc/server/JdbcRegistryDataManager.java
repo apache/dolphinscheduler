@@ -136,6 +136,11 @@ public class JdbcRegistryDataManager
     }
 
     @Override
+    public List<JdbcRegistryDataDTO> getAllJdbcRegistryData() {
+        return jdbcRegistryDataRepository.selectAll();
+    }
+
+    @Override
     public Optional<JdbcRegistryDataDTO> getRegistryDataByKey(String key) {
         checkNotNull(key);
         return jdbcRegistryDataRepository.selectByKey(key);
@@ -212,7 +217,7 @@ public class JdbcRegistryDataManager
             return;
         }
         jdbcRegistryDataRepository.deleteByKey(key);
-        JdbcRegistryDataChanceEventDTO registryDataChanceEvent = JdbcRegistryDataChanceEventDTO.builder()
+        final JdbcRegistryDataChanceEventDTO registryDataChanceEvent = JdbcRegistryDataChanceEventDTO.builder()
                 .jdbcRegistryData(jdbcRegistryDataOptional.get())
                 .eventType(JdbcRegistryDataChanceEventDTO.EventType.DELETE)
                 .createTime(new Date())

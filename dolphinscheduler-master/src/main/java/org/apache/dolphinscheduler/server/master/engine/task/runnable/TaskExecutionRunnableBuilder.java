@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+
+import javax.annotation.Nullable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,9 +40,10 @@ public class TaskExecutionRunnableBuilder {
 
     private final IWorkflowExecutionGraph workflowExecutionGraph;
     private final WorkflowDefinition workflowDefinition;
+    private final Project project;
     private final WorkflowInstance workflowInstance;
     private final TaskDefinition taskDefinition;
-    private final TaskInstance taskInstance;
+    private final @Nullable TaskInstance taskInstance;
 
     private final WorkflowEventBus workflowEventBus;
     private final ApplicationContext applicationContext;

@@ -175,17 +175,19 @@ security:
     # IF you set type `LDAP`, below config will be effective
     ldap:
       # ldap server config
-      urls: ldap://ldap.forumsys.com:389/
+      url: ldap://ldap.forumsys.com:389/
       base-dn: dc=example,dc=com
-      username: cn=read-only-admin,dc=example,dc=com
+      username: cn=admin,dc=example,dc=com
       password: password
       user:
-        # admin userId when you use LDAP login
-        admin: read-only-admin
+        # admin username when you use LDAP login
+        admin-username: ldap-admin
+        # user search filter to find admin user
+        admin-user-filter: (&(cn={0}))
         identity-attribute: uid
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
-        not-exist-action: CREATE
+        not-exist-action: DENY
       ssl:
         enable: false
         # jks file absolute path && password

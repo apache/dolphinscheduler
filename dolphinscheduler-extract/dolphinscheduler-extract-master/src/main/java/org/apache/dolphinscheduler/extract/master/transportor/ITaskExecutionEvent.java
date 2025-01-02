@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.extract.master.transportor;
 
 // todo: add event source to distinguish the event is from executor or user operation
+// 将这个类移到common中?
 public interface ITaskExecutionEvent {
 
     int getWorkflowInstanceId();
@@ -28,9 +29,9 @@ public interface ITaskExecutionEvent {
 
     void setEventCreateTime(long eventCreateTime);
 
-    long getEventSendTime();
+    Long getEventSendTime();
 
-    void setEventSendTime(long eventSendTime);
+    void setEventSendTime(Long eventSendTime);
 
     void setWorkflowInstanceHost(String host);
 
@@ -43,7 +44,7 @@ public interface ITaskExecutionEvent {
     TaskInstanceExecutionEventType getEventType();
 
     enum TaskInstanceExecutionEventType {
-        DISPATCH,
+        DISPATCHED,
         RUNNING,
         PAUSED,
         KILLED,
