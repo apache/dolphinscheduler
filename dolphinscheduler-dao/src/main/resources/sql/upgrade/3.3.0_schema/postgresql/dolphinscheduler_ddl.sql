@@ -373,4 +373,4 @@ CREATE TABLE t_ds_task_instance_context (
     PRIMARY KEY (id)
 );
 
-create index idx_task_instance_id on t_ds_task_instance_context (task_instance_id, context_type);
+create unique index idx_task_instance_id on t_ds_task_instance_context (task_instance_id, context_type);
