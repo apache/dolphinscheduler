@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
@@ -85,13 +85,14 @@ public class ConditionLogicTask extends AbstractLogicTask<ConditionsParameters> 
                         dependentTaskModel.getRelation(),
                         dependentTaskModel.getDependItemList()
                                 .stream()
-                                .map(dependentItem -> getDependResultForItem(dependentItem, taskInstanceMap))
+                                .map(dependentItem -> getDependResultForItem((ConditionDependentItem) dependentItem,
+                                        taskInstanceMap))
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
         return DependentUtils.getDependResultForRelation(dependence.getRelation(), dependResults);
     }
 
-    private DependResult getDependResultForItem(DependentItem item, Map<Long, TaskInstance> taskInstanceMap) {
+    private DependResult getDependResultForItem(ConditionDependentItem item, Map<Long, TaskInstance> taskInstanceMap) {
         TaskInstance taskInstance = taskInstanceMap.get(item.getDepTaskCode());
         if (taskInstance == null) {
             log.info("The depend item: {} has not completed yet", DependResult.FAILED);

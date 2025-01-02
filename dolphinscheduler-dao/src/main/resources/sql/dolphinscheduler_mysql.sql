@@ -926,6 +926,21 @@ CREATE TABLE `t_ds_task_instance` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_task_instance_context
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_instance_context`;
+CREATE TABLE `t_ds_task_instance_context` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `task_instance_id` int(11) NOT NULL,
+    `context` text NOT NULL,
+    `context_type` varchar(200) NOT NULL COMMENT 'context type',
+    `create_time` datetime NOT NULL,
+    `update_time` datetime NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `task_instance_id` (`task_instance_id`,`context_type`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
 -- Table structure for t_ds_tenant
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_tenant`;

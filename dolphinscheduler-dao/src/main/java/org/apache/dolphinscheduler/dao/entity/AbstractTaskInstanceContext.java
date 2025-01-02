@@ -15,9 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.dao.entity;
 
-public enum DependentRelation {
+import org.apache.dolphinscheduler.common.enums.ContextType;
+import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 
-    AND, OR;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public abstract class AbstractTaskInstanceContext implements ITaskInstanceContext {
+
+    protected ContextType contextType;
 }

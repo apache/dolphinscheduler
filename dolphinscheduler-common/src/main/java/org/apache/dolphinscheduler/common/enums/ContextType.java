@@ -15,9 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.common.enums;
 
-public enum DependentRelation {
+import lombok.Getter;
 
-    AND, OR;
+@Getter
+public enum ContextType {
+
+    DEPENDENT_RESULT_CONTEXT;
+
+    public static ContextType of(String name) {
+        for (ContextType contextType : values()) {
+            if (contextType.name().equalsIgnoreCase(name)) {
+                return contextType;
+            }
+        }
+        return null;
+    }
 }

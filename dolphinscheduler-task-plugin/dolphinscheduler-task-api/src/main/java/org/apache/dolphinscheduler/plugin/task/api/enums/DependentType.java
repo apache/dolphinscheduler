@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.enums;
 
-public enum DependentRelation {
-
-    AND, OR;
+public enum DependentType {
+    DEPENDENT_ON_WORKFLOW, DEPENDENT_ON_TASK
 }
