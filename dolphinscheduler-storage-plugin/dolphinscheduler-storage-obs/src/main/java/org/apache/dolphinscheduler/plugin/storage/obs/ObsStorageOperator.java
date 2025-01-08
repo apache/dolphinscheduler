@@ -111,7 +111,7 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);
         }
         ObsObject obsObject = obsClient.getObject(bucketName, srcFilePath);
         try (
