@@ -15,20 +15,13 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-import ko_KR from './ko_KR'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US,
-    ko_KR
-  }
-})
-
-export default i18n
+export default {
+  test: '테스트',
+  userName: '사용자 이름',
+  userName_tips: '사용자 이름을 입력하세요',
+  userPassword: '비밀번호',
+  userPassword_tips: '비밀번호를 입력하세요',
+  login: '로그인',
+  loginWithOAuth2: 'OAuth2로 로그인',
+  ssoLogin: 'SSO 로그인'
+}

@@ -15,20 +15,26 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-import ko_KR from './ko_KR'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US,
-    ko_KR
-  }
-})
-
-export default i18n
+export default {
+  profile: '프로필',
+  edit: '편집',
+  username: '사용자 이름',
+  email: '이메일',
+  phone: '전화번호',
+  state: '상태',
+  permission: '권한',
+  create_time: '생성 시간',
+  update_time: '업데이트 시간',
+  administrator: '관리자',
+  ordinary_user: '일반 사용자',
+  edit_profile: '프로필 편집',
+  username_tips: '사용자 이름을 입력하세요',
+  email_tips: '이메일을 입력하세요',
+  email_correct_tips: '올바른 이메일 형식을 입력하세요',
+  phone_tips: '전화번호를 입력하세요',
+  state_tips: '상태를 선택하세요',
+  enable: '활성화',
+  disable: '비활성화',
+  timezone_success: '시간대 업데이트 성공',
+  please_select_timezone: '시간대를 선택하세요'
+}

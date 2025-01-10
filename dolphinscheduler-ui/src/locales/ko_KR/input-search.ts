@@ -15,20 +15,6 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-import ko_KR from './ko_KR'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US,
-    ko_KR
-  }
-})
-
-export default i18n
+export default {
+  placeholder: '키워드를 입력하세요'
+}

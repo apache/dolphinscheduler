@@ -15,20 +15,11 @@
  * limitations under the License.
  */
 
-import { createI18n } from 'vue-i18n'
-import zh_CN from './zh_CN'
-import en_US from './en_US'
-import ko_KR from './ko_KR'
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: 'zh_CN',
-  messages: {
-    zh_CN,
-    en_US,
-    ko_KR
-  }
-})
-
-export default i18n
+export default {
+  refresh_time: '로그 자동 새로 고침 시간',
+  experimental_feature: '실험적 기능',
+  request_settings: '요청 설정',
+  dynamic_task_component: '동적 작업 컴포넌트',
+  api_timeout: 'API 시간 초과',
+  millisecond: '밀리초'
+}
