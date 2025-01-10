@@ -41,6 +41,7 @@ public class WorkerServerMetadata extends BaseServerMetadata {
 
     public static WorkerServerMetadata parseFromHeartBeat(final WorkerHeartBeat workerHeartBeat) {
         return WorkerServerMetadata.builder()
+                .processId(workerHeartBeat.getProcessId())
                 .serverStartupTime(workerHeartBeat.getStartupTime())
                 .address(workerHeartBeat.getHost() + Constants.COLON + workerHeartBeat.getPort())
                 .workerGroup(workerHeartBeat.getWorkerGroup())

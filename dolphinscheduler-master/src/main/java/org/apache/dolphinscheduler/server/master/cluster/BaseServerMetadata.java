@@ -28,6 +28,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
 
+    private final int processId;
+
     // The server startup time in milliseconds.
     private final long serverStartupTime;
 
