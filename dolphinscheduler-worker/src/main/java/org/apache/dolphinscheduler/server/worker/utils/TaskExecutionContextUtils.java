@@ -50,7 +50,8 @@ public class TaskExecutionContextUtils {
                 log.warn("The TaskInstance WorkingDirectory: {} is exist, will recreate again",
                         taskInstanceWorkingDirectory);
             }
-            FileUtils.createDirectoryWith755(Paths.get(taskInstanceWorkingDirectory));
+
+            FileUtils.createDirectoryWithPermission(Paths.get(taskInstanceWorkingDirectory), FileUtils.PERMISSION_775);
 
             taskExecutionContext.setExecutePath(taskInstanceWorkingDirectory);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(taskInstanceWorkingDirectory));

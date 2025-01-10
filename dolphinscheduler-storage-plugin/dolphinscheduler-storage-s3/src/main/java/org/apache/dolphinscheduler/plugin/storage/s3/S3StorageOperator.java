@@ -113,7 +113,7 @@ public class S3StorageOperator extends AbstractStorageOperator implements Closea
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);
         }
         S3Object o = s3Client.getObject(bucketName, srcFilePath);
         try (
