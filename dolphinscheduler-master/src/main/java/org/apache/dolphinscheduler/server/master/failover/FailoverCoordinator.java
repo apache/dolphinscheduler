@@ -44,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Component
@@ -66,9 +65,6 @@ public class FailoverCoordinator implements IFailoverCoordinator {
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private PlatformTransactionManager platformTransactionManager;
-
-    @Autowired
     private WorkflowFailover workflowFailover;
 
     @Override
@@ -81,13 +77,21 @@ public class FailoverCoordinator implements IFailoverCoordinator {
             final Optional<MasterServerMetadata> aliveMasterOptional =
                     clusterManager.getMasterClusters().getServer(masterAddress);
             if (aliveMasterOptional.isPresent()) {
+                // If the master is alive, then we use the alive master's startup time as the failover deadline.
                 final MasterServerMetadata aliveMasterServerMetadata = aliveMasterOptional.get();
                 log.info("The master[{}] is alive, do global master failover on it", aliveMasterServerMetadata);
-                doMasterFailover(aliveMasterServerMetadata.getAddress(),
-                        aliveMasterServerMetadata.getServerStartupTime());
+                doMasterFailover(
+                        masterAddress,
+                        aliveMasterServerMetadata.getServerStartupTime(),
+                        RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(
+                                masterAddress));
             } else {
+                // If the master is not alive, then we use the event time as the failover deadline.
                 log.info("The master[{}] is not alive, do global master failover on it", masterAddress);
-                doMasterFailover(masterAddress, globalMasterFailoverEvent.getEventTime().getTime());
+                doMasterFailover(
+                        masterAddress,
+                        globalMasterFailoverEvent.getEventTime().getTime(),
+                        RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(masterAddress));
             }
         }
 
@@ -99,53 +103,55 @@ public class FailoverCoordinator implements IFailoverCoordinator {
     public void failoverMaster(final MasterFailoverEvent masterFailoverEvent) {
         final MasterServerMetadata masterServerMetadata = masterFailoverEvent.getMasterServerMetadata();
         log.info("Master[{}] failover starting", masterServerMetadata);
+        final String masterAddress = masterServerMetadata.getAddress();
 
         final Optional<MasterServerMetadata> aliveMasterOptional =
-                clusterManager.getMasterClusters().getServer(masterServerMetadata.getAddress());
+                clusterManager.getMasterClusters().getServer(masterAddress);
         if (aliveMasterOptional.isPresent()) {
             final MasterServerMetadata aliveMasterServerMetadata = aliveMasterOptional.get();
             if (aliveMasterServerMetadata.getServerStartupTime() == masterServerMetadata.getServerStartupTime()) {
                 log.info("The master[{}] is alive, maybe it reconnect to registry skip failover", masterServerMetadata);
-            } else {
-                log.info("The master[{}] is alive, but the startup time is different, will failover on {}",
-                        masterServerMetadata,
-                        aliveMasterServerMetadata);
-                doMasterFailover(aliveMasterServerMetadata.getAddress(),
-                        aliveMasterServerMetadata.getServerStartupTime());
+                return;
             }
-        } else {
-            log.info("The master[{}] is not alive, will failover", masterServerMetadata);
-            doMasterFailover(masterServerMetadata.getAddress(), masterServerMetadata.getServerStartupTime());
         }
+        doMasterFailover(
+                masterServerMetadata.getAddress(),
+                masterFailoverEvent.getEventTime().getTime(),
+                RegistryUtils.getFailoveredNodePath(
+                        masterServerMetadata.getAddress(),
+                        masterServerMetadata.getServerStartupTime(),
+                        masterServerMetadata.getProcessId()));
     }
 
     /**
      * Do master failover.
      * <p> Will failover the workflow which is scheduled by the master and the workflow's fire time is before the maxWorkflowFireTime.
      */
-    private void doMasterFailover(final String masterAddress, final long masterStartupTime) {
+    private void doMasterFailover(final String masterAddress,
+                                  final long workflowFailoverDeadline,
+                                  final String masterFailoverNodePath) {
         // We use lock to avoid multiple master failover at the same time.
         // Once the workflow has been failovered, then it's state will be changed to FAILOVER
         // Once the FAILOVER workflow has been refired, then it's host will be changed to the new master and have a new
         // start time.
         // So if a master has been failovered multiple times, there is no problem.
         final StopWatch failoverTimeCost = StopWatch.createStarted();
-        registryClient.getLock(RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath());
+        registryClient.getLock(RegistryUtils.getMasterFailoverLockPath(masterAddress));
         try {
-            final String failoverFinishedNodePath =
-                    RegistryUtils.getFailoverFinishedNodePath(masterAddress, masterStartupTime);
-            if (registryClient.exists(failoverFinishedNodePath)) {
-                log.error("The master[{}-{}] is exist at: {}, means it has already been failovered, skip failover",
+            // If the master has already been failovered, then we skip the failover.
+            if (registryClient.exists(masterFailoverNodePath)
+                    && String.valueOf(workflowFailoverDeadline).equals(registryClient.get(masterFailoverNodePath))) {
+                log.error("The master[{}/{}] is exist at: {}, means it has already been failovered, skip failover",
                         masterAddress,
-                        masterStartupTime,
-                        failoverFinishedNodePath);
+                        workflowFailoverDeadline,
+                        masterFailoverNodePath);
                 return;
             }
             final List<WorkflowInstance> needFailoverWorkflows =
-                    getFailoverWorkflowsForMaster(masterAddress, new Date(masterStartupTime));
+                    getFailoverWorkflowsForMaster(masterAddress, new Date(workflowFailoverDeadline));
             needFailoverWorkflows.forEach(workflowFailover::failoverWorkflow);
+            registryClient.persist(masterFailoverNodePath, String.valueOf(workflowFailoverDeadline));
             failoverTimeCost.stop();
-            registryClient.persist(failoverFinishedNodePath, String.valueOf(System.currentTimeMillis()));
             log.info("Master[{}] failover {} workflows finished, cost: {}/ms",
                     masterAddress,
                     needFailoverWorkflows.size(),
@@ -190,28 +196,30 @@ public class FailoverCoordinator implements IFailoverCoordinator {
             final WorkerServerMetadata aliveWorkerServerMetadata = aliveWorkerOptional.get();
             if (aliveWorkerServerMetadata.getServerStartupTime() == workerServerMetadata.getServerStartupTime()) {
                 log.info("The worker[{}] is alive, maybe it reconnect to registry skip failover", workerServerMetadata);
-            } else {
-                log.info("The worker[{}] is alive, but the startup time is different, will failover on {}",
-                        workerServerMetadata,
-                        aliveWorkerServerMetadata);
-                doWorkerFailover(aliveWorkerServerMetadata.getAddress(),
-                        aliveWorkerServerMetadata.getServerStartupTime());
+                return;
             }
-        } else {
-            log.info("The worker[{}] is not alive, will failover", workerServerMetadata);
-            doWorkerFailover(workerServerMetadata.getAddress(), workerServerMetadata.getServerStartupTime());
         }
+        doWorkerFailover(
+                workerServerMetadata.getAddress(),
+                System.currentTimeMillis(),
+                RegistryUtils.getFailoveredNodePath(
+                        workerServerMetadata.getAddress(),
+                        workerServerMetadata.getServerStartupTime(),
+                        workerServerMetadata.getProcessId()));
     }
 
-    private void doWorkerFailover(final String workerAddress, final long workerCrashTime) {
+    private void doWorkerFailover(final String workerAddress,
+                                  final long taskFailoverDeadline,
+                                  final String workerFailoverNodePath) {
         final StopWatch failoverTimeCost = StopWatch.createStarted();
+        // we don't check the workerFailoverNodePath exist, since the worker may be failovered multiple master
 
         final List<ITaskExecutionRunnable> needFailoverTasks =
-                getFailoverTaskForWorker(workerAddress, new Date(workerCrashTime));
+                getFailoverTaskForWorker(workerAddress, new Date(taskFailoverDeadline));
         needFailoverTasks.forEach(taskFailover::failoverTask);
 
         registryClient.persist(
-                RegistryUtils.getFailoverFinishedNodePath(workerAddress, workerCrashTime),
+                workerFailoverNodePath,
                 String.valueOf(System.currentTimeMillis()));
         failoverTimeCost.stop();
         log.info("Worker[{}] failover {} tasks finished, cost: {}/ms",
@@ -221,7 +229,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
     }
 
     private List<ITaskExecutionRunnable> getFailoverTaskForWorker(final String workerAddress,
-                                                                  final Date workerCrashTime) {
+                                                                  final Date taskFailoverDeadline) {
         return workflowRepository.getAll()
                 .stream()
                 .map(IWorkflowExecutionRunnable::getWorkflowExecutionGraph)
@@ -237,7 +245,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                     // The submitTime should not be null.
                     // This is a bad case unless someone manually set the submitTime to null.
                     final Date submitTime = taskExecutionRunnable.getTaskInstance().getSubmitTime();
-                    return submitTime != null && submitTime.before(workerCrashTime);
+                    return submitTime != null && submitTime.before(taskFailoverDeadline);
                 })
                 .collect(Collectors.toList());
     }
