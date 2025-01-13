@@ -345,9 +345,6 @@ conf:
     # -- development state
     development.state: false
 
-    # -- rpc port
-    alert.rpc.port: 50052
-
     # -- set path of conda.sh
     conda.path: /opt/anaconda3/etc/profile.d/conda.sh
 
