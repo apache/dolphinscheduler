@@ -86,7 +86,7 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
 
     @Override
     public void writeHeartBeat(final MasterHeartBeat masterHeartBeat) {
-        final String failoverNodePath = RegistryUtils.getFailoverFinishedNodePath(masterHeartBeat);
+        final String failoverNodePath = RegistryUtils.getFailoveredNodePath(masterHeartBeat);
         if (registryClient.exists(failoverNodePath)) {
             log.warn("The master: {} is under {}, means it has been failover will close myself",
                     masterHeartBeat,

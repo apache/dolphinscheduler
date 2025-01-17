@@ -122,7 +122,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | common.sharedStoragePersistence.storage | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | common.sharedStoragePersistence.storageClassName | string | `"-"` | Shared Storage persistent volume storage class, must support the access mode: ReadWriteMany |
 | conf.auto | bool | `false` | auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false |
-| conf.common."alert.rpc.port" | int | `50052` | rpc port |
 | conf.common."appId.collect" | string | `"log"` | way to collect applicationId: log, aop |
 | conf.common."aws.credentials.provider.type" | string | `"AWSStaticCredentialsProvider"` |  |
 | conf.common."aws.s3.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |

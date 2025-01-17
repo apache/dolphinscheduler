@@ -29,6 +29,7 @@ import lombok.Getter;
 public class MasterFailoverEvent extends AbstractSystemEvent {
 
     private final MasterServerMetadata masterServerMetadata;
+    // The time when the event occurred. This might be different at different nodes.
     private final Date eventTime;
 
     private MasterFailoverEvent(final MasterServerMetadata masterServerMetadata,

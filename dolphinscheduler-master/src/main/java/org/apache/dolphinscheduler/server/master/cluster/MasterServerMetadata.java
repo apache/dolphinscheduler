@@ -33,6 +33,7 @@ public class MasterServerMetadata extends BaseServerMetadata implements Comparab
 
     public static MasterServerMetadata parseFromHeartBeat(final MasterHeartBeat masterHeartBeat) {
         return MasterServerMetadata.builder()
+                .processId(masterHeartBeat.getProcessId())
                 .serverStartupTime(masterHeartBeat.getStartupTime())
                 .address(masterHeartBeat.getHost() + Constants.COLON + masterHeartBeat.getPort())
                 .cpuUsage(masterHeartBeat.getCpuUsage())

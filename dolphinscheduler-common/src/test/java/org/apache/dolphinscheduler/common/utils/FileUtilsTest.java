@@ -60,10 +60,10 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void createDirectoryWith755() throws IOException {
+    public void testCreateDirectoryWithPermission() throws IOException {
         Path path = Paths.get("/tmp/createWorkDirAndUserIfAbsent");
         try {
-            FileUtils.createDirectoryWith755(path);
+            FileUtils.createDirectoryWithPermission(path, FileUtils.PERMISSION_755);
             File file = path.toFile();
             Assertions.assertTrue(file.exists());
             Assertions.assertTrue(file.isDirectory());
@@ -71,7 +71,7 @@ public class FileUtilsTest {
             Assertions.assertTrue(file.canRead());
             Assertions.assertTrue(file.canWrite());
 
-            FileUtils.createDirectoryWith755(Paths.get("/"));
+            FileUtils.createDirectoryWithPermission(Paths.get("/"), FileUtils.PERMISSION_755);
         } catch (Exception e) {
             e.printStackTrace();
             Assertions.fail(e.getMessage());
