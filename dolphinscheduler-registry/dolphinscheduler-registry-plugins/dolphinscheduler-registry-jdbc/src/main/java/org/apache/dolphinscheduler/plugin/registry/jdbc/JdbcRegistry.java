@@ -97,19 +97,19 @@ public final class JdbcRegistry implements Registry {
     }
 
     @Override
-    public void subscribe(String path, SubscribeListener listener) {
-        checkNotNull(path);
+    public void subscribe(String subscribePath, SubscribeListener listener) {
+        checkNotNull(subscribePath);
         checkNotNull(listener);
         jdbcRegistryClient.subscribeJdbcRegistryDataChange(new JdbcRegistryDataChangeListener() {
 
             @Override
-            public void onJdbcRegistryDataChanged(String key, String value) {
-                if (!key.startsWith(path)) {
+            public void onJdbcRegistryDataChanged(String eventPath, String value) {
+                if (!isPathMatch(subscribePath, eventPath)) {
                     return;
                 }
-                Event event = Event.builder()
-                        .key(key)
-                        .path(path)
+                final Event event = Event.builder()
+                        .key(subscribePath)
+                        .path(eventPath)
                         .data(value)
                         .type(Event.Type.UPDATE)
                         .build();
@@ -117,30 +117,34 @@ public final class JdbcRegistry implements Registry {
             }
 
             @Override
-            public void onJdbcRegistryDataDeleted(String key) {
-                if (!key.startsWith(path)) {
+            public void onJdbcRegistryDataDeleted(String eventPath) {
+                if (!isPathMatch(subscribePath, eventPath)) {
                     return;
                 }
-                Event event = Event.builder()
-                        .key(key)
-                        .path(key)
+                final Event event = Event.builder()
+                        .key(subscribePath)
+                        .path(eventPath)
                         .type(Event.Type.REMOVE)
                         .build();
                 listener.notify(event);
             }
 
             @Override
-            public void onJdbcRegistryDataAdded(String key, String value) {
-                if (!key.startsWith(path)) {
+            public void onJdbcRegistryDataAdded(String eventPath, String value) {
+                if (!isPathMatch(subscribePath, eventPath)) {
                     return;
                 }
-                Event event = Event.builder()
-                        .key(key)
-                        .path(key)
+                final Event event = Event.builder()
+                        .key(subscribePath)
+                        .path(eventPath)
                         .data(value)
                         .type(Event.Type.ADD)
                         .build();
                 listener.notify(event);
+            }
+
+            private boolean isPathMatch(String subscribePath, String eventPath) {
+                return KeyUtils.isParent(subscribePath, eventPath) || KeyUtils.isSamePath(subscribePath, eventPath);
             }
         });
     }
@@ -206,11 +210,10 @@ public final class JdbcRegistry implements Registry {
     @Override
     public Collection<String> children(String key) {
         try {
-            List<JdbcRegistryDataDTO> children = jdbcRegistryClient.listJdbcRegistryDataChildren(key);
+            final List<JdbcRegistryDataDTO> children = jdbcRegistryClient.listJdbcRegistryDataChildren(key);
             return children
                     .stream()
                     .map(JdbcRegistryDataDTO::getDataKey)
-                    .filter(fullPath -> fullPath.length() > key.length())
                     .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
                     .distinct()
                     .collect(Collectors.toList());
