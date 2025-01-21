@@ -836,6 +836,22 @@ CREATE TABLE t_ds_task_instance (
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
 
 --
+-- Table structure for t_ds_task_instance_context
+--
+DROP TABLE IF EXISTS t_ds_task_instance_context;
+CREATE TABLE t_ds_task_instance_context (
+  id int NOT NULL,
+  task_instance_id int NOT NULL,
+  context text NOT NULL,
+  context_type varchar(200) NOT NULL,
+  create_time timestamp NOT NULL,
+  update_time timestamp NOT NULL,
+  PRIMARY KEY (id)
+);
+
+create unique index idx_task_instance_id on t_ds_task_instance_context (task_instance_id, context_type);
+
+--
 -- Table structure for table t_ds_tenant
 --
 

@@ -19,7 +19,9 @@ Administrator login, default username/password: admin/dolphinscheduler123
 - Tenant Code: **The tenant code is the user on Linux, unique and cannot be repeated**
 - The administrator enters the `Security Center->Tenant Management` page, and clicks the `Create Tenant` button to create a tenant.
 
-> Note: Currently, only admin users can modify tenant.
+> Note:
+> 1. Currently, only admin users can modify tenant.
+> 2. If you create a tenant manually in the Linux, you need to add the manually created tenant to the dolphinscheduler bootstrap user's group, so that the tenant will have enough working directory permissions.
 
 ![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 

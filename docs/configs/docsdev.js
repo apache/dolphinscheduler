@@ -258,6 +258,10 @@ export default {
                                 title: 'File Parameter',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
+                            {
+                                title: 'StartUp Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/startup-parameter.html',
+                            },
                         ],
                     },
                     {
@@ -968,6 +972,10 @@ export default {
                             {
                                 title: '文件参数传递',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
+                            {
+                                title: '启动参数',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/startup-parameter.html',
                             },
                         ],
                     },

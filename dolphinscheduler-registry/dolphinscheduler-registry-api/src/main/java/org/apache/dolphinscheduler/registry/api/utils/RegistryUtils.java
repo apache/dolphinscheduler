@@ -20,14 +20,30 @@ package org.apache.dolphinscheduler.registry.api.utils;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
+import com.google.common.base.Preconditions;
+
 public class RegistryUtils {
 
-    public static String getFailoverFinishedNodePath(final BaseHeartBeat baseHeartBeat) {
-        return getFailoverFinishedNodePath(baseHeartBeat.getHost() + ":" + baseHeartBeat.getPort(),
-                baseHeartBeat.getStartupTime());
+    public static String getMasterFailoverLockPath(final String masterAddress) {
+        Preconditions.checkNotNull(masterAddress, "master address cannot be null");
+        return RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath() + "/" + masterAddress;
     }
 
-    public static String getFailoverFinishedNodePath(final String masterAddress, final long masterStartupTime) {
-        return RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + "/" + masterAddress + "-" + masterStartupTime;
+    public static String getFailoveredNodePathWhichStartupTimeIsUnknown(final String serverAddress) {
+        return RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + "/" + serverAddress + "-" + "unknown" + "-"
+                + "unknown";
+    }
+
+    public static String getFailoveredNodePath(final BaseHeartBeat baseHeartBeat) {
+        return getFailoveredNodePath(
+                baseHeartBeat.getHost() + ":" + baseHeartBeat.getPort(),
+                baseHeartBeat.getStartupTime(),
+                baseHeartBeat.getProcessId());
+    }
+
+    public static String getFailoveredNodePath(final String serverAddress, final long serverStartupTime,
+                                               final int processId) {
+        return RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + "/" + serverAddress + "-" + serverStartupTime
+                + "-" + processId;
     }
 }

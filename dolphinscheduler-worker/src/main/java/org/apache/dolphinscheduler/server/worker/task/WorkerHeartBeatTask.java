@@ -85,7 +85,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
 
     @Override
     public void writeHeartBeat(final WorkerHeartBeat workerHeartBeat) {
-        final String failoverNodePath = RegistryUtils.getFailoverFinishedNodePath(workerHeartBeat);
+        final String failoverNodePath = RegistryUtils.getFailoveredNodePath(workerHeartBeat);
         if (registryClient.exists(failoverNodePath)) {
             log.warn("The worker: {} is under {}, means it has been failover will close myself",
                     workerHeartBeat,

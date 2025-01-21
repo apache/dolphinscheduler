@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
-import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -27,8 +27,10 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
@@ -57,7 +59,7 @@ public class ConditionsParameters extends AbstractParameters {
     @AllArgsConstructor
     public static class ConditionDependency {
 
-        private List<DependentTaskModel> dependTaskList;
+        private List<ConditionDependentTaskModel> dependTaskList;
 
         private DependentRelation relation;
     }

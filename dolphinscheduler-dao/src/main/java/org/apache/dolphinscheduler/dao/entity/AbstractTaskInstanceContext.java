@@ -15,40 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.cluster;
+package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.enums.ContextType;
+import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 
 import lombok.Data;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import lombok.NoArgsConstructor;
 
 @Data
-@ToString
-@SuperBuilder
-public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
+@NoArgsConstructor
+public abstract class AbstractTaskInstanceContext implements ITaskInstanceContext {
 
-    private final int processId;
-
-    // The server startup time in milliseconds.
-    private final long serverStartupTime;
-
-    private final String address;
-
-    private final double cpuUsage;
-
-    private final double memoryUsage;
-
-    private final ServerStatus serverStatus;
-
-    @Override
-    public String getAddress() {
-        return address;
-    }
-
-    @Override
-    public ServerStatus getServerStatus() {
-        return serverStatus;
-    }
-
+    protected ContextType contextType;
 }
