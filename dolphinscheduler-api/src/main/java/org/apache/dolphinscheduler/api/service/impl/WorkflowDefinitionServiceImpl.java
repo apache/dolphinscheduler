@@ -2118,37 +2118,38 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 List<TaskDefinitionLog> taskDefinitionLogs =
                         taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
-                for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                taskDefinitionLogs.forEach(taskDefinitionLog -> {
                     try {
-                        long taskCode = CodeGenerateUtils.genCode();
-                        taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
-                        taskDefinitionLog.setCode(taskCode);
-                        if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())) {
-                            final String taskParams = taskDefinitionLog.getTaskParams();
-                            final SwitchParameters switchParameters =
-                                    JSONUtils.parseObject(taskParams, SwitchParameters.class);
-                            if (switchParameters == null) {
-                                throw new IllegalArgumentException(
-                                        "Switch task params: " + taskParams + " is invalid.");
-                            }
-                            SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
-                            switchResult.getDependTaskList().forEach(switchResultVo -> {
-                                switchResultVo.setNextNode(taskCodeMap.get(switchResultVo.getNextNode()));
-                            });
-                            if (switchResult.getNextNode() != null) {
-                                switchResult.setNextNode(
-                                        taskCodeMap.get(switchResult.getNextNode()));
-                            }
-                            taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParameters));
-                        }
+                        taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode());
                     } catch (CodeGenerateException e) {
                         log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
                         putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                         throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                     }
+                });
+                for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                    taskDefinitionLog.setCode(taskCodeMap.get(taskDefinitionLog.getCode()));
                     taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setVersion(0);
                     taskDefinitionLog.setName(taskDefinitionLog.getName());
+                    if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())) {
+                        final String taskParams = taskDefinitionLog.getTaskParams();
+                        final SwitchParameters switchParameters =
+                                JSONUtils.parseObject(taskParams, SwitchParameters.class);
+                        if (switchParameters == null) {
+                            throw new IllegalArgumentException(
+                                    "Switch task params: " + taskParams + " is invalid.");
+                        }
+                        SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
+                        switchResult.getDependTaskList().forEach(switchResultVo -> {
+                            switchResultVo.setNextNode(taskCodeMap.get(switchResultVo.getNextNode()));
+                        });
+                        if (switchResult.getNextNode() != null) {
+                            switchResult.setNextNode(
+                                    taskCodeMap.get(switchResult.getNextNode()));
+                        }
+                        taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParameters));
+                    }
                 }
                 for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
                     if (workflowTaskRelationLog.getPreTaskCode() > 0) {
