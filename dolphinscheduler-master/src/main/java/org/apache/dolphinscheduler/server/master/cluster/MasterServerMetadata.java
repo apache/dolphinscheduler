@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 
@@ -32,6 +34,7 @@ import lombok.experimental.SuperBuilder;
 public class MasterServerMetadata extends BaseServerMetadata implements Comparable<MasterServerMetadata> {
 
     public static MasterServerMetadata parseFromHeartBeat(final MasterHeartBeat masterHeartBeat) {
+        checkNotNull(masterHeartBeat);
         return MasterServerMetadata.builder()
                 .processId(masterHeartBeat.getProcessId())
                 .serverStartupTime(masterHeartBeat.getStartupTime())
