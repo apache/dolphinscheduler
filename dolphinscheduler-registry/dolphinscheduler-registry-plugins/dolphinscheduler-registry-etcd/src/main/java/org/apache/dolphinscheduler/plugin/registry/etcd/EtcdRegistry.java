@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -158,7 +159,24 @@ public class EtcdRegistry implements Registry {
             watcherMap.computeIfAbsent(path,
                     $ -> client.getWatchClient().watch(watchKey, watchOption, watchResponse -> {
                         for (WatchEvent event : watchResponse.getEvents()) {
-                            listener.notify(new EventAdaptor(event, path));
+                            final String eventPath = event.getKeyValue().getKey().toString(StandardCharsets.UTF_8);
+                            switch (listener.getSubscribeScope()) {
+                                case PATH_ONLY:
+                                    if (eventPath.equals(path)) {
+                                        listener.notify(toEvent(event, path));
+                                    }
+                                    break;
+                                case CHILDREN_ONLY:
+                                    if (!eventPath.equals(path)) {
+                                        listener.notify(toEvent(event, path));
+                                    }
+                                    break;
+                                case ALL:
+                                    listener.notify(toEvent(event, path));
+                                    break;
+                                default:
+                                    throw new RegistryException("Unknown event scope: " + listener.getSubscribeScope());
+                            }
                         }
                     }));
         } catch (Exception e) {
@@ -373,30 +391,31 @@ public class EtcdRegistry implements Registry {
         return ByteSequence.from(val, StandardCharsets.UTF_8);
     }
 
-    static final class EventAdaptor extends Event {
-
-        public EventAdaptor(WatchEvent event, String key) {
-            key(key);
-
-            switch (event.getEventType()) {
-                case PUT:
-                    if (event.getPrevKV().getKey().isEmpty()) {
-                        type(Type.ADD);
-                    } else {
-                        type(Type.UPDATE);
-                    }
-                    break;
-                case DELETE:
-                    type(Type.REMOVE);
-                    break;
-                default:
-                    break;
-            }
-            KeyValue keyValue = event.getKeyValue();
-            if (keyValue != null) {
-                path(keyValue.getKey().toString(StandardCharsets.UTF_8));
-                data(keyValue.getValue().toString(StandardCharsets.UTF_8));
-            }
+    private Event toEvent(final WatchEvent watchEvent, final String watchedPath) {
+        Event.Type eventType = null;
+        switch (watchEvent.getEventType()) {
+            case PUT:
+                if (watchEvent.getPrevKV().getKey().isEmpty()) {
+                    eventType = Event.Type.ADD;
+                } else {
+                    eventType = Event.Type.UPDATE;
+                }
+                break;
+            case DELETE:
+                eventType = Event.Type.REMOVE;
+                break;
+            default:
+                break;
         }
+        final KeyValue keyValue = watchEvent.getKeyValue();
+        return Event.builder()
+                .type(eventType)
+                .watchedPath(watchedPath)
+                .eventPath(Optional.ofNullable(keyValue).map(kv -> kv.getKey().toString(StandardCharsets.UTF_8))
+                        .orElse(null))
+                .eventData(Optional.ofNullable(keyValue).map(kv -> kv.getValue().toString(StandardCharsets.UTF_8))
+                        .orElse(null))
+                .build();
     }
+
 }

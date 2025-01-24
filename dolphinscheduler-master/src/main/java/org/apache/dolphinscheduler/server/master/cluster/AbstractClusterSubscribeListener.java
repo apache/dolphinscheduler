@@ -30,8 +30,8 @@ public abstract class AbstractClusterSubscribeListener<T extends BaseServerMetad
         try {
             // make sure the event is processed in order
             synchronized (this) {
-                Event.Type type = event.type();
-                T server = parseServerFromHeartbeat(event.data());
+                Event.Type type = event.getType();
+                T server = parseServerFromHeartbeat(event.getEventData());
                 if (server == null) {
                     log.error("Unknown cluster change event: {}", event);
                     return;
@@ -56,6 +56,11 @@ public abstract class AbstractClusterSubscribeListener<T extends BaseServerMetad
         } catch (Exception ex) {
             log.error("Notify cluster change event: {} failed", event, ex);
         }
+    }
+
+    @Override
+    public SubscribeScope getSubscribeScope() {
+        return SubscribeScope.CHILDREN_ONLY;
     }
 
     abstract T parseServerFromHeartbeat(String serverHeartBeatJson);

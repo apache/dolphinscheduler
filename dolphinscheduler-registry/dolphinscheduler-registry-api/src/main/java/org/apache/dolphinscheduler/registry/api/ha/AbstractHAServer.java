@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
 
@@ -56,15 +57,24 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public void start() {
-        registry.subscribe(selectorPath, event -> {
-            if (Event.Type.REMOVE.equals(event.type())) {
-                if (serverIdentify.equals(event.data())) {
-                    statusChange(ServerStatus.STAND_BY);
-                } else {
-                    if (participateElection()) {
-                        statusChange(ServerStatus.ACTIVE);
+        registry.subscribe(selectorPath, new SubscribeListener() {
+
+            @Override
+            public void notify(Event event) {
+                if (Event.Type.REMOVE.equals(event.getType())) {
+                    if (serverIdentify.equals(event.getEventData())) {
+                        statusChange(ServerStatus.STAND_BY);
+                    } else {
+                        if (participateElection()) {
+                            statusChange(ServerStatus.ACTIVE);
+                        }
                     }
                 }
+            }
+
+            @Override
+            public SubscribeScope getSubscribeScope() {
+                return SubscribeScope.PATH_ONLY;
             }
         });
 

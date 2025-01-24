@@ -81,16 +81,24 @@ public abstract class RegistryTestCase<R extends Registry> {
         final AtomicBoolean subscribeRemoved = new AtomicBoolean(false);
         final AtomicBoolean subscribeUpdated = new AtomicBoolean(false);
 
-        SubscribeListener subscribeListener = event -> {
-            System.out.println("Receive event: " + event);
-            if (event.type() == Event.Type.ADD) {
-                subscribeAdded.compareAndSet(false, true);
+        final SubscribeListener subscribeListener = new SubscribeListener() {
+
+            @Override
+            public void notify(Event event) {
+                if (event.getType() == Event.Type.ADD) {
+                    subscribeAdded.compareAndSet(false, true);
+                }
+                if (event.getType() == Event.Type.REMOVE) {
+                    subscribeRemoved.compareAndSet(false, true);
+                }
+                if (event.getType() == Event.Type.UPDATE) {
+                    subscribeUpdated.compareAndSet(false, true);
+                }
             }
-            if (event.type() == Event.Type.REMOVE) {
-                subscribeRemoved.compareAndSet(false, true);
-            }
-            if (event.type() == Event.Type.UPDATE) {
-                subscribeUpdated.compareAndSet(false, true);
+
+            @Override
+            public SubscribeScope getSubscribeScope() {
+                return SubscribeScope.PATH_ONLY;
             }
         };
         String key = "/nodes/master" + System.nanoTime();
