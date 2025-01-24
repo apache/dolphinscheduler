@@ -65,6 +65,9 @@ public class DefaultMetricsProvider implements MetricsProvider {
         long totalSystemMemory = OSUtils.getTotalSystemMemory();
         long systemMemoryAvailable = OSUtils.getSystemAvailableMemoryUsed();
 
+        double diskToTalBytes = meterRegistry.get("disk.total").gauge().value();
+        double diskFreeBytes = meterRegistry.get("disk.free").gauge().value();
+
         systemMetrics = SystemMetrics.builder()
                 .systemCpuUsagePercentage(systemCpuUsage)
                 .jvmCpuUsagePercentage(processCpuUsage)
@@ -74,6 +77,9 @@ public class DefaultMetricsProvider implements MetricsProvider {
                 .systemMemoryUsed(totalSystemMemory - systemMemoryAvailable)
                 .systemMemoryMax(totalSystemMemory)
                 .systemMemoryUsedPercentage((double) (totalSystemMemory - systemMemoryAvailable) / totalSystemMemory)
+                .diskUsed(diskToTalBytes - diskFreeBytes)
+                .diskTotal(diskToTalBytes)
+                .diskUsedPercentage((diskToTalBytes - diskFreeBytes) / diskToTalBytes)
                 .build();
         lastRefreshTime = System.currentTimeMillis();
         return systemMetrics;

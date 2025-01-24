@@ -15,45 +15,27 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
-}
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-type ServerNodeType = 'MASTER' | 'WORKER' | 'ALERT_SERVER'
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-interface ServerNode {
-  id: number
-  host: string
-  port: number
-  serverDirectory: string
-  heartBeatInfo: string
-  createTime: string
-  lastHeartbeatTime: string
-}
+import org.junit.jupiter.api.Test;
 
-interface MasterNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-}
+class KeyUtilsTest {
 
-interface WorkerNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-  workerHostWeight?: number
-  threadPoolUsage?: number
-}
+    @Test
+    void isParent() {
+        assertFalse(KeyUtils.isParent("/a", "/b"));
+        assertFalse(KeyUtils.isParent("/a", "/a"));
+        assertFalse(KeyUtils.isParent("/b/c", "/b"));
+        assertFalse(KeyUtils.isParent("/b/c", "/b/"));
 
-interface AlertNode extends MasterNode {}
+        assertTrue(KeyUtils.isParent("/", "/b"));
+        assertTrue(KeyUtils.isParent("/b/c", "/b/c/d"));
+        assertTrue(KeyUtils.isParent("/b", "/b/c/d"));
+        assertTrue(KeyUtils.isParent("/b/", "/b/c/d"));
 
-export {
-  DatabaseRes,
-  MasterNode,
-  WorkerNode,
-  ServerNodeType,
-  ServerNode,
-  AlertNode
+    }
+
 }

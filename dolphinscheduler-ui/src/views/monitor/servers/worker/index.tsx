@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import { NGrid, NGi, NCard, NNumberAnimation, NSpace, NTag } from 'naive-ui'
+import { NGrid, NGi, NCard, NSpace, NTag } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useWorker } from './use-worker'
 import styles from './index.module.scss'
@@ -64,7 +64,7 @@ const worker = defineComponent({
       this
 
     const renderNodeServerStatusTag = (item: WorkerNode) => {
-      const serverStatus = JSON.parse(item.resInfo)?.serverStatus
+      const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
 
       if (!serverStatus) return ''
 
@@ -103,7 +103,7 @@ const worker = defineComponent({
                       }`}</span>
                       <span
                         class={styles['link-btn']}
-                        onClick={() => clickDetails(item.zkDirectory)}
+                        onClick={() => clickDetails(item.serverDirectory)}
                       >
                         {t('monitor.worker.directory_detail')}
                       </span>
@@ -118,14 +118,14 @@ const worker = defineComponent({
                     </NSpace>
                   </NSpace>
                 </NCard>
-                <NGrid x-gap='12' cols='5'>
+                <NGrid x-gap='12' cols='4'>
                   <NGi>
                     <Card title={t('monitor.worker.cpu_usage')}>
                       <div class={styles.card}>
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).cpuUsage * 100
+                              JSON.parse(item.heartBeatInfo).cpuUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -138,7 +138,7 @@ const worker = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).memoryUsage * 100
+                              JSON.parse(item.heartBeatInfo).memoryUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -146,54 +146,28 @@ const worker = defineComponent({
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.worker.disk_available')}>
-                      <div class={[styles.card, styles['load-average']]}>
+                    <Card title={t('monitor.worker.disk_usage')}>
+                      <div class={[styles.card]}>
                         {item && (
-                          <NNumberAnimation
-                            precision={2}
-                            from={0}
-                            to={JSON.parse(item.resInfo).diskAvailable}
+                          <Gauge
+                            data={(
+                              JSON.parse(item.heartBeatInfo).diskUsage * 100
+                            ).toFixed(2)}
                           />
                         )}
                       </div>
                     </Card>
                   </NGi>
-                  <NGi>
-                    <Card title={t('monitor.worker.load_average')}>
-                      <div class={[styles.card, styles['load-average']]}>
-                        {item && (
-                          <NNumberAnimation
-                            precision={2}
-                            from={0}
-                            to={JSON.parse(item.resInfo).loadAverage}
-                          />
-                        )}
-                      </div>
-                    </Card>
-                  </NGi>
-
                   <NGi>
                     <Card title={t('monitor.worker.thread_pool_usage')}>
-                      <div
-                        class={[styles.card, styles['load-average']]}
-                        style={{
-                          'font-size': '90px'
-                        }}
-                      >
+                      <div class={[styles.card]}>
                         {item && (
-                          <>
-                            <NNumberAnimation
-                              precision={0}
-                              from={0}
-                              to={JSON.parse(item.resInfo).threadPoolUsage}
-                            />
-                            /
-                            <NNumberAnimation
-                              precision={0}
-                              from={0}
-                              to={JSON.parse(item.resInfo).workerHostWeight}
-                            />
-                          </>
+                          <Gauge
+                            data={(
+                              JSON.parse(item.heartBeatInfo).threadPoolUsage *
+                              100
+                            ).toFixed(2)}
+                          />
                         )}
                       </div>
                     </Card>
