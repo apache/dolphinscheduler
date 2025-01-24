@@ -19,8 +19,7 @@ export default {
   master: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
-    disk_available: '磁盘可用容量',
-    load_average: '平均负载量',
+    disk_usage: '磁盘使用量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
@@ -33,8 +32,7 @@ export default {
   worker: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
-    disk_available: '磁盘可用容量',
-    load_average: '平均负载量',
+    disk_usage: '磁盘使用量',
     thread_pool_usage: '线程池使用量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
