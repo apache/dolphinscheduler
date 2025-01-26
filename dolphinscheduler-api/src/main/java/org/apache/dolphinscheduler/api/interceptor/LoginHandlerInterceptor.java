@@ -96,8 +96,10 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request,
+                           HttpServletResponse response,
+                           Object handler,
+                           ModelAndView modelAndView) {
         ThreadLocalContext.getTimezoneThreadLocal().remove();
 
         int code = response.getStatus();
