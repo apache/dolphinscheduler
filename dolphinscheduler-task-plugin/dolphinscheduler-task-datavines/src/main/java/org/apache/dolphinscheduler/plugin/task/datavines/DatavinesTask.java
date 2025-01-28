@@ -18,9 +18,13 @@
 package org.apache.dolphinscheduler.plugin.task.datavines;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.*;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.http.HttpResponse;
@@ -172,9 +176,9 @@ public class DatavinesTask extends AbstractRemoteTask {
      */
     private int mapStatusToExitCode(boolean status) {
         if (status) {
-            return TaskConstants.EXIT_CODE_SUCCESS;
+            return EXIT_CODE_SUCCESS;
         } else {
-            return TaskConstants.EXIT_CODE_FAILURE;
+            return EXIT_CODE_FAILURE;
         }
     }
 
@@ -192,7 +196,7 @@ public class DatavinesTask extends AbstractRemoteTask {
     }
 
     private void errorHandle(Object msg) {
-        setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+        setExitStatusCode(EXIT_CODE_FAILURE);
         log.error("datavines task execute failed with error: {}", msg);
     }
 
