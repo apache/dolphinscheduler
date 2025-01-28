@@ -478,7 +478,7 @@ interface ITaskParams {
   kubeConfig?: string
   jobId?: string
   token?: string
-  failureBlock?:string
+  failureBlock?: string
 }
 
 interface INodeData

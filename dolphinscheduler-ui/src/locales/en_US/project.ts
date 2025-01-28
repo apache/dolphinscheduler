@@ -903,7 +903,8 @@ export default {
     dinky_task_id_tips: 'Please enter the task id of your dinky',
     dinky_online: 'Online task',
     datavines_address: 'Datavines address',
-    datavines_address_tips: 'Please enter the url of your datavines, eg: http://localhost:5600',
+    datavines_address_tips:
+      'Please enter the url of your datavines, eg: http://localhost:5600',
     datavines_job_id: 'Datavines job id',
     datavines_job_id_tips: 'Please enter the job id of your datavines',
     datavines_token: 'Datavines token',
