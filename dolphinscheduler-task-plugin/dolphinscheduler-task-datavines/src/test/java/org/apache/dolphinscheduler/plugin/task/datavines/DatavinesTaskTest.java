@@ -20,14 +20,15 @@ package org.apache.dolphinscheduler.plugin.task.datavines;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -48,7 +49,8 @@ class DatavinesTaskTest {
 
     @Test
     void initValidParametersInitializesSuccessfully() {
-        when(taskExecutionContext.getTaskParams()).thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+        when(taskExecutionContext.getTaskParams())
+                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
         datavinesTask.init();
         assertNotNull(datavinesTask.getParameters());
     }
@@ -61,14 +63,16 @@ class DatavinesTaskTest {
 
     @Test
     void submitApplicationExecutesJobSuccessfully() {
-        when(taskExecutionContext.getTaskParams()).thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+        when(taskExecutionContext.getTaskParams())
+                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
         datavinesTask.init();
         assertDoesNotThrow(() -> datavinesTask.submitApplication());
     }
 
     @Test
     void trackApplicationStatusJobExecutionFailureSetsExitCodeFailure() throws TaskException {
-        when(taskExecutionContext.getTaskParams()).thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+        when(taskExecutionContext.getTaskParams())
+                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
         datavinesTask.init();
         datavinesTask.submitApplication();
         datavinesTask.trackApplicationStatus();
@@ -77,7 +81,8 @@ class DatavinesTaskTest {
 
     @Test
     void cancelApplicationTerminatesJobSuccessfully() {
-        when(taskExecutionContext.getTaskParams()).thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+        when(taskExecutionContext.getTaskParams())
+                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
         datavinesTask.init();
         assertDoesNotThrow(() -> datavinesTask.cancelApplication());
     }
