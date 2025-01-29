@@ -140,7 +140,7 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     @Override
     public boolean isTaskExecutionRunnableActive(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return activeTaskExecutionRunnable.add(taskExecutionRunnable.getName());
+        return activeTaskExecutionRunnable.contains(taskExecutionRunnable.getName());
     }
 
     @Override
@@ -254,6 +254,16 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     @Override
     public boolean isTaskExecutionRunnableForbidden(final ITaskExecutionRunnable taskExecutionRunnable) {
         return (taskExecutionRunnable.getTaskDefinition().getFlag() == Flag.NO);
+    }
+
+    @Override
+    public boolean isTaskExecutionRunnableRetrying(final ITaskExecutionRunnable taskExecutionRunnable) {
+        if (!taskExecutionRunnable.isTaskInstanceInitialized()) {
+            return false;
+        }
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        return taskInstance.getState() == TaskExecutionStatus.FAILURE && taskExecutionRunnable.isTaskInstanceCanRetry()
+                && isTaskExecutionRunnableActive(taskExecutionRunnable);
     }
 
     /**

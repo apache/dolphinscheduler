@@ -294,4 +294,54 @@ public class WorkflowInstancePauseTestCase extends AbstractMasterIntegrationTest
         masterContainer.assertAllResourceReleased();
     }
 
+    @Test
+    @DisplayName("Test pause a workflow with failed retrying task")
+    public void testPauseWorkflow_with_failedRetryingTask() {
+        final String yaml = "/it/pause/workflow_with_fake_task_failed_retrying.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .pollInterval(Duration.ofMillis(100))
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+
+                    assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(
+                                    taskInstance -> {
+                                        assertThat(taskInstance.getName()).isEqualTo("FAILED-RETRY");
+                                        assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                    });
+                });
+
+        assertThat(workflowOperator.pauseWorkflowInstance(workflowInstanceId).isSuccess());
+
+        await()
+                .pollInterval(Duration.ofMillis(100))
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .satisfies(
+                                    workflowInstance -> {
+                                        assertThat(workflowInstance.getState())
+                                                .isEqualTo(WorkflowExecutionStatus.PAUSE);
+                                    });
+
+                    assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .satisfiesExactly(
+                                    taskInstance -> {
+                                        assertThat(taskInstance.getName()).isEqualTo("FAILED-RETRY");
+                                        assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.PAUSE);
+                                    });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
 }
