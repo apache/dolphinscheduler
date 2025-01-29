@@ -18,22 +18,31 @@
 package org.apache.dolphinscheduler.plugin.task.datavines;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.datavines.utils.RequestUtils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DatavinesTaskTest {
 
     @Mock
@@ -52,7 +61,7 @@ class DatavinesTaskTest {
         when(taskExecutionContext.getTaskParams())
                 .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
         datavinesTask.init();
-        assertNotNull(datavinesTask.getParameters());
+        Assertions.assertNotNull(datavinesTask.getParameters());
     }
 
     @Test
@@ -70,13 +79,42 @@ class DatavinesTaskTest {
     }
 
     @Test
+    void trackApplicationStatusJobExecutionSuccessSetsExitCodeSuccess() throws TaskException {
+        JsonNode executeJobResult = RequestUtils.parse("{\"code\":\"200\",\"data\":\"1\"}");
+        JsonNode executeStatus = RequestUtils.parse("{\"code\":\"200\",\"data\":\"SUCCESS\"}");
+        JsonNode executeResult = RequestUtils.parse("{\"code\":\"200\",\"data\":\"1\"}");
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            when(taskExecutionContext.getTaskParams())
+                    .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+            datavinesTask.init();
+
+            requestUtilsStatic.when(() -> RequestUtils.executeJob(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(executeJobResult);
+            datavinesTask.submitApplication();
+
+            // 第一次调用 RequestUtils.getJobExecutionResult
+            requestUtilsStatic
+                    .when(() -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(executeStatus);
+
+            // 第二次调用 RequestUtils.getJobExecutionResult
+            requestUtilsStatic
+                    .when(() -> RequestUtils.getJobExecutionResult(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(executeResult);
+
+            datavinesTask.trackApplicationStatus();
+            Assertions.assertEquals(EXIT_CODE_SUCCESS, datavinesTask.getExitStatusCode());
+        }
+    }
+
+    @Test
     void trackApplicationStatusJobExecutionFailureSetsExitCodeFailure() throws TaskException {
         when(taskExecutionContext.getTaskParams())
                 .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
         datavinesTask.init();
         datavinesTask.submitApplication();
         datavinesTask.trackApplicationStatus();
-        assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
     }
 
     @Test
@@ -92,7 +130,7 @@ class DatavinesTaskTest {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress("http://localhost");
         parameters.setJobId("1");
-        assertTrue(parameters.checkParameters());
+        Assertions.assertTrue(parameters.checkParameters());
     }
 
     @Test
@@ -100,7 +138,7 @@ class DatavinesTaskTest {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress("");
         parameters.setJobId("1");
-        assertFalse(parameters.checkParameters());
+        Assertions.assertFalse(parameters.checkParameters());
     }
 
     @Test
@@ -108,7 +146,7 @@ class DatavinesTaskTest {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress("http://localhost");
         parameters.setJobId("");
-        assertFalse(parameters.checkParameters());
+        Assertions.assertFalse(parameters.checkParameters());
     }
 
     @Test
@@ -116,7 +154,7 @@ class DatavinesTaskTest {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress(null);
         parameters.setJobId("1");
-        assertFalse(parameters.checkParameters());
+        Assertions.assertFalse(parameters.checkParameters());
     }
 
     @Test
@@ -124,13 +162,43 @@ class DatavinesTaskTest {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress("http://localhost");
         parameters.setJobId(null);
-        assertFalse(parameters.checkParameters());
+        Assertions.assertFalse(parameters.checkParameters());
     }
 
     @Test
     void getResourceFilesListReturnsEmptyList() {
         DatavinesParameters parameters = new DatavinesParameters();
-        assertTrue(parameters.getResourceFilesList().isEmpty());
+        Assertions.assertTrue(parameters.getResourceFilesList().isEmpty());
+    }
+
+    @Test
+    void killJobExecutionValidParametersExecutesSuccessfully() {
+        String address = "http://localhost";
+        String jobExecutionId = "1";
+        String token = "token";
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            requestUtilsStatic
+                    .when(() -> RequestUtils
+                            .doPost(address + DatavinesTaskConstants.JOB_EXECUTION_KILL + jobExecutionId, token))
+                    .thenReturn("");
+            RequestUtils.killJobExecution(address, jobExecutionId, token);
+            // No exception means success
+        }
+    }
+
+    @Test
+    void parseValidJsonStringReturnsJsonNode() {
+        String jsonString = "{\"code\":\"200\",\"data\":\"SUCCESS\"}";
+        JsonNode result = RequestUtils.parse(jsonString);
+        Assertions.assertEquals("200", result.get("code").asText());
+        Assertions.assertEquals("SUCCESS", result.get("data").asText());
+    }
+
+    @Test
+    void parseInvalidJsonStringReturnsNull() {
+        String jsonString = "invalid json";
+        JsonNode result = RequestUtils.parse(jsonString);
+        Assertions.assertNull(result);
     }
 
 }

@@ -26,25 +26,14 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.datavines.utils.RequestUtils;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 
@@ -97,9 +86,8 @@ public class DatavinesTask extends AbstractRemoteTask {
             String address = this.datavinesParameters.getAddress();
             String jobId = this.datavinesParameters.getJobId();
             String token = this.datavinesParameters.getToken();
-            JsonNode result;
             String apiResultDataKey = DatavinesTaskConstants.API_RESULT_DATA;
-            result = executeJob(address, jobId, token);
+            JsonNode result = RequestUtils.executeJob(address, jobId, token);
             if (checkResult(result)) {
                 jobExecutionId = result.get(apiResultDataKey).asText();
                 executionStatus = true;
@@ -126,7 +114,8 @@ public class DatavinesTask extends AbstractRemoteTask {
             boolean finishFlag = false;
             while (!finishFlag) {
                 JsonNode jobExecutionStatus =
-                        getJobExecutionStatus(address, jobExecutionId, this.datavinesParameters.getToken());
+                        RequestUtils.getJobExecutionStatus(address, jobExecutionId,
+                                this.datavinesParameters.getToken());
                 if (!checkResult(jobExecutionStatus)) {
                     break;
                 }
@@ -135,7 +124,8 @@ public class DatavinesTask extends AbstractRemoteTask {
                     case DatavinesTaskConstants.STATUS_SUCCESS:
                         setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address, this.jobExecutionId));
                         JsonNode jobExecutionResult =
-                                getJobExecutionResult(address, jobExecutionId, this.datavinesParameters.getToken());
+                                RequestUtils.getJobExecutionResult(address, jobExecutionId,
+                                        this.datavinesParameters.getToken());
                         if (!checkResult(jobExecutionResult)) {
                             break;
                         }
@@ -212,89 +202,10 @@ public class DatavinesTask extends AbstractRemoteTask {
                 this.taskExecutionContext.getTaskInstanceId(),
                 address,
                 jobExecutionId);
-        killJobExecution(address, jobExecutionId, this.datavinesParameters.getToken());
+        RequestUtils.killJobExecution(address, jobExecutionId, this.datavinesParameters.getToken());
         log.warn("datavines task terminated, taskId: {}, address: {}, jobExecutionId: {}",
                 this.taskExecutionContext.getTaskInstanceId(),
                 address,
                 jobExecutionId);
     }
-
-    private JsonNode executeJob(String address, String jobId, String token) {
-        return parse(doPost(address + DatavinesTaskConstants.EXECUTE_JOB + jobId, token));
-    }
-
-    private JsonNode getJobExecutionStatus(String address, String jobExecutionId, String token) {
-        return parse(doGet(address + DatavinesTaskConstants.GET_JOB_EXECUTION_STATUS + jobExecutionId, token));
-    }
-
-    private JsonNode getJobExecutionResult(String address, String jobExecutionId, String token) {
-        return parse(doGet(address + DatavinesTaskConstants.GET_JOB_EXECUTION_RESULT + jobExecutionId, token));
-    }
-
-    private JsonNode killJobExecution(String address, String jobExecutionId, String token) {
-        return parse(doPost(address + DatavinesTaskConstants.JOB_EXECUTION_KILL + jobExecutionId, token));
-    }
-
-    private JsonNode parse(String res) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode result = null;
-        try {
-            result = mapper.readTree(res);
-        } catch (JsonProcessingException e) {
-            log.error("datavines task submit failed with error", e);
-        }
-        return result;
-    }
-
-    private String doGet(String url, String token) {
-        String result = "";
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet httpGet = null;
-        try {
-            URIBuilder uriBuilder = new URIBuilder(url);
-            URI uri = uriBuilder.build();
-            httpGet = new HttpGet(uri);
-            httpGet.setHeader("Authorization", "Bearer " + token);
-            log.info("access url: {}", uri);
-            HttpResponse response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                result = EntityUtils.toString(response.getEntity());
-                log.info("datavines task succeed with results: {}", result);
-            } else {
-                log.error("datavines task terminated,response: {}", response);
-            }
-        } catch (IllegalArgumentException ie) {
-            log.error("datavines task terminated: {}", ie.getMessage());
-        } catch (Exception e) {
-            log.error("datavines task terminated: ", e);
-        } finally {
-            if (null != httpGet) {
-                httpGet.releaseConnection();
-            }
-        }
-        return result;
-    }
-
-    private String doPost(String url, String token) {
-        String result = "";
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost httpPost = new HttpPost(url);
-        try {
-            httpPost.setHeader("Authorization", "Bearer " + token);
-            HttpResponse response = httpClient.execute(httpPost);
-            log.info("access url: {}", url);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                result = EntityUtils.toString(response.getEntity());
-                log.info("datavines task succeed with results: {}", result);
-            } else {
-                log.error("datavines task terminated, response: {}", response);
-            }
-        } catch (IllegalArgumentException ie) {
-            log.error("datavines task terminated: {}", ie.getMessage());
-        } catch (Exception he) {
-            log.error("datavines task terminated: ", he);
-        }
-        return result;
-    }
-
 }
