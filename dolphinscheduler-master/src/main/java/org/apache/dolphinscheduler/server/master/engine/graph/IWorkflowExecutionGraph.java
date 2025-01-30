@@ -192,6 +192,11 @@ public interface IWorkflowExecutionGraph {
     boolean isTaskExecutionRunnableForbidden(final ITaskExecutionRunnable taskExecutionRunnable);
 
     /**
+     * Whether the given task's execution is failure and waiting for retry.
+     */
+    boolean isTaskExecutionRunnableRetrying(final ITaskExecutionRunnable taskExecutionRunnable);
+
+    /**
      * Whether all predecessors task is skipped.
      * <p> Once all predecessors are marked as skipped, then the task will be marked as skipped, and will trigger its successors.
      */
