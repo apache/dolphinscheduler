@@ -16,14 +16,14 @@
  */
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDeployMode, useResources, useCustomParams } from '.'
+import { useDeployMode, useResources, useCustomParams, useSeaTunnelSourceType, useSeaTunnelTargetType } from '.'
 import type { IJsonItem } from '../types'
 
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
-  const resourceEditorSpan = computed(() => (model.useCustom ? 0 : 24))
+  const resourceEditorSpan = computed(() => (model.useCustom ? 24 : 0))
   const flinkSpan = computed(() =>
     model.startupScript.includes('flink') ? 24 : 0
   )
@@ -53,6 +53,12 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       ? 24
       : 0
   )
+
+  const customDataFilterSpan = computed(() => (model['useCustom'] === true ? 0 : 24))
+
+  const customTransfromEditorSpan = computed(() => (model['useCustom'] === true ? 0 : model['customDataFilter'] === true ? 24 : 0))
+
+  const useCustomSpan = computed(() => (model['useCustom'] === true ? 0 : 24))
 
   return [
     {
@@ -132,6 +138,13 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
     // SeaTunnel config parameter
     {
+      type: 'input-number',
+      field: 'parallelism',
+      name: t('project.node.parallelism'),
+      span: 24,
+      props: { min: 1 }
+    },
+    {
       type: 'switch',
       field: 'useCustom',
       name: t('project.node.custom_config')
@@ -151,7 +164,30 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    useResources(resourceEditorSpan, true, 1),
+    ...useSeaTunnelSourceType(model, useCustomSpan),
+    ...useSeaTunnelTargetType(model, useCustomSpan),
+    {
+      type: 'switch',
+      field: 'customDataFilter',
+      name: t('project.node.sea_tunnel_custom_filter'),
+      span: customDataFilterSpan
+    },
+    {
+      type: 'editor',
+      field: 'customTransform',
+      span: customTransfromEditorSpan,
+      name: t('project.node.sea_tunnel_custom_transform'),
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(unuse: any, value) {
+          if (!value && value !== 0) {
+            return Error(t('project.node.sea_tunnel_custom_transform'))
+          }
+        }
+      }
+    },
+    useResources(resourceEditorSpan, false, 1),
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

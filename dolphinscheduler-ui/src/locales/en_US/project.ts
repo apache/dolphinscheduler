@@ -924,7 +924,22 @@ export default {
     spark_submit_parameters: 'spark submit parameters',
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
-    is_production_tips: 'is production'
+    is_production_tips: 'is production',
+    sea_tunnel_parallelism: 'Parallelism',
+    sea_tunnel_target_datasource_type: 'Target Datasource Type',
+    sea_tunnel_source_datasource_type: 'Source Datasource Type',
+    sea_tunnel_source_datasource_instances: 'Source Datasource Instance',
+    sea_tunnel_target_datasource_instances: 'Target Datasource Instance',
+    sea_tunnel_file_path: 'File Path',
+    sea_tunnel_custom_filter: 'Custom Transform',
+    sea_tunnel_custom_transform: 'Transform',
+    sea_tunnel_file_format: 'File Format',
+    sea_tunnel_custom_title_source: 'Data Source',
+    sea_tunnel_custom_title_target: 'Data Target',
+    sea_tunnel_source_table_name: 'Source Table Name',
+    sea_tunnel_target_table_name: 'Target Table Name',
+    sea_tunnel_add_custom_params: 'Add Params',
+    sea_tunnel_default_fs: 'fs.defaultFS'
   },
   menu: {
     fav: 'Favorites',

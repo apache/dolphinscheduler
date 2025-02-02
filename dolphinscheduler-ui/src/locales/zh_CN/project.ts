@@ -894,7 +894,23 @@ export default {
     spark_submit_parameters: 'spark submit parameters',
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
-    is_production_tips: 'is production'
+    is_production_tips: 'is production',
+    sea_tunnel_parallelism: '并发度',
+    sea_tunnel_target_datasource_type: '目标数据源类型',
+    sea_tunnel_source_datasource_type: '源数据源类型',
+    sea_tunnel_source_datasource_instances: '源数据源实例',
+    sea_tunnel_target_datasource_instances: '目标数据源实例',
+    sea_tunnel_file_path: '文件路径',
+    sea_tunnel_custom_filter: '自定义Transform',
+    sea_tunnel_custom_transform: 'Transform',
+    sea_tunnel_file_format: '文件格式',
+    sea_tunnel_custom_title_source: '数据来源',
+    sea_tunnel_custom_title_target: '数据目的',
+    sea_tunnel_source_table_name: '源表名',
+    sea_tunnel_target_table_name: '目的表名',
+    sea_tunnel_add_custom_params: '添加配置参数',
+    sea_tunnel_default_fs: 'fs.defaultFS'
+
   },
   menu: {
     fav: '收藏组件',

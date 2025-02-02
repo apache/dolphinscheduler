@@ -17,10 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.parameter.BaseDataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.parameter.SeatunnelConfigParameters;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,8 +40,36 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SeatunnelParameters extends AbstractParameters {
 
+    /**
+     * source config parameters
+     */
+    SeatunnelConfigParameters sourceConfig;
+
+    /**
+     * sink config parameters
+     */
+    SeatunnelConfigParameters sinkConfig;
+
+    /**
+     * task parallelism
+     */
+    private int parallelism;
+
+    /**
+     * Enable custom data filtering
+     */
+    private boolean customDataFilter;
+
+    /**
+     * Custom seatunnel transform config when customDataFilter set true
+     */
+    private String customTransform;
+
     private String startupScript;
 
+    /**
+     * Whether to use user-defined configuration
+     */
     private Boolean useCustom;
 
     private String rawScript;
@@ -51,12 +83,60 @@ public class SeatunnelParameters extends AbstractParameters {
     public boolean checkParameters() {
         return Objects.nonNull(startupScript)
                 && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
-                        || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList)
-                                && resourceList.size() == 1));
+                        || (BooleanUtils.isFalse(useCustom) && sourceConfig != null && sinkConfig != null));
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return resourceList;
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+
+        if (Objects.nonNull(sourceConfig) && sourceConfig.getDbType().isDatasourceType()) {
+            BaseDataSourceParameters dataSourceParameters = (BaseDataSourceParameters) sourceConfig;
+            int sourceDatabaseId = dataSourceParameters.getDatabaseId();
+            if (sourceDatabaseId != 0) {
+                resources.put(ResourceType.DATASOURCE, sourceDatabaseId);
+            }
+        }
+
+        if (Objects.nonNull(sinkConfig) && sinkConfig.getDbType().isDatasourceType()) {
+            BaseDataSourceParameters dataSourceParameters = (BaseDataSourceParameters) sinkConfig;
+            int sinkDatabaseId = dataSourceParameters.getDatabaseId();
+            if (sinkDatabaseId != 0) {
+                resources.put(ResourceType.DATASOURCE, sinkDatabaseId);
+            }
+
+        }
+
+        return resources;
+    }
+
+    public SeatunnelTaskExecutionContext generateExtendedContext(ResourceParametersHelper resourceParametersHelper) {
+
+        SeatunnelTaskExecutionContext seatunnelTaskExecutionContext = new SeatunnelTaskExecutionContext();
+
+        if (!useCustom && sourceConfig.getDbType().isDatasourceType()) {
+            int dataSourceId = ((BaseDataSourceParameters) sourceConfig).getDatabaseId();
+            DataSourceParameters sourceParameters = (DataSourceParameters) resourceParametersHelper
+                    .getResourceParameters(ResourceType.DATASOURCE, dataSourceId);
+            seatunnelTaskExecutionContext.setDataSourceId(dataSourceId);
+            seatunnelTaskExecutionContext.setDataSourceType(sourceConfig.getDbType());
+            seatunnelTaskExecutionContext.setSourceConnectionParams(sourceParameters.getConnectionParams());
+        }
+
+        if (!useCustom && sinkConfig.getDbType().isDatasourceType()) {
+            int dataTargetId = ((BaseDataSourceParameters) sinkConfig).getDatabaseId();
+            DataSourceParameters targetParameters = (DataSourceParameters) resourceParametersHelper
+                    .getResourceParameters(ResourceType.DATASOURCE, dataTargetId);
+            seatunnelTaskExecutionContext.setDataTargetId(dataTargetId);
+            seatunnelTaskExecutionContext.setDataTargetType(sinkConfig.getDbType());
+            seatunnelTaskExecutionContext.setTargetConnectionParams(targetParameters.getConnectionParams());
+        }
+
+        return seatunnelTaskExecutionContext;
     }
 }

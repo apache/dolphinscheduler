@@ -23,7 +23,8 @@ import type {
   ISqoopTargetParams,
   ISqoopSourceParams,
   ILocalParam,
-  IDependentParameters
+  IDependentParameters,
+  ISeatunnelDataParams
 } from './types'
 import { ref } from 'vue'
 
@@ -209,6 +210,10 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SEATUNNEL') {
     taskParams.startupScript = data.startupScript
     taskParams.useCustom = data.useCustom
+    taskParams.parallelism = data.parallelism
+    let sourceConfig: ISeatunnelDataParams = {}
+    let sinkConfig: ISeatunnelDataParams = {}
+
     if (!data.useCustom) {
       taskParams.rawScript = ''
     }
@@ -225,6 +230,43 @@ export function formatParams(data: INodeData): {
       taskParams.deployMode = data.deployMode
       taskParams.others = data.others
     }
+
+    switch (data.sourceDbType) {
+      case 'HDFS':
+        sourceConfig.dbType = data.sourceDbType
+        sourceConfig.filePath = data.sourceFilePath
+        sourceConfig.fileFormat = data.sourceFileFormat
+        sourceConfig.defaultFs = data.sourceDefaultFs
+        break
+      default:
+        sourceConfig.dbType = data.sourceDbType
+        sourceConfig.databaseId = data.sourceDatabase
+        sourceConfig.table = data.sourceTable
+        break  
+    }
+
+    switch (data.targetDbType) {
+      case 'HDFS':
+        sinkConfig.dbType = data.targetDbType
+        sinkConfig.filePath = data.targetFilePath
+        sinkConfig.fileFormat = data.targetFileFormat
+        sinkConfig.defaultFs = data.targetDefaultFs
+        break
+      default:
+        sinkConfig.dbType = data.targetDbType
+        sinkConfig.databaseId = data.targetDatabase
+        sinkConfig.table = data.targetTable
+        break       
+    }
+
+    sourceConfig.customParams = data.sourceCustomParams
+    sinkConfig.customParams = data.targetCustomParams
+
+    taskParams.customDataFilter = data.customDataFilter
+    taskParams.customTransform = data.customTransform
+
+    taskParams.sourceConfig = sourceConfig
+    taskParams.sinkConfig = sinkConfig
   }
 
   if (data.taskType === 'SWITCH') {
@@ -705,6 +747,31 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
+  }
+
+  if (data.taskParams?.sourceConfig) {
+    params.sourceDbType = data.taskParams.sourceConfig.dbType
+    params.sourceDatabase = data.taskParams.sourceConfig.databaseId
+    params.parallelism = data.taskParams.sourceConfig.parallelism
+    params.sourceFilePath = data.taskParams.sourceConfig.filePath
+    params.sourceFileFormat = data.taskParams.sourceConfig.fileFormat
+    params.sourceTable = data.taskParams.sourceConfig.table
+    params.sourceDefaultFs = data.taskParams.sourceConfig.defaultFs
+    params.sourceCustomParams = data.taskParams.sourceConfig.customParams
+  }
+
+  if (data.taskParams?.sinkConfig) {
+    params.targetDbType = data.taskParams.sinkConfig.dbType
+    params.targetDatabase = data.taskParams.sinkConfig.databaseId
+    params.targetFilePath = data.taskParams.sinkConfig.filePath
+    params.targetFileFormat = data.taskParams.sinkConfig.fileFormat
+    params.targetTable = data.taskParams.sinkConfig.table
+    params.targetDefaultFs = data.taskParams.sinkConfig.defaultFs
+    params.targetCustomParams = data.taskParams.sinkConfig.customParams
+  }
+
+  if (data.taskParams?.parallelism) {
+    params.parallelism = data.taskParams.parallelism
   }
 
   return params

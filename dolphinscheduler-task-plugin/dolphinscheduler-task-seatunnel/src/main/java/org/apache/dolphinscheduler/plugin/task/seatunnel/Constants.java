@@ -32,4 +32,38 @@ public class Constants {
     public static final String JSON_SUFFIX = "json";
     public static final String CONF_SUFFIX = "conf";
 
+    public static final String EQUAL_SIGN = " = ";
+    public static final String LINE_BREAK = "\n";
+    public static final String INDENT_TWO_SPACE = "  ";
+    public static final String INDENT_FOUR_SPACE = "    ";
+    public static final String DOUBLE_QUOTE = "\"";
+    public static final String SINGLE_BRACKETS_RIGHT = "}";
+    public static final String SINGLE_BRACKETS_LEFT = "{";
+
+    /**
+     * doris config
+     */
+    public static final String FENODES = "fenodes = ";
+    public static final String USERNAME = "username = ";
+    public static final String PASSWORD = "password = ";
+    public static final String DATABASE = "database = ";
+    public static final String TABLE = "table = ";
+    public static final String DORIS_CONFIG = "doris.config";
+    public static final String FORMAT = "format = ";
+    public static final String FORMAT_JSON = "json";
+    public static final String READ_JSON_BY_LINE = "read_json_by_line = ";
+    public static final String TRUE = "true";
+
+    /**
+     * hdfs config
+     */
+    public static final String defaultFs = "fs.defaultFs = ";
+    public static final String HDFS_SITE_PATH = "hdfs_site_path = ";
+    public static final String KRB5_PATH = "krb5_path = ";
+    public static final String KERBEROS_PRINCIPAL = "kerberos_principal = ";
+    public static final String KERBEROS_KEYTAB_PATH = "kerberos_keytab_path = ";
+    public static final String TMP_PATH = "tmp_path = ";
+    public static final String TMP_PATH_VALUE = "/tmp/seatunnel";
+    public static final String REMOTE_USER = "remote_user = ";
+
 }

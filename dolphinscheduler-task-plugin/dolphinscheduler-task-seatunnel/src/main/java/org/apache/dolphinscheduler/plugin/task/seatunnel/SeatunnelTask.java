@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.generator.SeatunnelConfigGenerator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -73,6 +74,11 @@ public class SeatunnelTask extends AbstractRemoteTask {
     protected final TaskExecutionContext taskExecutionContext;
 
     /**
+     * seatunnelTaskExecutionContext
+     */
+    protected SeatunnelTaskExecutionContext seatunnelTaskExecutionContext;
+
+    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
@@ -95,6 +101,9 @@ public class SeatunnelTask extends AbstractRemoteTask {
         if (seatunnelParameters == null || !seatunnelParameters.checkParameters()) {
             throw new TaskException("SeaTunnel task params is not valid");
         }
+
+        seatunnelTaskExecutionContext =
+                seatunnelParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     // todo split handle to submit and track
@@ -160,13 +169,21 @@ public class SeatunnelTask extends AbstractRemoteTask {
         args.add(CONFIG_OPTIONS);
         String scriptContent;
         if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
-            scriptContent = buildCustomConfigContent();
+            if (null != seatunnelParameters.getResourceList() && !seatunnelParameters.getResourceList().isEmpty()) {
+                // use resource file
+                String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
+                ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+                scriptContent = FileUtils.readFileToString(
+                        new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
+                        StandardCharsets.UTF_8);
+            } else {
+                // use custom config
+                scriptContent = buildCustomConfigContent();
+            }
         } else {
-            String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
-            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
-            scriptContent = FileUtils.readFileToString(
-                    new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
-                    StandardCharsets.UTF_8);
+            // use generator config
+            scriptContent =
+                    SeatunnelConfigGenerator.generate(seatunnelParameters, seatunnelTaskExecutionContext);
         }
         String filePath = buildConfigFilePath();
         createConfigFileIfNotExists(scriptContent, filePath);
@@ -174,6 +191,26 @@ public class SeatunnelTask extends AbstractRemoteTask {
         args.addAll(generateTaskParameters());
         return args;
     }
+
+    // protected List<String> buildOptions() throws Exception {
+    // List<String> args = new ArrayList<>();s
+    // args.add(CONFIG_OPTIONS);
+    // String scriptContent;
+    // if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
+    // scriptContent = buildCustomConfigContent();
+    // } else {
+    // String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
+    // ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+    // scriptContent = FileUtils.readFileToString(
+    // new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
+    // StandardCharsets.UTF_8);
+    // }
+    // String filePath = buildConfigFilePath();
+    // createConfigFileIfNotExists(scriptContent, filePath);
+    // args.add(filePath);
+    // args.addAll(generateTaskParameters());
+    // return args;
+    // }
 
     private List<String> generateTaskParameters() {
         Map<String, String> variables = new HashMap<>();

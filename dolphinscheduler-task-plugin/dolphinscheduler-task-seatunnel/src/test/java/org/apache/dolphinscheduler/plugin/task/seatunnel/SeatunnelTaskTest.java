@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.generator.SeatunnelConfigGenerator;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.parameter.HdfsFileParameters;
 
 import org.apache.commons.io.FileUtils;
 
@@ -84,7 +86,7 @@ public class SeatunnelTaskTest {
     public void testReadConfigFromResourceCenter() throws Exception {
         String taskId = "2345";
         SeatunnelParameters seatunnelParameters = new SeatunnelParameters();
-        seatunnelParameters.setUseCustom(false);
+        seatunnelParameters.setUseCustom(true);
         ResourceInfo resourceInfo = new ResourceInfo();
         resourceInfo.setResourceName(RESOURCE_SCRIPT_PATH);
         seatunnelParameters.setResourceList(Collections.singletonList(resourceInfo));
@@ -108,7 +110,7 @@ public class SeatunnelTaskTest {
     public void testParameterPass() throws Exception {
         String taskId = "3456";
         SeatunnelParameters seatunnelParameters = new SeatunnelParameters();
-        seatunnelParameters.setUseCustom(false);
+        seatunnelParameters.setUseCustom(true);
         ResourceInfo resourceInfo = new ResourceInfo();
         resourceInfo.setResourceName(RESOURCE_SCRIPT_PATH);
         List<Property> localParam = new ArrayList<>();
@@ -131,6 +133,45 @@ public class SeatunnelTaskTest {
         String command = String.join(" ", seatunnelTask.buildOptions());
         String expectedCommand = String.format("--config %s/seatunnel_%s.conf -i key1='value1'", EXECUTE_PATH, taskId);
         Assertions.assertEquals(expectedCommand, command);
+    }
+
+    @Test
+    public void testSeatunnelConfigGeneration() {
+        SeatunnelParameters seatunnelParameters = new SeatunnelParameters();
+        seatunnelParameters.setUseCustom(false);
+
+        HdfsFileParameters sourceConfig = new HdfsFileParameters();
+        sourceConfig.setDbType(DbTypeEnum.HDFS);
+        sourceConfig.setFileFormat("parquet");
+        sourceConfig.setDefaultFs("hdfs://hadoopcluster");
+        sourceConfig.setFilePath("/tmp/dolphinscheduler/seautnnel/st_hdfs_source.parquet");
+
+        List<Property> sourceCustomConfig = new ArrayList<>();
+        sourceCustomConfig
+                .add(new Property("hdfs_site_path", Direct.IN, DataType.VARCHAR, "/tmp/hadoop/hdfs-site.xml"));
+        sourceCustomConfig.add(new Property("krb5_path", Direct.IN, DataType.VARCHAR, "/tmp/hadoop/krb5.conf"));
+        sourceConfig.setCustomParams(sourceCustomConfig);
+
+        HdfsFileParameters sinkConfig = new HdfsFileParameters();
+        sinkConfig.setDbType(DbTypeEnum.HDFS);
+        sinkConfig.setFileFormat("orc");
+        sinkConfig.setDefaultFs("hdfs://hadoopcluster");
+        sinkConfig.setFilePath("/tmp/dolphinscheduler/seautnnel/st_hdfs_sink.orc");
+
+        List<Property> sinkCustomConfig = new ArrayList<>();
+        sinkCustomConfig.add(new Property("hdfs_site_path", Direct.IN, DataType.VARCHAR, "/tmp/hadoop/hdfs-site.xml"));
+        sinkConfig.setCustomParams(sinkCustomConfig);
+
+        seatunnelParameters.setSourceConfig(sourceConfig);
+        seatunnelParameters.setSinkConfig(sinkConfig);
+        seatunnelParameters.setParallelism(5);
+
+        SeatunnelTaskExecutionContext seatunnelTaskExecutionContext = new SeatunnelTaskExecutionContext();
+
+        String generateConfig = SeatunnelConfigGenerator.generate(seatunnelParameters, seatunnelTaskExecutionContext);
+
+        Assertions.assertEquals(generateConfig, RAW_SCRIPT_3);
+
     }
 
     private static final String RAW_SCRIPT = "env {\n" +
@@ -178,6 +219,28 @@ public class SeatunnelTaskTest {
             "  },\n" +
             "  \"sink\": {\n" +
             "    \"Console\": {}\n" +
+            "  }\n" +
+            "}";
+
+    private static final String RAW_SCRIPT_3 = "env {\n" +
+            "  job.mode = \"BATCH\"" + "\n" +
+            "  parallelism = 5" + "\n" +
+            "}\n" +
+            "source {\n" +
+            "  HdfsFile {\n" +
+            "    path = \"/tmp/dolphinscheduler/seautnnel/st_hdfs_source.parquet\"" + "\n" +
+            "    file_format_type = \"parquet\"" + "\n" +
+            "    fs.defaultFS = \"hdfs://hadoopcluster\"" + "\n" +
+            "    hdfs_site_path = \"/tmp/hadoop/hdfs-site.xml\"" + "\n" +
+            "    krb5_path = \"/tmp/hadoop/krb5.conf\"" + "\n" +
+            "  }\n" +
+            "}\n\n" +
+            "sink {\n" +
+            "  HdfsFile {\n" +
+            "    path = \"/tmp/dolphinscheduler/seautnnel/st_hdfs_sink.orc\"" + "\n" +
+            "    file_format_type = \"orc\"" + "\n" +
+            "    fs.defaultFS = \"hdfs://hadoopcluster\"" + "\n" +
+            "    hdfs_site_path = \"/tmp/hadoop/hdfs-site.xml\"" + "\n" +
             "  }\n" +
             "}";
 }

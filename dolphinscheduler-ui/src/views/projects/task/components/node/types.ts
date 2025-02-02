@@ -260,6 +260,37 @@ interface IRuleParameters {
   mapping_columns?: string
 }
 
+interface ISeatunnelParams {
+  sourceDbType?: string,
+  sourceDatabase?: number,
+  sourceFilePath?: string,
+  targetDbType?: string,
+  targetDatabase?: number,
+  targetFilePath?: string,
+  customDataFilter?: boolean,
+  customTransform?: string,
+  sourceFileFormat?: string,
+  targetFileFormat?: string,
+  sourceDefaultFs?: string,
+  targetDefaultFs?: string,
+  parallelism?: number,
+  sourceTable?: string,
+  targetTable?: string,
+  sourceCustomParams?: ILocalParam[],
+  targetCustomParams?: ILocalParam[]
+}
+
+interface ISeatunnelDataParams {
+  dbType?: string,
+  databaseId?: number,
+  filePath?: string,
+  defaultFs?: string,
+  fileFormat?: string
+  parallelism?: number,
+  table?: string,
+  customParams?: ILocalParam[]
+}
+
 interface ITaskParams {
   resourceList?: ISourceItem[]
   mainJar?: ISourceItem
@@ -464,6 +495,19 @@ interface ITaskParams {
   yarnQueue?: string
   awsRegion?: string
   kubeConfig?: string
+  sourceDbType?: string
+  sourceDatabase?: number
+  sourceFilePath?: string
+  targetDbType?: string
+  targetDatabase?: number
+  targetFilePath?: string
+  customDataFilter?: boolean
+  customTransform?: string
+  fileFormat?: string
+  sourceConfig?: ISeatunnelDataParams
+  sinkConfig?: ISeatunnelDataParams
+  table?: string
+  defaultFs?: string
 }
 
 interface INodeData
@@ -481,6 +525,7 @@ interface INodeData
     ISqoopTargetData,
     ISqoopSourceData,
     IDependentParameters,
+    ISeatunnelParams,
     Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
@@ -557,5 +602,6 @@ export {
   IJsonItemParams,
   IResponseJsonItem,
   IDateType,
-  IDependentParameters
+  IDependentParameters,
+  ISeatunnelDataParams
 }
