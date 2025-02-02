@@ -33,9 +33,11 @@ import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
@@ -370,11 +372,9 @@ public class PythonGateway {
     public void execWorkflowInstance(String userName,
                                      String projectName,
                                      String workflowName,
-                                     String cronTime,
                                      String workerGroup,
                                      String warningType,
-                                     Integer warningGroupId,
-                                     Integer timeout) {
+                                     Integer warningGroupId) {
         User user = usersService.queryUser(userName);
         Project project = projectMapper.queryByName(projectName);
         WorkflowDefinition workflowDefinition =
@@ -389,6 +389,10 @@ public class PythonGateway {
                 .workerGroup(workerGroup)
                 .warningType(WarningType.of(warningType))
                 .warningGroupId(warningGroupId)
+                .execType(CommandType.START_PROCESS)
+                .taskDependType(TaskDependType.TASK_POST)
+                .dryRun(Flag.NO)
+                .testFlag(Flag.NO)
                 .build();
         executorService.triggerWorkflowDefinition(workflowTriggerRequest);
     }

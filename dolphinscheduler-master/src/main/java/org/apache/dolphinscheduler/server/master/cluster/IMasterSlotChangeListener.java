@@ -15,45 +15,11 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
-}
+package org.apache.dolphinscheduler.server.master.cluster;
 
-type ServerNodeType = 'MASTER' | 'WORKER' | 'ALERT_SERVER'
+import java.util.List;
 
-interface ServerNode {
-  id: number
-  host: string
-  port: number
-  serverDirectory: string
-  heartBeatInfo: string
-  createTime: string
-  lastHeartbeatTime: string
-}
+public interface IMasterSlotChangeListener {
 
-interface MasterNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-}
-
-interface WorkerNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-  workerHostWeight?: number
-  threadPoolUsage?: number
-}
-
-interface AlertNode extends MasterNode {}
-
-export {
-  DatabaseRes,
-  MasterNode,
-  WorkerNode,
-  ServerNodeType,
-  ServerNode,
-  AlertNode
+    void onMasterSlotChanged(final List<MasterServerMetadata> normalMasterServers);
 }

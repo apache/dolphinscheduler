@@ -104,6 +104,12 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
                                  final ITaskExecutionRunnable taskExecutionRunnable,
                                  final TaskPauseLifecycleEvent taskPauseEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
+        // When the failed task is awaiting retry, we can mark it as 'paused' to ignore the retry event.
+        if (isTaskRetrying(taskExecutionRunnable)) {
+            super.pausedEventAction(workflowExecutionRunnable, taskExecutionRunnable,
+                    TaskPausedLifecycleEvent.of(taskExecutionRunnable));
+            return;
+        }
         logWarningIfCannotDoAction(taskExecutionRunnable, taskPauseEvent);
     }
 
@@ -112,14 +118,11 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
                                   final ITaskExecutionRunnable taskExecutionRunnable,
                                   final TaskPausedLifecycleEvent taskPausedEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
         // This case happen when the task is failure but the task is in delay retry queue.
         // We don't remove the event in GlobalWorkflowDelayEventCoordinator the event should be dropped when the task is
         // killed.
-        if (taskExecutionRunnable.isTaskInstanceCanRetry()
-                && workflowExecutionGraph.isTaskExecutionRunnableActive(taskExecutionRunnable)) {
-            workflowExecutionGraph.markTaskExecutionRunnableChainPause(taskExecutionRunnable);
-            publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        if (isTaskRetrying(taskExecutionRunnable)) {
+            super.pausedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskPausedEvent);
             return;
         }
         logWarningIfCannotDoAction(taskExecutionRunnable, taskPausedEvent);
@@ -130,6 +133,12 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
                                 final ITaskExecutionRunnable taskExecutionRunnable,
                                 final TaskKillLifecycleEvent taskKillEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
+        // When the failed task is awaiting retry, we can mark it as 'killed' to ignore the retry event.
+        if (isTaskRetrying(taskExecutionRunnable)) {
+            super.killedEventAction(workflowExecutionRunnable, taskExecutionRunnable,
+                    TaskKilledLifecycleEvent.of(taskExecutionRunnable));
+            return;
+        }
         logWarningIfCannotDoAction(taskExecutionRunnable, taskKillEvent);
     }
 
@@ -138,14 +147,11 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
                                   final ITaskExecutionRunnable taskExecutionRunnable,
                                   final TaskKilledLifecycleEvent taskKilledEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
         // This case happen when the task is failure but the task is in delay retry queue.
         // We don't remove the event in GlobalWorkflowDelayEventCoordinator the event should be dropped when the task is
         // killed.
-        if (taskExecutionRunnable.isTaskInstanceCanRetry()
-                && workflowExecutionGraph.isTaskExecutionRunnableActive(taskExecutionRunnable)) {
-            workflowExecutionGraph.markTaskExecutionRunnableChainKill(taskExecutionRunnable);
-            publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        if (isTaskRetrying(taskExecutionRunnable)) {
+            super.killedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskKilledEvent);
             return;
         }
         logWarningIfCannotDoAction(taskExecutionRunnable, taskKilledEvent);
@@ -178,5 +184,10 @@ public class TaskFailureStateAction extends AbstractTaskStateAction {
     @Override
     public TaskExecutionStatus matchState() {
         return TaskExecutionStatus.FAILURE;
+    }
+
+    private boolean isTaskRetrying(final ITaskExecutionRunnable taskExecutionRunnable) {
+        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
+        return workflowExecutionGraph.isTaskExecutionRunnableRetrying(taskExecutionRunnable);
     }
 }
