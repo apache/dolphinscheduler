@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.generator;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -30,20 +31,19 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.util.List;
 import java.util.Objects;
 
-public class MysqlConfigTemplate implements ConfigTemplate {
+public class MysqlConfigGenerator implements IConfigGenerator {
 
     private final SeatunnelParameters seatunnelParameters;
 
     private final SeatunnelTaskExecutionContext seatunnelTaskExecutionContext;
 
-    public MysqlConfigTemplate(SeatunnelParameters seatunnelParameters,
-                               SeatunnelTaskExecutionContext seatunnelTaskExecutionContext) {
+    public MysqlConfigGenerator(SeatunnelParameters seatunnelParameters,
+                                SeatunnelTaskExecutionContext seatunnelTaskExecutionContext) {
         this.seatunnelParameters = seatunnelParameters;
         this.seatunnelTaskExecutionContext = seatunnelTaskExecutionContext;
     }
 
-    @Override
-    public String initConfigTemplate() {
+    private String initConfigTemplate() {
         return "  Jdbc {\n" +
                 "    url = \"%s\"" + "\n" +
                 "    driver = \"%s\"" + "\n" +
@@ -53,7 +53,9 @@ public class MysqlConfigTemplate implements ConfigTemplate {
 
     @Override
     public String createSourceConfig() {
-        MysqlParameters mysqlParameters = (MysqlParameters) seatunnelParameters.getSourceConfig();
+        MysqlParameters mysqlParameters =
+                JSONUtils.parseObject(seatunnelParameters.getSourceConfig(), MysqlParameters.class);
+
         String connectionParams = seatunnelTaskExecutionContext.getSourceConnectionParams();
         BaseConnectionParam sourceConnParams =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(DbType.MYSQL, connectionParams);
@@ -63,9 +65,10 @@ public class MysqlConfigTemplate implements ConfigTemplate {
         StringBuilder mysqlSourceSb = new StringBuilder("source {\n");
 
         String configTemplate = initConfigTemplate();
-        configTemplate = configTemplate + "    query = \"%s\"\n";
+        configTemplate = configTemplate + Constants.MYSQL_QUERY_PARAMS;
 
-        String fillConfigTemplate = String.format(configTemplate, buildJdbcUrl(sourceConnParams.getJdbcUrl()),
+        String fillConfigTemplate = String.format(configTemplate,
+                buildJdbcUrl(sourceConnParams.getJdbcUrl()),
                 DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER,
                 sourceConnParams.getUser(),
                 sourceConnParams.getPassword(),
@@ -76,21 +79,30 @@ public class MysqlConfigTemplate implements ConfigTemplate {
         List<Property> customParams = mysqlParameters.getCustomParams();
         if (null != customParams && !customParams.isEmpty()) {
             customParams.forEach(
-                    param -> mysqlSourceSb.append(Constants.INDENT_FOUR_SPACE)
-                            .append(param.getProp()).append(Constants.EQUAL_SIGN)
-                            .append(Constants.DOUBLE_QUOTE).append(param.getValue())
-                            .append(Constants.DOUBLE_QUOTE).append(Constants.LINE_BREAK));
+                    param -> mysqlSourceSb
+                            .append(Constants.INDENT_FOUR_SPACE)
+                            .append(param.getProp())
+                            .append(Constants.EQUAL_SIGN)
+                            .append(Constants.DOUBLE_QUOTE)
+                            .append(param.getValue())
+                            .append(Constants.DOUBLE_QUOTE)
+                            .append(Constants.LINE_BREAK));
         }
 
-        mysqlSourceSb.append(Constants.INDENT_TWO_SPACE).append(Constants.SINGLE_BRACKETS_RIGHT)
-                .append(Constants.LINE_BREAK).append(Constants.SINGLE_BRACKETS_RIGHT);
+        mysqlSourceSb
+                .append(Constants.INDENT_TWO_SPACE)
+                .append(Constants.SINGLE_BRACKETS_RIGHT)
+                .append(Constants.LINE_BREAK)
+                .append(Constants.SINGLE_BRACKETS_RIGHT);
 
         return mysqlSourceSb.toString();
     }
 
     @Override
     public String createSinkConfig() {
-        MysqlParameters mysqlParameters = (MysqlParameters) seatunnelParameters.getSinkConfig();
+        MysqlParameters mysqlParameters =
+                JSONUtils.parseObject(seatunnelParameters.getTargetConfig(), MysqlParameters.class);
+
         String connectionParams = seatunnelTaskExecutionContext.getTargetConnectionParams();
         BaseConnectionParam targetConnParams =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(DbType.MYSQL, connectionParams);
@@ -100,8 +112,10 @@ public class MysqlConfigTemplate implements ConfigTemplate {
         StringBuilder mysqlSinkSb = new StringBuilder("sink {\n");
 
         String configTemplate = initConfigTemplate();
+
+        // lowercase jdbc is used in seatunnel's mysql sink
         configTemplate = configTemplate.replace("Jdbc", "jdbc");
-        configTemplate += addAdditionalSinkParams();
+        configTemplate += Constants.MYSQL_EXTRA_SINK_PARAMS;
 
         String fillConfigTemplate = String.format(configTemplate,
                 buildJdbcUrl(targetConnParams.getJdbcUrl()),
@@ -118,14 +132,21 @@ public class MysqlConfigTemplate implements ConfigTemplate {
         List<Property> customParams = mysqlParameters.getCustomParams();
         if (null != customParams && !customParams.isEmpty()) {
             customParams.forEach(
-                    param -> mysqlSinkSb.append(Constants.INDENT_FOUR_SPACE)
-                            .append(param.getProp()).append(Constants.EQUAL_SIGN)
-                            .append(Constants.DOUBLE_QUOTE).append(param.getValue())
-                            .append(Constants.DOUBLE_QUOTE).append(Constants.LINE_BREAK));
+                    param -> mysqlSinkSb
+                            .append(Constants.INDENT_FOUR_SPACE)
+                            .append(param.getProp())
+                            .append(Constants.EQUAL_SIGN)
+                            .append(Constants.DOUBLE_QUOTE)
+                            .append(param.getValue())
+                            .append(Constants.DOUBLE_QUOTE)
+                            .append(Constants.LINE_BREAK));
         }
 
-        mysqlSinkSb.append(Constants.INDENT_TWO_SPACE).append(Constants.SINGLE_BRACKETS_RIGHT)
-                .append(Constants.LINE_BREAK).append(Constants.SINGLE_BRACKETS_RIGHT);
+        mysqlSinkSb
+                .append(Constants.INDENT_TWO_SPACE)
+                .append(Constants.SINGLE_BRACKETS_RIGHT)
+                .append(Constants.LINE_BREAK)
+                .append(Constants.SINGLE_BRACKETS_RIGHT);
 
         return mysqlSinkSb.toString();
     }
@@ -135,10 +156,6 @@ public class MysqlConfigTemplate implements ConfigTemplate {
     }
 
     private static String buildDefaultQuery(String table) {
-        return "select * from " + table;
-    }
-
-    private static String addAdditionalSinkParams() {
-        return "    database = \"%s\"\n    table = \"%s\"\n    generate_sink_sql = \"%s\"\n";
+        return Constants.MYSQL_DEFAULT_QUERY_PREFIX + table;
     }
 }

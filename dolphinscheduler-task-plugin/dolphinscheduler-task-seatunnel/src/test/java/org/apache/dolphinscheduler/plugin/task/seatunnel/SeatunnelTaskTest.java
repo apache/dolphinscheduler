@@ -136,12 +136,15 @@ public class SeatunnelTaskTest {
     }
 
     @Test
-    public void testSeatunnelConfigGeneration() {
+    void testSeatunnelConfigGeneration() {
         SeatunnelParameters seatunnelParameters = new SeatunnelParameters();
         seatunnelParameters.setUseCustom(false);
 
+        seatunnelParameters.setJobMode(JobModeEnum.BATCH);
+        seatunnelParameters.setSourceType("HDFS");
+        seatunnelParameters.setTargetType("HDFS");
+
         HdfsFileParameters sourceConfig = new HdfsFileParameters();
-        sourceConfig.setDbType(DbTypeEnum.HDFS);
         sourceConfig.setFileFormat("parquet");
         sourceConfig.setDefaultFs("hdfs://hadoopcluster");
         sourceConfig.setFilePath("/tmp/dolphinscheduler/seautnnel/st_hdfs_source.parquet");
@@ -153,7 +156,6 @@ public class SeatunnelTaskTest {
         sourceConfig.setCustomParams(sourceCustomConfig);
 
         HdfsFileParameters sinkConfig = new HdfsFileParameters();
-        sinkConfig.setDbType(DbTypeEnum.HDFS);
         sinkConfig.setFileFormat("orc");
         sinkConfig.setDefaultFs("hdfs://hadoopcluster");
         sinkConfig.setFilePath("/tmp/dolphinscheduler/seautnnel/st_hdfs_sink.orc");
@@ -162,15 +164,16 @@ public class SeatunnelTaskTest {
         sinkCustomConfig.add(new Property("hdfs_site_path", Direct.IN, DataType.VARCHAR, "/tmp/hadoop/hdfs-site.xml"));
         sinkConfig.setCustomParams(sinkCustomConfig);
 
-        seatunnelParameters.setSourceConfig(sourceConfig);
-        seatunnelParameters.setSinkConfig(sinkConfig);
+        seatunnelParameters.setSourceConfig(JSONUtils.toJsonString(sourceConfig));
+        seatunnelParameters.setTargetConfig(JSONUtils.toJsonString(sinkConfig));
         seatunnelParameters.setParallelism(5);
 
         SeatunnelTaskExecutionContext seatunnelTaskExecutionContext = new SeatunnelTaskExecutionContext();
 
-        String generateConfig = SeatunnelConfigGenerator.generate(seatunnelParameters, seatunnelTaskExecutionContext);
+        String generateConfig =
+                SeatunnelConfigGenerator.generateSeatunnelJob(seatunnelParameters, seatunnelTaskExecutionContext);
 
-        Assertions.assertEquals(generateConfig, RAW_SCRIPT_3);
+        Assertions.assertEquals(RAW_SCRIPT_3, generateConfig);
 
     }
 

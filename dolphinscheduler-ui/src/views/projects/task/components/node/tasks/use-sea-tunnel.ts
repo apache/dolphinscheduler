@@ -79,9 +79,9 @@ export function useSeaTunnel({
       '  Console {\n' +
       '  }\n' +
       '}',
-    sourceDbType: 'MYSQL',
+    sourceType: 'MYSQL',
     sourceFilePath: '',
-    targetDbType: 'MYSQL',
+    targetType: 'MYSQL',
     targetFilePath: '',
     customDataFilter: false,
     customTransform: 'transform {\n' +
@@ -92,7 +92,8 @@ export function useSeaTunnel({
     fileFormat: 'parquet',
     parallelism: 1,
     sourceCustomParams: [],
-    targetCustomParams: []
+    targetCustomParams: [],
+    jobMode: "BATCH"
   } as INodeData)
 
   return {

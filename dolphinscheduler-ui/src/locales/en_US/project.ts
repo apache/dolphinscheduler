@@ -939,7 +939,8 @@ export default {
     sea_tunnel_source_table_name: 'Source Table Name',
     sea_tunnel_target_table_name: 'Target Table Name',
     sea_tunnel_add_custom_params: 'Add Params',
-    sea_tunnel_default_fs: 'fs.defaultFS'
+    sea_tunnel_default_fs: 'fs.defaultFS',
+    sea_tunnel_job_mode: 'Job Mode'
   },
   menu: {
     fav: 'Favorites',

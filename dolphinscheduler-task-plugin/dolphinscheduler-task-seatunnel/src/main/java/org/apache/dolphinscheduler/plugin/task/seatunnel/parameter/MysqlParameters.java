@@ -22,7 +22,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MysqlParameters extends BaseDataSourceParameters {
+public class MysqlParameters extends CommonConfigParameters {
 
     @Override
     public String toString() {

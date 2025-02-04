@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.parameter;
 
-public class HdfsFileParameters extends SeatunnelConfigParameters {
+public class HdfsFileParameters extends CommonConfigParameters {
 
     /**
      * hdfs file path

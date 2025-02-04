@@ -16,11 +16,10 @@
  */
 import { computed, ref, Ref, onMounted, nextTick, h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDeployMode, useResources, useCustomParams } from '.'
+import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 import { indexOf, find } from 'lodash'
 import { queryDataSourceList, getDatasourceTablesById, queryDataSource } from '@/service/modules/data-source'
-import type { TypeReq } from '@/service/modules/data-source/types'
 import styles from '../index.module.scss'
 
 
@@ -36,13 +35,13 @@ export function useSeaTunnelSourceType(
 ): IJsonItem[] {
   const { t } = useI18n()
 
-  const sourceDbTypeSPan = computed(() => (useCustomSpan.value ? 12 : 0))
-  const sourceDatabaseSpan = computed(() => (useCustomSpan.value && model.sourceDbType !== 'HDFS' ? 12 : 0))
-  const filePathSpan = computed(() => (useCustomSpan.value && model.sourceDbType === 'HDFS' ? 24 : 0))
-  const defaultFsSpan = computed(() => (useCustomSpan.value && model.sourceDbType === 'HDFS' ? 24 : 0))
+  const sourceTypeSpan = computed(() => (useCustomSpan.value ? 12 : 0))
+  const sourceDatabaseSpan = computed(() => (useCustomSpan.value && model.sourceType !== 'HDFS' ? 12 : 0))
+  const filePathSpan = computed(() => (useCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0))
+  const defaultFsSpan = computed(() => (useCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0))
 
-  const customFileFormatSpan = computed(() => (useCustomSpan.value && model.sourceDbType === 'HDFS' ? 6 : 0))
-  const sourceTableSpan = computed(() => (useCustomSpan.value && model.sourceDbType !== 'HDFS' ? 12 : 0))
+  const customFileFormatSpan = computed(() => (useCustomSpan.value && model.sourceType === 'HDFS' ? 6 : 0))
+  const sourceTableSpan = computed(() => (useCustomSpan.value && model.sourceType !== 'HDFS' ? 12 : 0))
 
   const options = ref([] as { label: string; value: string }[])
   const sourceDatasourceOptions = ref([] as { label: string; value: number }[])
@@ -66,8 +65,8 @@ export function useSeaTunnelSourceType(
   }
 
   const refreshSourceDbOptions = async () => {
-    const parameters = { type: model[params.typeField || 'sourceDbType'] }
-    const sourceField = params.sourceField || 'sourceDatabase'
+    const parameters = { type: model[params.typeField ?? 'sourceType'] }
+    const sourceField = 'sourceDatabase'
 
     if (!parameters.type || parameters.type === 'HDFS') {
         model[sourceField] = null
@@ -92,8 +91,8 @@ export function useSeaTunnelSourceType(
   }
 
   const refreshSourceTableOptions = async () => {
-    const parameters = model[params.typeField || 'sourceDatabase'] 
-    const sourceField = params.sourceField || 'sourceTable'
+    const parameters = model[params.typeField ?? 'sourceDatabase'] 
+    const sourceField = 'sourceTable'
 
     if (!parameters) {
         model[sourceField] = null
@@ -105,9 +104,6 @@ export function useSeaTunnelSourceType(
     if (dataSourceRes) {
         database = dataSourceRes.database
     }
-
-    console.log('refreshSourceTableOptions => ', model[sourceField], ", parameters => ", parameters, "database => ", database)
-
     const tableRes = await getDatasourceTablesById(parameters, database)
 
     sourceTableOptions.value = tableRes.map((item: any) => ({
@@ -152,8 +148,8 @@ export function useSeaTunnelSourceType(
     },
     {
       type: 'select',
-      field: 'sourceDbType',
-      span: sourceDbTypeSPan,
+      field: 'sourceType',
+      span: sourceTypeSpan,
       name: t('project.node.sea_tunnel_source_datasource_type'),
       options: options,
       props: {

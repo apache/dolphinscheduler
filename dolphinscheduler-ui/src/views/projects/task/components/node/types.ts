@@ -35,7 +35,7 @@ export type { ITaskState } from '@/common/types'
 
 export type RelationType = 'AND' | 'OR'
 
-type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
+type SourceType = 'MYSQL' | 'HDFS' | 'HIVE' | 'DORIS'
 type ModelType = 'import' | 'export'
 type ITaskType = TaskType
 type IDateType = 'hour' | 'day' | 'week' | 'month'
@@ -261,10 +261,10 @@ interface IRuleParameters {
 }
 
 interface ISeatunnelParams {
-  sourceDbType?: string,
+  sourceType?: SourceType,
   sourceDatabase?: number,
   sourceFilePath?: string,
-  targetDbType?: string,
+  targetType?: SourceType,
   targetDatabase?: number,
   targetFilePath?: string,
   customDataFilter?: boolean,
@@ -277,18 +277,20 @@ interface ISeatunnelParams {
   sourceTable?: string,
   targetTable?: string,
   sourceCustomParams?: ILocalParam[],
-  targetCustomParams?: ILocalParam[]
+  targetCustomParams?: ILocalParam[],
+  jobMode?: string
 }
 
 interface ISeatunnelDataParams {
-  dbType?: string,
+  dbType?: SourceType,
   databaseId?: number,
   filePath?: string,
   defaultFs?: string,
   fileFormat?: string
   parallelism?: number,
   table?: string,
-  customParams?: ILocalParam[]
+  customParams?: ILocalParam[],
+  jobMode?: string
 }
 
 interface ITaskParams {
@@ -495,19 +497,18 @@ interface ITaskParams {
   yarnQueue?: string
   awsRegion?: string
   kubeConfig?: string
-  sourceDbType?: string
   sourceDatabase?: number
   sourceFilePath?: string
-  targetDbType?: string
   targetDatabase?: number
   targetFilePath?: string
   customDataFilter?: boolean
   customTransform?: string
   fileFormat?: string
-  sourceConfig?: ISeatunnelDataParams
-  sinkConfig?: ISeatunnelDataParams
+  sourceConfig?: string
+  targetConfig?: string
   table?: string
-  defaultFs?: string
+  defaultFs?: string,
+  jobMode?: string
 }
 
 interface INodeData

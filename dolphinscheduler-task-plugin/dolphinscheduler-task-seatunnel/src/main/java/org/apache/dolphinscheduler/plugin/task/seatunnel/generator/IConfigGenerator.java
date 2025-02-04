@@ -15,47 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.seatunnel;
+package org.apache.dolphinscheduler.plugin.task.seatunnel.generator;
 
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
-import java.io.Serializable;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class SeatunnelTaskExecutionContext implements Serializable {
+public interface IConfigGenerator {
 
     /**
-     * data source id
+     * generate the default env config
+     * @param seatunnelParameters seatunnel parameters
+     * @return seatunnel env config
      */
-    private int dataSourceId;
+    static String createEnv(SeatunnelParameters seatunnelParameters) {
+        return String.format("env {\n" +
+                "  job.mode = \"%s\"" + "\n" +
+                "  parallelism = %d" + "\n" +
+                "}",
+                seatunnelParameters.getJobMode(),
+                seatunnelParameters.getParallelism());
+    }
 
     /**
-     * data source type
+     * generate the source config
+     * @return seatunnel source config
      */
-    private DbType dataSourceType;
+    String createSourceConfig();
 
     /**
-     * source connection params
+     * generate the sink config
+     * @return seatunnel sink config
      */
-    private String sourceConnectionParams;
-
-    /**
-     * data target id
-     */
-    private int dataTargetId;
-
-    /**
-     * data target type
-     */
-    private DbType dataTargetType;
-
-    /**
-     * target connection params
-     */
-    private String targetConnectionParams;
+    String createSinkConfig();
 
 }

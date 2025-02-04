@@ -15,23 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.seatunnel.generator;
+package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
+import lombok.Getter;
 
-public interface ConfigTemplate {
+@Getter
+public enum JobModeEnum {
 
-    default String createEnv(SeatunnelParameters seatunnelParameters) {
-        return String.format("env {\n" +
-                "  job.mode = \"BATCH\"" + "\n" +
-                "  parallelism = %d" + "\n" +
-                "}", seatunnelParameters.getParallelism());
+    /**
+     * BATCH job mode in seatunnel env
+     */
+    BATCH("BATCH"),
+    /**
+     * STREAMING job mode in seatunnel env
+     */
+    STREAMING("STREAMING");
+
+    private final String name;
+
+    JobModeEnum(String jobMode) {
+        this.name = jobMode;
     }
-
-    String initConfigTemplate();
-
-    String createSourceConfig();
-
-    String createSinkConfig();
-
 }

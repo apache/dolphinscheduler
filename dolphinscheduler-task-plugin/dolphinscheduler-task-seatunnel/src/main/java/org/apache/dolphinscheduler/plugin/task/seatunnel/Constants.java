@@ -43,27 +43,24 @@ public class Constants {
     /**
      * doris config
      */
-    public static final String FENODES = "fenodes = ";
-    public static final String USERNAME = "username = ";
-    public static final String PASSWORD = "password = ";
-    public static final String DATABASE = "database = ";
-    public static final String TABLE = "table = ";
     public static final String DORIS_CONFIG = "doris.config";
-    public static final String FORMAT = "format = ";
     public static final String FORMAT_JSON = "json";
-    public static final String READ_JSON_BY_LINE = "read_json_by_line = ";
-    public static final String TRUE = "true";
+    public static final String READ_JSON_BY_LINE_VALUE = "true";
+    public static final String DORIS_CONFIG_SINK_TEMPLATE = "    doris.config {\n" +
+            "      format = \"%s\"" + "\n" +
+            "      read_json_by_line = \"%s\"" + "\n" +
+            "    }\n";
+    public static final String DORIS_HTTP_PORT = "8030";
 
     /**
-     * hdfs config
+     * mysql config
      */
-    public static final String defaultFs = "fs.defaultFs = ";
-    public static final String HDFS_SITE_PATH = "hdfs_site_path = ";
-    public static final String KRB5_PATH = "krb5_path = ";
-    public static final String KERBEROS_PRINCIPAL = "kerberos_principal = ";
-    public static final String KERBEROS_KEYTAB_PATH = "kerberos_keytab_path = ";
-    public static final String TMP_PATH = "tmp_path = ";
-    public static final String TMP_PATH_VALUE = "/tmp/seatunnel";
-    public static final String REMOTE_USER = "remote_user = ";
+    public static final String MYSQL_EXTRA_SINK_PARAMS =
+            "    database = \"%s\"\n    table = \"%s\"\n    generate_sink_sql = \"%s\"\n";
+    public static final String MYSQL_QUERY_PARAMS = "    query = \"%s\"\n";
+    public static final String MYSQL_DEFAULT_QUERY_PREFIX = "select * from ";
 
+    public static final String MYSQL = "MYSQL";
+    public static final String HDFS = "HDFS";
+    public static final String DORIS = "DORIS";
 }

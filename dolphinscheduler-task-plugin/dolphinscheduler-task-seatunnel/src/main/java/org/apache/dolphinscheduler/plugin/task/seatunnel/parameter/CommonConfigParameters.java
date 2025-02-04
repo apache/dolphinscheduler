@@ -18,33 +18,37 @@
 package org.apache.dolphinscheduler.plugin.task.seatunnel.parameter;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.seatunnel.DbTypeEnum;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "dbType")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = HdfsFileParameters.class, name = "HDFS"),
-        @JsonSubTypes.Type(value = DorisParameters.class, name = "DORIS"),
-        @JsonSubTypes.Type(value = MysqlParameters.class, name = "MYSQL")
-})
-public class SeatunnelConfigParameters {
+public class CommonConfigParameters {
 
     /**
-     * source database type
+     * database id
      */
-    protected DbTypeEnum dbType;
+    protected int databaseId;
 
+    /**
+     * table name
+     */
+    protected String table;
+
+    /**
+     * database type
+     */
+    protected DbType dbType;
+
+    /**
+     * custom params
+     */
     protected List<Property> customParams;
 
-    public DbTypeEnum getDbType() {
+    public DbType getDbType() {
         return dbType;
     }
 
-    public void setDbType(DbTypeEnum dbType) {
+    public void setDbType(DbType dbType) {
         this.dbType = dbType;
     }
 
@@ -54,5 +58,21 @@ public class SeatunnelConfigParameters {
 
     public void setCustomParams(List<Property> customParams) {
         this.customParams = customParams;
+    }
+
+    public int getDatabaseId() {
+        return databaseId;
+    }
+
+    public void setDatabaseId(int databaseId) {
+        this.databaseId = databaseId;
+    }
+
+    public String getTable() {
+        return this.table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
     }
 }

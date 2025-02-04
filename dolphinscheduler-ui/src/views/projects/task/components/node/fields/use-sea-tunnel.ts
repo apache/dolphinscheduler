@@ -56,7 +56,15 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   const customDataFilterSpan = computed(() => (model['useCustom'] === true ? 0 : 24))
 
-  const customTransfromEditorSpan = computed(() => (model['useCustom'] === true ? 0 : model['customDataFilter'] === true ? 24 : 0))
+  const customTransformEditorSpan = computed(() => {
+    if (model['useCustom']) {
+        return 0;
+    }
+    if (model['customDataFilter']) {
+        return 24;
+    }
+    return 0;
+  });
 
   const useCustomSpan = computed(() => (model['useCustom'] === true ? 0 : 24))
 
@@ -145,6 +153,13 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       props: { min: 1 }
     },
     {
+      type: 'select',
+      field: 'jobMode',
+      name: t('project.node.sea_tunnel_job_mode'),
+      options: jobModeOptions,
+      span: 12
+    },
+    {
       type: 'switch',
       field: 'useCustom',
       name: t('project.node.custom_config')
@@ -175,7 +190,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'editor',
       field: 'customTransform',
-      span: customTransfromEditorSpan,
+      span: customTransformEditorSpan,
       name: t('project.node.sea_tunnel_custom_transform'),
       validate: {
         trigger: ['input', 'blur'],
@@ -263,4 +278,15 @@ export const masterTypeOptions = [
     label: 'mesos://',
     value: 'MESOS'
   }
+]
+
+export const jobModeOptions = [
+  {
+    label: 'BATCH',
+    value: 'BATCH'
+  },
+  {
+    label: 'STREAMING',
+    value: 'STREAMING'
+  },
 ]

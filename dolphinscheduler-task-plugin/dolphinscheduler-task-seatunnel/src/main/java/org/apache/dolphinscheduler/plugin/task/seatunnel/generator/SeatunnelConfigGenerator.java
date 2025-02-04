@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.generator;
 
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.DORIS;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.HDFS;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.MYSQL;
+
 import org.apache.dolphinscheduler.plugin.task.seatunnel.Constants;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelTaskExecutionContext;
@@ -33,20 +37,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SeatunnelConfigGenerator {
 
-    private static final Pattern sourceTableNamePattern = Pattern.compile("source_table_name\\s*=\\s*\"(.*?)\"");
-    private static final Pattern resultTableNamePattern = Pattern.compile("result_table_name\\s*=\\s*\"(.*?)\"");
+    private static final Pattern SOURCE_TABLE_NAME_PATTERN = Pattern.compile("source_table_name\\s*=\\s*\"(.*?)\"");
+    private static final Pattern RESULT_TABLE_NAME_PATTERN = Pattern.compile("result_table_name\\s*=\\s*\"(.*?)\"");
 
     private static final String SOURCE_TABLE_NAME = "source_table_name";
     private static final String RESULT_TABLE_NAME = "result_table_name";
 
-    public static String generate(SeatunnelParameters seatunnelParams,
-                                  SeatunnelTaskExecutionContext seatunnelTaskExecutionContext) {
+    private SeatunnelConfigGenerator() {
 
-        ConfigTemplate configTemplate = seatunnelParams.getSourceConfig().getDbType().toConfigTemplate(seatunnelParams,
-                seatunnelTaskExecutionContext);
+    }
+
+    public static String generateSeatunnelJob(SeatunnelParameters seatunnelParams,
+                                              SeatunnelTaskExecutionContext seatunnelTaskExecutionContext) {
+
+        IConfigGenerator sourceGenerator = createGenerator(seatunnelParams.getSourceType(),
+                seatunnelParams, seatunnelTaskExecutionContext);
+
+        IConfigGenerator targetGenerator = createGenerator(seatunnelParams.getTargetType(),
+                seatunnelParams, seatunnelTaskExecutionContext);
+
+        if (sourceGenerator == null || targetGenerator == null) {
+            throw new RuntimeException("seatunnel task source type or target type is null");
+        }
 
         // build env config
-        String envConfig = configTemplate.createEnv(seatunnelParams);
+        String envConfig = IConfigGenerator.createEnv(seatunnelParams);
 
         // build transform config
         String transformConfig = "";
@@ -55,27 +70,23 @@ public class SeatunnelConfigGenerator {
         }
 
         // build source config
-        String sourceConfig = configTemplate.createSourceConfig();
+        String sourceConfig = sourceGenerator.createSourceConfig();
 
         // build sink config
-        ConfigTemplate sinkConfigTemplate = seatunnelParams.getSinkConfig().getDbType()
-                .toConfigTemplate(seatunnelParams, seatunnelTaskExecutionContext);
-        String sinkConfig = sinkConfigTemplate.createSinkConfig();
+        String sinkConfig = targetGenerator.createSinkConfig();
 
         // add 'source_table_name' and 'result_table_name' item in source and sink config
         // if transform config has set them
         Map<String, String> sourceAndResultTableFromTransform = getSourceAndResultTableFromTransform(transformConfig);
 
-        if (sourceAndResultTableFromTransform != null) {
-            if (sourceAndResultTableFromTransform.containsKey(SOURCE_TABLE_NAME)) {
-                sourceConfig = addValues(sourceConfig,
-                        RESULT_TABLE_NAME + " = \"" + sourceAndResultTableFromTransform.get(SOURCE_TABLE_NAME) + "\"");
-            }
+        if (sourceAndResultTableFromTransform.containsKey(SOURCE_TABLE_NAME)) {
+            sourceConfig = addValues(sourceConfig,
+                    RESULT_TABLE_NAME + " = \"" + sourceAndResultTableFromTransform.get(SOURCE_TABLE_NAME) + "\"");
+        }
 
-            if (sourceAndResultTableFromTransform.containsKey(RESULT_TABLE_NAME)) {
-                sinkConfig = addValues(sinkConfig,
-                        SOURCE_TABLE_NAME + " = \"" + sourceAndResultTableFromTransform.get(RESULT_TABLE_NAME) + "\"");
-            }
+        if (sourceAndResultTableFromTransform.containsKey(RESULT_TABLE_NAME)) {
+            sinkConfig = addValues(sinkConfig,
+                    SOURCE_TABLE_NAME + " = \"" + sourceAndResultTableFromTransform.get(RESULT_TABLE_NAME) + "\"");
         }
 
         String seatunnelConfig = envConfig + "\n" + sourceConfig + "\n" + transformConfig + "\n" + sinkConfig;
@@ -96,13 +107,13 @@ public class SeatunnelConfigGenerator {
 
     public static Map<String, String> getSourceAndResultTableFromTransform(String transform) {
         if (StringUtils.isEmpty(transform)) {
-            return null;
+            return new HashMap<>();
         }
 
         Map<String, String> sourceAndResultTableNameMap = new HashMap<>();
 
-        Matcher sourceMatcher = sourceTableNamePattern.matcher(transform);
-        Matcher resultMatcher = resultTableNamePattern.matcher(transform);
+        Matcher sourceMatcher = SOURCE_TABLE_NAME_PATTERN.matcher(transform);
+        Matcher resultMatcher = RESULT_TABLE_NAME_PATTERN.matcher(transform);
 
         if (sourceMatcher.find()) {
             sourceAndResultTableNameMap.put(SOURCE_TABLE_NAME, sourceMatcher.group(1));
@@ -124,6 +135,22 @@ public class SeatunnelConfigGenerator {
         String configTmp = config.substring(0, penultimateOfBracketsRight);
 
         return configTmp + value + "\n" + "  }\n}";
+    }
+
+    private static IConfigGenerator createGenerator(String connectorType,
+                                                    SeatunnelParameters seatunnelParameters,
+                                                    SeatunnelTaskExecutionContext seatunnelTaskExecutionContext) {
+        switch (connectorType) {
+            case MYSQL:
+                return new MysqlConfigGenerator(seatunnelParameters, seatunnelTaskExecutionContext);
+            case HDFS:
+                return new HdfsFileConfigGenerator(seatunnelParameters);
+            case DORIS:
+                return new DorisConfigGenerator(seatunnelParameters, seatunnelTaskExecutionContext);
+            default:
+                return null;
+
+        }
     }
 
 }

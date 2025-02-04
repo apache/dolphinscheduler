@@ -168,7 +168,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
         List<String> args = new ArrayList<>();
         args.add(CONFIG_OPTIONS);
         String scriptContent;
-        if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
+        if (BooleanUtils.isTrue(seatunnelParameters.isUseCustom())) {
             if (null != seatunnelParameters.getResourceList() && !seatunnelParameters.getResourceList().isEmpty()) {
                 // use resource file
                 String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
@@ -183,7 +183,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
         } else {
             // use generator config
             scriptContent =
-                    SeatunnelConfigGenerator.generate(seatunnelParameters, seatunnelTaskExecutionContext);
+                    SeatunnelConfigGenerator.generateSeatunnelJob(seatunnelParameters, seatunnelTaskExecutionContext);
         }
         String filePath = buildConfigFilePath();
         createConfigFileIfNotExists(scriptContent, filePath);
@@ -191,26 +191,6 @@ public class SeatunnelTask extends AbstractRemoteTask {
         args.addAll(generateTaskParameters());
         return args;
     }
-
-    // protected List<String> buildOptions() throws Exception {
-    // List<String> args = new ArrayList<>();s
-    // args.add(CONFIG_OPTIONS);
-    // String scriptContent;
-    // if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
-    // scriptContent = buildCustomConfigContent();
-    // } else {
-    // String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
-    // ResourceContext resourceContext = taskExecutionContext.getResourceContext();
-    // scriptContent = FileUtils.readFileToString(
-    // new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
-    // StandardCharsets.UTF_8);
-    // }
-    // String filePath = buildConfigFilePath();
-    // createConfigFileIfNotExists(scriptContent, filePath);
-    // args.add(filePath);
-    // args.addAll(generateTaskParameters());
-    // return args;
-    // }
 
     private List<String> generateTaskParameters() {
         Map<String, String> variables = new HashMap<>();

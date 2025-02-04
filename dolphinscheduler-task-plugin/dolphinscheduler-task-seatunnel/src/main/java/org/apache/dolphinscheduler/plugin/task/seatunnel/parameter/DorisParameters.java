@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.parameter;
 
-public class DorisParameters extends BaseDataSourceParameters {
+public class DorisParameters extends CommonConfigParameters {
 
     @Override
     public String toString() {
