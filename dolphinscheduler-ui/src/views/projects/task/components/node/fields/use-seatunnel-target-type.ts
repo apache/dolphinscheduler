@@ -19,9 +19,12 @@ import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 import { indexOf, find } from 'lodash'
-import { queryDataSourceList, getDatasourceTablesById, queryDataSource } from '@/service/modules/data-source'
+import {
+  queryDataSourceList,
+  getDatasourceTablesById,
+  queryDataSource
+} from '@/service/modules/data-source'
 import styles from '../index.module.scss'
-
 
 export function useSeaTunnelTargetType(
   model: { [field: string]: any },
@@ -36,12 +39,22 @@ export function useSeaTunnelTargetType(
   const { t } = useI18n()
 
   const targetTypeSPan = computed(() => (useCustomSpan.value ? 12 : 0))
-  const targetDatabaseSpan = computed(() => (useCustomSpan.value && model.targetType !== 'HDFS' ? 12 : 0))
-  const targetFilePathSpan = computed(() => (useCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0))
-  const customFileFormatSpan = computed(() => (useCustomSpan.value && model.targetType === 'HDFS' ? 6 : 0))
-  const targetTableSpan = computed(() => (useCustomSpan.value && model.targetType !== 'HDFS' ? 12 : 0))
-  const defaultFsSpan = computed(() => (useCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0))
-  
+  const targetDatabaseSpan = computed(() =>
+    useCustomSpan.value && model.targetType !== 'HDFS' ? 12 : 0
+  )
+  const targetFilePathSpan = computed(() =>
+    useCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0
+  )
+  const customFileFormatSpan = computed(() =>
+    useCustomSpan.value && model.targetType === 'HDFS' ? 6 : 0
+  )
+  const targetTableSpan = computed(() =>
+    useCustomSpan.value && model.targetType !== 'HDFS' ? 12 : 0
+  )
+  const defaultFsSpan = computed(() =>
+    useCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0
+  )
+
   const options = ref([] as { label: string; value: string }[])
   const targetDatasourceOptions = ref([] as { label: string; value: number }[])
   const targetTableOptions = ref([] as { label: string; value: string }[])
@@ -67,8 +80,8 @@ export function useSeaTunnelTargetType(
     const targetField = 'targetDatabase'
 
     if (!parameters.type || parameters.type === 'HDFS') {
-        model[targetField] = null
-        return ;
+      model[targetField] = null
+      return
     }
     const res = await queryDataSourceList(parameters)
     targetDatasourceOptions.value = res.map((item: any) => ({
@@ -89,18 +102,18 @@ export function useSeaTunnelTargetType(
   }
 
   const refreshTargetTableOptions = async () => {
-    const parameters = model[params.typeField ?? 'targetDatabase'] 
+    const parameters = model[params.typeField ?? 'targetDatabase']
     const targetField = 'targetTable'
 
     if (!parameters) {
-        model[targetField] = null
-        return ;
+      model[targetField] = null
+      return
     }
 
-    let database = ""
+    let database = ''
     const dataSourceRes = await queryDataSource(parameters)
     if (dataSourceRes) {
-        database = dataSourceRes.database
+      database = dataSourceRes.database
     }
     const tableRes = await getDatasourceTablesById(parameters, database)
     targetTableOptions.value = tableRes.map((item: any) => ({
@@ -176,7 +189,9 @@ export function useSeaTunnelTargetType(
         required: true,
         validator(unuse: any, value) {
           if (!value && value !== 0) {
-            return Error(t('project.node.sea_tunnel_target_datasource_instances'))
+            return Error(
+              t('project.node.sea_tunnel_target_datasource_instances')
+            )
           }
         }
       }
@@ -244,12 +259,12 @@ export function useSeaTunnelTargetType(
       }
     },
     ...useCustomParams({
-        model,
-        field: 'targetCustomParams',
-        name: 'sea_tunnel_add_custom_params',
-        isSimple: true,
-        span: customParamsSpan
-      })
+      model,
+      field: 'targetCustomParams',
+      name: 'sea_tunnel_add_custom_params',
+      isSimple: true,
+      span: customParamsSpan
+    })
   ]
 }
 
@@ -262,13 +277,13 @@ export const datasourceTypes = [
   {
     id: 1,
     code: 'HDFS',
-    disabled: false,
+    disabled: false
   },
   {
     id: 2,
     code: 'DORIS',
     disabled: false
-  },
+  }
 ]
 
 export const fileFormatOptions = [
@@ -303,5 +318,5 @@ export const fileFormatOptions = [
   {
     label: 'binary',
     value: 'binary'
-  },
+  }
 ]

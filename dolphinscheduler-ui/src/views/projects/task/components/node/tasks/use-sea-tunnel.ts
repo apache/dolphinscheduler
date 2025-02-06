@@ -84,7 +84,8 @@ export function useSeaTunnel({
     targetType: 'MYSQL',
     targetFilePath: '',
     customDataFilter: false,
-    customTransform: 'transform {\n' +
+    customTransform:
+      'transform {\n' +
       '    sql {\n' +
       '        query = "select name,age from fake"\n' +
       '    }\n' +
@@ -93,7 +94,7 @@ export function useSeaTunnel({
     parallelism: 1,
     sourceCustomParams: [],
     targetCustomParams: [],
-    jobMode: "BATCH"
+    jobMode: 'BATCH'
   } as INodeData)
 
   return {

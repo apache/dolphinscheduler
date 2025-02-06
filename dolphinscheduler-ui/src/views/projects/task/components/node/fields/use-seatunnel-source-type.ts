@@ -19,9 +19,12 @@ import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
 import { indexOf, find } from 'lodash'
-import { queryDataSourceList, getDatasourceTablesById, queryDataSource } from '@/service/modules/data-source'
+import {
+  queryDataSourceList,
+  getDatasourceTablesById,
+  queryDataSource
+} from '@/service/modules/data-source'
 import styles from '../index.module.scss'
-
 
 export function useSeaTunnelSourceType(
   model: { [field: string]: any },
@@ -36,19 +39,28 @@ export function useSeaTunnelSourceType(
   const { t } = useI18n()
 
   const sourceTypeSpan = computed(() => (useCustomSpan.value ? 12 : 0))
-  const sourceDatabaseSpan = computed(() => (useCustomSpan.value && model.sourceType !== 'HDFS' ? 12 : 0))
-  const filePathSpan = computed(() => (useCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0))
-  const defaultFsSpan = computed(() => (useCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0))
+  const sourceDatabaseSpan = computed(() =>
+    useCustomSpan.value && model.sourceType !== 'HDFS' ? 12 : 0
+  )
+  const filePathSpan = computed(() =>
+    useCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0
+  )
+  const defaultFsSpan = computed(() =>
+    useCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0
+  )
 
-  const customFileFormatSpan = computed(() => (useCustomSpan.value && model.sourceType === 'HDFS' ? 6 : 0))
-  const sourceTableSpan = computed(() => (useCustomSpan.value && model.sourceType !== 'HDFS' ? 12 : 0))
+  const customFileFormatSpan = computed(() =>
+    useCustomSpan.value && model.sourceType === 'HDFS' ? 6 : 0
+  )
+  const sourceTableSpan = computed(() =>
+    useCustomSpan.value && model.sourceType !== 'HDFS' ? 12 : 0
+  )
 
   const options = ref([] as { label: string; value: string }[])
   const sourceDatasourceOptions = ref([] as { label: string; value: number }[])
   const sourceTableOptions = ref([] as { label: string; value: string }[])
 
   const customParamsSpan = computed(() => (useCustomSpan.value ? 24 : 0))
-
 
   const getDatasourceTypes = async () => {
     options.value = datasourceTypes
@@ -69,8 +81,8 @@ export function useSeaTunnelSourceType(
     const sourceField = 'sourceDatabase'
 
     if (!parameters.type || parameters.type === 'HDFS') {
-        model[sourceField] = null
-        return ;
+      model[sourceField] = null
+      return
     }
     const res = await queryDataSourceList(parameters)
     sourceDatasourceOptions.value = res.map((item: any) => ({
@@ -91,18 +103,18 @@ export function useSeaTunnelSourceType(
   }
 
   const refreshSourceTableOptions = async () => {
-    const parameters = model[params.typeField ?? 'sourceDatabase'] 
+    const parameters = model[params.typeField ?? 'sourceDatabase']
     const sourceField = 'sourceTable'
 
     if (!parameters) {
-        model[sourceField] = null
-        return ;
+      model[sourceField] = null
+      return
     }
 
-    let database = ""
+    let database = ''
     const dataSourceRes = await queryDataSource(parameters)
     if (dataSourceRes) {
-        database = dataSourceRes.database
+      database = dataSourceRes.database
     }
     const tableRes = await getDatasourceTablesById(parameters, database)
 
@@ -122,7 +134,6 @@ export function useSeaTunnelSourceType(
   const onSourceChange = () => {
     refreshSourceDbOptions()
   }
-
 
   const onSourceTableChange = () => {
     refreshSourceTableOptions()
@@ -159,10 +170,10 @@ export function useSeaTunnelSourceType(
         trigger: ['input', 'blur'],
         required: true,
         validator(unuse: any, value) {
-            if (!value && value !== 0) {
-              return Error(t('project.node.sea_tunnel_source_datasource_type'))
-            }
+          if (!value && value !== 0) {
+            return Error(t('project.node.sea_tunnel_source_datasource_type'))
           }
+        }
       }
     },
     {
@@ -179,7 +190,9 @@ export function useSeaTunnelSourceType(
         required: true,
         validator(unuse: any, value) {
           if (!value && value !== 0) {
-            return Error(t('project.node.sea_tunnel_source_datasource_instances'))
+            return Error(
+              t('project.node.sea_tunnel_source_datasource_instances')
+            )
           }
         }
       }
@@ -247,15 +260,14 @@ export function useSeaTunnelSourceType(
       }
     },
     ...useCustomParams({
-        model,
-        field: 'sourceCustomParams',
-        name: 'sea_tunnel_add_custom_params',
-        isSimple: true,
-        span: customParamsSpan
-      })
+      model,
+      field: 'sourceCustomParams',
+      name: 'sea_tunnel_add_custom_params',
+      isSimple: true,
+      span: customParamsSpan
+    })
   ]
 }
-
 
 export const datasourceTypes = [
   {
@@ -266,15 +278,14 @@ export const datasourceTypes = [
   {
     id: 1,
     code: 'HDFS',
-    disabled: false,
+    disabled: false
   },
   {
     id: 2,
     code: 'DORIS',
     disabled: false
-  },
+  }
 ]
-
 
 export const fileFormatOptions = [
   {
@@ -308,5 +319,5 @@ export const fileFormatOptions = [
   {
     label: 'binary',
     value: 'binary'
-  },
+  }
 ]

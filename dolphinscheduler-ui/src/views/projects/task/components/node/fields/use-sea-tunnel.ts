@@ -16,7 +16,13 @@
  */
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useDeployMode, useResources, useCustomParams, useSeaTunnelSourceType, useSeaTunnelTargetType } from '.'
+import {
+  useDeployMode,
+  useResources,
+  useCustomParams,
+  useSeaTunnelSourceType,
+  useSeaTunnelTargetType
+} from '.'
 import type { IJsonItem } from '../types'
 
 export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
@@ -54,17 +60,19 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       : 0
   )
 
-  const customDataFilterSpan = computed(() => (model['useCustom'] === true ? 0 : 24))
+  const customDataFilterSpan = computed(() =>
+    model['useCustom'] === true ? 0 : 24
+  )
 
   const customTransformEditorSpan = computed(() => {
     if (model['useCustom']) {
-        return 0;
+      return 0
     }
     if (model['customDataFilter']) {
-        return 24;
+      return 24
     }
-    return 0;
-  });
+    return 0
+  })
 
   const useCustomSpan = computed(() => (model['useCustom'] === true ? 0 : 24))
 
@@ -288,5 +296,5 @@ export const jobModeOptions = [
   {
     label: 'STREAMING',
     value: 'STREAMING'
-  },
+  }
 ]

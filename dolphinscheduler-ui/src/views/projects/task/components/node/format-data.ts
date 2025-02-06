@@ -212,8 +212,8 @@ export function formatParams(data: INodeData): {
     taskParams.useCustom = data.useCustom
     taskParams.parallelism = data.parallelism
     taskParams.jobMode = data.jobMode
-    let sourceConfig: ISeatunnelDataParams = {}
-    let targetConfig: ISeatunnelDataParams = {}
+    const sourceConfig: ISeatunnelDataParams = {}
+    const targetConfig: ISeatunnelDataParams = {}
 
     if (!data.useCustom) {
       taskParams.rawScript = ''
@@ -250,8 +250,8 @@ export function formatParams(data: INodeData): {
       targetConfig.defaultFs = data.targetDefaultFs
     } else {
       targetConfig.dbType = data.targetType
-        targetConfig.databaseId = data.targetDatabase
-        targetConfig.table = data.targetTable
+      targetConfig.databaseId = data.targetDatabase
+      targetConfig.table = data.targetTable
     }
 
     sourceConfig.customParams = data.sourceCustomParams

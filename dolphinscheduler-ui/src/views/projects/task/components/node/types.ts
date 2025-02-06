@@ -261,35 +261,35 @@ interface IRuleParameters {
 }
 
 interface ISeatunnelParams {
-  sourceType?: SourceType,
-  sourceDatabase?: number,
-  sourceFilePath?: string,
-  targetType?: SourceType,
-  targetDatabase?: number,
-  targetFilePath?: string,
-  customDataFilter?: boolean,
-  customTransform?: string,
-  sourceFileFormat?: string,
-  targetFileFormat?: string,
-  sourceDefaultFs?: string,
-  targetDefaultFs?: string,
-  parallelism?: number,
-  sourceTable?: string,
-  targetTable?: string,
-  sourceCustomParams?: ILocalParam[],
-  targetCustomParams?: ILocalParam[],
+  sourceType?: SourceType
+  sourceDatabase?: number
+  sourceFilePath?: string
+  targetType?: SourceType
+  targetDatabase?: number
+  targetFilePath?: string
+  customDataFilter?: boolean
+  customTransform?: string
+  sourceFileFormat?: string
+  targetFileFormat?: string
+  sourceDefaultFs?: string
+  targetDefaultFs?: string
+  parallelism?: number
+  sourceTable?: string
+  targetTable?: string
+  sourceCustomParams?: ILocalParam[]
+  targetCustomParams?: ILocalParam[]
   jobMode?: string
 }
 
 interface ISeatunnelDataParams {
-  dbType?: SourceType,
-  databaseId?: number,
-  filePath?: string,
-  defaultFs?: string,
+  dbType?: SourceType
+  databaseId?: number
+  filePath?: string
+  defaultFs?: string
   fileFormat?: string
-  parallelism?: number,
-  table?: string,
-  customParams?: ILocalParam[],
+  parallelism?: number
+  table?: string
+  customParams?: ILocalParam[]
   jobMode?: string
 }
 
@@ -507,7 +507,7 @@ interface ITaskParams {
   sourceConfig?: string
   targetConfig?: string
   table?: string
-  defaultFs?: string,
+  defaultFs?: string
   jobMode?: string
 }
 
