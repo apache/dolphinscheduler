@@ -53,7 +53,7 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
                                                      final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                                      final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        super.onTaskFinish(workflowExecutionRunnable,
+        super.tryToTriggerSuccessorsAfterTaskFinish(workflowExecutionRunnable,
                 workflowTopologyLogicalTransitionWithTaskFinishEvent.getTaskExecutionRunnable());
     }
 
