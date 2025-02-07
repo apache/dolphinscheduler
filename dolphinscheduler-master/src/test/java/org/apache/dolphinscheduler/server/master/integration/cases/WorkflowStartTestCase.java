@@ -131,7 +131,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
-                .dryRun(Flag.YES)
                 .build();
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
@@ -148,6 +147,37 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(4)
                             .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState())
                                     && taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one fake task(A) using environment config")
+    public void testStartWorkflow_with_oneSuccessTaskUsingEnvironmentConfig() {
+        final String yaml = "/it/start/workflow_with_one_fake_task_using_environment_success.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
                 });
 
         masterContainer.assertAllResourceReleased();
