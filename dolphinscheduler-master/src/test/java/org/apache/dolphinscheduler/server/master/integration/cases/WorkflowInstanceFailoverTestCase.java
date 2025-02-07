@@ -147,6 +147,42 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
     }
 
     @Test
+    public void testGlobalFailover_runningWorkflow_withRunningTasksUsingEnvironment() {
+        final String yaml = "/it/failover/running_workflowInstance_with_one_running_fake_task_using_environment.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo(
+                                                "running_workflowInstance_with_one_running_fake_task_using_environment-20240816071251690");
+                            });
+                    final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
+                    assertThat(taskInstances)
+                            .hasSize(2);
+                    assertThat(taskInstances.get(0))
+                            .matches(t -> t.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE)
+                            .matches(t -> t.getFlag() == Flag.NO);
+
+                    assertThat(taskInstances.get(1))
+                            .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
+                            .matches(t -> t.getFlag() == Flag.YES)
+                            .matches(t -> StringUtils.isNotEmpty(t.getLogPath()));
+                });
+        masterContainer.assertAllResourceReleased();
+
+    }
+
+    @Test
     public void testGlobalFailover_runningWorkflow_withSuccessTasks() {
         final String yaml = "/it/failover/running_workflowInstance_with_one_success_fake_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
