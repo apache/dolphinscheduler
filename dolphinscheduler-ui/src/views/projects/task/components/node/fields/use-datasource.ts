@@ -162,6 +162,11 @@ export function useDatasource(
       id: 27,
       code: 'ALIYUN_SERVERLESS_SPARK',
       disabled: false
+    },
+    {
+      id: 28,
+      code: 'DOLPHINDB',
+      disabled: false
     }
   ]
 

@@ -512,8 +512,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     tencentcloud-sdk-java-common 3.1.213 https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-common/3.1.213, Apache 2.0
     tencentcloud-sdk-java-kms 3.1.213 https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-kms/3.1.213, Apache 2.0
     logging-interceptor 2.7.5 https://mvnrepository.com/artifact/com.squareup.okhttp/logging-interceptor/2.7.5, Apache 2.0
-
-
+    dolphindb-jdbc 3.00.0.1 https://github.com/dolphindb/jdbc Apache 2.0
+    dolphindb-javaapi 3.00.0.2 https://github.com/dolphindb/api-java Apache 2.0
+    lz4-java 1.7.1 https://github.com/lz4/lz4-java Apache 2.0
 
 
 jna-platform

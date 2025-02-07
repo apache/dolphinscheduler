@@ -250,7 +250,8 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
-    state.requiredDataBase = type !== 'POSTGRESQL' && type !== 'ATHENA'
+    state.requiredDataBase =
+      type !== 'POSTGRESQL' && type !== 'ATHENA' && type !== 'DOLPHINDB'
 
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
@@ -275,12 +276,17 @@ export function useForm(id?: number) {
       type === 'ZEPPELIN' ||
       type === 'SAGEMAKER' ||
       type === 'K8S' ||
-      type === 'ALIYUN_SERVERLESS_SPARK'
+      type === 'ALIYUN_SERVERLESS_SPARK' ||
+      type === 'DOLPHINDB'
     ) {
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
       state.showPublicKey = false
+      if (type === 'DOLPHINDB') {
+        state.showJDBCConnectParameters = true
+        state.showPublicKey = false
+      }
       if (type === 'SSH') {
         state.showPublicKey = true
       }
@@ -497,6 +503,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'ALIYUN_SERVERLESS_SPARK',
     label: 'ALIYUN_SERVERLESS_SPARK',
     defaultPort: 0
+  },
+  DOLPHINDB: {
+    value: 'DOLPHINDB',
+    label: 'DOLPHINDB',
+    defaultPort: 8848
   }
 }
 
