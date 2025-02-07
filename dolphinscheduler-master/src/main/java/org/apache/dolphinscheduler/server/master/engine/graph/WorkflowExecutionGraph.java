@@ -51,6 +51,8 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     private final Set<String> activeTaskExecutionRunnable;
 
+    private final Set<String> inActiveTaskExecutionRunnable;
+
     public WorkflowExecutionGraph() {
         this.failureTaskChains = new HashSet<>();
         this.pausedTaskChains = new HashSet<>();
@@ -60,6 +62,7 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
         this.successors = new HashMap<>();
         this.totalTaskExecuteRunnableMap = new HashMap<>();
         this.activeTaskExecutionRunnable = new HashSet<>();
+        this.inActiveTaskExecutionRunnable = new HashSet<>();
     }
 
     @Override
@@ -144,8 +147,23 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     }
 
     @Override
+    public boolean isTaskExecutionRunnableInActive(ITaskExecutionRunnable taskExecutionRunnable) {
+        return inActiveTaskExecutionRunnable.contains(taskExecutionRunnable.getName());
+    }
+
+    @Override
     public boolean isTaskExecutionRunnableKilled(final ITaskExecutionRunnable taskExecutionRunnable) {
         return killedTaskChains.contains(taskExecutionRunnable.getName());
+    }
+
+    @Override
+    public boolean isTaskExecutionRunnableFailed(ITaskExecutionRunnable taskExecutionRunnable) {
+        return failureTaskChains.contains(taskExecutionRunnable.getName());
+    }
+
+    @Override
+    public boolean isTaskExecutionRunnablePaused(ITaskExecutionRunnable taskExecutionRunnable) {
+        return pausedTaskChains.contains(taskExecutionRunnable.getName());
     }
 
     @Override
@@ -165,10 +183,10 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     public boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable) {
         return getPredecessors(taskExecutionRunnable.getName())
                 .stream()
-                .allMatch(predecessor -> isTaskFinish(predecessor)
-                        && !isTaskFailure(predecessor)
-                        && !isTaskPaused(predecessor)
-                        && !isTaskKilled(predecessor));
+                .allMatch(predecessor -> isTaskExecutionRunnableInActive(predecessor)
+                        && !isTaskExecutionRunnableFailed(predecessor)
+                        && !isTaskExecutionRunnablePaused(predecessor)
+                        && !isTaskExecutionRunnableKilled(predecessor));
     }
 
     @Override
@@ -209,6 +227,7 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     @Override
     public void markTaskExecutionRunnableInActive(final ITaskExecutionRunnable taskExecutionRunnable) {
         activeTaskExecutionRunnable.remove(taskExecutionRunnable.getName());
+        inActiveTaskExecutionRunnable.add(taskExecutionRunnable.getName());
     }
 
     @Override
@@ -242,8 +261,9 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     @Override
     public boolean isEndOfTaskChain(final ITaskExecutionRunnable taskExecutionRunnable) {
         return successors.get(taskExecutionRunnable.getName()).isEmpty()
-                || killedTaskChains.contains(taskExecutionRunnable.getName())
-                || pausedTaskChains.contains(taskExecutionRunnable.getName());
+                || isTaskExecutionRunnableKilled(taskExecutionRunnable)
+                || isTaskExecutionRunnablePaused(taskExecutionRunnable)
+                || isTaskExecutionRunnableFailed(taskExecutionRunnable);
     }
 
     @Override
@@ -289,22 +309,6 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
         return successors.stream().allMatch(
                 successor -> isTaskExecutionRunnableSkipped(successor)
                         || TaskTypeUtils.isConditionTask(taskExecutionRunnable.getTaskInstance().getTaskType()));
-    }
-
-    private boolean isTaskFinish(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return !activeTaskExecutionRunnable.contains(taskExecutionRunnable.getName());
-    }
-
-    private boolean isTaskFailure(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return failureTaskChains.contains(taskExecutionRunnable.getName());
-    }
-
-    private boolean isTaskPaused(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return pausedTaskChains.contains(taskExecutionRunnable.getName());
-    }
-
-    private boolean isTaskKilled(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return killedTaskChains.contains(taskExecutionRunnable.getName());
     }
 
     private void assertTaskExecutionRunnableState(final ITaskExecutionRunnable taskExecutionRunnable,

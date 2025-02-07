@@ -81,9 +81,25 @@ public interface IWorkflowExecutionGraph {
     boolean isTaskExecutionRunnableActive(final ITaskExecutionRunnable taskExecutionRunnable);
 
     /**
+     * Whether the given task is inactive.
+     * <p> A task is inactive means the task has been `executed`.
+     */
+    boolean isTaskExecutionRunnableInActive(final ITaskExecutionRunnable taskExecutionRunnable);
+
+    /**
      * Whether the given task is killed.
      */
     boolean isTaskExecutionRunnableKilled(final ITaskExecutionRunnable taskExecutionRunnable);
+
+    /**
+     * Whether the given task is failure.
+     */
+    boolean isTaskExecutionRunnableFailed(final ITaskExecutionRunnable taskExecutionRunnable);
+
+    /**
+     * Whether the given task is paused.
+     */
+    boolean isTaskExecutionRunnablePaused(final ITaskExecutionRunnable taskExecutionRunnable);
 
     /**
      * Get the active TaskExecutionRunnable list.
@@ -176,6 +192,7 @@ public interface IWorkflowExecutionGraph {
      * Check whether the given task is the end of the task chain.
      * <p> If the given task has no successor, then it is the end of the task chain.
      * <p> If the given task is killed or paused, then it is the end of the task chain.
+     * <p> If the given task is failure, and all its successors are condition task then it is not end of a task chain.
      */
     boolean isEndOfTaskChain(final ITaskExecutionRunnable taskExecutionRunnable);
 
