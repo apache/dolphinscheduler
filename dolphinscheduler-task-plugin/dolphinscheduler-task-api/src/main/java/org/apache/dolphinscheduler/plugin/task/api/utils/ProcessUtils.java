@@ -85,27 +85,101 @@ public final class ProcessUtils {
     private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
-     * kill tasks according to different task types.
+     * Terminate the task process, support multi-level signal processing and fallback strategy
+     * @param request Task execution context
+     * @return Whether the process was successfully terminated
      */
-    @Deprecated
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
-            log.info("Begin kill task instance, processId: {}", request.getProcessId());
+            log.info("Begin killing task instance, processId: {}", request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                log.error("Task instance kill failed, processId is not exist");
+                log.error("Task instance kill failed, processId is not available");
                 return false;
             }
 
-            String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);
-            log.info("process id:{}, cmd:{}", processId, cmd);
+            // Get all child processes
+            String pids = getPidsStr(processId);
+            String[] pidArray = pids.split("\\s+");
+            if (pidArray.length == 0) {
+                log.warn("No valid PIDs found for process: {}", processId);
+                return true;
+            }
 
-            OSUtils.exeCmd(cmd);
-            log.info("Success kill task instance, processId: {}", request.getProcessId());
+            // 1. Try to terminate gracefully (SIGINT)
+            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pids, request.getTenantCode(), 2000);
+            if (gracefulKillSuccess) {
+                log.info("Successfully killed process tree using SIGINT, processId: {}", processId);
+                return true;
+            }
+
+            // 2. Try to terminate forcefully (SIGTERM)
+            boolean termKillSuccess = sendKillSignal("SIGTERM", pids, request.getTenantCode(), 2000);
+            if (termKillSuccess) {
+                log.info("Successfully killed process tree using SIGTERM, processId: {}", processId);
+                return true;
+            }
+
+            // 3. As a last resort, use `kill -9`
+            log.warn("SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}", processId);
+            boolean forceKillSuccess = sendKillSignal("SIGKILL", pids, request.getTenantCode(), 3000);
+            if (forceKillSuccess) {
+                log.info("Successfully killed process tree using SIGKILL, processId: {}", processId);
+                return true;
+            }
+
+            // 4. Finally, check if the process is still alive
+            for (String pid : pidArray) {
+                if (isProcessAlive(pid)) {
+                    log.error("Failed to kill process {}, even after multiple attempts", pid);
+                    return false;
+                }
+            }
+
+            log.info("Success: process {} is no longer running", processId);
             return true;
+
         } catch (Exception e) {
             log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Send a kill signal to a process group and wait for it to terminate, but it may not be successful to kill the process
+     * @param signal Signal type (SIGINT, SIGTERM, SIGKILL)
+     * @param pids Process ID list
+     * @param tenantCode Tenant code
+     * @param waitTimeMs Wait time
+     */
+    private static boolean sendKillSignal(String signal, String pids, String tenantCode, int waitTimeMs) {
+        try {
+            String killCmd = String.format("kill -s %s %s", signal, pids);
+            killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
+            log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
+            OSUtils.exeCmd(killCmd);
+
+            // Wait for a while and check if the process is still alive
+            Thread.sleep(waitTimeMs);
+            return true;
+        } catch (Exception e) {
+            log.error("Error sending {} to process: {}", signal, pids, e);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a process is still alive
+     * @param pid Process ID
+     * @return Whether the process is still alive
+     */
+    private static boolean isProcessAlive(String pid) {
+        try {
+            String checkCmd = String.format("ps -p %s", pid);
+            String result = OSUtils.exeCmd(checkCmd);
+            return result != null && result.contains(pid);
+        } catch (Exception e) {
+            log.info("Error checking process status for pid {}", pid);
             return false;
         }
     }

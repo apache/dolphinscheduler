@@ -216,13 +216,30 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
-        // soft kill
-        log.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
-        process.destroy();
-        if (!process.waitFor(5, TimeUnit.SECONDS)) {
+        try {
+            // Try to kill process tree first
+            boolean killed = ProcessUtils.kill(taskRequest);
+            if (killed) {
+                log.info("Successfully killed process tree for task: {}, pid: {}",
+                        taskRequest.getTaskAppId(), taskRequest.getProcessId());
+                return;
+            }
+
+            // If killing process tree fails, try to destroy the process directly
+            log.info("Failed to kill process tree, trying to destroy process directly");
+            process.destroy();
+            if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                log.info("Process did not exit after destroy, forcing termination");
+                process.destroyForcibly();
+            }
+            log.info("Successfully killed process tree for task: {}, pid: {}",
+                    taskRequest.getTaskAppId(), taskRequest.getProcessId());
+
+        } catch (Exception e) {
+            log.error("Error while killing process, pid: {}", taskRequest.getProcessId(), e);
+            // Try destroyForcibly as last resort
             process.destroyForcibly();
         }
-        log.info("Success kill task: {}, pid: {}", taskRequest.getTaskAppId(), taskRequest.getProcessId());
     }
 
     private void collectPodLogIfNeeded() {
