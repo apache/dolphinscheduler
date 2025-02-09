@@ -706,6 +706,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         schedule.setReleaseState(ReleaseState.ONLINE);
+        schedule.setUpdateTime(new Date());
         scheduleMapper.updateById(schedule);
 
         Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
@@ -735,6 +736,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             log.debug("The schedule is already offline, scheduleId:{}.", schedule.getId());
             return;
         }
+        schedule.setUpdateTime(new Date());
         schedule.setReleaseState(ReleaseState.OFFLINE);
         scheduleMapper.updateById(schedule);
         WorkflowDefinition workflowDefinition =
