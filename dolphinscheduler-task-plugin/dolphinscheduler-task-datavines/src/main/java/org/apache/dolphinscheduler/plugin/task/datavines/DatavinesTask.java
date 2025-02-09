@@ -67,11 +67,6 @@ public class DatavinesTask extends AbstractRemoteTask {
     }
 
     @Override
-    public void handle(TaskCallBack taskCallBack) throws TaskException {
-        super.handle(taskCallBack);
-    }
-
-    @Override
     public void submitApplication() throws TaskException {
         executeJob();
     }
