@@ -92,12 +92,10 @@ class DatavinesTaskTest {
                     .thenReturn(executeJobResult);
             datavinesTask.submitApplication();
 
-            // 第一次调用 RequestUtils.getJobExecutionResult
             requestUtilsStatic
                     .when(() -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()))
                     .thenReturn(executeStatus);
 
-            // 第二次调用 RequestUtils.getJobExecutionResult
             requestUtilsStatic
                     .when(() -> RequestUtils.getJobExecutionResult(Mockito.any(), Mockito.any(), Mockito.any()))
                     .thenReturn(executeResult);

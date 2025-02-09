@@ -39,6 +39,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 public class RequestUtils {
 
+    private RequestUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static JsonNode executeJob(String address, String jobId, String token) {
         return parse(doPost(address + DatavinesTaskConstants.EXECUTE_JOB + jobId, token));
     }
