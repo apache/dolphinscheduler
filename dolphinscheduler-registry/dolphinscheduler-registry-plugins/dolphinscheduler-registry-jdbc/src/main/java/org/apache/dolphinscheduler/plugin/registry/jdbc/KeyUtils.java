@@ -40,8 +40,10 @@ public class KeyUtils {
         if (StringUtils.isEmpty(childPath)) {
             throw new IllegalArgumentException("Invalid child path " + childPath);
         }
-        final String[] parentSplit = parentPath.split(RegistryConstants.PATH_SEPARATOR);
-        final String[] childSplit = childPath.split(RegistryConstants.PATH_SEPARATOR);
+        final String[] parentSplit = removeLastSlash(parentPath).split(RegistryConstants.PATH_SEPARATOR);
+        final String[] childSplit = removeLastSlash(childPath).split(RegistryConstants.PATH_SEPARATOR);
+        // If the parent path is longer than or equals the child path, it is impossible to be the parent path of the
+        // child path
         if (parentSplit.length >= childSplit.length) {
             return false;
         }

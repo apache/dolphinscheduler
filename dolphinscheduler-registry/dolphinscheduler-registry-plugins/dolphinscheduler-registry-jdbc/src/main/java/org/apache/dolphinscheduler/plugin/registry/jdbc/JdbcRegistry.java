@@ -24,10 +24,8 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.ConnectionStateListener;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServer;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.server.JdbcRegistryDataChangeListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -97,56 +95,11 @@ public final class JdbcRegistry implements Registry {
     }
 
     @Override
-    public void subscribe(String subscribePath, SubscribeListener listener) {
-        checkNotNull(subscribePath);
+    public void subscribe(String watchedPath, SubscribeListener listener) {
+        checkNotNull(watchedPath);
         checkNotNull(listener);
-        jdbcRegistryClient.subscribeJdbcRegistryDataChange(new JdbcRegistryDataChangeListener() {
-
-            @Override
-            public void onJdbcRegistryDataChanged(String eventPath, String value) {
-                if (!isPathMatch(subscribePath, eventPath)) {
-                    return;
-                }
-                final Event event = Event.builder()
-                        .key(subscribePath)
-                        .path(eventPath)
-                        .data(value)
-                        .type(Event.Type.UPDATE)
-                        .build();
-                listener.notify(event);
-            }
-
-            @Override
-            public void onJdbcRegistryDataDeleted(String eventPath) {
-                if (!isPathMatch(subscribePath, eventPath)) {
-                    return;
-                }
-                final Event event = Event.builder()
-                        .key(subscribePath)
-                        .path(eventPath)
-                        .type(Event.Type.REMOVE)
-                        .build();
-                listener.notify(event);
-            }
-
-            @Override
-            public void onJdbcRegistryDataAdded(String eventPath, String value) {
-                if (!isPathMatch(subscribePath, eventPath)) {
-                    return;
-                }
-                final Event event = Event.builder()
-                        .key(subscribePath)
-                        .path(eventPath)
-                        .data(value)
-                        .type(Event.Type.ADD)
-                        .build();
-                listener.notify(event);
-            }
-
-            private boolean isPathMatch(String subscribePath, String eventPath) {
-                return KeyUtils.isParent(subscribePath, eventPath) || KeyUtils.isSamePath(subscribePath, eventPath);
-            }
-        });
+        jdbcRegistryClient
+                .subscribeJdbcRegistryDataChange(new JdbcRegistryDataChangeListenerAdapter(watchedPath, listener));
     }
 
     @Override

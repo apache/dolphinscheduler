@@ -22,10 +22,13 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPAC
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
+import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -46,6 +49,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,60 +69,48 @@ public class TaskExecutionContextFactory {
     @Autowired
     private MasterConfig masterConfig;
 
+    @Autowired
+    private IEnvironmentDao environmentDao;
+
     public TaskExecutionContext createTaskExecutionContext(TaskExecutionContextCreateRequest request) {
-        TaskInstance taskInstance = request.getTaskInstance();
-        WorkflowInstance workflowInstance = request.getWorkflowInstance();
-        WorkflowDefinition workflowDefinition = request.getWorkflowDefinition();
-        Project project = request.getProject();
+        final TaskInstance taskInstance = request.getTaskInstance();
+        final WorkflowInstance workflowInstance = request.getWorkflowInstance();
+        final WorkflowDefinition workflowDefinition = request.getWorkflowDefinition();
+        final Project project = request.getProject();
 
-        ResourceParametersHelper resources = TaskPluginManager.getTaskChannel(taskInstance.getTaskType())
-                .parseParameters(taskInstance.getTaskParams())
-                .getResources();
-        setTaskResourceInfo(resources);
-
-        Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(workflowInstance);
-
-        AbstractParameters baseParam =
-                TaskPluginManager.parseTaskParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
-
-        Map<String, Property> propertyMap =
-                curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance,
-                        project.getName(), workflowDefinition.getName());
-        TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+        return TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())
                 .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildEnvironmentConfig(getEnvironmentConfigFromDB(taskInstance).orElse(null))
                 .buildTaskDefinitionRelatedInfo(request.getTaskDefinition())
                 .buildProcessInstanceRelatedInfo(request.getWorkflowInstance())
-                .buildResourceParametersInfo(resources)
-                .buildBusinessParamsMap(businessParamsMap)
-                .buildParamInfo(propertyMap)
+                .buildResourceParameters(getResourceParameters(taskInstance))
+                .buildBusinessParams(getBusinessParams(workflowInstance))
+                .buildPrepareParams(getPrepareParams(taskInstance, workflowInstance, workflowDefinition, project))
+                .buildK8sTaskRelatedInfo(getK8sTaskExecutionContext(taskInstance))
                 .create();
-
-        setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
-        return taskExecutionContext;
     }
 
-    public void setK8sTaskRelatedInfo(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance) {
-        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
-        taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
-    }
-
-    private void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
-        if (Objects.isNull(resourceParametersHelper)) {
-            return;
+    private ResourceParametersHelper getResourceParameters(final TaskInstance taskInstance) {
+        final ResourceParametersHelper resourceParameters = TaskPluginManager.getTaskChannel(taskInstance.getTaskType())
+                .parseParameters(taskInstance.getTaskParams())
+                .getResources();
+        if (resourceParameters != null) {
+            // todo: add DataSourceParametersAssembler to assemble DataSourceParameters
+            resourceParameters.getResourceMap().forEach((type, map) -> {
+                switch (type) {
+                    case DATASOURCE:
+                        assembleDataSourceParameters(map);
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
-        resourceParametersHelper.getResourceMap().forEach((type, map) -> {
-            switch (type) {
-                case DATASOURCE:
-                    setTaskDataSourceResourceInfo(map);
-                    break;
-                default:
-                    break;
-            }
-        });
+        return resourceParameters;
     }
 
-    private void setTaskDataSourceResourceInfo(Map<Integer, AbstractResourceParameters> map) {
+    private void assembleDataSourceParameters(Map<Integer, AbstractResourceParameters> map) {
         if (MapUtils.isEmpty(map)) {
             return;
         }
@@ -135,7 +127,7 @@ public class TaskExecutionContextFactory {
         });
     }
 
-    private K8sTaskExecutionContext setK8sTaskRelation(TaskInstance taskInstance) {
+    private K8sTaskExecutionContext getK8sTaskExecutionContext(final TaskInstance taskInstance) {
         K8sTaskExecutionContext k8sTaskExecutionContext = null;
         String namespace = "";
         switch (taskInstance.getTaskType()) {
@@ -158,6 +150,38 @@ public class TaskExecutionContextFactory {
             }
         }
         return k8sTaskExecutionContext;
+    }
+
+    private Map<String, Property> getBusinessParams(final WorkflowInstance workflowInstance) {
+        return curingParamsService.preBuildBusinessParams(workflowInstance);
+    }
+
+    private Map<String, Property> getPrepareParams(final TaskInstance taskInstance,
+                                                   final WorkflowInstance workflowInstance,
+                                                   final WorkflowDefinition workflowDefinition,
+                                                   final Project project) {
+        final AbstractParameters baseParam = TaskPluginManager.parseTaskParameters(
+                taskInstance.getTaskType(),
+                taskInstance.getTaskParams());
+
+        return curingParamsService.paramParsingPreparation(
+                taskInstance,
+                baseParam,
+                workflowInstance,
+                project.getName(),
+                workflowDefinition.getName());
+    }
+
+    private Optional<String> getEnvironmentConfigFromDB(final TaskInstance taskInstance) {
+        if (EnvironmentUtils.isEnvironmentCodeEmpty(taskInstance.getEnvironmentCode())) {
+            return Optional.empty();
+        }
+        final Optional<Environment> environmentOptional =
+                environmentDao.queryByEnvironmentCode(taskInstance.getEnvironmentCode());
+        if (!environmentOptional.isPresent()) {
+            throw new IllegalArgumentException("Cannot find the environment: " + taskInstance.getEnvironmentCode());
+        }
+        return Optional.ofNullable(environmentOptional.get().getConfig());
     }
 
 }

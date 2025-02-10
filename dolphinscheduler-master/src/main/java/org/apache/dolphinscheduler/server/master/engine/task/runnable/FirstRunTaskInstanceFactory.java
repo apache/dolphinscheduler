@@ -51,7 +51,6 @@ public class FirstRunTaskInstanceFactory extends AbstractTaskInstanceFactory<Fir
         TaskInstance taskInstance = new TaskInstance();
         injectMetadataFromTaskDefinition(taskInstance, taskDefinition);
         injectMetadataFromWorkflowInstance(taskInstance, workflowInstance);
-        injectEnvironmentConfigFromDB(taskInstance);
 
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         taskInstance.setFirstSubmitTime(new Date());

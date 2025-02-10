@@ -15,17 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security.impl.pwd;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
+import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
+
+import java.util.Optional;
 
 import lombok.NonNull;
 
-public class PasswordAuthenticator extends AbstractAuthenticator {
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class EnvironmentDaoImpl extends BaseDao<Environment, EnvironmentMapper> implements IEnvironmentDao {
+
+    public EnvironmentDaoImpl(@NonNull EnvironmentMapper environmentMapper) {
+        super(environmentMapper);
+    }
 
     @Override
-    public User login(@NonNull String userName, String password) {
-        return userService.queryUser(userName, password);
+    public Optional<Environment> queryByEnvironmentCode(Long environmentCode) {
+        return Optional.ofNullable(mybatisMapper.queryByEnvironmentCode(environmentCode));
     }
 }

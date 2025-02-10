@@ -15,17 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security.impl.pwd;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 
-import lombok.NonNull;
+import java.util.Optional;
 
-public class PasswordAuthenticator extends AbstractAuthenticator {
+public interface IEnvironmentDao extends IDao<Environment> {
 
-    @Override
-    public User login(@NonNull String userName, String password) {
-        return userService.queryUser(userName, password);
-    }
+    Optional<Environment> queryByEnvironmentCode(Long environmentCode);
 }
