@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.integration;
 
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
@@ -79,6 +81,9 @@ public class WorkflowTestCaseContextFactory {
     @Autowired
     private TaskGroupDao taskGroupDao;
 
+    @Autowired
+    private IEnvironmentDao environmentDao;
+
     public WorkflowTestCaseContext initializeContextFromYaml(final String yamlPath) {
         final WorkflowTestCaseContext workflowTestCaseContext = YamlFactory.load(yamlPath);
         initializeProjectToDB(workflowTestCaseContext.getProject());
@@ -93,6 +98,9 @@ public class WorkflowTestCaseContextFactory {
         }
         if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getTaskGroups())) {
             initializeTaskGroupsToDB(workflowTestCaseContext.getTaskGroups());
+        }
+        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getEnvironments())) {
+            initializeEnvironmentToDB(workflowTestCaseContext.getEnvironments());
         }
         return workflowTestCaseContext;
     }
@@ -145,6 +153,12 @@ public class WorkflowTestCaseContextFactory {
     private void initializeTaskGroupsToDB(final List<TaskGroup> taskGroups) {
         for (final TaskGroup taskGroup : taskGroups) {
             taskGroupDao.insert(taskGroup);
+        }
+    }
+
+    private void initializeEnvironmentToDB(final List<Environment> environments) {
+        for (final Environment environment : environments) {
+            environmentDao.insert(environment);
         }
     }
 

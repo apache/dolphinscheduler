@@ -52,7 +52,7 @@ public class WorkflowReadyPauseStateAction extends AbstractWorkflowStateAction {
     public void topologyLogicalTransitionEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                                      final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        super.onTaskFinish(workflowExecutionRunnable,
+        super.tryToTriggerSuccessorsAfterTaskFinish(workflowExecutionRunnable,
                 workflowTopologyLogicalTransitionWithTaskFinishEvent.getTaskExecutionRunnable());
     }
 

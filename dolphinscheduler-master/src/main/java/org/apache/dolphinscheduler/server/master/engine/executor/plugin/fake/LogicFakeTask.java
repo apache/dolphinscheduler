@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.Abstract
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -51,9 +53,13 @@ public class LogicFakeTask extends AbstractLogicTask<LogicFakeTaskParameters> {
         try {
             log.info("Begin to execute LogicFakeTask: {}", taskExecutionContext.getTaskName());
 
-            final String shellScript = ParameterUtils.convertParameterPlaceholders(
+            String shellScript = ParameterUtils.convertParameterPlaceholders(
                     taskParameters.getShellScript(),
                     ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+
+            if (StringUtils.isNotEmpty(taskExecutionContext.getEnvironmentConfig())) {
+                shellScript = taskExecutionContext.getEnvironmentConfig() + "\n" + shellScript;
+            }
             final String[] cmd = {"/bin/sh", "-c", shellScript};
             process = Runtime.getRuntime().exec(cmd);
             int exitCode = process.waitFor();
