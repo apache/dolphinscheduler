@@ -28,6 +28,10 @@
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 
+    <properties>
+        <plugin.name>datasource.dolphindb</plugin.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
@@ -52,7 +56,23 @@
             <groupId>com.dolphindb</groupId>
             <artifactId>jdbc</artifactId>
         </dependency>
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

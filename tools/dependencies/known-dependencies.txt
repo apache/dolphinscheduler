@@ -447,5 +447,3 @@ semver-5.7.2.jar
 sigmund-1.0.1.jar
 wrappy-1.0.2.jar
 yallist-2.1.2.jar
-dolphindb-jdbc-3.00.0.1.jar
-dolphindb-javaapi-3.00.0.2.jar
