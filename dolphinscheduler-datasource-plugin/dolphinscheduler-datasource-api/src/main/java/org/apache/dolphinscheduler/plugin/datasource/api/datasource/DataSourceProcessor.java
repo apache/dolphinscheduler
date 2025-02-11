@@ -36,7 +36,8 @@ public interface DataSourceProcessor {
     BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson);
 
     /**
-     * check datasource param is valid
+     * check datasource param is valid.
+     * @throws IllegalArgumentException if invalid
      */
     void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam);
 
