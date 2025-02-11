@@ -290,7 +290,6 @@ interface ISeatunnelDataParams {
   parallelism?: number
   table?: string
   customParams?: ILocalParam[]
-  jobMode?: string
 }
 
 interface ITaskParams {

@@ -152,7 +152,7 @@ public class MysqlConfigGenerator implements IConfigGenerator {
     }
 
     private static String buildJdbcUrl(String jdbcUrl) {
-        return jdbcUrl + "?" + "serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=UTF-8";
+        return jdbcUrl + "?" + "useUnicode=true&characterEncoding=UTF-8";
     }
 
     private static String buildDefaultQuery(String table) {

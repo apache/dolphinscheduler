@@ -56,7 +56,9 @@ public class Constants {
      * mysql config
      */
     public static final String MYSQL_EXTRA_SINK_PARAMS =
-            "    database = \"%s\"\n    table = \"%s\"\n    generate_sink_sql = \"%s\"\n";
+            "    database = \"%s\"\n" +
+                    "    table = \"%s\"\n" +
+                    "    generate_sink_sql = \"%s\"\n";
     public static final String MYSQL_QUERY_PARAMS = "    query = \"%s\"\n";
     public static final String MYSQL_DEFAULT_QUERY_PREFIX = "select * from ";
 

@@ -154,7 +154,8 @@ public class SeatunnelParameters extends AbstractParameters {
 
         SeatunnelTaskExecutionContext seatunnelTaskExecutionContext = new SeatunnelTaskExecutionContext();
 
-        if (this.isUseCustom()) {
+        if (this.isUseCustom()
+                || resourceParametersHelper.getResourceMap().isEmpty()) {
             return seatunnelTaskExecutionContext;
         }
 
