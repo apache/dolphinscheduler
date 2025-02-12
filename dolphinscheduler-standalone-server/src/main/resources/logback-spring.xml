@@ -20,10 +20,13 @@
     <property name="log.base" value="logs"/>
     <property scope="context" name="log.base.ctx" value="${log.base}" />
 
+    <conversionRule conversionWord="message"
+                    converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                [WI-%X{workflowInstanceId:-0}][TI-%X{taskInstanceId:-0}] - %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{10}:[%line] - %msg%n
+                [WI-%X{workflowInstanceId:-0}][TI-%X{taskInstanceId:-0}] - %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{10}:[%line] - %message%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -40,7 +43,7 @@
         </rollingPolicy>
         <encoder>
             <pattern>
-                [WI-%X{workflowInstanceId:-0}][TI-%X{taskInstanceId:-0}] - %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{10}:[%line] - %msg%n
+                [WI-%X{workflowInstanceId:-0}][TI-%X{taskInstanceId:-0}] - %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{10}:[%line] - %message%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -50,8 +53,6 @@
     <logger name="org.apache.hbase" level="WARN"/>
     <logger name="org.apache.hadoop" level="WARN"/>
 
-    <conversionRule conversionWord="message"
-                    converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
         <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
