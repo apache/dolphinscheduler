@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.api.validator.workflow;
 
 import org.apache.dolphinscheduler.api.validator.IValidator;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -40,6 +42,15 @@ public class BackfillWorkflowDTOValidator implements IValidator<BackfillWorkflow
         }
         if (backfillParams.getExpectedParallelismNumber() < 0) {
             throw new IllegalArgumentException("expectedParallelismNumber should >= 0");
+        }
+        if (backfillWorkflowDTO.getExecType() != CommandType.COMPLEMENT_DATA) {
+            throw new IllegalArgumentException("The execType should be START_PROCESS");
+        }
+        if (backfillWorkflowDTO.getWorkflowDefinition() == null) {
+            throw new IllegalArgumentException("The workflowDefinition should not be null");
+        }
+        if (backfillWorkflowDTO.getWorkflowDefinition().getReleaseState() != ReleaseState.ONLINE) {
+            throw new IllegalStateException("The workflowDefinition should be online");
         }
     }
 }
