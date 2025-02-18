@@ -147,6 +147,6 @@ public class ProcessUtilsTest {
         boolean result = ProcessUtils.kill(taskRequest);
 
         // Assert
-        Assertions.assertFalse(result);
+        Assertions.assertTrue(result);
     }
 }

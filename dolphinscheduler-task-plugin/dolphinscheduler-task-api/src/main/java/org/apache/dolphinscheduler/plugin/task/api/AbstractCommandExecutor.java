@@ -220,7 +220,7 @@ public abstract class AbstractCommandExecutor {
             // Try to kill process tree first
             boolean killed = ProcessUtils.kill(taskRequest);
             if (killed) {
-                log.info("Successfully killed process tree for task: {}, pid: {}",
+                log.info("Process tree for task: {} is killed or already finished, pid: {}",
                         taskRequest.getTaskAppId(), taskRequest.getProcessId());
                 return;
             }
@@ -237,8 +237,6 @@ public abstract class AbstractCommandExecutor {
 
         } catch (Exception e) {
             log.error("Error while killing process, pid: {}", taskRequest.getProcessId(), e);
-            // Try destroyForcibly as last resort
-            process.destroyForcibly();
         }
     }
 
