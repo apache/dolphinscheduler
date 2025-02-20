@@ -216,27 +216,14 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
-        try {
-            // Try to kill process tree first
-            boolean killed = ProcessUtils.kill(taskRequest);
-            if (killed) {
-                log.info("Process tree for task: {} is killed or already finished, pid: {}",
-                        taskRequest.getTaskAppId(), taskRequest.getProcessId());
-                return;
-            }
-
-            // If killing process tree fails, try to destroy the process directly
-            log.info("Failed to kill process tree, trying to destroy process directly");
-            process.destroy();
-            if (!process.waitFor(5, TimeUnit.SECONDS)) {
-                log.info("Process did not exit after destroy, forcing termination");
-                process.destroyForcibly();
-            }
-            log.info("Successfully killed process tree for task: {}, pid: {}",
+        // Try to kill process tree
+        boolean killed = ProcessUtils.kill(taskRequest);
+        if (killed) {
+            log.info("Process tree for task: {} is killed or already finished, pid: {}",
                     taskRequest.getTaskAppId(), taskRequest.getProcessId());
-
-        } catch (Exception e) {
-            log.error("Error while killing process, pid: {}", taskRequest.getProcessId(), e);
+        } else {
+            log.error("Failed to kill process tree for task: {}, pid: {}",
+                    taskRequest.getTaskAppId(), taskRequest.getProcessId());
         }
     }
 
