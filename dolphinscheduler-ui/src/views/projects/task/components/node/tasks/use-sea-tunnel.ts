@@ -94,7 +94,9 @@ export function useSeaTunnel({
     parallelism: 1,
     sourceCustomParams: [],
     targetCustomParams: [],
-    jobMode: 'BATCH'
+    jobMode: 'BATCH',
+    xms: 1,
+    xmx: 1
   } as INodeData)
 
   return {

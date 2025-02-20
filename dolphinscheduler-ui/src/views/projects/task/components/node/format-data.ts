@@ -212,6 +212,8 @@ export function formatParams(data: INodeData): {
     taskParams.useCustom = data.useCustom
     taskParams.parallelism = data.parallelism
     taskParams.jobMode = data.jobMode
+    taskParams.xms = data.xms
+    taskParams.xmx = data.xmx
     const sourceConfig: ISeatunnelDataParams = {}
     const targetConfig: ISeatunnelDataParams = {}
 

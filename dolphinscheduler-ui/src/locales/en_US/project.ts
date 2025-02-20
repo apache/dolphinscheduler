@@ -408,6 +408,7 @@ export default {
     min_memory: 'Min memory',
     cores: 'Cores',
     mb: 'MB',
+    gb: 'GB',
     image: 'Image',
     image_tips: 'Please enter image',
     image_pull_policy: 'Image pull policy',
@@ -940,7 +941,9 @@ export default {
     sea_tunnel_target_table_name: 'Target Table Name',
     sea_tunnel_add_custom_params: 'Add Params',
     sea_tunnel_default_fs: 'fs.defaultFS',
-    sea_tunnel_job_mode: 'Job Mode'
+    sea_tunnel_job_mode: 'Job Mode',
+    sea_tunnel_job_runtime_memory_xms: 'Low Limit Value',
+    sea_tunnel_job_runtime_memory_xmx: 'High Limit Value'
   },
   menu: {
     fav: 'Favorites',

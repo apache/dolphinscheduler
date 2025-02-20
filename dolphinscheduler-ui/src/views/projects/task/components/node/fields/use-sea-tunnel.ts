@@ -210,6 +210,26 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
+    {
+      type: 'input-number',
+      field: 'xms',
+      name: t('project.node.sea_tunnel_job_runtime_memory_xms'),
+      span: 12,
+      slots: {
+        suffix: () => t('project.node.gb')
+      },
+      props: { min: 1 }
+    },
+    {
+      type: 'input-number',
+      field: 'xmx',
+      name: t('project.node.sea_tunnel_job_runtime_memory_xmx'),
+      span: 12,
+      slots: {
+        suffix: () => t('project.node.gb')
+      },
+      props: { min: 1 }
+    },
     useResources(resourceEditorSpan, false, 1),
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]

@@ -103,6 +103,16 @@ public class SeatunnelParameters extends AbstractParameters {
     private String rawScript;
 
     /**
+     * Xms memory
+     */
+    private int xms;
+
+    /**
+     * Xmx memory
+     */
+    private int xmx;
+
+    /**
      * resource list
      */
     private List<ResourceInfo> resourceList;

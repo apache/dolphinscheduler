@@ -59,6 +59,11 @@ public class SeatunnelTask extends AbstractRemoteTask {
     private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
 
     /**
+     * jvm parameters
+     */
+    private static final String JVM_PARAMS = "-DJvmOption=\"-Xms%dG -Xmx%dG\"";
+
+    /**
      * seatunnel parameters
      */
     private SeatunnelParameters seatunnelParameters;
@@ -189,6 +194,9 @@ public class SeatunnelTask extends AbstractRemoteTask {
         createConfigFileIfNotExists(scriptContent, filePath);
         args.add(filePath);
         args.addAll(generateTaskParameters());
+
+        // Add JVM options
+        args.add(loadJvmParams());
         return args;
     }
 
@@ -254,6 +262,13 @@ public class SeatunnelTask extends AbstractRemoteTask {
     private String parseScript(String script) {
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
+    }
+
+    public String loadJvmParams() {
+        int xms = Math.max(seatunnelParameters.getXms(), 1);
+        int xmx = Math.max(seatunnelParameters.getXmx(), 1);
+
+        return String.format(JVM_PARAMS, xms, xmx);
     }
 
     public void setSeatunnelParameters(SeatunnelParameters seatunnelParameters) {

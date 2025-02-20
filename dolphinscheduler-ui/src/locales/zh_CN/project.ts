@@ -401,6 +401,7 @@ export default {
     min_memory: '最小内存',
     cores: '核',
     mb: 'MB',
+    gb: 'GB',
     image: '镜像',
     image_tips: '请输入镜像',
     image_pull_policy: '镜像拉取策略',
@@ -910,7 +911,9 @@ export default {
     sea_tunnel_target_table_name: '目的表名',
     sea_tunnel_add_custom_params: '添加配置参数',
     sea_tunnel_default_fs: 'fs.defaultFS',
-    sea_tunnel_job_mode: '作业模式'
+    sea_tunnel_job_mode: '作业模式',
+    sea_tunnel_job_runtime_memory_xms: '最小内存',
+    sea_tunnel_job_runtime_memory_xmx: '最大内存'
   },
   menu: {
     fav: '收藏组件',
