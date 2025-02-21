@@ -24,10 +24,8 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.ConnectionStateListener;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServer;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.server.JdbcRegistryDataChangeListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -97,52 +95,11 @@ public final class JdbcRegistry implements Registry {
     }
 
     @Override
-    public void subscribe(String path, SubscribeListener listener) {
-        checkNotNull(path);
+    public void subscribe(String watchedPath, SubscribeListener listener) {
+        checkNotNull(watchedPath);
         checkNotNull(listener);
-        jdbcRegistryClient.subscribeJdbcRegistryDataChange(new JdbcRegistryDataChangeListener() {
-
-            @Override
-            public void onJdbcRegistryDataChanged(String key, String value) {
-                if (!key.startsWith(path)) {
-                    return;
-                }
-                Event event = Event.builder()
-                        .key(key)
-                        .path(path)
-                        .data(value)
-                        .type(Event.Type.UPDATE)
-                        .build();
-                listener.notify(event);
-            }
-
-            @Override
-            public void onJdbcRegistryDataDeleted(String key) {
-                if (!key.startsWith(path)) {
-                    return;
-                }
-                Event event = Event.builder()
-                        .key(key)
-                        .path(key)
-                        .type(Event.Type.REMOVE)
-                        .build();
-                listener.notify(event);
-            }
-
-            @Override
-            public void onJdbcRegistryDataAdded(String key, String value) {
-                if (!key.startsWith(path)) {
-                    return;
-                }
-                Event event = Event.builder()
-                        .key(key)
-                        .path(key)
-                        .data(value)
-                        .type(Event.Type.ADD)
-                        .build();
-                listener.notify(event);
-            }
-        });
+        jdbcRegistryClient
+                .subscribeJdbcRegistryDataChange(new JdbcRegistryDataChangeListenerAdapter(watchedPath, listener));
     }
 
     @Override
@@ -206,11 +163,10 @@ public final class JdbcRegistry implements Registry {
     @Override
     public Collection<String> children(String key) {
         try {
-            List<JdbcRegistryDataDTO> children = jdbcRegistryClient.listJdbcRegistryDataChildren(key);
+            final List<JdbcRegistryDataDTO> children = jdbcRegistryClient.listJdbcRegistryDataChildren(key);
             return children
                     .stream()
                     .map(JdbcRegistryDataDTO::getDataKey)
-                    .filter(fullPath -> fullPath.length() > key.length())
                     .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
                     .distinct()
                     .collect(Collectors.toList());

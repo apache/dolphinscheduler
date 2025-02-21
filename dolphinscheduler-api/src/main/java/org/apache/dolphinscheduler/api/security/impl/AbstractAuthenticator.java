@@ -119,8 +119,12 @@ public abstract class AbstractAuthenticator implements Authenticator {
                 sessionId = cookie.getValue();
             }
         }
-        Session session = sessionService.getSession(sessionId);
+        final Session session = sessionService.getSession(sessionId);
         if (session == null) {
+            return null;
+        }
+        if (sessionService.isSessionExpire(session)) {
+            sessionService.expireSession(session.getUserId());
             return null;
         }
         // get user object from session

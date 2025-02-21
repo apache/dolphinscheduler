@@ -75,6 +75,7 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
                 .cpuUsage(systemMetrics.getSystemCpuUsagePercentage())
                 .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
                 .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .diskUsage(systemMetrics.getDiskUsedPercentage())
                 .serverStatus(ServerStatus.NORMAL)
                 .isActive(alertHAServer.isActive())
                 .host(NetUtils.getHost())

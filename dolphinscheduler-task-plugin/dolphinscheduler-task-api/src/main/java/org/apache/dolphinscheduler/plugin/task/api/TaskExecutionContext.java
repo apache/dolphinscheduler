@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -112,9 +111,6 @@ public class TaskExecutionContext implements Serializable {
     private int taskTimeout;
 
     private String workerGroup;
-
-    @Deprecated
-    private TaskExecutionStatus currentExecutionStatus;
 
     private ResourceParametersHelper resourceParametersHelper;
 

@@ -29,34 +29,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class MasterSlotManager implements IMasterSlotReBalancer {
 
-    private final MasterClusters masterClusters;
-
     private final MasterConfig masterConfig;
 
     private volatile int currentSlot = -1;
 
     private volatile int totalSlots = 0;
 
-    public MasterSlotManager(ClusterManager clusterManager, MasterConfig masterConfig) {
+    public MasterSlotManager(final MasterConfig masterConfig) {
         this.masterConfig = masterConfig;
-        this.masterClusters = clusterManager.getMasterClusters();
-        this.masterClusters.registerListener(new IClusters.IClustersChangeListener<MasterServerMetadata>() {
-
-            @Override
-            public void onServerAdded(MasterServerMetadata server) {
-                doReBalance(masterClusters.getNormalServers());
-            }
-
-            @Override
-            public void onServerRemove(MasterServerMetadata server) {
-                doReBalance(masterClusters.getNormalServers());
-            }
-
-            @Override
-            public void onServerUpdate(MasterServerMetadata server) {
-                doReBalance(masterClusters.getNormalServers());
-            }
-        });
     }
 
     /**

@@ -115,8 +115,8 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
         }
     }
 
-    protected void onTaskFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final ITaskExecutionRunnable taskExecutionRunnable) {
+    protected void tryToTriggerSuccessorsAfterTaskFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                         final ITaskExecutionRunnable taskExecutionRunnable) {
         final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
         if (workflowExecutionGraph.isEndOfTaskChain(taskExecutionRunnable)) {
             emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);

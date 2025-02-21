@@ -23,11 +23,9 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -48,7 +46,11 @@ public class TaskExecutionContextBuilder {
         return new TaskExecutionContextBuilder();
     }
 
-    private TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+    private final TaskExecutionContext taskExecutionContext;
+
+    public TaskExecutionContextBuilder() {
+        this.taskExecutionContext = new TaskExecutionContext();
+    }
 
     /**
      * build taskInstance related info
@@ -56,7 +58,7 @@ public class TaskExecutionContextBuilder {
      * @param taskInstance taskInstance
      * @return TaskExecutionContextBuilder
      */
-    public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance) {
+    public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(final TaskInstance taskInstance) {
         taskExecutionContext.setTaskInstanceId(taskInstance.getId());
         taskExecutionContext.setTaskName(taskInstance.getName());
         taskExecutionContext.setFirstSubmitTime(DateUtils.dateToTimeStamp(taskInstance.getFirstSubmitTime()));
@@ -64,19 +66,17 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
-        taskExecutionContext.setEnvironmentConfig(taskInstance.getEnvironmentConfig());
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setVarPool(taskInstance.getVarPool());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());
         taskExecutionContext.setTestFlag(taskInstance.getTestFlag());
-        taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUBMITTED_SUCCESS);
         taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
         taskExecutionContext.setMemoryMax(taskInstance.getMemoryMax());
         taskExecutionContext.setAppIds(taskInstance.getAppLink());
         return this;
     }
 
-    public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition) {
+    public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(final TaskDefinition taskDefinition) {
         // todo: remove the timeout setting here the timeout strategy should be used at master
         taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         if (taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN) {
@@ -97,7 +97,7 @@ public class TaskExecutionContextBuilder {
      * @param workflowInstance processInstance
      * @return TaskExecutionContextBuilder
      */
-    public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(WorkflowInstance workflowInstance) {
+    public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(final WorkflowInstance workflowInstance) {
         taskExecutionContext.setWorkflowInstanceId(workflowInstance.getId());
         taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(workflowInstance.getScheduleTime()));
         taskExecutionContext.setGlobalParams(workflowInstance.getGlobalParams());
@@ -110,20 +110,7 @@ public class TaskExecutionContextBuilder {
         return this;
     }
 
-    /**
-     * build processDefinition related info
-     *
-     * @param workflowDefinition processDefinition
-     * @return TaskExecutionContextBuilder
-     */
-    public TaskExecutionContextBuilder buildProcessDefinitionRelatedInfo(WorkflowDefinition workflowDefinition) {
-        taskExecutionContext.setWorkflowDefinitionCode(workflowDefinition.getCode());
-        taskExecutionContext.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
-        taskExecutionContext.setProjectCode(workflowDefinition.getProjectCode());
-        return this;
-    }
-
-    public TaskExecutionContextBuilder buildResourceParametersInfo(ResourceParametersHelper parametersHelper) {
+    public TaskExecutionContextBuilder buildResourceParameters(final ResourceParametersHelper parametersHelper) {
         taskExecutionContext.setResourceParametersHelper(parametersHelper);
         return this;
     }
@@ -135,7 +122,7 @@ public class TaskExecutionContextBuilder {
      * @return TaskExecutionContextBuilder
      */
 
-    public TaskExecutionContextBuilder buildK8sTaskRelatedInfo(K8sTaskExecutionContext k8sTaskExecutionContext) {
+    public TaskExecutionContextBuilder buildK8sTaskRelatedInfo(final K8sTaskExecutionContext k8sTaskExecutionContext) {
         taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
         return this;
     }
@@ -146,7 +133,7 @@ public class TaskExecutionContextBuilder {
      * @param propertyMap
      * @return
      */
-    public TaskExecutionContextBuilder buildParamInfo(Map<String, Property> propertyMap) {
+    public TaskExecutionContextBuilder buildPrepareParams(final Map<String, Property> propertyMap) {
         taskExecutionContext.setPrepareParamsMap(propertyMap);
         return this;
     }
@@ -157,13 +144,18 @@ public class TaskExecutionContextBuilder {
      * @param businessParamsMap
      * @return
      */
-    public TaskExecutionContextBuilder buildBusinessParamsMap(Map<String, Property> businessParamsMap) {
+    public TaskExecutionContextBuilder buildBusinessParams(final Map<String, Property> businessParamsMap) {
         taskExecutionContext.setParamsMap(businessParamsMap);
         return this;
     }
 
-    public TaskExecutionContextBuilder buildWorkflowInstanceHost(String masterHost) {
+    public TaskExecutionContextBuilder buildWorkflowInstanceHost(final String masterHost) {
         taskExecutionContext.setWorkflowInstanceHost(masterHost);
+        return this;
+    }
+
+    public TaskExecutionContextBuilder buildEnvironmentConfig(final String environmentConfig) {
+        taskExecutionContext.setEnvironmentConfig(environmentConfig);
         return this;
     }
 

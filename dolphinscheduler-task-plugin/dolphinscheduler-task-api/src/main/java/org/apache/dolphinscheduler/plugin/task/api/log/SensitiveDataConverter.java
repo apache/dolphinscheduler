@@ -21,15 +21,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-
-import com.google.common.base.Strings;
 
 /**
  * sensitive data log converter
@@ -37,8 +35,11 @@ import com.google.common.base.Strings;
 public class SensitiveDataConverter extends MessageConverter {
 
     private static Pattern multilinePattern;
-    private static HashSet<String> maskPatterns =
-            new HashSet<>(Collections.singletonList(TaskConstants.DATASOURCE_PASSWORD_REGEX));
+    private static final Set<String> maskPatterns = new HashSet<>();
+
+    static {
+        addMaskPattern(TaskConstants.DATASOURCE_PASSWORD_REGEX);
+    }
 
     @Override
     public String convert(ILoggingEvent event) {
@@ -50,23 +51,24 @@ public class SensitiveDataConverter extends MessageConverter {
         return maskSensitiveData(requestLogMsg);
     }
 
-    public static void addMaskPattern(String maskPattern) {
+    public static synchronized void addMaskPattern(final String maskPattern) {
+        if (maskPatterns.contains(maskPattern)) {
+            return;
+        }
         maskPatterns.add(maskPattern);
+        multilinePattern = Pattern.compile(String.join("|", maskPatterns), Pattern.MULTILINE);
     }
 
     public static String maskSensitiveData(final String logMsg) {
         if (StringUtils.isEmpty(logMsg)) {
             return logMsg;
         }
-        multilinePattern = Pattern.compile(String.join("|", maskPatterns), Pattern.MULTILINE);
 
-        StringBuffer sb = new StringBuffer(logMsg.length());
-        Matcher matcher = multilinePattern.matcher(logMsg);
+        final StringBuffer sb = new StringBuffer(logMsg.length());
+        final Matcher matcher = multilinePattern.matcher(logMsg);
 
         while (matcher.find()) {
-            String password = matcher.group();
-            String maskPassword = Strings.repeat(TaskConstants.STAR, password.length());
-            matcher.appendReplacement(sb, maskPassword);
+            matcher.appendReplacement(sb, TaskConstants.SENSITIVE_DATA_MASK);
         }
         matcher.appendTail(sb);
 

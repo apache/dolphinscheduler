@@ -15,29 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.utils;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Date;
-import java.util.HashMap;
-
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class TaskInstanceUtilsTest {
+class KeyUtilsTest {
 
     @Test
-    void copyTaskInstance() {
-        TaskInstance source = new TaskInstance();
-        source.setId(1);
-        source.setName("source");
-        source.setSubmitTime(new Date());
-        source.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
-        TaskInstance target = new TaskInstance();
-        TaskInstanceUtils.copyTaskInstance(source, target);
-        Assertions.assertEquals(target.getId(), source.getId());
-        Assertions.assertEquals(target.getName(), source.getName());
+    void isParent() {
+        assertFalse(KeyUtils.isParent("/a", "/b"));
+        assertFalse(KeyUtils.isParent("/a", "/a"));
+        assertFalse(KeyUtils.isParent("/b/c", "/b"));
+        assertFalse(KeyUtils.isParent("/b/c", "/b/"));
+
+        assertTrue(KeyUtils.isParent("/", "/b"));
+        assertTrue(KeyUtils.isParent("/b/c", "/b/c/d"));
+        assertTrue(KeyUtils.isParent("/b", "/b/c/d"));
+        assertTrue(KeyUtils.isParent("/b/", "/b/c/d"));
+
     }
+
 }

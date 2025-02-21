@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.integration;
 
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
@@ -51,6 +52,8 @@ public class WorkflowTestCaseContext {
     private List<WorkflowTaskRelation> taskRelations;
 
     private List<TaskGroup> taskGroups;
+
+    private List<Environment> environments;
 
     public WorkflowDefinition getOneWorkflow() {
         if (CollectionUtils.isEmpty(workflows)) {
