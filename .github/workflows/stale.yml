@@ -32,8 +32,8 @@ jobs:
           # Stale Issues
           days-before-issue-stale: 30
           days-before-issue-close: 7
-          # We do not stale Issues with label Waiting for reply,DSIP,security,roadmap,help wanted,good first issue,community
-          exempt-issue-labels: 'Waiting for reply,DSIP,security,roadmap,help wanted,good first issue,community'
+          # We do not stale Issues with below labels
+          exempt-issue-labels: 'Waiting for reply,DSIP,security,roadmap,help wanted,good first issue,community,priority:low,priority:middle,priority:high'
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had recent activity
             for 30 days. It will be closed in next 7 days if no further activity occurs.
