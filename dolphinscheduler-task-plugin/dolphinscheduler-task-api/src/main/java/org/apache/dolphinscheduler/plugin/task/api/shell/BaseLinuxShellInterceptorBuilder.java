@@ -171,6 +171,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         }
 
         bootstrapCommand.add(String.format("--uid=%s", runUser));
+        bootstrapCommand.add(shellAbsolutePath().toString());
         return bootstrapCommand;
     }
 }
