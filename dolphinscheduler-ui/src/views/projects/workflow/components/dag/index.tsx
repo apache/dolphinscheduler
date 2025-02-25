@@ -88,9 +88,6 @@ export default defineComponent({
     const route = useRoute()
     const theme = useThemeStore()
 
-    const uiSettingStore = useUISettingStore()
-    const logTimer = uiSettingStore.getLogTimer
-
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
 
@@ -246,12 +243,10 @@ export default defineComponent({
       taskModalVisible.value = false
       viewLog(taskId, taskType)
 
-      getLogs(logTimer)
+      getLogs()
     }
 
-    let getLogsID: number
-
-    const getLogs = (logTimer: number) => {
+    const getLogs = () => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: nodeVariables.logTaskId,
@@ -260,21 +255,10 @@ export default defineComponent({
         }).then((res: any) => {
           nodeVariables.logRef += res.message || ''
           if (res && res.message !== '') {
-            nodeVariables.limit += 1000
             nodeVariables.skipLineNum += res.lineNum
-            getLogs(logTimer)
+            getLogs()
           } else {
             nodeVariables.logLoadingRef = false
-            if (logTimer !== 0) {
-              if (typeof getLogsID === 'number') {
-                clearTimeout(getLogsID)
-              }
-              getLogsID = setTimeout(() => {
-                nodeVariables.limit += 1000
-                nodeVariables.skipLineNum += 1000
-                getLogs(logTimer)
-              }, logTimer * 1000)
-            }
           }
         }),
         {}
@@ -283,11 +267,11 @@ export default defineComponent({
       return state
     }
 
-    const refreshLogs = (logTimer: number) => {
+    const refreshLogs = () => {
       nodeVariables.logRef = ''
       nodeVariables.limit = 1000
       nodeVariables.skipLineNum = 0
-      getLogs(logTimer)
+      getLogs()
     }
 
     const handleExecuteTask = (
