@@ -216,13 +216,15 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
-        // soft kill
-        log.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
-        process.destroy();
-        if (!process.waitFor(5, TimeUnit.SECONDS)) {
-            process.destroyForcibly();
+        // Try to kill process tree
+        boolean killed = ProcessUtils.kill(taskRequest);
+        if (killed) {
+            log.info("Process tree for task: {} is killed or already finished, pid: {}",
+                    taskRequest.getTaskAppId(), taskRequest.getProcessId());
+        } else {
+            log.error("Failed to kill process tree for task: {}, pid: {}",
+                    taskRequest.getTaskAppId(), taskRequest.getProcessId());
         }
-        log.info("Success kill task: {}, pid: {}", taskRequest.getTaskAppId(), taskRequest.getProcessId());
     }
 
     private void collectPodLogIfNeeded() {
