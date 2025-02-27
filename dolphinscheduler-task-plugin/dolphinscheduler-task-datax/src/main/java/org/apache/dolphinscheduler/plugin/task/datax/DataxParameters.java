@@ -96,6 +96,11 @@ public class DataxParameters extends AbstractParameters {
     private int jobSpeedRecord;
 
     /**
+     * channel count
+     */
+    private int channelCount = 1;
+
+    /**
      * Xms memory
      */
     private int xms;
@@ -206,6 +211,14 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
+    public int getChannelCount() {
+        return channelCount;
+    }
+
+    public void setChannelCount(int channelCount) {
+        this.channelCount = channelCount;
+    }
+
     public int getXms() {
         return xms;
     }
@@ -262,6 +275,7 @@ public class DataxParameters extends AbstractParameters {
                 + ", postStatements=" + postStatements
                 + ", jobSpeedByte=" + jobSpeedByte
                 + ", jobSpeedRecord=" + jobSpeedRecord
+                + ", channelCount=" + channelCount
                 + ", xms=" + xms
                 + ", xmx=" + xmx
                 + ", resourceList=" + JSONUtils.toJsonString(resourceList)
