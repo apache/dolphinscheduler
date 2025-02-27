@@ -55,7 +55,6 @@ import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
-import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import { executeTask } from '@/service/modules/executors'
 import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
 
