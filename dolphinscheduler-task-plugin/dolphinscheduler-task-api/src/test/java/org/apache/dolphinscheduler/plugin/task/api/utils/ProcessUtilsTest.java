@@ -19,16 +19,32 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class ProcessUtilsTest {
 
+    private MockedStatic<OSUtils> mockedOSUtils;
+
+    @BeforeEach
+    void setUp() {
+        mockedOSUtils = Mockito.mockStatic(OSUtils.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (mockedOSUtils != null) {
+            mockedOSUtils.close();
+        }
+    }
     @Test
     public void testGetPidsStr() throws Exception {
         // first
@@ -36,7 +52,6 @@ public class ProcessUtilsTest {
         int processId = 6279;
         String exceptPidsStr = "6279 6282 6354";
         String command;
-        MockedStatic<OSUtils> osUtilsMockedStatic = Mockito.mockStatic(OSUtils.class);
         if (SystemUtils.IS_OS_MAC) {
             pids = "-+= 6279 sudo -+- 6282 558_1497.sh --- 6354 sleep";
             command = String.format("%s -sp %d", TaskConstants.PSTREE, processId);
@@ -45,7 +60,7 @@ public class ProcessUtilsTest {
         } else {
             command = String.format("%s -p %d", TaskConstants.PSTREE, processId);
         }
-        osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command)).thenReturn(pids);
+        mockedOSUtils.when(() -> OSUtils.exeCmd(command)).thenReturn(pids);
         String actualPidsStr = ProcessUtils.getPidsStr(processId);
         Assertions.assertEquals(exceptPidsStr, actualPidsStr);
 
@@ -62,7 +77,7 @@ public class ProcessUtilsTest {
         } else {
             command2 = String.format("%s -p %d", TaskConstants.PSTREE, processId2);
         }
-        osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command2)).thenReturn(pids2);
+        mockedOSUtils.when(() -> OSUtils.exeCmd(command2)).thenReturn(pids2);
         String actualPidsStr2 = ProcessUtils.getPidsStr(processId2);
         Assertions.assertEquals(exceptPidsStr2, actualPidsStr2);
 
@@ -79,7 +94,7 @@ public class ProcessUtilsTest {
         } else {
             command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);
         }
-        osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
+        mockedOSUtils.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
         String actualPidsStr3 = ProcessUtils.getPidsStr(processId3);
         Assertions.assertEquals(exceptPidsStr3, actualPidsStr3);
     }
@@ -95,4 +110,43 @@ public class ProcessUtilsTest {
         });
     }
 
+    @Test
+    void testKillProcessSuccessWithSigInt() throws Exception {
+        // Arrange
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        // Mock getPidsStr
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345"))).thenReturn("1234 12345");
+
+        // Mock SIGINT command
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGINT.*")))
+                .thenReturn("kill -s SIGINT 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGINT 12345")).thenReturn("");
+
+        // Mock process check - process dies after SIGINT
+        mockedOSUtils.when(() -> OSUtils.exeCmd("ps -p 12345")).thenReturn(null);
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert
+        Assertions.assertTrue(result);
+        // Verify SIGKILL was never called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345"), Mockito.never());
+    }
+
+    @Test
+    void testKillNonExistentProcess() {
+        // Arrange
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(0);
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert
+        Assertions.assertTrue(result);
+    }
 }
