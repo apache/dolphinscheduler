@@ -350,10 +350,6 @@ public class DataxTask extends AbstractTask {
     private ObjectNode buildDataxCoreJson() {
 
         ObjectNode speed = JSONUtils.createObjectNode();
-        if (dataXParameters.getChannelCount() > 0) {
-            speed.put("channel", dataXParameters.getChannelCount());
-        }
-
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());
         }
