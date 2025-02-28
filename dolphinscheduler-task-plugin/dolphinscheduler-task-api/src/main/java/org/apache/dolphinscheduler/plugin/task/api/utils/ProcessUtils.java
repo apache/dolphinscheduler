@@ -85,27 +85,73 @@ public final class ProcessUtils {
     private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
-     * kill tasks according to different task types.
+     * Terminate the task process, support multi-level signal processing and fallback strategy
+     * @param request Task execution context
+     * @return Whether the process was successfully terminated
      */
-    @Deprecated
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
-            log.info("Begin kill task instance, processId: {}", request.getProcessId());
+            log.info("Begin killing task instance, processId: {}", request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                log.error("Task instance kill failed, processId is not exist");
-                return false;
+                log.info("Task instance has already finished, no need to kill");
+                return true;
             }
 
-            String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);
-            log.info("process id:{}, cmd:{}", processId, cmd);
+            // Get all child processes
+            String pids = getPidsStr(processId);
+            String[] pidArray = pids.split("\\s+");
+            if (pidArray.length == 0) {
+                log.warn("No valid PIDs found for process: {}", processId);
+                return true;
+            }
 
-            OSUtils.exeCmd(cmd);
-            log.info("Success kill task instance, processId: {}", request.getProcessId());
-            return true;
+            // 1. Try to terminate gracefully (SIGINT)
+            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pids, request.getTenantCode());
+            if (gracefulKillSuccess) {
+                log.info("Successfully killed process tree using SIGINT, processId: {}", processId);
+                return true;
+            }
+
+            // 2. Try to terminate forcefully (SIGTERM)
+            boolean termKillSuccess = sendKillSignal("SIGTERM", pids, request.getTenantCode());
+            if (termKillSuccess) {
+                log.info("Successfully killed process tree using SIGTERM, processId: {}", processId);
+                return true;
+            }
+
+            // 3. As a last resort, use `kill -9`
+            log.warn("SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}", processId);
+            boolean forceKillSuccess = sendKillSignal("SIGKILL", pids, request.getTenantCode());
+            if (forceKillSuccess) {
+                log.info("Successfully sent SIGKILL signal to process tree, processId: {}", processId);
+            } else {
+                log.error("Error sending SIGKILL signal to process tree, processId: {}", processId);
+            }
+            return forceKillSuccess;
+
         } catch (Exception e) {
             log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Send a kill signal to a process group
+     * @param signal Signal type (SIGINT, SIGTERM, SIGKILL)
+     * @param pids Process ID list
+     * @param tenantCode Tenant code
+     */
+    private static boolean sendKillSignal(String signal, String pids, String tenantCode) {
+        try {
+            String killCmd = String.format("kill -s %s %s", signal, pids);
+            killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
+            log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
+            OSUtils.exeCmd(killCmd);
+
+            return true;
+        } catch (Exception e) {
+            log.error("Error sending {} to process: {}", signal, pids, e);
             return false;
         }
     }
