@@ -90,7 +90,8 @@ public class WorkerGroupQueueLooper extends BaseDaemonThread implements AutoClos
                                 status);
                         return;
                     }
-                    log.debug("dispatch task:{}, workflowInstancePriority:{}, taskPriority:{}, ",workerGroupExecutionRunnable.getTaskInstance().getName(),
+                    log.debug("dispatch task:{}, workflowInstancePriority:{}, taskPriority:{}, ",
+                            workerGroupExecutionRunnable.getTaskInstance().getName(),
                             workerGroupExecutionRunnable.getWorkflowInstance().getWorkflowInstancePriority(),
                             workerGroupExecutionRunnable.getTaskInstance().getTaskInstancePriority());
                     taskExecutorClient.dispatch(workerGroupExecutionRunnable);

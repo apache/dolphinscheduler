@@ -45,7 +45,6 @@ import java.util.concurrent.CompletableFuture;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.context.ApplicationContext;
@@ -54,11 +53,6 @@ class GlobalTaskDispatchWaitingQueueTest {
 
     @InjectMocks
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
-
-//    @BeforeEach
-//    public void setUp() {
-//        globalTaskDispatchWaitingQueue = new GlobalTaskDispatchWaitingQueue();
-//    }
 
     @Test
     void submitTaskExecuteRunnable() {

@@ -40,11 +40,10 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
+import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
 
 import java.util.HashMap;
 
-import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +75,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     @Test
     void testTaskExecutionRunnableStatusIsNotSubmitted() throws Exception {
         final DelayEntry<ITaskExecutionRunnable> defaultEntryTaskExecuteRunnable =
-                createTaskExecuteRunnable("workerGroup1",TaskExecutionStatus.KILL);
+                createTaskExecuteRunnable("workerGroup1", TaskExecutionStatus.KILL);
 
         doNothing().when(taskExecutorClient).dispatch(any());
         globalTaskDispatchWaitingQueueLooper.doDispatch();
@@ -90,8 +89,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     void testTaskExecutionRunnableStatusIsSubmitted() throws Exception {
 
         final DelayEntry<ITaskExecutionRunnable> defaultEntryTaskExecuteRunnable =
-                createTaskExecuteRunnable("workerGroup2",TaskExecutionStatus.SUBMITTED_SUCCESS);
-
+                createTaskExecuteRunnable("workerGroup2", TaskExecutionStatus.SUBMITTED_SUCCESS);
 
         doNothing().when(taskExecutorClient).dispatch(any());
 
