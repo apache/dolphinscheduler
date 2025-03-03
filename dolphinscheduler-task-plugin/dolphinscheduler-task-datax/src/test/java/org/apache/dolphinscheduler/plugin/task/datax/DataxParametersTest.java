@@ -75,15 +75,15 @@ public class DataxParametersTest {
         dataxParameters.setResourceList(resourceInfoList);
 
         String expected = "DataxParameters"
-                + "{"
+                + "("
                 + "customConfig=0, "
-                + "json='json', "
-                + "dsType='MYSQL', "
+                + "json=json, "
+                + "dsType=MYSQL, "
                 + "dataSource=1, "
-                + "dtType='MYSQL', "
+                + "dtType=MYSQL, "
                 + "dataTarget=1, "
-                + "sql='null', "
-                + "targetTable='null', "
+                + "sql=null, "
+                + "targetTable=null, "
                 + "preStatements=null, "
                 + "postStatements=null, "
                 + "jobSpeedByte=1, "
@@ -91,8 +91,9 @@ public class DataxParametersTest {
                 + "channelCount=1, "
                 + "xms=0, "
                 + "xmx=-100, "
-                + "resourceList=[{\"id\":null,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"
-                + "}";
+                + "resourceList=[ResourceInfo(id=null, "
+                + "resourceName=/hdfs.keytab, res=null)]"
+                + ")";
 
         Assertions.assertEquals(expected, dataxParameters.toString());
     }
