@@ -29,12 +29,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class DelayEntry<V extends Comparable<V>> implements Delayed {
 
-    private final long delayTimeMills;
+    protected final long delayTimeMills;
 
-    private final long triggerTimeMills;
+    protected final long triggerTimeMills;
 
     @Getter
-    private final V data;
+    protected final V data;
 
     public DelayEntry(long delayTimeMills, V data) {
         this.delayTimeMills = delayTimeMills;
@@ -54,14 +54,6 @@ public class DelayEntry<V extends Comparable<V>> implements Delayed {
     @Override
     public int compareTo(@NotNull Delayed o) {
         DelayEntry<V> other = (DelayEntry<V>) o;
-        int delayTimeMillsCompareResult = Long.compare(delayTimeMills, other.delayTimeMills);
-        if (delayTimeMillsCompareResult != 0) {
-            return delayTimeMillsCompareResult;
-        }
-
-        if (data == null || other.data == null) {
-            return 0;
-        }
         return data.compareTo(other.data);
     }
 

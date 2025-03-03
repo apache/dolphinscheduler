@@ -43,6 +43,9 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecut
 
 import java.util.HashMap;
 
+import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayEntry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,19 +68,19 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     @Mock
     private ITaskExecutorClient taskExecutorClient;
 
+    @BeforeEach
+    void setUp() {
+        globalTaskDispatchWaitingQueueLooper = new GlobalTaskDispatchWaitingQueueLooper();
+    }
+
     @Test
     void testTaskExecutionRunnableStatusIsNotSubmitted() throws Exception {
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setState(TaskExecutionStatus.KILL);
-        taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
-        final ITaskExecutionRunnable defaultTaskExecuteRunnable =
-                createTaskExecuteRunnable(taskInstance, workflowInstance);
+        final DelayEntry<ITaskExecutionRunnable> defaultEntryTaskExecuteRunnable =
+                createTaskExecuteRunnable("workerGroup1",TaskExecutionStatus.KILL);
 
         doNothing().when(taskExecutorClient).dispatch(any());
-
-        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
+        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
         await().during(ofSeconds(1))
                 .untilAsserted(() -> verify(taskExecutorClient, never()).dispatch(any()));
         globalTaskDispatchWaitingQueueLooper.close();
@@ -85,16 +88,14 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
 
     @Test
     void testTaskExecutionRunnableStatusIsSubmitted() throws Exception {
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-        taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
-        final ITaskExecutionRunnable defaultTaskExecuteRunnable =
-                createTaskExecuteRunnable(taskInstance, workflowInstance);
+
+        final DelayEntry<ITaskExecutionRunnable> defaultEntryTaskExecuteRunnable =
+                createTaskExecuteRunnable("workerGroup2",TaskExecutionStatus.SUBMITTED_SUCCESS);
+
 
         doNothing().when(taskExecutorClient).dispatch(any());
 
-        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
+        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
         await().atMost(ofSeconds(1)).untilAsserted(() -> {
             verify(taskExecutorClient, atLeastOnce()).dispatch(any(ITaskExecutionRunnable.class));
@@ -102,8 +103,13 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
 
     }
 
-    private ITaskExecutionRunnable createTaskExecuteRunnable(final TaskInstance taskInstance,
-                                                             final WorkflowInstance workflowInstance) {
+    private DelayEntry<ITaskExecutionRunnable> createTaskExecuteRunnable(String groupName, TaskExecutionStatus status) {
+
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setWorkerGroup(groupName);
+        taskInstance.setState(status);
+        taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
 
         final ApplicationContext applicationContext = mock(ApplicationContext.class);
         when(applicationContext.getBean(TaskExecutionContextFactory.class))
@@ -118,6 +124,6 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
                 .taskDefinition(new TaskDefinition())
                 .workflowEventBus(new WorkflowEventBus())
                 .build();
-        return new TaskExecutionRunnable(taskExecutionRunnableBuilder);
+        return new DelayEntry<>(0, new TaskExecutionRunnable(taskExecutionRunnableBuilder));
     }
 }

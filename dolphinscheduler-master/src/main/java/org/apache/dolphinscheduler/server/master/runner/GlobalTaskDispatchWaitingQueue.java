@@ -19,10 +19,11 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -31,18 +32,19 @@ import org.springframework.stereotype.Component;
 
 /**
  * The class is used to store {@link ITaskExecutionRunnable} which needs to be dispatched. The {@link ITaskExecutionRunnable}
- * will be stored in {@link PriorityDelayQueue}, if the {@link ITaskExecutionRunnable}'s delay time is 0, then it will be
+ * will be stored in {@link DelayQueue}, if the {@link ITaskExecutionRunnable}'s delay time is 0, then it will be
  * consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
  * <p>
- * The order of {@link ITaskExecutionRunnable} in the {@link PriorityDelayQueue} is determined by {@link ITaskExecutionRunnable#compareTo}.
+ * The order of {@link ITaskExecutionRunnable} in the {@link DelayQueue} is determined by {@link ITaskExecutionRunnable#compareTo}.
  */
 @Slf4j
 @Component
 public class GlobalTaskDispatchWaitingQueue {
 
     private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
-    private final PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> priorityDelayQueue =
-            new PriorityDelayQueue<>();
+
+    private final PriorityBlockingQueue<DelayEntry<ITaskExecutionRunnable>> priorityQueue =
+            new PriorityBlockingQueue<>();
 
     /**
      * Submit a {@link ITaskExecutionRunnable} with delay time 0, it will be consumed immediately.
@@ -57,19 +59,21 @@ public class GlobalTaskDispatchWaitingQueue {
     public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,
                                                                   long delayTimeMills) {
         waitingTaskInstanceIds.add(taskExecutionRunnable.getTaskInstance().getId());
-        priorityDelayQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
+        priorityQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
     }
 
     /**
-     * Consume {@link ITaskExecutionRunnable} from the {@link PriorityDelayQueue}, only the delay time <= 0 can be consumed.
+     * Consume {@link ITaskExecutionRunnable} from the {@link DelayQueue}, only the delay time <= 0 can be consumed.
      */
     @SneakyThrows
-    public ITaskExecutionRunnable takeTaskExecuteRunnable() {
-        ITaskExecutionRunnable taskExecutionRunnable = priorityDelayQueue.take().getData();
+    public DelayEntry<ITaskExecutionRunnable> takeTaskExecuteRunnable() {
+        DelayEntry<ITaskExecutionRunnable> delayEntry = priorityQueue.take();
+        ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
         while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
-            taskExecutionRunnable = priorityDelayQueue.take().getData();
+            delayEntry = priorityQueue.take();
+            taskExecutionRunnable = delayEntry.getData();
         }
-        return taskExecutionRunnable;
+        return delayEntry;
     }
 
     public int getWaitingDispatchTaskNumber() {

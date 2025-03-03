@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.WorkerGroupQueueMap;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +38,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Autowired
-    private ITaskExecutorClient taskExecutorClient;
-
+    private WorkerGroupQueueMap workerGroupQueueMap;
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
     public GlobalTaskDispatchWaitingQueueLooper() {
@@ -65,25 +64,10 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     }
 
     void doDispatch() {
-        final ITaskExecutionRunnable taskExecutionRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        try {
-            final TaskExecutionStatus status = taskInstance.getState();
-            if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
-                log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
-                return;
-            }
-            taskExecutorClient.dispatch(taskExecutionRunnable);
-        } catch (Exception e) {
-            // If dispatch failed, will put the task back to the queue
-            // The task will be dispatched after waiting time.
-            // the waiting time will increase multiple of times, but will not exceed 60 seconds
-            long waitingTimeMills = Math.min(
-                    taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
-                    waitingTimeMills);
-            log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
-        }
+        DelayEntry<ITaskExecutionRunnable> delayEntry = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
+        ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
+        workerGroupQueueMap.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(), taskExecutionRunnable,
+                delayEntry.getDelay(TimeUnit.MILLISECONDS));
     }
 
     @Override

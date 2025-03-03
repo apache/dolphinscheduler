@@ -47,16 +47,18 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.context.ApplicationContext;
 
 class GlobalTaskDispatchWaitingQueueTest {
 
+    @InjectMocks
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
-    @BeforeEach
-    public void setUp() {
-        globalTaskDispatchWaitingQueue = new GlobalTaskDispatchWaitingQueue();
-    }
+//    @BeforeEach
+//    public void setUp() {
+//        globalTaskDispatchWaitingQueue = new GlobalTaskDispatchWaitingQueue();
+//    }
 
     @Test
     void submitTaskExecuteRunnable() {
@@ -109,11 +111,11 @@ class GlobalTaskDispatchWaitingQueueTest {
         ITaskExecutionRunnable3.getTaskInstance().setTaskInstancePriority(Priority.LOW);
         globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
 
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(2);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(1);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(3);
     }
 
@@ -134,11 +136,11 @@ class GlobalTaskDispatchWaitingQueueTest {
         ITaskExecutionRunnable3.getTaskInstance().setTaskGroupPriority(Priority.LOW.getCode());
         globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
 
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(3);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(1);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(2);
     }
 
@@ -161,11 +163,11 @@ class GlobalTaskDispatchWaitingQueueTest {
         ITaskExecutionRunnable3.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, -1));
         globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
 
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(3);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(1);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getData().getTaskInstance().getId())
                 .isEqualTo(2);
     }
 

@@ -17,25 +17,24 @@
 
 package org.apache.dolphinscheduler.server.master.runner.queue;
 
-import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
 
-import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 
-public class PriorityDelayQueue<V extends DelayEntry> {
+public class PriorityDelayEntry<V extends Comparable<V>> extends DelayEntry {
 
-    private final DelayQueue<V> queue = new DelayQueue<>();
-
-    public void add(V v) {
-        queue.put(v);
+    public PriorityDelayEntry(long delayTimeMills, V data) {
+        super(delayTimeMills, data);
     }
+    @Override
+    public int compareTo(@NotNull Delayed o) {
+        PriorityDelayEntry<V> other = (PriorityDelayEntry<V>) o;
 
-    @SneakyThrows
-    public V take() {
-        return queue.take();
+        // priority is the same, compare by delayTimeMills
+        int priority = data.compareTo(other.data);
+        if (priority != 0) {
+            return priority;
+        }
+        return Long.compare(this.triggerTimeMills, other.triggerTimeMills);
     }
-
-    public int size() {
-        return queue.size();
-    }
-
 }
