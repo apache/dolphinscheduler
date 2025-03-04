@@ -302,7 +302,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 位置：`worker-server/conf/application.yaml`
 
-|                                     参数                                      | 默认值       |                                           描述                                            |
+|                                     参数                                      |    默认值    |                                           描述                                            |
 |-----------------------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------|
 | worker.listen-port                                                          | 1234      | worker监听端口                                                                              |
 | worker.max-heartbeat-interval                                               | 10s       | worker最大心跳间隔                                                                            |

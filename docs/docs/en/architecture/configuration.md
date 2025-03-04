@@ -275,7 +275,7 @@ Location: `api-server/conf/application.yaml`
 
 Location: `master-server/conf/application.yaml`
 
-|                                 Parameters                                  | Default value                |                                                                    Description                                                                    |
+|                                 Parameters                                  |        Default value         |                                                                    Description                                                                    |
 |-----------------------------------------------------------------------------|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | master.listen-port                                                          | 5678                         | master listen port                                                                                                                                |
 | master.logic-task-config.task-executor-thread-count                         | 2 * CPU +1                   | The thread size used to execute logic task                                                                                                        |
