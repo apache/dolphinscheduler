@@ -63,6 +63,7 @@ class WorkerGroupQueueMapTest {
 
     @BeforeEach
     public void setUp() {
+        workerGroupQueueMap = new WorkerGroupQueueMap();
         taskExecutionRunnableMock = createTaskExecuteRunnable();
     }
 
@@ -92,7 +93,7 @@ class WorkerGroupQueueMapTest {
     }
 
     @Test
-    public void testAddTaskWithDelaySuccess() {
+    void testAddTaskWithDelaySuccess() {
         String workerGroup = "testGroup";
         long delayTimeMills = 1000L;
 
@@ -110,10 +111,10 @@ class WorkerGroupQueueMapTest {
     }
 
     @Test
-    public void testAddTaskWithoutDelaySuccess() {
+    void testAddTaskWithoutDelaySuccess() {
         String workerGroup = "testGroup";
 
-        workerGroupQueueMap.add(workerGroup, taskExecutionRunnableMock);
+        workerGroupQueueMap.add(workerGroup, taskExecutionRunnableMock, 0);
 
         Map<String, ITaskExecutionRunnable> map = workerGroupQueueMap.poll();
         ITaskExecutionRunnable iTaskExecutionRunnable = map.get(workerGroup);
@@ -121,7 +122,7 @@ class WorkerGroupQueueMapTest {
     }
 
     @Test
-    public void testPollWithTasksSuccess() {
+    void testPollWithTasksSuccess() {
         String workerGroup1 = "group1";
         String workerGroup2 = "group2";
         ITaskExecutionRunnable task1 = createTaskExecuteRunnable();
@@ -140,14 +141,14 @@ class WorkerGroupQueueMapTest {
     }
 
     @Test
-    public void testPollWithNoTasksSuccess() {
+    void testPollWithNoTasksSuccess() {
         Map<String, ITaskExecutionRunnable> result = workerGroupQueueMap.poll();
 
         assertTrue(result.isEmpty());
     }
 
     @Test
-    public void testPollWithPartialTasksSuccess() {
+    void testPollWithPartialTasksSuccess() {
         String workerGroup1 = "group1";
         String workerGroup2 = "group2";
         ITaskExecutionRunnable task1 = createTaskExecuteRunnable();

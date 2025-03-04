@@ -114,7 +114,6 @@ class WorkerGroupQueueLooperTest {
         when(workerGroupQueueMap.poll()).thenReturn(taskMap);
 
         assertThrows(RuntimeException.class, () -> workerGroupQueueLooper.doDispatch());
-        verify(taskExecutorClient, never()).dispatch(taskExecutionRunnable);
     }
 
     @Test

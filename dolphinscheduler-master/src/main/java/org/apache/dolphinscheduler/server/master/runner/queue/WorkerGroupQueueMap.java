@@ -39,15 +39,11 @@ public class WorkerGroupQueueMap {
 
     }
 
-    public void add(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable) {
-        queueMap.computeIfAbsent(workerGroup, k -> new DelayQueue<>())
-                .add(new PriorityDelayEntry<>(0, taskExecutionRunnable));
-    }
-
     public Map<String, ITaskExecutionRunnable> poll() {
         Map<String, ITaskExecutionRunnable> taskExecutionRunnablesMap = new HashMap<>();
-        for (String workerGroup : queueMap.keySet()) {
-            DelayQueue<PriorityDelayEntry<ITaskExecutionRunnable>> queue = queueMap.get(workerGroup);
+        for (Map.Entry<String, DelayQueue<PriorityDelayEntry<ITaskExecutionRunnable>>> entry : queueMap.entrySet()) {
+            String workerGroup = entry.getKey();
+            DelayQueue<PriorityDelayEntry<ITaskExecutionRunnable>> queue = entry.getValue();
             PriorityDelayEntry<ITaskExecutionRunnable> priorityDelayEntry = queue.poll();
             if (priorityDelayEntry != null) {
                 ITaskExecutionRunnable taskExecutionRunnable = (ITaskExecutionRunnable) priorityDelayEntry.getData();
@@ -58,5 +54,6 @@ public class WorkerGroupQueueMap {
         }
         return taskExecutionRunnablesMap;
     }
+
 
 }

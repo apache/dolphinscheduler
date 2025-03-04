@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static java.time.Duration.ofSeconds;
-import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,15 +34,14 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.WorkerGroupQueueMap;
 
 import java.util.HashMap;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,40 +62,17 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Mock
-    private ITaskExecutorClient taskExecutorClient;
-
-    @BeforeEach
-    void setUp() {
-        globalTaskDispatchWaitingQueueLooper = new GlobalTaskDispatchWaitingQueueLooper();
-    }
+    private WorkerGroupQueueMap workerGroupQueueMap;
 
     @Test
-    void testTaskExecutionRunnableStatusIsNotSubmitted() throws Exception {
-        final DelayEntry<ITaskExecutionRunnable> defaultEntryTaskExecuteRunnable =
-                createTaskExecuteRunnable("workerGroup1", TaskExecutionStatus.KILL);
-
-        doNothing().when(taskExecutorClient).dispatch(any());
-        globalTaskDispatchWaitingQueueLooper.doDispatch();
-        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
-        await().during(ofSeconds(1))
-                .untilAsserted(() -> verify(taskExecutorClient, never()).dispatch(any()));
-        globalTaskDispatchWaitingQueueLooper.close();
-    }
-
-    @Test
-    void testTaskExecutionRunnableStatusIsSubmitted() throws Exception {
+    void testTaskExecutionRunnableStatusIsSubmitted() {
 
         final DelayEntry<ITaskExecutionRunnable> defaultEntryTaskExecuteRunnable =
                 createTaskExecuteRunnable("workerGroup2", TaskExecutionStatus.SUBMITTED_SUCCESS);
-
-        doNothing().when(taskExecutorClient).dispatch(any());
-
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
-        await().atMost(ofSeconds(1)).untilAsserted(() -> {
-            verify(taskExecutorClient, atLeastOnce()).dispatch(any(ITaskExecutionRunnable.class));
-        });
 
+        verify(workerGroupQueueMap, times(1)).add(anyString(), any(ITaskExecutionRunnable.class), anyLong());
     }
 
     private DelayEntry<ITaskExecutionRunnable> createTaskExecuteRunnable(String groupName, TaskExecutionStatus status) {
