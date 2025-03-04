@@ -302,17 +302,17 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 位置：`worker-server/conf/application.yaml`
 
-|                                     参数                                      |    默认值    |                                           描述                                            |
+|                                     参数                                      | 默认值       |                                           描述                                            |
 |-----------------------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------|
 | worker.listen-port                                                          | 1234      | worker监听端口                                                                              |
 | worker.max-heartbeat-interval                                               | 10s       | worker最大心跳间隔                                                                            |
 | worker.host-weight                                                          | 100       | 派发任务时，worker主机的权重                                                                       |
 | worker.tenant-auto-create                                                   | true      | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
 | worker.server-load-protection.enabled                                       | true      | 是否开启系统保护策略                                                                              |
-| worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.7       | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统CPU       |
-| worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.7       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的JVM CPU |
-| worker.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.7       | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统内存          |
-| worker.server-load-protection.max-disk-usage-percentage-thresholds          | 0.7       | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统磁盘空间         |
+| worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.8       | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统CPU       |
+| worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.8       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的JVM CPU |
+| worker.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.8       | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统内存          |
+| worker.server-load-protection.max-disk-usage-percentage-thresholds          | 0.8       | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统磁盘空间         |
 | worker.alert-listen-host                                                    | localhost | alert监听host                                                                             |
 | worker.alert-listen-port                                                    | 50052     | alert监听端口                                                                               |
 | worker.physical-task-config.task-executor-thread-size                       | 100       | Worker中任务最大并发度                                                                          |
