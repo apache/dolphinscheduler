@@ -44,6 +44,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -51,7 +53,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkerGroupQueueMapTest {
+class WorkerGroupQueueMapTest {
 
     @InjectMocks
     private WorkerGroupQueueMap workerGroupQueueMap;
@@ -59,7 +61,7 @@ public class WorkerGroupQueueMapTest {
     @Mock
     private ITaskExecutionRunnable taskExecutionRunnableMock;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         taskExecutionRunnableMock = createTaskExecuteRunnable();
     }
