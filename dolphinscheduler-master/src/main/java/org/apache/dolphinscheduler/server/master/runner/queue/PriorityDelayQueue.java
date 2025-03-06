@@ -38,7 +38,7 @@ public class PriorityDelayQueue<V extends DelayEntry> {
         return queue.size();
     }
 
-    public V poll(){
+    public V poll() {
         return queue.poll();
     }
 }

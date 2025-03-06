@@ -18,15 +18,19 @@
 package org.apache.dolphinscheduler.server.master.runner.queue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.util.Objects;
-import lombok.Getter;
+
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+
+import java.util.Objects;
+
+import lombok.Getter;
+
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class ComparableEntry implements Comparable<ComparableEntry> {
 
-    //Pass it to the workerGroup queue without participating in the comparison
+    // Pass it to the workerGroup queue without participating in the comparison
     private final long delayTimeMills;
 
     private final ITaskExecutionRunnable data;

@@ -42,7 +42,6 @@ public class WorkflowEngine implements AutoCloseable {
     @Autowired
     private LogicTaskEngineDelegator logicTaskEngineDelegator;
 
-
     public void start() {
 
         workflowEventBusCoordinator.start();

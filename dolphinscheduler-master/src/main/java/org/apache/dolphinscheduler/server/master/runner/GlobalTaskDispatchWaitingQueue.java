@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.queue.ComparableEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

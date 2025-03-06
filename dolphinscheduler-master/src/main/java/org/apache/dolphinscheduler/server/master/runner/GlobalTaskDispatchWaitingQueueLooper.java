@@ -64,7 +64,8 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     void doDispatch() {
         ComparableEntry delayEntry = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
         ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
-        workerGroupTaskDispatchManager.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(), taskExecutionRunnable,
+        workerGroupTaskDispatchManager.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
+                taskExecutionRunnable,
                 delayEntry.getDelayTimeMills());
     }
 

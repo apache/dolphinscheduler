@@ -22,11 +22,14 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
+
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WorkerGroupTaskDispatchWaitingQueueLooper extends BaseDaemonThread implements AutoCloseable {
+
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
     private final DispatchWorker dispatchWorker;
@@ -34,7 +37,7 @@ public class WorkerGroupTaskDispatchWaitingQueueLooper extends BaseDaemonThread 
     public WorkerGroupTaskDispatchWaitingQueueLooper(String workerGroupName,
                                                      ITaskExecutorClient taskExecutorClient,
                                                      PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue) {
-        super("WorkerGroupQueueLooper-"+workerGroupName);
+        super("WorkerGroupQueueLooper-" + workerGroupName);
         this.dispatchWorker = new DispatchWorker(taskExecutorClient, workerGroupQueue);
     }
 
@@ -65,7 +68,6 @@ public class WorkerGroupTaskDispatchWaitingQueueLooper extends BaseDaemonThread 
             doDispatch();
         }
     }
-
 
     private void doDispatch() {
         dispatchWorker.dispatch();
