@@ -37,6 +37,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     @Autowired
     private WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
+
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
     public GlobalTaskDispatchWaitingQueueLooper() {

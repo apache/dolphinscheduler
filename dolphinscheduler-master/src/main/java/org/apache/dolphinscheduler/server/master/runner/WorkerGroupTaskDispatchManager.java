@@ -36,10 +36,8 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
     @Autowired
     private ITaskExecutorClient taskExecutorClient;
 
-    private ConcurrentHashMap<String, WorkerGroupTaskDispatchWaitingQueueLooper> workerGroupTaskDispatchWaitingQueueLooperMap =
-            new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>>> workerGroupPriorityDelayQueueMap =
-            new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, WorkerGroupTaskDispatchWaitingQueueLooper> workerGroupTaskDispatchWaitingQueueLooperMap;
+    private final ConcurrentHashMap<String, PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>>> workerGroupPriorityDelayQueueMap;
 
     public WorkerGroupTaskDispatchManager() {
         workerGroupTaskDispatchWaitingQueueLooperMap = new ConcurrentHashMap<>();
