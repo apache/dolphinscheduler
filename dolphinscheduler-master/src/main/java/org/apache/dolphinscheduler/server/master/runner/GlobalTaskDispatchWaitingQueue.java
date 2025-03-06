@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.runner.queue.ComparableEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
 
 import java.util.Set;
@@ -43,14 +44,14 @@ public class GlobalTaskDispatchWaitingQueue {
 
     private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
 
-    private final PriorityBlockingQueue<DelayEntry<ITaskExecutionRunnable>> priorityQueue =
+    private final PriorityBlockingQueue<ComparableEntry> priorityQueue =
             new PriorityBlockingQueue<>();
 
     /**
      * Submit a {@link ITaskExecutionRunnable} with delay time 0, it will be consumed immediately.
      */
-    public synchronized void dispatchTaskExecuteRunnable(ITaskExecutionRunnable ITaskExecutionRunnable) {
-        dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable, 0);
+    public synchronized void dispatchTaskExecuteRunnable(ITaskExecutionRunnable iTaskExecutionRunnable) {
+        dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable, 0);
     }
 
     /**
@@ -59,15 +60,16 @@ public class GlobalTaskDispatchWaitingQueue {
     public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,
                                                                   long delayTimeMills) {
         waitingTaskInstanceIds.add(taskExecutionRunnable.getTaskInstance().getId());
-        priorityQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
+        priorityQueue.add(new ComparableEntry(delayTimeMills, taskExecutionRunnable));
     }
 
     /**
      * Consume {@link ITaskExecutionRunnable} from the {@link DelayQueue}, only the delay time <= 0 can be consumed.
      */
     @SneakyThrows
-    public DelayEntry<ITaskExecutionRunnable> takeTaskExecuteRunnable() {
-        DelayEntry<ITaskExecutionRunnable> delayEntry = priorityQueue.take();
+    public ComparableEntry takeTaskExecuteRunnable() {
+        ComparableEntry delayEntry = priorityQueue.take();
+
         ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
         while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
             delayEntry = priorityQueue.take();

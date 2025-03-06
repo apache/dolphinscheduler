@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.engine;
 import org.apache.dolphinscheduler.server.master.engine.command.CommandEngine;
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskEngineDelegator;
 import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueueLooper;
-import org.apache.dolphinscheduler.server.master.runner.WorkerGroupQueueLooper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +42,6 @@ public class WorkflowEngine implements AutoCloseable {
     @Autowired
     private LogicTaskEngineDelegator logicTaskEngineDelegator;
 
-    @Autowired
-    private WorkerGroupQueueLooper workerGroupQueueLooper;
 
     public void start() {
 
@@ -55,8 +52,6 @@ public class WorkflowEngine implements AutoCloseable {
         globalTaskDispatchWaitingQueueLooper.start();
 
         logicTaskEngineDelegator.start();
-
-        workerGroupQueueLooper.start();
 
         log.info("WorkflowEngine started");
     }

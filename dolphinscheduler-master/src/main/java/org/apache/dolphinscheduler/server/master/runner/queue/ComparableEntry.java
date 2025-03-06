@@ -18,60 +18,42 @@
 package org.apache.dolphinscheduler.server.master.runner.queue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Objects;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
-
 import lombok.Getter;
-
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.jetbrains.annotations.NotNull;
 
-public class DelayEntry<V extends Comparable<V>> implements Delayed {
+@Getter
+public class ComparableEntry implements Comparable<ComparableEntry> {
 
+    //Pass it to the workerGroup queue without participating in the comparison
     private final long delayTimeMills;
 
-    private final long triggerTimeMills;
+    private final ITaskExecutionRunnable data;
 
-    @Getter
-    private final V data;
-
-    public DelayEntry(long delayTimeMills, V data) {
+    public ComparableEntry(long delayTimeMills, ITaskExecutionRunnable data) {
         this.delayTimeMills = delayTimeMills;
-        this.triggerTimeMills = System.currentTimeMillis() + delayTimeMills;
         this.data = checkNotNull(data, "data is null");
     }
 
     @Override
-    public long getDelay(@NotNull TimeUnit unit) {
-        long remainTimeMills = triggerTimeMills - System.currentTimeMillis();
-        if (TimeUnit.MILLISECONDS.equals(unit)) {
-            return remainTimeMills;
+    public int compareTo(@NotNull ComparableEntry other) {
+        int priortyCompareResult = data.compareTo(other.data);
+        if (priortyCompareResult != 0) {
+            return priortyCompareResult;
         }
-        return unit.convert(remainTimeMills, TimeUnit.MILLISECONDS);
+        return Long.compare(delayTimeMills, other.delayTimeMills);
     }
 
     @Override
-    public int compareTo(@NotNull Delayed o) {
-        DelayEntry<V> other = (DelayEntry<V>) o;
-        int delayTimeMillsCompareResult = Long.compare(delayTimeMills, other.delayTimeMills);
-        if (delayTimeMillsCompareResult != 0) {
-            return delayTimeMillsCompareResult;
-        }
-
-        if (data == null || other.data == null) {
-            return 0;
-        }
-        return data.compareTo(other.data);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
-        DelayEntry<?> that = (DelayEntry<?>) o;
+        }
+        ComparableEntry that = (ComparableEntry) obj;
         return delayTimeMills == that.delayTimeMills && Objects.equals(data, that.data);
     }
 
