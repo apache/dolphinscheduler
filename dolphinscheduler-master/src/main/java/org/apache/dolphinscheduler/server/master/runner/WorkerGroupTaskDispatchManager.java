@@ -53,15 +53,12 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
      */
     public void add(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable, long delayTimeMills) {
         PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue =
-                workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, j -> new PriorityDelayQueue<>());
-
-        workerGroupQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
-        WorkerGroupTaskDispatchWaitingQueueLooper looper = workerGroupTaskDispatchWaitingQueueLooperMap.computeIfAbsent(
-                workerGroup,
-                k -> new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, taskExecutorClient, workerGroupQueue));
-        if (!looper.isAlive()) {
-            looper.start();
+                workerGroupPriorityDelayQueueMap.get(workerGroup);
+        if (workerGroupQueue != null) {
+            workerGroupQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
+            log.info("queue size {}", workerGroupQueue.size());
         }
+        log.info("add task {} to {} ", taskExecutionRunnable.getName(), workerGroup);
     }
 
     /**
@@ -69,13 +66,33 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
      *
      * @param workerGroup the identifier for the worker group
      */
-    public void stopWorkerGroup(String workerGroup) throws Exception {
+    public synchronized void stopWorkerGroup(String workerGroup) throws Exception {
         WorkerGroupTaskDispatchWaitingQueueLooper looper =
-                workerGroupTaskDispatchWaitingQueueLooperMap.get(workerGroup);
+                workerGroupTaskDispatchWaitingQueueLooperMap.remove(workerGroup);
+        PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue =
+                workerGroupPriorityDelayQueueMap.get(workerGroup);
+        if (workerGroupQueue != null) {
+            workerGroupQueue.clear();
+        }
         if (looper != null) {
             looper.close();
+        }
+    }
 
-            workerGroupTaskDispatchWaitingQueueLooperMap.remove(workerGroup);
+    /**
+     * add workerGroup
+     *
+     * @param workerGroup the identifier for the worker group
+     */
+    public synchronized void addWorkerGroup(String workerGroup) {
+        PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue =
+                workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, k -> new PriorityDelayQueue<>());
+        WorkerGroupTaskDispatchWaitingQueueLooper looper =
+                workerGroupTaskDispatchWaitingQueueLooperMap.computeIfAbsent(workerGroup,
+                        k -> new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, taskExecutorClient,
+                                workerGroupQueue));
+        if (!looper.isAlive()) {
+            looper.start();
         }
     }
 
