@@ -126,7 +126,7 @@ export default defineComponent({
     const handleCopy = () => {
       const genNums = 1
       const type = props.cell?.data.taskType
-      const taskName = uuid(props.cell?.data.taskName + '_')
+      const taskName = uuid(props.cell?.data.taskName + '-')
       const targetCode = Number(props.cell?.id)
       const flag = props.cell?.data.flag
 
