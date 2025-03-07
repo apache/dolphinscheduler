@@ -75,6 +75,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
         if (RUNNING_FLAG.compareAndSet(true, false)) {
             log.info("GlobalTaskDispatchWaitingQueueLooper stopping...");
             log.info("GlobalTaskDispatchWaitingQueueLooper stopped...");
+            workerGroupTaskDispatchManager.close();
         } else {
             log.error("GlobalTaskDispatchWaitingQueueLooper is not started");
         }

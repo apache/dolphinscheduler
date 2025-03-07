@@ -56,20 +56,19 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
                 workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, j -> new PriorityDelayQueue<>());
 
         workerGroupQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
-        try (
-                WorkerGroupTaskDispatchWaitingQueueLooper looper =
-                        workerGroupTaskDispatchWaitingQueueLooperMap.computeIfAbsent(
-                                workerGroup,
-                                k -> new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, this.taskExecutorClient,
-                                        workerGroupQueue))) {
+        WorkerGroupTaskDispatchWaitingQueueLooper looper = workerGroupTaskDispatchWaitingQueueLooperMap.get(workerGroup);
+        if (looper == null) {
+            looper = new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, taskExecutorClient, workerGroupQueue);
+            workerGroupTaskDispatchWaitingQueueLooperMap.put(workerGroup, looper);
+        }
+        if(!looper.isAlive()){
             looper.start();
-        } catch (Exception e) {
-            log.error("Error occurred while shutting down the thread manager: {}", e.getMessage(), e);
         }
     }
 
+
     /**
-     * 停止所有workerGroupTaskDispatchWaitingQueueLooperMaps 里所有AutoCloseable
+     * Stop all workerGroupTaskDispatchWaitingQueueLooper
      */
     @Override
     public void close() throws Exception {
