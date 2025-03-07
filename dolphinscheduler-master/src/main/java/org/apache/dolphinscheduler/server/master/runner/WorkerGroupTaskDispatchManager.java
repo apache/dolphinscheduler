@@ -56,11 +56,8 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
                 workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, j -> new PriorityDelayQueue<>());
 
         workerGroupQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
-        WorkerGroupTaskDispatchWaitingQueueLooper looper = workerGroupTaskDispatchWaitingQueueLooperMap.get(workerGroup);
-        if (looper == null) {
-            looper = new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, taskExecutorClient, workerGroupQueue);
-            workerGroupTaskDispatchWaitingQueueLooperMap.put(workerGroup, looper);
-        }
+        WorkerGroupTaskDispatchWaitingQueueLooper looper = workerGroupTaskDispatchWaitingQueueLooperMap.computeIfAbsent(workerGroup
+        ,k -> new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, taskExecutorClient, workerGroupQueue));
         if(!looper.isAlive()){
             looper.start();
         }
@@ -79,5 +76,6 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
                 looper.close();
             }
         }
+        workerGroupTaskDispatchWaitingQueueLooperMap.clear();
     }
 }
