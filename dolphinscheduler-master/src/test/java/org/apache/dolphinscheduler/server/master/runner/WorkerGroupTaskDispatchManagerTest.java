@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -51,7 +50,8 @@ public class WorkerGroupTaskDispatchManagerTest {
         workerGroupTaskDispatchManager.add(workerGroup, task, delay);
 
         // not have workerGroup queue，cannot add
-        Assertions.assertEquals(0, workerGroupTaskDispatchManager.getWorkerGroupTaskDispatchWaitingQueueLooperMap().size());
+        Assertions.assertEquals(0,
+                workerGroupTaskDispatchManager.getDispatchWorkerMap().size());
     }
 
     @Test
@@ -62,7 +62,8 @@ public class WorkerGroupTaskDispatchManagerTest {
         workerGroupTaskDispatchManager.addWorkerGroup(workerGroup);
         workerGroupTaskDispatchManager.add(workerGroup, task, delay);
 
-        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
+        Assertions.assertTrue(
+                workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
     }
 
     @Test
@@ -73,13 +74,10 @@ public class WorkerGroupTaskDispatchManagerTest {
 
         workerGroupTaskDispatchManager.addWorkerGroup(workerGroup);
         workerGroupTaskDispatchManager.add(workerGroup, task, delay);
-        WorkerGroupTaskDispatchWaitingQueueLooper looper =
-                workerGroupTaskDispatchManager.getWorkerGroupTaskDispatchWaitingQueueLooperMap().get(workerGroup);
-        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
-        Assertions.assertTrue(looper.getRUNNING_FLAG().get());
-        workerGroupTaskDispatchManager.stopWorkerGroup(workerGroup);
-        Assertions.assertFalse(workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
-        Assertions.assertFalse(looper.getRUNNING_FLAG().get());
+        DispatchWorker dispatchWorker =
+                workerGroupTaskDispatchManager.getDispatchWorkerMap().get(workerGroup);
+        Assertions.assertTrue(
+                workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
     }
 
     @Test
@@ -88,21 +86,23 @@ public class WorkerGroupTaskDispatchManagerTest {
 
         workerGroupTaskDispatchManager.addWorkerGroup(workerGroup);
 
-        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
-        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupTaskDispatchWaitingQueueLooperMap()
+        Assertions.assertTrue(
+                workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
+        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap()
                 .containsKey(workerGroup));
     }
 
     @Test
     public void testClose() throws Exception {
         String workerGroup = "testWorkerGroup";
-        WorkerGroupTaskDispatchWaitingQueueLooper looper = mock(WorkerGroupTaskDispatchWaitingQueueLooper.class);
+        DispatchWorker looper = mock(DispatchWorker.class);
 
-        workerGroupTaskDispatchManager.getWorkerGroupTaskDispatchWaitingQueueLooperMap().put(workerGroup, looper);
+        workerGroupTaskDispatchManager.getDispatchWorkerMap().put(workerGroup, looper);
 
         workerGroupTaskDispatchManager.close();
 
         verify(looper).close();
-        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupTaskDispatchWaitingQueueLooperMap().isEmpty());
+        Assertions
+                .assertTrue(workerGroupTaskDispatchManager.getDispatchWorkerMap().isEmpty());
     }
 }

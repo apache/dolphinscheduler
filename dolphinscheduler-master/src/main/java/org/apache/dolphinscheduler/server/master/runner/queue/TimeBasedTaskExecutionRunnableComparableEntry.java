@@ -28,25 +28,26 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class ComparableEntry implements Comparable<ComparableEntry> {
+public class TimeBasedTaskExecutionRunnableComparableEntry
+        implements
+            Comparable<TimeBasedTaskExecutionRunnableComparableEntry> {
 
-    // Pass it to the workerGroup queue without participating in the comparison
     private final long delayTimeMills;
 
     private final ITaskExecutionRunnable data;
 
-    public ComparableEntry(long delayTimeMills, ITaskExecutionRunnable data) {
+    public TimeBasedTaskExecutionRunnableComparableEntry(long delayTimeMills, ITaskExecutionRunnable data) {
         this.delayTimeMills = delayTimeMills;
         this.data = checkNotNull(data, "data is null");
     }
 
     @Override
-    public int compareTo(@NotNull ComparableEntry other) {
-        int priortyCompareResult = data.compareTo(other.data);
-        if (priortyCompareResult != 0) {
-            return priortyCompareResult;
+    public int compareTo(@NotNull TimeBasedTaskExecutionRunnableComparableEntry other) {
+        int delayTimeCompareResult = Long.compare(delayTimeMills, other.delayTimeMills);
+        if (delayTimeCompareResult != 0) {
+            return delayTimeCompareResult;
         }
-        return Long.compare(delayTimeMills, other.delayTimeMills);
+        return data.compareTo(other.data);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class ComparableEntry implements Comparable<ComparableEntry> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ComparableEntry that = (ComparableEntry) obj;
+        TimeBasedTaskExecutionRunnableComparableEntry that = (TimeBasedTaskExecutionRunnableComparableEntry) obj;
         return delayTimeMills == that.delayTimeMills && Objects.equals(data, that.data);
     }
 

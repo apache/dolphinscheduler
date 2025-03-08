@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.ComparableEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.TimeBasedTaskExecutionRunnableComparableEntry;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +43,7 @@ public class GlobalTaskDispatchWaitingQueue {
 
     private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
 
-    private final PriorityBlockingQueue<ComparableEntry> priorityQueue =
+    private final PriorityBlockingQueue<TimeBasedTaskExecutionRunnableComparableEntry> priorityQueue =
             new PriorityBlockingQueue<>();
 
     /**
@@ -59,15 +59,15 @@ public class GlobalTaskDispatchWaitingQueue {
     public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,
                                                                   long delayTimeMills) {
         waitingTaskInstanceIds.add(taskExecutionRunnable.getTaskInstance().getId());
-        priorityQueue.add(new ComparableEntry(delayTimeMills, taskExecutionRunnable));
+        priorityQueue.add(new TimeBasedTaskExecutionRunnableComparableEntry(delayTimeMills, taskExecutionRunnable));
     }
 
     /**
      * Consume {@link ITaskExecutionRunnable} from the {@link DelayQueue}, only the delay time <= 0 can be consumed.
      */
     @SneakyThrows
-    public ComparableEntry takeTaskExecuteRunnable() {
-        ComparableEntry delayEntry = priorityQueue.take();
+    public TimeBasedTaskExecutionRunnableComparableEntry takeTaskExecuteRunnable() {
+        TimeBasedTaskExecutionRunnableComparableEntry delayEntry = priorityQueue.take();
 
         ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
         while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {

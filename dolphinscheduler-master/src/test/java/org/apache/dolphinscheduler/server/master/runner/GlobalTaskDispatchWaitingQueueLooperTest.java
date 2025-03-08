@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionG
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
-import org.apache.dolphinscheduler.server.master.runner.queue.ComparableEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.TimeBasedTaskExecutionRunnableComparableEntry;
 
 import java.util.HashMap;
 
@@ -66,7 +66,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     @Test
     void testTaskExecutionRunnableStatusIsSubmitted() {
 
-        final ComparableEntry defaultEntryTaskExecuteRunnable =
+        final TimeBasedTaskExecutionRunnableComparableEntry defaultEntryTaskExecuteRunnable =
                 createTaskExecuteRunnable("workerGroup2", TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
@@ -74,7 +74,8 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         verify(workerGroupTaskDispatchManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class), anyLong());
     }
 
-    private ComparableEntry createTaskExecuteRunnable(String groupName, TaskExecutionStatus status) {
+    private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable(String groupName,
+                                                                                    TaskExecutionStatus status) {
 
         WorkflowInstance workflowInstance = new WorkflowInstance();
         TaskInstance taskInstance = new TaskInstance();
@@ -95,6 +96,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
                 .taskDefinition(new TaskDefinition())
                 .workflowEventBus(new WorkflowEventBus())
                 .build();
-        return new ComparableEntry(0, new TaskExecutionRunnable(taskExecutionRunnableBuilder));
+        return new TimeBasedTaskExecutionRunnableComparableEntry(0,
+                new TaskExecutionRunnable(taskExecutionRunnableBuilder));
     }
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
@@ -24,28 +25,72 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecu
 import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DispatchWorker {
+public class DispatchWorker extends BaseDaemonThread implements AutoCloseable {
 
     private final ITaskExecutorClient taskExecutorClient;
 
     private final PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue;
 
-    public DispatchWorker(ITaskExecutorClient taskExecutorClient,
+    private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
+
+    @Getter
+    private DispatchWorkerStatus status;
+
+    public DispatchWorker(String workerGroupName, ITaskExecutorClient taskExecutorClient,
                           PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue) {
+        super("DispatchWorker-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupQueue = workerGroupQueue;
+    }
+
+    @Override
+    public synchronized void start() {
+        if (!RUNNING_FLAG.compareAndSet(false, true)) {
+            log.error("The {} already started, will not start again", this.getName());
+            return;
+        }
+        log.info("{} starting...", this.getName());
+        super.start();
+        log.info("{} started...", this.getName());
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (workerGroupQueue.size() == 0) {
+            status = DispatchWorkerStatus.DELETE_SUCCESS;
+            if (RUNNING_FLAG.compareAndSet(true, false)) {
+                log.info("{} stopping...", this.getName());
+                log.info("{} stopped...", this.getName());
+            } else {
+                log.error("{} is not started", this.getName());
+            }
+        } else {
+            log.warn("The {} queue is not empty, will not stop", this.getName());
+            status = DispatchWorkerStatus.DELETING;
+        }
+    }
+
+    @Override
+    public void run() {
+        while (RUNNING_FLAG.get()) {
+            this.dispatch();
+        }
     }
 
     public void dispatch() {
         ITaskExecutionRunnable taskExecutionRunnable = workerGroupQueue.take().getData();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         try {
-            final TaskExecutionStatus status = taskInstance.getState();
-            if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
-                log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
+            final TaskExecutionStatus taskStatus = taskInstance.getState();
+            if (taskStatus != TaskExecutionStatus.SUBMITTED_SUCCESS
+                    && taskStatus != TaskExecutionStatus.DELAY_EXECUTION) {
+                log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), taskStatus);
                 return;
             }
             taskExecutorClient.dispatch(taskExecutionRunnable);
@@ -59,5 +104,4 @@ public class DispatchWorker {
             log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
         }
     }
-
 }
