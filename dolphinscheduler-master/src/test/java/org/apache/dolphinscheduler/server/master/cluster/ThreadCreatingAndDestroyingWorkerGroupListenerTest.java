@@ -43,9 +43,6 @@ public class ThreadCreatingAndDestroyingWorkerGroupListenerTest {
     @Mock
     private WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
 
-    @Mock
-    private Logger logger;
-
     @InjectMocks
     private ThreadCreatingAndDestroyingWorkerGroupListener threadCreatingAndDestroyingWorkerGroupListener;
 
