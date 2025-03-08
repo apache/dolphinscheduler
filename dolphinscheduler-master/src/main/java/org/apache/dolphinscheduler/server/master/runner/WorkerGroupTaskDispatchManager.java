@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,9 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
     @Autowired
     private ITaskExecutorClient taskExecutorClient;
 
+    @Getter
     private final ConcurrentHashMap<String, WorkerGroupTaskDispatchWaitingQueueLooper> workerGroupTaskDispatchWaitingQueueLooperMap;
+    @Getter
     private final ConcurrentHashMap<String, PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>>> workerGroupPriorityDelayQueueMap;
 
     public WorkerGroupTaskDispatchManager() {
@@ -57,8 +60,9 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
         if (workerGroupQueue != null) {
             workerGroupQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
             log.info("queue size {}", workerGroupQueue.size());
+        } else {
+            log.error("workerGroup {} not found", workerGroup);
         }
-        log.info("add task {} to {} ", taskExecutionRunnable.getName(), workerGroup);
     }
 
     /**
@@ -91,7 +95,7 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable {
                 workerGroupTaskDispatchWaitingQueueLooperMap.computeIfAbsent(workerGroup,
                         k -> new WorkerGroupTaskDispatchWaitingQueueLooper(workerGroup, taskExecutorClient,
                                 workerGroupQueue));
-        if (!looper.isAlive()) {
+        if (!looper.getRUNNING_FLAG().get()) {
             looper.start();
         }
     }

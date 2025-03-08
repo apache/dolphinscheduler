@@ -25,11 +25,13 @@ import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WorkerGroupTaskDispatchWaitingQueueLooper extends BaseDaemonThread implements AutoCloseable {
 
+    @Getter
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
     private final DispatchWorker dispatchWorker;
