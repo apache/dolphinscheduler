@@ -143,8 +143,11 @@ public class WorkflowGraphTopologyLogicalVisitor {
             }
             for (String successor : successors) {
                 inDegreeMap.put(successor, inDegreeMap.get(successor) - 1);
+                // Add all non-repeating successors to bootstrapTaskCodes
+                if (!bootstrapTaskCodes.contains(successor)) {
+                    bootstrapTaskCodes.add(successor);
+                }
             }
-            bootstrapTaskCodes.addAll(successors);
         }
     }
 
