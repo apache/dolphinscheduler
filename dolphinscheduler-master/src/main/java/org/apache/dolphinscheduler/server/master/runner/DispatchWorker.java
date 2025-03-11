@@ -42,8 +42,7 @@ public class DispatchWorker extends BaseDaemonThread implements AutoCloseable {
 
     private final ITaskExecutorClient taskExecutorClient;
 
-
-    //todo: The current queue is flawed. When a high-priority task fails,
+    // todo: The current queue is flawed. When a high-priority task fails,
     // it will be delayed and will not return to the first or second position.
     // Tasks with the same priority will preempt its position.
     // If it needs to be placed at the front of the queue, the queue needs to be re-implemented.
