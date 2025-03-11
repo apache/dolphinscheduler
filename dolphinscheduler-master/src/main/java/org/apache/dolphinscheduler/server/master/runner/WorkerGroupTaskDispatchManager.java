@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
@@ -32,12 +33,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * WorkerGroupTaskDispatchManager is responsible for managing the task dispatching for worker groups.
+ * It maintains a mapping of worker groups to their task dispatchers and priority delay queues,
+ * and supports adding tasks, starting and stopping worker groups, as well as cleaning up resources upon shutdown.
+ */
 @Component
 @Slf4j
 public class WorkerGroupTaskDispatchManager implements AutoCloseable, WorkerGroupChangeNotifier.WorkerGroupListener {
@@ -60,6 +68,11 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable, WorkerGrou
         scheduler = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
 
         scheduler.scheduleAtFixedRate(this::checkDeleteDispatchWorker, 0, 1, TimeUnit.SECONDS);
+    }
+
+    @PostConstruct
+    public void init() {
+        this.addWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
     }
 
     /**

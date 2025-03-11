@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.runner.WorkerGroupTaskDispatchManager;
@@ -50,16 +49,15 @@ public class ClusterManager {
     @Autowired
     private RegistryClient registryClient;
 
-    private final WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
+    private WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
 
     public ClusterManager() {
         this.masterClusters = new MasterClusters();
         this.workerClusters = new WorkerClusters();
-        workerGroupTaskDispatchManager = new WorkerGroupTaskDispatchManager();
-        workerGroupTaskDispatchManager.addWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
     }
 
-    public void start() {
+    public void start(WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager) {
+        this.workerGroupTaskDispatchManager = workerGroupTaskDispatchManager;
         initializeMasterClusters();
         initializeWorkerClusters();
         log.info("ClusterManager started...");

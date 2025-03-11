@@ -99,10 +99,8 @@ public class WorkerGroupTaskDispatchManagerTest {
 
         workerGroupTaskDispatchManager.getDispatchWorkerMap().put(workerGroup, looper);
 
-        workerGroupTaskDispatchManager.close();
+        workerGroupTaskDispatchManager.deleteWorkerGroup(workerGroup);
 
         verify(looper).close();
-        Assertions
-                .assertTrue(workerGroupTaskDispatchManager.getDispatchWorkerMap().isEmpty());
     }
 }

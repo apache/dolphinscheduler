@@ -30,6 +30,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * DispatchWorker is responsible for dispatching tasks from the task queue.
+ * The main responsibilities include:
+ * 1. Continuously fetching tasks from the {@link PriorityDelayQueue} for dispatch.
+ * 2. Re-queuing tasks that fail to dispatch according to retry logic.
+ * 3. Ensuring thread safety and correct state transitions during task processing.
+ */
 @Slf4j
 public class DispatchWorker extends BaseDaemonThread implements AutoCloseable {
 
