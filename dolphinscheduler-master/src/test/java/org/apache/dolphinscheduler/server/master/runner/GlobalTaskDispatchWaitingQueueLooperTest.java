@@ -67,20 +67,19 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     void testTaskExecutionRunnableStatusIsSubmitted() {
 
         final TimeBasedTaskExecutionRunnableComparableEntry defaultEntryTaskExecuteRunnable =
-                createTaskExecuteRunnable("workerGroup2", TaskExecutionStatus.SUBMITTED_SUCCESS);
+                createTaskExecuteRunnable();
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
 
         verify(workerGroupTaskDispatcherManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class), anyLong());
     }
 
-    private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable(String groupName,
-                                                                                    TaskExecutionStatus status) {
+    private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable() {
 
         WorkflowInstance workflowInstance = new WorkflowInstance();
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setWorkerGroup(groupName);
-        taskInstance.setState(status);
+        taskInstance.setWorkerGroup("workerGroup2");
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
 
         final ApplicationContext applicationContext = mock(ApplicationContext.class);

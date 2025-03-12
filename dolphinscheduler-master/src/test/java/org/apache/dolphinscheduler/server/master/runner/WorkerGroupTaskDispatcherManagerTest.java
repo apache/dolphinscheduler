@@ -67,15 +67,13 @@ public class WorkerGroupTaskDispatcherManagerTest {
     }
 
     @Test
-    public void testStopWorkerGroup() throws Exception {
+    public void testStopWorkerGroup() {
         String workerGroup = "testWorkerGroup";
         ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
         long delay = 1000L;
 
         workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
         workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
-        DispatchWorker dispatchWorker =
-                workerGroupTaskDispatcherManager.getDispatchWorkerMap().get(workerGroup);
         Assertions.assertTrue(
                 workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
     }
