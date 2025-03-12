@@ -140,7 +140,7 @@ public class WorkflowGraphTopologyLogicalVisitor {
                 continue;
             }
             // Visit only when the in-degree is 0
-            if(!visitedTaskCodes.contains(taskName)) {
+            if (!visitedTaskCodes.contains(taskName)) {
                 visitedTaskCodes.add(taskName); // Record the nodes
                 final Set<String> successors = workflowGraph.getSuccessors(taskName);
                 if (subGraphNodes.contains(taskName)) {
