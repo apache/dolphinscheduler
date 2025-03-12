@@ -31,10 +31,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class WorkerGroupTaskDispatchManagerTest {
+public class WorkerGroupTaskDispatcherManagerTest {
 
     @InjectMocks
-    private WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
+    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
 
     @BeforeEach
     public void setUp() {
@@ -47,11 +47,11 @@ public class WorkerGroupTaskDispatchManagerTest {
         ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
         long delay = 1000L;
 
-        workerGroupTaskDispatchManager.add(workerGroup, task, delay);
+        workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
 
         // not have workerGroup queue，cannot add
         Assertions.assertEquals(0,
-                workerGroupTaskDispatchManager.getDispatchWorkerMap().size());
+                workerGroupTaskDispatcherManager.getDispatchWorkerMap().size());
     }
 
     @Test
@@ -59,11 +59,11 @@ public class WorkerGroupTaskDispatchManagerTest {
         String workerGroup = "nonExistingWorkerGroup";
         ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
         long delay = 1000L;
-        workerGroupTaskDispatchManager.addWorkerGroup(workerGroup);
-        workerGroupTaskDispatchManager.add(workerGroup, task, delay);
+        workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
+        workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
 
         Assertions.assertTrue(
-                workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
+                workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
     }
 
     @Test
@@ -72,23 +72,23 @@ public class WorkerGroupTaskDispatchManagerTest {
         ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
         long delay = 1000L;
 
-        workerGroupTaskDispatchManager.addWorkerGroup(workerGroup);
-        workerGroupTaskDispatchManager.add(workerGroup, task, delay);
+        workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
+        workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
         DispatchWorker dispatchWorker =
-                workerGroupTaskDispatchManager.getDispatchWorkerMap().get(workerGroup);
+                workerGroupTaskDispatcherManager.getDispatchWorkerMap().get(workerGroup);
         Assertions.assertTrue(
-                workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
+                workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
     }
 
     @Test
     public void testAddWorkerGroup() {
         String workerGroup = "newWorkerGroup";
 
-        workerGroupTaskDispatchManager.addWorkerGroup(workerGroup);
+        workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
 
         Assertions.assertTrue(
-                workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
-        Assertions.assertTrue(workerGroupTaskDispatchManager.getWorkerGroupPriorityDelayQueueMap()
+                workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
+        Assertions.assertTrue(workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap()
                 .containsKey(workerGroup));
     }
 
@@ -97,9 +97,9 @@ public class WorkerGroupTaskDispatchManagerTest {
         String workerGroup = "testWorkerGroup";
         DispatchWorker looper = mock(DispatchWorker.class);
 
-        workerGroupTaskDispatchManager.getDispatchWorkerMap().put(workerGroup, looper);
+        workerGroupTaskDispatcherManager.getDispatchWorkerMap().put(workerGroup, looper);
 
-        workerGroupTaskDispatchManager.deleteWorkerGroup(workerGroup);
+        workerGroupTaskDispatcherManager.deleteWorkerGroup(workerGroup);
 
         verify(looper).close();
     }

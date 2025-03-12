@@ -61,7 +61,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Mock
-    private WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
+    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
 
     @Test
     void testTaskExecutionRunnableStatusIsSubmitted() {
@@ -71,7 +71,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
 
-        verify(workerGroupTaskDispatchManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class), anyLong());
+        verify(workerGroupTaskDispatcherManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class), anyLong());
     }
 
     private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable(String groupName,

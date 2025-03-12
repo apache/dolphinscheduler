@@ -42,13 +42,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * WorkerGroupTaskDispatchManager is responsible for managing the task dispatching for worker groups.
+ * WorkerGroupTaskDispatcherManager is responsible for managing the task dispatching for worker groups.
  * It maintains a mapping of worker groups to their task dispatchers and priority delay queues,
  * and supports adding tasks, starting and stopping worker groups, as well as cleaning up resources upon shutdown.
  */
 @Component
 @Slf4j
-public class WorkerGroupTaskDispatchManager implements AutoCloseable, WorkerGroupChangeNotifier.WorkerGroupListener {
+public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGroupChangeNotifier.WorkerGroupListener {
 
     private static final int SHUTDOWN_WAIT_TIME = 5;
 
@@ -62,7 +62,7 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable, WorkerGrou
 
     private final ScheduledExecutorService scheduler;
 
-    public WorkerGroupTaskDispatchManager() {
+    public WorkerGroupTaskDispatcherManager() {
         dispatchWorkerMap = new ConcurrentHashMap<>();
         workerGroupPriorityDelayQueueMap = new ConcurrentHashMap<>();
         scheduler = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
@@ -125,13 +125,13 @@ public class WorkerGroupTaskDispatchManager implements AutoCloseable, WorkerGrou
      */
     @Override
     public void close() throws Exception {
-        log.info("WorkerGroupTaskDispatchManager stopping...");
+        log.info("WorkerGroupTaskDispatcherManager stopping...");
         scheduler.shutdown();
         if (!scheduler.awaitTermination(SHUTDOWN_WAIT_TIME, TimeUnit.SECONDS)) {
-            log.warn("WorkerGroupTaskDispatchManager did not terminate within 10 seconds, shutting down now");
+            log.warn("WorkerGroupTaskDispatcherManager did not terminate within 10 seconds, shutting down now");
             scheduler.shutdownNow();
         }
-        log.info("WorkerGroupTaskDispatchManager stopped");
+        log.info("WorkerGroupTaskDispatcherManager stopped");
     }
 
     @Override

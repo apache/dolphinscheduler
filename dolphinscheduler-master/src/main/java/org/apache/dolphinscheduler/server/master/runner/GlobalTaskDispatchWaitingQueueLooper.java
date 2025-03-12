@@ -36,7 +36,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Autowired
-    private WorkerGroupTaskDispatchManager workerGroupTaskDispatchManager;
+    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -66,7 +66,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
         TimeBasedTaskExecutionRunnableComparableEntry delayEntry =
                 globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
         ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
-        workerGroupTaskDispatchManager.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
+        workerGroupTaskDispatcherManager.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
                 taskExecutionRunnable,
                 delayEntry.getDelayTimeMills());
     }
@@ -76,7 +76,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
         if (RUNNING_FLAG.compareAndSet(true, false)) {
             log.info("GlobalTaskDispatchWaitingQueueLooper stopping...");
             log.info("GlobalTaskDispatchWaitingQueueLooper stopped...");
-            workerGroupTaskDispatchManager.close();
+            workerGroupTaskDispatcherManager.close();
         } else {
             log.error("GlobalTaskDispatchWaitingQueueLooper is not started");
         }
