@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 public class PriorityDelayQueueTest {
 
-    private PriorityDelayQueue<DelayEntry> queue;
+    private PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> queue;
     private ITaskExecutionRunnable taskExecutionRunnable;
 
     @BeforeEach
@@ -39,17 +39,17 @@ public class PriorityDelayQueueTest {
 
     @Test
     public void testAdd() {
-        queue.add(new DelayEntry(1000, taskExecutionRunnable));
+        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
 
-        queue.add(new DelayEntry(2000, taskExecutionRunnable));
+        queue.add(new PriorityAndDelayBasedTaskEntry(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
     }
 
     @Test
     public void testTake() throws InterruptedException {
-        queue.add(new DelayEntry(1000, taskExecutionRunnable));
-        DelayEntry entry = queue.take();
+        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
+        PriorityAndDelayBasedTaskEntry entry = queue.take();
         assertNotNull(entry);
         assertEquals(0, queue.size());
 
@@ -59,14 +59,14 @@ public class PriorityDelayQueueTest {
     public void testSize() {
         assertEquals(0, queue.size());
 
-        queue.add(new DelayEntry(1000, taskExecutionRunnable));
+        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
     }
 
     @Test
     public void testClear() {
-        queue.add(new DelayEntry(1000, taskExecutionRunnable));
-        queue.add(new DelayEntry(2000, taskExecutionRunnable));
+        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
+        queue.add(new PriorityAndDelayBasedTaskEntry(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
 
         queue.clear();

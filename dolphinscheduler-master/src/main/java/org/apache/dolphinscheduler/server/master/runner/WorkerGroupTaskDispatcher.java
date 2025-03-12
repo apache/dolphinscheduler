@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,7 +46,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
     // it will be delayed and will not return to the first or second position.
     // Tasks with the same priority will preempt its position.
     // If it needs to be placed at the front of the queue, the queue needs to be re-implemented.
-    private final PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue;
+    private final PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -54,7 +54,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
     private DispatchWorkerStatus status;
 
     public WorkerGroupTaskDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient,
-                                     PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue) {
+                                     PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupQueue = workerGroupQueue;
@@ -95,7 +95,8 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
     }
 
     public void dispatch() {
-        ITaskExecutionRunnable taskExecutionRunnable = workerGroupQueue.take().getData();
+        PriorityAndDelayBasedTaskEntry taskEntry = workerGroupQueue.take();
+        ITaskExecutionRunnable taskExecutionRunnable = (ITaskExecutionRunnable) taskEntry.getData();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         try {
             final TaskExecutionStatus taskStatus = taskInstance.getState();
@@ -111,7 +112,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
             // the waiting time will increase multiple of times, but will not exceed 60 seconds
             long waitingTimeMills = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            workerGroupQueue.add(new DelayEntry<>(waitingTimeMills, taskExecutionRunnable));
+            workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry(waitingTimeMills, taskExecutionRunnable));
             log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
         }
     }

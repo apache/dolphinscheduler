@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ public class WorkerGroupTaskDispatcherTest {
     private ITaskExecutorClient taskExecutorClient;
 
     @Mock
-    private PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue;
+    private PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue;
 
     @InjectMocks
     private WorkerGroupTaskDispatcher workerGroupTaskDispatcher;
@@ -56,7 +56,7 @@ public class WorkerGroupTaskDispatcherTest {
         ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
 
-        when(workerGroupQueue.take()).thenReturn(new DelayEntry<>(0, taskExecutionRunnable));
+        when(workerGroupQueue.take()).thenReturn(new PriorityAndDelayBasedTaskEntry<>(0, taskExecutionRunnable));
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
 
@@ -71,7 +71,7 @@ public class WorkerGroupTaskDispatcherTest {
         ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
 
-        when(workerGroupQueue.take()).thenReturn(new DelayEntry<>(0, taskExecutionRunnable));
+        when(workerGroupQueue.take()).thenReturn(new PriorityAndDelayBasedTaskEntry<>(0, taskExecutionRunnable));
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
@@ -83,6 +83,6 @@ public class WorkerGroupTaskDispatcherTest {
 
         verify(workerGroupQueue, times(1)).take();
         verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
-        verify(workerGroupQueue, times(1)).add(any(DelayEntry.class));
+        verify(workerGroupQueue, times(1)).add(any(PriorityAndDelayBasedTaskEntry.class));
     }
 }

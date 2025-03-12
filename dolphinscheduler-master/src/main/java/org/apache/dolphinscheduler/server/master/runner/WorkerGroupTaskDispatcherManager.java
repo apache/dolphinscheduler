@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
@@ -58,7 +58,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     @Getter
     private final ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap;
     @Getter
-    private final ConcurrentHashMap<String, PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>>> workerGroupPriorityDelayQueueMap;
+    private final ConcurrentHashMap<String, PriorityDelayQueue<PriorityAndDelayBasedTaskEntry>> workerGroupPriorityDelayQueueMap;
 
     private final ScheduledExecutorService scheduler;
 
@@ -83,10 +83,10 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param delayTimeMills the delay time before the task is executed, in milliseconds
      */
     public void add(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable, long delayTimeMills) {
-        PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue =
+        PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue =
                 workerGroupPriorityDelayQueueMap.get(workerGroup);
         if (workerGroupQueue != null) {
-            workerGroupQueue.add(new DelayEntry<>(delayTimeMills, taskExecutionRunnable));
+            workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(delayTimeMills, taskExecutionRunnable));
             log.info("queue size {}", workerGroupQueue.size());
         } else {
             log.error("workerGroup {} not found", workerGroup);
@@ -111,7 +111,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param workerGroup the identifier for the worker group
      */
     public synchronized void addWorkerGroup(String workerGroup) {
-        PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue =
+        PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue =
                 workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, k -> new PriorityDelayQueue<>());
         WorkerGroupTaskDispatcher looper =
                 dispatchWorkerMap.computeIfAbsent(workerGroup,
