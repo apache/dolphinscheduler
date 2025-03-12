@@ -56,11 +56,14 @@ public class ClusterManager {
         this.workerClusters = new WorkerClusters();
     }
 
-    public void start(WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager) {
-        this.workerGroupTaskDispatcherManager = workerGroupTaskDispatcherManager;
+    public void start() {
         initializeMasterClusters();
         initializeWorkerClusters();
         log.info("ClusterManager started...");
+    }
+
+    public void registerWorkerGroupListener(WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager) {
+        this.workerGroupTaskDispatcherManager = workerGroupTaskDispatcherManager;
     }
 
     /**

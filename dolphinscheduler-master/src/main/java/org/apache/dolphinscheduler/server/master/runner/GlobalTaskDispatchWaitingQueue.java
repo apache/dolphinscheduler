@@ -63,18 +63,15 @@ public class GlobalTaskDispatchWaitingQueue {
     }
 
     /**
-     * Consume {@link ITaskExecutionRunnable} from the {@link DelayQueue}, only the delay time <= 0 can be consumed.
+     * Consume {@link ITaskExecutionRunnable} from the {@link PriorityBlockingQueue}, only the delay time <= 0 can be consumed.
      */
     @SneakyThrows
-    public TimeBasedTaskExecutionRunnableComparableEntry takeTaskExecuteRunnable() {
-        TimeBasedTaskExecutionRunnableComparableEntry delayEntry = priorityQueue.take();
-
-        ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
+    public ITaskExecutionRunnable takeTaskExecuteRunnable() {
+        ITaskExecutionRunnable taskExecutionRunnable = priorityQueue.take().getData();
         while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
-            delayEntry = priorityQueue.take();
-            taskExecutionRunnable = delayEntry.getData();
+            taskExecutionRunnable = priorityQueue.take().getData();
         }
-        return delayEntry;
+        return taskExecutionRunnable;
     }
 
     public int getWaitingDispatchTaskNumber() {

@@ -31,14 +31,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * DispatchWorker is responsible for dispatching tasks from the task queue.
+ * WorkerGroupTaskDispatcher is responsible for dispatching tasks from the task queue.
  * The main responsibilities include:
  * 1. Continuously fetching tasks from the {@link PriorityDelayQueue} for dispatch.
  * 2. Re-queuing tasks that fail to dispatch according to retry logic.
  * 3. Ensuring thread safety and correct state transitions during task processing.
  */
 @Slf4j
-public class DispatchWorker extends BaseDaemonThread implements AutoCloseable {
+public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoCloseable {
 
     private final ITaskExecutorClient taskExecutorClient;
 
@@ -53,9 +53,9 @@ public class DispatchWorker extends BaseDaemonThread implements AutoCloseable {
     @Getter
     private DispatchWorkerStatus status;
 
-    public DispatchWorker(String workerGroupName, ITaskExecutorClient taskExecutorClient,
-                          PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue) {
-        super("DispatchWorker-" + workerGroupName);
+    public WorkerGroupTaskDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient,
+                                     PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue) {
+        super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupQueue = workerGroupQueue;
     }

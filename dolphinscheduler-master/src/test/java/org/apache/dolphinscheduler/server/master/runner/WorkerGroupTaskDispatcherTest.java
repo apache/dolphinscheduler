@@ -40,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class DispatchWorkerTest {
+public class WorkerGroupTaskDispatcherTest {
 
     @Mock
     private ITaskExecutorClient taskExecutorClient;
@@ -49,7 +49,7 @@ public class DispatchWorkerTest {
     private PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue;
 
     @InjectMocks
-    private DispatchWorker dispatchWorker;
+    private WorkerGroupTaskDispatcher workerGroupTaskDispatcher;
 
     @Test
     public void dispatch_TaskStatusEligible_ShouldDispatchTask() throws TaskDispatchException {
@@ -60,7 +60,7 @@ public class DispatchWorkerTest {
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
 
-        dispatchWorker.dispatch();
+        workerGroupTaskDispatcher.dispatch();
 
         verify(workerGroupQueue, times(1)).take();
         verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
@@ -79,7 +79,7 @@ public class DispatchWorkerTest {
         when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(taskExecutionContext);
         doThrow(new RuntimeException("Dispatch failed")).when(taskExecutorClient).dispatch(taskExecutionRunnable);
 
-        dispatchWorker.dispatch();
+        workerGroupTaskDispatcher.dispatch();
 
         verify(workerGroupQueue, times(1)).take();
         verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);

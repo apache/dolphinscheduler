@@ -93,7 +93,7 @@ public class WorkerGroupTaskDispatcherManagerTest {
     @Test
     public void testClose() throws Exception {
         String workerGroup = "testWorkerGroup";
-        DispatchWorker looper = mock(DispatchWorker.class);
+        WorkerGroupTaskDispatcher looper = mock(WorkerGroupTaskDispatcher.class);
 
         workerGroupTaskDispatcherManager.getDispatchWorkerMap().put(workerGroup, looper);
 

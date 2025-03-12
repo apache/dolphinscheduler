@@ -132,7 +132,9 @@ public class MasterServer implements IStoppable {
 
         this.masterCoordinator.start();
 
-        this.clusterManager.start(this.workerGroupTaskDispatcherManager);
+        this.clusterManager.registerWorkerGroupListener(this.workerGroupTaskDispatcherManager);
+        this.clusterManager.start();
+
         this.clusterStateMonitors.start();
 
         this.workflowEngine.start();
@@ -188,7 +190,8 @@ public class MasterServer implements IStoppable {
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext;
-                WorkerGroupTaskDispatcherManager closeWorkerGroupTaskDispatcherManager = workerGroupTaskDispatcherManager) {
+                WorkerGroupTaskDispatcherManager closeWorkerGroupTaskDispatcherManager =
+                        workerGroupTaskDispatcherManager) {
 
             log.info("MasterServer is stopping, current cause : {}", cause);
         } catch (Exception e) {

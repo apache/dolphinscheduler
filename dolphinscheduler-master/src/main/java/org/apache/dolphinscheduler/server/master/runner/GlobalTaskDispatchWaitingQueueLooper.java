@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.TimeBasedTaskExecutionRunnableComparableEntry;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -63,12 +62,10 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     }
 
     void doDispatch() {
-        TimeBasedTaskExecutionRunnableComparableEntry delayEntry =
+        ITaskExecutionRunnable taskExecutionRunnable =
                 globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
-        ITaskExecutionRunnable taskExecutionRunnable = delayEntry.getData();
         workerGroupTaskDispatcherManager.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
-                taskExecutionRunnable,
-                delayEntry.getDelayTimeMills());
+                taskExecutionRunnable, 0);
     }
 
     @Override

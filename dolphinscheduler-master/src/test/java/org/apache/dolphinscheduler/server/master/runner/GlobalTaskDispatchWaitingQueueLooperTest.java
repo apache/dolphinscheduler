@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionG
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
-import org.apache.dolphinscheduler.server.master.runner.queue.TimeBasedTaskExecutionRunnableComparableEntry;
 
 import java.util.HashMap;
 
@@ -66,15 +65,16 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     @Test
     void testTaskExecutionRunnableStatusIsSubmitted() {
 
-        final TimeBasedTaskExecutionRunnableComparableEntry defaultEntryTaskExecuteRunnable =
+        final ITaskExecutionRunnable defaultTaskExecuteRunnable =
                 createTaskExecuteRunnable();
-        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultEntryTaskExecuteRunnable);
+        when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
 
-        verify(workerGroupTaskDispatcherManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class), anyLong());
+        verify(workerGroupTaskDispatcherManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class),
+                anyLong());
     }
 
-    private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable() {
+    private ITaskExecutionRunnable createTaskExecuteRunnable() {
 
         WorkflowInstance workflowInstance = new WorkflowInstance();
         TaskInstance taskInstance = new TaskInstance();
@@ -95,7 +95,6 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
                 .taskDefinition(new TaskDefinition())
                 .workflowEventBus(new WorkflowEventBus())
                 .build();
-        return new TimeBasedTaskExecutionRunnableComparableEntry(0,
-                new TaskExecutionRunnable(taskExecutionRunnableBuilder));
+        return new TaskExecutionRunnable(taskExecutionRunnableBuilder);
     }
 }

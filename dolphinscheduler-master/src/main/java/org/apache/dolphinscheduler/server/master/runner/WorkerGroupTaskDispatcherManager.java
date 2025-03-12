@@ -56,7 +56,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     private ITaskExecutorClient taskExecutorClient;
 
     @Getter
-    private final ConcurrentHashMap<String, DispatchWorker> dispatchWorkerMap;
+    private final ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap;
     @Getter
     private final ConcurrentHashMap<String, PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>>> workerGroupPriorityDelayQueueMap;
 
@@ -99,9 +99,9 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param workerGroup the identifier for the worker group
      */
     public synchronized void deleteWorkerGroup(String workerGroup) throws Exception {
-        DispatchWorker dispatchWorker = dispatchWorkerMap.get(workerGroup);
-        if (dispatchWorker != null) {
-            dispatchWorker.close();
+        WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
+        if (workerGroupTaskDispatcher != null) {
+            workerGroupTaskDispatcher.close();
         }
     }
 
@@ -113,9 +113,9 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     public synchronized void addWorkerGroup(String workerGroup) {
         PriorityDelayQueue<DelayEntry<ITaskExecutionRunnable>> workerGroupQueue =
                 workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, k -> new PriorityDelayQueue<>());
-        DispatchWorker looper =
+        WorkerGroupTaskDispatcher looper =
                 dispatchWorkerMap.computeIfAbsent(workerGroup,
-                        k -> new DispatchWorker(workerGroup, taskExecutorClient,
+                        k -> new WorkerGroupTaskDispatcher(workerGroup, taskExecutorClient,
                                 workerGroupQueue));
         looper.start();
     }
@@ -161,26 +161,26 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     }
 
     private void checkDeleteDispatchWorker() {
-        for (Map.Entry<String, DispatchWorker> entry : dispatchWorkerMap.entrySet()) {
+        for (Map.Entry<String, WorkerGroupTaskDispatcher> entry : dispatchWorkerMap.entrySet()) {
             String workerGroup = entry.getKey();
-            DispatchWorker dispatchWorker = entry.getValue();
-            switch (dispatchWorker.getStatus()) {
+            WorkerGroupTaskDispatcher workerGroupTaskDispatcher = entry.getValue();
+            switch (workerGroupTaskDispatcher.getStatus()) {
                 case DELETING:
-                    try (DispatchWorker ignored = dispatchWorker) {
+                    try (WorkerGroupTaskDispatcher ignored = workerGroupTaskDispatcher) {
                         log.info("try to delete worker group {}", workerGroup);
                     } catch (Exception e) {
                         log.error("stop worker group error", e);
                     }
                     break;
                 case DELETE_SUCCESS:
-                    try (DispatchWorker ignored = dispatchWorkerMap.remove(workerGroup)) {
+                    try (WorkerGroupTaskDispatcher ignored = dispatchWorkerMap.remove(workerGroup)) {
                         log.info("success remove worker group {}", workerGroup);
                     } catch (Exception e) {
                         log.error("stop worker group error", e);
                     }
                     break;
                 default:
-                    log.debug("worker group {} status {}", workerGroup, dispatchWorker.getStatus());
+                    log.debug("worker group {} status {}", workerGroup, workerGroupTaskDispatcher.getStatus());
                     break;
             }
         }
