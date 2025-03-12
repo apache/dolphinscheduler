@@ -43,7 +43,7 @@ public class GlobalTaskDispatchWaitingQueue {
 
     private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
 
-    private final PriorityBlockingQueue<TimeBasedTaskExecutionRunnableComparableEntry> priorityQueue =
+    private final PriorityBlockingQueue<TimeBasedTaskExecutionRunnableComparableEntry> delayQueue =
             new PriorityBlockingQueue<>();
 
     /**
@@ -59,7 +59,7 @@ public class GlobalTaskDispatchWaitingQueue {
     public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,
                                                                   long delayTimeMills) {
         waitingTaskInstanceIds.add(taskExecutionRunnable.getTaskInstance().getId());
-        priorityQueue.add(new TimeBasedTaskExecutionRunnableComparableEntry(delayTimeMills, taskExecutionRunnable));
+        delayQueue.add(new TimeBasedTaskExecutionRunnableComparableEntry(delayTimeMills, taskExecutionRunnable));
     }
 
     /**
@@ -67,9 +67,9 @@ public class GlobalTaskDispatchWaitingQueue {
      */
     @SneakyThrows
     public ITaskExecutionRunnable takeTaskExecuteRunnable() {
-        ITaskExecutionRunnable taskExecutionRunnable = priorityQueue.take().getData();
+        ITaskExecutionRunnable taskExecutionRunnable = delayQueue.take().getData();
         while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
-            taskExecutionRunnable = priorityQueue.take().getData();
+            taskExecutionRunnable = delayQueue.take().getData();
         }
         return taskExecutionRunnable;
     }
