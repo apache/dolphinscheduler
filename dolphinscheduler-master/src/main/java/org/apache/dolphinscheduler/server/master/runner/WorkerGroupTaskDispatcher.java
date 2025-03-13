@@ -53,11 +53,19 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
     @Getter
     private DispatchWorkerStatus status;
 
-    public WorkerGroupTaskDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient,
-                                     PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue) {
+    public WorkerGroupTaskDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
-        this.workerGroupQueue = workerGroupQueue;
+        this.workerGroupQueue = new PriorityDelayQueue<>();
+        status = DispatchWorkerStatus.DEFAULT;
+    }
+
+    public void add(ITaskExecutionRunnable taskExecutionRunnable, long delayTimeMills) {
+        workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry(delayTimeMills, taskExecutionRunnable));
+    }
+
+    public int size() {
+        return workerGroupQueue.size();
     }
 
     @Override
@@ -78,8 +86,6 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
             if (RUNNING_FLAG.compareAndSet(true, false)) {
                 log.info("{} stopping...", this.getName());
                 log.info("{} stopped...", this.getName());
-            } else {
-                log.error("{} is not started", this.getName());
             }
         } else {
             log.warn("The {} queue is not empty, will not stop", this.getName());

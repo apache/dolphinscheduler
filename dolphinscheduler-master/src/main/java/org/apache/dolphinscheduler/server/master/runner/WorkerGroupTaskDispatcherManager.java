@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
 import java.util.List;
@@ -57,17 +55,16 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
 
     @Getter
     private final ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap;
-    @Getter
-    private final ConcurrentHashMap<String, PriorityDelayQueue<PriorityAndDelayBasedTaskEntry>> workerGroupPriorityDelayQueueMap;
 
     private final ScheduledExecutorService scheduler;
 
+    private boolean shutDownFlag;
+
     public WorkerGroupTaskDispatcherManager() {
         dispatchWorkerMap = new ConcurrentHashMap<>();
-        workerGroupPriorityDelayQueueMap = new ConcurrentHashMap<>();
         scheduler = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
-
-        scheduler.scheduleAtFixedRate(this::checkDeleteDispatchWorker, 0, 1, TimeUnit.SECONDS);
+        shutDownFlag = false;
+        scheduler.scheduleAtFixedRate(this::checkDeleteDispatchWorkerComplete, 0, 1, TimeUnit.SECONDS);
     }
 
     @PostConstruct
@@ -82,15 +79,16 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param taskExecutionRunnable an instance of ITaskExecutionRunnable representing the task to be executed
      * @param delayTimeMills the delay time before the task is executed, in milliseconds
      */
-    public void add(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable, long delayTimeMills) {
-        PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue =
-                workerGroupPriorityDelayQueueMap.get(workerGroup);
-        if (workerGroupQueue != null) {
-            workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(delayTimeMills, taskExecutionRunnable));
-            log.info("queue size {}", workerGroupQueue.size());
+    public Boolean add(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable, long delayTimeMills) {
+        WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
+        if (workerGroupTaskDispatcher != null) {
+            workerGroupTaskDispatcher.add(taskExecutionRunnable, delayTimeMills);
+            log.info("queue size {}", workerGroupTaskDispatcher.size());
+            return true;
         } else {
-            log.error("workerGroup {} not found", workerGroup);
+            log.error("workerGroupTaskDispatcher {} not found", workerGroup);
         }
+        return false;
     }
 
     /**
@@ -102,6 +100,8 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
         WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
         if (workerGroupTaskDispatcher != null) {
             workerGroupTaskDispatcher.close();
+        } else {
+            log.warn("workerGroupTaskDispatcher {} not found", workerGroup);
         }
     }
 
@@ -111,12 +111,9 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param workerGroup the identifier for the worker group
      */
     public synchronized void addWorkerGroup(String workerGroup) {
-        PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue =
-                workerGroupPriorityDelayQueueMap.computeIfAbsent(workerGroup, k -> new PriorityDelayQueue<>());
         WorkerGroupTaskDispatcher looper =
                 dispatchWorkerMap.computeIfAbsent(workerGroup,
-                        k -> new WorkerGroupTaskDispatcher(workerGroup, taskExecutorClient,
-                                workerGroupQueue));
+                        k -> new WorkerGroupTaskDispatcher(workerGroup, taskExecutorClient));
         looper.start();
     }
 
@@ -125,13 +122,15 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      */
     @Override
     public void close() throws Exception {
-        log.info("WorkerGroupTaskDispatcherManager stopping...");
-        scheduler.shutdown();
-        if (!scheduler.awaitTermination(SHUTDOWN_WAIT_TIME, TimeUnit.SECONDS)) {
-            log.warn("WorkerGroupTaskDispatcherManager did not terminate within 10 seconds, shutting down now");
-            scheduler.shutdownNow();
+        log.info("WorkerGroupTaskDispatcherManager ready close...");
+        shutDownFlag = true;
+        for (Map.Entry<String, WorkerGroupTaskDispatcher> entry : dispatchWorkerMap.entrySet()) {
+            try {
+                entry.getValue().close();
+            } catch (Exception e) {
+                log.error("stop worker group error", e);
+            }
         }
-        log.info("WorkerGroupTaskDispatcherManager stopped");
     }
 
     @Override
@@ -160,7 +159,8 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
         }
     }
 
-    private void checkDeleteDispatchWorker() {
+    private void checkDeleteDispatchWorkerComplete() {
+        boolean complete = true;
         for (Map.Entry<String, WorkerGroupTaskDispatcher> entry : dispatchWorkerMap.entrySet()) {
             String workerGroup = entry.getKey();
             WorkerGroupTaskDispatcher workerGroupTaskDispatcher = entry.getValue();
@@ -171,6 +171,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
                     } catch (Exception e) {
                         log.error("stop worker group error", e);
                     }
+                    complete = false;
                     break;
                 case DELETE_SUCCESS:
                     try (WorkerGroupTaskDispatcher ignored = dispatchWorkerMap.remove(workerGroup)) {
@@ -180,10 +181,31 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
                     }
                     break;
                 default:
+                    complete = false;
                     log.debug("worker group {} status {}", workerGroup, workerGroupTaskDispatcher.getStatus());
                     break;
             }
         }
+        if (shutDownFlag && complete) {
+            this.shutdown();
+        }
+    }
+
+    private void shutdown() {
+        log.info("WorkerGroupTaskDispatcherManager start close...");
+        dispatchWorkerMap.clear();
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(SHUTDOWN_WAIT_TIME, TimeUnit.SECONDS)) {
+                log.warn(
+                        "WorkerGroupTaskDispatcherManager did not terminate within SHUTDOWN_WAIT_TIME seconds, shutting down now");
+                scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        } catch (InterruptedException e) {
+            log.info("WorkerGroupTaskDispatcherManager error: ", e);
+        }
+        log.info("WorkerGroupTaskDispatcherManager closed");
     }
 
 }

@@ -17,88 +17,132 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.truth.Truth;
 
 @ExtendWith(MockitoExtension.class)
 public class WorkerGroupTaskDispatcherManagerTest {
 
     @InjectMocks
-    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
+    private WorkerGroupTaskDispatcherManager manager;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    public void testAddTaskToExistingWorkerGroup_ShouldReturnTrue() {
+        String workerGroupName = "testGroup";
+        manager.addWorkerGroup(workerGroupName);
+        ITaskExecutionRunnable mockTask = mock(ITaskExecutionRunnable.class);
+
+        boolean result = manager.add(workerGroupName, mockTask, 0L);
+
+        assertTrue(result);
     }
 
     @Test
-    public void testAddTaskToExistingWorkerGroup() {
-        String workerGroup = "testWorkerGroup";
-        ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
-        long delay = 1000L;
-
-        workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
-
-        // not have workerGroup queue，cannot add
-        Assertions.assertEquals(0,
-                workerGroupTaskDispatcherManager.getDispatchWorkerMap().size());
+    public void testAddTaskToNonExistingWorkerGroup_ShouldReturnFalse() {
+        String workerGroupName = "nonExistingGroup";
+        ITaskExecutionRunnable mockTask = mock(ITaskExecutionRunnable.class);
+        boolean result = manager.add(workerGroupName, mockTask, 0L);
+        assertFalse(result);
     }
 
     @Test
-    public void testAddTaskToNonExistingWorkerGroup() {
-        String workerGroup = "nonExistingWorkerGroup";
-        ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
-        long delay = 1000L;
-        workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
-        workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
+    public void testDeleteExistingWorkerGroup_ShouldRemoveGroup() throws Exception {
+        String workerGroupName = "testGroup";
+        manager.addWorkerGroup(workerGroupName);
 
-        Assertions.assertTrue(
-                workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
+        manager.deleteWorkerGroup(workerGroupName);
+
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    Truth.assertThat(manager.getDispatchWorkerMap().isEmpty()).isTrue();
+                });
     }
 
     @Test
-    public void testStopWorkerGroup() {
-        String workerGroup = "testWorkerGroup";
-        ITaskExecutionRunnable task = mock(ITaskExecutionRunnable.class);
-        long delay = 1000L;
-
-        workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
-        workerGroupTaskDispatcherManager.add(workerGroup, task, delay);
-        Assertions.assertTrue(
-                workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().get(workerGroup).size() > 0);
+    public void testAddNewWorkerGroup_ShouldAddGroup() {
+        String workerGroupName = "newGroup";
+        manager.addWorkerGroup(workerGroupName);
+        assertFalse(manager.getDispatchWorkerMap().isEmpty());
     }
 
     @Test
-    public void testAddWorkerGroup() {
-        String workerGroup = "newWorkerGroup";
+    public void testClose_ShouldShutdownScheduler() throws Exception {
+        manager.addWorkerGroup("testGroup");
+        manager.add("testGroup", mock(ITaskExecutionRunnable.class), 0);
+        WorkerGroupTaskDispatcher dispatcher = manager.getDispatchWorkerMap().get("testGroup");
 
-        workerGroupTaskDispatcherManager.addWorkerGroup(workerGroup);
+        manager.deleteWorkerGroup("testGroup");
 
-        Assertions.assertTrue(
-                workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap().containsKey(workerGroup));
-        Assertions.assertTrue(workerGroupTaskDispatcherManager.getWorkerGroupPriorityDelayQueueMap()
-                .containsKey(workerGroup));
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    Truth.assertThat(dispatcher.getStatus() == DispatchWorkerStatus.DELETE_SUCCESS).isTrue();
+                });
+
     }
 
     @Test
-    public void testClose() throws Exception {
-        String workerGroup = "testWorkerGroup";
-        WorkerGroupTaskDispatcher looper = mock(WorkerGroupTaskDispatcher.class);
+    public void testOnWorkerGroupAdd_ShouldAddWorkerGroups() {
+        WorkerGroup group1 = new WorkerGroup();
+        WorkerGroup group2 = new WorkerGroup();
+        group1.setName("testGroup1");
+        group2.setName("testGroup2");
+        List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
+        manager.onWorkerGroupAdd(workerGroups);
+        assertEquals(2, manager.getDispatchWorkerMap().size());
+    }
 
-        workerGroupTaskDispatcherManager.getDispatchWorkerMap().put(workerGroup, looper);
+    @Test
+    public void testOnWorkerGroupDelete_ShouldDeleteWorkerGroups() {
+        WorkerGroup group1 = new WorkerGroup();
+        WorkerGroup group2 = new WorkerGroup();
+        group1.setName("testGroup1");
+        group2.setName("testGroup2");
+        List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
+        workerGroups.forEach(workerGroup -> manager.addWorkerGroup(workerGroup.getName()));
 
-        workerGroupTaskDispatcherManager.deleteWorkerGroup(workerGroup);
+        manager.onWorkerGroupDelete(workerGroups);
 
-        verify(looper).close();
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    Truth.assertThat(manager.getDispatchWorkerMap().isEmpty()).isTrue();
+                });
+
+    }
+
+    @Test
+    public void testOnCloseWorkerGroupTaskDispatcherManager() throws Exception {
+        WorkerGroup group1 = new WorkerGroup();
+        WorkerGroup group2 = new WorkerGroup();
+        group1.setName("testGroup1");
+        group2.setName("testGroup2");
+        List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
+        workerGroups.forEach(workerGroup -> manager.addWorkerGroup(workerGroup.getName()));
+
+        manager.close();
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    Truth.assertThat(manager.getDispatchWorkerMap().isEmpty()).isTrue();
+                });
     }
 }
