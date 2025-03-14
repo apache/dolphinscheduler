@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.graph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
@@ -32,6 +30,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class WorkflowGraph implements IWorkflowGraph {
 
