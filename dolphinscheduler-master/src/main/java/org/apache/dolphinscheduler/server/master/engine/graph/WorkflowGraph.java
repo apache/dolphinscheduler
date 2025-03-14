@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.server.master.engine.graph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class WorkflowGraph implements IWorkflowGraph {
 
@@ -43,6 +45,7 @@ public class WorkflowGraph implements IWorkflowGraph {
     public WorkflowGraph(List<WorkflowTaskRelation> workflowTaskRelations, List<TaskDefinition> taskDefinitions) {
         checkNotNull(taskDefinitions, "taskDefinitions can not be null");
         checkNotNull(workflowTaskRelations, "taskDefinitions can not be null");
+        checkIfDAG(workflowTaskRelations, taskDefinitions);
         this.predecessors = new HashMap<>();
         this.successors = new HashMap<>();
 
@@ -55,6 +58,61 @@ public class WorkflowGraph implements IWorkflowGraph {
 
         addTaskNodes(taskDefinitions);
         addTaskEdge(workflowTaskRelations);
+    }
+
+    private void checkIfDAG(List<WorkflowTaskRelation> workflowTaskRelations, List<TaskDefinition> taskDefinitions) {
+        //If topology-sort-result`s size less than taskDefinitions`s size, then not a DAG
+        Map<Long, List<Long>> preTaskCodeMap = workflowTaskRelations
+                .stream()
+                .collect(Collectors.groupingBy(WorkflowTaskRelation::getPostTaskCode,
+                        Collectors.mapping(WorkflowTaskRelation::getPreTaskCode, Collectors.toList())));
+        Map<Long, List<Long>> postTaskCodeMap = workflowTaskRelations
+                .stream()
+                .collect(Collectors.groupingBy(WorkflowTaskRelation::getPreTaskCode,
+                        Collectors.mapping(WorkflowTaskRelation::getPostTaskCode, Collectors.toList())));
+
+        // build in-degree count
+        Map<Long, Integer> inDegreeCount = new HashMap<>();
+        for (TaskDefinition taskDefinition : taskDefinitions) {
+            List<Long> preTasks = preTaskCodeMap.get(taskDefinition.getCode());
+            if (preTasks == null) {
+                inDegreeCount.put(taskDefinition.getCode(), 0);
+            } else {
+                inDegreeCount.put(taskDefinition.getCode(), preTasks.size());
+            }
+        }
+
+        // Adds the task with zero-in-degree to the queue
+        Set<Long> visitTable = new HashSet<>();
+        Queue<Long> queue = new ArrayDeque<>();
+        for (Map.Entry<Long, Integer> entry : inDegreeCount.entrySet()) {
+            if (entry.getValue() == 0 && visitTable.add(entry.getKey())) {
+                queue.offer(entry.getKey());
+            }
+        }
+
+        // topology sort
+        Set<Long> resultTable = new HashSet<>();
+        while (!queue.isEmpty()) {
+            Long taskCode = queue.poll();
+            resultTable.add(taskCode);
+
+            List<Long> postCodes = postTaskCodeMap.get(taskCode);
+            if (postCodes == null) {
+                continue;
+            }
+            for (Long postCode : postCodes) {
+                inDegreeCount.put(postCode, inDegreeCount.get(postCode) - 1);
+
+                if (inDegreeCount.get(postCode) == 0) {
+                    queue.offer(postCode);
+                }
+            }
+        }
+
+        if (resultTable.size() < taskDefinitions.size()) {
+            throw new IllegalArgumentException("The workflow task relation is not a DAG");
+        }
     }
 
     @Override
