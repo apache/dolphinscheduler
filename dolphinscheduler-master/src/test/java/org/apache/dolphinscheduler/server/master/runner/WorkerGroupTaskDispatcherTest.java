@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,10 +29,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 
+import java.time.Duration;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -46,43 +46,86 @@ public class WorkerGroupTaskDispatcherTest {
     private ITaskExecutorClient taskExecutorClient;
 
     @Mock
-    private PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue;
+    private ITaskExecutionRunnable taskExecutionRunnable;
 
     @InjectMocks
     private WorkerGroupTaskDispatcher workerGroupTaskDispatcher;
 
-    @Test
-    public void dispatch_TaskStatusEligible_ShouldDispatchTask() throws TaskDispatchException {
-        ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
-        TaskInstance taskInstance = mock(TaskInstance.class);
-
-        when(workerGroupQueue.take()).thenReturn(new PriorityAndDelayBasedTaskEntry<>(0, taskExecutionRunnable));
-        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
-
-        workerGroupTaskDispatcher.dispatch();
-
-        verify(workerGroupQueue, times(1)).take();
-        verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
+    @BeforeEach
+    public void setUp() {
+        workerGroupTaskDispatcher = new WorkerGroupTaskDispatcher("testWorkerGroup", taskExecutorClient);
     }
 
     @Test
-    public void dispatch_TaskDispatchFails_ShouldRetryTask() throws TaskDispatchException {
-        ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
-        TaskInstance taskInstance = mock(TaskInstance.class);
-
-        when(workerGroupQueue.take()).thenReturn(new PriorityAndDelayBasedTaskEntry<>(0, taskExecutionRunnable));
+    public void testDispatch_Success() throws Exception {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
+
+        workerGroupTaskDispatcher.add(taskExecutionRunnable, 0L);
+
+        workerGroupTaskDispatcher.start();
+        await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
+            workerGroupTaskDispatcher.close();
+            verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
+        });
+    }
+
+    @Test
+    public void testDispatch_FailureAndRetry() throws Exception {
+
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setDispatchFailTimes(1);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(taskExecutionContext);
         doThrow(new RuntimeException("Dispatch failed")).when(taskExecutorClient).dispatch(taskExecutionRunnable);
 
-        workerGroupTaskDispatcher.dispatch();
+        workerGroupTaskDispatcher.add(taskExecutionRunnable, 0L);
 
-        verify(workerGroupQueue, times(1)).take();
-        verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
-        verify(workerGroupQueue, times(1)).add(any(PriorityAndDelayBasedTaskEntry.class));
+        workerGroupTaskDispatcher.start();
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            workerGroupTaskDispatcher.close();
+            verify(taskExecutorClient, times(2)).dispatch(taskExecutionRunnable);
+        });
+
     }
+
+    @Test
+    public void testDispatch_TaskStatusCheck() throws Exception {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+
+        workerGroupTaskDispatcher.add(taskExecutionRunnable, 0L);
+
+        workerGroupTaskDispatcher.start();
+        await().atMost(Duration.ofSeconds(1)).untilAsserted(() -> {
+            workerGroupTaskDispatcher.close();
+        });
+
+        verify(taskExecutorClient, times(0)).dispatch(taskExecutionRunnable);
+    }
+
+    @Test
+    public void testClose_QueueEmpty() throws Exception {
+        workerGroupTaskDispatcher.start();
+        workerGroupTaskDispatcher.close();
+        await().atMost(Duration.ofSeconds(1)).until(
+                () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.DELETE_SUCCESS));
+
+    }
+
+    @Test
+    public void testClose_QueueNotEmpty() throws Exception {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        workerGroupTaskDispatcher.add(taskExecutionRunnable, 1000);
+        workerGroupTaskDispatcher.start();
+        workerGroupTaskDispatcher.close();
+        assertEquals(DispatchWorkerStatus.DELETING, workerGroupTaskDispatcher.getStatus());
+    }
+
 }

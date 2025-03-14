@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGroupChangeNotifier.WorkerGroupListener {
 
-    private static final int SHUTDOWN_WAIT_TIME = 5;
+    private static final long CHECK_DELETE_DISPATCH_WORKER_PERIOD_SECONDS = 5;
 
     @Autowired
     private ITaskExecutorClient taskExecutorClient;
@@ -58,13 +58,11 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
 
     private final ScheduledExecutorService scheduler;
 
-    private boolean shutDownFlag;
-
     public WorkerGroupTaskDispatcherManager() {
         dispatchWorkerMap = new ConcurrentHashMap<>();
         scheduler = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
-        shutDownFlag = false;
-        scheduler.scheduleAtFixedRate(this::checkDeleteDispatchWorkerComplete, 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::checkDeleteDispatchWorkerComplete, 0,
+                CHECK_DELETE_DISPATCH_WORKER_PERIOD_SECONDS, TimeUnit.SECONDS);
     }
 
     @PostConstruct
@@ -122,8 +120,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      */
     @Override
     public void close() throws Exception {
-        log.info("WorkerGroupTaskDispatcherManager ready close...");
-        shutDownFlag = true;
+        log.info("WorkerGroupTaskDispatcherManager start close");
         for (Map.Entry<String, WorkerGroupTaskDispatcher> entry : dispatchWorkerMap.entrySet()) {
             try {
                 entry.getValue().close();
@@ -131,6 +128,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
                 log.error("stop worker group error", e);
             }
         }
+        log.info("WorkerGroupTaskDispatcherManager closed");
     }
 
     @Override
@@ -160,7 +158,6 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     }
 
     private void checkDeleteDispatchWorkerComplete() {
-        boolean complete = true;
         for (Map.Entry<String, WorkerGroupTaskDispatcher> entry : dispatchWorkerMap.entrySet()) {
             String workerGroup = entry.getKey();
             WorkerGroupTaskDispatcher workerGroupTaskDispatcher = entry.getValue();
@@ -171,7 +168,6 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
                     } catch (Exception e) {
                         log.error("stop worker group error", e);
                     }
-                    complete = false;
                     break;
                 case DELETE_SUCCESS:
                     try (WorkerGroupTaskDispatcher ignored = dispatchWorkerMap.remove(workerGroup)) {
@@ -181,31 +177,9 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
                     }
                     break;
                 default:
-                    complete = false;
                     log.debug("worker group {} status {}", workerGroup, workerGroupTaskDispatcher.getStatus());
                     break;
             }
         }
-        if (shutDownFlag && complete) {
-            this.shutdown();
-        }
     }
-
-    private void shutdown() {
-        log.info("WorkerGroupTaskDispatcherManager start close...");
-        dispatchWorkerMap.clear();
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(SHUTDOWN_WAIT_TIME, TimeUnit.SECONDS)) {
-                log.warn(
-                        "WorkerGroupTaskDispatcherManager did not terminate within SHUTDOWN_WAIT_TIME seconds, shutting down now");
-                scheduler.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        } catch (InterruptedException e) {
-            log.info("WorkerGroupTaskDispatcherManager error: ", e);
-        }
-        log.info("WorkerGroupTaskDispatcherManager closed");
-    }
-
 }
