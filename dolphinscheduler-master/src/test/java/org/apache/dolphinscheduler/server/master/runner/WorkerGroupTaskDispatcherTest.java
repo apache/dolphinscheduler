@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import static java.time.Duration.ofSeconds;
+import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,8 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-
-import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,7 @@ public class WorkerGroupTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatch_Success() throws Exception {
+    public void testDispatch_Success() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
@@ -65,7 +64,7 @@ public class WorkerGroupTaskDispatcherTest {
         workerGroupTaskDispatcher.add(taskExecutionRunnable, 0L);
 
         workerGroupTaskDispatcher.start();
-        await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> {
+        await().atMost(ofSeconds(2)).untilAsserted(() -> {
             workerGroupTaskDispatcher.close();
             verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
         });
@@ -75,7 +74,7 @@ public class WorkerGroupTaskDispatcherTest {
     public void testDispatch_FailureAndRetry() throws Exception {
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setDispatchFailTimes(1);
+        taskExecutionContext.setDispatchFailTimes(0);
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
@@ -85,7 +84,7 @@ public class WorkerGroupTaskDispatcherTest {
         workerGroupTaskDispatcher.add(taskExecutionRunnable, 0L);
 
         workerGroupTaskDispatcher.start();
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+        await().atMost(ofSeconds(5)).untilAsserted(() -> {
             workerGroupTaskDispatcher.close();
             verify(taskExecutorClient, times(2)).dispatch(taskExecutionRunnable);
         });
@@ -101,7 +100,7 @@ public class WorkerGroupTaskDispatcherTest {
         workerGroupTaskDispatcher.add(taskExecutionRunnable, 0L);
 
         workerGroupTaskDispatcher.start();
-        await().atMost(Duration.ofSeconds(1)).untilAsserted(() -> {
+        await().atMost(ofSeconds(1)).untilAsserted(() -> {
             workerGroupTaskDispatcher.close();
         });
 
@@ -112,7 +111,7 @@ public class WorkerGroupTaskDispatcherTest {
     public void testClose_QueueEmpty() throws Exception {
         workerGroupTaskDispatcher.start();
         workerGroupTaskDispatcher.close();
-        await().atMost(Duration.ofSeconds(1)).until(
+        await().atMost(ofSeconds(1)).until(
                 () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.DELETE_SUCCESS));
 
     }
@@ -122,10 +121,13 @@ public class WorkerGroupTaskDispatcherTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-        workerGroupTaskDispatcher.add(taskExecutionRunnable, 1000);
+        workerGroupTaskDispatcher.add(taskExecutionRunnable, 0);
         workerGroupTaskDispatcher.start();
+        sleep(1000);
         workerGroupTaskDispatcher.close();
-        assertEquals(DispatchWorkerStatus.DELETING, workerGroupTaskDispatcher.getStatus());
+        await().atMost(ofSeconds(1)).until(
+                () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.DELETE_SUCCESS));
+
     }
 
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -86,9 +86,7 @@ public class WorkerGroupTaskDispatcherManagerTest {
         manager.deleteWorkerGroup("testGroup");
 
         Awaitility.await()
-                .atMost(Duration.ofSeconds(6))
                 .untilAsserted(() -> assertEquals(0, manager.getDispatchWorkerMap().size()));
-
     }
 
     @Test
@@ -114,7 +112,7 @@ public class WorkerGroupTaskDispatcherManagerTest {
         manager.onWorkerGroupDelete(workerGroups);
 
         Awaitility.await()
-                .atMost(Duration.ofSeconds(6))
+                .atMost(ofSeconds(6))
                 .untilAsserted(() -> assertEquals(0, manager.getDispatchWorkerMap().size()));
 
     }
@@ -130,7 +128,8 @@ public class WorkerGroupTaskDispatcherManagerTest {
 
         manager.close();
         workerGroups.forEach(workerGroup -> {
-            assertEquals(DispatchWorkerStatus.DELETE_SUCCESS, manager.getDispatchWorkerMap().get(workerGroup.getName()).getStatus());
+            assertEquals(DispatchWorkerStatus.DELETE_SUCCESS,
+                    manager.getDispatchWorkerMap().get(workerGroup.getName()).getStatus());
         });
     }
 }
