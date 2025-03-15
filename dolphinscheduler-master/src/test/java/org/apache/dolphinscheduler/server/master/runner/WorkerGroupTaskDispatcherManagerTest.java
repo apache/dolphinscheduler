@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import static java.time.Duration.ofSeconds;
+import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -82,7 +83,7 @@ public class WorkerGroupTaskDispatcherManagerTest {
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         manager.add("testGroup", taskExecutionRunnable, 0);
-
+        sleep(1000);
         manager.deleteWorkerGroup("testGroup");
 
         Awaitility.await()
