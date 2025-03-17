@@ -43,6 +43,11 @@ public class WorkflowGraphCheckIfDAGTest {
         TaskDefinition taskDefinition = new TaskDefinition(1L, 1);
         taskDefinitions.add(taskDefinition);
 
+        WorkflowTaskRelation relation = new WorkflowTaskRelation();
+        relation.setPreTaskCode(0);
+        relation.setPostTaskCode(1);
+        workflowTaskRelations.add(relation);
+
         Assertions.assertDoesNotThrow(() -> new WorkflowGraph(workflowTaskRelations, taskDefinitions));
     }
 
