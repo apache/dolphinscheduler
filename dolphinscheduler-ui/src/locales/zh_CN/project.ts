@@ -894,7 +894,8 @@ export default {
     spark_submit_parameters: 'spark submit parameters',
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
-    is_production_tips: 'is production'
+    is_production_tips: 'is production',
+    json_format_tips: 'json参数不是一个正确的JSON格式'
   },
   menu: {
     fav: '收藏组件',
