@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class TimeBasedTaskExecutionRunnableComparableEntryTest {
 
     private static final long TEST_DELAY_MILLS = 1000L;
-    private String testData = "testData";
+    private final String testData = "testData";
     private TimeBasedTaskExecutionRunnableComparableEntry<String> entry;
 
     @BeforeEach
