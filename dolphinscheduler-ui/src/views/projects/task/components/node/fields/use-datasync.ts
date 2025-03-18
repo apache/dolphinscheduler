@@ -80,6 +80,10 @@ export function useDatasync(model: { [field: string]: any }): IJsonItem[] {
       name: 'cloudWatchLogGroupArn',
       span: cloudWatchLogGroupArnSpan
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
