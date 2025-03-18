@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -56,12 +55,10 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     @Getter
     private final ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap;
 
-    private final ScheduledExecutorService scheduler;
-
     public WorkerGroupTaskDispatcherManager() {
         dispatchWorkerMap = new ConcurrentHashMap<>();
-        scheduler = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
-        scheduler.scheduleAtFixedRate(this::checkDeleteDispatchWorkerComplete, 0,
+        MasterThreadFactory.getDefaultSchedulerThreadExecutor().scheduleAtFixedRate(
+                this::checkDeleteDispatchWorkerComplete, 0,
                 CHECK_DELETE_DISPATCH_WORKER_PERIOD_SECONDS, TimeUnit.SECONDS);
     }
 
@@ -162,14 +159,14 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
             String workerGroup = entry.getKey();
             WorkerGroupTaskDispatcher workerGroupTaskDispatcher = entry.getValue();
             switch (workerGroupTaskDispatcher.getStatus()) {
-                case DELETING:
+                case CLOSING:
                     try (WorkerGroupTaskDispatcher ignored = workerGroupTaskDispatcher) {
                         log.info("try to delete worker group {}", workerGroup);
                     } catch (Exception e) {
                         log.error("stop worker group error", e);
                     }
                     break;
-                case DELETE_SUCCESS:
+                case CLOSED:
                     try (WorkerGroupTaskDispatcher ignored = dispatchWorkerMap.remove(workerGroup)) {
                         log.info("success remove worker group {}", workerGroup);
                     } catch (Exception e) {

@@ -43,8 +43,8 @@ public class GlobalTaskDispatchWaitingQueue {
 
     private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
 
-    private final PriorityBlockingQueue<TimeBasedTaskExecutionRunnableComparableEntry> delayQueue =
-            new PriorityBlockingQueue<>();
+    private final DelayQueue<TimeBasedTaskExecutionRunnableComparableEntry> delayQueue =
+            new DelayQueue<>();
 
     /**
      * Submit a {@link ITaskExecutionRunnable} with delay time 0, it will be consumed immediately.
@@ -67,9 +67,9 @@ public class GlobalTaskDispatchWaitingQueue {
      */
     @SneakyThrows
     public ITaskExecutionRunnable takeTaskExecuteRunnable() {
-        ITaskExecutionRunnable taskExecutionRunnable = delayQueue.take().getData();
+        ITaskExecutionRunnable taskExecutionRunnable = (ITaskExecutionRunnable) delayQueue.take().getData();
         while (!markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
-            taskExecutionRunnable = delayQueue.take().getData();
+            taskExecutionRunnable = (ITaskExecutionRunnable) delayQueue.take().getData();
         }
         return taskExecutionRunnable;
     }

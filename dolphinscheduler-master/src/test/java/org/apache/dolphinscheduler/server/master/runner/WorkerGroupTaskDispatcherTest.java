@@ -112,7 +112,7 @@ public class WorkerGroupTaskDispatcherTest {
         workerGroupTaskDispatcher.start();
         workerGroupTaskDispatcher.close();
         await().atMost(ofSeconds(1)).until(
-                () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.DELETE_SUCCESS));
+                () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.CLOSED));
 
     }
 
@@ -126,7 +126,7 @@ public class WorkerGroupTaskDispatcherTest {
         sleep(1000);
         workerGroupTaskDispatcher.close();
         await().atMost(ofSeconds(1)).until(
-                () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.DELETE_SUCCESS));
+                () -> workerGroupTaskDispatcher.getStatus().equals(DispatchWorkerStatus.CLOSED));
 
     }
 

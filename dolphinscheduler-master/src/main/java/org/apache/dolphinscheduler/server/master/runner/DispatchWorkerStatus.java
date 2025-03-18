@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 public enum DispatchWorkerStatus {
-    DEFAULT,
-    DELETE_SUCCESS,
-    DELETING
+    STARTED,
+    CLOSING,
+    CLOSED
 }

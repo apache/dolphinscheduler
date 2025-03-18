@@ -19,51 +19,38 @@ package org.apache.dolphinscheduler.server.master.runner.queue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-
-import java.util.Objects;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 
 import org.jetbrains.annotations.NotNull;
 
-@Getter
-public class TimeBasedTaskExecutionRunnableComparableEntry
-        implements
-            Comparable<TimeBasedTaskExecutionRunnableComparableEntry> {
+public class TimeBasedTaskExecutionRunnableComparableEntry<V> implements Delayed {
 
-    private final long delayTimeMills;
+    private final long triggerTimeMills;
 
-    private final ITaskExecutionRunnable data;
-
-    public TimeBasedTaskExecutionRunnableComparableEntry(long delayTimeMills, ITaskExecutionRunnable data) {
-        this.delayTimeMills = delayTimeMills;
+    @Getter
+    private final V data;
+    public TimeBasedTaskExecutionRunnableComparableEntry(long delayTimeMills, V data) {
+        this.triggerTimeMills = System.currentTimeMillis() + delayTimeMills;
         this.data = checkNotNull(data, "data is null");
     }
 
     @Override
-    public int compareTo(@NotNull TimeBasedTaskExecutionRunnableComparableEntry other) {
-        int delayTimeCompareResult = Long.compare(delayTimeMills, other.delayTimeMills);
-        if (delayTimeCompareResult != 0) {
-            return delayTimeCompareResult;
+    public long getDelay(@NotNull TimeUnit unit) {
+        long remainTimeMills = triggerTimeMills - System.currentTimeMillis();
+        if (TimeUnit.MILLISECONDS.equals(unit)) {
+            return remainTimeMills;
         }
-        return data.compareTo(other.data);
+        return unit.convert(remainTimeMills, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+    public int compareTo(@NotNull Delayed delayed) {
+        if (this == delayed) {
+            return 0;
         }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        TimeBasedTaskExecutionRunnableComparableEntry that = (TimeBasedTaskExecutionRunnableComparableEntry) obj;
-        return delayTimeMills == that.delayTimeMills && Objects.equals(data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(delayTimeMills, data);
+        return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), delayed.getDelay(TimeUnit.MILLISECONDS));
     }
 }

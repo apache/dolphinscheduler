@@ -17,149 +17,72 @@
 
 package org.apache.dolphinscheduler.server.master.runner.queue;
 
+import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
-import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
-
-import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
 
 public class TimeBasedTaskExecutionRunnableComparableEntryTest {
 
-    private static final long DEFAULT_DELAY_TIME = 1000L;
-    private ITaskExecutionRunnable mockTaskExecutionRunnable;
-
-    private Date date = new Date();
+    private static final long TEST_DELAY_MILLS = 1000L;
+    private String testData = "testData";
+    private TimeBasedTaskExecutionRunnableComparableEntry<String> entry;
 
     @BeforeEach
     public void setUp() {
-        mockTaskExecutionRunnable = createTaskExecuteRunnable().getData();
-    }
-
-    private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable() {
-        return createTaskExecuteRunnable(Priority.MEDIUM);
-    }
-    private TimeBasedTaskExecutionRunnableComparableEntry createTaskExecuteRunnable(Priority workFlowInstancePriority) {
-
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setWorkflowInstancePriority(workFlowInstancePriority);
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setWorkerGroup("default");
-        taskInstance.setTaskInstancePriority(Priority.MEDIUM);
-        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-        taskInstance.setFirstSubmitTime(date);
-        taskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
-
-        final ApplicationContext applicationContext = mock(ApplicationContext.class);
-        when(applicationContext.getBean(TaskExecutionContextFactory.class))
-                .thenReturn(mock(TaskExecutionContextFactory.class));
-        final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder = TaskExecutionRunnableBuilder.builder()
-                .applicationContext(applicationContext)
-                .workflowInstance(workflowInstance)
-                .taskInstance(taskInstance)
-                .workflowExecutionGraph(new WorkflowExecutionGraph())
-                .workflowDefinition(new WorkflowDefinition())
-                .project(new Project())
-                .taskDefinition(new TaskDefinition())
-                .workflowEventBus(new WorkflowEventBus())
-                .build();
-        return new TimeBasedTaskExecutionRunnableComparableEntry(0,
-                new TaskExecutionRunnable(taskExecutionRunnableBuilder));
+        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
     }
 
     @Test
-    public void testConstructor_NullData_ThrowsException() {
-        assertThrows(NullPointerException.class,
-                () -> new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, null));
+    public void constructor_NullData_ThrowsNullPointerException() {
+        try {
+            new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, null);
+            fail("Expected NullPointerException to be thrown");
+        } catch (NullPointerException e) {
+            assertEquals("data is null", e.getMessage());
+        }
     }
 
     @Test
-    public void testCompareTo_DataDifferent_ReturnsNonZero() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME,
-                        createTaskExecuteRunnable(Priority.HIGH).getData());
-        int result = entry1.compareTo(entry2);
-        assertNotEquals(0, result);
+    public void getDelay_BeforeTriggerTime_ReturnsPositive() {
+        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        sleep(500L);
+        long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
+        assertTrue(remainTime > 0);
     }
 
     @Test
-    public void testCompareTo_DataSameDelayDifferent_ReturnsNegative() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 = new TimeBasedTaskExecutionRunnableComparableEntry(
-                DEFAULT_DELAY_TIME + 1, createTaskExecuteRunnable().getData());
-        int result = entry1.compareTo(entry2);
-        // entry1 should be greater priority than entry2
-        assertTrue(result < 0);
+    public void getDelay_AtTriggerTime_ReturnsZero() {
+        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        sleep(1000L);
+        long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
+        long tolerance = 100;
+        assertTrue(remainTime <= tolerance);
     }
 
     @Test
-    public void testCompareTo_DataSameDelaySame_ReturnsZero() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 = new TimeBasedTaskExecutionRunnableComparableEntry(
-                DEFAULT_DELAY_TIME, createTaskExecuteRunnable().getData());
-        int result = entry1.compareTo(entry2);
-        assertEquals(0, result);
+    public void getDelay_AfterTriggerTime_ReturnsNegative() {
+        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        sleep(1500L);
+        long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
+        assertTrue(remainTime < 0);
     }
 
     @Test
-    public void testEquals_SameObjects_ReturnsTrue() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        assertEquals(entry1, entry2);
+    public void getDelay_DifferentTimeUnits_ReturnsCorrectValues() {
+        long remainTimeMillis = entry.getDelay(TimeUnit.MILLISECONDS);
+        long remainTimeSeconds = entry.getDelay(TimeUnit.SECONDS);
+
+        assertTrue(remainTimeSeconds <= remainTimeMillis / 1000);
     }
 
     @Test
-    public void testEquals_DifferentObjects_ReturnsFalse() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 = new TimeBasedTaskExecutionRunnableComparableEntry(
-                DEFAULT_DELAY_TIME + 1, createTaskExecuteRunnable().getData());
-        assertNotEquals(entry1, entry2);
-    }
-
-    @Test
-    public void testHashCode_SameObjects_HashCodeEqual() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        assertEquals(entry1.hashCode(), entry2.hashCode());
-    }
-
-    @Test
-    public void testHashCode_DifferentObjects_HashCodeDifferent() {
-        TimeBasedTaskExecutionRunnableComparableEntry entry1 =
-                new TimeBasedTaskExecutionRunnableComparableEntry(DEFAULT_DELAY_TIME, mockTaskExecutionRunnable);
-        TimeBasedTaskExecutionRunnableComparableEntry entry2 = new TimeBasedTaskExecutionRunnableComparableEntry(
-                DEFAULT_DELAY_TIME + 1, createTaskExecuteRunnable().getData());
-        assertNotEquals(entry1.hashCode(), entry2.hashCode());
+    public void compareTo_SameObject_ReturnsZero() {
+        assertEquals(0, entry.compareTo(entry));
     }
 }

@@ -129,7 +129,7 @@ public class WorkerGroupTaskDispatcherManagerTest {
 
         manager.close();
         workerGroups.forEach(workerGroup -> {
-            assertEquals(DispatchWorkerStatus.DELETE_SUCCESS,
+            assertEquals(DispatchWorkerStatus.CLOSED,
                     manager.getDispatchWorkerMap().get(workerGroup.getName()).getStatus());
         });
     }

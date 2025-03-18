@@ -57,7 +57,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupQueue = new PriorityDelayQueue<>();
-        status = DispatchWorkerStatus.DEFAULT;
+        status = DispatchWorkerStatus.STARTED;
     }
 
     public void add(ITaskExecutionRunnable taskExecutionRunnable, long delayTimeMills) {
@@ -80,16 +80,20 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
     }
 
     @Override
-    public void close() throws Exception {
+    public synchronized void close() throws Exception {
+        this.markDispatcherDeleting();
+    }
+
+    private void markDispatcherDeleting() {
         if (workerGroupQueue.size() == 0) {
-            status = DispatchWorkerStatus.DELETE_SUCCESS;
+            status = DispatchWorkerStatus.CLOSED;
             if (RUNNING_FLAG.compareAndSet(true, false)) {
                 log.info("{} stopping...", this.getName());
                 log.info("{} stopped...", this.getName());
             }
         } else {
             log.warn("The {} queue is not empty, will not stop", this.getName());
-            status = DispatchWorkerStatus.DELETING;
+            status = DispatchWorkerStatus.CLOSING;
         }
     }
 
@@ -100,7 +104,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread implements AutoC
         }
     }
 
-    public void dispatch() {
+    private void dispatch() {
         PriorityAndDelayBasedTaskEntry taskEntry = workerGroupQueue.take();
         ITaskExecutionRunnable taskExecutionRunnable = (ITaskExecutionRunnable) taskEntry.getData();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();

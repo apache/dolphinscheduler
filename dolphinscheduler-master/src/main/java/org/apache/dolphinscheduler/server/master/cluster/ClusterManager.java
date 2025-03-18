@@ -49,8 +49,6 @@ public class ClusterManager {
     @Autowired
     private RegistryClient registryClient;
 
-    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
-
     public ClusterManager() {
         this.masterClusters = new MasterClusters();
         this.workerClusters = new WorkerClusters();
@@ -63,7 +61,7 @@ public class ClusterManager {
     }
 
     public void registerWorkerGroupListener(WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager) {
-        this.workerGroupTaskDispatcherManager = workerGroupTaskDispatcherManager;
+        this.workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerGroupTaskDispatcherManager);
     }
 
     /**
@@ -102,7 +100,6 @@ public class ClusterManager {
         this.registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
 
         this.workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
-        this.workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerGroupTaskDispatcherManager);
         this.workerGroupChangeNotifier.start();
     }
 
