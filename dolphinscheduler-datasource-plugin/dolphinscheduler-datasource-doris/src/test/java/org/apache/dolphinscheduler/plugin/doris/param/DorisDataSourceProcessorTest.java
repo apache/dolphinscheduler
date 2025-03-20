@@ -138,7 +138,7 @@ public class DorisDataSourceProcessorTest {
     }
 
     @Test
-    public void testSplitAndRemoveCommentWithComments() {
+    void testSplitAndRemoveCommentWithComments() {
         String sql = "-- This is a comment\r\n" +
                 "select *, udfTest(p1) from table1 -- This is a comment\r\n;" +
                 "/*Annotation test*/select * from table2/*Annotation test*/";
