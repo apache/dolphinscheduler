@@ -55,3 +55,9 @@ github:
         required_approving_review_count: 2
   features:
     discussions: true
+
+notifications:
+  commits: commits@dolphinscheduler.apache.org
+  issues: commits@dolphinscheduler.apache.org
+  pullrequests: commits@dolphinscheduler.apache.org
+  discussions: commits@dolphinscheduler.apache.org
