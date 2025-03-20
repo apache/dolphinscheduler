@@ -925,7 +925,7 @@ export default {
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
     is_production_tips: 'is production',
-    json_format_tips: 'json parameters is not a correct JSON format'
+    json_format_tips: 'Json parameters format is abnormal'
   },
   menu: {
     fav: 'Favorites',
