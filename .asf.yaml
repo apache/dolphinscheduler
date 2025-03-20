@@ -54,6 +54,13 @@ github:
         dismiss_stale_reviews: true
         required_approving_review_count: 2
   features:
+    # Enable issues management
+    issues: true
+    # Enable projects for project management boards
+    projects: false
+    # Enable wiki for documentation
+    wiki: false
+    # Enable discussions
     discussions: true
 
 notifications:
