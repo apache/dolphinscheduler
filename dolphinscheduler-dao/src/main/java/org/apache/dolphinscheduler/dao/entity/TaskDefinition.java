@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
@@ -121,11 +120,6 @@ public class TaskDefinition {
      * // todo: remove the flag field
      */
     private Flag flag;
-
-    /**
-     * task is cache: yes/no
-     */
-    private Flag isCache;
 
     /**
      * task priority
@@ -264,10 +258,6 @@ public class TaskDefinition {
         return taskParamMap;
     }
 
-    public String getDependence() {
-        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
-    }
-
     public Integer getCpuQuota() {
         return cpuQuota == null ? -1 : cpuQuota;
     }
@@ -291,7 +281,6 @@ public class TaskDefinition {
                 && Objects.equals(taskType, that.taskType)
                 && Objects.equals(taskParams, that.taskParams)
                 && flag == that.flag
-                && isCache == that.isCache
                 && taskPriority == that.taskPriority
                 && Objects.equals(workerGroup, that.workerGroup)
                 && timeoutFlag == that.timeoutFlag

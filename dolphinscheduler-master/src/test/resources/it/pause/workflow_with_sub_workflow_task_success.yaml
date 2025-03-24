@@ -29,7 +29,7 @@ workflows:
     code: 2
     version: 1
     projectCode: 1
-    description: This is a workflow with sub workflow task
+    description: This is a workflow with one sub workflow task
     releaseState: ONLINE
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
@@ -39,7 +39,7 @@ workflows:
     code: 1
     version: 1
     projectCode: 1
-    description: This is a workflow with a fake task
+    description: This is a workflow with two fake task
     releaseState: ONLINE
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00

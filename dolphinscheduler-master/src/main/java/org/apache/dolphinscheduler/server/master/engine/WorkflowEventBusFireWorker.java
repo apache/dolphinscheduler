@@ -78,7 +78,7 @@ public class WorkflowEventBusFireWorker {
         if (CollectionUtils.isEmpty(workflowExecutionRunnables)) {
             return;
         }
-        for (IWorkflowExecutionRunnable workflowExecutionRunnable : workflowExecutionRunnables) {
+        for (final IWorkflowExecutionRunnable workflowExecutionRunnable : workflowExecutionRunnables) {
             final Integer workflowInstanceId = workflowExecutionRunnable.getId();
             final String workflowInstanceName = workflowExecutionRunnable.getName();
             try {
@@ -90,6 +90,10 @@ public class WorkflowEventBusFireWorker {
                 LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
+    }
+
+    public int getRegisteredWorkflowExecuteRunnableSize() {
+        return registeredWorkflowExecuteRunnableMap.size();
     }
 
     private List<IWorkflowExecutionRunnable> getWaitingFireWorkflowExecutionRunnables() {

@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.master.engine;
 
 import org.apache.dolphinscheduler.server.master.engine.command.CommandEngine;
-import org.apache.dolphinscheduler.server.master.runner.MasterTaskExecutorBootstrap;
+import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskEngineDelegator;
+import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueueLooper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,26 +31,26 @@ import org.springframework.stereotype.Component;
 public class WorkflowEngine implements AutoCloseable {
 
     @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
-
-    @Autowired
     private WorkflowEventBusCoordinator workflowEventBusCoordinator;
-
-    @Autowired
-    private MasterTaskExecutorBootstrap masterTaskExecutorBootstrap;
 
     @Autowired
     private CommandEngine commandEngine;
 
+    @Autowired
+    private GlobalTaskDispatchWaitingQueueLooper globalTaskDispatchWaitingQueueLooper;
+
+    @Autowired
+    private LogicTaskEngineDelegator logicTaskEngineDelegator;
+
     public void start() {
-
-        taskGroupCoordinator.start();
-
-        masterTaskExecutorBootstrap.start();
 
         workflowEventBusCoordinator.start();
 
         commandEngine.start();
+
+        globalTaskDispatchWaitingQueueLooper.start();
+
+        logicTaskEngineDelegator.start();
 
         log.info("WorkflowEngine started");
     }
@@ -57,10 +58,10 @@ public class WorkflowEngine implements AutoCloseable {
     @Override
     public void close() throws Exception {
         try (
-                final CommandEngine commandEngine1 = commandEngine;
-                final WorkflowEventBusCoordinator workflowEventBusCoordinator1 = workflowEventBusCoordinator;
-                final MasterTaskExecutorBootstrap masterTaskExecutorBootstrap1 = masterTaskExecutorBootstrap;
-                final TaskGroupCoordinator taskGroupCoordinator1 = taskGroupCoordinator) {
+                final CommandEngine ignore1 = commandEngine;
+                final WorkflowEventBusCoordinator ignore2 = workflowEventBusCoordinator;
+                final GlobalTaskDispatchWaitingQueueLooper ignore3 = globalTaskDispatchWaitingQueueLooper;
+                final LogicTaskEngineDelegator ignore5 = logicTaskEngineDelegator) {
             // closed the resource
         }
     }

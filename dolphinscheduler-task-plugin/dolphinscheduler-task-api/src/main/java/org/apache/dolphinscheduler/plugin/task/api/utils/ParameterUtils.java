@@ -49,8 +49,6 @@ public class ParameterUtils {
 
     private static final Pattern DATE_PARSE_PATTERN = Pattern.compile("\\$\\[([^\\$\\]]+)]");
 
-    private static final Pattern DATE_START_PATTERN = Pattern.compile("^[0-9]");
-
     private static final char PARAM_REPLACE_CHAR = '?';
 
     private ParameterUtils() {
@@ -288,21 +286,24 @@ public class ParameterUtils {
         return map;
     }
 
-    private static String dateTemplateParse(String templateStr, Date date) {
-        if (templateStr == null) {
-            return null;
+    // Replace the time placeholder in the template string with the given actual time value
+    // If the templateStr does not contain a time placeholder, will return the original string
+    private static String dateTemplateParse(final String templateStr, final Date date) {
+        if (StringUtils.isEmpty(templateStr)) {
+            return templateStr;
         }
 
-        StringBuffer newValue = new StringBuffer(templateStr.length());
+        final StringBuffer newValue = new StringBuffer(templateStr.length());
 
-        Matcher matcher = DATE_PARSE_PATTERN.matcher(templateStr);
+        final Matcher matcher = DATE_PARSE_PATTERN.matcher(templateStr);
 
         while (matcher.find()) {
-            String key = matcher.group(1);
-            if (DATE_START_PATTERN.matcher(key).matches()) {
+            final String key = matcher.group(1);
+            String value = TimePlaceholderUtils.formatTimeExpression(key, date, true);
+            if (StringUtils.equals(key, value)) {
+                // There is no corresponding time format, so the original string is retained
                 continue;
             }
-            String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);
             matcher.appendReplacement(newValue, value);
         }
 

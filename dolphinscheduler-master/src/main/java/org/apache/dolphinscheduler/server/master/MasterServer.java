@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterStateMonitors;
+import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEngine;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBusFireWorker;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMaste
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
+import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -94,6 +96,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private SystemEventBusFireWorker systemEventBusFireWorker;
 
+    @Autowired
+    private MasterCoordinator masterCoordinator;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -120,6 +125,8 @@ public class MasterServer implements IStoppable {
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
+
+        this.masterCoordinator.start();
 
         this.clusterManager.start();
         this.clusterStateMonitors.start();
@@ -166,17 +173,19 @@ public class MasterServer implements IStoppable {
         }
         // thread sleep 3 seconds for thread quietly stop
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
+        MasterThreadFactory.getDefaultSchedulerThreadExecutor().shutdownNow();
         try (
                 SystemEventBusFireWorker systemEventBusFireWorker1 = systemEventBusFireWorker;
                 WorkflowEngine workflowEngine1 = workflowEngine;
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterRpcServer closedRpcServer = masterRPCServer;
+                MasterCoordinator closeMasterCoordinator = masterCoordinator;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext) {
 
-            log.info("Master server is stopping, current cause : {}", cause);
+            log.info("MasterServer is stopping, current cause : {}", cause);
         } catch (Exception e) {
             log.error("MasterServer stop failed, current cause: {}", cause, e);
             return;

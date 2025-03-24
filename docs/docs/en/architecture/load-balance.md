@@ -46,15 +46,7 @@ Each worker has two weights parameters, weight (which remains constant after war
 
 ### Linear Weighting (Default Algorithm)
 
-This algorithm reports its own load information to the registry at regular intervals. Make decision on two main pieces of information:
-
-- load average (default is the number of CPU cores * 2)
-- available physical memory (default is 0.3, in G)
+This algorithm reports its own load information to the registry at regular intervals. We mainly judge by CPU usage, memory usage and worker slot usage.
 
 If either of these is lower than the configured item, then this worker will not participate in the load. (no traffic will be allocated)
-
-You can customise the configuration by changing the following properties in worker.properties
-
-- worker.max.cpu.load.avg=-1 (worker max cpu load avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2)
-- worker.reserved.memory=0.3 (worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is percentage)
 

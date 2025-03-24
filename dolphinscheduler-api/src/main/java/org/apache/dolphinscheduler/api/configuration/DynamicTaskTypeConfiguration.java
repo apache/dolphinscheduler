@@ -45,13 +45,12 @@ public class DynamicTaskTypeConfiguration {
 
     private static final List<String> defaultTaskCategories =
             Arrays.asList(Constants.TYPE_UNIVERSAL, Constants.TYPE_DATA_INTEGRATION, Constants.TYPE_CLOUD,
-                    Constants.TYPE_LOGIC, Constants.TYPE_DATA_QUALITY, Constants.TYPE_OTHER,
+                    Constants.TYPE_LOGIC, Constants.TYPE_OTHER,
                     Constants.TYPE_MACHINE_LEARNING);
     private List<DynamicTaskInfo> universal;
     private List<DynamicTaskInfo> cloud;
     private List<DynamicTaskInfo> logic;
     private List<DynamicTaskInfo> dataIntegration;
-    private List<DynamicTaskInfo> dataQuality;
     private List<DynamicTaskInfo> other;
     private List<DynamicTaskInfo> machineLearning;
 
@@ -69,8 +68,6 @@ public class DynamicTaskTypeConfiguration {
                 return logic;
             case Constants.TYPE_LOGIC:
                 return dataIntegration;
-            case Constants.TYPE_DATA_QUALITY:
-                return dataQuality;
             case Constants.TYPE_OTHER:
                 return other;
             case Constants.TYPE_MACHINE_LEARNING:
@@ -86,7 +83,6 @@ public class DynamicTaskTypeConfiguration {
         log.info("support default cloud dynamic task types: {}", cloud);
         log.info("support default logic dynamic task types: {}", logic);
         log.info("support default dataIntegration dynamic task types: {}", dataIntegration);
-        log.info("support default dataQuality dynamic task types: {}", dataQuality);
         log.info("support default machineLearning dynamic task types: {}", machineLearning);
         log.info("support default other dynamic task types: {}", other);
     }

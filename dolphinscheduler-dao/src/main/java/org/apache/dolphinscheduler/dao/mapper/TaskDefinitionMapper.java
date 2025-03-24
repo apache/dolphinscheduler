@@ -30,9 +30,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * task definition mapper interface
- */
 public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
 
     /**
@@ -61,7 +58,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param projectCode projectCode
      * @return task definition list
      */
-    List<TaskDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
+    List<String> queryAllTaskDefinitionWorkerGroups(@Param("projectCode") long projectCode);
 
     /**
      * count task definition group by user

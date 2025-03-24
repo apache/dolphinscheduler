@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -100,15 +99,6 @@ public interface TaskInstanceService {
      * @return the result code and msg
      */
     TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId);
-
-    /**
-     * remove task instance cache
-     * @param loginUser
-     * @param projectCode
-     * @param taskInstanceId
-     * @return
-     */
-    TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode, Integer taskInstanceId);
 
     void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 }

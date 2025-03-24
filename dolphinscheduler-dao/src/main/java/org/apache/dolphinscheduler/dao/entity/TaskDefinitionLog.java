@@ -19,11 +19,14 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * task definition log
  */
+@Data
 @TableName("t_ds_task_definition_log")
 public class TaskDefinitionLog extends TaskDefinition {
 
@@ -69,27 +72,12 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setFailRetryInterval(taskDefinition.getFailRetryInterval());
         this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
         this.setFlag(taskDefinition.getFlag());
-        this.setIsCache(taskDefinition.getIsCache());
         this.setModifyBy(taskDefinition.getModifyBy());
+        this.setTaskGroupId(taskDefinition.getTaskGroupId());
+        this.setTaskGroupPriority(taskDefinition.getTaskGroupPriority());
         this.setCpuQuota(taskDefinition.getCpuQuota());
         this.setMemoryMax(taskDefinition.getMemoryMax());
         this.setTaskExecuteType(taskDefinition.getTaskExecuteType());
-    }
-
-    public int getOperator() {
-        return operator;
-    }
-
-    public void setOperator(int operator) {
-        this.operator = operator;
-    }
-
-    public Date getOperateTime() {
-        return operateTime;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
     }
 
     @Override

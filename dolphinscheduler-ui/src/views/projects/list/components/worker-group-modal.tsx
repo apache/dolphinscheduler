@@ -72,6 +72,7 @@ const WorkerGroupModal = defineComponent({
     return (
       <Modal
         title={t('project.list.assign_worker_group')}
+        class={'assign-worker-group-modal'}
         show={this.showModalRef}
         onConfirm={this.confirmModal}
         onCancel={this.cancelModal}

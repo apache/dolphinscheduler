@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.utils.MapComparator;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Use to watch the worker group from database and notify the change.
@@ -43,20 +44,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkerGroupChangeNotifier {
 
-    private static final long DEFAULT_REFRESH_WORKER_INTERVAL = Duration.ofMinutes(1).toMillis();
+    private final MasterConfig masterConfig;
+
+    private final TransactionTemplate transactionTemplate;
 
     private final WorkerGroupDao workerGroupDao;
+
     private final List<WorkerGroupListener> listeners = new CopyOnWriteArrayList<>();
 
     private Map<String, WorkerGroup> workerGroupMap = new HashMap<>();
 
-    public WorkerGroupChangeNotifier(WorkerGroupDao workerGroupDao) {
+    public WorkerGroupChangeNotifier(final MasterConfig masterConfig,
+                                     final WorkerGroupDao workerGroupDao,
+                                     final TransactionTemplate transactionTemplate) {
+        this.masterConfig = masterConfig;
         this.workerGroupDao = workerGroupDao;
+        this.transactionTemplate = transactionTemplate;
+    }
+
+    public void start() {
         detectWorkerGroupChanges();
+        final long workerGroupRefreshIntervalSeconds = masterConfig.getWorkerGroupRefreshInterval().getSeconds();
         MasterThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
                 this::detectWorkerGroupChanges,
-                DEFAULT_REFRESH_WORKER_INTERVAL,
-                DEFAULT_REFRESH_WORKER_INTERVAL,
+                workerGroupRefreshIntervalSeconds,
+                workerGroupRefreshIntervalSeconds,
                 TimeUnit.SECONDS);
     }
 
@@ -64,9 +76,9 @@ public class WorkerGroupChangeNotifier {
         listeners.add(listener);
     }
 
-    void detectWorkerGroupChanges() {
+    public synchronized void detectWorkerGroupChanges() {
         try {
-            MapComparator<String, WorkerGroup> mapComparator = detectChangedWorkerGroups();
+            final MapComparator<String, WorkerGroup> mapComparator = detectChangedWorkerGroups();
             triggerListeners(mapComparator);
             workerGroupMap = mapComparator.getNewMap();
         } catch (Exception ex) {
@@ -79,10 +91,15 @@ public class WorkerGroupChangeNotifier {
     }
 
     private MapComparator<String, WorkerGroup> detectChangedWorkerGroups() {
-        final Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
-                .stream()
-                .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
-        return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
+        // We use transaction here to ensure that if mysql is configured at master/slave mode, this query will be routed
+        // to the master db.
+        // Avoid we query from the slave and find the data is not the latest.
+        return transactionTemplate.execute(status -> {
+            Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
+                    .stream()
+                    .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
+            return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
+        });
     }
 
     private void triggerListeners(MapComparator<String, WorkerGroup> mapComparator) {

@@ -107,10 +107,10 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testQueryAllDefinitionList() {
+    public void testQueryAllTaskDefinitionWorkerGroups() {
         TaskDefinition taskDefinition = insertOne();
-        List<TaskDefinition> taskDefinitions =
-                taskDefinitionMapper.queryAllDefinitionList(taskDefinition.getProjectCode());
+        List<String> taskDefinitions =
+                taskDefinitionMapper.queryAllTaskDefinitionWorkerGroups(taskDefinition.getProjectCode());
         Assertions.assertNotEquals(0, taskDefinitions.size());
 
     }

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.FailoverTaskInstanceFactory.FailoverTaskInstanceBuilder;
 
 import java.util.Date;
@@ -34,6 +35,9 @@ public class FailoverTaskInstanceFactory extends AbstractTaskInstanceFactory<Fai
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private ITaskGroupCoordinator taskGroupCoordinator;
 
     @Override
     public FailoverTaskInstanceFactory.FailoverTaskInstanceBuilder builder() {
@@ -53,6 +57,10 @@ public class FailoverTaskInstanceFactory extends AbstractTaskInstanceFactory<Fai
         taskInstance.setLogPath(null);
         taskInstance.setExecutePath(null);
         taskInstanceDao.insert(taskInstance);
+
+        if (taskGroupCoordinator.needToReleaseTaskGroupSlot(needFailoverTaskInstance)) {
+            taskGroupCoordinator.releaseTaskGroupSlot(needFailoverTaskInstance);
+        }
 
         needFailoverTaskInstance.setFlag(Flag.NO);
         needFailoverTaskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);

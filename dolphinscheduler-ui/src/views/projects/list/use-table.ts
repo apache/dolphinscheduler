@@ -182,7 +182,7 @@ export function useTable() {
                           circle: true,
                           type: 'info',
                           size: 'small',
-                          class: 'edit',
+                          class: 'assign-worker-group-btn',
                           onClick: () => {
                             handleAssign(row)
                           }

@@ -126,6 +126,7 @@ public class ResourceTreeVisitor implements Visitor {
         tempResourceComponent.setName(resource.getFileName());
         tempResourceComponent.setFullName(resource.getFullName());
         tempResourceComponent.setType(resource.getType());
+        tempResourceComponent.setCurrentDir(resource.getRelativePath());
         return tempResourceComponent;
     }
 

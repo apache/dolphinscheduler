@@ -24,7 +24,7 @@ public class TaskGroupUtils {
     /**
      * Check if the task instance is using task group
      */
-    public static boolean isUsingTaskGroup(TaskInstance taskInstance) {
+    public static boolean isUsingTaskGroup(final TaskInstance taskInstance) {
         return taskInstance.getTaskGroupId() > 0;
     }
 

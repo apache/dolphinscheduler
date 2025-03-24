@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +68,10 @@ public class RegistryClient {
         if (!registry.exists(RegistryNodeType.ALERT_SERVER.getRegistryPath())) {
             registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
         }
+        if (!registry.exists(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath())) {
+            registry.put(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath(), EMPTY, false);
+        }
+        cleanHistoryFailoverFinishedNodes();
     }
 
     public boolean isConnected() {
@@ -120,9 +125,9 @@ public class RegistryClient {
                     log.warn("unknown registry node type: {}", registryNodeType);
             }
 
-            server.setResInfo(heartBeatJson);
+            server.setHeartBeatInfo(heartBeatJson);
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
-            server.setZkDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
+            server.setServerDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
             serverList.add(server);
         }
         return serverList;
@@ -166,6 +171,11 @@ public class RegistryClient {
 
     public void persistEphemeral(String key, String value) {
         registry.put(key, value, true);
+    }
+
+    public void persist(String key, String value) {
+        log.info("persist key: {}, value: {}", key, value);
+        registry.put(key, value, false);
     }
 
     public void remove(String key) {
@@ -221,5 +231,28 @@ public class RegistryClient {
 
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {
         return getChildrenKeys(nodeType.getRegistryPath());
+    }
+
+    private void cleanHistoryFailoverFinishedNodes() {
+        // Clean the history failover finished nodes
+        // which failover is before the current time minus 1 week
+        final Collection<String> failoverFinishedNodes =
+                registry.children(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath());
+        if (CollectionUtils.isEmpty(failoverFinishedNodes)) {
+            return;
+        }
+        for (final String failoverFinishedNode : failoverFinishedNodes) {
+            try {
+                final String failoverFinishTime = registry.get(failoverFinishedNode);
+                if (System.currentTimeMillis() - Long.parseLong(failoverFinishTime) > TimeUnit.DAYS.toMillis(7)) {
+                    registry.delete(failoverFinishedNode);
+                    log.info(
+                            "Clear the failover finished node: {} which failover time is before the current time minus 1 week",
+                            failoverFinishedNode);
+                }
+            } catch (Exception ex) {
+                log.error("Failed to clean the failoverFinishedNode: {}", failoverFinishedNode, ex);
+            }
+        }
     }
 }

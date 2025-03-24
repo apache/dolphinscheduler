@@ -274,8 +274,6 @@ public enum Status {
     NOT_SUPPORT_SSO(10211, "Not support SSO login.", "不支持SSO登录"),
     STATE_CODE_ERROR(10212, "state inconsistency or state and code not pair", "状态码前后不一致或状态码和code不匹配"),
 
-    TASK_INSTANCE_NOT_DYNAMIC_TASK(10213, "task instance {0} is not dynamic", "任务实例[{0}]不是Dynamic类型"),
-
     CREATE_PROJECT_PARAMETER_ERROR(10214, "create project parameter error", "创建项目参数错误"),
 
     UPDATE_PROJECT_PARAMETER_ERROR(10215, "update project parameter error", "更新项目参数错误"),
@@ -315,8 +313,6 @@ public enum Status {
     RESOURCE_IS_AUTHORIZED(20017, "resource is authorized to user {0},suffix not allowed to be modified",
             "资源文件已授权其他用户[{0}],后缀不允许修改"),
     RESOURCE_HAS_FOLDER(20018, "There are files or folders in the current directory:{0}", "当前目录下有文件或文件夹[{0}]"),
-
-    REMOVE_TASK_INSTANCE_CACHE_ERROR(20019, "remove task instance cache error", "删除任务实例缓存错误"),
 
     ILLEGAL_RESOURCE_PATH(20020, "Resource file [{0}] is illegal", "非法的资源路径[{0}]"),
 
@@ -485,12 +481,6 @@ public enum Status {
     QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment code [{0}] ", "查询环境编码[{0}]不存在"),
     QUERY_ENVIRONMENT_ERROR(1200010, "login user query environment error", "分页查询环境列表错误"),
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
-    GET_RULE_FORM_CREATE_JSON_ERROR(1200012, "get rule form create json error", "获取规则 FROM-CREATE-JSON 错误"),
-    QUERY_RULE_LIST_PAGING_ERROR(1200013, "query rule list paging error", "获取规则分页列表错误"),
-    QUERY_RULE_LIST_ERROR(1200014, "query rule list error", "获取规则列表错误"),
-    QUERY_RULE_INPUT_ENTRY_LIST_ERROR(1200015, "query rule list error", "获取规则列表错误"),
-    QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(1200016, "query execute result list paging error", "获取数据质量任务结果分页错误"),
-    GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
     GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
     GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
     GET_DATASOURCE_DATABASES_ERROR(1200035, "get datasource databases error", "获取数据库列表错误"),
@@ -528,7 +518,6 @@ public enum Status {
     CLOSE_TASK_GROUP_ERROR(130011, "close task group error", "关闭任务组错误"),
     START_TASK_GROUP_ERROR(130012, "start task group error", "启动任务组错误"),
     QUERY_TASK_GROUP_QUEUE_LIST_ERROR(130013, "query task group queue list error", "查询任务组队列列表错误"),
-    TASK_GROUP_CACHE_START_FAILED(130014, "cache start failed", "任务组相关的缓存启动失败"),
     ENVIRONMENT_WORKER_GROUPS_IS_INVALID(130015, "environment worker groups is invalid format", "环境关联的工作组参数解析错误"),
     UPDATE_ENVIRONMENT_WORKER_GROUP_RELATION_ERROR(130016,
             "You can't modify the worker group, because the worker group [{0}] and this environment [{1}] already be used in the task [{2}]",

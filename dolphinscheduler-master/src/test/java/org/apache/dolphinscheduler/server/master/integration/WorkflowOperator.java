@@ -95,6 +95,12 @@ public class WorkflowOperator {
         schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
     }
 
+    public void unSchedulingWorkflow(final WorkflowSchedulingDTO workflowSchedulingDTO) {
+        final Project project = workflowSchedulingDTO.getProject();
+        final Schedule schedule = workflowSchedulingDTO.getSchedule();
+        schedulerApi.deleteScheduleTask(project.getId(), schedule.getId());
+    }
+
     public void repeatRunningWorkflowInstance(final Integer workflowInstanceId) {
         final WorkflowInstanceRepeatRunningRequest repeatRunningRequest = WorkflowInstanceRepeatRunningRequest.builder()
                 .workflowInstanceId(workflowInstanceId)

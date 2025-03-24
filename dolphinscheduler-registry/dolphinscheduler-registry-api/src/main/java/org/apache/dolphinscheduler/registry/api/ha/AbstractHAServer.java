@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.registry.api.ha;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,38 +35,54 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final Registry registry;
 
-    private final String serverPath;
+    private final String selectorPath;
+
+    private final String serverIdentify;
 
     private ServerStatus serverStatus;
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
-    public AbstractHAServer(Registry registry, String serverPath) {
+    private static final long DEFAULT_RETRY_INTERVAL = 5_000;
+
+    private static final int DEFAULT_MAX_RETRY_TIMES = 20;
+
+    public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
-        this.serverPath = serverPath;
+        this.selectorPath = checkNotNull(selectorPath);
+        this.serverIdentify = checkNotNull(serverIdentify);
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }
 
     @Override
     public void start() {
-        registry.subscribe(serverPath, event -> {
-            if (Event.Type.REMOVE.equals(event.type())) {
-                if (isActive() && !participateElection()) {
-                    statusChange(ServerStatus.STAND_BY);
+        registry.subscribe(selectorPath, new SubscribeListener() {
+
+            @Override
+            public void notify(Event event) {
+                if (Event.Type.REMOVE.equals(event.getType())) {
+                    if (serverIdentify.equals(event.getEventData())) {
+                        statusChange(ServerStatus.STAND_BY);
+                    } else {
+                        if (participateElection()) {
+                            statusChange(ServerStatus.ACTIVE);
+                        }
+                    }
                 }
             }
+
+            @Override
+            public SubscribeScope getSubscribeScope() {
+                return SubscribeScope.PATH_ONLY;
+            }
         });
-        ScheduledExecutorService electionSelectionThread =
-                ThreadUtils.newSingleDaemonScheduledExecutorService("election-selection-thread");
-        electionSelectionThread.schedule(() -> {
-            if (isActive()) {
-                return;
-            }
-            if (participateElection()) {
-                statusChange(ServerStatus.ACTIVE);
-            }
-        }, 10, TimeUnit.SECONDS);
+
+        if (participateElection()) {
+            statusChange(ServerStatus.ACTIVE);
+        } else {
+            log.info("Server {} is standby", serverIdentify);
+        }
     }
 
     @Override
@@ -75,7 +92,31 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public boolean participateElection() {
-        return registry.acquireLock(serverPath, 3_000);
+        final String electionLock = selectorPath + "-lock";
+        // If meet exception during participate election, will retry.
+        // This can avoid the situation that the server is not elected as leader due to network jitter.
+        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES; i++) {
+            try {
+                try {
+                    if (registry.acquireLock(electionLock)) {
+                        if (!registry.exists(selectorPath)) {
+                            registry.put(selectorPath, serverIdentify, true);
+                            return true;
+                        }
+                        return serverIdentify.equals(registry.get(selectorPath));
+                    }
+                    return false;
+                } finally {
+                    registry.releaseLock(electionLock);
+                }
+            } catch (Exception e) {
+                log.error("Participate election error, meet an exception, will retry after {}ms",
+                        DEFAULT_RETRY_INTERVAL, e);
+                ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
+            }
+        }
+        throw new IllegalStateException(
+                "Participate election failed after retry " + DEFAULT_MAX_RETRY_TIMES + " times");
     }
 
     @Override
@@ -88,18 +129,15 @@ public abstract class AbstractHAServer implements HAServer {
         return serverStatus;
     }
 
-    @Override
-    public void shutdown() {
-        if (isActive()) {
-            registry.releaseLock(serverPath);
-        }
-    }
-
     private void statusChange(ServerStatus targetStatus) {
+        final ServerStatus originStatus = serverStatus;
+        serverStatus = targetStatus;
         synchronized (this) {
-            ServerStatus originStatus = serverStatus;
-            serverStatus = targetStatus;
-            serverStatusChangeListeners.forEach(listener -> listener.change(originStatus, serverStatus));
+            try {
+                serverStatusChangeListeners.forEach(listener -> listener.change(originStatus, serverStatus));
+            } catch (Exception ex) {
+                log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
+            }
         }
     }
 }

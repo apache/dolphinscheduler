@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import { NGrid, NGi, NCard, NNumberAnimation, NSpace, NTag } from 'naive-ui'
+import { NGrid, NGi, NCard, NSpace, NTag } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useServerNode } from './use-server-node'
 import styles from './index.module.scss'
@@ -64,7 +64,7 @@ const alertServer = defineComponent({
       this
 
     const renderNodeServerStatusTag = (item: AlertNode) => {
-      const serverStatus = JSON.parse(item.resInfo)?.serverStatus
+      const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
 
       if (!serverStatus) return ''
 
@@ -103,7 +103,7 @@ const alertServer = defineComponent({
                       }`}</span>
                       <span
                         class={styles['link-btn']}
-                        onClick={() => clickDetails(item.zkDirectory)}
+                        onClick={() => clickDetails(item.serverDirectory)}
                       >
                         {t('monitor.master.directory_detail')}
                       </span>
@@ -125,7 +125,7 @@ const alertServer = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).cpuUsage * 100
+                              JSON.parse(item.heartBeatInfo).cpuUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -138,7 +138,7 @@ const alertServer = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).memoryUsage * 100
+                              JSON.parse(item.heartBeatInfo).memoryUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -146,26 +146,13 @@ const alertServer = defineComponent({
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.master.disk_available')}>
-                      <div class={[styles.card, styles['load-average']]}>
+                    <Card title={t('monitor.master.disk_usage')}>
+                      <div class={[styles.card]}>
                         {item && (
-                          <NNumberAnimation
-                            precision={2}
-                            from={0}
-                            to={JSON.parse(item.resInfo).diskAvailable}
-                          />
-                        )}
-                      </div>
-                    </Card>
-                  </NGi>
-                  <NGi>
-                    <Card title={t('monitor.master.load_average')}>
-                      <div class={[styles.card, styles['load-average']]}>
-                        {item && (
-                          <NNumberAnimation
-                            precision={2}
-                            from={0}
-                            to={JSON.parse(item.resInfo).loadAverage}
+                          <Gauge
+                            data={(
+                              JSON.parse(item.heartBeatInfo).diskUsage * 100
+                            ).toFixed(2)}
                           />
                         )}
                       </div>

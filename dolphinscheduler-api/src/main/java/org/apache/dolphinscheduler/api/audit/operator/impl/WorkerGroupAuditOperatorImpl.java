@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 public class WorkerGroupAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private WorkerGroupMapper workerGroupMapper;
+    private WorkerGroupDao workerGroupDao;
 
     @Override
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
@@ -54,7 +54,7 @@ public class WorkerGroupAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        WorkerGroup obj = workerGroupMapper.selectById(objId);
+        WorkerGroup obj = workerGroupDao.queryById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

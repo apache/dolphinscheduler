@@ -82,20 +82,20 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
 
   const CYCLE_LIST = [
     {
-      value: 'month',
-      label: t('project.node.month')
-    },
-    {
-      value: 'week',
-      label: t('project.node.week')
-    },
-    {
       value: 'day',
       label: t('project.node.day')
     },
     {
       value: 'hour',
       label: t('project.node.hour')
+    },
+    {
+      value: 'week',
+      label: t('project.node.week')
+    },
+    {
+      value: 'month',
+      label: t('project.node.month')
     }
   ]
   const DATE_LIST = {
@@ -251,16 +251,23 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   const renderState = (item: {
     definitionCode: number
     depTaskCode: number
-    cycle: string
+    projectCode: number
     dateValue: string
   }) => {
     if (!item || router.currentRoute.value.name !== 'workflow-instance-detail')
       return null
-    const key = `${item.definitionCode}-${item.depTaskCode}-${item.cycle}-${item.dateValue}`
+    const key = `${item.projectCode}-${item.definitionCode}-${item.depTaskCode}-${item.dateValue}`
     const state: ITaskState = dependentResult[key]
-    return h(NIcon, { size: 24, color: TasksStateConfig[state]?.color }, () =>
-      h(TasksStateConfig[state]?.icon)
-    )
+    let icon: any
+    let color: string
+    if (state) {
+      icon = TasksStateConfig[state]?.icon
+      color = TasksStateConfig[state]?.color
+    } else {
+      icon = TasksStateConfig.RUNNING_EXECUTION.icon
+      color = TasksStateConfig.RUNNING_EXECUTION.color
+    }
+    return h(NIcon, { size: 24, color: color }, () => h(icon))
   }
 
   onMounted(() => {
@@ -449,6 +456,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               }
             },
             options: CYCLE_LIST,
+            value: CYCLE_LIST.length > 0 ? CYCLE_LIST[0].value : '',
             path: `dependTaskList.${i}.dependItemList.${j}.cycle`,
             rule: {
               required: true,
@@ -466,7 +474,9 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 10,
             name: ' ',
             options:
-              selectOptions.value[i]?.dependItemList[j]?.dateOptions || [],
+              selectOptions.value[i]?.dependItemList[j]?.dateOptions ||
+              DATE_LIST.day,
+            value: DATE_LIST.day[0].value,
             path: `dependTaskList.${i}.dependItemList.${j}.dateValue`,
             rule: {
               trigger: ['input', 'blur'],
@@ -478,18 +488,18 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             }
           }),
           (j = 0) => ({
-            type: 'switch',
-            field: 'parameterPassing',
-            span: 20,
-            name: t('project.node.dependent_task_parameter_passing'),
-            path: `dependTaskList.${i}.dependItemList.${j}.parameterPassing`
-          }),
-          (j = 0) => ({
             type: 'custom',
             field: 'state',
             span: 2,
             name: ' ',
             widget: renderState(model.dependTaskList[i]?.dependItemList[j])
+          }),
+          (j = 0) => ({
+            type: 'switch',
+            field: 'parameterPassing',
+            span: 20,
+            name: t('project.node.dependent_task_parameter_passing'),
+            path: `dependTaskList.${i}.dependItemList.${j}.parameterPassing`
           })
         ]
       }),

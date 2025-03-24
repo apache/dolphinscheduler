@@ -30,7 +30,7 @@ public class SqoopTaskTest {
                 "sqoop import -D mapred.job.name=sqoop_task -m 1 --connect \"jdbc:mysql://localhost:3306/defuault\" --username root --password \"mypassword\" --table student --target-dir /sqoop_test --as-textfile";
 
         final String maskScript =
-                "sqoop import -D mapred.job.name=sqoop_task -m 1 --connect \"jdbc:mysql://localhost:3306/defuault\" --username root --password \"**********\" --table student --target-dir /sqoop_test --as-textfile";
+                "sqoop import -D mapred.job.name=sqoop_task -m 1 --connect \"jdbc:mysql://localhost:3306/defuault\" --username root --password \"******\" --table student --target-dir /sqoop_test --as-textfile";
 
         SensitiveDataConverter.addMaskPattern(SqoopConstants.SQOOP_PASSWORD_REGEX);
         Assertions.assertEquals(maskScript, SensitiveDataConverter.maskSensitiveData(originalScript));

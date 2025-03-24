@@ -57,7 +57,6 @@ export default {
   task_group_manage: '任务组管理',
   task_group_option: '任务组配置',
   task_group_queue: '任务组队列',
-  data_quality: '数据质量',
   task_result: '任务结果',
   rule: '规则管理'
 }

@@ -22,16 +22,14 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
-import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
+import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import java.util.Map;
@@ -55,13 +53,7 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private TaskExecutionContextFactory taskExecutionContextFactory;
-
-    @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
+    private ITaskGroupCoordinator taskGroupCoordinator;
 
     @Autowired
     private ApplicationContext applicationContext;

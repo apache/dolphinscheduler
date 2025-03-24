@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.List;
 import java.util.Map;
 
-/**
- * the service of project and worker group
- */
 public interface ProjectWorkerGroupRelationService {
 
     /**
@@ -43,6 +40,6 @@ public interface ProjectWorkerGroupRelationService {
      * @param loginUser the login user
      * @param projectCode project code
      */
-    Map<String, Object> queryWorkerGroupsByProject(User loginUser, Long projectCode);
+    Map<String, Object> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode);
 
 }

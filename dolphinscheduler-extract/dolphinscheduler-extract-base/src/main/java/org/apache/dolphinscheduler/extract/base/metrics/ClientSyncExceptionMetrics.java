@@ -34,23 +34,18 @@ public class ClientSyncExceptionMetrics {
 
     private Transporter transporter;
 
-    private String clientHost;
-
     @Builder.Default
-    private String serverHost = NetUtils.getHost();
+    private String clientHost = NetUtils.getHost();
+
+    private String serverAddress;
 
     private Throwable throwable;
 
-    public static ClientSyncExceptionMetrics of(SyncRequestDto syncRequestDto) {
+    public static ClientSyncExceptionMetrics of(final SyncRequestDto syncRequestDto, final Throwable throwable) {
         return ClientSyncExceptionMetrics.builder()
                 .transporter(syncRequestDto.getTransporter())
+                .serverAddress(syncRequestDto.getServerHost().getAddress())
+                .throwable(throwable)
                 .build();
-
     }
-
-    public ClientSyncExceptionMetrics withThrowable(Throwable throwable) {
-        this.throwable = throwable;
-        return this;
-    }
-
 }

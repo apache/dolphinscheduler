@@ -232,7 +232,6 @@ export default {
     workflow_relation_no_data_result_desc:
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     wait_to_run: 'Wait to run',
-    want_to_set_timing: 'Would you like to set the workflow timing?',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',
     time_to_online: 'Confirm to make the Scheduler online?',
@@ -318,7 +317,6 @@ export default {
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
     please_choose: 'Please Choose',
-    remove_task_cache: 'Clear cache',
     delete_validate_dependent_tasks_desc:
       'The downstream dependent tasks exists. You can not delete the task.'
   },
@@ -366,7 +364,6 @@ export default {
     online: 'Online'
   },
   node: {
-    is_cache: 'Cache Execution',
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',
@@ -470,8 +467,9 @@ export default {
     expression_value_tips: 'expression values(optional)',
     pre_tasks: 'Pre tasks',
     program_type: 'Program Type',
-    main_class: 'Main Class',
-    main_class_tips: 'Please enter main class',
+    main_class: 'Main Class Name',
+    main_class_tips: 'Please enter the full main class name (optional)',
+    main_class_invalid: 'Invalid main class name',
     main_package: 'Main Package',
     main_package_tips: 'Please enter main package',
     deploy_mode: 'Deploy Mode',
@@ -894,9 +892,6 @@ export default {
     filter_condition: 'Filter Condition',
     params_value: 'Params Value',
     separator: 'Separator',
-    dynamic_name_tips: 'name(required)',
-    dynamic_value_tips: 'params or value(required)',
-    dynamic_separator_tips: 'separator(required)',
     child_node_definition: 'child node definition',
     child_node_instance: 'child node instance',
     yarn_queue: 'Yarn Queue',
@@ -937,7 +932,6 @@ export default {
     cloud: 'Cloud',
     logic: 'Logic',
     di: 'Data Integration',
-    dq: 'Data Quality',
     ml: 'Machine Learning',
     other: 'Other'
   },

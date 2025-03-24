@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -65,8 +64,6 @@ public class TaskExecutionContext implements Serializable {
 
     private String appInfoPath;
 
-    private String taskJson;
-
     private int processId;
 
     private Long workflowDefinitionCode;
@@ -105,6 +102,8 @@ public class TaskExecutionContext implements Serializable {
 
     private Map<String, Property> prepareParamsMap;
 
+    // Please use task instanceId
+    @Deprecated
     private String taskAppId;
 
     private TaskTimeoutStrategy taskTimeoutStrategy;
@@ -112,8 +111,6 @@ public class TaskExecutionContext implements Serializable {
     private int taskTimeout;
 
     private String workerGroup;
-
-    private TaskExecutionStatus currentExecutionStatus;
 
     private ResourceParametersHelper resourceParametersHelper;
 
@@ -130,8 +127,6 @@ public class TaskExecutionContext implements Serializable {
     private int dryRun;
 
     private Map<String, Property> paramsMap;
-
-    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
     private Integer cpuQuota;
 

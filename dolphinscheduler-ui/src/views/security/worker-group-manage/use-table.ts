@@ -68,6 +68,11 @@ export function useTable() {
           })
       },
       {
+        title: t('security.worker_group.source'),
+        key: 'source',
+        className: 'source'
+      },
+      {
         title: t('security.worker_group.create_time'),
         key: 'createTime'
       },

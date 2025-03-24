@@ -27,6 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
         "security.authentication.type=LDAP",
+        "security.authentication.ldap.user.not-exist-action=CREATE"
 })
 public class SecurityConfigLDAPTest extends AbstractControllerTest {
 

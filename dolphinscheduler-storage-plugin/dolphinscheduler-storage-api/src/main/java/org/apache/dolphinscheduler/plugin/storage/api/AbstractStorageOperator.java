@@ -85,7 +85,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         String resourceBaseDirectory;
         switch (resourceType) {
             case FILE:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, FILE_FOLDER_NAME);
+                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, StorageOperator.FILE_FOLDER_NAME);
                 break;
             case ALL:
                 resourceBaseDirectory = tenantBaseDirectory;

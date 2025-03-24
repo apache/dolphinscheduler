@@ -46,4 +46,5 @@ public class StorageEntity {
     private long size;
     private Date createTime;
     private Date updateTime;
+    private String relativePath;
 }

@@ -18,16 +18,25 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskPausedLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskPausedLifecycleEvent> {
+
+    private final TaskExecutorClient taskExecutorClient;
+
+    public TaskPausedLifecycleEventHandler(final TaskExecutorClient taskExecutorClient) {
+        this.taskExecutorClient = taskExecutorClient;
+    }
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,
@@ -35,6 +44,11 @@ public class TaskPausedLifecycleEventHandler extends AbstractTaskLifecycleEventH
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskPausedLifecycleEvent event) {
         taskStateAction.pausedEventAction(workflowExecutionRunnable, taskExecutionRunnable, event);
+        taskExecutorClient.ackTaskExecutorLifecycleEvent(
+                taskExecutionRunnable,
+                new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
+                        taskExecutionRunnable.getId(),
+                        TaskExecutorLifecycleEventType.PAUSED));
     }
 
     @Override

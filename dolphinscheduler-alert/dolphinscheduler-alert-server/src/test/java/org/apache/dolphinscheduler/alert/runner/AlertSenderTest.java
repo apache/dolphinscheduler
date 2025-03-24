@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.alert.runner;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
@@ -25,6 +29,8 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.service.AlertSender;
+import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -148,22 +154,46 @@ class AlertSenderTest {
         alert.setTitle(TITLE);
         alert.setContent(CONTENT);
         alert.setWarningType(WarningType.FAILURE);
+        alert.setAlertType(AlertType.TASK_FAILURE);
 
-        int pluginDefineId = 1;
-        String pluginInstanceParams = "alert-instance-mail-params";
-        String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
-        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId, pluginInstanceParams, pluginInstanceName);
-        alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(ALERT_GROUP_ID)).thenReturn(alertInstanceList);
 
-        AlertResult alertResult = new AlertResult();
-        alertResult.setSuccess(true);
-        alertResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
-        Assertions.assertTrue(alertResult.isSuccess());
-        when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
+        // 1. alert plugin send success
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
+                PLUGIN_DEFINE_ID, PLUGIN_INSTANCE_PARAMS, PLUGIN_INSTANCE_NAME);
+        alertPluginInstance.setId(alertPluginInstance.getPluginDefineId());
+        alertInstanceList.add(alertPluginInstance);
+
+        AlertChannel alertChannelMock = mock(AlertChannel.class);
+        when(alertPluginManager.getAlertChannel(PLUGIN_DEFINE_ID)).thenReturn(Optional.of(alertChannelMock));
+        AlertResult alertSuccessResult = AlertResult.success();
+        when(alertChannelMock.process(Mockito.any())).thenReturn(alertSuccessResult);
         alertSender.sendEvent(alert);
+        verify(alertDao).updateAlert(eq(AlertStatus.EXECUTION_SUCCESS), anyString(), anyInt());
+
+        // 2. alert plugin send failed
+        AlertPluginInstance otherAlertPluginInstance = new AlertPluginInstance(
+                PLUGIN_DEFINE_ID + 1, PLUGIN_INSTANCE_PARAMS, PLUGIN_INSTANCE_NAME);
+        otherAlertPluginInstance.setId(otherAlertPluginInstance.getPluginDefineId());
+        alertInstanceList.clear();
+        alertInstanceList.add(otherAlertPluginInstance);
+
+        AlertChannel otherAlertChannelMock = mock(AlertChannel.class);
+        when(alertPluginManager.getAlertChannel(PLUGIN_DEFINE_ID + 1)).thenReturn(Optional.of(otherAlertChannelMock));
+        AlertResult alertFailedResult =
+                AlertResult.fail(String.format("Alert Plugin %s send failed", PLUGIN_INSTANCE_NAME));
+        when(otherAlertChannelMock.process(Mockito.any())).thenReturn(alertFailedResult);
+        alertSender.sendEvent(alert);
+        verify(alertDao).updateAlert(eq(AlertStatus.EXECUTION_FAILURE), anyString(), anyInt());
+
+        // 3. alert plugin send partial success
+        alertInstanceList.clear();
+        alertInstanceList.add(alertPluginInstance);
+        alertInstanceList.add(otherAlertPluginInstance);
+        alertSender.sendEvent(alert);
+        verify(alertDao).updateAlert(eq(AlertStatus.EXECUTION_PARTIAL_SUCCESS), anyString(), anyInt());
+
     }
 
     @Test

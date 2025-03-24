@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.api.security.impl.pwd;
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import lombok.NonNull;
+
 public class PasswordAuthenticator extends AbstractAuthenticator {
 
     @Override
-    public User login(String userId, String password) {
-        return userService.queryUser(userId, password);
+    public User login(@NonNull String userName, String password) {
+        return userService.queryUser(userName, password);
     }
 }

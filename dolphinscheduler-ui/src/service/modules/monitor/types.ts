@@ -31,8 +31,8 @@ interface ServerNode {
   id: number
   host: string
   port: number
-  zkDirectory: string
-  resInfo: string
+  serverDirectory: string
+  heartBeatInfo: string
   createTime: string
   lastHeartbeatTime: string
 }

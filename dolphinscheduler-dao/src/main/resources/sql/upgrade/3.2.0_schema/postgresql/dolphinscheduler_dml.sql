@@ -24,14 +24,6 @@ UPDATE t_ds_process_instance SET tenant_code = 'default' WHERE tenant_code IS NU
 -- If the admin account is not associated with a tenant, the admin's tenant will be set to the default tenant.
 UPDATE t_ds_user SET tenant_id = '-1' WHERE (user_name = 'admin') AND (tenant_id = '0');
 
--- data quality support choose database
-INSERT INTO t_ds_dq_rule_input_entry
-(id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
-VALUES(30, 'src_database', 'select', '$t(src_database)', NULL, NULL, 'Please select source database', 0, 0, 0, 1, 1, 1, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000') ON CONFLICT (id) DO NOTHING;
-INSERT INTO t_ds_dq_rule_input_entry
-(id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
-VALUES(31, 'target_database', 'select', '$t(target_database)', NULL, NULL, 'Please select target database', 0, 0, 0, 1, 1, 1, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000') ON CONFLICT (id) DO NOTHING;
-
 INSERT INTO t_ds_relation_rule_input_entry
 (id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
 VALUES(151, 1, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000') ON CONFLICT (id) DO NOTHING;

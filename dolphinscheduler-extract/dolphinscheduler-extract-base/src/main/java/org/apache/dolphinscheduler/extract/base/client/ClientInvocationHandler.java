@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,7 +52,13 @@ class ClientInvocationHandler implements InvocationHandler {
         }
         ClientMethodInvoker methodInvoker = methodInvokerMap.computeIfAbsent(
                 method.toGenericString(), m -> new SyncClientMethodInvoker(serverHost, method, nettyRemotingClient));
-        return methodInvoker.invoke(proxy, method, args);
+        try {
+            return methodInvoker.invoke(proxy, method, args);
+        } catch (UndeclaredThrowableException undeclaredThrowableException) {
+            throw undeclaredThrowableException.getCause();
+        } catch (Throwable throwable) {
+            throw throwable;
+        }
     }
 
 }

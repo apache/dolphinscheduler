@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources, useJavaTaskMainJar } from '.'
 import type { IJsonItem } from '../types'
+import { useJavaTaskNormalJar } from '@/views/projects/task/components/node/fields/use-java-task-normal-jar'
 
 export function useJava(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-  const rawScriptSpan = computed(() => (model.runType === 'JAR' ? 0 : 24))
   return [
     {
       type: 'select',
@@ -57,17 +56,7 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useJavaTaskMainJar(model),
-    {
-      type: 'editor',
-      field: 'rawScript',
-      span: rawScriptSpan,
-      name: t('project.node.script'),
-      validate: {
-        trigger: ['input', 'trigger'],
-        required: true,
-        message: t('project.node.script_tips')
-      }
-    },
+    ...useJavaTaskNormalJar(model),
     useResources(),
     ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
@@ -75,11 +64,11 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
 
 export const RUN_TYPES = [
   {
-    label: 'JAVA',
-    value: 'JAVA'
+    label: 'FAT_JAR',
+    value: 'FAT_JAR'
   },
   {
-    label: 'JAR',
-    value: 'JAR'
+    label: 'NORMAL_JAR',
+    value: 'NORMAL_JAR'
   }
 ]

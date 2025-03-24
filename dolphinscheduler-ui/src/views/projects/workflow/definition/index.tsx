@@ -23,8 +23,7 @@ import {
   NPagination,
   NSpace,
   NTooltip,
-  NPopconfirm,
-  NModal
+  NPopconfirm
 } from 'naive-ui'
 import {
   defineComponent,
@@ -80,10 +79,6 @@ export default defineComponent({
     const handleCopyUpdateList = () => {
       variables.checkedRowKeys = []
       requestData()
-    }
-
-    const confirmToSetWorkflowTiming = () => {
-      variables.timingShowRef = true
     }
 
     const handleSearch = () => {
@@ -143,7 +138,6 @@ export default defineComponent({
       batchExportWorkflow,
       batchCopyWorkflow,
       handleCopyUpdateList,
-      confirmToSetWorkflowTiming,
       ...toRefs(variables),
       uiSettingStore,
       trim
@@ -274,7 +268,6 @@ export default defineComponent({
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}
-                page-count={this.totalPage}
                 show-size-picker
                 page-sizes={[10, 30, 50]}
                 show-quick-jumper
@@ -311,16 +304,6 @@ export default defineComponent({
           v-model:codes={this.checkedRowKeys}
           v-model:show={this.copyShowRef}
           onUpdateList={this.handleCopyUpdateList}
-        />
-        <NModal
-          v-model:show={this.setTimingDialogShowRef}
-          preset={'dialog'}
-          title={t('project.workflow.success')}
-          content={t('project.workflow.want_to_set_timing')}
-          positiveText={t('project.workflow.confirm')}
-          negativeText={t('project.workflow.cancel')}
-          maskClosable={false}
-          onPositiveClick={this.confirmToSetWorkflowTiming}
         />
         <DependenciesModal
           v-model:row={this.row}

@@ -46,16 +46,8 @@ public class DataSourceUtils {
         getDatasourceProcessor(baseDataSourceParamDTO.getType()).checkDatasourceParam(baseDataSourceParamDTO);
     }
 
-    /**
-     * build connection url
-     *
-     * @param baseDataSourceParamDTO datasourceParam
-     */
     public static ConnectionParam buildConnectionParams(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        ConnectionParam connectionParams = getDatasourceProcessor(baseDataSourceParamDTO.getType())
-                .createConnectionParams(baseDataSourceParamDTO);
-        log.info("Parameters map:{}", connectionParams);
-        return connectionParams;
+        return getDatasourceProcessor(baseDataSourceParamDTO.getType()).createConnectionParams(baseDataSourceParamDTO);
     }
 
     public static ConnectionParam buildConnectionParams(DbType dbType, String connectionJson) {
