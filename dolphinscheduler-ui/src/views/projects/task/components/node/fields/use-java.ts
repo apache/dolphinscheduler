@@ -58,7 +58,11 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
     useJavaTaskMainJar(model),
     ...useJavaTaskNormalJar(model),
     useResources(),
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
 
