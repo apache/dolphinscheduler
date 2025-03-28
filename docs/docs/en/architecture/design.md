@@ -22,7 +22,7 @@
 
 ### Architecture Description
 
-* **MasterServer**
+- **MasterServer**
 
   MasterServer adopts a distributed and decentralized design concept. MasterServer is mainly responsible for DAG task segmentation, task submission monitoring, and monitoring the health status of other MasterServer and WorkerServer at the same time.
   When the MasterServer service starts, register a temporary node with ZooKeeper, and perform fault tolerance by monitoring changes in the temporary node of ZooKeeper.
@@ -44,7 +44,7 @@
 
   - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
 
-* **WorkerServer**
+- **WorkerServer**
 
   WorkerServer also adopts a distributed and decentralized design concept. WorkerServer is mainly responsible for task execution and providing log services.
 
@@ -59,21 +59,25 @@
 
   - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
-* **ZooKeeper**
+- **ZooKeeper**
 
-  ZooKeeper service, MasterServer and WorkerServer nodes in the system all use ZooKeeper for cluster management and fault tolerance. In addition, the system implements event monitoring and distributed locks based on ZooKeeper.
+  ZooKeeper service, MasterServer and WorkerServer nodes in the system all use ZooKeeper for cluster management and fault tolerance. With evolving needs and modern deployment environments, DolphinScheduler now supports event monitoring and distributed locks not only based on ZooKeeper, but also on **JDBC** and **Etcd** implementations.
+
+  - **JDBC** provides a lightweight solution for lock and event management through relational databases, making it ideal for simpler deployments or systems that already rely heavily on SQL databases.
+
+  - **Etcd** enables distributed coordination using a high-performance key-value store, suitable for modern cloud-native environments.
 
   We have also implemented queues based on Redis, but we hope DolphinScheduler depends on as few components as possible, so we finally removed the Redis implementation.
 
-* **AlertServer**
+- **AlertServer**
 
   Provides alarm services, and implements rich alarm methods through alarm plugins.
 
-* **API**
+- **API**
 
   The API interface layer is mainly responsible for processing requests from the front-end UI layer. The service uniformly provides RESTful APIs to provide request services to external.
 
-* **UI**
+- **UI**
 
   The front-end page of the system provides various visual operation interfaces of the system, see more at [Introduction to Functions](../guide/homepage.md) section.
 
@@ -170,7 +174,9 @@ If there is a task failure in the workflow that reaches the maximum retry times,
 In the early schedule design, if there is no priority design and use the fair scheduling, the task submitted first may complete at the same time with the task submitted later, thus invalid the priority of process or task. So we have re-designed this, and the following is our current design:
 
 - According to **the priority of different process instances** prior over **priority of the same process instance** prior over **priority of tasks within the same process** prior over **tasks within the same process**, process task submission order from highest to Lowest.
+
   - The specific implementation is to parse the priority according to the JSON of the task instance, and then save the **process instance priority_process instance id_task priority_task id** information to the ZooKeeper task queue. When obtain from the task queue, we can get the highest priority task by comparing string.
+
     - The priority of the process definition is to consider that some processes need to process before other processes. Configure the priority when the process starts or schedules. There are 5 levels in total, which are HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
       <p align="center">
@@ -222,4 +228,3 @@ In the early schedule design, if there is no priority design and use the fair sc
 ## Sum Up
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation ideas of the big data distributed workflow scheduling system: DolphinScheduler. To be continued.
-
