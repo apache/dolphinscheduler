@@ -59,7 +59,7 @@ class GlobalTaskDispatchWaitingQueueTest {
     @Test
     void submitTaskExecuteRunnable() {
         ITaskExecutionRunnable iTaskExecutionRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(iTaskExecutionRunnable);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable, 500);
         Awaitility.await()
                 .atMost(Duration.ofSeconds(1))
                 .untilAsserted(
@@ -69,7 +69,7 @@ class GlobalTaskDispatchWaitingQueueTest {
     @Test
     void testSubmitTaskExecuteRunnableWithDelay() {
         globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(createTaskExecuteRunnable(), 3_000L);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(createTaskExecuteRunnable());
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(createTaskExecuteRunnable(), 500);
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).isNotNull();
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).isNotNull();
@@ -112,7 +112,7 @@ class GlobalTaskDispatchWaitingQueueTest {
     void getWaitingDispatchTaskNumber() {
         Assertions.assertEquals(0, globalTaskDispatchWaitingQueue.getWaitingDispatchTaskNumber());
         ITaskExecutionRunnable iTaskExecutionRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(iTaskExecutionRunnable);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable, 500);
         Assertions.assertEquals(1, globalTaskDispatchWaitingQueue.getWaitingDispatchTaskNumber());
     }
 

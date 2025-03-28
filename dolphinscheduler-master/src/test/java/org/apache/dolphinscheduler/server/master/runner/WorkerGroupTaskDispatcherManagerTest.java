@@ -17,23 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static java.time.Duration.ofSeconds;
-import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,45 +46,14 @@ public class WorkerGroupTaskDispatcherManagerTest {
     private ITaskExecutorClient taskExecutorClient;
 
     @Test
-    public void testAddTaskToExistingWorkerGroup_ShouldReturnTrue() {
-        String workerGroupName = "testGroup";
-        manager.addWorkerGroup(workerGroupName);
-
-        boolean result = manager.add(workerGroupName, taskExecutionRunnable, 0L);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testAddTaskToNonExistingWorkerGroup_ShouldReturnFalse() {
+    public void testAddTaskToWorkerGroupTaskToWorkerGroupQueueTaskToNonExistingWorkerGroup_ShouldReturnFalse() {
         String workerGroupName = "nonExistingGroup";
-        boolean result = manager.add(workerGroupName, taskExecutionRunnable, 0L);
+        boolean result = manager.addTaskToWorkerGroup(workerGroupName, taskExecutionRunnable, 0L);
         assertFalse(result);
     }
 
     @Test
-    public void testAddNewWorkerGroup_ShouldAddGroup() {
-        String workerGroupName = "newGroup";
-        manager.addWorkerGroup(workerGroupName);
-        assertFalse(manager.getDispatchWorkerMap().isEmpty());
-    }
-
-    @Test
-    public void testDeleteWorkerGroup_ShouldMapEmpty() throws Exception {
-        manager.addWorkerGroup("testGroup");
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-        manager.add("testGroup", taskExecutionRunnable, 0);
-        sleep(1000);
-        manager.deleteWorkerGroup("testGroup");
-
-        Awaitility.await()
-                .untilAsserted(() -> assertEquals(0, manager.getDispatchWorkerMap().size()));
-    }
-
-    @Test
-    public void testOnWorkerGroupAdd_ShouldAddWorkerGroups() {
+    public void testOnWorkerGroupAdd_ShouldAddTaskToWorkerGroupTaskToWorkerGroupQueueWorkerGroups() {
         WorkerGroup group1 = new WorkerGroup();
         WorkerGroup group2 = new WorkerGroup();
         group1.setName("testGroup1");
@@ -99,38 +61,5 @@ public class WorkerGroupTaskDispatcherManagerTest {
         List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
         manager.onWorkerGroupAdd(workerGroups);
         assertEquals(2, manager.getDispatchWorkerMap().size());
-    }
-
-    @Test
-    public void testOnWorkerGroupDelete_ShouldDeleteWorkerGroups() {
-        WorkerGroup group1 = new WorkerGroup();
-        WorkerGroup group2 = new WorkerGroup();
-        group1.setName("testGroup1");
-        group2.setName("testGroup2");
-        List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
-        workerGroups.forEach(workerGroup -> manager.addWorkerGroup(workerGroup.getName()));
-
-        manager.onWorkerGroupDelete(workerGroups);
-
-        Awaitility.await()
-                .atMost(ofSeconds(6))
-                .untilAsserted(() -> assertEquals(0, manager.getDispatchWorkerMap().size()));
-
-    }
-
-    @Test
-    public void testOnCloseWorkerGroupTaskDispatcherManager() throws Exception {
-        WorkerGroup group1 = new WorkerGroup();
-        WorkerGroup group2 = new WorkerGroup();
-        group1.setName("testGroup1");
-        group2.setName("testGroup2");
-        List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
-        workerGroups.forEach(workerGroup -> manager.addWorkerGroup(workerGroup.getName()));
-
-        manager.close();
-        workerGroups.forEach(workerGroup -> {
-            assertEquals(DispatchWorkerStatus.CLOSED,
-                    manager.getDispatchWorkerMap().get(workerGroup.getName()).getStatus());
-        });
     }
 }

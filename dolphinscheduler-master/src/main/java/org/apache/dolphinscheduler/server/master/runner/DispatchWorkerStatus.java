@@ -20,5 +20,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 public enum DispatchWorkerStatus {
     STARTED,
     CLOSING,
-    CLOSED
+    CLOSED,
+    INIT
 }

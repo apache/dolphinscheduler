@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,6 +37,9 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     @Autowired
     private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
+
+    @Autowired
+    private TaskExecutorClient taskExecutorClient;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -64,8 +68,17 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     void doDispatch() {
         ITaskExecutionRunnable taskExecutionRunnable =
                 globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
-        workerGroupTaskDispatcherManager.add(taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
+        boolean addTaskSuccess = workerGroupTaskDispatcherManager.addTaskToWorkerGroup(
+                taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
                 taskExecutionRunnable, 0);
+        if (!addTaskSuccess) {
+            log.warn("worker group is deleting or deleted, taskInstance: {}", taskExecutionRunnable.getTaskInstance());
+            // The operation of deleting a worker group is quite cautious.
+            // It is unlikely that a worker group will be deleted and then immediately re-added.
+            // Therefore, waiting for a retry is meaningless; it should fail directly.
+            // todo set task fail
+
+        }
     }
 
     @Override

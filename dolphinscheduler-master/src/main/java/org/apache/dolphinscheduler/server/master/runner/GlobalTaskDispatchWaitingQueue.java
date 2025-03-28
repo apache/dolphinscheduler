@@ -47,13 +47,6 @@ public class GlobalTaskDispatchWaitingQueue {
             new DelayQueue<>();
 
     /**
-     * Submit a {@link ITaskExecutionRunnable} with delay time 0, it will be consumed immediately.
-     */
-    public synchronized void dispatchTaskExecuteRunnable(ITaskExecutionRunnable iTaskExecutionRunnable) {
-        dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable, 0);
-    }
-
-    /**
      * Submit a {@link ITaskExecutionRunnable} with delay time, if the delay time <= 0 then it can be consumed.
      */
     public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,

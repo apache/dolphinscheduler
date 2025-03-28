@@ -70,7 +70,8 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(defaultTaskExecuteRunnable);
         globalTaskDispatchWaitingQueueLooper.doDispatch();
 
-        verify(workerGroupTaskDispatcherManager, times(1)).add(anyString(), any(ITaskExecutionRunnable.class),
+        verify(workerGroupTaskDispatcherManager, times(1)).addTaskToWorkerGroup(anyString(),
+                any(ITaskExecutionRunnable.class),
                 anyLong());
     }
 
