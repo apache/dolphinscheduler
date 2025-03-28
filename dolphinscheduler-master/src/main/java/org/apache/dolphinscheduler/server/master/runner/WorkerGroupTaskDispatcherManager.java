@@ -46,8 +46,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGroupChangeNotifier.WorkerGroupListener {
 
-    private static final long CHECK_DELETE_DISPATCH_WORKER_PERIOD_SECONDS = 5;
-
     @Autowired
     private ITaskExecutorClient taskExecutorClient;
 

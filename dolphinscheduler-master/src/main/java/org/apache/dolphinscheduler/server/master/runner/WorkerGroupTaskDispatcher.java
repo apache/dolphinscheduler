@@ -72,8 +72,6 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
             workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry(delayTimeMills, taskExecutionRunnable));
             return true;
         } else {
-            // todo set task fail;
-            this.failTask(taskExecutionRunnable);
             log.warn("The {} status is {}, task can not add Queue, it will fail", this.getName(), status.get());
         }
         return false;
@@ -144,9 +142,5 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
             workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry(waitingTimeMills, taskExecutionRunnable));
             log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
         }
-    }
-
-    private void failTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        taskExecutionRunnable.kill();
     }
 }
