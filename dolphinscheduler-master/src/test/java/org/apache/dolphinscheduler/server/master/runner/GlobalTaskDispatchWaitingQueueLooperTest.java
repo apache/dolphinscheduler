@@ -63,6 +63,7 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
         verify(workerGroupTaskDispatcherManager, times(1)).addTaskToWorkerGroup(any(),
                 any(ITaskExecutionRunnable.class),
                 anyLong());
+
     }
 
 }
