@@ -73,9 +73,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
                 taskExecutionRunnable, 0);
         if (!addTaskSuccess) {
             log.warn("worker group is deleting or deleted, taskInstance: {}", taskExecutionRunnable.getTaskInstance());
-            // The operation of deleting a worker group is quite cautious.
-            // It is unlikely that a worker group will be deleted and then immediately re-added.
-            // Therefore, waiting for a retry is meaningless; it should fail directly.
+            // Workgroup cannot be re added to the global queue and killed
             long waitingTimeMills = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
             globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
