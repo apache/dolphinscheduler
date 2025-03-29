@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.Arrays;
@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,10 +44,11 @@ public class WorkerGroupTaskDispatcherManagerTest {
     private ITaskExecutionRunnable taskExecutionRunnable;
 
     @Mock
-    private ITaskExecutorClient taskExecutorClient;
+    private TaskInstance taskInstance;
 
     @Test
     public void testAddTaskToWorkerGroupTaskToWorkerGroupQueueTaskToNonExistingWorkerGroup_ShouldReturnFalse() {
+        Mockito.when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         String workerGroupName = "nonExistingGroup";
         boolean result = manager.addTaskToWorkerGroup(workerGroupName, taskExecutionRunnable, 0L);
         assertFalse(result);

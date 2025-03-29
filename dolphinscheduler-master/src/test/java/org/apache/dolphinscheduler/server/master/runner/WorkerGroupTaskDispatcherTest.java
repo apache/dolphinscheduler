@@ -20,20 +20,17 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WorkerGroupTaskDispatcherTest {
 
     @Mock
@@ -42,40 +39,19 @@ public class WorkerGroupTaskDispatcherTest {
     @Mock
     private ITaskExecutionRunnable taskExecutionRunnable;
 
-    @Mock
-    private TaskInstance taskInstance;
-
     @InjectMocks
     private WorkerGroupTaskDispatcher workerGroupTaskDispatcher;
 
-    @BeforeEach
-    public void setUp() {
-        workerGroupTaskDispatcher = new WorkerGroupTaskDispatcher("testWorkerGroup", taskExecutorClient);
-        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-    }
-
     @Test
     public void testInitAddTaskSuccess() {
-
-        // 添加任务到队列
         boolean result = workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L);
-
-        // 验证任务成功添加到队列
         assertTrue(result);
     }
 
     @Test
     public void testAddTaskFail() {
-        // 设置调度器状态为 CLOSING
         workerGroupTaskDispatcher.markDispatcherClosing();
-
-        // 模拟任务实例
-        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-
-        // 添加任务到队列失败
         boolean result = workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L);
-
-        // 验证任务添加失败
         assertFalse(result);
     }
 
@@ -83,8 +59,6 @@ public class WorkerGroupTaskDispatcherTest {
     public void testStartDispatcher() {
         assertFalse(workerGroupTaskDispatcher.isAlive());
         workerGroupTaskDispatcher.start();
-
-        // 验证调度器状态已变为 STARTED
         assertTrue(workerGroupTaskDispatcher.isAlive());
     }
 
