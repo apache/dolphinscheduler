@@ -251,7 +251,7 @@ A： 将 hive pom
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>2.3.9</version>
+    3.3.0-alpha2.3.9</version>
 </dependency>
 ```
 
@@ -261,7 +261,7 @@ A： 将 hive pom
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>1.1.0</version>
+    3.3.0-alpha1.1.0</version>
 </dependency>
 ```
 
@@ -455,7 +455,7 @@ A：1，修改项目根目录 maven 配置文件，移除 scope 的 test 属性�
 <dependency>
 	<groupId>mysql</groupId>
 	<artifactId>mysql-connector-java</artifactId>
-	<version>${mysql.connector.version}</version>
+	3.3.0-alpha${mysql.connector.version}</version>
 	<scope>test<scope>
 </dependency>
 ```

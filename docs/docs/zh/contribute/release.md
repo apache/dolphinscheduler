@@ -183,7 +183,7 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
 
 > 注意：设置环境变量后，我们可以直接在你的 bash 中使用该变量，而无需更改任何内容。例如，我们可以直接使用命令 `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git`
 > 来克隆发布分支，他会自动将其中的 `"${VERSION}"` 转化成你设置的值 `<THE-VERSION-YOU-RELEASE>`。 但是您必须在一些非 bash 步骤中手动更改
-> `<VERSION>` 为对应的版本号，例如发起投票中的内容。我们使用 `<VERSION>` 而不是 `"${VERSION}"` 来提示 release manager 他们必须手动更改这部分内容
+> `3.3.0-alpha` 为对应的版本号，例如发起投票中的内容。我们使用 `3.3.0-alpha` 而不是 `"${VERSION}"` 来提示 release manager 他们必须手动更改这部分内容
 
 ### 更新文档和代码的版本
 
@@ -201,7 +201,7 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
     - `Chart.yaml`: `appVersion` 和 `version` 版本更新为 x.y.z
     - `values.yaml`: `image.tag` 版本更新为 x.y.z
 - 修改文档（docs 模块）中的版本号:
-  - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
+  - 将 `docs` 文件夹下文件的占位符 `3.3.0-alpha` (除了 pom.xml 相关的) 修改成 `x.y.z`
   - 新增历史版本
     - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的历史版本为 `x.y.z`
   - 修改文档 sidebar
@@ -364,7 +364,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查源码包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`，进行如下检查:
+解压缩`apache-dolphinscheduler-3.3.0-alpha-src.tar.gz`，进行如下检查:
 
 - 检查源码包是否包含由于包含不必要文件，致使 tarball 过于庞大
 - 存在`LICENSE`和`NOTICE`文件
@@ -377,7 +377,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-bin.tar.gz`进行如下检查:
+解压缩`apache-dolphinscheduler-3.3.0-alpha-bin.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有 ASF 许可证
@@ -412,7 +412,7 @@ DolphinScheduler 社区投票，发起投票邮件到`dev@dolphinscheduler.apach
 标题：
 
 ```txt
-[VOTE] Release Apache DolphinScheduler <VERSION>
+[VOTE] Release Apache DolphinScheduler 3.3.0-alpha
 ```
 
 正文：
@@ -420,15 +420,15 @@ DolphinScheduler 社区投票，发起投票邮件到`dev@dolphinscheduler.apach
 ```txt
 Hello DolphinScheduler Community,
 
-This is a call for vote to release Apache DolphinScheduler version <VERSION>
+This is a call for vote to release Apache DolphinScheduler version 3.3.0-alpha
 
-Release notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
+Release notes: https://github.com/apache/dolphinscheduler/releases/tag/3.3.0-alpha
 
-The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/<VERSION>/
+The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/3.3.0-alpha/
 
 Maven 2 staging repository: https://repository.apache.org/content/repositories/<STAGING.REPOSITORY>/org/apache/dolphinscheduler/
 
-Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSION>
+Git tag for the release: https://github.com/apache/dolphinscheduler/tree/3.3.0-alpha
 
 Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
@@ -459,11 +459,11 @@ Checklist for reference:
 Title：
 
 ```txt
-[RESULT][VOTE] Release Apache DolphinScheduler <VERSION>
+[RESULT][VOTE] Release Apache DolphinScheduler 3.3.0-alpha
 ```
 
 ```txt
-The vote to release Apache DolphinScheduler <VERSION> has passed.Here is the vote result,
+The vote to release Apache DolphinScheduler 3.3.0-alpha has passed.Here is the vote result,
 
 4 PMC member +1 votes:
 
@@ -495,17 +495,17 @@ svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/do
 
 ### 更新文档
 
-官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
+官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `3.3.0-alpha`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
-  - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
-  - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
+  - `config/download.json`: 增加 `3.3.0-alpha` 版本发布包的下载
+  - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `3.3.0-alpha` 的新键值对
 - **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
-    - `docsLatest`: 更新为 `<VERSION>`
-    - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(<VERSION>)`
-  - `docs/configs/index.md.jsx`: 增加 `'<VERSION>': docsxyzConfig,` 以及新的 `import`
-  - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `<VERSION>` 的链接
+    - `docsLatest`: 更新为 `3.3.0-alpha`
+    - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(3.3.0-alpha)`
+  - `docs/configs/index.md.jsx`: 增加 `'3.3.0-alpha': docsxyzConfig,` 以及新的 `import`
+  - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `3.3.0-alpha` 的链接
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler 在 GitHub bug report 的 issue 中有版本选择，当有新的版本发版后，需要更新
     [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml) 中的 **Version** 部分。
 
@@ -525,7 +525,7 @@ svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/do
 标题：
 
 ```txt
-[ANNOUNCE] Release Apache DolphinScheduler <VERSION>
+[ANNOUNCE] Release Apache DolphinScheduler 3.3.0-alpha
 ```
 
 正文：
@@ -533,7 +533,7 @@ svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/do
 ```txt
 Hi all,
 
-We are glad to announce the release of Apache DolphinScheduler <VERSION>. Once again I would like to express my thanks to your help.
+We are glad to announce the release of Apache DolphinScheduler 3.3.0-alpha. Once again I would like to express my thanks to your help.
 
 Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler system,
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
@@ -541,14 +541,14 @@ dedicated to solving the complex task dependencies in data processing, making th
 
 Download Links: https://dolphinscheduler.apache.org/zh-cn/download
 
-Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
+Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/3.3.0-alpha
 
 Website: https://dolphinscheduler.apache.org/
 
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/3.3.0-alpha/about/introduction
 ```
 
 ## 删除prepare分支

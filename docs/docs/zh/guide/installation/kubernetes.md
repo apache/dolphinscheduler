@@ -16,7 +16,7 @@ Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务
 
 ```bash
 # 自行选择对应的版本
-helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version>
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha
 ```
 
 这些命令以默认配置在 Kubernetes 集群上部署 DolphinScheduler，[附录-配置](#appendix-configuration)部分列出了可以在安装过程中配置的参数 <!-- markdown-link-check-disable-line -->
@@ -98,7 +98,7 @@ helm install keda kedacore/keda \
 其次，您需要将 `values.yaml` 中的 `worker.keda.enabled` 配置设置成 `true`，或者您可以通过以下命令安装 chart：
 
 ```bash
-helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.keda.enabled=true
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha --set worker.keda.enabled=true
 ```
 
 一旦自动扩缩容功能启用，worker的数量将基于任务状态在 `minReplicaCount` 和 `maxReplicaCount` 之间弹性扩缩。
@@ -218,9 +218,9 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 2. 创建一个新的 `Dockerfile`，用于添加 MySQL 的驱动包:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.3.0-alpha
 # 例如
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:3.3.0-alpha
 
 # 注意，如果构建的是dolphinscheduler-tools镜像
 # 需要将下面一行修改为COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
@@ -269,9 +269,9 @@ externalDatabase:
 2. 创建一个新的 `Dockerfile`，用于添加 MySQL 或者 Oracle 驱动包:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.3.0-alpha
 # 例如
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.3.0-alpha
 
 # 如果你想支持 MySQL 数据源
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
@@ -301,7 +301,7 @@ docker build -t apache/dolphinscheduler-<service>:new-driver .
 1. 创建一个新的 `Dockerfile`，用于安装 pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.3.0-alpha
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -336,7 +336,7 @@ docker build -t apache/dolphinscheduler-worker:pip .
 1. 创建一个新的 `Dockerfile`，用于安装 Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.3.0-alpha
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*
@@ -489,15 +489,15 @@ common:
 
 ```bash
 # 安装 master、api-server、alert-server以及其他默认组件，但是不安装 worker
-helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.enabled=false
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha --set worker.enabled=false
 # 禁用其他组件的安装，只安装 worker，使用自行建构建的 CPU镜像，通过 nodeselector部署到附带 x86标签的 CPU服务器，使用 zookeeper作为外部注册中心
-helm upgrade --install dolphinscheduler-cpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
+helm upgrade --install dolphinscheduler-cpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 # 禁用其他组件的安装，只安装 worker，使用自行建构建的 GPU 镜像，通过 nodeselector部署到附带 a100标签的 gpu服务器，使用zookeeper作为外部注册中心
-helm upgrade --install dolphinscheduler-gpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
+helm upgrade --install dolphinscheduler-gpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \

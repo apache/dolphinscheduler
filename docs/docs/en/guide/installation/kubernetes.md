@@ -16,7 +16,7 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ```bash
 # Choose the corresponding version yourself
-helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version>
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha
 ```
 
 These commands are used to deploy DolphinScheduler on the Kubernetes cluster by default. The [Appendix-Configuration](#appendix-configuration) section lists the parameters that can be configured during installation.
@@ -98,7 +98,7 @@ helm install keda kedacore/keda \
 Secondly, you need to set `worker.keda.enabled` to `true` in `values.yaml` or install the chart by:
 
 ```bash
-helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.keda.enabled=true
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha --set worker.keda.enabled=true
 ```
 
 Once autoscaling enabled, the number of workers will scale between `minReplicaCount` and `maxReplicaCount` based on the states
@@ -219,9 +219,9 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.3.0-alpha
 # For example
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:3.3.0-alpha
 
 # Attention Please, If the build is dolphinscheduler-tools image
 # You need to change the following line to: COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
@@ -270,9 +270,9 @@ externalDatabase:
 2. Create a new `Dockerfile` to add MySQL or Oracle driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.3.0-alpha
 # For example
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.3.0-alpha
 
 # If you want to support MySQL Datasource
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
@@ -302,7 +302,7 @@ docker build -t apache/dolphinscheduler-<service>:new-driver .
 1. Create a new `Dockerfile` to install pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.3.0-alpha
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -337,7 +337,7 @@ docker build -t apache/dolphinscheduler-worker:pip .
 1. Create a new `Dockerfile` to install Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.3.0-alpha
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*
@@ -490,15 +490,15 @@ For example, if you need to deploy worker to both CPU and GPU servers in a clust
 
 ```bash
 # Install master, api-server, alert-server, and other default components, but do not install worker
-helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.enabled=false
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha --set worker.enabled=false
 # Disable the installation of other components, only install worker, use the self-built CPU image, deploy to CPU servers with the `x86` label through nodeselector, and use zookeeper as the external registry center
-helm upgrade --install dolphinscheduler-cpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
+helm upgrade --install dolphinscheduler-cpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 # Disable the installation of other components, only install worker, use the self-built GPU image, deploy to GPU servers with the `a100` label through nodeselector, and use zookeeper as the external registry center
-helm upgrade --install dolphinscheduler-gpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
+helm upgrade --install dolphinscheduler-gpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version 3.3.0-alpha \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \

@@ -280,7 +280,7 @@ A ： Will hive pom
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>2.3.9</version>
+    3.3.0-alpha2.3.9</version>
 </dependency>
 ```
 
@@ -290,7 +290,7 @@ change into
 <dependency>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive-jdbc</artifactId>
-    <version>1.1.0</version>
+    3.3.0-alpha1.1.0</version>
 </dependency>
 ```
 
@@ -484,7 +484,7 @@ A: 1, Edit project root dir maven config file, remove scope test property so tha
 <dependency>
 	<groupId>mysql</groupId>
 	<artifactId>mysql-connector-java</artifactId>
-	<version>${mysql.connector.version}</version>
+	3.3.0-alpha${mysql.connector.version}</version>
 	<scope>test<scope>
 </dependency>
 ```
