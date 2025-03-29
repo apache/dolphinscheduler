@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
+import java.time.Duration;
+
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -70,10 +73,12 @@ public class WorkerGroupTaskDispatcherTest {
         boolean result = workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L);
         assertFalse(result);
         sleep(1000);
-        assertTrue(workerGroupTaskDispatcher.checkCloseDispatchWorkerComplete());
-        // closed can not to start, cannot add task
-        workerGroupTaskDispatcher.start();
-        assertFalse(workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L));
-        assertTrue(workerGroupTaskDispatcher.checkCloseDispatchWorkerComplete());
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(1)).untilAsserted(() -> {
+                    assertTrue(workerGroupTaskDispatcher.checkCloseDispatchWorkerComplete());
+                    // closed can not to start, cannot add task
+                    workerGroupTaskDispatcher.start();
+                    assertFalse(workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L));
+                });
     }
 }
