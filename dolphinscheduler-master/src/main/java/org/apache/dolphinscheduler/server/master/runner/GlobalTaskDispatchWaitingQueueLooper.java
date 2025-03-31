@@ -73,12 +73,13 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
                 taskExecutionRunnable, 0);
         if (!addTaskSuccess) {
             log.warn("worker group is deleting or deleted, taskInstance: {}", taskExecutionRunnable.getTaskInstance());
-            // Workgroup cannot be re added to the global queue and killed
+            // If dispatch failed, will put the task back to the queue
+            // The task will be dispatched after waiting time.
+            // the waiting time will increase multiple of times, but will not exceed 60 seconds
             long waitingTimeMills = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
             globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
                     waitingTimeMills);
-            taskExecutionRunnable.kill();
         }
     }
 
