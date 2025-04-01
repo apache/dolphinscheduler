@@ -123,14 +123,13 @@ sub   rsa4096 2023-07-01 [E]
 命令如下：
 
 ```shell
-gpg --keyserver hkp://pool.sks-keyservers.net --send-key 85E11560
+gpg --keyserver hkp://keyserver.ubuntu.com --send-key 85E11560
 ```
 
-`pool.sks-keyservers.net`为随意挑选的[公钥服务器](https://sks-keyservers.net/status/)，每个服务器之间是自动同步的，选任意一个即可。
+`keyserver.ubuntu.com`为随意挑选的[公钥服务器](https://keyserver.ubuntu.com)，每个服务器之间是自动同步的，选任意一个即可。
 
 注意：如果同步到公钥服务器，可以在服务器上查到新建的公钥
-http://keyserver.ubuntu.com:11371/pks/lookup?search=${用户名}&fingerprint=on&op=index
-备用公钥服务器 gpg --keyserver hkp://keyserver.ubuntu.com --send-key ${公钥 ID}
+http://keyserver.ubuntu.com/pks/lookup?search=${用户名}&fingerprint=on&op=index
 
 ### 配置 Apache Maven Central Repository
 
@@ -225,6 +224,7 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
 cd "${SOURCE_CODE_DIR}"
 git checkout -b "${VERSION}"-release "${VERSION}"-prepare
 git push "${GH_REMOTE}" "${VERSION}"-release
+export GPG_TTY=$(tty)
 ```
 
 > 注意：如果你在没有源代码的远程主机上发布，你应该先运行 `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git`
@@ -232,7 +232,7 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 
 ```shell
 # 运行发版校验
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
 - `-Prelease`: 选择 release 的 profile，这个 profile 会打包所有源码、jar 文件以及可执行二进制包。
@@ -250,7 +250,7 @@ mvn release:clean
 然后准备执行发布。
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
@@ -279,7 +279,7 @@ git push "${GH_REMOTE}" --tags
 #### 部署发布
 
 ```shell
-mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=false" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 执行完该命令后，待发布版本会自动上传到 Apache 的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)

@@ -107,7 +107,11 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       field: 'nodeSelectors',
       name: 'node_selectors'
     }),
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
 

@@ -121,7 +121,11 @@ export function useDms(model: { [field: string]: any }): IJsonItem[] {
       span: replicationTaskArnSpan
     },
     useResources(),
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
 
