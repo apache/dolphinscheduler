@@ -18,9 +18,7 @@
 package org.apache.dolphinscheduler.meter;
 
 import org.apache.dolphinscheduler.meter.metrics.DefaultMetricsProvider;
-import org.apache.dolphinscheduler.meter.metrics.EmptyMetricsProvider;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -46,25 +44,16 @@ import io.micrometer.core.instrument.MeterRegistry;
 public class MeterAutoConfiguration {
 
     @Bean
-    @ConditionalOnProperty(prefix = "metrics", name = "enabled", havingValue = "true")
     public DefaultMetricsProvider metricsProvider(MeterRegistry meterRegistry) {
         return new DefaultMetricsProvider(meterRegistry);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "metrics", name = "enabled", havingValue = "false", matchIfMissing = true)
-    public EmptyMetricsProvider emptyMetricsProvider() {
-        return new EmptyMetricsProvider();
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "metrics", name = "enabled", havingValue = "true")
     public TimedAspect timedAspect(MeterRegistry registry) {
         return new TimedAspect(registry);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "metrics", name = "enabled", havingValue = "true")
     public CountedAspect countedAspect(MeterRegistry registry) {
         return new CountedAspect(registry);
     }
