@@ -168,6 +168,10 @@ export function useAliyunServerlessSpark(model: {
       span: 12
     },
 
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }

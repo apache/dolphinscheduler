@@ -61,6 +61,10 @@ export function useDinky(model: { [field: string]: any }): IJsonItem[] {
       field: 'online',
       name: t('project.node.dinky_online')
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }

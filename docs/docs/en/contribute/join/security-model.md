@@ -69,6 +69,10 @@ Apache DolphinScheduler supports four authentication methods: login with your ow
 
 Administrator users can configure resources such as queues, tenants, users, alarm groups, worker groups, tokens, k8s clusters, k8s namespaces, etc. It is necessary to trust that the user's permission allocation, use, and maintenance of resources will not affect the platform and service itself.
 
+## Network Environment
+
+Apache DolphinScheduler's deployment and usage are based on the assumption that the user's network is secure and trustworthy. Apache DolphinScheduler does not address internal network cross-infiltration issues.
+
 ### Examples of Mistaken Security Vulnerabilities
 
 The following are some erroneous vulnerabilities raised by users and developers in the past.

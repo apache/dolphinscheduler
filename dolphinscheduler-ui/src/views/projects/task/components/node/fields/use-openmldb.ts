@@ -82,6 +82,10 @@ export function useOpenmldb(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useResources(),
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
