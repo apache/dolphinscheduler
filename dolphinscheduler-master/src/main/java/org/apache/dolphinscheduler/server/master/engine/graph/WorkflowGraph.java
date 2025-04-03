@@ -19,15 +19,16 @@ package org.apache.dolphinscheduler.server.master.engine.graph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -60,18 +61,58 @@ public class WorkflowGraph implements IWorkflowGraph {
     }
 
     private void checkIfDAG(List<WorkflowTaskRelation> workflowTaskRelations, List<TaskDefinition> taskDefinitions) {
-        DAG<Long, TaskDefinition, WorkflowTaskRelation> graph = new DAG<>();
-        // Fill the vertices
+        // If topology-sort-result`s size less than taskDefinitions`s size, then not a DAG
+        Map<Long, List<Long>> preTaskCodeMap = workflowTaskRelations
+                .stream()
+                .filter(relation -> relation.getPreTaskCode() != 0)
+                .collect(Collectors.groupingBy(WorkflowTaskRelation::getPostTaskCode,
+                        Collectors.mapping(WorkflowTaskRelation::getPreTaskCode, Collectors.toList())));
+        Map<Long, List<Long>> postTaskCodeMap = workflowTaskRelations
+                .stream()
+                .collect(Collectors.groupingBy(WorkflowTaskRelation::getPreTaskCode,
+                        Collectors.mapping(WorkflowTaskRelation::getPostTaskCode, Collectors.toList())));
+
+        // build in-degree count
+        Map<Long, Integer> inDegreeCount = new HashMap<>();
         for (TaskDefinition taskDefinition : taskDefinitions) {
-            graph.addNode(taskDefinition.getCode(), taskDefinition);
-        }
-        // Fill edge relations
-        for (WorkflowTaskRelation relation : workflowTaskRelations) {
-            long preTaskCode = relation.getPreTaskCode();
-            // When exist a ring cycle, then not a DAG.
-            if (preTaskCode != 0 && !graph.addEdge(preTaskCode, relation.getPostTaskCode())) {
-                throw new IllegalArgumentException("The workflow graph is not a DAG");
+            List<Long> preTasks = preTaskCodeMap.get(taskDefinition.getCode());
+            if (preTasks == null) {
+                inDegreeCount.put(taskDefinition.getCode(), 0);
+            } else {
+                inDegreeCount.put(taskDefinition.getCode(), preTasks.size());
             }
+        }
+
+        // Adds the task with zero-in-degree to the queue
+        Set<Long> visitTable = new HashSet<>();
+        Queue<Long> queue = new ArrayDeque<>();
+        for (Map.Entry<Long, Integer> entry : inDegreeCount.entrySet()) {
+            if (entry.getValue() == 0 && visitTable.add(entry.getKey())) {
+                queue.offer(entry.getKey());
+            }
+        }
+
+        // topology sort
+        Set<Long> resultTable = new HashSet<>();
+        while (!queue.isEmpty()) {
+            Long taskCode = queue.poll();
+            resultTable.add(taskCode);
+
+            List<Long> postCodes = postTaskCodeMap.get(taskCode);
+            if (postCodes == null) {
+                continue;
+            }
+            for (Long postCode : postCodes) {
+                inDegreeCount.put(postCode, inDegreeCount.get(postCode) - 1);
+
+                if (inDegreeCount.get(postCode) == 0) {
+                    queue.offer(postCode);
+                }
+            }
+        }
+
+        if (resultTable.size() < taskDefinitions.size()) {
+            throw new IllegalArgumentException("The workflow task relation is not a DAG");
         }
     }
 
