@@ -14,7 +14,7 @@ Standalone 仅适用于 DolphinScheduler 的快速体验.
 
 ## 下载插件依赖
 
-请参考伪集群部署的[下载插件依赖](../installation/pseudo-cluster.md#下载插件依赖)
+请参考伪集群部署的[下载插件依赖](pseudo-cluster.md#下载插件依赖)
 
 ## 配置用户免密及权限
 
