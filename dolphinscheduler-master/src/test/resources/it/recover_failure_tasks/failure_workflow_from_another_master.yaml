@@ -25,7 +25,7 @@ project:
   updateTime: 2025-03-22 00:00:00
 
 workflows:
-  - name: workflow_with_one_fake_task_running
+  - name: workflow_with_one_fake_task_killed
     code: 1
     version: 1
     projectCode: 1
@@ -38,11 +38,11 @@ workflows:
 
 workflowInstance:
   id: 1
-  name: workflow_with_one_fake_task_running-20250322201900000
+  name: workflow_with_one_fake_task_killed-20250322201900000
   workflowDefinitionCode: 1
   workflowDefinitionVersion: 1
   projectCode: 1
-  state: RUNNING_EXECUTION
+  state: FAILURE
   recovery: NO
   startTime: 2025-03-22 20:19:00
   endTime: null
@@ -65,14 +65,15 @@ taskInstances:
     name: A
     taskType: LogicFakeTask
     workflowInstanceId: 1
-    workflowInstanceName: workflow_with_one_fake_task_running-20250322201900000
+    workflowInstanceName: workflow_with_one_fake_task_killed-20250322201900000
     projectCode: 1
     taskCode: 1
     taskDefinitionVersion: 1
-    state: RUNNING_EXECUTION
+    state: FAILURE
     firstSubmitTime: 2025-03-22 20:19:00
     submitTime: 2025-03-22 20:19:00
     startTime: 2025-03-22 20:19:00
+    endTime: 2025-03-22 20:19:01
     retryTimes: 0
     host: 127.0.0.1:1234
     maxRetryTimes: 0

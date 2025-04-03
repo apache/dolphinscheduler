@@ -25,7 +25,14 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
@@ -45,9 +52,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     @Autowired
     private SystemEventBus systemEventBus;
-
-    @Autowired
-    private MasterConfig masterConfig;
 
     @Test
     public void testGlobalFailover_runningWorkflow_withSubmittedTasks() {
@@ -569,6 +573,16 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
+        final String masterFailoverNodePath = RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(
+                "127.0.0.1:15678");
+        // wait failover process
+        await()
+                .atMost(Duration.ofMinutes(3))
+                .untilAsserted(() -> {
+                    assertThat(registryClient.exists(masterFailoverNodePath)).isTrue();
+                });
+
+        // check workflow's status and can stop it
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
@@ -576,18 +590,33 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                             .hasSize(1)
                             .anySatisfy(workflowInstance -> {
                                 assertThat(workflowInstance.getState())
-                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                                 assertThat(workflowInstance.getName())
-                                        .isEqualTo("workflow_with_one_fake_task_success-20250322201900000");
+                                        .isEqualTo("workflow_with_one_fake_task_running-20250322201900000");
+
+                                final WorkflowInstanceStopResponse stopResponse = Clients
+                                        .withService(IWorkflowControlClient.class)
+                                        .withHost(workflowInstance.getHost())
+                                        .stopWorkflowInstance(new WorkflowInstanceStopRequest(workflowInstance.getId()));
+
+                                assertThat((stopResponse != null && stopResponse.isSuccess())).isTrue();
                             });
-                    final WorkflowInstance workflowInstance = repository.queryWorkflowInstance(1);
-                    final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    assertThat(workflowInstance)
-                            .matches(t -> t.getHost().equals(masterConfig.getMasterAddress()));
                 });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.STOP);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_running-20250322201900000");
+                            });
+                });
+
         masterContainer.assertAllResourceReleased();
 
     }
-
-
 }
