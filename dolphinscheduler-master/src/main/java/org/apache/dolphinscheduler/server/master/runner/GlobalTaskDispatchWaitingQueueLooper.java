@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,9 +38,6 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     @Autowired
     private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
-
-    @Autowired
-    private TaskExecutorClient taskExecutorClient;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -66,20 +64,41 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     }
 
     void doDispatch() {
-        ITaskExecutionRunnable taskExecutionRunnable =
-                globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
+        final ITaskExecutionRunnable taskExecutionRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        try {
+            final TaskExecutionStatus status = taskInstance.getState();
+            if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
+                log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
+                return;
+            }
+            this.dispatchTaskToWorkerGroup(taskExecutionRunnable);
+        } catch (Exception e) {
+            this.delayRetryDispatch(taskExecutionRunnable, e);
+        }
+    }
+
+    private void delayRetryDispatch(ITaskExecutionRunnable taskExecutionRunnable, Exception e) {
+        // If dispatch failed, will put the task back to the queue
+        // The task will be dispatched after waiting time.
+        // the waiting time will increase multiple of times, but will not exceed 60 seconds
+        long waitingTimeMills = Math.min(
+                taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
+                waitingTimeMills);
+        log.error("Dispatch Task: {} failed will retry after: {}/ms", taskExecutionRunnable.getTaskInstance().getName(),
+                waitingTimeMills, e);
+    }
+
+    private void dispatchTaskToWorkerGroup(ITaskExecutionRunnable taskExecutionRunnable) {
         boolean addTaskSuccess = workerGroupTaskDispatcherManager.addTaskToWorkerGroup(
                 taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
                 taskExecutionRunnable, 0);
         if (!addTaskSuccess) {
-            log.warn("worker group is deleting or deleted, taskInstance: {}", taskExecutionRunnable.getTaskInstance());
-            // If dispatch failed, will put the task back to the queue
-            // The task will be dispatched after waiting time.
-            // the waiting time will increase multiple of times, but will not exceed 60 seconds
-            long waitingTimeMills = Math.min(
-                    taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
-                    waitingTimeMills);
+            this.delayRetryDispatch(taskExecutionRunnable,
+                    new Exception(String.format("Dispatch TaskInstance: %s WorkerGrouTaskDispatcher: %s failed",
+                            taskExecutionRunnable.getTaskInstance().getName(),
+                            taskExecutionRunnable.getTaskInstance().getWorkerGroup())));
         }
     }
 
@@ -87,8 +106,8 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     public void close() throws Exception {
         if (RUNNING_FLAG.compareAndSet(true, false)) {
             log.info("GlobalTaskDispatchWaitingQueueLooper stopping...");
-            log.info("GlobalTaskDispatchWaitingQueueLooper stopped...");
             workerGroupTaskDispatcherManager.close();
+            log.info("GlobalTaskDispatchWaitingQueueLooper stopped...");
         } else {
             log.error("GlobalTaskDispatchWaitingQueueLooper is not started");
         }

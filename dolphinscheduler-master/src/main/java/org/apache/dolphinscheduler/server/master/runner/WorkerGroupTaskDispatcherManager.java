@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -124,7 +123,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
             try {
                 entry.getValue().markDispatcherClosing();
             } catch (Exception e) {
-                log.error("stop worker group error", e);
+                log.error("close worker group error", e);
             }
         }
         log.info("WorkerGroupTaskDispatcherManager closed");
@@ -140,11 +139,9 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
 
     @Override
     public void onWorkerGroupChange(List<WorkerGroup> workerGroups) {
-        this.checkAndRemoveClosedDispatchWorker();
-        String workerGroupsString = workerGroups.stream()
-                .map(WorkerGroup::getName)
-                .collect(Collectors.joining(", "));
-        log.info("Worker groups: {}", workerGroupsString);
+        // Worker group changes will trigger add and delete events.
+        // There is no need to handle the change events here; just log the records.
+        log.info("on change worker groups: {}", workerGroups);
     }
 
     @Override
@@ -153,7 +150,8 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
             try {
                 this.deleteWorkerGroup(workerGroup.getName());
             } catch (Exception e) {
-                log.error("stop worker group error", e);
+                log.error("Delete worker group: {} from WorkerGroupTaskDispatcherManager error", workerGroup.getName(),
+                        e);
             }
         }
         this.checkAndRemoveClosedDispatchWorker();

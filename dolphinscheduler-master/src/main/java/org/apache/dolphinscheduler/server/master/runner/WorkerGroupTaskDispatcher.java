@@ -45,7 +45,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
     // it will be delayed and will not return to the first or second position.
     // Tasks with the same priority will preempt its position.
     // If it needs to be placed at the front of the queue, the queue needs to be re-implemented.
-    private final PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> workerGroupQueue;
+    private final PriorityDelayQueue<PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable>> workerGroupQueue;
 
     private final AtomicReference<DispatchWorkerStatus> status = new AtomicReference<>(DispatchWorkerStatus.INIT);
 
@@ -72,7 +72,8 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
             workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry(delayTimeMills, taskExecutionRunnable));
             return true;
         } else {
-            log.warn("The {} status is {}, task can not add Queue, it will fail", this.getName(), status.get());
+            log.warn("The WorkerGroupTaskDispatcher: {} status is {}, cannot receive task: {}", this.getName(),
+                    status.get(), taskExecutionRunnable.getTaskInstance().getName());
         }
         return false;
     }
@@ -88,7 +89,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
         }
     }
 
-    public void markDispatcherClosing() {
+    public synchronized void markDispatcherClosing() {
         if (status.get() != DispatchWorkerStatus.CLOSED) {
             status.set(DispatchWorkerStatus.CLOSING);
         } else {

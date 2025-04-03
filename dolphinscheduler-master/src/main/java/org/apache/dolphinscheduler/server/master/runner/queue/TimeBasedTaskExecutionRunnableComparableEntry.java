@@ -27,14 +27,14 @@ import lombok.Getter;
 
 import org.jetbrains.annotations.NotNull;
 
-public class TimeBasedTaskExecutionRunnableComparableEntry<V> implements Delayed {
+public class TimeBasedTaskExecutionRunnableComparableEntry<ITaskExecutionRunnable> implements Delayed {
 
     private final long triggerTimeMills;
     private final long delayTimeMills;
 
     @Getter
-    private final V data;
-    public TimeBasedTaskExecutionRunnableComparableEntry(long delayTimeMills, V data) {
+    private final ITaskExecutionRunnable data;
+    public TimeBasedTaskExecutionRunnableComparableEntry(long delayTimeMills, ITaskExecutionRunnable data) {
         this.delayTimeMills = delayTimeMills;
         this.triggerTimeMills = System.currentTimeMillis() + delayTimeMills;
         this.data = checkNotNull(data, "data is null");
@@ -59,11 +59,13 @@ public class TimeBasedTaskExecutionRunnableComparableEntry<V> implements Delayed
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        DelayEntry<?> that = (DelayEntry<?>) o;
+        }
+        TimeBasedTaskExecutionRunnableComparableEntry<?> that = (TimeBasedTaskExecutionRunnableComparableEntry<?>) o;
         return this.getDelay(TimeUnit.MILLISECONDS) == that.getDelay(TimeUnit.MILLISECONDS)
                 && Objects.equals(data, that.getData());
     }
