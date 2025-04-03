@@ -77,7 +77,7 @@ jobs:
       helm-doc: ${{ steps.filter.outputs.helm-doc }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |

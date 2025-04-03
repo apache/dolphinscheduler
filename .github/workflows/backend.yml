@@ -38,7 +38,7 @@ jobs:
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |
