@@ -25,7 +25,7 @@ set -eo pipefail
 DOLPHINSCHEDULER_HOME=$(cd $(dirname $0);cd ../;pwd)
 
 # plugins default version is 3.3.0, you can also choose a custom version. eg: 3.3.0: bash install-plugins.sh 3.3.0
-version=3.3.0
+version=3.3.0-alpha
 
 if [ -n "$1" ]; then
   if [ "$1" == "dev" ]; then
