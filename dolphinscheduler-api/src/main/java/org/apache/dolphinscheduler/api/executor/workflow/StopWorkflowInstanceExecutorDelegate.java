@@ -95,7 +95,7 @@ public class StopWorkflowInstanceExecutorDelegate
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
-            log.error("WorkflowInstance: {} stop failed", workflowInstance.getName(), e);
+            log.error("WorkflowInstance stop failed, workflowInstanceId: {}, workflowInstanceName: {}", workflowInstance.getId(), workflowInstance.getName(), e);
             throw new ServiceException(
                     String.format("WorkflowInstance: %s stop failed", workflowInstance.getName()), e);
         }
