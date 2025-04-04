@@ -158,7 +158,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
             bootstrapCommand.add("CPUQuota=");
         } else {
             bootstrapCommand.add("-p");
-            bootstrapCommand.add(String.format("CPUQuota=%s%%", cpuQuota));
+            bootstrapCommand.add(String.format("CPUQuota=%s%", cpuQuota));
         }
 
         // use `man systemd.resource-control` to find available parameter
