@@ -2,13 +2,10 @@
 
 ## Preface
 
-Issues function is used to track various Features, Bugs, Functions, etc. The project maintainer can organize the tasks to be completed through issues.
-
-Issue is an important step in drawing out a feature or bug,
-and the contents that can be discussed in an issue are not limited to the features, the causes of the existing bugs, the research on preliminary scheme, and the corresponding implementation design and code design.
-
-And only when the Issue is approved, the corresponding Pull Request should be implemented.
-
+Issues function is used to track various Features, Bugs, Functions, etc. 
+The project maintainer can organize the tasks to be completed through issues.
+Issue is an important step in drawing out a feature or bug, and the contents that can be discussed in an issue are not limited to the features, the causes of the existing bugs, the research on preliminary scheme, and the corresponding implementation design and code design.
+When the Issue is approved, the corresponding Pull Request should be implemented accordingly.
 If an issue corresponds to a large feature, it is recommended to divide it into multiple small issues according to the functional modules and other dimensions.
 
 ## Specification

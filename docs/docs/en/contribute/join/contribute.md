@@ -38,3 +38,5 @@ If you want to implement a Feature or fix a Bug. Please refer to the following:
 * When you're done, send a Pull Request to dolphinscheduler, please refer to the《[Submit Guide-Submit Pull Request Process](./submit-code.md)》
 
 If you want to submit a Pull Request to complete a Feature or fix a Bug, it is recommended that you start with the `good first issue`, `easy-to-fix` issues, complete a small function to submit, do not change too many files at a time, changing too many files will also put a lot of pressure on Reviewers, it is recommended to submit them through multiple Pull Requests, not all at once.
+
+_Contributed as part of GSoC 2025 application by Marya Alamzeb_
