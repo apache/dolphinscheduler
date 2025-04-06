@@ -184,6 +184,92 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow with one success switch task and two fake task")
+    public void testStartWorkflow_with_oneSuccessSwitch_twoFakeTask() {
+        final String yaml = "/it/start/workflow_with_one_success_switch_two_fake_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                            .matches(
+                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO)
+                            .matches(
+                                    workflowInstance -> workflowInstance.getDryRun() == Flag.NO.getCode());
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("switch_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("success_branch");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one failed switch task and two fake task")
+    public void testStartWorkflow_with_oneFailedSwitch_twoFakeTask() {
+        final String yaml = "/it/start/workflow_with_one_failed_switch_two_fake_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                            .matches(
+                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO)
+                            .matches(
+                                    workflowInstance -> workflowInstance.getDryRun() == Flag.NO.getCode());
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("switch_task");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("default_branch");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with one sub workflow task(A) success")
     public void testStartWorkflow_with_subWorkflowTask_success() {
         final String yaml = "/it/start/workflow_with_sub_workflow_task_success.yaml";
