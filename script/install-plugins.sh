@@ -24,15 +24,11 @@ set -eo pipefail
 # get ds home
 DOLPHINSCHEDULER_HOME=$(cd $(dirname $0);cd ../;pwd)
 
-# plugins default version is 3.3.0, you can also choose a custom version. eg: 3.3.0: bash install-plugins.sh 3.3.0
-version=3.3.0
+# plugins default version is dev-SNAPSHOT, you can also choose a custom version. eg: dev-SNAPSHOT: bash install-plugins.sh dev-SNAPSHOT
+version=dev-SNAPSHOT
 
 if [ -n "$1" ]; then
-  if [ "$1" == "dev" ]; then
-    version="dev-SNAPSHOT"
-  else
-    version="$1"
-  fi
+  version="$1"
 fi
 
 echo "Install Dolphinscheduler plugins, usage version is ${version}"
