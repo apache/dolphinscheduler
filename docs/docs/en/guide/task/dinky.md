@@ -3,7 +3,7 @@
 ## Overview
 
 Use `Dinky Task` to create a dinky-type task and support one-stop development, debugging, operation and maintenance of FlinkSql, Flink jar and SQL. When the worker executes `Dinky Task`,
-it will call `Dinky API` to trigger dinky task. Click [here](http://www.dlink.top/) for details about `Dinky`.
+it will call `Dinky API` to trigger dinky task. Click [here](https://www.dinky.org.cn/) for details about `Dinky`.
 
 ## Create Task
 
