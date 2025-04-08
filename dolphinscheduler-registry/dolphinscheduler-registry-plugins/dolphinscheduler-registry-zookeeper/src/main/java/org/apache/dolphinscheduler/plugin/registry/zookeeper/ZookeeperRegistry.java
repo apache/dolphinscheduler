@@ -107,7 +107,7 @@ final class ZookeeperRegistry implements Registry {
                 client.close();
                 throw new RegistryException(
                         "zookeeper connect failed to: " + properties.getConnectString() + " in : "
-                                + properties.getBlockUntilConnected() + "ms");
+                                + properties.getBlockUntilConnected().toMillis() + "ms");
             }
             stopWatch.stop();
             log.info("ZookeeperRegistry started at: {}/ms", stopWatch.getTime());
