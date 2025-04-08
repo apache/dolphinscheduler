@@ -38,6 +38,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.api.configuration.OidcConfiguration;
+import org.apache.dolphinscheduler.api.security.impl.sso.GenericOidcAuthenticator;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -84,6 +87,13 @@ public class LoginController extends BaseController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired(required = false)
+    private OidcConfiguration oidcConfiguration;
+
+    @Autowired(required = false)
+    private GenericOidcAuthenticator genericOidcAuthenticator;
+
 
     @Autowired
     private Authenticator authenticator;
@@ -206,6 +216,24 @@ public class LoginController extends BaseController {
         }).collect(Collectors.toList());
         return Result.success(providers);
     }
+    @SneakyThrows
+    @Operation(summary = "redirectToOidc", description = "REDIRECT_TO_OIDC_LOGIN")
+    @GetMapping("redirect/login/oidc")
+    public void loginByOidc(@RequestParam String code, @RequestParam String provider,
+                            HttpServletRequest request, HttpServletResponse response) {
+        try {
+            User user = ((GenericOidcAuthenticator) authenticator).login(provider, code);
+            Session session = sessionService.createSessionIfAbsent(user);
+            response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+            response.sendRedirect(String.format("%s?sessionId=%s&authType=oidc",
+                    oidcConfiguration.getProvider().get(provider).getCallbackUrl(), session.getId()));
+        } catch (Exception ex) {
+            log.error("OIDC Login failed", ex);
+            response.sendRedirect(String.format("%s?authType=oidc&error=auth_failed",
+                    oidcConfiguration.getProvider().get(provider).getCallbackUrl()));
+        }
+    }
+
 
     @SneakyThrows
     @Operation(summary = "redirectToOauth2", description = "REDIRECT_TO_OAUTH2_LOGIN")

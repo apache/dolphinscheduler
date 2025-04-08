@@ -170,6 +170,25 @@ metrics:
 
 security:
   authentication:
+    oidc:
+      enable: true
+      provider:
+        keycloak:
+          issuer-uri: "https://keycloak.example.com/realms/myrealm"
+          client-id: "dolphinscheduler-client"
+          client-secret: "your-client-secret"
+          redirect-uri: "http://localhost:12345/dolphinscheduler/redirect/login/oidc"
+          callback-url: "http://localhost:5173/login"
+          icon-uri: "https://www.keycloak.org/resources/images/keycloak-icon.png"
+          provider: keycloak
+        dex:
+          issuer-uri: "https://dex.example.com"
+          client-id: "dolphinscheduler-client"
+          client-secret: "your-client-secret"
+          redirect-uri: "http://localhost:12345/dolphinscheduler/redirect/login/oidc"
+          callback-url: "http://localhost:5173/login"
+          icon-uri: "https://dexidp.io/images/dex-logo.svg"
+          provider: dex
     # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
