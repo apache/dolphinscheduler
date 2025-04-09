@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,9 @@ class GlobalTaskDispatchWaitingQueueLooperTest {
     void testTaskExecutionRunnableStatusIsSubmittedNoWorkerGroup() {
 
         when(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).thenReturn(taskExecutionRunnable);
-        when(taskExecutionRunnable.getTaskInstance()).thenReturn(mock(TaskInstance.class));
+        TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(mock(TaskExecutionContext.class));
         globalTaskDispatchWaitingQueueLooper.doDispatch();
 
