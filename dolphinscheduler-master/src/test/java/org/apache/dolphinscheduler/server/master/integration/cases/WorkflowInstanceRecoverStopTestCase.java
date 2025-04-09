@@ -125,7 +125,6 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
         masterContainer.assertAllResourceReleased();
     }
 
-
     @Test
     @DisplayName("Test recover a stopped workflow from another master")
     public void testRecoverStoppedWorkflow_from_another_master() {
@@ -150,7 +149,8 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
                                 final WorkflowInstanceStopResponse stopResponse = Clients
                                         .withService(IWorkflowControlClient.class)
                                         .withHost(workflowInstance.getHost())
-                                        .stopWorkflowInstance(new WorkflowInstanceStopRequest(workflowInstance.getId()));
+                                        .stopWorkflowInstance(
+                                                new WorkflowInstanceStopRequest(workflowInstance.getId()));
 
                                 assertThat(stopResponse != null && stopResponse.isSuccess()).isTrue();
                             });

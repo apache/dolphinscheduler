@@ -24,17 +24,13 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
@@ -564,7 +560,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         masterContainer.assertAllResourceReleased();
     }
 
-
     @Test
     public void testGlobalFailover_runningWorkflow_fromAnotherMaster() {
         final String yaml = "/it/failover/running_workflowInstance_from_another_master.yaml";
@@ -597,7 +592,8 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                                 final WorkflowInstanceStopResponse stopResponse = Clients
                                         .withService(IWorkflowControlClient.class)
                                         .withHost(workflowInstance.getHost())
-                                        .stopWorkflowInstance(new WorkflowInstanceStopRequest(workflowInstance.getId()));
+                                        .stopWorkflowInstance(
+                                                new WorkflowInstanceStopRequest(workflowInstance.getId()));
 
                                 assertThat((stopResponse != null && stopResponse.isSuccess())).isTrue();
                             });

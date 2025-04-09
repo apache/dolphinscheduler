@@ -118,7 +118,8 @@ public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIn
                                 final WorkflowInstanceStopResponse stopResponse = Clients
                                         .withService(IWorkflowControlClient.class)
                                         .withHost(workflowInstance.getHost())
-                                        .stopWorkflowInstance(new WorkflowInstanceStopRequest(workflowInstance.getId()));
+                                        .stopWorkflowInstance(
+                                                new WorkflowInstanceStopRequest(workflowInstance.getId()));
 
                                 assertThat(stopResponse != null && stopResponse.isSuccess()).isTrue();
                             });
