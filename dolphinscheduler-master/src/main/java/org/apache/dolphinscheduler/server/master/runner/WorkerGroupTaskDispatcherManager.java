@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifi
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,16 +65,14 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param workerGroup the identifier for the worker group, used to distinguish different task queues
      * @param taskExecutionRunnable an instance of ITaskExecutionRunnable representing the task to be executed
      * @param delayTimeMills the delay time before the task is executed, in milliseconds
+     * @return true if the task is successfully added to the queue, false workerGroupTaskDispatcher not found
      */
     public synchronized boolean addTaskToWorkerGroup(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable,
                                                      long delayTimeMills) {
         WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
         if (workerGroupTaskDispatcher != null) {
-            if (workerGroupTaskDispatcher.checkCloseDispatchWorkerComplete()) {
-                dispatchWorkerMap.remove(workerGroup);
-                return false;
-            }
-            return workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, delayTimeMills);
+            workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, delayTimeMills);
+            return true;
         } else {
             log.error("workerGroupTaskDispatcher {} not found, will set task {} fail",
                     workerGroup, taskExecutionRunnable.getTaskInstance().getId());
@@ -91,7 +88,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
     private synchronized void deleteWorkerGroup(String workerGroup) {
         WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
         if (workerGroupTaskDispatcher != null) {
-            workerGroupTaskDispatcher.markDispatcherClosing();
+            workerGroupTaskDispatcher.close();
         } else {
             log.warn("workerGroupTaskDispatcher {} not found", workerGroup);
         }
@@ -103,14 +100,10 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
      * @param workerGroup the identifier for the worker group
      */
     private synchronized void addWorkerGroup(String workerGroup) {
-        WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
-        if (workerGroupTaskDispatcher == null) {
-            workerGroupTaskDispatcher = new WorkerGroupTaskDispatcher(workerGroup, taskExecutorClient);
-            dispatchWorkerMap.put(workerGroup, workerGroupTaskDispatcher);
-            workerGroupTaskDispatcher.start();
-        } else {
-            workerGroupTaskDispatcher.markDispatcherStart();
-        }
+        log.info("add workerGroup: {}", workerGroup);
+        WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.computeIfAbsent(
+                workerGroup, key -> new WorkerGroupTaskDispatcher(workerGroup, taskExecutorClient));
+        workerGroupTaskDispatcher.start();
     }
 
     /**
@@ -121,7 +114,7 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
         log.info("WorkerGroupTaskDispatcherManager start close");
         for (Map.Entry<String, WorkerGroupTaskDispatcher> entry : dispatchWorkerMap.entrySet()) {
             try {
-                entry.getValue().markDispatcherClosing();
+                entry.getValue().close();
             } catch (Exception e) {
                 log.error("close worker group error", e);
             }
@@ -131,7 +124,6 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
 
     @Override
     public void onWorkerGroupAdd(List<WorkerGroup> workerGroups) {
-        this.checkAndRemoveClosedDispatchWorker();
         for (WorkerGroup workerGroup : workerGroups) {
             this.addWorkerGroup(workerGroup.getName());
         }
@@ -152,20 +144,6 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
             } catch (Exception e) {
                 log.error("Delete worker group: {} from WorkerGroupTaskDispatcherManager error", workerGroup.getName(),
                         e);
-            }
-        }
-        this.checkAndRemoveClosedDispatchWorker();
-    }
-
-    // check closed workerGroupTaskDispatcher and remove when workerGroup Listener notify
-    private void checkAndRemoveClosedDispatchWorker() {
-        Iterator<Map.Entry<String, WorkerGroupTaskDispatcher>> iterator = dispatchWorkerMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, WorkerGroupTaskDispatcher> entry = iterator.next();
-            WorkerGroupTaskDispatcher workerGroupTaskDispatcher = entry.getValue();
-            if (workerGroupTaskDispatcher.checkCloseDispatchWorkerComplete()) {
-                iterator.remove();
-                log.warn("workerGroupTaskDispatcher {} closed", entry.getKey());
             }
         }
     }

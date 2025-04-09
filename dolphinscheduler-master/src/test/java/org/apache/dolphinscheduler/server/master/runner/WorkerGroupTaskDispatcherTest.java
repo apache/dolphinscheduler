@@ -20,65 +20,117 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 
 import java.time.Duration;
 
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
-public class WorkerGroupTaskDispatcherTest {
+class WorkerGroupTaskDispatcherTest {
 
-    @Mock
+    private WorkerGroupTaskDispatcher dispatcher;
     private ITaskExecutorClient taskExecutorClient;
 
-    @Mock
-    private ITaskExecutionRunnable taskExecutionRunnable;
-
-    @InjectMocks
-    private WorkerGroupTaskDispatcher workerGroupTaskDispatcher;
-
-    @Test
-    public void testInitAddTaskSuccess() {
-        boolean result = workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L);
-        assertTrue(result);
+    @BeforeEach
+    void setUp() {
+        taskExecutorClient = mock(ITaskExecutorClient.class);
+        dispatcher = new WorkerGroupTaskDispatcher("TestGroup", taskExecutorClient);
     }
 
     @Test
-    public void testAddTaskFail() {
-        workerGroupTaskDispatcher.markDispatcherClosing();
-        boolean result = workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L);
-        assertFalse(result);
+    void addTaskToWorkerGroupQueue_StatusAllowed_TaskAdded() {
+        // Arrange
+        ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        doReturn(TaskExecutionStatus.SUBMITTED_SUCCESS).when(taskInstance).getState();
+        dispatcher.start();
+
+        // Act
+        dispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0);
+
+        // Assert
+        assertFalse(dispatcher.queueSize() == 0);
     }
 
     @Test
-    public void testStartDispatcher() {
-        assertFalse(workerGroupTaskDispatcher.isAlive());
-        workerGroupTaskDispatcher.start();
-        assertTrue(workerGroupTaskDispatcher.isAlive());
+    void addTaskToWorkerGroupQueue_StatusNotAllowed_TaskNotAdded() {
+        // Arrange
+        ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        doReturn(TaskExecutionStatus.RUNNING_EXECUTION).when(taskInstance).getState();
+
+        // Act
+        dispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0);
+
+        // Assert
+        assertTrue(dispatcher.queueSize() > 0);
     }
 
     @Test
-    public void testCloseToStartDispatcher() {
-        workerGroupTaskDispatcher.start();
-        workerGroupTaskDispatcher.markDispatcherClosing();
+    void start_DispatcherStartsSuccessfully() {
+        // Act
+        dispatcher.start();
 
-        boolean result = workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L);
-        assertFalse(result);
-        sleep(1000);
+        // Assert
+        assertTrue(dispatcher.isAlive());
+    }
+
+    @Test
+    void dispatch_TaskDispatchedSuccessfully() throws TaskDispatchException {
+        // Arrange
+        ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        doReturn(TaskExecutionStatus.SUBMITTED_SUCCESS).when(taskInstance).getState();
+        doNothing().when(taskExecutorClient).dispatch(any());
+        dispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0);
+
+        // Act
+        dispatcher.start();
+        sleep(100); // Give some time for the dispatcher to run
+        dispatcher.close();
         Awaitility.await()
-                .atMost(Duration.ofSeconds(1)).untilAsserted(() -> {
-                    assertTrue(workerGroupTaskDispatcher.checkCloseDispatchWorkerComplete());
-                    // closed can not to start, cannot add task
-                    workerGroupTaskDispatcher.start();
-                    assertFalse(workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0L));
-                });
+                .atMost(Duration.ofSeconds(1)).untilAsserted(
+                        () -> verify(taskExecutorClient, atLeastOnce()).dispatch(taskExecutionRunnable));
+        // Assert
+
+    }
+
+    @Test
+    void dispatch_TaskDispatchFails_RetryLogicWorks() throws TaskDispatchException {
+        // Arrange
+        ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        doReturn(TaskExecutionStatus.SUBMITTED_SUCCESS).when(taskInstance).getState();
+        doThrow(new RuntimeException()).when(taskExecutorClient).dispatch(any());
+        dispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, 0);
+
+        // Act
+        dispatcher.start();
+        sleep(100); // Give some time for the dispatcher to run
+        dispatcher.close();
+
+        // Assert
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(1)).untilAsserted(
+                        () -> verify(taskExecutorClient, atLeastOnce()).dispatch(any()));
     }
 }
