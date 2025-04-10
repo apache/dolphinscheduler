@@ -27,14 +27,7 @@ then access the `Grafana` by the url: `http://localhost:3001` for dashboards.
 
 ## Configuration
 
-- Please add the following config in master/worker/alert/api's yaml file to enable the metrics exporter.
-
-```yaml
-metrics:
-  enabled: true
-```
-
-- Once the metrics exporter enabled, you could access the metrics by the url `http://ip:port/actuator/prometheus`.
+You could access the metrics by the url `http://ip:port/actuator/prometheus`.
 
 The exporter port is the `server.port` defined in application.yaml, e.g: master: `server.port: 5679`, worker: `server.port: 1235`, alert: `server.port: 50053`, api: `server.port: 12345`.
 
