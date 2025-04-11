@@ -213,7 +213,7 @@ public class DataxTaskTest {
 
             ResultSetMetaData md = mock(ResultSetMetaData.class);
             when(md.getColumnCount()).thenReturn(1);
-            when(md.getColumnName(eq(1))).thenReturn("something");
+            when(md.getColumnLabel(eq(1))).thenReturn("something");
 
             ResultSet resultSet = mock(ResultSet.class);
             when(resultSet.getMetaData()).thenReturn(md);
