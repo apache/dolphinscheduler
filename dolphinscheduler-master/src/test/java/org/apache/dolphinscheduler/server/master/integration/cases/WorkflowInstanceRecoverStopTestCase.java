@@ -24,7 +24,11 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
@@ -121,4 +125,50 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
         masterContainer.assertAllResourceReleased();
     }
 
+    @Test
+    @DisplayName("Test recover a stopped workflow from another master")
+    public void testRecoverStoppedWorkflow_from_another_master() {
+        final String yaml = "/it/recover_stopped/stopped_workflow_from_another_master.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        assertThat(workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_killed-20250322201900000");
+
+                                final WorkflowInstanceStopResponse stopResponse = Clients
+                                        .withService(IWorkflowControlClient.class)
+                                        .withHost(workflowInstance.getHost())
+                                        .stopWorkflowInstance(
+                                                new WorkflowInstanceStopRequest(workflowInstance.getId()));
+
+                                assertThat(stopResponse != null && stopResponse.isSuccess()).isTrue();
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.STOP);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_killed-20250322201900000");
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
 }
