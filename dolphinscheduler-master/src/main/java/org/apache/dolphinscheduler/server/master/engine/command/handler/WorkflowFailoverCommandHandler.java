@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -58,6 +59,9 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     /**
      * Generate the recover workflow instance.
      * <p> Will use the origin workflow instance, but will update the following fields. Need to note we cannot not
@@ -86,6 +90,7 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
                     "The WorkflowFailoverCommandParam: " + command.getCommandParam() + " is invalid");
         }
         workflowInstance.setState(workflowFailoverCommandParam.getWorkflowExecutionStatus());
+        workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
