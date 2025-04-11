@@ -195,6 +195,8 @@ We need to update some documentation before the Maven release. For example, to r
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` and `version` needs to be updated to x.y.z
     - `values.yaml`: `image.tag` needs to be updated to x.y.z
+  - `config`
+    - `install-plugins.sh`: `dev-SNAPSHOT` needs to be updated to x.y.z
 - Version in the docs:
   - Change the placeholder `<version>`(except `pom`) to the `x.y.z` in directory `docs`
   - Add new history version

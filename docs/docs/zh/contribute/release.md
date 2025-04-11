@@ -199,6 +199,8 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` 和 `version` 版本更新为 x.y.z
     - `values.yaml`: `image.tag` 版本更新为 x.y.z
+  - `config`
+    - `install-plugins.sh`: `version` 版本 `dev-SNAPSHOT` 更新为 x.y.z
 - 修改文档（docs 模块）中的版本号:
   - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
   - 新增历史版本
