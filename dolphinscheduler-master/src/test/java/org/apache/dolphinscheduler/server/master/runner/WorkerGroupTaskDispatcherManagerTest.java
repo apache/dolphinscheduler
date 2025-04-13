@@ -17,51 +17,89 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupTaskDispatcherManagerTest {
 
     @InjectMocks
-    private WorkerGroupTaskDispatcherManager manager;
+    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
+
+    @Mock
+    private ITaskExecutorClient taskExecutorClient;
 
     @Mock
     private ITaskExecutionRunnable taskExecutionRunnable;
 
-    @Mock
-    private TaskInstance taskInstance;
-
-    @Test
-    public void testAddTaskToWorkerGroupTaskToWorkerGroupQueueTaskToNonExistingWorkerGroup_ShouldReturnFalse() {
-        Mockito.when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
-        String workerGroupName = "nonExistingGroup";
-        boolean result = manager.addTaskToWorkerGroup(workerGroupName, taskExecutionRunnable, 0L);
-        assertFalse(result);
+    @BeforeEach
+    public void setUp() {
+        workerGroupTaskDispatcherManager = new WorkerGroupTaskDispatcherManager();
+        ReflectionTestUtils.setField(workerGroupTaskDispatcherManager, "taskExecutorClient", taskExecutorClient);
     }
 
     @Test
-    public void testOnWorkerGroupAdd_ShouldAddTaskToWorkerGroupTaskToWorkerGroupQueueWorkerGroups() {
-        WorkerGroup group1 = new WorkerGroup();
-        WorkerGroup group2 = new WorkerGroup();
-        group1.setName("testGroup1");
-        group2.setName("testGroup2");
-        List<WorkerGroup> workerGroups = Arrays.asList(group1, group2);
-        manager.onWorkerGroupAdd(workerGroups);
-        assertEquals(2, manager.getDispatchWorkerMap().size());
+    public void addTaskToWorkerGroup_NewWorkerGroup_ShouldAddTask() {
+        String workerGroup = "newGroup";
+        long delayTimeMills = 1000;
+
+        workerGroupTaskDispatcherManager.addTaskToWorkerGroup(workerGroup, taskExecutionRunnable, delayTimeMills);
+
+        ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap =
+                (ConcurrentHashMap<String, WorkerGroupTaskDispatcher>) ReflectionTestUtils
+                        .getField(workerGroupTaskDispatcherManager, "dispatchWorkerMap");
+
+        assert dispatchWorkerMap != null;
+        assertTrue(dispatchWorkerMap.containsKey(workerGroup));
+    }
+
+    @Test
+    public void addTaskToWorkerGroup_ExistingWorkerGroup_ShouldAddTask() {
+        String workerGroup = "existingGroup";
+        long delayTimeMills = 1000;
+
+        WorkerGroupTaskDispatcher mockDispatcher = mock(WorkerGroupTaskDispatcher.class);
+
+        ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap = new ConcurrentHashMap<>();
+        dispatchWorkerMap.put(workerGroup, mockDispatcher);
+
+        ReflectionTestUtils.setField(workerGroupTaskDispatcherManager, "dispatchWorkerMap", dispatchWorkerMap);
+        doNothing().when(mockDispatcher).start();
+        workerGroupTaskDispatcherManager.addTaskToWorkerGroup(workerGroup, taskExecutionRunnable, delayTimeMills);
+
+        verify(mockDispatcher, times(1)).addTaskToWorkerGroupQueue(taskExecutionRunnable, delayTimeMills);
+    }
+
+    @Test
+    public void close_ShouldCloseAllWorkerGroups() throws Exception {
+        WorkerGroupTaskDispatcher mockDispatcher1 = mock(WorkerGroupTaskDispatcher.class);
+        WorkerGroupTaskDispatcher mockDispatcher2 = mock(WorkerGroupTaskDispatcher.class);
+
+        ConcurrentHashMap<String, WorkerGroupTaskDispatcher> dispatchWorkerMap = new ConcurrentHashMap<>();
+        dispatchWorkerMap.put("group1", mockDispatcher1);
+        dispatchWorkerMap.put("group2", mockDispatcher2);
+
+        ReflectionTestUtils.setField(workerGroupTaskDispatcherManager, "dispatchWorkerMap", dispatchWorkerMap);
+
+        workerGroupTaskDispatcherManager.close();
+
+        verify(mockDispatcher1, times(1)).close();
+        verify(mockDispatcher2, times(1)).close();
     }
 }

@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.server.master.runner.WorkerGroupTaskDispatcherManager;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,10 +57,6 @@ public class ClusterManager {
         initializeMasterClusters();
         initializeWorkerClusters();
         log.info("ClusterManager started...");
-    }
-
-    public void registerWorkerGroupListener(WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager) {
-        this.workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerGroupTaskDispatcherManager);
     }
 
     /**

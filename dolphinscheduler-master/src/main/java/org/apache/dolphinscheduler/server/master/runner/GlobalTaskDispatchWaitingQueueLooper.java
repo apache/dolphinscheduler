@@ -91,15 +91,9 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     }
 
     private void dispatchTaskToWorkerGroup(ITaskExecutionRunnable taskExecutionRunnable) {
-        boolean addTaskSuccess = workerGroupTaskDispatcherManager.addTaskToWorkerGroup(
+        workerGroupTaskDispatcherManager.addTaskToWorkerGroup(
                 taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
                 taskExecutionRunnable, 0);
-        if (!addTaskSuccess) {
-            this.delayRetryDispatch(taskExecutionRunnable,
-                    new Exception(String.format("Dispatch TaskInstance: %s WorkerGrouTaskDispatcher: %s failed",
-                            taskExecutionRunnable.getTaskInstance().getName(),
-                            taskExecutionRunnable.getTaskInstance().getWorkerGroup())));
-        }
     }
 
     @Override

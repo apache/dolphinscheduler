@@ -132,7 +132,6 @@ public class MasterServer implements IStoppable {
 
         this.masterCoordinator.start();
 
-        this.clusterManager.registerWorkerGroupListener(this.workerGroupTaskDispatcherManager);
         this.clusterManager.start();
 
         this.clusterStateMonitors.start();

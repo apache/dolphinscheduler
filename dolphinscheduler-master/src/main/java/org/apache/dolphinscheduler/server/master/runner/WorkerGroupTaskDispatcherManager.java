@@ -17,17 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGroupChangeNotifier.WorkerGroupListener {
+public class WorkerGroupTaskDispatcherManager implements AutoCloseable {
 
     @Autowired
     private ITaskExecutorClient taskExecutorClient;
@@ -54,56 +48,21 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
         dispatchWorkerMap = new ConcurrentHashMap<>();
     }
 
-    @PostConstruct
-    public void init() {
-        this.addWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-    }
-
     /**
      * Adds a task to the specified worker group queue and starts or wakes up the corresponding processing loop.
      *
      * @param workerGroup the identifier for the worker group, used to distinguish different task queues
      * @param taskExecutionRunnable an instance of ITaskExecutionRunnable representing the task to be executed
      * @param delayTimeMills the delay time before the task is executed, in milliseconds
-     * @return true if the task is successfully added to the queue, false workerGroupTaskDispatcher not found
      */
-    public synchronized boolean addTaskToWorkerGroup(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable,
-                                                     long delayTimeMills) {
-        WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
-        if (workerGroupTaskDispatcher != null) {
-            workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, delayTimeMills);
-            return true;
-        } else {
-            log.error("workerGroupTaskDispatcher {} not found, will set task {} fail",
-                    workerGroup, taskExecutionRunnable.getTaskInstance().getId());
-        }
-        return false;
-    }
-
-    /**
-     * Stops a specific worker group's task dispatch waiting queue looper.
-     *
-     * @param workerGroup the identifier for the worker group
-     */
-    private synchronized void deleteWorkerGroup(String workerGroup) {
-        WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.get(workerGroup);
-        if (workerGroupTaskDispatcher != null) {
-            workerGroupTaskDispatcher.close();
-        } else {
-            log.warn("workerGroupTaskDispatcher {} not found", workerGroup);
-        }
-    }
-
-    /**
-     * add workerGroup
-     *
-     * @param workerGroup the identifier for the worker group
-     */
-    private synchronized void addWorkerGroup(String workerGroup) {
-        log.info("add workerGroup: {}", workerGroup);
+    public synchronized void addTaskToWorkerGroup(String workerGroup, ITaskExecutionRunnable taskExecutionRunnable,
+                                                  long delayTimeMills) {
         WorkerGroupTaskDispatcher workerGroupTaskDispatcher = dispatchWorkerMap.computeIfAbsent(
                 workerGroup, key -> new WorkerGroupTaskDispatcher(workerGroup, taskExecutorClient));
-        workerGroupTaskDispatcher.start();
+        if (!workerGroupTaskDispatcher.isAlive()) {
+            workerGroupTaskDispatcher.start();
+        }
+        workerGroupTaskDispatcher.addTaskToWorkerGroupQueue(taskExecutionRunnable, delayTimeMills);
     }
 
     /**
@@ -120,31 +79,5 @@ public class WorkerGroupTaskDispatcherManager implements AutoCloseable, WorkerGr
             }
         }
         log.info("WorkerGroupTaskDispatcherManager closed");
-    }
-
-    @Override
-    public void onWorkerGroupAdd(List<WorkerGroup> workerGroups) {
-        for (WorkerGroup workerGroup : workerGroups) {
-            this.addWorkerGroup(workerGroup.getName());
-        }
-    }
-
-    @Override
-    public void onWorkerGroupChange(List<WorkerGroup> workerGroups) {
-        // Worker group changes will trigger add and delete events.
-        // There is no need to handle the change events here; just log the records.
-        log.info("on change worker groups: {}", workerGroups);
-    }
-
-    @Override
-    public void onWorkerGroupDelete(List<WorkerGroup> workerGroups) {
-        for (WorkerGroup workerGroup : workerGroups) {
-            try {
-                this.deleteWorkerGroup(workerGroup.getName());
-            } catch (Exception e) {
-                log.error("Delete worker group: {} from WorkerGroupTaskDispatcherManager error", workerGroup.getName(),
-                        e);
-            }
-        }
     }
 }
