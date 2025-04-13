@@ -119,6 +119,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -245,6 +246,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
+
+    @Autowired
+    private SchedulerApi schedulerApi;
 
     /**
      * create workflow definition
@@ -1583,6 +1587,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         projectCode, workflowDefinition.getCode());
                 putMsg(result, Status.IMPORT_WORKFLOW_DEFINE_ERROR);
                 throw new ServiceException(Status.IMPORT_WORKFLOW_DEFINE_ERROR);
+            }
+            if (ReleaseState.ONLINE.equals(schedule.getReleaseState())) {
+                Project project = projectMapper.queryByCode(projectCode);
+                schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
             }
         }
 
