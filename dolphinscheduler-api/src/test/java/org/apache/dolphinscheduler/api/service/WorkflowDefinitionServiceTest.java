@@ -66,7 +66,15 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
@@ -1268,18 +1276,16 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
-    public void testImportWorkflowDefinitionWithoutProjectAuth(){
+    public void testImportWorkflowDefinitionWithoutProjectAuth() {
         Project project = this.getProject(projectCode);
         Map<String, Object> successResult = new HashMap<>();
         putMsg(successResult, Status.SUCCESS);
         MultipartFile file = new MockMultipartFile(
                 "file", "", "application/json", "".getBytes());
-
         Map<String, Object> checkProjectPermResult1 = new HashMap<>();
         putMsg(checkProjectPermResult1, Status.USER_NO_OPERATION_PROJECT_PERM);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), WORKFLOW_IMPORT))
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
                 .thenReturn(checkProjectPermResult1);
         Map<String, Object> checkProjectPermResult = processDefinitionService.importWorkflowDefinition(
                 user, projectCode, file);
@@ -1288,15 +1294,13 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
-    public void testImportWorkflowDefinitionWithEmptyFileContent(){
+    public void testImportWorkflowDefinitionWithEmptyFileContent() {
         Project project = this.getProject(projectCode);
         Map<String, Object> successResult = new HashMap<>();
         putMsg(successResult, Status.SUCCESS);
         MultipartFile file = new MockMultipartFile("file", "", "application/json", "".getBytes());
-
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), WORKFLOW_IMPORT))
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
                 .thenReturn(successResult);
         Map<String, Object> result = processDefinitionService.importWorkflowDefinition(user, projectCode, file);
         Assertions.assertEquals(Status.DATA_IS_NULL, result.get(Constants.STATUS));
@@ -1310,8 +1314,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // miss workflowTaskRelationList
         MultipartFile checkImportanceParamsFile = createMultipartFile("workflowImport/check_importance_params.json");
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), WORKFLOW_IMPORT))
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
                 .thenReturn(successResult);
         Map<String, Object> checkImportanceParamsResult = processDefinitionService.importWorkflowDefinition(
                 user, projectCode, checkImportanceParamsFile);
@@ -1327,12 +1330,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Map<String, Object> verifyNameResult = new HashMap<>();
         putMsg(verifyNameResult, Status.WORKFLOW_DEFINITION_NAME_EXIST);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), WORKFLOW_IMPORT))
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
                 .thenReturn(successResult);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), WORKFLOW_CREATE))
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_CREATE))
                 .thenReturn(successResult);
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(2);
@@ -1351,12 +1352,11 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         putMsg(successResult, Status.SUCCESS);
         MultipartFile successfulFile = createMultipartFile("workflowImport/check_successful.json");
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), ApiFuncIdentificationConstant.WORKFLOW_IMPORT))
-                .thenReturn(successResult);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(),
+                ApiFuncIdentificationConstant.WORKFLOW_IMPORT))
+                        .thenReturn(successResult);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(
-                user, project, project.getCode(), WORKFLOW_CREATE))
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_CREATE))
                 .thenReturn(successResult);
         when(workflowDefinitionMapper.verifyByDefineName(eq(projectCode), anyString()))
                 .thenReturn(null);
@@ -1383,8 +1383,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 "file",
                 "",
                 "application/json",
-                content
-        );
+                content);
         return multipartFile;
     }
 }
