@@ -17,17 +17,17 @@
 
 package org.apache.dolphinscheduler.server.master.runner.queue;
 
-import static org.apache.dolphinscheduler.common.thread.ThreadUtils.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.concurrent.TimeUnit;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TimeBasedTaskExecutionRunnableComparableEntryTest {
+class TimeBasedTaskExecutionRunnableComparableEntryTest {
 
     private static final long TEST_DELAY_MILLS = 1000L;
     private final String testData = "testData";
@@ -39,7 +39,7 @@ public class TimeBasedTaskExecutionRunnableComparableEntryTest {
     }
 
     @Test
-    public void constructor_NullData_ThrowsNullPointerException() {
+    void constructor_NullData_ThrowsNullPointerException() {
         try {
             new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, null);
             fail("Expected NullPointerException to be thrown");
@@ -49,32 +49,35 @@ public class TimeBasedTaskExecutionRunnableComparableEntryTest {
     }
 
     @Test
-    public void getDelay_BeforeTriggerTime_ReturnsPositive() {
+    void getDelay_BeforeTriggerTime_ReturnsPositive() {
         entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
-        sleep(500L);
-        long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
-        assertTrue(remainTime > 0);
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).untilAsserted(
+                () -> assertTrue(entry.getDelay(TimeUnit.MILLISECONDS) > 0));
     }
 
     @Test
-    public void getDelay_AtTriggerTime_ReturnsZero() {
+    void getDelay_AtTriggerTime_ReturnsZero() {
         entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
-        sleep(1000L);
-        long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
-        long tolerance = 100;
-        assertTrue(remainTime <= tolerance);
+        Awaitility.await().atLeast(1000, TimeUnit.MILLISECONDS)
+                .with().pollInterval(1000, TimeUnit.MILLISECONDS)
+                .untilAsserted(
+                        () -> {
+                            long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
+                            // The allowable error is +-200
+                            System.out.println("remainTime:" + remainTime);
+                            assertTrue(Math.abs(remainTime) <= 200);
+                        });
     }
 
     @Test
-    public void getDelay_AfterTriggerTime_ReturnsNegative() {
+    void getDelay_AfterTriggerTime_ReturnsNegative() {
         entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
-        sleep(1500L);
-        long remainTime = entry.getDelay(TimeUnit.MILLISECONDS);
-        assertTrue(remainTime < 0);
+        Awaitility.await().atMost(1500, TimeUnit.MILLISECONDS).untilAsserted(
+                () -> assertTrue(entry.getDelay(TimeUnit.MILLISECONDS) < 0));
     }
 
     @Test
-    public void getDelay_DifferentTimeUnits_ReturnsCorrectValues() {
+    void getDelay_DifferentTimeUnits_ReturnsCorrectValues() {
         long remainTimeMillis = entry.getDelay(TimeUnit.MILLISECONDS);
         long remainTimeSeconds = entry.getDelay(TimeUnit.SECONDS);
 
@@ -82,7 +85,7 @@ public class TimeBasedTaskExecutionRunnableComparableEntryTest {
     }
 
     @Test
-    public void compareTo_SameObject_ReturnsZero() {
+    void compareTo_SameObject_ReturnsZero() {
         assertEquals(0, entry.compareTo(entry));
     }
 }
