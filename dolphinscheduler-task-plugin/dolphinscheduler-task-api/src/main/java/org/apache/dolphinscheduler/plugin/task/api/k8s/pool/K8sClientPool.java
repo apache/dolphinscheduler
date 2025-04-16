@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.task.api.k8s.pool;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import io.fabric8.kubernetes.client.Client;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class K8sClientPool {
 
@@ -34,8 +35,7 @@ public class K8sClientPool {
 
         return clientMap.computeIfAbsent(
                 server,
-                key -> createClient(configYml)
-        );
+                key -> createClient(configYml));
     }
 
     public static void removeClient(String server) {

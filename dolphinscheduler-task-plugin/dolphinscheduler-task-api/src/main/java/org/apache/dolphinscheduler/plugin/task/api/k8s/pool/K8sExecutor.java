@@ -14,23 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.task.api.k8s.pool;
 
-import io.fabric8.kubernetes.api.model.batch.v1.Job;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.client.KubernetesClient;
 
 public class K8sExecutor {
 
-    private static String clusterServer;
+    private String configYml;
+
+    public K8sExecutor(String configYml) {
+        this.configYml = configYml;
+    }
 
     public void createJob(String namespace, Job job) {
 
         KubernetesClient client;
 
         try {
-            client = K8sClientPool.getClient(clusterServer);
+            client = K8sClientPool.getClient(configYml);
 
             client.batch()
                     .v1()
@@ -48,7 +53,7 @@ public class K8sExecutor {
         KubernetesClient client;
 
         try {
-            client = K8sClientPool.getClient(clusterServer);
+            client = K8sClientPool.getClient(configYml);
 
             Job job = client.batch()
                     .v1()
@@ -68,7 +73,7 @@ public class K8sExecutor {
         KubernetesClient client;
 
         try {
-            client = K8sClientPool.getClient(clusterServer);
+            client = K8sClientPool.getClient(configYml);
 
             client.batch()
                     .v1()
@@ -79,14 +84,6 @@ public class K8sExecutor {
         } catch (Exception e) {
             throw new TaskException("fail to delete job", e);
         }
-    }
-
-    public void buildClient(String configYml) {
-        clusterServer = getMasterUrl(configYml);
-    }
-
-    private static String getMasterUrl(String configYml) {
-        return Config.fromKubeconfig(configYml).getMasterUrl();
     }
 
 }
