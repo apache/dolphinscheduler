@@ -265,6 +265,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         clusterExist.setConfig(config);
         clusterExist.setName(name);
         clusterExist.setDescription(desc);
+        clusterExist.setUpdateTime(new Date());
         clusterMapper.updateById(clusterExist);
         return clusterExist;
     }
