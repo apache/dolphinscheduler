@@ -43,5 +43,5 @@ public interface Authenticator {
      * @param request http servlet request
      * @return user
      */
-    User getAuthUser(HttpServletRequest request);
+    User getAuthUser(HttpServletRequest re`quest);
 }
