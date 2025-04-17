@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecut
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
 import java.util.Date;
@@ -45,23 +44,22 @@ import java.util.concurrent.CompletableFuture;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
+@ExtendWith(MockitoExtension.class)
 class GlobalTaskDispatchWaitingQueueTest {
 
+    @InjectMocks
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
-
-    @BeforeEach
-    public void setUp() {
-        globalTaskDispatchWaitingQueue = new GlobalTaskDispatchWaitingQueue();
-    }
 
     @Test
     void submitTaskExecuteRunnable() {
-        ITaskExecutionRunnable ITaskExecutionRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable);
+        ITaskExecutionRunnable iTaskExecutionRunnable = createTaskExecuteRunnable();
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable, 500);
         Awaitility.await()
                 .atMost(Duration.ofSeconds(1))
                 .untilAsserted(
@@ -71,14 +69,10 @@ class GlobalTaskDispatchWaitingQueueTest {
     @Test
     void testSubmitTaskExecuteRunnableWithDelay() {
         globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(createTaskExecuteRunnable(), 3_000L);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(createTaskExecuteRunnable());
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(createTaskExecuteRunnable(), 500);
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).isNotNull();
-        Awaitility.await()
-                .atLeast(Duration.ofSeconds(2))
-                .atMost(Duration.ofSeconds(4))
-                .untilAsserted(
-                        () -> Assertions.assertNotNull(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()));
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable()).isNotNull();
     }
 
     @Test
@@ -93,87 +87,32 @@ class GlobalTaskDispatchWaitingQueueTest {
     }
 
     @Test
-    void takeTaskExecuteRunnable_withDifferentTaskInstancePriority() {
+    void takeTaskExecuteRunnable_withDifferentTaskInstanceDelay() {
         ITaskExecutionRunnable taskExecutionRunnable1 = createTaskExecuteRunnable();
         taskExecutionRunnable1.getTaskInstance().setId(1);
-        taskExecutionRunnable1.getTaskInstance().setTaskInstancePriority(Priority.MEDIUM);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecutionRunnable1);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable1, 0);
 
-        ITaskExecutionRunnable ITaskExecutionRunnable2 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable2.getTaskInstance().setId(2);
-        ITaskExecutionRunnable2.getTaskInstance().setTaskInstancePriority(Priority.HIGH);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable2);
+        ITaskExecutionRunnable iTaskExecutionRunnable2 = createTaskExecuteRunnable();
+        iTaskExecutionRunnable2.getTaskInstance().setId(2);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable2, 1);
 
-        ITaskExecutionRunnable ITaskExecutionRunnable3 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable3.getTaskInstance().setId(3);
-        ITaskExecutionRunnable3.getTaskInstance().setTaskInstancePriority(Priority.LOW);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
+        ITaskExecutionRunnable iTaskExecutionRunnable3 = createTaskExecuteRunnable();
+        iTaskExecutionRunnable3.getTaskInstance().setId(3);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable3, 2);
 
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
-                .isEqualTo(2);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
-                .isEqualTo(1);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
-                .isEqualTo(3);
-    }
-
-    @Test
-    void takeTaskExecuteRunnable_withDifferentTaskGroupPriority() {
-        ITaskExecutionRunnable ITaskExecutionRunnable1 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable1.getTaskInstance().setId(1);
-        ITaskExecutionRunnable1.getTaskInstance().setTaskGroupPriority(Priority.MEDIUM.getCode());
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable1);
-
-        ITaskExecutionRunnable ITaskExecutionRunnable2 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable2.getTaskInstance().setId(2);
-        ITaskExecutionRunnable2.getTaskInstance().setTaskGroupPriority(Priority.HIGH.getCode());
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable2);
-
-        ITaskExecutionRunnable ITaskExecutionRunnable3 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable3.getTaskInstance().setId(3);
-        ITaskExecutionRunnable3.getTaskInstance().setTaskGroupPriority(Priority.LOW.getCode());
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
-
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
-                .isEqualTo(3);
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
                 .isEqualTo(1);
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
                 .isEqualTo(2);
-    }
-
-    @Test
-    void takeTaskExecuteRunnable_withDifferentSubmitTime() {
-        Date now = new Date();
-
-        ITaskExecutionRunnable ITaskExecutionRunnable1 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable1.getTaskInstance().setId(1);
-        ITaskExecutionRunnable1.getTaskInstance().setFirstSubmitTime(now);
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable1);
-
-        ITaskExecutionRunnable ITaskExecutionRunnable2 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable2.getTaskInstance().setId(2);
-        ITaskExecutionRunnable2.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, 1));
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable2);
-
-        ITaskExecutionRunnable ITaskExecutionRunnable3 = createTaskExecuteRunnable();
-        ITaskExecutionRunnable3.getTaskInstance().setId(3);
-        ITaskExecutionRunnable3.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, -1));
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable3);
-
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
                 .isEqualTo(3);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
-                .isEqualTo(1);
-        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
-                .isEqualTo(2);
     }
 
     @Test
     void getWaitingDispatchTaskNumber() {
         Assertions.assertEquals(0, globalTaskDispatchWaitingQueue.getWaitingDispatchTaskNumber());
-        ITaskExecutionRunnable ITaskExecutionRunnable = createTaskExecuteRunnable();
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(ITaskExecutionRunnable);
+        ITaskExecutionRunnable iTaskExecutionRunnable = createTaskExecuteRunnable();
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(iTaskExecutionRunnable, 500);
         Assertions.assertEquals(1, globalTaskDispatchWaitingQueue.getWaitingDispatchTaskNumber());
     }
 
