@@ -148,7 +148,7 @@ public class LogUtils {
             final int lineSize = line.length();
             if (lineSize >= MaxResponseLogSize) {
                 builder.append(line, 0, MaxResponseLogSize)
-                        .append(" [this line's size ").append(lineSize).append(" bytes is exceed ")
+                        .append(" [this line's size ").append(lineSize).append(" bytes exceeds ")
                         .append(MaxResponseLogSize).append(" bytes, so only ")
                         .append(MaxResponseLogSize).append(" characters are reserved for performance reasons.]")
                         .append("\r\n");
