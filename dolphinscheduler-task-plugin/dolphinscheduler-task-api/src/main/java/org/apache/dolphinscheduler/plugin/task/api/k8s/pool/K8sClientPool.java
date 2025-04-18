@@ -39,9 +39,13 @@ public class K8sClientPool {
     }
 
     public static void removeClient(String server) {
-        KubernetesClient client = clientMap.get(server);
+        KubernetesClient client = clientMap.remove(server);
         if (client != null) {
-            client.close();
+            try {
+                client.close();
+            } catch (Exception e) {
+                throw new RuntimeException("fail to remove client",e);
+            }
         }
     }
 
