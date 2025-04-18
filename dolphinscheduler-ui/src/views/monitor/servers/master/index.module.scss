@@ -27,11 +27,6 @@
   @include base;
 }
 
-.load-average {
-  @include base;
-  color: var(--n-color-target);
-}
-
 .link-btn {
   color: var(--n-color-target);
   cursor: pointer;

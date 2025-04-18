@@ -102,10 +102,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sub-workflow.html',
                             },
                             {
-                                title: 'Dynamic',
-                                link: '/en-us/docs/dev/user_doc/guide/task/dynamic.html',
-                            },
-                            {
                                 title: 'Dependent',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dependent.html',
                             },
@@ -261,6 +257,10 @@ export default {
                             {
                                 title: 'File Parameter',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
+                            {
+                                title: 'StartUp Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/startup-parameter.html',
                             },
                         ],
                     },
@@ -456,10 +456,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
-                    },
-                    {
-                        title: 'Data Quality',
-                        link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: 'Remote Logging',
@@ -821,10 +817,6 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sub-workflow.html',
                             },
                             {
-                                title: 'Dynamic',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/dynamic.html',
-                            },
-                            {
                                 title: 'Dependent',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dependent.html',
                             },
@@ -980,6 +972,10 @@ export default {
                             {
                                 title: '文件参数传递',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
+                            {
+                                title: '启动参数',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/startup-parameter.html',
                             },
                         ],
                     },
@@ -1159,10 +1155,6 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/metrics/metrics.html',
                             }
                         ],
-                    },
-                    {
-                        title: '数据质量',
-                        link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
                     },
                     {
                         title: '远程日志存储',

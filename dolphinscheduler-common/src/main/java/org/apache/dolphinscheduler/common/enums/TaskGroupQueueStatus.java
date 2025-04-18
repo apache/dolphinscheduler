@@ -28,6 +28,7 @@ public enum TaskGroupQueueStatus {
 
     WAIT_QUEUE(-1, "wait queue"),
     ACQUIRE_SUCCESS(1, "acquire success"),
+    @Deprecated
     RELEASE(2, "release");
 
     @EnumValue

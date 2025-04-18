@@ -90,15 +90,15 @@ public class ProjectWorkerGroupController extends BaseController {
      * @param projectCode project code
      * @return worker group list
      */
-    @Operation(summary = "queryWorkerGroups", description = "QUERY_WORKER_GROUP_LIST")
+    @Operation(summary = "queryAssignedWorkerGroups", description = "QUERY_WORKER_GROUP_LIST")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "123456"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> queryWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        return projectWorkerGroupRelationService.queryWorkerGroupsByProject(loginUser, projectCode);
+    public Map<String, Object> queryAssignedWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(loginUser, projectCode);
     }
 
 }

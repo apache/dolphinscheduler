@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
  * @see WorkflowFailedStateAction
  * @see WorkflowSuccessStateAction
  * @see WorkflowFailoverStateAction
- * @see WorkflowWaitToRunStateAction
  */
 public interface IWorkflowStateAction {
 

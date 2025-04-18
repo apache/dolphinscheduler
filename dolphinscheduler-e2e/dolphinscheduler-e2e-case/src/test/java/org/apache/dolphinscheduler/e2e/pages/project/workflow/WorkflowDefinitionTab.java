@@ -59,12 +59,6 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     })
     private WebElement buttonConfirm;
 
-    @FindBys({
-            @FindBy(className = "n-dialog__action"),
-            @FindBy(className = "n-button--default-type"),
-    })
-    private WebElement publishSuccessButtonCancel;
-
     @FindBy(className = "items")
     private List<WebElement> workflowList;
 
@@ -98,9 +92,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
                 .orElseThrow(() -> new RuntimeException("Can not find publish button in workflow definition"))
                 .click();
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
-
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", publishSuccessButtonCancel());
+        driver.executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }

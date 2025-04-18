@@ -101,6 +101,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
                     .code(CodeGenerateUtils.genCode())
                     .projectCode(projectCode)
                     .userId(loginUser.getId())
+                    .operator(loginUser.getId())
                     .createTime(now)
                     .updateTime(now)
                     .build();

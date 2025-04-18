@@ -34,7 +34,7 @@ export function formatParams(data: INodeData): {
 } {
   const rdbmsSourceTypes = ref(['MYSQL', 'ORACLE', 'SQLSERVER', 'HANA'])
   const taskParams: ITaskParams = {}
-  if (data.taskType === 'SUB_WORKFLOW' || data.taskType === 'DYNAMIC') {
+  if (data.taskType === 'SUB_WORKFLOW') {
     taskParams.workflowDefinitionCode = data.workflowDefinitionCode
   }
 
@@ -43,7 +43,11 @@ export function formatParams(data: INodeData): {
     taskParams.mainArgs = data.mainArgs
     taskParams.jvmArgs = data.jvmArgs
     taskParams.isModulePath = data.isModulePath
-    if (data.runType === 'JAR' && data.mainJar) {
+    taskParams.mainClass = data.mainClass
+    if (
+      (data.runType === 'FAT_JAR' || data.runType === 'NORMAL_JAR') &&
+      data.mainJar
+    ) {
       taskParams.mainJar = { resourceName: data.mainJar }
     }
   }
@@ -205,7 +209,9 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'SEATUNNEL') {
     taskParams.startupScript = data.startupScript
     taskParams.useCustom = data.useCustom
-    taskParams.rawScript = data.rawScript
+    if (!data.useCustom) {
+      taskParams.rawScript = ''
+    }
     if (data.startupScript?.includes('flink')) {
       taskParams.runMode = data.runMode
       taskParams.others = data.others
@@ -271,49 +277,6 @@ export function formatParams(data: INodeData): {
       failureWaitingTime: data.failureWaitingTime,
       relation: data.relation,
       dependTaskList: data.dependTaskList
-    }
-  }
-  if (data.taskType === 'DATA_QUALITY') {
-    taskParams.ruleId = data.ruleId
-    taskParams.ruleInputParameter = {
-      check_type: data.check_type,
-      comparison_execute_sql: data.comparison_execute_sql,
-      comparison_type: data.comparison_type,
-      comparison_name: data.comparison_name,
-      failure_strategy: data.failure_strategy,
-      operator: data.operator,
-      src_connector_type: data.src_connector_type,
-      src_datasource_id: data.src_datasource_id,
-      src_database: data.src_database,
-      field_length: data.field_length,
-      begin_time: data.begin_time,
-      deadline: data.deadline,
-      datetime_format: data.datetime_format,
-      enum_list: data.enum_list,
-      regexp_pattern: data.regexp_pattern,
-      target_filter: data.target_filter,
-      src_filter: data.src_filter,
-      src_field: data.src_field,
-      src_table: data.src_table,
-      statistics_execute_sql: data.statistics_execute_sql,
-      statistics_name: data.statistics_name,
-      target_connector_type: data.target_connector_type,
-      target_datasource_id: data.target_datasource_id,
-      target_database: data.target_database,
-      target_table: data.target_table,
-      threshold: data.threshold,
-      mapping_columns: JSON.stringify(data.mapping_columns)
-    }
-    taskParams.sparkParameters = {
-      deployMode: data.deployMode,
-      driverCores: data.driverCores,
-      driverMemory: data.driverMemory,
-      executorCores: data.executorCores,
-      executorMemory: data.executorMemory,
-      numExecutors: data.numExecutors,
-      others: data.others,
-      yarnQueue: data.yarnQueue,
-      sqlExecutionType: data.sqlExecutionType
     }
   }
 
@@ -495,14 +458,6 @@ export function formatParams(data: INodeData): {
     taskParams.datasource = data.datasource
   }
 
-  if (data.taskType === 'DYNAMIC') {
-    taskParams.workflowDefinitionCode = data.workflowDefinitionCode
-    taskParams.maxNumOfSubWorkflowInstances = data.maxNumOfSubWorkflowInstances
-    taskParams.degreeOfParallelism = data.degreeOfParallelism
-    taskParams.filterCondition = data.filterCondition
-    taskParams.listParameters = data.listParameters
-  }
-
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
@@ -527,7 +482,6 @@ export function formatParams(data: INodeData): {
         : '0',
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
-      isCache: data.isCache ? 'YES' : 'NO',
       name: data.name,
       taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
@@ -578,7 +532,6 @@ export function formatModel(data: ITaskData) {
     ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
-    isCache: data.isCache === 'YES',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
       ? [data.timeoutNotifyStrategy]
       : [],

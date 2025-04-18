@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.runnable;
 
-import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -57,13 +56,11 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         result.setPid(originTaskInstance.getPid());
         result.setAppLink(originTaskInstance.getAppLink());
         result.setFlag(originTaskInstance.getFlag());
-        result.setIsCache(originTaskInstance.getIsCache());
         result.setMaxRetryTimes(originTaskInstance.getMaxRetryTimes());
         result.setRetryInterval(originTaskInstance.getRetryInterval());
         result.setTaskInstancePriority(originTaskInstance.getTaskInstancePriority());
         result.setWorkerGroup(originTaskInstance.getWorkerGroup());
         result.setEnvironmentCode(originTaskInstance.getEnvironmentCode());
-        result.setEnvironmentConfig(originTaskInstance.getEnvironmentConfig());
         result.setExecutorId(originTaskInstance.getExecutorId());
         result.setVarPool(originTaskInstance.getVarPool());
         result.setExecutorName(originTaskInstance.getExecutorName());
@@ -83,7 +80,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setTaskType(taskDefinition.getTaskType());
         taskInstance.setTaskCode(taskDefinition.getCode());
         taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
-        taskInstance.setIsCache(taskDefinition.getIsCache());
         taskInstance.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskInstance.setRetryInterval(taskDefinition.getFailRetryInterval());
         taskInstance.setTaskInstancePriority(taskDefinition.getTaskPriority());
@@ -118,14 +114,4 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setTestFlag(workflowInstance.getTestFlag());
     }
 
-    protected void injectEnvironmentConfigFromDB(TaskInstance taskInstance) {
-        if (EnvironmentUtils.isEnvironmentCodeEmpty(taskInstance.getEnvironmentCode())) {
-            return;
-        }
-        Environment environment = environmentMapper.queryByEnvironmentCode(taskInstance.getEnvironmentCode());
-        if (environment == null) {
-            throw new IllegalArgumentException("Cannot find the environment: " + taskInstance.getEnvironmentCode());
-        }
-        taskInstance.setEnvironmentConfig(environment.getConfig());
-    }
 }

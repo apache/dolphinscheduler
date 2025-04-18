@@ -31,7 +31,6 @@ import { useSwitch } from './use-switch'
 import { useConditions } from './use-conditions'
 import { useDataX } from './use-datax'
 import { useDependent } from './use-dependent'
-import { useDataQuality } from './use-data-quality'
 import { useEmr } from './use-emr'
 import { useZeppelin } from './use-zeppelin'
 import { useK8s } from './use-k8s'
@@ -51,13 +50,11 @@ import { useKubeflow } from './use-kubeflow'
 import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
-import { useDynamic } from './use-dynamic'
 import { useAliyunServerlessSpark } from './use-aliyun-serverless-spark'
 
 export default {
   SHELL: useShell,
   SUB_WORKFLOW: useSubWorkflow,
-  DYNAMIC: useDynamic,
   PYTHON: usePython,
   SPARK: useSpark,
   MR: useMr,
@@ -71,7 +68,6 @@ export default {
   CONDITIONS: useConditions,
   DATAX: useDataX,
   DEPENDENT: useDependent,
-  DATA_QUALITY: useDataQuality,
   EMR: useEmr,
   ZEPPELIN: useZeppelin,
   K8S: useK8s,

@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -80,16 +81,24 @@ public abstract class RegistryTestCase<R extends Registry> {
         final AtomicBoolean subscribeRemoved = new AtomicBoolean(false);
         final AtomicBoolean subscribeUpdated = new AtomicBoolean(false);
 
-        SubscribeListener subscribeListener = event -> {
-            System.out.println("Receive event: " + event);
-            if (event.type() == Event.Type.ADD) {
-                subscribeAdded.compareAndSet(false, true);
+        final SubscribeListener subscribeListener = new SubscribeListener() {
+
+            @Override
+            public void notify(Event event) {
+                if (event.getType() == Event.Type.ADD) {
+                    subscribeAdded.compareAndSet(false, true);
+                }
+                if (event.getType() == Event.Type.REMOVE) {
+                    subscribeRemoved.compareAndSet(false, true);
+                }
+                if (event.getType() == Event.Type.UPDATE) {
+                    subscribeUpdated.compareAndSet(false, true);
+                }
             }
-            if (event.type() == Event.Type.REMOVE) {
-                subscribeRemoved.compareAndSet(false, true);
-            }
-            if (event.type() == Event.Type.UPDATE) {
-                subscribeUpdated.compareAndSet(false, true);
+
+            @Override
+            public SubscribeScope getSubscribeScope() {
+                return SubscribeScope.PATH_ONLY;
             }
         };
         String key = "/nodes/master" + System.nanoTime();
@@ -172,8 +181,8 @@ public abstract class RegistryTestCase<R extends Registry> {
         registry.put(master1, value, true);
         registry.put(master2, value, true);
         assertThat(registry.children("/nodes/children")).containsExactly("childGroup1");
-        assertThat(registry.children("/nodes/children/childGroup1")).containsExactly("127.0.0.1:8080",
-                "127.0.0.2:8080");
+        assertThat(registry.children("/nodes/children/childGroup1")).containsExactlyElementsIn(
+                Arrays.asList("127.0.0.1:8080", "127.0.0.2:8080"));
     }
 
     @Test

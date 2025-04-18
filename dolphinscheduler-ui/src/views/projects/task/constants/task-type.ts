@@ -17,7 +17,6 @@
 export type TaskType =
   | 'SHELL'
   | 'SUB_WORKFLOW'
-  | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'
   | 'SPARK'
@@ -29,7 +28,6 @@ export type TaskType =
   | 'DATAX'
   | 'SQOOP'
   | 'CONDITIONS'
-  | 'DATA_QUALITY'
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'
@@ -66,9 +64,6 @@ export const TASK_TYPES_MAP = {
   SUB_WORKFLOW: {
     alias: 'SUB_WORKFLOW'
   },
-  DYNAMIC: {
-    alias: 'DYNAMIC'
-  },
   PROCEDURE: {
     alias: 'PROCEDURE'
   },
@@ -103,10 +98,6 @@ export const TASK_TYPES_MAP = {
   },
   CONDITIONS: {
     alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY',
-    helperLinkDisable: true
   },
   SWITCH: {
     alias: 'SWITCH'

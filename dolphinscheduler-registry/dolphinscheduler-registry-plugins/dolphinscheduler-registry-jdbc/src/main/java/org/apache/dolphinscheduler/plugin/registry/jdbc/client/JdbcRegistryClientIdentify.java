@@ -18,11 +18,9 @@
 package org.apache.dolphinscheduler.plugin.registry.jdbc.client;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
-@ToString
-@Getter
+@Data
 @AllArgsConstructor
 public class JdbcRegistryClientIdentify {
 

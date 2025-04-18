@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.server.master.engine.system.event.AbstractSys
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 
-import java.util.concurrent.LinkedBlockingQueue;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
@@ -37,24 +35,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SystemEventBus extends AbstractDelayEventBus<AbstractSystemEvent> {
 
-    private final LinkedBlockingQueue<AbstractSystemEvent> eventChannel = new LinkedBlockingQueue<>();
-
     public void publish(final AbstractSystemEvent event) {
-        try {
-            eventChannel.put(event);
-            log.info("Published SystemEvent: {}", event);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("The thread has been interrupted", e);
-        }
+        super.publish(event);
+        log.info("Published SystemEvent: {}", event);
     }
 
     public AbstractSystemEvent take() throws InterruptedException {
-        return eventChannel.take();
+        return delayEventQueue.take();
     }
-
-    public boolean isEmpty() {
-        return eventChannel.isEmpty();
-    }
-
 }

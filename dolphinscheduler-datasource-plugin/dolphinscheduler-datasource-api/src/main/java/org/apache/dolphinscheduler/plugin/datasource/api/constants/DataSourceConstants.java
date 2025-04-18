@@ -414,13 +414,6 @@ public class DataSourceConstants {
      */
     public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
-    /**
-     * data.quality.jar.dir
-     */
-    public static final String DATA_QUALITY_JAR_DIR = "data-quality.jar.dir";
-
-    public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
-
     public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
 
     /**

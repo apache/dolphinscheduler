@@ -21,7 +21,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
-import org.apache.dolphinscheduler.plugin.task.api.task.DynamicLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
 
@@ -34,7 +33,6 @@ class TaskPluginManagerTest {
     @ValueSource(strings = {
             ConditionsLogicTaskChannelFactory.NAME,
             DependentLogicTaskChannelFactory.NAME,
-            DynamicLogicTaskChannelFactory.NAME,
             SubWorkflowLogicTaskChannelFactory.NAME,
             SwitchLogicTaskChannelFactory.NAME})
     void testGetTaskChannel_logicTaskChannel(String type) {

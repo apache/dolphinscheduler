@@ -26,7 +26,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -410,29 +409,4 @@ public class TaskInstanceServiceTest {
                 () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
     }
 
-    @Test
-    public void testRemoveTaskInstanceCache() {
-        User user = getAdminUser();
-        long projectCode = 1L;
-        Project project = getProject(projectCode);
-        int taskId = 1;
-        TaskInstance task = getTaskInstance();
-        String cacheKey = "950311f3597f9198976cd3fd69e208e5b9ba6750";
-        task.setCacheKey(cacheKey);
-
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(taskInstanceMapper.selectById(1)).thenReturn(task);
-        when(taskInstanceDao.queryByCacheKey(cacheKey)).thenReturn(task, null);
-        when(taskInstanceDao.updateById(task)).thenReturn(true);
-
-        TaskInstanceRemoveCacheResponse response =
-                taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode());
-
-        when(taskInstanceMapper.selectById(1)).thenReturn(null);
-        TaskInstanceRemoveCacheResponse responseNotFoundTask =
-                taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), responseNotFoundTask.getCode());
-
-    }
 }

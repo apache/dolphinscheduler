@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,9 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 @DisableIfTestFails
 class ProjectE2ETest {
 
-    private static final String project = "test-project-1";
+    private static final String project = "test-project-" + UUID.randomUUID();
+
+    private static final String workerGroup = "default";
 
     private static RemoteWebDriver browser;
 
@@ -48,7 +52,23 @@ class ProjectE2ETest {
     @Test
     @Order(1)
     void testCreateProject() {
-        new ProjectPage(browser).create(project);
+        final ProjectPage page = new ProjectPage(browser);
+        page.create(project);
+
+        Awaitility.await().untilAsserted(() -> {
+            browser.navigate().refresh();
+            assertThat(
+                    page.projectList()).anyMatch(
+                            it -> it.getText().contains(project));
+        });
+    }
+
+    @Test
+    @Order(5)
+    void testAssignWorkerGroup() {
+        final ProjectPage page = new ProjectPage(browser);
+        page.assignWorkerGroup(project, workerGroup);
+        page.verifyAssignedWorkerGroup(project, workerGroup);
     }
 
     @Test

@@ -26,7 +26,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * have_arr_variables
  * have_map_variables
  * have_alert
- * is_cache
  */
 public enum Flag {
 

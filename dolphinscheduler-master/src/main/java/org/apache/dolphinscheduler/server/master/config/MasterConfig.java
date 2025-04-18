@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
-import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
 
@@ -49,10 +48,8 @@ public class MasterConfig implements Validator {
 
     private int workflowEventBusFireThreadCount = Runtime.getRuntime().availableProcessors() * 2 + 1;
 
-    // todo: change to sync thread pool/ async thread pool ?
-    private int masterSyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
+    private LogicTaskConfig logicTaskConfig = new LogicTaskConfig();
 
-    private int masterAsyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
     /**
      * Master heart beat task execute interval.
      */
@@ -60,9 +57,7 @@ public class MasterConfig implements Validator {
 
     private MasterServerLoadProtection serverLoadProtection = new MasterServerLoadProtection();
 
-    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
-
-    private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
+    private Duration workerGroupRefreshInterval = Duration.ofMinutes(5);
 
     private CommandFetchStrategy commandFetchStrategy = new CommandFetchStrategy();
 
@@ -118,9 +113,9 @@ public class MasterConfig implements Validator {
                 "\n****************************Master Configuration**************************************" +
                         "\n  listen-port -> " + listenPort +
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
+                        "\n  logic-task-config -> " + logicTaskConfig +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  server-load-protection -> " + serverLoadProtection +
-                        "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +
                         "\n  master-address -> " + masterAddress +
                         "\n  master-registry-path: " + masterRegistryPath +
                         "\n  worker-group-refresh-interval: " + workerGroupRefreshInterval +

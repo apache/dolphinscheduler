@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryThreadFactory;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.KeyUtils;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataChanceEventDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
@@ -136,18 +137,22 @@ public class JdbcRegistryDataManager
     }
 
     @Override
+    public List<JdbcRegistryDataDTO> getAllJdbcRegistryData() {
+        return jdbcRegistryDataRepository.selectAll();
+    }
+
+    @Override
     public Optional<JdbcRegistryDataDTO> getRegistryDataByKey(String key) {
         checkNotNull(key);
         return jdbcRegistryDataRepository.selectByKey(key);
     }
 
     @Override
-    public List<JdbcRegistryDataDTO> listJdbcRegistryDataChildren(String key) {
+    public List<JdbcRegistryDataDTO> listJdbcRegistryDataChildren(final String key) {
         checkNotNull(key);
         return jdbcRegistryDataRepository.selectAll()
                 .stream()
-                .filter(jdbcRegistryDataDTO -> jdbcRegistryDataDTO.getDataKey().startsWith(key)
-                        && !jdbcRegistryDataDTO.getDataKey().equals(key))
+                .filter(jdbcRegistryDataDTO -> KeyUtils.isParent(key, jdbcRegistryDataDTO.getDataKey()))
                 .collect(Collectors.toList());
     }
 
@@ -212,7 +217,7 @@ public class JdbcRegistryDataManager
             return;
         }
         jdbcRegistryDataRepository.deleteByKey(key);
-        JdbcRegistryDataChanceEventDTO registryDataChanceEvent = JdbcRegistryDataChanceEventDTO.builder()
+        final JdbcRegistryDataChanceEventDTO registryDataChanceEvent = JdbcRegistryDataChanceEventDTO.builder()
                 .jdbcRegistryData(jdbcRegistryDataOptional.get())
                 .eventType(JdbcRegistryDataChanceEventDTO.EventType.DELETE)
                 .createTime(new Date())

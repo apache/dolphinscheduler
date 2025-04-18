@@ -55,6 +55,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -84,6 +85,7 @@ public class DependentExecute {
     /**
      * depend result map
      */
+    @Getter
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
     /**
@@ -102,8 +104,10 @@ public class DependentExecute {
      */
     private final TaskDefinitionDao taskDefinitionDao = SpringApplicationContext.getBean(TaskDefinitionDao.class);
 
+    @Getter
     private Map<String, Property> dependTaskVarPoolPropertyMap = new HashMap<>();
 
+    @Getter
     private Map<String, Long> dependTaskVarPoolEndTimeMap = new HashMap<>();
 
     private Map<String, Property> dependItemVarPoolPropertyMap = new HashMap<>();
@@ -410,7 +414,7 @@ public class DependentExecute {
                 continue;
             }
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
-            if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
+            if (dependResult != DependResult.WAITING) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
                 if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
                     DependentUtils.addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap,
@@ -437,18 +441,6 @@ public class DependentExecute {
             return dependResultMap.get(key);
         }
         return getDependentResultForItem(item, currentTime, testFlag);
-    }
-
-    public Map<String, DependResult> getDependResultMap() {
-        return dependResultMap;
-    }
-
-    public Map<String, Property> getDependTaskVarPoolPropertyMap() {
-        return dependTaskVarPoolPropertyMap;
-    }
-
-    public Map<String, Long> getDependTaskVarPoolEndTimeMap() {
-        return dependTaskVarPoolEndTimeMap;
     }
 
     /**

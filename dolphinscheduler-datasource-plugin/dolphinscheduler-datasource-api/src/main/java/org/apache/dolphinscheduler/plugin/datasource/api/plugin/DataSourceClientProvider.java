@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -69,8 +68,7 @@ public class DataSourceClientProvider {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         return POOLED_DATASOURCE_CLIENT_CACHE.get(datasourceUniqueId, () -> {
-            Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getName());
+            DataSourceChannel dataSourceChannel = dataSourcePluginManager.getDataSourceChannel(dbType);
             if (null == dataSourceChannel) {
                 throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getName()));
             }
@@ -85,8 +83,7 @@ public class DataSourceClientProvider {
 
     public static AdHocDataSourceClient getAdHocDataSourceClient(DbType dbType, ConnectionParam connectionParam) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
-        Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-        DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getName());
+        DataSourceChannel dataSourceChannel = dataSourcePluginManager.getDataSourceChannel(dbType);
         if (null == dataSourceChannel) {
             throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getName()));
         }

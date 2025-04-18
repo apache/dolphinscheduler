@@ -17,47 +17,34 @@
 
 package org.apache.dolphinscheduler.server.master.integration.cases;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.integration.Repository;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
-import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The integration test for recover from failure tasks.
  */
 public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIntegrationTestCase {
-
-    @Autowired
-    private WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
-
-    @Autowired
-    private WorkflowOperator workflowOperator;
-
-    @Autowired
-    private IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private Repository repository;
 
     @Test
     @DisplayName("Test recover from failure tasks")
@@ -72,8 +59,7 @@ public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIn
                 .pollInterval(Duration.ofMillis(100))
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
                             .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                 });
 
@@ -81,37 +67,77 @@ public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIn
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     final WorkflowInstance workflowInstance = repository.queryWorkflowInstance(workflowInstanceId);
-                    Assertions
-                            .assertThat(workflowInstance.getState())
+                    assertThat(workflowInstance.getState())
                             .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                    Assertions
-                            .assertThat(workflowInstance.getRunTimes())
+                    assertThat(workflowInstance.getRunTimes())
                             .isEqualTo(2);
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflowInstanceId);
-                    Assertions
-                            .assertThat(taskInstances)
+                    assertThat(taskInstances)
                             .hasSize(3);
 
-                    Assertions
-                            .assertThat(taskInstances.get(0))
+                    assertThat(taskInstances.get(0))
                             .matches(t -> "A".equals(t.getName()))
                             .matches(t -> t.getState() == TaskExecutionStatus.FAILURE)
                             .matches(t -> t.getFlag() == Flag.NO);
 
-                    Assertions
-                            .assertThat(taskInstances.get(1))
+                    assertThat(taskInstances.get(1))
                             .matches(t -> "A".equals(t.getName()))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES)
                             .matches(t -> StringUtils.isNotEmpty(t.getLogPath()));
 
-                    Assertions
-                            .assertThat(taskInstances.get(2))
+                    assertThat(taskInstances.get(2))
                             .matches(t -> t.getState() == TaskExecutionStatus.SUCCESS)
                             .matches(t -> t.getFlag() == Flag.YES)
                             .matches(t -> StringUtils.isNotEmpty(t.getLogPath()));
                 });
-        assertThat(workflowRepository.getAll()).isEmpty();
+        masterContainer.assertAllResourceReleased();
     }
 
+    @Test
+    @DisplayName("Test recover a failure workflow from another master")
+    public void testRecoverFailureWorkflow_from_another_master() {
+        final String yaml = "/it/recover_failure_tasks/failure_workflow_from_another_master.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        workflowOperator.recoverFailureTasks(workflowInstanceId);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_killed-20250322201900000");
+
+                                final WorkflowInstanceStopResponse stopResponse = Clients
+                                        .withService(IWorkflowControlClient.class)
+                                        .withHost(workflowInstance.getHost())
+                                        .stopWorkflowInstance(
+                                                new WorkflowInstanceStopRequest(workflowInstance.getId()));
+
+                                assertThat(stopResponse != null && stopResponse.isSuccess()).isTrue();
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.STOP);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_killed-20250322201900000");
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
 }

@@ -148,7 +148,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);
         }
 
         GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, cosKey);
@@ -306,6 +306,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
                 .type(resourceMetaData.getResourceType())
                 .isDirectory(StringUtils.isEmpty(fileExtension))
                 .size(metadata.getContentLength())
+                .relativePath(resourceMetaData.getResourceRelativePath())
                 .createTime(metadata.getLastModified())
                 .updateTime(metadata.getLastModified())
                 .build();

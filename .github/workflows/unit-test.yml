@@ -43,7 +43,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |
@@ -62,6 +62,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:

@@ -30,21 +30,27 @@
     <artifactId>dolphinscheduler-extract-master</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-extract-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-extract-base</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-executor</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

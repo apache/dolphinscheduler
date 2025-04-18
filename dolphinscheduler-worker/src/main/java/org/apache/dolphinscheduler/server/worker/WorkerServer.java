@@ -27,21 +27,12 @@ import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
-import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskEngineDelegator;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
@@ -66,10 +57,10 @@ public class WorkerServer implements IStoppable {
     private WorkerRpcServer workerRpcServer;
 
     @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private MetricsProvider metricsProvider;
 
     @Autowired
-    private MetricsProvider metricsProvider;
+    private PhysicalTaskEngineDelegator physicalTaskEngineDelegator;
 
     /**
      * worker server startup, not use web service
@@ -86,14 +77,17 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         ServerLifeCycleManager.toRunning();
+
         this.workerRpcServer.start();
+
         TaskPluginManager.loadTaskPlugin();
+
         DataSourceProcessorProvider.initialize();
 
         this.workerRegistryClient.setRegistryStoppable(this);
         this.workerRegistryClient.start();
 
-        this.messageRetryRunner.start();
+        this.physicalTaskEngineDelegator.start();
 
         WorkerServerMetrics.registerWorkerCpuUsageGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
@@ -126,17 +120,10 @@ public class WorkerServer implements IStoppable {
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
         try (
-                WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
-                WorkerRegistryClient closedRegistryClient = workerRegistryClient) {
+                final PhysicalTaskEngineDelegator ignore1 = physicalTaskEngineDelegator;
+                final WorkerRpcServer ignore2 = workerRpcServer;
+                final WorkerRegistryClient ignore3 = workerRegistryClient) {
             log.info("Worker server is stopping, current cause : {}", cause);
-            // todo: we need to remove this method
-            // since for some task, we need to take-over the remote task after the worker restart
-            // and if the worker crash, the `killAllRunningTasks` will not be execute, this will cause there exist two
-            // kind of situation:
-            // 1. If the worker is stop by kill, the tasks will be kill.
-            // 2. If the worker is stop by kill -9, the tasks will not be kill.
-            // So we don't need to kill the tasks.
-            this.killAllRunningTasks();
         } catch (Exception e) {
             log.error("Worker server stop failed, current cause: {}", cause, e);
             return;
@@ -153,26 +140,4 @@ public class WorkerServer implements IStoppable {
         System.exit(1);
     }
 
-    public void killAllRunningTasks() {
-        Collection<WorkerTaskExecutor> workerTaskExecutors = WorkerTaskExecutorHolder.getAllTaskExecutor();
-        if (CollectionUtils.isEmpty(workerTaskExecutors)) {
-            return;
-        }
-        log.info("Worker begin to kill all cache task, task size: {}", workerTaskExecutors.size());
-        int killNumber = 0;
-        for (WorkerTaskExecutor workerTaskExecutor : workerTaskExecutors) {
-            // kill task when it's not finished yet
-            try {
-                TaskExecutionContext taskExecutionContext = workerTaskExecutor.getTaskExecutionContext();
-                LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
-                if (ProcessUtils.kill(taskExecutionContext)) {
-                    killNumber++;
-                }
-            } finally {
-                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
-            }
-        }
-        log.info("Worker after kill all cache task, task size: {}, killed number: {}", workerTaskExecutors.size(),
-                killNumber);
-    }
 }

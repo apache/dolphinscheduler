@@ -94,7 +94,7 @@ public class TaskDispatchStateAction extends AbstractTaskStateAction {
                                  final ITaskExecutionRunnable taskExecutionRunnable,
                                  final TaskPauseLifecycleEvent taskPauseEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        taskExecutorClient.kill(taskExecutionRunnable);
+        taskExecutorClient.pause(taskExecutionRunnable);
     }
 
     @Override

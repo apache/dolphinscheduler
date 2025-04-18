@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -39,7 +37,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
     @Autowired
-    private TaskDispatchFactory taskDispatchFactory;
+    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
@@ -74,24 +72,35 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
                 log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
                 return;
             }
-            final TaskDispatcher taskDispatcher = taskDispatchFactory.getTaskDispatcher(taskInstance);
-            taskDispatcher.dispatchTask(taskExecutionRunnable);
+            this.dispatchTaskToWorkerGroup(taskExecutionRunnable);
         } catch (Exception e) {
-            // If dispatch failed, will put the task back to the queue
-            // The task will be dispatched after waiting time.
-            // the waiting time will increase multiple of times, but will not exceed 60 seconds
-            long waitingTimeMills = Math.max(
-                    taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
-                    waitingTimeMills);
-            log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
+            this.delayRetryDispatch(taskExecutionRunnable, e);
         }
+    }
+
+    private void delayRetryDispatch(ITaskExecutionRunnable taskExecutionRunnable, Exception e) {
+        // If dispatch failed, will put the task back to the queue
+        // The task will be dispatched after waiting time.
+        // the waiting time will increase multiple of times, but will not exceed 60 seconds
+        long waitingTimeMills = Math.min(
+                taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable,
+                waitingTimeMills);
+        log.error("Dispatch Task: {} failed will retry after: {}/ms", taskExecutionRunnable.getTaskInstance().getName(),
+                waitingTimeMills, e);
+    }
+
+    private void dispatchTaskToWorkerGroup(ITaskExecutionRunnable taskExecutionRunnable) {
+        workerGroupTaskDispatcherManager.addTaskToWorkerGroup(
+                taskExecutionRunnable.getTaskInstance().getWorkerGroup(),
+                taskExecutionRunnable, 0);
     }
 
     @Override
     public void close() throws Exception {
         if (RUNNING_FLAG.compareAndSet(true, false)) {
             log.info("GlobalTaskDispatchWaitingQueueLooper stopping...");
+            workerGroupTaskDispatcherManager.close();
             log.info("GlobalTaskDispatchWaitingQueueLooper stopped...");
         } else {
             log.error("GlobalTaskDispatchWaitingQueueLooper is not started");

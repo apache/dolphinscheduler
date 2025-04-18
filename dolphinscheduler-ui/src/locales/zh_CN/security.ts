@@ -64,6 +64,7 @@ export default {
     group_name_tips: '请输入分组名称',
     worker_addresses: 'Worker地址',
     worker_addresses_tips: '请选择Worker地址',
+    source: '来源',
     create_time: '创建时间',
     update_time: '更新时间'
   },

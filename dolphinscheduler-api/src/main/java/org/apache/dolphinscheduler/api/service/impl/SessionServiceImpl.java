@@ -94,7 +94,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
 
     @Override
     public boolean isSessionExpire(Session session) {
-        return System.currentTimeMillis() - session.getLastLoginTime().getTime() <= Constants.SESSION_TIME_OUT * 1000;
+        return System.currentTimeMillis() - session.getLastLoginTime().getTime() >= Constants.SESSION_TIME_OUT * 1000;
     }
 
 }

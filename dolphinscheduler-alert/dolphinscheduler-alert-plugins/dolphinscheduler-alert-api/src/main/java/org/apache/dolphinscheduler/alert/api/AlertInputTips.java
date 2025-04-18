@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -72,5 +74,12 @@ public enum AlertInputTips {
         } else {
             return this.enMsg;
         }
+    }
+
+    public static Map<String, String> getAllMsg(AlertInputTips alertInputTips) {
+        Map<String, String> allMsgMap = new HashMap<>();
+        allMsgMap.put("zhMsg", alertInputTips.zhMsg);
+        allMsgMap.put("enMsg", alertInputTips.enMsg);
+        return allMsgMap;
     }
 }

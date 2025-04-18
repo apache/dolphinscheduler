@@ -28,6 +28,8 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * The command fetcher which is fetch commands by command id and slot.
  */
@@ -48,7 +50,10 @@ public class IdSlotBasedCommandFetcher implements ICommandFetcher {
         this.commandDao = commandDao;
     }
 
+    // We use transaction here to ensure that if mysql is configured at master/slave mode, this query will be routed to
+    // the master db.
     @Override
+    @Transactional
     public List<Command> fetchCommands() {
         long scheduleStartTime = System.currentTimeMillis();
         if (!masterSlotManager.checkSlotValid()) {
@@ -64,7 +69,7 @@ public class IdSlotBasedCommandFetcher implements ICommandFetcher {
                 idSlotBasedFetchConfig.getIdStep(),
                 idSlotBasedFetchConfig.getFetchSize());
         long cost = System.currentTimeMillis() - scheduleStartTime;
-        log.info("[Slot-{}/{}] Fetch {} commands in {}ms.", currentSlotIndex, totalSlot, commands.size(), cost);
+        log.debug("[Slot-{}/{}] Fetch {} commands in {}ms.", currentSlotIndex, totalSlot, commands.size(), cost);
         WorkflowInstanceMetrics.recordCommandQueryTime(cost);
         return commands;
     }

@@ -46,19 +46,24 @@ registry:
 
 master:
   listen-port: 5678
-  workflow-event-bus-fire-thread-count: 10
+    # The number of workflow event bus fire worker used to fire the workflow event, default is 2*CPU core + 1.
+  workflow-event-bus-fire-thread-count: 4
+  logic-task-config:
+    # The number of threads used to execute logic task.
+    task-executor-thread-count: 4
   max-heartbeat-interval: 10s
+  group: default
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true
     # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
-    max-system-cpu-usage-percentage-thresholds: 0.90
+    max-system-cpu-usage-percentage-thresholds: 0.9
     # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
-    max-jvm-cpu-usage-percentage-thresholds: 0.90
+    max-jvm-cpu-usage-percentage-thresholds: 0.9
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
-    max-system-memory-usage-percentage-thresholds: 0.90
+    max-system-memory-usage-percentage-thresholds: 0.9
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
-    max-disk-usage-percentage-thresholds: 0.90
+    max-disk-usage-percentage-thresholds: 0.9
   worker-load-balancer-configuration-properties:
     # RANDOM, ROUND_ROBIN, FIXED_WEIGHTED_ROUND_ROBIN, DYNAMIC_WEIGHTED_ROUND_ROBIN
     type: DYNAMIC_WEIGHTED_ROUND_ROBIN
@@ -67,9 +72,6 @@ master:
       memory-usage-weight: 40
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 30
-  registry-disconnect-strategy:
-    # The disconnect strategy: stop, waiting
-    strategy: stop
   worker-group-refresh-interval: 10s
   command-fetch-strategy:
     type: ID_SLOT_BASED
@@ -99,6 +101,3 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-
-metrics:
-  enabled: true

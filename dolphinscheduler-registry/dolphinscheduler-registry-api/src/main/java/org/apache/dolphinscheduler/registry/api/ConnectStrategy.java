@@ -26,6 +26,4 @@ public interface ConnectStrategy {
 
     void reconnect();
 
-    StrategyType getStrategyType();
-
 }

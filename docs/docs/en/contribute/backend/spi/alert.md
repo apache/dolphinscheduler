@@ -50,7 +50,7 @@ Under this package, we currently only encapsulate RadioParam, TextParam, and Pas
 
 AbsPluginParams This class is the base class of all parameters, RadioParam these classes all inherit this class. Each DS alert plug-in will return a list of AbsPluginParams in the implementation of AlertChannelFactory.
 
-The specific design of alert_spi can be seen in the issue: [Alert Plugin Design](https://github.com/apache/incubator-dolphinscheduler/issues/3049)
+The specific design of alert_spi can be seen in the issue: [Alert Plugin Design](https://github.com/apache/dolphinscheduler/issues/3049)
 
 #### Alert SPI built-in implementation
 

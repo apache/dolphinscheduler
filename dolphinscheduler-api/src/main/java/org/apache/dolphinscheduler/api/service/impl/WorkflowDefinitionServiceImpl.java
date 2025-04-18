@@ -117,8 +117,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
-import org.apache.dolphinscheduler.plugin.task.sql.SqlTaskChannelFactory;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -1061,9 +1061,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // check workflow instances is already running
-        List<WorkflowInstance> workflowInstances = workflowInstanceService
-                .queryByWorkflowDefinitionCodeAndStatus(workflowDefinition.getCode(),
-                        org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
+        List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowDefinitionCodeAndStatus(
+                workflowDefinition.getCode(), WorkflowExecutionStatus.getNotTerminalStatus());
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
@@ -1438,7 +1437,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         sqlParameters.setLocalParams(Collections.emptyList());
         taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
         taskDefinition.setCode(CodeGenerateUtils.genCode());
-        taskDefinition.setTaskType(SqlTaskChannelFactory.NAME);
+        taskDefinition.setTaskType("SQL");
         taskDefinition.setFailRetryTimes(0);
         taskDefinition.setFailRetryInterval(0);
         taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
@@ -2119,19 +2118,38 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 List<TaskDefinitionLog> taskDefinitionLogs =
                         taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
-                for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                taskDefinitionLogs.forEach(taskDefinitionLog -> {
                     try {
-                        long taskCode = CodeGenerateUtils.genCode();
-                        taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
-                        taskDefinitionLog.setCode(taskCode);
+                        taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode());
                     } catch (CodeGenerateException e) {
                         log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
                         putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
                         throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
                     }
+                });
+                for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                    taskDefinitionLog.setCode(taskCodeMap.get(taskDefinitionLog.getCode()));
                     taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setVersion(0);
                     taskDefinitionLog.setName(taskDefinitionLog.getName());
+                    if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())) {
+                        final String taskParams = taskDefinitionLog.getTaskParams();
+                        final SwitchParameters switchParameters =
+                                JSONUtils.parseObject(taskParams, SwitchParameters.class);
+                        if (switchParameters == null) {
+                            throw new IllegalArgumentException(
+                                    "Switch task params: " + taskParams + " is invalid.");
+                        }
+                        SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
+                        switchResult.getDependTaskList().forEach(switchResultVo -> {
+                            switchResultVo.setNextNode(taskCodeMap.get(switchResultVo.getNextNode()));
+                        });
+                        if (switchResult.getNextNode() != null) {
+                            switchResult.setNextNode(
+                                    taskCodeMap.get(switchResult.getNextNode()));
+                        }
+                        taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParameters));
+                    }
                 }
                 for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
                     if (workflowTaskRelationLog.getPreTaskCode() > 0) {

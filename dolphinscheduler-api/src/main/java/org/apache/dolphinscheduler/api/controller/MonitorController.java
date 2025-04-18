@@ -65,7 +65,7 @@ public class MonitorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
     public Result<List<Server>> listServer(@PathVariable("nodeType") RegistryNodeType nodeType) {
-        List<Server> servers = monitorService.listServer(nodeType);
+        final List<Server> servers = monitorService.listServer(nodeType);
         return Result.success(servers);
     }
 

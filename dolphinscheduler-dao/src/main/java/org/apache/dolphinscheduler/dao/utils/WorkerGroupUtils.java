@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +55,7 @@ public class WorkerGroupUtils {
         if (StringUtils.isEmpty(addrList)) {
             return Collections.emptyList();
         }
-        return Lists.newArrayList(addrList.split(","));
+        return Lists.newArrayList(addrList.split(Constants.COMMA));
     }
 
 }

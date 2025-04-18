@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
@@ -32,9 +35,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
 
@@ -53,6 +54,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -104,6 +106,18 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
 
         if (CommonUtils.getKerberosStartupState()) {
             CommonUtils.loadKerberosConf(configuration);
+            final Long kerberosExpireTimeInHour = PropertyUtils.getLong(DataSourceConstants.KERBEROS_EXPIRE_TIME, -1L);
+            if (kerberosExpireTimeInHour > 0) {
+                ThreadUtils.newDaemonScheduledExecutorService("ds-hdfs-kerberos-refresh-%s", 1)
+                        .scheduleWithFixedDelay(() -> {
+                            try {
+                                UserGroupInformation.getLoginUser().checkTGTAndReloginFromKeytab();
+                                log.info("checkTGTAndReloginFromKeytab finished");
+                            } catch (Exception e) {
+                                log.error("checkTGTAndReloginFromKeytab Error", e);
+                            }
+                        }, kerberosExpireTimeInHour, kerberosExpireTimeInHour, TimeUnit.MINUTES);
+            }
             fs = FileSystem.get(configuration);
             log.info("Initialize HdfsStorageOperator with kerberos");
             return;
@@ -235,10 +249,12 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
             if (!fs.exists(path)) {
                 continue;
             }
-            RemoteIterator<LocatedFileStatus> remoteIterator = fs.listFiles(path, true);
-            while (remoteIterator.hasNext()) {
-                LocatedFileStatus locatedFileStatus = remoteIterator.next();
-                result.add(transformFileStatusToResourceMetadata(locatedFileStatus));
+            FileStatus[] fileStatuses = fs.listStatus(path);
+            for (FileStatus fileStatus : fileStatuses) {
+                if (fileStatus.isDirectory()) {
+                    foldersToFetch.addLast(fileStatus.getPath().toString());
+                }
+                result.add(transformFileStatusToResourceMetadata(fileStatus));
             }
         }
         return result;
@@ -268,7 +284,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
         Path fileStatusPath = fileStatus.getPath();
         String fileAbsolutePath = fileStatusPath.toString();
         ResourceMetadata resourceMetaData = getResourceMetaData(fileAbsolutePath);
-
         return StorageEntity.builder()
                 .fileName(fileStatusPath.getName())
                 .fullName(fileAbsolutePath)
@@ -276,6 +291,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
                 .type(resourceMetaData.getResourceType())
                 .isDirectory(fileStatus.isDirectory())
                 .size(fileStatus.getLen())
+                .relativePath(resourceMetaData.getResourceRelativePath())
                 .createTime(new Date(fileStatus.getModificationTime()))
                 .updateTime(new Date(fileStatus.getModificationTime()))
                 .build();

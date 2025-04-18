@@ -26,7 +26,7 @@ export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
   const mainJarOptions = ref([] as IMainJar[])
   const taskStore = useTaskNodeStore()
 
-  const mainJarSpan = computed(() => (model.runType === 'JAVA' ? 0 : 24))
+  const mainJarSpan = computed(() => (model.runType === 'FAT_JAR' ? 24 : 0))
   const getMainJars = async (programType: ProgramType) => {
     const storeMainJar = taskStore.getMainJar(programType)
     if (storeMainJar) {

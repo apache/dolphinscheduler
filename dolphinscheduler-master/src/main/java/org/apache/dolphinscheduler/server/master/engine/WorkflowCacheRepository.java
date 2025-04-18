@@ -68,8 +68,4 @@ public class WorkflowCacheRepository implements IWorkflowRepository {
         return ImmutableList.copyOf(workflowExecutionRunnableMap.values());
     }
 
-    @Override
-    public void clear() {
-        workflowExecutionRunnableMap.clear();
-    }
 }

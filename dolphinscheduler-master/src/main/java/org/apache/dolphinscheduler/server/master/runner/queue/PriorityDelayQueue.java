@@ -38,4 +38,7 @@ public class PriorityDelayQueue<V extends DelayEntry> {
         return queue.size();
     }
 
+    public void clear() {
+        queue.clear();
+    }
 }

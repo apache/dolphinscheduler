@@ -27,7 +27,6 @@ import java.util.Date;
 
 import lombok.Data;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -94,11 +93,6 @@ public class TaskInstance implements Serializable {
     private String appLink;
 
     private Flag flag;
-
-    private Flag isCache;
-
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private String cacheKey;
 
     @TableField(exist = false)
     private String duration;

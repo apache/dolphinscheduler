@@ -26,6 +26,7 @@ import org.apache.commons.collections4.list.UnmodifiableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -50,6 +51,11 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
         return UnmodifiableList.unmodifiableList(new ArrayList<>(masterServerMap.values()));
     }
 
+    @Override
+    public Optional<MasterServerMetadata> getServer(final String address) {
+        return Optional.ofNullable(masterServerMap.get(address));
+    }
+
     public List<MasterServerMetadata> getNormalServers() {
         List<MasterServerMetadata> normalMasterServers = masterServerMap.values()
                 .stream()
@@ -59,12 +65,12 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     }
 
     @Override
-    public void registerListener(IClustersChangeListener<MasterServerMetadata> listener) {
+    public void registerListener(final IClustersChangeListener<MasterServerMetadata> listener) {
         masterClusterChangeListeners.add(listener);
     }
 
     @Override
-    MasterServerMetadata parseServerFromHeartbeat(String masterHeartBeatJson) {
+    MasterServerMetadata parseServerFromHeartbeat(final String masterHeartBeatJson) {
         MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(masterHeartBeatJson, MasterHeartBeat.class);
         if (masterHeartBeat == null) {
             return null;
@@ -73,7 +79,7 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     }
 
     @Override
-    public void onServerAdded(MasterServerMetadata masterServer) {
+    public void onServerAdded(final MasterServerMetadata masterServer) {
         masterServerMap.put(masterServer.getAddress(), masterServer);
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerAdded(masterServer);
@@ -81,7 +87,7 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     }
 
     @Override
-    public void onServerRemove(MasterServerMetadata masterServer) {
+    public void onServerRemove(final MasterServerMetadata masterServer) {
         masterServerMap.remove(masterServer.getAddress());
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerRemove(masterServer);
@@ -89,7 +95,7 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     }
 
     @Override
-    public void onServerUpdate(MasterServerMetadata masterServer) {
+    public void onServerUpdate(final MasterServerMetadata masterServer) {
         masterServerMap.put(masterServer.getAddress(), masterServer);
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerUpdate(masterServer);

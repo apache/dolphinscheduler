@@ -112,7 +112,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);
         }
 
         Blob blob = gcsStorage.get(BlobId.of(bucketName, srcFilePath));
@@ -273,6 +273,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         entity.setDirectory(resourceMetaData.isDirectory());
         entity.setType(resourceMetaData.getResourceType());
         entity.setSize(blob.getSize());
+        entity.setRelativePath(resourceMetaData.getResourceRelativePath());
         entity.setCreateTime(Date.from(blob.getCreateTimeOffsetDateTime().toInstant()));
         entity.setUpdateTime(Date.from(blob.getUpdateTimeOffsetDateTime().toInstant()));
         return entity;

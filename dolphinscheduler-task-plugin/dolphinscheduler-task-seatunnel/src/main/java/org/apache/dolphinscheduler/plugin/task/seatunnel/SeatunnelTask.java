@@ -27,9 +27,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -44,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -154,26 +157,47 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     protected List<String> buildOptions() throws Exception {
         List<String> args = new ArrayList<>();
+        args.add(CONFIG_OPTIONS);
+        String scriptContent;
         if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {
-            args.add(CONFIG_OPTIONS);
-            args.add(buildCustomConfigCommand());
+            scriptContent = buildCustomConfigContent();
         } else {
-            seatunnelParameters.getResourceList().forEach(resourceInfo -> {
-                args.add(CONFIG_OPTIONS);
-                // TODO: Need further check for refactored resource center
-                // TODO Currently resourceName is `/xxx.sh`, it has more `/` and needs to be optimized
-                args.add(resourceInfo.getResourceName().replaceFirst(".*:", ""));
-            });
+            String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            scriptContent = FileUtils.readFileToString(
+                    new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
+                    StandardCharsets.UTF_8);
         }
+        String filePath = buildConfigFilePath();
+        createConfigFileIfNotExists(scriptContent, filePath);
+        args.add(filePath);
+        args.addAll(generateTaskParameters());
         return args;
     }
 
-    protected String buildCustomConfigCommand() throws Exception {
-        String config = buildCustomConfigContent();
-        String filePath = buildConfigFilePath();
-        createConfigFileIfNotExists(config, filePath);
-
-        return filePath;
+    private List<String> generateTaskParameters() {
+        Map<String, String> variables = new HashMap<>();
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
+        if (propertyList != null && !propertyList.isEmpty()) {
+            for (Property property : propertyList) {
+                variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+            }
+        }
+        List<Property> localParams = this.seatunnelParameters.getLocalParams();
+        if (localParams != null && !localParams.isEmpty()) {
+            for (Property property : localParams) {
+                if (property.getDirect().equals(Direct.IN)) {
+                    variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
+                }
+            }
+        }
+        List<String> parameters = new ArrayList<>();
+        variables.forEach((k, v) -> {
+            parameters.add("-i");
+            parameters.add(String.format("%s='%s'", k, v));
+        });
+        return parameters;
     }
 
     private String buildCustomConfigContent() {

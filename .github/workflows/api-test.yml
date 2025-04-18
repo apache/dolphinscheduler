@@ -38,7 +38,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |
@@ -115,6 +115,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
           - name: WorkflowInstanceAPITest
             class: org.apache.dolphinscheduler.api.test.cases.WorkflowInstanceAPITest
+          - name: LdapLoginAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.LdapLoginAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

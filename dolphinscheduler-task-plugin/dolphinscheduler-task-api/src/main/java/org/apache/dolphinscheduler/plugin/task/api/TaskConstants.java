@@ -42,6 +42,7 @@ public class TaskConstants {
      * exit code kill
      */
     public static final int EXIT_CODE_KILL = 137;
+    public static final int EXIT_CODE_HARD_KILL = 143;
     public static final String PID = "pid";
 
     /**
@@ -386,4 +387,5 @@ public class TaskConstants {
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
 
     public static final String STAR = "*";
+    public static final String SENSITIVE_DATA_MASK = "******";
 }

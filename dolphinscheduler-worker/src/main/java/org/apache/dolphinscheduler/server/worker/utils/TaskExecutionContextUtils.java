@@ -42,20 +42,16 @@ public class TaskExecutionContextUtils {
 
     public static void createTaskInstanceWorkingDirectory(TaskExecutionContext taskExecutionContext) throws TaskException {
         // local execute path
-        String taskInstanceWorkingDirectory = FileUtils.getTaskInstanceWorkingDirectory(
-                taskExecutionContext.getTenantCode(),
-                taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getWorkflowDefinitionCode(),
-                taskExecutionContext.getWorkflowDefinitionVersion(),
-                taskExecutionContext.getWorkflowInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+        String taskInstanceWorkingDirectory =
+                FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
         try {
             if (new File(taskInstanceWorkingDirectory).exists()) {
                 FileUtils.deleteFile(taskInstanceWorkingDirectory);
                 log.warn("The TaskInstance WorkingDirectory: {} is exist, will recreate again",
                         taskInstanceWorkingDirectory);
             }
-            FileUtils.createDirectoryWith755(Paths.get(taskInstanceWorkingDirectory));
+
+            FileUtils.createDirectoryWithPermission(Paths.get(taskInstanceWorkingDirectory), FileUtils.PERMISSION_775);
 
             taskExecutionContext.setExecutePath(taskInstanceWorkingDirectory);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(taskInstanceWorkingDirectory));
