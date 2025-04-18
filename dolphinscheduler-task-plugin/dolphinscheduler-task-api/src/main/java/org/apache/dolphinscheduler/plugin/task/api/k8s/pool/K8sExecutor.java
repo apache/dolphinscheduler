@@ -64,7 +64,7 @@ public class K8sExecutor {
 
             return job != null;
         } catch (Exception e) {
-            throw new TaskException("fail to check job: ", e);
+            throw new TaskException("fail to check job", e);
         }
     }
 
