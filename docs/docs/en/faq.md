@@ -754,9 +754,9 @@ start API server. If you want disabled when Python gateway service you could cha
 
 ## Q: Why is the schedule status of a workflow definition set to "Offline" after importing an online workflow definition?
 
-A: This is because we want to prevent users from directly importing a scheduled workflow that is already "Online". 
+A: This is because we want to prevent users from directly importing a scheduled workflow that is already "Online".
 Therefore, when exporting such workflows, the system automatically changes their status to "Offline".
-To enforce this rule, even if a user manually sets the schedule status to "Online" in the workflow definition before importing, 
+To enforce this rule, even if a user manually sets the schedule status to "Online" in the workflow definition before importing,
 the system will override it and set it to "Offline".
 
 ---
