@@ -142,7 +142,7 @@ public class LogUtils {
     public static String rollViewLogLines(List<String> lines) {
         StringBuilder builder = new StringBuilder();
         final int MaxResponseLogSize = 65535;
-        int totalLogSize = 0;
+        int totalLogCharSize = 0;
         for (String line : lines) {
             // If a single line of log is exceed max response size, cut off the line
             final int lineSize = line.length();
