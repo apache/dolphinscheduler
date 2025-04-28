@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -45,11 +46,15 @@ public class WorkflowTestCaseContext {
 
     private WorkflowInstance workflowInstance;
 
+    private List<WorkflowInstance> workflowInstances;
+
     private List<TaskInstance> taskInstances;
 
     private List<TaskDefinition> tasks;
 
     private List<WorkflowTaskRelation> taskRelations;
+
+    private List<WorkflowInstanceRelation> workflowInstanceRelations;
 
     private List<TaskGroup> taskGroups;
 
@@ -61,5 +66,4 @@ public class WorkflowTestCaseContext {
         }
         return workflows.get(0);
     }
-
 }
