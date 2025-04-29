@@ -31,7 +31,7 @@ public class TaskDispatchDelayEntryEvent<V extends Comparable<V>> extends Abstra
     }
 
     @Override
-    public int compareTo(@NotNull Delayed other) {
+    public int compareTo(@NotNull AbstractTaskDispatchEntryEvent<V> other) {
         if (this == other) {
             return 0;
         }
