@@ -15,30 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.runner.events;
 
-import java.util.concurrent.DelayQueue;
+import lombok.Getter;
 
-import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 
-public class PriorityDelayQueue<V extends DelayEntry> {
+@Getter
+public class TaskDispatchPriorityEntryEvent<V extends Comparable<V>> extends AbstractTaskDispatchEntryEvent<V> {
 
-    private final DelayQueue<V> queue = new DelayQueue<>();
-
-    public void add(V v) {
-        queue.put(v);
+    public TaskDispatchPriorityEntryEvent(long delayTimeMills, V data) {
+        super(delayTimeMills, data);
     }
 
-    @SneakyThrows
-    public V take() {
-        return queue.take();
-    }
+    @Override
+    public int compareTo(@NotNull AbstractTaskDispatchEntryEvent<V> other) {
+        // there should compare data first
+        if (data != null && other.data != null) {
+            final int compareResult = data.compareTo(other.data);
+            if (compareResult != 0) {
+                return compareResult;
+            }
+        }
 
-    public int size() {
-        return queue.size();
-    }
-
-    public void clear() {
-        queue.clear();
+        return super.compareTo(other);
     }
 }

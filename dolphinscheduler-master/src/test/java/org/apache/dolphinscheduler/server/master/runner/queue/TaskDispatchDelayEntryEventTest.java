@@ -21,27 +21,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.apache.dolphinscheduler.server.master.runner.events.TaskDispatchDelayEntryEvent;
+
 import java.util.concurrent.TimeUnit;
 
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class TimeBasedTaskExecutionRunnableComparableEntryTest {
+class TaskDispatchDelayEntryEventTest {
 
     private static final long TEST_DELAY_MILLS = 1000L;
     private final String testData = "testData";
-    private TimeBasedTaskExecutionRunnableComparableEntry<String> entry;
+    private TaskDispatchDelayEntryEvent<String> entry;
 
     @BeforeEach
     public void setUp() {
-        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        entry = new TaskDispatchDelayEntryEvent<>(TEST_DELAY_MILLS, testData);
     }
 
     @Test
     void constructor_NullData_ThrowsNullPointerException() {
         try {
-            new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, null);
+            new TaskDispatchDelayEntryEvent<>(TEST_DELAY_MILLS, null);
             fail("Expected NullPointerException to be thrown");
         } catch (NullPointerException e) {
             assertEquals("data is null", e.getMessage());
@@ -50,14 +52,14 @@ class TimeBasedTaskExecutionRunnableComparableEntryTest {
 
     @Test
     void getDelay_BeforeTriggerTime_ReturnsPositive() {
-        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        entry = new TaskDispatchDelayEntryEvent<>(TEST_DELAY_MILLS, testData);
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).untilAsserted(
                 () -> assertTrue(entry.getDelay(TimeUnit.MILLISECONDS) > 0));
     }
 
     @Test
     void getDelay_AtTriggerTime_ReturnsZero() {
-        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        entry = new TaskDispatchDelayEntryEvent<>(TEST_DELAY_MILLS, testData);
         Awaitility.await().atLeast(1000, TimeUnit.MILLISECONDS)
                 .with().pollInterval(1000, TimeUnit.MILLISECONDS)
                 .untilAsserted(
@@ -71,7 +73,7 @@ class TimeBasedTaskExecutionRunnableComparableEntryTest {
 
     @Test
     void getDelay_AfterTriggerTime_ReturnsNegative() {
-        entry = new TimeBasedTaskExecutionRunnableComparableEntry<>(TEST_DELAY_MILLS, testData);
+        entry = new TaskDispatchDelayEntryEvent<>(TEST_DELAY_MILLS, testData);
         Awaitility.await().atMost(1500, TimeUnit.MILLISECONDS).untilAsserted(
                 () -> assertTrue(entry.getDelay(TimeUnit.MILLISECONDS) < 0));
     }

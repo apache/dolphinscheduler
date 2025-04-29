@@ -15,21 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.runner.events;
 
-import static com.google.common.truth.Truth.assertThat;
+import java.util.concurrent.Delayed;
 
-import java.util.concurrent.TimeUnit;
+import lombok.Getter;
 
-import org.junit.jupiter.api.Test;
+import org.jetbrains.annotations.NotNull;
 
-class DelayEntryTest {
+@Getter
+public class TaskDispatchDelayEntryEvent<V extends Comparable<V>> extends AbstractTaskDispatchEntryEvent<V> {
 
-    @Test
-    void getDelay() {
-        DelayEntry<String> delayEntry = new DelayEntry<>(5_000L, "Item");
-        assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
-                .isWithin(TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS))
-                .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
+    public TaskDispatchDelayEntryEvent(long delayTimeMills, V data) {
+        super(delayTimeMills, data);
+    }
+
+    @Override
+    public int compareTo(@NotNull Delayed other) {
+        if (this == other) {
+            return 0;
+        }
+        return super.compareTo(other);
     }
 }

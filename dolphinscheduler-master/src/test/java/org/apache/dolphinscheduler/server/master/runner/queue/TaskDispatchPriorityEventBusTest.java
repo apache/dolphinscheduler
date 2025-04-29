@@ -22,34 +22,36 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskDispatchEntryEventBus;
+import org.apache.dolphinscheduler.server.master.runner.events.TaskDispatchPriorityEntryEvent;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PriorityDelayQueueTest {
+public class TaskDispatchPriorityEventBusTest {
 
-    private PriorityDelayQueue<PriorityAndDelayBasedTaskEntry> queue;
+    private TaskDispatchEntryEventBus<TaskDispatchPriorityEntryEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> queue;
     private ITaskExecutionRunnable taskExecutionRunnable;
 
     @BeforeEach
     public void setUp() {
-        queue = new PriorityDelayQueue<>();
+        queue = new TaskDispatchEntryEventBus<>();
         taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
     }
 
     @Test
     public void testAdd() {
-        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
 
-        queue.add(new PriorityAndDelayBasedTaskEntry(2000, taskExecutionRunnable));
+        queue.add(new TaskDispatchPriorityEntryEvent<>(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
     }
 
     @Test
     public void testTake() throws InterruptedException {
-        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
-        PriorityAndDelayBasedTaskEntry entry = queue.take();
+        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
+        TaskDispatchPriorityEntryEvent<ITaskExecutionRunnable> entry = queue.take();
         assertNotNull(entry);
         assertEquals(0, queue.size());
 
@@ -59,14 +61,14 @@ public class PriorityDelayQueueTest {
     public void testSize() {
         assertEquals(0, queue.size());
 
-        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
     }
 
     @Test
     public void testClear() {
-        queue.add(new PriorityAndDelayBasedTaskEntry(1000, taskExecutionRunnable));
-        queue.add(new PriorityAndDelayBasedTaskEntry(2000, taskExecutionRunnable));
+        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchPriorityEntryEvent<>(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
 
         queue.clear();

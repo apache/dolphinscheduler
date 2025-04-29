@@ -22,8 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
+import org.apache.dolphinscheduler.server.master.runner.events.TaskDispatchPriorityEntryEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * WorkerGroupTaskDispatcher is responsible for dispatching tasks from the task queue.
  * The main responsibilities include:
- * 1. Continuously fetching tasks from the {@link PriorityDelayQueue} for dispatch.
+ * 1. Continuously fetching tasks from the {@link TaskDispatchPriorityEntryEvent} for dispatch.
  * 2. Re-queuing tasks that fail to dispatch according to retry logic.
  * 3. Ensuring thread safety and correct state transitions during task processing.
  */
@@ -45,14 +44,13 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
     // it will be delayed and will not return to the first or second position.
     // Tasks with the same priority will preempt its position.
     // If it needs to be placed at the front of the queue, the queue needs to be re-implemented.
-    private final PriorityDelayQueue<PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable>> workerGroupQueue;
-
+    private final TaskDispatchEntryEventBus<TaskDispatchPriorityEntryEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupQueue;
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
     public WorkerGroupTaskDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
-        this.workerGroupQueue = new PriorityDelayQueue<>();
+        this.workerGroupQueue = new TaskDispatchEntryEventBus<>();
     }
 
     /**
@@ -66,7 +64,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
      */
     public void addTaskToWorkerGroupQueue(ITaskExecutionRunnable taskExecutionRunnable,
                                           long delayTimeMills) {
-        workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(delayTimeMills, taskExecutionRunnable));
+        workerGroupQueue.add(new TaskDispatchPriorityEntryEvent<>(delayTimeMills, taskExecutionRunnable));
     }
 
     @Override
@@ -93,7 +91,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
     }
 
     private void dispatch() {
-        PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
+        TaskDispatchPriorityEntryEvent<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
         ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         try {
@@ -110,7 +108,7 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
             // the waiting time will increase multiple of times, but will not exceed 60 seconds
             long waitingTimeMills = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(waitingTimeMills, taskExecutionRunnable));
+            workerGroupQueue.add(new TaskDispatchPriorityEntryEvent<>(waitingTimeMills, taskExecutionRunnable));
             log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
         }
     }
