@@ -80,7 +80,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -201,9 +200,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private SchedulerApi schedulerApi;
 
     protected User user;
     protected Exception exception;
@@ -1362,7 +1358,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(null);
         when(taskDefinitionMapper.batchInsert(anyList())).thenReturn(1);
         when(taskDefinitionLogMapper.batchInsert(anyList())).thenReturn(1);
-        doNothing().when(schedulerApi).insertOrUpdateScheduleTask(eq(1), any());
         WorkflowDefinition successWorkflowDef = new WorkflowDefinition();
         successWorkflowDef.setCode(123);
         when(workflowDefinitionMapper.queryByCode(anyLong())).thenReturn(successWorkflowDef);
