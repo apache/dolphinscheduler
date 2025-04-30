@@ -90,9 +90,7 @@ public class WorkflowTestCaseContextFactory {
         initializeWorkflowDefinitionToDB(workflowTestCaseContext.getWorkflows());
         initializeTaskDefinitionsToDB(workflowTestCaseContext.getTasks());
         initializeTaskRelationsToDB(workflowTestCaseContext.getTaskRelations());
-        if (workflowTestCaseContext.getWorkflowInstance() != null) {
-            initializeWorkflowInstanceToDB(workflowTestCaseContext.getWorkflowInstance());
-        } else {
+        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getWorkflowInstances())) {
             initializeWorkflowInstancesToDB(workflowTestCaseContext.getWorkflowInstances());
         }
         if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getTaskInstances())) {
@@ -111,10 +109,6 @@ public class WorkflowTestCaseContextFactory {
         for (TaskInstance taskInstance : taskInstances) {
             taskInstanceDao.insert(taskInstance);
         }
-    }
-
-    private void initializeWorkflowInstanceToDB(WorkflowInstance workflowInstance) {
-        workflowInstanceDao.insert(workflowInstance);
     }
 
     private void initializeWorkflowInstancesToDB(List<WorkflowInstance> workflowInstances) {

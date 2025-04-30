@@ -43,8 +43,6 @@ public class WorkflowTestCaseContext {
 
     private List<WorkflowDefinition> workflows;
 
-    private WorkflowInstance workflowInstance;
-
     private List<WorkflowInstance> workflowInstances;
 
     private List<TaskInstance> taskInstances;
