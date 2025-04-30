@@ -54,8 +54,6 @@ public class WorkflowTestCaseContext {
 
     private List<WorkflowTaskRelation> taskRelations;
 
-    private List<WorkflowInstanceRelation> workflowInstanceRelations;
-
     private List<TaskGroup> taskGroups;
 
     private List<Environment> environments;

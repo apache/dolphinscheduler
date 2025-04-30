@@ -186,9 +186,3 @@ taskRelations:
     postTaskVersion: 1
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
-
-workflowInstanceRelations:
-  - id: 1
-    parentWorkflowInstanceId: 1
-    parentTaskInstanceId: 1
-    workflowInstanceId: 2
