@@ -18,9 +18,15 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class MasterServerLoadProtectionTest {
 
@@ -38,6 +44,35 @@ class MasterServerLoadProtectionTest {
         Assertions.assertFalse(masterServerLoadProtection.isOverload(systemMetrics));
 
         masterServerLoadProtection.setEnabled(true);
+        Assertions.assertTrue(masterServerLoadProtection.isOverload(systemMetrics));
+    }
+
+    @Test
+    void isOverloadWithMaxConcurrentWorkflowInstances() {
+        MasterServerLoadProtection masterServerLoadProtection = new MasterServerLoadProtection();
+        SystemMetrics systemMetrics = SystemMetrics.builder()
+                .jvmMemoryUsedPercentage(0.5)
+                .systemMemoryUsedPercentage(0.5)
+                .systemCpuUsagePercentage(0.5)
+                .jvmCpuUsagePercentage(0.5)
+                .diskUsedPercentage(0.5)
+                .build();
+
+        WorkflowCacheRepository mockRepository = Mockito.mock(WorkflowCacheRepository.class);
+        Collection<IWorkflowExecutionRunnable> mockWorkflows =
+                Collections.nCopies(5, Mockito.mock(IWorkflowExecutionRunnable.class));
+        Mockito.when(mockRepository.getAll()).thenReturn(mockWorkflows);
+
+        masterServerLoadProtection.setEnabled(true);
+        masterServerLoadProtection.setWorkflowCacheRepository(mockRepository);
+
+        masterServerLoadProtection.setMaxConcurrentWorkflowInstances(10);
+        Assertions.assertFalse(masterServerLoadProtection.isOverload(systemMetrics));
+
+        masterServerLoadProtection.setMaxConcurrentWorkflowInstances(5);
+        Assertions.assertTrue(masterServerLoadProtection.isOverload(systemMetrics));
+
+        masterServerLoadProtection.setMaxConcurrentWorkflowInstances(3);
         Assertions.assertTrue(masterServerLoadProtection.isOverload(systemMetrics));
     }
 }

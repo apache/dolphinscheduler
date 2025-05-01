@@ -18,10 +18,48 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Getter
+@Setter
 public class MasterServerLoadProtection extends BaseServerLoadProtection {
 
+    private Integer maxConcurrentWorkflowInstances;
+
+    private WorkflowCacheRepository workflowCacheRepository;
+
+    public void setWorkflowCacheRepository(WorkflowCacheRepository workflowCacheRepository) {
+        this.workflowCacheRepository = workflowCacheRepository;
+    }
+
+    @Override
+    public boolean isOverload(SystemMetrics systemMetrics) {
+        if (!enabled) {
+            return false;
+        }
+
+        // Check system metrics first
+        if (super.isOverload(systemMetrics)) {
+            return true;
+        }
+
+        // Check workflow instance count if configured and repository is available
+        if (maxConcurrentWorkflowInstances != null && workflowCacheRepository != null) {
+            int currentWorkflowInstanceCount = workflowCacheRepository.getAll().size();
+            if (currentWorkflowInstanceCount >= maxConcurrentWorkflowInstances) {
+                log.info(
+                        "OverLoad: the workflow instance count: {} is over then the maxConcurrentWorkflowInstances {}",
+                        currentWorkflowInstanceCount, maxConcurrentWorkflowInstances);
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
