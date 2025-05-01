@@ -141,22 +141,22 @@ public class LogUtils {
 
     public static String rollViewLogLines(List<String> lines) {
         StringBuilder builder = new StringBuilder();
-        final int MaxResponseLogSize = 65535;
+        final int MaxResponseLogCharSize = 65535;
         int totalLogCharSize = 0;
         for (String line : lines) {
             // If a single line of log is exceed max response size, cut off the line
-            final int lineSize = line.length();
-            if (lineSize >= MaxResponseLogSize) {
-                builder.append(line, 0, MaxResponseLogSize)
-                        .append(" [this line's size ").append(lineSize).append(" bytes exceeds ")
-                        .append(MaxResponseLogSize).append(" bytes, so only ")
-                        .append(MaxResponseLogSize).append(" characters are reserved for performance reasons.]")
+            final int lineCharSize = line.length();
+            if (lineCharSize >= MaxResponseLogCharSize) {
+                builder.append(line, 0, MaxResponseLogCharSize)
+                        .append(" [this line's size ").append(lineCharSize).append(" characters exceeds ")
+                        .append(MaxResponseLogCharSize).append(" characters, so only ")
+                        .append(MaxResponseLogCharSize).append(" characters are reserved for performance reasons.]")
                         .append("\r\n");
             } else {
                 builder.append(line).append("\r\n");
             }
-            totalLogSize += lineSize;
-            if (totalLogSize >= MaxResponseLogSize) {
+            totalLogCharSize += lineCharSize;
+            if (totalLogCharSize >= MaxResponseLogCharSize) {
                 break;
             }
         }
