@@ -25,19 +25,47 @@ import java.util.List;
 
 import com.google.auto.service.AutoService;
 
+/**
+ * Factory class for creating Flink Materialized Table Task Channels.
+ * 
+ * This class is responsible for creating instances of FlinkMaterializedTableTaskChannel
+ * and providing plugin-specific parameters.
+ * It is annotated with @AutoService to enable automatic service discovery.
+ */
 @AutoService(TaskChannelFactory.class)
 public class FlinkMaterializedTableTaskChannelFactory implements TaskChannelFactory {
 
+    /**
+     * Gets the name of the task type.
+     * 
+     * This name is used to identify the task type in the DolphinScheduler system.
+     *
+     * @return The task type name "FLINK_MATERIALIZED_TABLE"
+     */
     @Override
     public String getName() {
         return "FLINK_MATERIALIZED_TABLE";
     }
 
+    /**
+     * Gets the plugin parameters.
+     * 
+     * This method returns the list of parameters that can be configured for this task type.
+     *
+     * @return List of plugin parameters (currently returns null as parameters are handled internally)
+     */
     @Override
     public List<PluginParams> getParams() {
         return null;
     }
 
+    /**
+     * Creates a new task channel instance.
+     * 
+     * This method is called by the DolphinScheduler system to create a new task channel.
+     *
+     * @return A new instance of FlinkMaterializedTableTaskChannel
+     */
     @Override
     public TaskChannel create() {
         return new FlinkMaterializedTableTaskChannel();

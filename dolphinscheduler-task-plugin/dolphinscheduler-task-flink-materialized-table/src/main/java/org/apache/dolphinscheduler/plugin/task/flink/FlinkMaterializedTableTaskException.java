@@ -18,18 +18,41 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 /**
- * Custom ZeppelinTaskException
+ * Custom exception class for Flink Materialized Table tasks.
+ * 
+ * This exception is thrown when errors occur during the execution of Flink Materialized Table tasks.
+ * It provides specific error handling for materialized table operations.
  */
 public class FlinkMaterializedTableTaskException extends RuntimeException {
 
+    /**
+     * Default constructor.
+     * 
+     * Creates a new exception without a message or cause.
+     */
     public FlinkMaterializedTableTaskException() {
         super();
     }
 
+    /**
+     * Constructor with error message.
+     * 
+     * Creates a new exception with the specified error message.
+     *
+     * @param message The error message
+     */
     public FlinkMaterializedTableTaskException(String message) {
         super(message);
     }
 
+    /**
+     * Constructor with error message and cause.
+     * 
+     * Creates a new exception with the specified error message and cause.
+     *
+     * @param message The error message
+     * @param cause The cause of the exception
+     */
     public FlinkMaterializedTableTaskException(String message, Throwable cause) {
         super(message, cause);
     }

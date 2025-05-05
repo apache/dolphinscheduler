@@ -17,51 +17,118 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
-
-@Getter
-@Setter
-@ToString
-@Slf4j
+/**
+ * Parameters for Flink Materialized Table Task.
+ * 
+ * This class defines the configuration parameters required for refreshing Flink materialized tables.
+ * It includes parameters for table identification, gateway connection, and execution configuration.
+ */
 public class FlinkMaterializedTableParameters extends AbstractParameters {
 
+    /**
+     * The fully qualified identifier of the materialized table in the format: catalog.database.table.
+     */
     private String identifier;
+
+    /**
+     * The endpoint URL of the Flink SQL Gateway.
+     */
     private String gatewayEndpoint;
 
-    private boolean isPeriodic;
+    /**
+     * Initial configuration for the Flink SQL Gateway session.
+     * These parameters are used when opening a new session.
+     */
+    private Map<String, String> initConfig;
 
-    private String dynamicOptions;
+    /**
+     * Dynamic options for the materialized table refresh operation.
+     * These parameters are passed to the refresh request.
+     */
+    private Map<String, String> dynamicOptions;
 
-    private String staticPartitions;
+    /**
+     * Execution configuration for the refresh operation.
+     * These parameters control how the refresh job is executed.
+     */
+    private Map<String, String> executionConfig;
 
-    private String executionConfig;
-
-    private String initConfig;
-
+    /**
+     * Description of the SQL statement (optional).
+     */
     private String statementDescription;
 
-    @Override
-    public boolean checkParameters() {
-        return StringUtils.isNotEmpty(identifier) && StringUtils.isNotEmpty(gatewayEndpoint);
+    /**
+     * Regular expression pattern for validating gateway endpoint URLs.
+     */
+    private static final Pattern URL_PATTERN = Pattern.compile("^(http|https)://[\\w\\-\\.]+(?::\\d+)?(?:/.*)?$");
+
+    public FlinkMaterializedTableParameters() {
+        // Default constructor
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getGatewayEndpoint() {
+        return gatewayEndpoint;
+    }
+
+    public void setGatewayEndpoint(String gatewayEndpoint) {
+        this.gatewayEndpoint = gatewayEndpoint;
+    }
+
+    public Map<String, String> getInitConfig() {
+        return initConfig;
+    }
+
+    public void setInitConfig(Map<String, String> initConfig) {
+        this.initConfig = initConfig;
+    }
+
+    public Map<String, String> getDynamicOptions() {
+        return dynamicOptions;
+    }
+
+    public void setDynamicOptions(Map<String, String> dynamicOptions) {
+        this.dynamicOptions = dynamicOptions;
+    }
+
+    public Map<String, String> getExecutionConfig() {
+        return executionConfig;
+    }
+
+    public void setExecutionConfig(Map<String, String> executionConfig) {
+        this.executionConfig = executionConfig;
+    }
+
+    /**
+     * Validates the required parameters.
+     * 
+     * Checks if the identifier and gateway endpoint are properly set.
+     *
+     * @return true if all required parameters are valid, false otherwise
+     */
     @Override
-    public List<ResourceInfo> getResourceFilesList() {
-        return Collections.emptyList();
+    public boolean checkParameters() {
+        if (identifier == null || identifier.trim().isEmpty()) {
+            return false;
+        }
+
+        if (gatewayEndpoint == null || !URL_PATTERN.matcher(gatewayEndpoint).matches()) {
+            return false;
+        }
+
+        return true;
     }
 }
