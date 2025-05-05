@@ -17,7 +17,7 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
 1. Run `yarn` in the root directory to install the dependencies.
 2. Run commands to collect resources
    2.1. Run `export PROTOCOL_MODE=ssh` tells Git clone resource via SSH protocol instead of HTTPS protocol
-   2.2. Run `./scripts/prepare_docs.sh` prepare all related resources, for more information you could see [how prepare script work](HOW_PREPARE_WORK.md)
+   2.2. Run `./scripts/prepare_docs.sh` prepare all related resources, for more information you could see [how prepare script work](https://github.com/apache/dolphinscheduler-website/blob/master/HOW_PREPARE_WORK.md)
 3. Run `yarn generate` in the root directory to format and perpare the data.
 4. Run `yarn dev` in the root directory to start a local server, you will see the website in 'http://localhost:3000'.
 
