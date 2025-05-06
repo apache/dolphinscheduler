@@ -45,8 +45,8 @@ import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapp
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -56,6 +56,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,9 +83,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private WorkerGroupDao workerGroupDao;
 
     @Autowired
-    private WorkflowInstanceMapper workflowInstanceMapper;
-
-    @Autowired
     private RegistryClient registryClient;
 
     @Autowired
@@ -98,6 +96,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private WorkflowDefinitionMapper workflowDefinitionMapper;
+    @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
 
     /**
      * create or update a worker group
@@ -344,9 +344,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByWorkerGroupNameAndStatus(
-                workerGroup.getName(),
-                WorkflowExecutionStatus.getNotTerminalStatus());
+        List<WorkflowInstance> workflowInstances = workflowInstanceDao.queryByCondition(queryWrapper -> queryWrapper
+                .eq(WorkflowInstance::getWorkerGroup, workerGroup.getName()).in(WorkflowInstance::getState, Arrays
+                        .stream(WorkflowExecutionStatus.getNotTerminalStatus()).boxed().collect(Collectors.toList())));
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             List<Integer> workflowInstanceIds =
                     workflowInstances.stream().map(WorkflowInstance::getId).collect(Collectors.toList());

@@ -326,7 +326,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
 
-        WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
         if (!workflowInstance.getState().isFinished()) {

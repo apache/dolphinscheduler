@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -42,6 +41,7 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -88,6 +88,9 @@ public class TenantServiceTest {
 
     @Mock
     private WorkflowInstanceMapper workflowInstanceMapper;
+
+    @Mock
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     private UserMapper userMapper;
@@ -191,9 +194,7 @@ public class TenantServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        when(workflowInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
-                WorkflowExecutionStatus.getNotTerminalStatus()))
-                        .thenReturn(getInstanceList());
+        when(workflowInstanceDao.queryByCondition(Mockito.any())).thenReturn(getInstanceList());
         when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
         when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
@@ -205,7 +206,7 @@ public class TenantServiceTest {
                 () -> tenantService.deleteTenantById(getLoginUser(), 1));
 
         // DELETE_TENANT_BY_ID_FAIL_DEFINES
-        when(workflowInstanceMapper.queryByTenantCodeAndStatus(any(), any())).thenReturn(Collections.emptyList());
+        when(workflowInstanceDao.queryByCondition(any())).thenReturn(Collections.emptyList());
         when(tenantMapper.queryById(2)).thenReturn(getTenant(2));
         assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES,
                 () -> tenantService.deleteTenantById(getLoginUser(), 2));

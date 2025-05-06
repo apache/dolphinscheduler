@@ -230,16 +230,6 @@ public interface WorkflowInstanceService {
     List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode,
                                                          int size);
 
-    /**
-     * query workflow instance list bt trigger code
-     *
-     * @param loginUser
-     * @param projectCode
-     * @param triggerCode
-     * @return
-     */
-    Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
-
     void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     void deleteWorkflowInstanceById(int workflowInstanceId);

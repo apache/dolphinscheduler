@@ -179,7 +179,7 @@ public class TaskInstanceServiceTest {
                 Mockito.any()))
                         .thenReturn(pageReturn);
         when(usersService.queryUser(workflowInstance.getExecutorId())).thenReturn(loginUser);
-        when(processService.findWorkflowInstanceDetailById(taskInstance.getWorkflowInstanceId()))
+        when(workflowInstanceDao.queryOptionalById(taskInstance.getWorkflowInstanceId()))
                 .thenReturn(Optional.of(workflowInstance));
 
         Result successRes = taskInstanceService.queryTaskListPaging(loginUser,

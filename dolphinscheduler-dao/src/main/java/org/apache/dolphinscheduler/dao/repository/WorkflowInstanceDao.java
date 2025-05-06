@@ -26,7 +26,8 @@ import java.util.List;
 public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
 
     /**
-     * insert or update work workflow instance to database
+     * Insert or update work workflow instance to database.
+     * <p> If the workflow instance id is null, it will be inserted, otherwise it will be updated.
      *
      * @param workflowInstance workflowInstance
      */
@@ -40,18 +41,11 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
                                      WorkflowExecutionStatus targetState);
 
     /**
-     * performs an "upsert" operation (update or insert) on a WorkflowInstance object within a new transaction
-     *
-     * @param workflowInstance workflowInstance
-     */
-    void performTransactionalUpsert(WorkflowInstance workflowInstance);
-
-    /**
      * find last scheduler workflow instance in the date interval
      *
      * @param workflowDefinitionCode definitionCode
-     * @param taskDefinitionCode    definitionCode
-     * @param dateInterval          dateInterval
+     * @param taskDefinitionCode     definitionCode
+     * @param dateInterval           dateInterval
      * @return workflow instance
      */
     WorkflowInstance queryLastSchedulerWorkflowInterval(Long workflowDefinitionCode, Long taskDefinitionCode,
@@ -86,11 +80,10 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
 
     WorkflowInstance querySubWorkflowInstanceByParentId(Integer workflowInstanceId, Integer taskInstanceId);
 
-    List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                            int workflowDefinitionVersion,
-                                                            int[] states);
-
-    List<String> queryNeedFailoverMasters();
+    /**
+     * Find the host which contains workflow instances need failover.
+     */
+    List<String> listHostsNeedingFailover();
 
     /**
      * Query the workflow instances under the master that need to be failover.

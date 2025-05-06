@@ -40,18 +40,21 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,6 +86,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
     @Autowired(required = false)
     private StorageOperator storageOperator;
+    @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
 
     /**
      * Check the tenant new object valid or not
@@ -129,10 +134,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      */
     @Override
@@ -179,11 +184,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateWorkflowInstance tenant
      *
-     * @param loginUser login user
-     * @param id tenant id
+     * @param loginUser  login user
+     * @param id         tenant id
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
@@ -256,9 +261,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     }
 
     private List<WorkflowInstance> getWorkflowInstancesByTenant(Tenant tenant) {
-        return workflowInstanceMapper.queryByTenantCodeAndStatus(
-                tenant.getTenantCode(),
-                WorkflowExecutionStatus.getNotTerminalStatus());
+        return workflowInstanceDao.queryByCondition(
+                queryWrapper -> queryWrapper.eq(WorkflowInstance::getTenantCode, tenant.getTenantCode())
+                        .in(WorkflowInstance::getState,
+                                Arrays.stream(WorkflowExecutionStatus.getNotTerminalStatus()).boxed()
+                                        .collect(Collectors.toList())));
     }
 
     /**
@@ -324,9 +331,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * ONLY for python gateway server, and should not use this in web ui function
      *
      * @param tenantCode tenant code
-     * @param desc The description of tenant object
-     * @param queue The value of queue which current tenant belong
-     * @param queueName The name of queue which current tenant belong
+     * @param desc       The description of tenant object
+     * @param queue      The value of queue which current tenant belong
+     * @param queueName  The name of queue which current tenant belong
      * @return Tenant object
      */
     @Override

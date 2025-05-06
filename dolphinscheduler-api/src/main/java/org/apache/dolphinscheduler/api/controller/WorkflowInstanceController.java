@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR;
-
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
@@ -422,22 +420,4 @@ public class WorkflowInstanceController extends BaseController {
         return returnDataList(result);
     }
 
-    // Todo: This is unstable, in some case the command trigger failed, we cannot get workflow instance
-    // And it's a bad design to use trigger code to get workflow instance why not directly get by workflow instanceId or
-    // inject the trigger id into workflow instance?
-    @Deprecated
-    @Operation(summary = "queryWorkflowInstanceListByTrigger", description = "QUERY_WORKFLOW_INSTANCE_BY_TRIGGER_NOTES")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),
-            @Parameter(name = "triggerCode", description = "TRIGGER_CODE", required = true, schema = @Schema(implementation = Long.class))
-    })
-    @GetMapping("/trigger")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
-    public Result queryWorkflowInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                      @PathVariable long projectCode,
-                                                      @RequestParam(value = "triggerCode") Long triggerCode) {
-        Map<String, Object> result = workflowInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
-        return returnDataList(result);
-    }
 }

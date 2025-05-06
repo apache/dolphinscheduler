@@ -64,7 +64,7 @@ public class WorkflowInstanceAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        WorkflowInstance obj = workflowInstanceMapper.queryDetailById(objId);
+        WorkflowInstance obj = workflowInstanceMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

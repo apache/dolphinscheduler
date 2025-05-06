@@ -72,7 +72,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         final StopWatch failoverTimeCost = StopWatch.createStarted();
         log.info("Global master failover starting");
         final List<String> masterAddressWhichContainsUnFinishedWorkflow =
-                workflowInstanceDao.queryNeedFailoverMasters();
+                workflowInstanceDao.listHostsNeedingFailover();
         for (final String masterAddress : masterAddressWhichContainsUnFinishedWorkflow) {
             final Optional<MasterServerMetadata> aliveMasterOptional =
                     clusterManager.getMasterClusters().getServer(masterAddress);

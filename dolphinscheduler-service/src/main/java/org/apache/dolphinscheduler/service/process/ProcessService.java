@@ -41,20 +41,15 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public interface ProcessService {
 
     WorkflowInstance constructWorkflowInstance(Command command,
                                                String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
-    Optional<WorkflowInstance> findWorkflowInstanceDetailById(int workflowInstanceId);
-
     WorkflowInstance findWorkflowInstanceById(int workflowInstanceId);
 
     WorkflowDefinition findWorkflowDefinition(Long workflowDefinitionCode, int workflowDefinitionVersion);
-
-    WorkflowDefinition findWorkflowDefinitionByCode(Long workflowDefinitionCode);
 
     int deleteWorkflowInstanceById(int workflowInstanceId);
 
@@ -73,8 +68,6 @@ public interface ProcessService {
     WorkflowInstance findParentWorkflowInstance(Integer subWorkflowInstanceId);
 
     void changeOutParam(TaskInstance taskInstance);
-
-    Schedule querySchedule(int id);
 
     List<Schedule> queryReleaseSchedulerListByWorkflowDefinitionCode(long workflowDefinitionCode);
 

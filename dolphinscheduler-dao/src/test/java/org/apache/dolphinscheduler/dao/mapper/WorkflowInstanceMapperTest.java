@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Date;
 import java.util.List;
@@ -127,29 +126,9 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         WorkflowInstance workflowInstance = insertOne();
         workflowInstanceMapper.updateById(workflowInstance);
 
-        WorkflowInstance workflowInstance1 = workflowInstanceMapper.queryDetailById(workflowInstance.getId());
+        WorkflowInstance workflowInstance1 = workflowInstanceMapper.selectById(workflowInstance.getId());
         Assertions.assertNotNull(workflowInstance1);
         workflowInstanceMapper.deleteById(workflowInstance.getId());
-    }
-
-    /**
-     * test query by host and states
-     */
-    @Test
-    public void testQueryByHostAndStates() {
-        WorkflowInstance workflowInstance = insertOne();
-        workflowInstance.setHost("192.168.2.155");
-        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        workflowInstanceMapper.updateById(workflowInstance);
-
-        int[] stateArray = new int[]{
-                TaskExecutionStatus.RUNNING_EXECUTION.getCode(),
-                TaskExecutionStatus.SUCCESS.getCode()};
-
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByHostAndStatus(null, stateArray);
-
-        workflowInstanceMapper.deleteById(workflowInstance.getId());
-        Assertions.assertNotEquals(0, workflowInstances.size());
     }
 
     /**
@@ -233,26 +212,6 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
         Assertions.assertNotEquals(0, workflowInstanceStatusCountDtos.size());
 
         workflowInstanceMapper.deleteById(workflowInstance.getId());
-    }
-
-    /**
-     * test query process instance by process definition id
-     */
-    @Test
-    public void testQueryByProcessDefineId() {
-        WorkflowInstance workflowInstance = insertOne();
-        WorkflowInstance workflowInstance1 = insertOne();
-
-        List<WorkflowInstance> workflowInstances =
-                workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode(), 1);
-        Assertions.assertEquals(1, workflowInstances.size());
-
-        workflowInstances =
-                workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode(), 2);
-        Assertions.assertEquals(2, workflowInstances.size());
-
-        workflowInstanceMapper.deleteById(workflowInstance.getId());
-        workflowInstanceMapper.deleteById(workflowInstance1.getId());
     }
 
     /**

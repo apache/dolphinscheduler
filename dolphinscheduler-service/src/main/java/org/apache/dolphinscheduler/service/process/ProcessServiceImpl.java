@@ -59,7 +59,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -77,7 +76,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
@@ -89,7 +87,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
-import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -162,16 +159,10 @@ public class ProcessServiceImpl implements ProcessService {
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Autowired
-    private WorkflowInstanceMapDao workflowInstanceMapDao;
-
-    @Autowired
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
     private WorkflowInstanceRelationMapper workflowInstanceRelationMapper;
-
-    @Autowired
-    private CommandMapper commandMapper;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
@@ -199,20 +190,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private CuringParamsService curingGlobalParamsService;
-
-    @Autowired
-    private CommandService commandService;
-
-    /**
-     * find workflow instance detail by id
-     *
-     * @param workflowInstanceId workflowInstanceId
-     * @return workflow instance
-     */
-    @Override
-    public Optional<WorkflowInstance> findWorkflowInstanceDetailById(int workflowInstanceId) {
-        return Optional.ofNullable(workflowInstanceMapper.queryDetailById(workflowInstanceId));
-    }
 
     /**
      * find workflow instance by id
@@ -242,17 +219,6 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         return workflowDefinition;
-    }
-
-    /**
-     * find workflow define by code.
-     *
-     * @param workflowDefinitionCode workflowDefinitionCode
-     * @return workflow definition
-     */
-    @Override
-    public WorkflowDefinition findWorkflowDefinitionByCode(Long workflowDefinitionCode) {
-        return workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
     }
 
     /**
@@ -513,7 +479,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (workflowInstanceId == 0) {
             workflowInstance = generateNewWorkflowInstance(workflowDefinition, command, cmdParam);
         } else {
-            workflowInstance = this.findWorkflowInstanceDetailById(workflowInstanceId).orElse(null);
+            workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId).orElse(null);
             setGlobalParamIfCommanded(workflowDefinition, cmdParam);
             if (workflowInstance == null) {
                 return null;
@@ -859,17 +825,6 @@ public class ProcessServiceImpl implements ProcessService {
             result.add(String.valueOf(intVar));
         }
         return result;
-    }
-
-    /**
-     * query schedule by id
-     *
-     * @param id id
-     * @return schedule
-     */
-    @Override
-    public Schedule querySchedule(int id) {
-        return scheduleMapper.selectById(id);
     }
 
     /**
@@ -1377,7 +1332,8 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public void forceWorkflowInstanceSuccessByTaskInstanceId(TaskInstance task) {
-        WorkflowInstance workflowInstance = findWorkflowInstanceDetailById(task.getWorkflowInstanceId()).orElse(null);
+        WorkflowInstance workflowInstance =
+                workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId()).orElse(null);
         if (workflowInstance != null
                 && (workflowInstance.getState().isFailure() || workflowInstance.getState().isStop())) {
             List<TaskInstance> validTaskList =

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
@@ -26,16 +27,15 @@ import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Repository
@@ -60,7 +60,8 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     }
 
     @Override
-    public void updateWorkflowInstanceState(Integer workflowInstanceId, WorkflowExecutionStatus originalStatus,
+    public void updateWorkflowInstanceState(Integer workflowInstanceId,
+                                            WorkflowExecutionStatus originalStatus,
                                             WorkflowExecutionStatus targetStatus) {
         int update = mybatisMapper.updateWorkflowInstanceState(workflowInstanceId, originalStatus, targetStatus);
         if (update != 1) {
@@ -75,18 +76,12 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
         }
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
-    public void performTransactionalUpsert(WorkflowInstance workflowInstance) {
-        this.upsertWorkflowInstance(workflowInstance);
-    }
-
     /**
      * find last scheduler process instance in the date interval
      *
      * @param workflowDefinitionCode definitionCode
-     * @param taskDefinitionCode    definitionCode
-     * @param dateInterval          dateInterval
+     * @param taskDefinitionCode     definitionCode
+     * @param dateInterval           dateInterval
      * @return process instance
      */
     @Override
@@ -128,7 +123,10 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      */
     @Override
     public WorkflowInstance queryFirstScheduleWorkflowInstance(Long definitionCode) {
-        return mybatisMapper.queryFirstScheduleWorkflowInstance(definitionCode);
+        return queryOneByCondition(queryWrapper -> queryWrapper
+                .eq(WorkflowInstance::getWorkflowDefinitionCode, definitionCode)
+                .isNotNull(WorkflowInstance::getScheduleTime)
+                .orderByDesc(WorkflowInstance::getScheduleTime)).orElse(null);
     }
 
     /**
@@ -139,7 +137,10 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      */
     @Override
     public WorkflowInstance queryFirstStartWorkflowInstance(Long definitionCode) {
-        return mybatisMapper.queryFirstStartWorkflowInstance(definitionCode);
+        return queryOneByCondition(queryWrapper -> queryWrapper
+                .eq(WorkflowInstance::getWorkflowDefinitionCode, definitionCode)
+                .isNotNull(WorkflowInstance::getStartTime)
+                .orderByDesc(WorkflowInstance::getStartTime)).orElse(null);
     }
 
     @Override
@@ -155,22 +156,24 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                                   int workflowDefinitionVersion,
-                                                                   int[] states) {
-        return mybatisMapper.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
-                states);
-    }
-
-    @Override
-    public List<String> queryNeedFailoverMasters() {
-        return mybatisMapper
-                .queryNeedFailoverWorkflowInstanceHost(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+    public List<String> listHostsNeedingFailover() {
+        return queryByCondition(queryWrapper -> queryWrapper
+                .in(WorkflowInstance::getState,
+                        Arrays.stream(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState()).boxed()
+                                .collect(Collectors.toList())))
+                                        .stream()
+                                        .map(WorkflowInstance::getHost)
+                                        .distinct()
+                                        .collect(Collectors.toList());
     }
 
     @Override
     public List<WorkflowInstance> queryNeedFailoverWorkflowInstances(String masterAddress) {
-        return mybatisMapper.queryMainWorkflowByHostAndStatus(masterAddress,
-                WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+        return queryByCondition(queryWrapper -> queryWrapper
+                .eq(WorkflowInstance::getHost, masterAddress)
+                .eq(WorkflowInstance::getIsSubWorkflow, Flag.NO.getCode())
+                .in(WorkflowInstance::getState,
+                        Arrays.stream(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState()).boxed()
+                                .collect(Collectors.toList())));
     }
 }

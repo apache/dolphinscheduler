@@ -39,17 +39,19 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,6 +65,8 @@ import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+
+import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -79,7 +83,7 @@ public class WorkerGroupServiceTest {
     private WorkerGroupDao workerGroupDao;
 
     @Mock
-    private WorkflowInstanceMapper workflowInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     private RegistryClient registryClient;
@@ -230,15 +234,9 @@ public class WorkerGroupServiceTest {
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        WorkerGroup workerGroup = getWorkerGroup(1);
-        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setId(1);
-        List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
-        workflowInstances.add(workflowInstance);
-        when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
-                WorkflowExecutionStatus.getNotTerminalStatus()))
-                        .thenReturn(workflowInstances);
+        when(workerGroupDao.queryById(1)).thenReturn(getWorkerGroup(1));
+        when(workflowInstanceDao.queryByCondition(Mockito.any()))
+                .thenReturn(Lists.newArrayList(WorkflowInstance.builder().id(1).build()));
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
@@ -254,8 +252,10 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
         when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
-        when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
-                WorkflowExecutionStatus.getNotTerminalStatus())).thenReturn(null);
+        when(workflowInstanceDao.queryByCondition(queryWrapper -> queryWrapper
+                .eq(WorkflowInstance::getWorkerGroup, workerGroup.getName()).in(WorkflowInstance::getState, Arrays
+                        .stream(WorkflowExecutionStatus.getNotTerminalStatus()).boxed().collect(Collectors.toList()))))
+                                .thenReturn(null);
 
         when(workerGroupDao.deleteById(1)).thenReturn(true);
 

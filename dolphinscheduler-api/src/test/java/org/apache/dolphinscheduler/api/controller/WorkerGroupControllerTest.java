@@ -27,13 +27,17 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -58,6 +62,9 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
 
     @MockBean(name = "processInstanceMapper")
     private WorkflowInstanceMapper workflowInstanceMapper;
+
+    @MockBean(name = "workflowInstanceDao")
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @MockBean(name = "registryClient")
     private RegistryClient registryClient;
@@ -134,8 +141,10 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         workerGroup.setId(12);
         workerGroup.setName("测试");
         Mockito.when(workerGroupDao.queryById(12)).thenReturn(workerGroup);
-        Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus("测试",
-                WorkflowExecutionStatus.getNotTerminalStatus()))
+        Mockito.when(workflowInstanceDao.queryByCondition(
+                queryWrapper -> queryWrapper.eq(WorkflowInstance::getWorkerGroup, "测试").in(WorkflowInstance::getState,
+                        Arrays.stream(WorkflowExecutionStatus.getNotTerminalStatus()).boxed()
+                                .collect(Collectors.toList()))))
                 .thenReturn(null);
         Mockito.when(workerGroupDao.deleteById(12)).thenReturn(true);
         Mockito.when(workflowInstanceMapper.updateWorkflowInstanceByWorkerGroupName("测试", "")).thenReturn(1);

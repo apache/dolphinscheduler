@@ -21,8 +21,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import lombok.NonNull;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 public interface IDao<Entity> {
 
@@ -49,7 +52,18 @@ public interface IDao<Entity> {
     /**
      * Query the entity by condition.
      */
-    List<Entity> queryByCondition(Entity queryCondition);
+    List<Entity> queryByCondition(Function<LambdaQueryWrapper<Entity>, LambdaQueryWrapper<Entity>> queryCondition);
+
+    /**
+     * Query the entity by condition.
+     */
+    Optional<Entity> queryOneByCondition(Function<LambdaQueryWrapper<Entity>, LambdaQueryWrapper<Entity>> queryCondition);
+
+    /**
+     * Query the entity by condition.
+     */
+    List<Entity> queryByCondition(Function<LambdaQueryWrapper<Entity>, LambdaQueryWrapper<Entity>> queryCondition,
+                                  int limit);
 
     /**
      * Insert the entity.

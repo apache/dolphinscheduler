@@ -24,11 +24,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import lombok.NonNull;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public abstract class BaseDao<ENTITY, MYBATIS_MAPPER extends BaseMapper<ENTITY>> implements IDao<ENTITY> {
 
@@ -62,11 +65,33 @@ public abstract class BaseDao<ENTITY, MYBATIS_MAPPER extends BaseMapper<ENTITY>>
     }
 
     @Override
-    public List<ENTITY> queryByCondition(ENTITY queryCondition) {
+    public List<ENTITY> queryByCondition(Function<LambdaQueryWrapper<ENTITY>, LambdaQueryWrapper<ENTITY>> queryCondition) {
         if (queryCondition == null) {
             throw new IllegalArgumentException("queryCondition can not be null");
         }
-        return mybatisMapper.selectList(new QueryWrapper<>(queryCondition));
+        LambdaQueryWrapper<ENTITY> wrapper = new LambdaQueryWrapper<>();
+        queryCondition.apply(wrapper);
+        return mybatisMapper.selectList(wrapper);
+    }
+
+    @Override
+    public Optional<ENTITY> queryOneByCondition(Function<LambdaQueryWrapper<ENTITY>, LambdaQueryWrapper<ENTITY>> queryCondition) {
+        return queryByCondition(queryCondition).stream().findFirst();
+    }
+
+    @Override
+    public List<ENTITY> queryByCondition(Function<LambdaQueryWrapper<ENTITY>, LambdaQueryWrapper<ENTITY>> queryCondition,
+                                         int limit) {
+        if (queryCondition == null) {
+            throw new IllegalArgumentException("queryCondition can not be null");
+        }
+        if (limit <= 0) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<ENTITY> wrapper = new LambdaQueryWrapper<>();
+        queryCondition.apply(wrapper);
+        Page<ENTITY> entityPage = mybatisMapper.selectPage(new Page<>(1, limit), wrapper);
+        return entityPage.getRecords();
     }
 
     @Override
