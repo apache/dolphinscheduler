@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
 import javax.annotation.PostConstruct;
 
@@ -34,12 +34,12 @@ public class MasterServerLoadProtectionConfig {
     private MasterConfig masterConfig;
 
     @Autowired
-    private WorkflowCacheRepository workflowCacheRepository;
+    private IWorkflowRepository workflowRepository;
 
     @PostConstruct
     public void init() {
         MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
-        serverLoadProtection.setWorkflowCacheRepository(workflowCacheRepository);
-        log.info("Initialized MasterServerLoadProtection with WorkflowCacheRepository");
+        serverLoadProtection.setWorkflowRepository(workflowRepository);
+        log.info("Initialized MasterServerLoadProtection with IWorkflowRepository");
     }
 }
