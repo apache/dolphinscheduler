@@ -28,4 +28,8 @@ public class TaskInstanceLogPageQueryResponse {
 
     private String logContent;
 
+    private int code = 0;
+
+    private String message;
+
 }
