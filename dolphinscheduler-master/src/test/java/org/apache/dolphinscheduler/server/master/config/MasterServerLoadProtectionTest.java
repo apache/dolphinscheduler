@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import java.util.Collection;
@@ -58,13 +58,13 @@ class MasterServerLoadProtectionTest {
                 .diskUsedPercentage(0.5)
                 .build();
 
-        WorkflowCacheRepository mockRepository = Mockito.mock(WorkflowCacheRepository.class);
+        IWorkflowRepository mockRepository = Mockito.mock(IWorkflowRepository.class);
         Collection<IWorkflowExecutionRunnable> mockWorkflows =
                 Collections.nCopies(5, Mockito.mock(IWorkflowExecutionRunnable.class));
         Mockito.when(mockRepository.getAll()).thenReturn(mockWorkflows);
 
         masterServerLoadProtection.setEnabled(true);
-        masterServerLoadProtection.setWorkflowCacheRepository(mockRepository);
+        masterServerLoadProtection.setWorkflowRepository(mockRepository);
 
         masterServerLoadProtection.setMaxConcurrentWorkflowInstances(10);
         Assertions.assertFalse(masterServerLoadProtection.isOverload(systemMetrics));
