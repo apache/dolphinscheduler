@@ -30,13 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 public class MasterServerLoadProtection extends BaseServerLoadProtection {
 
-    private Integer maxConcurrentWorkflowInstances;
+    private Integer maxConcurrentWorkflowInstances = Integer.MAX_VALUE;
 
-    private WorkflowCacheRepository workflowCacheRepository;
-
-    public void setWorkflowCacheRepository(WorkflowCacheRepository workflowCacheRepository) {
-        this.workflowCacheRepository = workflowCacheRepository;
-    }
+    private IWorkflowRepository workflowRepository;
 
     @Override
     public boolean isOverload(SystemMetrics systemMetrics) {
@@ -49,9 +45,9 @@ public class MasterServerLoadProtection extends BaseServerLoadProtection {
             return true;
         }
 
-        // Check workflow instance count if configured and repository is available
-        if (maxConcurrentWorkflowInstances != null && workflowCacheRepository != null) {
-            int currentWorkflowInstanceCount = workflowCacheRepository.getAll().size();
+        // Check workflow instance count if repository is available
+        if (workflowRepository != null) {
+            int currentWorkflowInstanceCount = workflowRepository.getAll().size();
             if (currentWorkflowInstanceCount >= maxConcurrentWorkflowInstances) {
                 log.info(
                         "OverLoad: the workflow instance count: {} is over then the maxConcurrentWorkflowInstances {}",
