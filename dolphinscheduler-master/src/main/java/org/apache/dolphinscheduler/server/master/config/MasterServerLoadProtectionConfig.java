@@ -18,26 +18,13 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-
-import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
 public class MasterServerLoadProtectionConfig {
-
-    @Autowired
-    private MasterConfig masterConfig;
-
-    @Autowired
-    private IWorkflowRepository workflowRepository;
-
-    @PostConstruct
-    public void init() {
+    public MasterServerLoadProtectionConfig(MasterConfig masterConfig, IWorkflowRepository workflowRepository) {
         MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         serverLoadProtection.setWorkflowRepository(workflowRepository);
         log.info("Initialized MasterServerLoadProtection with IWorkflowRepository");
