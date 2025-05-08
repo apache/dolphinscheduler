@@ -45,17 +45,14 @@ public class MasterServerLoadProtection extends BaseServerLoadProtection {
             return true;
         }
 
-        // Check workflow instance count if repository is available
-        if (workflowRepository != null) {
-            int currentWorkflowInstanceCount = workflowRepository.getAll().size();
-            if (currentWorkflowInstanceCount >= maxConcurrentWorkflowInstances) {
-                log.info(
-                        "OverLoad: the workflow instance count: {} is over then the maxConcurrentWorkflowInstances {}",
-                        currentWorkflowInstanceCount, maxConcurrentWorkflowInstances);
-                return true;
-            }
+        // Check workflow instance count
+        int currentWorkflowInstanceCount = workflowRepository.getAll().size();
+        if (currentWorkflowInstanceCount >= maxConcurrentWorkflowInstances) {
+            log.info(
+                    "OverLoad: the workflow instance count: {} is over then the maxConcurrentWorkflowInstances {}",
+                    currentWorkflowInstanceCount, maxConcurrentWorkflowInstances);
+            return true;
         }
-
         return false;
     }
 }
