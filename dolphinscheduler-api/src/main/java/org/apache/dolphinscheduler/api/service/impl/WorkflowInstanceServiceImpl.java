@@ -1037,7 +1037,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return workflowInstanceDao.queryByCondition(
                 queryWrapper -> queryWrapper.eq(WorkflowInstance::getWorkflowDefinitionCode, workflowDefinitionCode)
                         .eq(WorkflowInstance::getWorkflowDefinitionVersion, workflowDefinitionVersion)
-                        .in(WorkflowInstance::getState, states));
+                        .in(WorkflowInstance::getState, Arrays.stream(states).boxed().collect(Collectors.toList())));
     }
 
     /**
