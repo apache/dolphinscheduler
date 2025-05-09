@@ -1970,19 +1970,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @return if graph has cycle flag
      */
     private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
-        DAG<String, TaskNode, String> graph = new DAG<>();
+        DAG<Long, TaskNode, String> graph = new DAG<>();
         // Fill the vertices
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            graph.addNode(Long.toString(taskNodeResponse.getCode()), taskNodeResponse);
+            graph.addNode(taskNodeResponse.getCode(), taskNodeResponse);
         }
         // Fill edge relations
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
-            if (CollectionUtils.isNotEmpty(preTasks)) {
-                for (String preTask : preTasks) {
-                    if (!graph.addEdge(preTask, Long.toString(taskNodeResponse.getCode()))) {
-                        return true;
-                    }
+            for (Long preTask : taskNodeResponse.getDepList()) {
+                if (!graph.addEdge(preTask, taskNodeResponse.getCode())) {
+                    return true;
                 }
             }
         }
