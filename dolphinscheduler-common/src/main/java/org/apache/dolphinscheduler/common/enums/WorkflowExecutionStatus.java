@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +92,10 @@ public enum WorkflowExecutionStatus {
         return this == RUNNING_EXECUTION
                 || this == READY_PAUSE
                 || this == SERIAL_WAIT;
+    }
+
+    public boolean canFailover() {
+        return Arrays.stream(NEED_FAILOVER_STATES).anyMatch(x -> x == this.getCode());
     }
 
     public boolean canDirectPauseInDB() {
