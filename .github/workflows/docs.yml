@@ -52,7 +52,7 @@ jobs:
   dead-link:
     if: (github.event_name == 'schedule' && github.repository == 'apache/dolphinscheduler') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,12 +66,13 @@ jobs:
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
       - run: |
+          set -xo pipefail
           MAX_CONCURRENCY=4
           for file in $(locate "$PWD*/*.md" | grep -v ./deploy/terraform/aws/README.md | grep -v ./.github); do
             while [ $(jobs -r | wc -l) -ge "$MAX_CONCURRENCY" ]; do
               wait -n
             done
-            markdown-link-check -c .dlc.json -q "$file" &
+            markdown-link-check -c .dlc.json -q "$file" -p &
           done
           wait
   paths-filter:
