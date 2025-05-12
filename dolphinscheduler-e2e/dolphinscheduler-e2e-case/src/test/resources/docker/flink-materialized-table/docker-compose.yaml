@@ -1,0 +1,39 @@
+version: "3"
+services:
+  flink-sql-gateway:
+    image: apache/flink:1.20-snapshot-scala_2.12-java11
+    ports:
+      - "8083:8083"
+    environment:
+      - FLINK_PROPERTIES=jobmanager.rpc.address=jobmanager
+    command: sql-gateway
+    depends_on:
+      - jobmanager
+      - taskmanager
+
+  jobmanager:
+    image: apache/flink:1.20-snapshot-scala_2.12-java11
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address=jobmanager
+        state.backend=filesystem
+        state.checkpoints.dir=file:///opt/flink/checkpoints
+        state.savepoints.dir=file:///opt/flink/savepoints
+
+  taskmanager:
+    image: apache/flink:1.20-snapshot-scala_2.12-java11
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address=jobmanager
+        taskmanager.numberOfTaskSlots=2
+        state.backend=filesystem
+        state.checkpoints.dir=file:///opt/flink/checkpoints
+        state.savepoints.dir=file:///opt/flink/savepoints 

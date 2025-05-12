@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskFor
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.FlinkMaterializedTableTaskForm;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -90,6 +92,8 @@ public final class WorkflowForm {
                 return (T) new JavaTaskForm(this);
             case PYTHON:
                 return (T) new PythonTaskForm(this);
+            case FLINK_MATERIALIZED_TABLE:
+                return (T) new FlinkMaterializedTableTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -129,6 +133,7 @@ public final class WorkflowForm {
         SWITCH,
         HTTP,
         JAVA,
-        PYTHON
+        PYTHON,
+        FLINK_MATERIALIZED_TABLE,
     }
 }

@@ -42,7 +42,7 @@
             <artifactId>dolphinscheduler-datasource-all</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-filesystem-test-utils</artifactId>
             <version>1.20-SNAPSHOT</version>
@@ -56,6 +56,6 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-files</artifactId>
             <version>1.20-SNAPSHOT</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
 </project>
