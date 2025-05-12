@@ -72,7 +72,6 @@ jobs:
               wait -n
             done
             markdown-link-check -c .dlc.json -q "$file" &
-            sleep $((RANDOM % 5)) &
           done
           wait
   paths-filter:
