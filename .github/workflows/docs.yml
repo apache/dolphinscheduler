@@ -66,8 +66,13 @@ jobs:
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
       - run: |
+          MAX_CONCURRENCY=4
           for file in $(locate "$PWD*/*.md" | grep -v ./deploy/terraform/aws/README.md | grep -v ./.github); do
+            while [ $(jobs -r | wc -l) -ge "$MAX_CONCURRENCY" ]; do
+              wait -n
+            done
             markdown-link-check -c .dlc.json -q "$file" &
+            sleep $((RANDOM % 5)) &
           done
           wait
   paths-filter:
