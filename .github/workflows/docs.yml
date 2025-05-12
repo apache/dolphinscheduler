@@ -62,7 +62,7 @@ jobs:
         with:
           comment_on_pr: false
       - run: sudo npm install -g markdown-link-check@3.13.7
-      - run: sudo apt install plocate -y
+      - run: sudo apt install plocate -y && sudo updatedb
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
       - run: |
