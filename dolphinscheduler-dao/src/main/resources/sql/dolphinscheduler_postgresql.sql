@@ -349,7 +349,7 @@ CREATE TABLE t_ds_workflow_definition (
   CONSTRAINT workflow_definition_unique UNIQUE (name, project_code)
 ) ;
 
-create index workflow_definition_index on t_ds_workflow_definition (code,id);
+create unique index uniq_workflow_definition_code on t_ds_workflow_definition (code);
 create index workflow_definition_index_project_code on t_ds_workflow_definition (project_code);
 
 --

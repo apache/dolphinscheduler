@@ -423,7 +423,7 @@ CREATE TABLE t_ds_workflow_definition
     update_time      datetime     DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY workflow_unique (name,project_code) USING BTREE,
-    UNIQUE KEY code_unique (code)
+    UNIQUE KEY uniq_workflow_definition_code (code)
 );
 
 -- ----------------------------
