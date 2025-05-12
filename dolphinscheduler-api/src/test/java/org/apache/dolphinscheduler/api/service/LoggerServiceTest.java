@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.AssertionsHelper;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -88,12 +89,16 @@ public class LoggerServiceTest {
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
+    @Mock
+    private LogClientDelegate logClientDelegate;
+
     private SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery;
 
     private int nettyServerPort = 18080;
 
     @BeforeEach
     public void setUp() {
+        logger.info(logClientDelegate.toString());
         try (ServerSocket s = new ServerSocket(0)) {
             nettyServerPort = s.getLocalPort();
         } catch (IOException e) {
@@ -108,9 +113,9 @@ public class LoggerServiceTest {
             @Override
             public TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest) {
                 if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 1) {
-                    return new TaskInstanceLogFileDownloadResponse(new byte[0]);
+                    return new TaskInstanceLogFileDownloadResponse(new byte[0], 0, "");
                 } else if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 10) {
-                    return new TaskInstanceLogFileDownloadResponse("log content".getBytes());
+                    return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), 0, "");
                 }
 
                 throw new ServiceException("download error");
@@ -122,7 +127,7 @@ public class LoggerServiceTest {
                     if (taskInstanceLogPageQueryRequest.getTaskInstanceId() == 100) {
                         throw new ServiceException("query log error");
                     } else if (taskInstanceLogPageQueryRequest.getTaskInstanceId() == 10) {
-                        return new TaskInstanceLogPageQueryResponse("log content");
+                        return new TaskInstanceLogPageQueryResponse("log content", 0, "");
                     }
                 }
 

@@ -17,22 +17,28 @@
 
 package org.apache.dolphinscheduler.api.executor.logging;
 
-import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.extract.base.client.Clients;
-import org.apache.dolphinscheduler.extract.common.ILogService;
-import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
-import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class LogClientDelegate {
+
+    @Autowired
+    private LocalLogClient localLogClient;
+    @Autowired
+    private RemoteLogClient remoteLogClient;
+    @Autowired
+    private RegistryClient registryClient;
 
     /**
      * Retrieves a portion of the log string for a given task instance.
@@ -44,14 +50,14 @@ public class LogClientDelegate {
      * @return A string containing the specified portion of the log.
      */
     public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
-        TaskInstanceLogPageQueryResponse response = getLocalPartLog(taskInstance, skipLineNum, limit);
+        checkArgs(taskInstance);
+        checkNodeExists(taskInstance);
+        TaskInstanceLogPageQueryResponse response = localLogClient.getPartLog(taskInstance, skipLineNum, limit);
         if (response.getCode() == 0) {
             return response.getLogContent();
         } else {
-            log.warn("Failed to get local part log, trying remote: {}", response.getMessage());
-            // todo We can optimize requests by the actual range, reducing disk usage and network traffic.
-            return LogUtils.rollViewLogLines(
-                    LogUtils.readPartFileContentFromRemote(taskInstance.getLogPath(), skipLineNum, limit));
+            log.warn("trying fetch remote part log: {}", taskInstance.getLogPath());
+            return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
         }
     }
 
@@ -63,48 +69,32 @@ public class LogClientDelegate {
      * @return A byte array containing the complete log content.
      */
     public byte[] getWholeLogBytes(TaskInstance taskInstance) {
-        TaskInstanceLogFileDownloadResponse response = getLocalWholeLog(taskInstance);
+        checkArgs(taskInstance);
+        checkNodeExists(taskInstance);
+        TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
         if (response.getCode() == 0) {
             return response.getLogBytes();
         } else {
-            log.warn("Failed to get local whole log, trying remote: {}", response.getMessage());
-            return getRemoteWholeLog(taskInstance.getLogPath());
+            log.warn("trying fetch remote whole log: {}", taskInstance.getLogPath());
+            return remoteLogClient.getWholeLog(taskInstance);
         }
     }
 
-    private byte[] getRemoteWholeLog(String logPath) {
-        return LogUtils.getFileContentBytesFromRemote(logPath);
+    private static void checkArgs(TaskInstance taskInstance) {
+        if (taskInstance == null) {
+            throw new IllegalArgumentException("canFetchLog task instance is null");
+        }
     }
 
-    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
-        TaskInstanceLogFileDownloadRequest request = buildLogFileDownloadRequest(taskInstance);
-        return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
-    }
-
-    private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
-        TaskInstanceLogPageQueryRequest request = buildLogPageQueryRequest(taskInstance, skipLineNum, limit);
-        return getProxyLogService(taskInstance).pageQueryTaskInstanceLog(request);
-    }
-
-    private TaskInstanceLogFileDownloadRequest buildLogFileDownloadRequest(TaskInstance taskInstance) {
-        return new TaskInstanceLogFileDownloadRequest(
-                taskInstance.getId(),
-                taskInstance.getLogPath());
-    }
-
-    private TaskInstanceLogPageQueryRequest buildLogPageQueryRequest(TaskInstance taskInstance, int skipLineNum,
-                                                                     int limit) {
-        return TaskInstanceLogPageQueryRequest.builder()
-                .taskInstanceId(taskInstance.getId())
-                .taskInstanceLogAbsolutePath(taskInstance.getLogPath())
-                .skipLineNum(skipLineNum)
-                .limit(limit)
-                .build();
-    }
-
-    private ILogService getProxyLogService(TaskInstance taskInstance) {
-        return Clients
-                .withService(ILogService.class)
-                .withHost(taskInstance.getHost());
+    private void checkNodeExists(TaskInstance taskInstance) {
+        RegistryNodeType nodeType;
+        if (TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
+            nodeType = RegistryNodeType.MASTER;
+        } else {
+            nodeType = RegistryNodeType.WORKER;
+        }
+        if (!registryClient.checkNodeExists(taskInstance.getHost(), nodeType)) {
+            throw new IllegalArgumentException("canFetchLog node " + taskInstance.getHost() + " is not exists");
+        }
     }
 }
