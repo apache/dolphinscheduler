@@ -26,7 +26,7 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
 注意：如果您在 Windows 而非 Mac 或 Linux 中克隆代码。请阅读下面的详细信息。
 如果执行上述两个步骤中的命令，将出现异常 “UnhandledPromiseRejectionWarning.Error:”： Error： EPERM: operation not permitted, symlink ‘2.0.3’ -> ‘latest’".
 如果出现异常 “Can't resolve ‘antd’ in xxx”，你可以运行 `yarn add antd` 和 `yarn install`。
-因为这两个步骤运行的命令`./scripts/prepare_docs.sh`应该是 Linux 环境，所以如果你是 windwos 系统，可以使用 WSL 来完成。
+因为这两个步骤运行的命令`./scripts/prepare_docs.sh`应该是 Linux 环境，所以如果你是 Windows 系统，可以使用 WSL 来完成。
 遇到这个问题时。你可以以管理员身份运行 cmd.exe 中的两个步骤。
 ```
 
