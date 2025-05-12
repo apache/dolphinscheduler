@@ -52,7 +52,7 @@ jobs:
   dead-link:
     if: (github.event_name == 'schedule' && github.repository == 'apache/dolphinscheduler') || (github.event_name != 'schedule')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,7 +61,7 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - run: sudo npm install -g markdown-link-check@3.11.2
+      - run: sudo npm install -g markdown-link-check@3.13.7
       - run: sudo apt install plocate -y
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
