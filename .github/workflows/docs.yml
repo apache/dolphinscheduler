@@ -65,7 +65,8 @@ jobs:
       - run: sudo apt install plocate -y && sudo updatedb
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
-      - run: |
+      - name: Check Dead Links
+        run: |
           set -xe
           MAX_CONCURRENCY=6
           EXIT_CODE=0
