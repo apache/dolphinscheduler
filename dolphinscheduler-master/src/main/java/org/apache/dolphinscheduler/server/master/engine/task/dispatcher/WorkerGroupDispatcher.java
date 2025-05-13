@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
+import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
  * 3. Ensuring thread safety and correct state transitions during task processing.
  */
 @Slf4j
-public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
+public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final ITaskExecutorClient taskExecutorClient;
 
@@ -47,26 +48,16 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
     // If it needs to be placed at the front of the queue, the queue needs to be re-implemented.
     private final PriorityDelayQueue<PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable>> workerGroupQueue;
 
+    private final Set<Integer> waitingDispatchTaskIds;
+
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
-    public WorkerGroupTaskDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
+    public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupQueue = new PriorityDelayQueue<>();
-    }
-
-    /**
-     * Adds a task to the worker group queue.
-     * This method wraps the given task execution object into a priority and delay-based task entry and adds it to the worker group queue.
-     * The task is only added if the current dispatcher status is either STARTED or INIT. If the dispatcher is in any other state,
-     * the task addition will fail, and a warning message will be logged.
-     *
-     * @param taskExecutionRunnable The task execution object to add to the queue, which implements the {@link ITaskExecutionRunnable} interface.
-     * @param delayTimeMills The delay time in milliseconds before the task should be executed.
-     */
-    public void addTaskToWorkerGroupQueue(ITaskExecutionRunnable taskExecutionRunnable,
-                                          long delayTimeMills) {
-        workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(delayTimeMills, taskExecutionRunnable));
+        this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
+        log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
 
     @Override
@@ -80,27 +71,25 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
         }
     }
 
-    public synchronized void close() {
-        log.info("The {} closed called but not implemented", this.getName());
-        // todo WorkerGroupTaskDispatcher thread needs to be shut down after the WorkerGroup is deleted.
-    }
-
     @Override
     public void run() {
         while (runningFlag.get()) {
-            dispatch();
+            PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
+            ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
+            try (
+                    TaskExecutorMDCUtils.MDCAutoClosable ignore =
+                            TaskExecutorMDCUtils.logWithMDC(taskExecutionRunnable.getId())) {
+                doDispatchTask(taskExecutionRunnable);
+            }
         }
     }
 
-    private void dispatch() {
-        PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
-        ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+    private void doDispatchTask(ITaskExecutionRunnable taskExecutionRunnable) {
         try {
-            final TaskExecutionStatus taskStatus = taskInstance.getState();
-            if (taskStatus != TaskExecutionStatus.SUBMITTED_SUCCESS
-                    && taskStatus != TaskExecutionStatus.DELAY_EXECUTION) {
-                log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), taskStatus);
+            if (!waitingDispatchTaskIds.remove(taskExecutionRunnable.getId())) {
+                log.info(
+                        "The task: {} doesn't exist in waitingDispatchTaskIds(it might be paused or killed), will skip dispatch",
+                        taskExecutionRunnable.getId());
                 return;
             }
             taskExecutorClient.dispatch(taskExecutionRunnable);
@@ -110,16 +99,44 @@ public class WorkerGroupTaskDispatcher extends BaseDaemonThread {
             // the waiting time will increase multiple of times, but will not exceed 60 seconds
             long waitingTimeMills = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(waitingTimeMills, taskExecutionRunnable));
-            log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
+            dispatchTask(taskExecutionRunnable, waitingTimeMills);
+            log.error("Dispatch Task: {} failed will retry after: {}/ms", taskExecutionRunnable.getId(),
+                    waitingTimeMills, e);
         }
     }
 
     /**
-     * ony use unit test
-     * @return size
+     * Adds a task to the worker group queue.
+     * This method wraps the given task execution object into a priority and delay-based task entry and adds it to the worker group queue.
+     * The task is only added if the current dispatcher status is either STARTED or INIT. If the dispatcher is in any other state,
+     * the task addition will fail, and a warning message will be logged.
+     *
+     * @param taskExecutionRunnable The task execution object to add to the queue, which implements the {@link ITaskExecutionRunnable} interface.
+     * @param delayTimeMills        The delay time in milliseconds before the task should be executed.
      */
-    protected int queueSize() {
+    public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable, final long delayTimeMills) {
+        waitingDispatchTaskIds.add(taskExecutionRunnable.getId());
+        workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(delayTimeMills, taskExecutionRunnable));
+    }
+
+    public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
+        return waitingDispatchTaskIds.remove(taskExecutionRunnable.getId());
+    }
+
+    public boolean existTask(ITaskExecutionRunnable taskExecutionRunnable) {
+        return waitingDispatchTaskIds.contains(taskExecutionRunnable.getId());
+    }
+
+    public synchronized void close() {
+        // todo WorkerGroupTaskDispatcher thread needs to be shut down after the WorkerGroup is deleted.
+        if (runningFlag.compareAndSet(true, false)) {
+            log.info("WorkerGroupDispatcher {} closed", this.getName());
+        } else {
+            log.warn("The WorkerGroupDispatcher: {} doesn't started", this.getName());
+        }
+    }
+
+    int queueSize() {
         return this.workerGroupQueue.size();
     }
 }

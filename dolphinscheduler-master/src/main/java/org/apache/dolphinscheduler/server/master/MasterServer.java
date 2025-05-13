@@ -38,10 +38,10 @@ import org.apache.dolphinscheduler.server.master.engine.WorkflowEngine;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBusFireWorker;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
-import org.apache.dolphinscheduler.server.master.runner.WorkerGroupTaskDispatcherManager;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -101,7 +101,7 @@ public class MasterServer implements IStoppable {
     private MasterCoordinator masterCoordinator;
 
     @Autowired
-    private WorkerGroupTaskDispatcherManager workerGroupTaskDispatcherManager;
+    private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
 
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
@@ -189,8 +189,8 @@ public class MasterServer implements IStoppable {
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext;
-                WorkerGroupTaskDispatcherManager closeWorkerGroupTaskDispatcherManager =
-                        workerGroupTaskDispatcherManager) {
+                WorkerGroupDispatcherCoordinator closeWorkerGroupDispatcherCoordinator =
+                        workerGroupDispatcherCoordinator) {
 
             log.info("MasterServer is stopping, current cause : {}", cause);
         } catch (Exception e) {
