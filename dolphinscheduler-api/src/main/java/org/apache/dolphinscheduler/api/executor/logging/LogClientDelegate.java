@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.executor.logging;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
@@ -51,12 +52,16 @@ public class LogClientDelegate {
      */
     public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
         checkArgs(taskInstance);
-        checkNodeExists(taskInstance);
-        TaskInstanceLogPageQueryResponse response = localLogClient.getPartLog(taskInstance, skipLineNum, limit);
-        if (response.getCode() == 0) {
-            return response.getLogContent();
+        if (checkNodeExists(taskInstance)) {
+            TaskInstanceLogPageQueryResponse response = localLogClient.getPartLog(taskInstance, skipLineNum, limit);
+            if (response.getCode() == LogResponseStatus.SUCCESS) {
+                return response.getLogContent();
+            } else {
+                log.warn("get part log string is not success for task instance {}; reason :{}",
+                        taskInstance.getId(), response.getMessage());
+                return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
+            }
         } else {
-            log.warn("trying fetch remote part log: {}", taskInstance.getLogPath());
             return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
         }
     }
@@ -70,12 +75,16 @@ public class LogClientDelegate {
      */
     public byte[] getWholeLogBytes(TaskInstance taskInstance) {
         checkArgs(taskInstance);
-        checkNodeExists(taskInstance);
-        TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
-        if (response.getCode() == 0) {
-            return response.getLogBytes();
+        if (checkNodeExists(taskInstance)) {
+            TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
+            if (response.getCode() == LogResponseStatus.SUCCESS) {
+                return response.getLogBytes();
+            } else {
+                log.warn("get whole log bytes is not success for task instance {}; reason :{}", taskInstance.getId(),
+                        response.getMessage());
+                return remoteLogClient.getWholeLog(taskInstance);
+            }
         } else {
-            log.warn("trying fetch remote whole log: {}", taskInstance.getLogPath());
             return remoteLogClient.getWholeLog(taskInstance);
         }
     }
@@ -86,15 +95,18 @@ public class LogClientDelegate {
         }
     }
 
-    private void checkNodeExists(TaskInstance taskInstance) {
+    private boolean checkNodeExists(TaskInstance taskInstance) {
         RegistryNodeType nodeType;
         if (TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
             nodeType = RegistryNodeType.MASTER;
         } else {
             nodeType = RegistryNodeType.WORKER;
         }
-        if (!registryClient.checkNodeExists(taskInstance.getHost(), nodeType)) {
-            throw new IllegalArgumentException("canFetchLog node " + taskInstance.getHost() + " is not exists");
+        boolean exists = registryClient.checkNodeExists(taskInstance.getHost(), nodeType);
+        if (!exists) {
+            log.warn("Node {} does not exist for task instance {}", taskInstance.getHost(), taskInstance.getId());
         }
+        return exists;
     }
+
 }

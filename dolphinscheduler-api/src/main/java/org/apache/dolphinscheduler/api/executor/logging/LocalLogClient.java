@@ -25,9 +25,12 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class LocalLogClient {
 
     /**
@@ -56,36 +59,30 @@ public class LocalLogClient {
         return getLocalPartLog(taskInstance, skipLineNum, limit);
     }
 
-    private static TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
-        TaskInstanceLogFileDownloadRequest request = buildLogFileDownloadRequest(taskInstance);
+    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
+        TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
+                taskInstance.getId(),
+                taskInstance.getLogPath());
         return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
     }
 
-    private static TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
-                                                                    int limit) {
-        TaskInstanceLogPageQueryRequest request = buildLogPageQueryRequest(taskInstance, skipLineNum, limit);
-        return getProxyLogService(taskInstance).pageQueryTaskInstanceLog(request);
-    }
-
-    private static TaskInstanceLogFileDownloadRequest buildLogFileDownloadRequest(TaskInstance taskInstance) {
-        return new TaskInstanceLogFileDownloadRequest(
-                taskInstance.getId(),
-                taskInstance.getLogPath());
-    }
-
-    private static TaskInstanceLogPageQueryRequest buildLogPageQueryRequest(TaskInstance taskInstance, int skipLineNum,
-                                                                            int limit) {
-        return TaskInstanceLogPageQueryRequest.builder()
+    private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
+                                                             int limit) {
+        TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest
+                .builder()
                 .taskInstanceId(taskInstance.getId())
                 .taskInstanceLogAbsolutePath(taskInstance.getLogPath())
                 .skipLineNum(skipLineNum)
                 .limit(limit)
                 .build();
+        return getProxyLogService(taskInstance).pageQueryTaskInstanceLog(request);
     }
 
-    private static ILogService getProxyLogService(TaskInstance taskInstance) {
-        return Clients
+    private ILogService getProxyLogService(TaskInstance taskInstance) {
+        ILogService logService = Clients
                 .withService(ILogService.class)
                 .withHost(taskInstance.getHost());
+        log.debug("Created log service for host: {}", taskInstance.getHost());
+        return logService;
     }
 }

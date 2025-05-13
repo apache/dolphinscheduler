@@ -28,7 +28,7 @@ public class TaskInstanceLogFileDownloadResponse {
 
     private byte[] logBytes;
 
-    private int code = 0;
+    private LogResponseStatus code = LogResponseStatus.SUCCESS;
 
     private String message;
 

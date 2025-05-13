@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.extract.common.service.impl;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.extract.common.ILogService;
+import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -44,8 +46,8 @@ public class LogServiceImpl implements ILogService {
                     .getFileContentBytesFromLocal(taskInstanceLogFileDownloadRequest.getTaskInstanceLogAbsolutePath());
             taskInstanceLogFileDownloadResponse.setLogBytes(bytes);
         } catch (Exception e) {
-            taskInstanceLogFileDownloadResponse.setCode(1);
-            taskInstanceLogFileDownloadResponse.setMessage(e.getMessage());
+            taskInstanceLogFileDownloadResponse.setCode(LogResponseStatus.ERROR);
+            taskInstanceLogFileDownloadResponse.setMessage(ExceptionUtils.getRootCauseMessage(e));
         }
         return taskInstanceLogFileDownloadResponse;
     }
@@ -68,8 +70,8 @@ public class LogServiceImpl implements ILogService {
                     taskInstanceLogPageQueryRequest.getLimit());
             taskInstanceLogPageQueryResponse.setLogContent(LogUtils.rollViewLogLines(lines));
         } catch (Exception e) {
-            taskInstanceLogPageQueryResponse.setCode(1);
-            taskInstanceLogPageQueryResponse.setMessage(e.getMessage());
+            taskInstanceLogPageQueryResponse.setCode(LogResponseStatus.ERROR);
+            taskInstanceLogPageQueryResponse.setMessage(ExceptionUtils.getMessage(e));
         }
         return taskInstanceLogPageQueryResponse;
     }
