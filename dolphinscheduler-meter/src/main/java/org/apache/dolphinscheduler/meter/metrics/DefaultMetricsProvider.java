@@ -72,7 +72,7 @@ public class DefaultMetricsProvider implements MetricsProvider {
         double jvmMemoryMax = jvmHeapMax + jvmNonHeapMax;
 
         // Ensure jvmMemoryMax is not zero
-        double jvmMemoryUsedPercentage = jvmMemoryMax > 0 ? jvmMemoryUsed / jvmMemoryMax : 0.0;
+        double jvmMemoryUsedPercentage = (jvmMemoryMax > 0) ? (jvmMemoryUsed / jvmMemoryMax) : 0.0;
 
         long totalSystemMemory = OSUtils.getTotalSystemMemory();
         long systemMemoryAvailable = OSUtils.getSystemAvailableMemoryUsed();
@@ -117,7 +117,8 @@ public class DefaultMetricsProvider implements MetricsProvider {
         for (Meter meter : meters) {
             if (area.equals(meter.getId().getTag("area"))) {
                 double value = meter.measure().iterator().next().getValue();
-                if (value > 0) { // Ignore undefined maximum values (-1)
+                // Ignore undefined maximum values (-1)
+                if (value > 0) {
                     memory += value;
                 }
             }
