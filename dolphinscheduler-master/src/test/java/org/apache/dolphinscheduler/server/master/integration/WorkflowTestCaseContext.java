@@ -43,7 +43,7 @@ public class WorkflowTestCaseContext {
 
     private List<WorkflowDefinition> workflows;
 
-    private WorkflowInstance workflowInstance;
+    private List<WorkflowInstance> workflowInstances;
 
     private List<TaskInstance> taskInstances;
 
@@ -61,5 +61,4 @@ public class WorkflowTestCaseContext {
         }
         return workflows.get(0);
     }
-
 }

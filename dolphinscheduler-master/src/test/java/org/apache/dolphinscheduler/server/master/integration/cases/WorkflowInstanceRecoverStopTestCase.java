@@ -132,7 +132,7 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
         assertThat(workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId).isSuccess()).isTrue();
 
         await()
