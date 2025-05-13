@@ -237,7 +237,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
         // add directories
         storageEntitys.addAll(result.getCommonPrefixes()
                 .stream()
-                .filter(x->!resourceAbsolutePath.equals(x))
+                .filter(x -> !resourceAbsolutePath.equals(x))
                 .map(key -> {
                     ObjectMetadata metadata = new ObjectMetadata();
                     COSObject object = new COSObject();
@@ -245,10 +245,10 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
                     object.setKey(key);
                     return transformCOSObjectToStorageEntity(object);
                 }).collect(Collectors.toList()));
-        //  add files
+        // add files
         storageEntitys.addAll(result.getObjectSummaries()
                 .stream()
-                .filter(x-> !resourceAbsolutePath.equals(x.getKey()))
+                .filter(x -> !resourceAbsolutePath.equals(x.getKey()))
                 .map((COSObjectSummary summary) -> {
                     ObjectMetadata metadata = new ObjectMetadata();
                     metadata.setContentLength(summary.getSize());
