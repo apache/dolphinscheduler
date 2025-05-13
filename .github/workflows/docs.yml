@@ -61,15 +61,30 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - run: sudo npm install -g markdown-link-check@3.11.2
-      - run: sudo apt install plocate -y
+      - run: sudo npm install -g markdown-link-check@3.13.7
+      - run: sudo apt install plocate -y && sudo updatedb
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
-      - run: |
+      - name: Check Dead Links
+        run: |
+          set -xe
+          MAX_CONCURRENCY=6
+          EXIT_CODE=0
+  
+          cleanup() {
+            pkill -P $$
+            exit "$EXIT_CODE"
+          }
+          
+          trap cleanup SIGINT SIGTERM
+          
           for file in $(locate "$PWD*/*.md" | grep -v ./deploy/terraform/aws/README.md | grep -v ./.github); do
+            while [ $(jobs -r | wc -l) -ge "$MAX_CONCURRENCY" ]; do
+              wait -n || { EXIT_CODE=$?; cleanup; }
+            done
             markdown-link-check -c .dlc.json -q "$file" &
           done
-          wait
+          wait || { EXIT_CODE=$?; cleanup; }
   paths-filter:
     name: Helm-Doc-Path-Filter
     runs-on: ubuntu-latest
