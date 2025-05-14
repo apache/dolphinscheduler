@@ -31,17 +31,17 @@ public class TaskExecutorMDCUtils {
         return logWithMDC(taskExecutor.getId(), taskExecutor.getTaskExecutionContext().getLogPath());
     }
 
-    public static MDCAutoClosable logWithMDC(final int taskExecutorId) {
-        return logWithMDC(taskExecutorId, null);
+    public static MDCAutoClosable logWithMDC(final int taskInstanceId) {
+        return logWithMDC(taskInstanceId, null);
     }
 
-    public static MDCAutoClosable logWithMDC(final int taskExecutorId, final String logPath) {
+    public static MDCAutoClosable logWithMDC(final int taskInstanceId, final String logPath) {
 
         if (logPath != null) {
             MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, logPath);
         }
 
-        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskExecutorId));
+        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
 
         return () -> {
             MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
