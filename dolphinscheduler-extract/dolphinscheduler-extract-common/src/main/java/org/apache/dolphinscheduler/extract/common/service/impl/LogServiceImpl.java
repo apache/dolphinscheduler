@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.common.service.impl;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.extract.common.ILogService;
@@ -26,6 +25,8 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.List;
 
