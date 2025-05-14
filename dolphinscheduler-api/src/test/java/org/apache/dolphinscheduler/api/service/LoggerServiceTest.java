@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
+import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -113,9 +114,9 @@ public class LoggerServiceTest {
             @Override
             public TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest) {
                 if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 1) {
-                    return new TaskInstanceLogFileDownloadResponse(new byte[0], 0, "");
+                    return new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "");
                 } else if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 10) {
-                    return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), 0, "");
+                    return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), LogResponseStatus.SUCCESS, "");
                 }
 
                 throw new ServiceException("download error");
@@ -127,7 +128,7 @@ public class LoggerServiceTest {
                     if (taskInstanceLogPageQueryRequest.getTaskInstanceId() == 100) {
                         throw new ServiceException("query log error");
                     } else if (taskInstanceLogPageQueryRequest.getTaskInstanceId() == 10) {
-                        return new TaskInstanceLogPageQueryResponse("log content", 0, "");
+                        return new TaskInstanceLogPageQueryResponse("log content", LogResponseStatus.SUCCESS, "");
                     }
                 }
 
