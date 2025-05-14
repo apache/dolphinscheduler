@@ -116,7 +116,8 @@ public class LoggerServiceTest {
                 if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 1) {
                     return new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "");
                 } else if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 10) {
-                    return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), LogResponseStatus.SUCCESS, "");
+                    return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), LogResponseStatus.SUCCESS,
+                            "");
                 }
 
                 throw new ServiceException("download error");
