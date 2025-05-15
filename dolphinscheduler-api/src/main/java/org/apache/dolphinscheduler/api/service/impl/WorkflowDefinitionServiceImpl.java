@@ -1977,7 +1977,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         // Fill edge relations
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            for (Long preTask : taskNodeResponse.getDepList()) {
+            for (Long preTask : taskNodeResponse.getPredecessors()) {
                 if (!graph.addEdge(preTask, taskNodeResponse.getCode())) {
                     return true;
                 }

@@ -109,7 +109,7 @@ public class TaskNode {
     /**
      * node dependency list
      */
-    private List<Long> depList;
+    private List<Long> predecessors;
 
     /**
      * task instance priority
@@ -201,13 +201,13 @@ public class TaskNode {
         this.extras = extras;
     }
 
-    public List<Long> getDepList() {
-        return depList;
+    public List<Long> getPredecessors() {
+        return predecessors;
     }
 
-    public void setDepList(List<Long> depList) {
-        if (depList != null) {
-            this.depList = depList;
+    public void setPredecessors(List<Long> predecessors) {
+        if (predecessors != null) {
+            this.predecessors = predecessors;
         }
     }
 
@@ -252,13 +252,13 @@ public class TaskNode {
                 && Objects.equals(runFlag, taskNode.runFlag)
                 && Objects.equals(workerGroup, taskNode.workerGroup)
                 && Objects.equals(environmentCode, taskNode.environmentCode)
-                && CollectionUtils.isEqualCollection(depList, taskNode.depList)
+                && CollectionUtils.isEqualCollection(predecessors, taskNode.predecessors)
                 && Objects.equals(taskExecuteType, taskNode.taskExecuteType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, desc, type, params, extras, depList, runFlag);
+        return Objects.hash(name, desc, type, params, extras, predecessors, runFlag);
     }
 
     public int getMaxRetryTimes() {
@@ -340,7 +340,7 @@ public class TaskNode {
                 + ", retryInterval=" + retryInterval
                 + ", params='" + params + '\''
                 + ", extras='" + extras + '\''
-                + ", depList=" + depList
+                + ", depList=" + predecessors
                 + ", taskInstancePriority=" + taskInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
                 + ", environmentCode=" + environmentCode
