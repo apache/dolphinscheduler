@@ -91,7 +91,7 @@ public class TaskInstanceContextDaoImpl extends BaseDao<TaskInstanceContext, Tas
             taskInstanceContext.setTaskInstanceContext(deduplicatedDependentResultTaskInstanceContextList);
             return mybatisMapper.updateTaskInstanceContextByTaskInstanceIdAndContextType(
                     taskInstanceContext.getTaskInstanceId(),
-                    taskInstanceContext.getContextType(), JSONUtils.toJsonString(taskInstanceContext.getContext()));
+                    taskInstanceContext.getContextType(), taskInstanceContext.getContext());
         }
     }
 
