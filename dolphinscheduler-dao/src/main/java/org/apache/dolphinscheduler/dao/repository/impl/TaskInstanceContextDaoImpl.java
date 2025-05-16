@@ -88,9 +88,7 @@ public class TaskInstanceContextDaoImpl extends BaseDao<TaskInstanceContext, Tas
                                                     + o.getDateCycle()))),
                                     ArrayList::new));
             taskInstanceContext.setTaskInstanceContext(deduplicatedDependentResultTaskInstanceContextList);
-            return mybatisMapper.updateTaskInstanceContextByTaskInstanceIdAndContextType(
-                    taskInstanceContext.getTaskInstanceId(),
-                    taskInstanceContext.getContextType(), taskInstanceContext.getContext());
+            return mybatisMapper.updateById(taskInstanceContext);
         }
     }
 
