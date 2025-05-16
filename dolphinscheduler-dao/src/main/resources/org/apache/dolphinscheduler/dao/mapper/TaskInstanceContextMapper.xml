@@ -39,7 +39,7 @@
         AND context_type = #{contextType}
     </delete>
 
-    <update id="updateByTaskInstanceId">
+    <update id="updateTaskInstanceContextByTaskInstanceIdAndContextType">
         UPDATE t_ds_task_instance_context
         SET
             context = #{context}
