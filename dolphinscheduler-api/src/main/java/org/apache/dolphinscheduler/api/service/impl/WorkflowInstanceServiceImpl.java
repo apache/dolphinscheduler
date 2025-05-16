@@ -499,7 +499,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             for (TaskInstanceDependentDetails<List<AbstractTaskInstanceContext>> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
                 if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
                     taskInstanceDependentDetails
-                            .setTaskInstanceDependentResults(taskInstanceContext.getTaskInstanceContext());
+                            .setTaskInstanceDependentResults(Collections.singletonList(taskInstanceContext.getTaskInstanceContext()));
                 }
             }
         }
