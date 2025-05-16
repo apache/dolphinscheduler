@@ -31,6 +31,7 @@ interface OAuth2Provider {
   provider: string
   authorizationUri: string
   iconUri: string
+  scope: string
 }
 
 export { LoginReq, LoginRes, OAuth2Provider }

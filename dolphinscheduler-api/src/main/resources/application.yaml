@@ -205,6 +205,9 @@ security:
           userInfoUri: ""
           callbackUrl: ""
           iconUri: ""
+          upgradeToOIDC: false
+          scope: ""
+          usernameAttribute: ""
           provider: github
         google:
           authorizationUri: ""
@@ -215,6 +218,9 @@ security:
           userInfoUri: ""
           callbackUrl: ""
           iconUri: ""
+          upgradeToOIDC: false
+          scope: ""
+          usernameAttribute: ""
           provider: google
 casdoor:
   # Your Casdoor server url

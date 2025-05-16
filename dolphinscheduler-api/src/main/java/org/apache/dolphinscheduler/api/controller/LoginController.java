@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
+import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
@@ -202,6 +203,7 @@ public class LoginController extends BaseController {
             oAuth2ClientProperties.setClientId(e.getClientId());
             oAuth2ClientProperties.setProvider(e.getProvider());
             oAuth2ClientProperties.setIconUri(e.getIconUri());
+            oAuth2ClientProperties.setScope(e.getScope());
             return oAuth2ClientProperties;
         }).collect(Collectors.toList());
         return Result.success(providers);
@@ -211,56 +213,160 @@ public class LoginController extends BaseController {
     @Operation(summary = "redirectToOauth2", description = "REDIRECT_TO_OAUTH2_LOGIN")
     @GetMapping("redirect/login/oauth2")
     public void loginByAuth2(@RequestParam String code, @RequestParam String provider,
-                             HttpServletRequest request, HttpServletResponse response) {
-        OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties =
-                oAuth2Configuration.getProvider().get(provider);
+            HttpServletRequest request, HttpServletResponse response) {
+        OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties = oAuth2Configuration.getProvider()
+                .get(provider);
         try {
-            Map<String, String> tokenRequestHeader = new HashMap<>();
-            tokenRequestHeader.put("Accept", "application/json");
-            Map<String, Object> requestBody = new HashMap<>(16);
-            requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
-            HashMap<String, Object> requestParamsMap = new HashMap<>();
-            requestParamsMap.put("client_id", oAuth2ClientProperties.getClientId());
-            requestParamsMap.put("code", code);
-            requestParamsMap.put("grant_type", "authorization_code");
-            requestParamsMap.put("redirect_uri",
-                    String.format("%s?provider=%s", oAuth2ClientProperties.getRedirectUri(), provider));
-            OkHttpRequestHeaders okHttpRequestHeadersPost = new OkHttpRequestHeaders();
-            okHttpRequestHeadersPost.setHeaders(tokenRequestHeader);
-            okHttpRequestHeadersPost.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_JSON);
-
-            String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), okHttpRequestHeadersPost,
-                    requestParamsMap, requestBody, Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
-                    Constants.HTTP_CONNECT_TIMEOUT).getBody();
-            String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
-            Map<String, String> userInfoRequestHeaders = new HashMap<>();
-            userInfoRequestHeaders.put("Accept", "application/json");
-            Map<String, Object> userInfoQueryMap = new HashMap<>();
-            userInfoQueryMap.put("access_token", accessToken);
-            userInfoRequestHeaders.put("Authorization", "Bearer " + accessToken);
-            OkHttpRequestHeaders okHttpRequestHeadersGet = new OkHttpRequestHeaders();
-            okHttpRequestHeadersGet.setHeaders(userInfoRequestHeaders);
-
-            String userInfoJsonStr = OkHttpUtils.get(oAuth2ClientProperties.getUserInfoUri(),
-                    okHttpRequestHeadersGet,
-                    userInfoQueryMap,
-                    Constants.HTTP_CONNECT_TIMEOUT,
-                    Constants.HTTP_CONNECT_TIMEOUT,
-                    Constants.HTTP_CONNECT_TIMEOUT).getBody();
-            String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
-            User user = usersService.getUserByUserName(username);
-            if (user == null) {
-                user = usersService.createUser(UserType.GENERAL_USER, username, null);
+            if (oAuth2ClientProperties.isUpgradeToOIDC()) {
+                loginByOIDC(code, provider, request, response);
+            } else {
+                loginByOAuth2(code, provider, request, response);
             }
-            Session session = sessionService.createSessionIfAbsent(user);
-            response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
-            response.sendRedirect(String.format("%s?sessionId=%s&authType=%s", oAuth2ClientProperties.getCallbackUrl(),
-                    session.getId(), "oauth2"));
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
             response.sendRedirect(String.format("%s?authType=%s&error=%s", oAuth2ClientProperties.getCallbackUrl(),
                     "oauth2", "oauth2 auth error"));
         }
+    }
+
+    private void loginByOIDC(String code, String provider, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties = oAuth2Configuration.getProvider()
+                .get(provider);
+        // Token request setup
+        Map<String, String> tokenRequestHeader = new HashMap<>();
+        tokenRequestHeader.put("Accept", "application/json");
+
+        // Form parameters for token request
+        Map<String, Object> formParams = new HashMap<>();
+        formParams.put("client_id", oAuth2ClientProperties.getClientId());
+        formParams.put("client_secret", oAuth2ClientProperties.getClientSecret());
+        formParams.put("code", code);
+        formParams.put("scope", oAuth2ClientProperties.getScope());
+        formParams.put("grant_type", "authorization_code");
+        formParams.put("redirect_uri",
+                String.format("%s?provider=%s", oAuth2ClientProperties.getRedirectUri(), provider));
+
+        OkHttpRequestHeaders okHttpRequestHeadersPost = new OkHttpRequestHeaders();
+        okHttpRequestHeadersPost.setHeaders(tokenRequestHeader);
+        okHttpRequestHeadersPost
+                .setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED);
+
+        // Get token
+        OkHttpResponse tokenResponse = OkHttpUtils.post(
+                oAuth2ClientProperties.getTokenUri(),
+                okHttpRequestHeadersPost,
+                null, // no query params
+                formParams,
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT);
+
+        String tokenJsonStr = tokenResponse.getBody();
+
+        // Check for token errors
+        if (tokenResponse.getStatusCode() != HttpStatus.SC_OK) {
+            log.error("Token endpoint returned error status: {} body: {}", tokenResponse.getStatusCode(),
+                    tokenJsonStr);
+            throw new RuntimeException("Failed to get access token: " + tokenResponse.getStatusCode());
+        }
+
+        String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
+        if (StringUtils.isEmpty(accessToken)) {
+            throw new RuntimeException("Access token is empty in response");
+        }
+
+        // User info request setup
+        Map<String, String> userInfoRequestHeaders = new HashMap<>();
+        userInfoRequestHeaders.put("Accept", "application/json");
+        userInfoRequestHeaders.put("Authorization", "Bearer " + accessToken);
+        OkHttpRequestHeaders okHttpRequestHeadersGet = new OkHttpRequestHeaders();
+        okHttpRequestHeadersGet.setHeaders(userInfoRequestHeaders);
+
+        // Get user info
+        OkHttpResponse userInfoResponse = OkHttpUtils.get(
+                oAuth2ClientProperties.getUserInfoUri(),
+                okHttpRequestHeadersGet,
+                null, // Remove userInfoQueryMap since we're using Authorization header
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT);
+
+        String userInfoJsonStr = userInfoResponse.getBody();
+
+        // Check for userinfo errors
+        if (userInfoResponse.getStatusCode() != HttpStatus.SC_OK) {
+            log.error("Userinfo endpoint returned error status: {} body: {}", 
+                    userInfoResponse.getStatusCode(), userInfoJsonStr);
+            throw new RuntimeException("Failed to get user info: " + userInfoResponse.getStatusCode());
+        }
+
+        String userNameAttribute = oAuth2ClientProperties.getUserNameAttribute();
+        if (StringUtils.isEmpty(userNameAttribute)) {
+            userNameAttribute = "sub";
+        }
+        String username = JSONUtils.getNodeString(userInfoJsonStr, userNameAttribute);
+        if (StringUtils.isEmpty(username)) {
+            log.error("Username not found in userinfo response: {}", userInfoJsonStr);
+            throw new RuntimeException("Username not found in userinfo response");
+        }
+
+        // Continue with user creation/session
+        User user = usersService.getUserByUserName(username);
+        if (user == null) {
+            user = usersService.createUser(UserType.GENERAL_USER, username, JSONUtils.getNodeString(userInfoJsonStr, "email"));
+        }
+        Session session = sessionService.createSessionIfAbsent(user);
+        response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+        response.sendRedirect(String.format("%s?sessionId=%s&authType=%s", oAuth2ClientProperties.getCallbackUrl(),
+                session.getId(), "oauth2"));
+    }
+
+    private void loginByOAuth2(String code, String provider, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties = oAuth2Configuration.getProvider()
+                .get(provider);
+        Map<String, String> tokenRequestHeader = new HashMap<>();
+        tokenRequestHeader.put("Accept", "application/json");
+        Map<String, Object> requestBody = new HashMap<>(16);
+        requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
+        HashMap<String, Object> requestParamsMap = new HashMap<>();
+        requestParamsMap.put("client_id", oAuth2ClientProperties.getClientId());
+        requestParamsMap.put("code", code);
+        requestParamsMap.put("grant_type", "authorization_code");
+        requestParamsMap.put("redirect_uri",
+                String.format("%s?provider=%s", oAuth2ClientProperties.getRedirectUri(), provider));
+        OkHttpRequestHeaders okHttpRequestHeadersPost = new OkHttpRequestHeaders();
+        okHttpRequestHeadersPost.setHeaders(tokenRequestHeader);
+        okHttpRequestHeadersPost.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_JSON);
+
+        String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), okHttpRequestHeadersPost,
+                requestParamsMap, requestBody, Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT).getBody();
+        String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
+        Map<String, String> userInfoRequestHeaders = new HashMap<>();
+        userInfoRequestHeaders.put("Accept", "application/json");
+        Map<String, Object> userInfoQueryMap = new HashMap<>();
+        userInfoQueryMap.put("access_token", accessToken);
+        userInfoRequestHeaders.put("Authorization", "Bearer " + accessToken);
+        OkHttpRequestHeaders okHttpRequestHeadersGet = new OkHttpRequestHeaders();
+        okHttpRequestHeadersGet.setHeaders(userInfoRequestHeaders);
+
+        String userInfoJsonStr = OkHttpUtils.get(oAuth2ClientProperties.getUserInfoUri(),
+                okHttpRequestHeadersGet,
+                userInfoQueryMap,
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT).getBody();
+        String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
+        User user = usersService.getUserByUserName(username);
+        if (user == null) {
+            user = usersService.createUser(UserType.GENERAL_USER, username, null);
+        }
+        Session session = sessionService.createSessionIfAbsent(user);
+        response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+        response.sendRedirect(String.format("%s?sessionId=%s&authType=%s", oAuth2ClientProperties.getCallbackUrl(),
+                session.getId(), "oauth2"));
     }
 }

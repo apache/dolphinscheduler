@@ -48,6 +48,9 @@ public class OAuth2Configuration {
         private String userInfoUri;
         private String callbackUrl;
         private String iconUri;
+        private boolean upgradeToOIDC;
+        private String scope;
+        private String userNameAttribute;
         private String provider;
 
     }

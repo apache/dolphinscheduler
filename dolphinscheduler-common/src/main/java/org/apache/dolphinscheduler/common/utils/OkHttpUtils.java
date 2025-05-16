@@ -77,21 +77,43 @@ public class OkHttpUtils {
      * @throws RuntimeException
      */
     public static @NonNull OkHttpResponse post(@NonNull String url,
-                                               @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
-                                               @Nullable Map<String, Object> requestParamsMap,
-                                               @Nullable Map<String, Object> requestBodyMap,
-                                               int connectTimeout,
-                                               int writeTimeout,
-                                               int readTimeout) throws IOException {
-        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
-        String finalUrl = addUrlParams(requestParamsMap, url);
-        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
-        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
-        if (requestBodyMap != null) {
-            requestBuilder = requestBuilder.post(RequestBody.create(
-                    JSONUtils.toJsonString(requestBodyMap),
-                    MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
+                                          @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                          @Nullable Map<String, Object> requestParamsMap,
+                                          @Nullable Map<String, Object> requestBodyMap,
+                                          int connectTimeout,
+                                          int writeTimeout,
+                                          int readTimeout) throws IOException {
+    OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+    String finalUrl = addUrlParams(requestParamsMap, url);
+    Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
+    addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+    
+    if (requestBodyMap != null) {
+        RequestBody requestBody;
+        if (okHttpRequestHeaders.getOkHttpRequestHeaderContentType() == OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED) {
+            // Handle form URL encoded
+            StringBuilder formBody = new StringBuilder();
+            for (Map.Entry<String, Object> entry : requestBodyMap.entrySet()) {
+                if (formBody.length() > 0) {
+                    formBody.append('&');
+                }
+                formBody.append(entry.getKey())
+                       .append('=')
+                       .append(entry.getValue());
+            }
+            requestBody = RequestBody.create(
+                formBody.toString(),
+                MediaType.parse(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED.getValue())
+            );
+        } else {
+            // Handle JSON
+            requestBody = RequestBody.create(
+                JSONUtils.toJsonString(requestBodyMap),
+                MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())
+            );
         }
+        requestBuilder = requestBuilder.post(requestBody);
+    }
         try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
