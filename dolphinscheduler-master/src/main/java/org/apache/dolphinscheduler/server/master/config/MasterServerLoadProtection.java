@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
 import lombok.Getter;
 import lombok.Setter;
