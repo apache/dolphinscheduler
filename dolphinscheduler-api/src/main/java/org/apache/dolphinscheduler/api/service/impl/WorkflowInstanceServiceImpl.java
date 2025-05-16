@@ -469,7 +469,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
                         workflowInstance.getTestFlag());
-        List<TaskInstanceDependentDetails<List<AbstractTaskInstanceContext>>> taskInstanceDependentDetailsList =
+        List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -481,11 +481,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return result;
     }
 
-    private List<TaskInstanceDependentDetails<List<AbstractTaskInstanceContext>>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
-        List<TaskInstanceDependentDetails<List<AbstractTaskInstanceContext>>> taskInstanceDependentDetailsList =
+    private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
+        List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 taskInstanceList.stream()
                         .map(taskInstance -> {
-                            TaskInstanceDependentDetails<List<AbstractTaskInstanceContext>> taskInstanceDependentDetails =
+                            TaskInstanceDependentDetails<AbstractTaskInstanceContext> taskInstanceDependentDetails =
                                     new TaskInstanceDependentDetails<>();
                             BeanUtils.copyProperties(taskInstance, taskInstanceDependentDetails);
                             return taskInstanceDependentDetails;
@@ -496,10 +496,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
                         ContextType.DEPENDENT_RESULT_CONTEXT);
         for (TaskInstanceContext taskInstanceContext : taskInstanceContextList) {
-            for (TaskInstanceDependentDetails<List<AbstractTaskInstanceContext>> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
+            for (TaskInstanceDependentDetails<AbstractTaskInstanceContext> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
                 if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
                     taskInstanceDependentDetails
-                            .setTaskInstanceDependentResults(Collections.singletonList(taskInstanceContext.getTaskInstanceContext()));
+                            .setTaskInstanceDependentResults(taskInstanceContext.getTaskInstanceContext());
                 }
             }
         }

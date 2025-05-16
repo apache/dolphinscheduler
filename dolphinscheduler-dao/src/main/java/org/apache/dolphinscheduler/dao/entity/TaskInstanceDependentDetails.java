@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TaskInstanceDependentDetails<T extends List<AbstractTaskInstanceContext>> extends TaskInstance {
+public class TaskInstanceDependentDetails<T extends AbstractTaskInstanceContext> extends TaskInstance {
 
     private List<T> taskInstanceDependentResults;
 
