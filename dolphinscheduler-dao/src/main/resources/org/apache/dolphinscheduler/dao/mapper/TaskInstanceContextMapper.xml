@@ -39,16 +39,6 @@
         AND context_type = #{contextType}
     </delete>
 
-    <update id="updateTaskInstanceContextByTaskInstanceIdAndContextType">
-        UPDATE t_ds_task_instance_context
-        SET
-            context = #{context}
-            ,update_time = now()
-        WHERE 1=1
-        AND task_instance_id = #{taskInstanceId}
-        AND context_type = #{contextType}
-    </update>
-
     <select id="batchQueryByTaskInstanceIdsAndContextType" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstanceContext">
         SELECT
             id
