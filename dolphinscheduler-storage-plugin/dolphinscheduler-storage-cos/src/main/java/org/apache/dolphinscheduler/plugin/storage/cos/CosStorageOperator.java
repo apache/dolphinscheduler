@@ -260,7 +260,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
         // add files
         storageEntitys.addAll(result.getObjectSummaries()
                 .stream()
-                .filter(x -> !resourceAbsolutePath.equals(x.getKey()))
+                .filter(x -> !x.getKey().endsWith(File.separator))
                 .map((COSObjectSummary summary) -> {
                     ObjectMetadata metadata = new ObjectMetadata();
                     metadata.setContentLength(summary.getSize());
