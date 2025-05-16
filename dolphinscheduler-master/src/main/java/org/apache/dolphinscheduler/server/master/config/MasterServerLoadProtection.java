@@ -49,7 +49,7 @@ public class MasterServerLoadProtection extends BaseServerLoadProtection {
         int currentWorkflowInstanceCount = workflowRepository.getAll().size();
         if (currentWorkflowInstanceCount >= maxConcurrentWorkflowInstances) {
             log.info(
-                    "OverLoad: the workflow instance count: {} is over then the maxConcurrentWorkflowInstances {}",
+                    "OverLoad: the workflow instance count: {} exceeds the maxConcurrentWorkflowInstances {}",
                     currentWorkflowInstanceCount, maxConcurrentWorkflowInstances);
             return true;
         }
