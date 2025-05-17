@@ -23,11 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,11 +70,6 @@ public class SqoopTask extends AbstractYarnTask {
         SqoopJobGenerator generator = new SqoopJobGenerator();
         return generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
-    }
-
-    @Override
-    protected Map<String, String> getProperties() {
-        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     @Override
