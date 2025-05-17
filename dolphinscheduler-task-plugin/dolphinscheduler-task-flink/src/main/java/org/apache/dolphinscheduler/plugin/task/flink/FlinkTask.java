@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -77,11 +76,6 @@ public class FlinkTask extends AbstractYarnTask {
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
         List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
         return args.stream().collect(Collectors.joining(" "));
-    }
-
-    @Override
-    protected Map<String, String> getProperties() {
-        return taskExecutionContext.getDefinedParams();
     }
 
     @Override
