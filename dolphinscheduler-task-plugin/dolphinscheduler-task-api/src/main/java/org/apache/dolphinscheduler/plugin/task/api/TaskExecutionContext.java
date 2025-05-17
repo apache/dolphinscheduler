@@ -80,26 +80,17 @@ public class TaskExecutionContext implements Serializable {
 
     private int executorId;
 
-    private int cmdTypeIfComplement;
-
     private String tenantCode;
 
     private int workflowDefinitionId;
-
-    private int projectId;
-
-    private long projectCode;
 
     private String taskParams;
 
     private String environmentConfig;
 
     /**
-     * definedParams
-     * // todo: we need to rename definedParams, prepareParamsMap, paramsMap, this is confusing
+     * Include local params, global params and system built-in params
      */
-    private Map<String, String> definedParams;
-
     private Map<String, Property> prepareParamsMap;
 
     // Please use task instanceId
@@ -126,15 +117,11 @@ public class TaskExecutionContext implements Serializable {
 
     private int dryRun;
 
-    private Map<String, Property> paramsMap;
-
     private Integer cpuQuota;
 
     private Integer memoryMax;
 
     private int testFlag;
-
-    private boolean logBufferEnable;
 
     private int dispatchFailTimes;
 
