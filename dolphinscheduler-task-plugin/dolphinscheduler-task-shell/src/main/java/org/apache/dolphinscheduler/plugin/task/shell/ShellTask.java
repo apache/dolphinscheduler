@@ -86,6 +86,7 @@ public class ShellTask extends AbstractTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setProcessId(commandExecuteResult.getProcessId());
             shellParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
+            taskExecutionContext.setVarPool(JSONUtils.toJsonString(shellParameters.getVarPool()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current Shell task has been interrupted", e);
