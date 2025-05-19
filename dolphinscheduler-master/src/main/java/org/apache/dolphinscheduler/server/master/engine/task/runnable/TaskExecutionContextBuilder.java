@@ -102,11 +102,9 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(workflowInstance.getScheduleTime()));
         taskExecutionContext.setGlobalParams(workflowInstance.getGlobalParams());
         taskExecutionContext.setExecutorId(workflowInstance.getExecutorId());
-        taskExecutionContext.setCmdTypeIfComplement(workflowInstance.getCmdTypeIfComplement().getCode());
         taskExecutionContext.setTenantCode(workflowInstance.getTenantCode());
         taskExecutionContext.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
         taskExecutionContext.setWorkflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion());
-        taskExecutionContext.setProjectCode(workflowInstance.getProjectCode());
         return this;
     }
 
@@ -128,24 +126,11 @@ public class TaskExecutionContextBuilder {
     }
 
     /**
-     * build global and local params
+     * The runtime params, include local params from task, global params from workflow, startup params from command, varpool params from pre-task, built-in params from system  
      *
-     * @param propertyMap
-     * @return
      */
     public TaskExecutionContextBuilder buildPrepareParams(final Map<String, Property> propertyMap) {
         taskExecutionContext.setPrepareParamsMap(propertyMap);
-        return this;
-    }
-
-    /**
-     * build business params
-     *
-     * @param businessParamsMap
-     * @return
-     */
-    public TaskExecutionContextBuilder buildBusinessParams(final Map<String, Property> businessParamsMap) {
-        taskExecutionContext.setParamsMap(businessParamsMap);
         return this;
     }
 
