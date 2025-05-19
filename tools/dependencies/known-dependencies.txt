@@ -447,4 +447,5 @@ semver-5.7.2.jar
 sigmund-1.0.1.jar
 wrappy-1.0.2.jar
 yallist-2.1.2.jar
+maven-wrapper.jar
 

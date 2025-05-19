@@ -50,6 +50,22 @@
         </if>
         order by id asc
     </select>
+    <select id="queryMainWorkflowByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_instance
+        where is_sub_workflow=0
+        <if test="host != null and host != ''">
+            and host=#{host}
+        </if>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        order by id asc
+    </select>
     <select id="queryNeedFailoverWorkflowInstanceHost" resultType="String">
         select distinct host
         from t_ds_workflow_instance

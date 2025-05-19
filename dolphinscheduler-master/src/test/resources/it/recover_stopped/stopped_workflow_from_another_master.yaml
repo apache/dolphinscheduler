@@ -1,0 +1,111 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+project:
+  name: MasterIntegrationTest
+  code: 1
+  description: This is a fake project
+  userId: 1
+  userName: admin
+  createTime: 2025-03-22 00:00:00
+  updateTime: 2025-03-22 00:00:00
+
+workflows:
+  - name: workflow_with_one_fake_task_killed
+    code: 1
+    version: 1
+    projectCode: 1
+    description: This is a fake workflow with single task
+    releaseState: ONLINE
+    createTime: 2025-03-22 00:00:00
+    updateTime: 2025-03-22 00:00:00
+    userId: 1
+    executionType: PARALLEL
+
+workflowInstances:
+  - id: 1
+    name: workflow_with_one_fake_task_killed-20250322201900000
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
+    projectCode: 1
+    state: STOP
+    recovery: NO
+    startTime: 2025-03-22 20:19:00
+    endTime: null
+    runTimes: 1
+    host: "127.0.0.1:15678"
+    commandType: START_PROCESS
+    commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
+    taskDependType: TASK_POST
+    commandStartTime: 2025-03-22 20:19:00
+    isSubWorkflow: NO
+    executorId: 1
+    historyCmd: START_PROCESS
+    workerGroup: default
+    globalParams: '[]'
+    varPool: '[]'
+    dryRun: 0
+
+taskInstances:
+  - id: 1
+    name: A
+    taskType: LogicFakeTask
+    workflowInstanceId: 1
+    workflowInstanceName: workflow_with_one_fake_task_killed-20250322201900000
+    projectCode: 1
+    taskCode: 1
+    taskDefinitionVersion: 1
+    state: KILL
+    firstSubmitTime: 2025-03-22 20:19:00
+    submitTime: 2025-03-22 20:19:00
+    startTime: 2025-03-22 20:19:00
+    endTime: 2025-03-22 20:19:01
+    retryTimes: 0
+    host: 127.0.0.1:1234
+    maxRetryTimes: 0
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 200"}'
+    flag: YES
+    retryInterval: 0
+    delayTime: 0
+    workerGroup: default
+    executorId: 1
+    varPool: '[]'
+    taskExecuteType: BATCH
+
+tasks:
+  - name: A
+    code: 1
+    version: 1
+    projectCode: 1
+    userId: 1
+    taskType: LogicFakeTask
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 200"}'
+    workerGroup: default
+    createTime: 2025-03-22 00:00:00
+    updateTime: 2025-03-22 00:00:00
+    taskExecuteType: BATCH
+
+taskRelations:
+  - projectCode: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
+    preTaskCode: 0
+    preTaskVersion: 0
+    postTaskCode: 1
+    postTaskVersion: 1
+    createTime: 2025-03-22 00:00:00
+    updateTime: 2025-03-22 00:00:00

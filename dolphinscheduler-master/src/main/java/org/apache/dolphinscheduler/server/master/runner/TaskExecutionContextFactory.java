@@ -85,7 +85,7 @@ public class TaskExecutionContextFactory {
                 .buildTaskDefinitionRelatedInfo(request.getTaskDefinition())
                 .buildProcessInstanceRelatedInfo(request.getWorkflowInstance())
                 .buildResourceParameters(getResourceParameters(taskInstance))
-                .buildBusinessParams(getBusinessParams(workflowInstance))
+                // todo: use TaskRuntimeParameters to replace Map<String, Property> in TaskExecutionContext
                 .buildPrepareParams(getPrepareParams(taskInstance, workflowInstance, workflowDefinition, project))
                 .buildK8sTaskRelatedInfo(getK8sTaskExecutionContext(taskInstance))
                 .create();
@@ -150,10 +150,6 @@ public class TaskExecutionContextFactory {
             }
         }
         return k8sTaskExecutionContext;
-    }
-
-    private Map<String, Property> getBusinessParams(final WorkflowInstance workflowInstance) {
-        return curingParamsService.preBuildBusinessParams(workflowInstance);
     }
 
     private Map<String, Property> getPrepareParams(final TaskInstance taskInstance,

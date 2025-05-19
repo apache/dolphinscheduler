@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.Abstract
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
+import org.apache.dolphinscheduler.server.master.failover.WorkflowFailover;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
@@ -148,7 +149,11 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
             return triggerNewSubWorkflow();
         }
 
-        switch (workflowExecutionRunnable.getWorkflowInstance().getCommandType()) {
+        // In some cases, workflow instance's command type has not been changed,
+        // there should better to use command.type instead
+        switch (workflowExecutionRunnable.getWorkflowExecuteContext().getCommand().getCommandType()) {
+            case RECOVER_TOLERANCE_FAULT_PROCESS:
+                return recoverFromFaultTolerantTasks();
             case RECOVER_SUSPENDED_PROCESS:
                 return recoverFromSuspendTasks();
             case START_FAILURE_TASK_PROCESS:
@@ -156,7 +161,21 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
             default:
                 return triggerNewSubWorkflow();
         }
+    }
 
+    private SubWorkflowLogicTaskRuntimeContext recoverFromFaultTolerantTasks() {
+        final WorkflowInstanceDao workflowInstanceDao = applicationContext.getBean(WorkflowInstanceDao.class);
+        final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(
+                subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
+
+        if (subWorkflowInstance != null && subWorkflowInstance.getState().canFailover()) {
+            // Only handle sub-workflow's fail-over in SubWorkflowLogicTask's fail-over
+            applicationContext.getBean(WorkflowFailover.class).failoverWorkflow(subWorkflowInstance);
+            return subWorkflowLogicTaskRuntimeContext;
+        }
+
+        // The sub-workflow's state is bad, trigger a new sub-workflow instance
+        return triggerNewSubWorkflow();
     }
 
     private SubWorkflowLogicTaskRuntimeContext recoverFromFailedTasks() {

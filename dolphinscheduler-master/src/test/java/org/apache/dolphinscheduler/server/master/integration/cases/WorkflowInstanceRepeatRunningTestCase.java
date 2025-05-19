@@ -47,7 +47,7 @@ public class WorkflowInstanceRepeatRunningTestCase extends AbstractMasterIntegra
         final String yaml = "/it/repeat_running/success_workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
 
-        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
         workflowOperator.repeatRunningWorkflowInstance(workflowInstanceId);
 
         await()
@@ -88,7 +88,7 @@ public class WorkflowInstanceRepeatRunningTestCase extends AbstractMasterIntegra
         final String yaml = "/it/repeat_running/failed_workflow_with_one_fake_task_failed.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
 
-        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
         workflowOperator.repeatRunningWorkflowInstance(workflowInstanceId);
 
         await()
@@ -129,7 +129,7 @@ public class WorkflowInstanceRepeatRunningTestCase extends AbstractMasterIntegra
         final String yaml = "/it/repeat_running/success_workflow_with_task_only.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
 
-        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
         workflowOperator.repeatRunningWorkflowInstance(workflowInstanceId);
 
         await()
