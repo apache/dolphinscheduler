@@ -67,7 +67,6 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
-        taskExecutionContext.setVarPool(taskInstance.getVarPool());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());
         taskExecutionContext.setTestFlag(taskInstance.getTestFlag());
         taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
