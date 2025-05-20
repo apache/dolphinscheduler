@@ -21,15 +21,21 @@ import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
 public class MasterServerLoadProtectionConfig {
 
-    public MasterServerLoadProtectionConfig(MasterConfig masterConfig, IWorkflowRepository workflowRepository) {
-        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
-        serverLoadProtection.setWorkflowRepository(workflowRepository);
-        log.info("Initialized MasterServerLoadProtection with IWorkflowRepository");
+    @Bean
+    public MasterServerLoadProtection masterServerLoadProtection(
+            IWorkflowRepository workflowRepository,
+            @Value("${master.server-load-protection.max-concurrent-workflow-instances:2147483647}") int maxConcurrentWorkflowInstances) {
+        MasterServerLoadProtection protection =
+                new MasterServerLoadProtection(workflowRepository, maxConcurrentWorkflowInstances);
+        log.info("Initialized MasterServerLoadProtection with IWorkflowRepository and maxConcurrentWorkflowInstances={}", maxConcurrentWorkflowInstances);
+        return protection;
     }
 }

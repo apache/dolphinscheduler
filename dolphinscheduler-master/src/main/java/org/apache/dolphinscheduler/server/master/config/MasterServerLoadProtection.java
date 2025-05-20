@@ -22,17 +22,19 @@ import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
-@Setter
 public class MasterServerLoadProtection extends BaseServerLoadProtection {
 
-    private Integer maxConcurrentWorkflowInstances = Integer.MAX_VALUE;
+    private final int maxConcurrentWorkflowInstances;
+    private final IWorkflowRepository workflowRepository;
 
-    private IWorkflowRepository workflowRepository;
+    public MasterServerLoadProtection(IWorkflowRepository workflowRepository, int maxConcurrentWorkflowInstances) {
+        this.workflowRepository = workflowRepository;
+        this.maxConcurrentWorkflowInstances = maxConcurrentWorkflowInstances;
+    }
 
     @Override
     public boolean isOverload(SystemMetrics systemMetrics) {

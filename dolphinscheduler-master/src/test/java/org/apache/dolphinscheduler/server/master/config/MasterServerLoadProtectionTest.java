@@ -32,7 +32,10 @@ class MasterServerLoadProtectionTest {
 
     @Test
     void isOverload() {
-        MasterServerLoadProtection masterServerLoadProtection = new MasterServerLoadProtection();
+        IWorkflowRepository mockRepository = Mockito.mock(IWorkflowRepository.class);
+        MasterServerLoadProtection masterServerLoadProtection =
+                new MasterServerLoadProtection(mockRepository, Integer.MAX_VALUE);
+
         SystemMetrics systemMetrics = SystemMetrics.builder()
                 .jvmMemoryUsedPercentage(0.71)
                 .systemMemoryUsedPercentage(0.71)
@@ -40,6 +43,7 @@ class MasterServerLoadProtectionTest {
                 .jvmCpuUsagePercentage(0.71)
                 .diskUsedPercentage(0.71)
                 .build();
+
         masterServerLoadProtection.setEnabled(false);
         Assertions.assertFalse(masterServerLoadProtection.isOverload(systemMetrics));
 
@@ -49,30 +53,45 @@ class MasterServerLoadProtectionTest {
 
     @Test
     void isOverloadWithMaxConcurrentWorkflowInstances() {
-        MasterServerLoadProtection masterServerLoadProtection = new MasterServerLoadProtection();
-        SystemMetrics systemMetrics = SystemMetrics.builder()
-                .jvmMemoryUsedPercentage(0.5)
-                .systemMemoryUsedPercentage(0.5)
-                .systemCpuUsagePercentage(0.5)
-                .jvmCpuUsagePercentage(0.5)
-                .diskUsedPercentage(0.5)
-                .build();
-
         IWorkflowRepository mockRepository = Mockito.mock(IWorkflowRepository.class);
         Collection<IWorkflowExecutionRunnable> mockWorkflows =
                 Collections.nCopies(5, Mockito.mock(IWorkflowExecutionRunnable.class));
         Mockito.when(mockRepository.getAll()).thenReturn(mockWorkflows);
 
+        MasterServerLoadProtection masterServerLoadProtection =
+                new MasterServerLoadProtection(mockRepository, 10);
+
         masterServerLoadProtection.setEnabled(true);
-        masterServerLoadProtection.setWorkflowRepository(mockRepository);
+        Assertions.assertFalse(masterServerLoadProtection.isOverload(SystemMetrics.builder()
+                .jvmMemoryUsedPercentage(0.5)
+                .systemMemoryUsedPercentage(0.5)
+                .systemCpuUsagePercentage(0.5)
+                .jvmCpuUsagePercentage(0.5)
+                .diskUsedPercentage(0.5)
+                .build()));
 
-        masterServerLoadProtection.setMaxConcurrentWorkflowInstances(10);
-        Assertions.assertFalse(masterServerLoadProtection.isOverload(systemMetrics));
+        // Now set the limit to 5, should be overload
+        MasterServerLoadProtection masterServerLoadProtection2 =
+                new MasterServerLoadProtection(mockRepository, 5);
+        masterServerLoadProtection2.setEnabled(true);
+        Assertions.assertTrue(masterServerLoadProtection2.isOverload(SystemMetrics.builder()
+                .jvmMemoryUsedPercentage(0.5)
+                .systemMemoryUsedPercentage(0.5)
+                .systemCpuUsagePercentage(0.5)
+                .jvmCpuUsagePercentage(0.5)
+                .diskUsedPercentage(0.5)
+                .build()));
 
-        masterServerLoadProtection.setMaxConcurrentWorkflowInstances(5);
-        Assertions.assertTrue(masterServerLoadProtection.isOverload(systemMetrics));
-
-        masterServerLoadProtection.setMaxConcurrentWorkflowInstances(3);
-        Assertions.assertTrue(masterServerLoadProtection.isOverload(systemMetrics));
+        // Now set the limit to 3, should be overload
+        MasterServerLoadProtection masterServerLoadProtection3 =
+                new MasterServerLoadProtection(mockRepository, 3);
+        masterServerLoadProtection3.setEnabled(true);
+        Assertions.assertTrue(masterServerLoadProtection3.isOverload(SystemMetrics.builder()
+                .jvmMemoryUsedPercentage(0.5)
+                .systemMemoryUsedPercentage(0.5)
+                .systemCpuUsagePercentage(0.5)
+                .jvmCpuUsagePercentage(0.5)
+                .diskUsedPercentage(0.5)
+                .build()));
     }
 }

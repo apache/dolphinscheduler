@@ -55,7 +55,7 @@ public class MasterConfig implements Validator {
      */
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
 
-    private MasterServerLoadProtection serverLoadProtection = new MasterServerLoadProtection();
+    private MasterServerLoadProtection serverLoadProtection;
 
     private Duration workerGroupRefreshInterval = Duration.ofMinutes(5);
 
