@@ -31,11 +31,13 @@ public class MasterServerLoadProtectionConfig {
 
     @Bean
     public MasterServerLoadProtection masterServerLoadProtection(
-            IWorkflowRepository workflowRepository,
-            @Value("${master.server-load-protection.max-concurrent-workflow-instances:2147483647}") int maxConcurrentWorkflowInstances) {
+                                                                 IWorkflowRepository workflowRepository,
+                                                                 @Value("${master.server-load-protection.max-concurrent-workflow-instances:2147483647}") int maxConcurrentWorkflowInstances) {
         MasterServerLoadProtection protection =
                 new MasterServerLoadProtection(workflowRepository, maxConcurrentWorkflowInstances);
-        log.info("Initialized MasterServerLoadProtection with IWorkflowRepository and maxConcurrentWorkflowInstances={}", maxConcurrentWorkflowInstances);
+        log.info(
+                "Initialized MasterServerLoadProtection with IWorkflowRepository and maxConcurrentWorkflowInstances={}",
+                maxConcurrentWorkflowInstances);
         return protection;
     }
 }
