@@ -50,11 +50,8 @@ export type TaskType =
   | 'LINKIS'
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
-<<<<<<< HEAD
   | 'ALIYUN_SERVERLESS_SPARK'
-=======
   | 'FLINK_MATERIALIZED_TABLE'
->>>>>>> d1a185500 (support flink materialized table)
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
