@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 /**
  * Flink Materialized Table Task Channel.
@@ -32,18 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
  * It implements the TaskChannel interface to provide task creation and parameter parsing capabilities.
  */
 public class FlinkMaterializedTableTaskChannel implements TaskChannel {
-
-    /**
-     * Cancels the application.
-     * 
-     * This method is not used in this implementation as the task is handled directly.
-     *
-     * @param status The status of the cancellation operation
-     */
-    @Override
-    public void cancelApplication(boolean status) {
-        // Not used in this implementation
-    }
 
     /**
      * Creates a new Flink Materialized Table task instance.
@@ -56,25 +42,8 @@ public class FlinkMaterializedTableTaskChannel implements TaskChannel {
         return new FlinkMaterializedTableTask(taskRequest);
     }
 
-    /**
-     * Parses the task parameters from the parameters node.
-     *
-     * @param parametersNode The parameters node containing task configuration
-     * @return Parsed FlinkMaterializedTableParameters instance
-     */
     @Override
-    public AbstractParameters parseParameters(ParametersNode parametersNode) {
-        return JSONUtils.parseObject(parametersNode.getTaskParams(), FlinkMaterializedTableParameters.class);
-    }
-
-    /**
-     * Gets the resource parameters helper for the task.
-     *
-     * @param parameters The task parameters as a JSON string
-     * @return ResourceParametersHelper instance for managing task resources
-     */
-    @Override
-    public ResourceParametersHelper getResources(String parameters) {
-        return JSONUtils.parseObject(parameters, FlinkMaterializedTableParameters.class).getResources();
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, FlinkMaterializedTableParameters.class);
     }
 }

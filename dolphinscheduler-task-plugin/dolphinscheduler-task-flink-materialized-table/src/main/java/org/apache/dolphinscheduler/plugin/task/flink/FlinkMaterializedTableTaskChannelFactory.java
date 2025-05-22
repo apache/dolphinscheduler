@@ -19,10 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.Collections;
-import java.util.List;
 
 import com.google.auto.service.AutoService;
 
@@ -46,18 +42,6 @@ public class FlinkMaterializedTableTaskChannelFactory implements TaskChannelFact
     @Override
     public String getName() {
         return "FLINK_MATERIALIZED_TABLE";
-    }
-
-    /**
-     * Gets the plugin parameters.
-     * 
-     * This method returns the list of parameters that can be configured for this task type.
-     *
-     * @return List of plugin parameters (currently returns null as parameters are handled internally)
-     */
-    @Override
-    public List<PluginParams> getParams() {
-        return Collections.emptyList();
     }
 
     /**

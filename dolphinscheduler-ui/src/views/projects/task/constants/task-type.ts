@@ -184,13 +184,12 @@ export const TASK_TYPES_MAP = {
     alias: 'REMOTESHELL',
     helperLinkDisable: true
   },
-<<<<<<< HEAD
   ALIYUN_SERVERLESS_SPARK: {
     alias: 'ALIYUN_SERVERLESS_SPARK',
-=======
+    helperLinkDisable: true
+  },
   FLINK_MATERIALIZED_TABLE: {
     alias: 'FLINK_MATERIALIZED_TABLE',
->>>>>>> d1a185500 (support flink materialized table)
     helperLinkDisable: true
   }
 } as {

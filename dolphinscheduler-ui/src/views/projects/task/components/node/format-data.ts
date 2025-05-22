@@ -458,14 +458,6 @@ export function formatParams(data: INodeData): {
     taskParams.datasource = data.datasource
   }
 
-  if (data.taskType === 'DYNAMIC') {
-    taskParams.processDefinitionCode = data.processDefinitionCode
-    taskParams.maxNumOfSubWorkflowInstances = data.maxNumOfSubWorkflowInstances
-    taskParams.degreeOfParallelism = data.degreeOfParallelism
-    taskParams.filterCondition = data.filterCondition
-    taskParams.listParameters = data.listParameters
-  }
-
   if (data.taskType === 'FLINK_MATERIALIZED_TABLE') {
     taskParams.identifier = data.identifier
     taskParams.gatewayEndpoint = data.gatewayEndpoint
