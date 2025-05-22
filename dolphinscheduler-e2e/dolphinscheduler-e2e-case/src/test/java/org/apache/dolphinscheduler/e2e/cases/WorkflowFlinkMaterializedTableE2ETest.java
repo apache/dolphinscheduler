@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -30,6 +32,8 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -40,12 +44,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @DolphinScheduler(composeFiles = "docker/flink-materialized-table/docker-compose.yaml")
 class WorkflowFlinkMaterializedTableE2ETest {
+
     private static final String project = "test-workflow-1";
     private static final String workflow = "test-workflow-1";
     private static final String user = "admin";
@@ -68,13 +69,13 @@ class WorkflowFlinkMaterializedTableE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(
+                        new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project)
-        ;
+                .create(project);
     }
 
     @AfterAll
@@ -107,7 +108,7 @@ class WorkflowFlinkMaterializedTableE2ETest {
 
         workflowDefinitionPage
                 .createWorkflow()
-                .<FlinkMaterializedTableTaskForm> addTask(WorkflowForm.TaskType.FLINK_MATERIALIZED_TABLE)
+                .<FlinkMaterializedTableTaskForm>addTask(WorkflowForm.TaskType.FLINK_MATERIALIZED_TABLE)
                 .gatewayEndpoint(flinkSqlGatewayUrl)
                 .identifier(materializedTableIdentifier)
                 .staticPartitions("{}")
@@ -120,14 +121,12 @@ class WorkflowFlinkMaterializedTableE2ETest {
                 .submit()
                 .name(workflow)
                 .addGlobalParam("global_param", "hello world")
-                .submit()
-        ;
+                .submit();
 
         Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(
-                        it -> it.getText().contains(workflow)
-                ));
+                        it -> it.getText().contains(workflow)));
         workflowDefinitionPage.publish(workflow);
     }
 
@@ -160,4 +159,4 @@ class WorkflowFlinkMaterializedTableE2ETest {
             assertThat(row.executionTime()).isEqualTo(1);
         });
     }
-} 
+}

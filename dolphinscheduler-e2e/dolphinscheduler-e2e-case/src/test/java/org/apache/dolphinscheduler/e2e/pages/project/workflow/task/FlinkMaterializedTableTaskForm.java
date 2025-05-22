@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
-import org.openqa.selenium.By;
+
+import lombok.Getter;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -29,14 +30,13 @@ import org.openqa.selenium.support.PageFactory;
 @Getter
 public final class FlinkMaterializedTableTaskForm extends TaskNodeForm {
 
-
     @FindBys({
             @FindBy(className = "input-identifier"),
             @FindBy(tagName = "input"),
     })
     private WebElement inputIdentifier;
 
-        @FindBys({
+    @FindBys({
             @FindBy(className = "input-gateway-endpoint"),
             @FindBy(tagName = "input"),
     })
@@ -103,4 +103,4 @@ public final class FlinkMaterializedTableTaskForm extends TaskNodeForm {
         executionConfig().sendKeys(executionConfig);
         return this;
     }
-} 
+}

@@ -216,7 +216,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <version>${project.version}</version>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-flink-materialized-table</artifactId>
             <version>${project.version}</version>
