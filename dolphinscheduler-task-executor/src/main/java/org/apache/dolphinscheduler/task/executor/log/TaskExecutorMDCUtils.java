@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.task.executor.log;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
 import org.slf4j.MDC;
@@ -41,7 +40,7 @@ public class TaskExecutorMDCUtils {
             MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, logPath);
         }
 
-        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
+        MDC.put(TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
 
         return () -> {
             MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
