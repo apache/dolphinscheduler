@@ -52,5 +52,6 @@ header:
     - '.terraform.lock.hcl'
     - deploy/kubernetes/dolphinscheduler/README.md.gotmpl
     - .idea/vcs.xml
+    - 'dolphinscheduler-e2e/dolphinscheduler-e2e-case/src/test/resources/docker/flink-materialized-table/catalog_store/**'
 
   comment: on-failure
