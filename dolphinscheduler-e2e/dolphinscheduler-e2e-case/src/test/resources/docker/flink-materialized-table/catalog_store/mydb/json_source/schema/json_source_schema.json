@@ -1,0 +1,17 @@
+{
+  "tableKind" : "TABLE",
+  "catalogTableInfo" : {
+    "schema.3.data-type" : "VARCHAR(2147483647)",
+    "schema.2.data-type" : "VARCHAR(2147483647)",
+    "schema.3.name" : "order_created_at",
+    "schema.0.data-type" : "BIGINT",
+    "schema.2.name" : "user_name",
+    "format" : "json",
+    "source.monitor-interval" : "10s",
+    "schema.1.name" : "user_id",
+    "schema.4.data-type" : "BIGINT",
+    "schema.4.name" : "payment_amount_cents",
+    "schema.0.name" : "order_id",
+    "schema.1.data-type" : "BIGINT"
+  }
+}

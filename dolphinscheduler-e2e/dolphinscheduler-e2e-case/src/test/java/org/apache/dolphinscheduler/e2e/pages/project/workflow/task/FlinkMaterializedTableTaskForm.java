@@ -28,17 +28,43 @@ import org.openqa.selenium.support.PageFactory;
 
 @Getter
 public final class FlinkMaterializedTableTaskForm extends TaskNodeForm {
-    @FindBys({
-            @FindBy(className = "input-gateway-endpoint"),
-            @FindBy(tagName = "input"),
-    })
-    private WebElement inputGatewayEndpoint;
+
 
     @FindBys({
             @FindBy(className = "input-identifier"),
             @FindBy(tagName = "input"),
     })
     private WebElement inputIdentifier;
+
+        @FindBys({
+            @FindBy(className = "input-gateway-endpoint"),
+            @FindBy(tagName = "input"),
+    })
+    private WebElement inputGatewayEndpoint;
+
+    @FindBys({
+            @FindBy(className = "input-dynamic-options"),
+            @FindBy(tagName = "input"),
+    })
+    private WebElement dynamicOptions;
+
+    @FindBys({
+            @FindBy(className = "input-static-partitions"),
+            @FindBy(tagName = "input"),
+    })
+    private WebElement staticPartitions;
+
+    @FindBys({
+            @FindBy(className = "input-init-config"),
+            @FindBy(tagName = "input"),
+    })
+    private WebElement initConfig;
+
+    @FindBys({
+            @FindBy(className = "input-execution-config"),
+            @FindBy(tagName = "input"),
+    })
+    private WebElement executionConfig;
 
     private final WebDriver driver;
 
@@ -55,6 +81,26 @@ public final class FlinkMaterializedTableTaskForm extends TaskNodeForm {
 
     public FlinkMaterializedTableTaskForm identifier(String identifier) {
         inputIdentifier().sendKeys(identifier);
+        return this;
+    }
+
+    public FlinkMaterializedTableTaskForm dynamicOptions(String staticPartitions) {
+        dynamicOptions().sendKeys(staticPartitions);
+        return this;
+    }
+
+    public FlinkMaterializedTableTaskForm staticPartitions(String staticPartitions) {
+        staticPartitions().sendKeys(staticPartitions);
+        return this;
+    }
+
+    public FlinkMaterializedTableTaskForm initConfig(String initConfig) {
+        initConfig().sendKeys(initConfig);
+        return this;
+    }
+
+    public FlinkMaterializedTableTaskForm executionConfig(String executionConfig) {
+        executionConfig().sendKeys(executionConfig);
         return this;
     }
 } 

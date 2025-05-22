@@ -469,8 +469,9 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'FLINK_MATERIALIZED_TABLE') {
     taskParams.identifier = data.identifier
     taskParams.gatewayEndpoint = data.gatewayEndpoint
-    taskParams.isPeriodic = data.isPeriodic
+    taskParams.dynamicOptions = data.dynamicOptions
     taskParams.staticPartitions = data.staticPartitions
+    taskParams.initConfig = data.initConfig
     taskParams.executionConfig = data.executionConfig
   }
 

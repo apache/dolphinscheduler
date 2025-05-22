@@ -1,0 +1,24 @@
+{
+  "tableKind" : "MATERIALIZED_TABLE",
+  "catalogTableInfo" : {
+    "schema.0.data-type" : "BIGINT",
+    "definition-query" : "SELECT `tmp`.`user_id`, `tmp`.`ds`, SUM(`tmp`.`payment_amount_cents`) AS `payed_buy_fee_sum`, SUM(1) AS `PV`\nFROM (SELECT `json_source`.`user_id`, `json_source`.`order_created_at` AS `ds`, `json_source`.`payment_amount_cents`\nFROM `mt_cat`.`mydb`.`json_source` AS `json_source`) AS `tmp`\nGROUP BY `tmp`.`user_id`, `tmp`.`ds`",
+    "partition.fields.ds.date-formatter" : "yyyy-MM-dd",
+    "schema.2.name" : "payed_buy_fee_sum",
+    "format" : "json",
+    "refresh-status" : "ACTIVATED",
+    "refresh-handler-bytes" : "rO0ABXNyAD5vcmcuYXBhY2hlLmZsaW5rLnRhYmxlLmdhdGV3YXkud29ya2Zsb3cuRW1iZWRkZWRSZWZyZXNoSGFuZGxlcgAAAAAAAAABAgACTAANd29ya2Zsb3dHcm91cHQAEkxqYXZhL2xhbmcvU3RyaW5nO0wADHdvcmtmbG93TmFtZXEAfgABeHB0AA1kZWZhdWx0X2dyb3VwdAAtcXVhcnR6X2pvYl9gbXRfY2F0YC5gbXlkYmAuYGZ1bGxfdXNlcnNfc2hvcHNg",
+    "schema.1.name" : "ds",
+    "freshness-interval" : "1",
+    "refresh-mode" : "FULL",
+    "schema.1.data-type" : "VARCHAR(2147483647)",
+    "partition.keys.0.name" : "ds",
+    "schema.3.data-type" : "INT NOT NULL",
+    "schema.2.data-type" : "BIGINT",
+    "schema.3.name" : "PV",
+    "freshness-unit" : "MINUTE",
+    "refresh-handler-desc" : "{\n  workflowName: quartz_job_`mt_cat`.`mydb`.`full_users_shops`,\n  workflowGroup: default_group\n}",
+    "logical-refresh-mode" : "FULL",
+    "schema.0.name" : "user_id"
+  }
+}

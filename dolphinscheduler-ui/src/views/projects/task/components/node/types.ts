@@ -469,6 +469,7 @@ interface ITaskParams {
   isPeriodic?: boolean
   dynamicOptions?: string
   staticPartitions?: string
+  initConfig?: string
   executionConfig?: string
 }
 

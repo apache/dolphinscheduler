@@ -937,7 +937,9 @@ export default {
     static_partitions: 'static_partitions',
     static_partitions_tips: 'static_partitions',
     execution_config: 'execution_config',
-    execution_config_tips: 'execution_config'
+    execution_config_tips: 'execution_config',
+    init_config: 'init_config',
+    init_config_tips: ' session init config'
   },
   menu: {
     fav: 'Favorites',

@@ -157,6 +157,11 @@ export default defineComponent({
         taskType: 'FLINK_STREAM',
         color: '#d68f5b',
         image: `${import.meta.env.BASE_URL}images/task-icons/flink.png`
+      },
+      {
+        taskType: 'FLINK_MATERIALIZED_TABLE',
+        color: '#d68f5b',
+        image: `${import.meta.env.BASE_URL}images/task-icons/flink.png`
       }
     ])
 

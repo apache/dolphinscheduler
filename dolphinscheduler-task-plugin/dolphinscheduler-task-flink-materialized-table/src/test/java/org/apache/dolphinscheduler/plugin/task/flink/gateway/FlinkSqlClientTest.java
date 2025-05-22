@@ -87,19 +87,15 @@ class FlinkSqlClientTest {
         request.setScheduleTime("2024-01-01 00:00:00");
 
         // Execute refresh
-        String operationHandle =
-                client.refreshMaterializedTable(sessionHandle, "mt_cat.mydb.continuous_users_shops", request);
-        assertNotNull(operationHandle);
+        String jobId =
+                client.refreshMaterializedTable(sessionHandle, "mt_cat.mydb.full_users_shops", request);
+        assertNotNull(jobId);
 
-        FetchResultResponseBody fetchResultResponseBody = client.waitForOperationResult(sessionHandle, operationHandle);
-
-        String jobId = fetchResultResponseBody.getResult().get(0).getValues().get(0);
         JobStatus jobStatus = client.describeJob(sessionHandle, jobId);
         while (jobStatus != JobStatus.FINISHED) {
             Thread.sleep(1000);
             jobStatus = client.describeJob(sessionHandle, jobId);
         }
-        assertNotNull(fetchResultResponseBody);
     }
 
     @Test

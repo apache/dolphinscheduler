@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -44,19 +43,19 @@ public class FlinkMaterializedTableParameters extends AbstractParameters {
      * Initial configuration for the Flink SQL Gateway session.
      * These parameters are used when opening a new session.
      */
-    private Map<String, String> initConfig;
+    private String initConfig;
 
     /**
      * Dynamic options for the materialized table refresh operation.
      * These parameters are passed to the refresh request.
      */
-    private Map<String, String> dynamicOptions;
+    private String dynamicOptions;
 
     /**
      * Execution configuration for the refresh operation.
      * These parameters control how the refresh job is executed.
      */
-    private Map<String, String> executionConfig;
+    private String executionConfig;
 
     /**
      * Description of the SQL statement (optional).
@@ -88,27 +87,27 @@ public class FlinkMaterializedTableParameters extends AbstractParameters {
         this.gatewayEndpoint = gatewayEndpoint;
     }
 
-    public Map<String, String> getInitConfig() {
+    public String getInitConfig() {
         return initConfig;
     }
 
-    public void setInitConfig(Map<String, String> initConfig) {
+    public void setInitConfig(String initConfig) {
         this.initConfig = initConfig;
     }
 
-    public Map<String, String> getDynamicOptions() {
+    public String getDynamicOptions() {
         return dynamicOptions;
     }
 
-    public void setDynamicOptions(Map<String, String> dynamicOptions) {
+    public void setDynamicOptions(String dynamicOptions) {
         this.dynamicOptions = dynamicOptions;
     }
 
-    public Map<String, String> getExecutionConfig() {
+    public String getExecutionConfig() {
         return executionConfig;
     }
 
-    public void setExecutionConfig(Map<String, String> executionConfig) {
+    public void setExecutionConfig(String executionConfig) {
         this.executionConfig = executionConfig;
     }
 

@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -29,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.flink.gateway.model.RefreshMateri
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -70,13 +71,13 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            sessionHandle = flinkSqlClient.openSession(parameters.getInitConfig());
+            sessionHandle = flinkSqlClient.openSession(JSONUtils.toMap(parameters.getInitConfig()));
 
             RefreshMaterializedTableRequest request = new RefreshMaterializedTableRequest();
             request.setIsPeriodic(Boolean.TRUE);
-            request.setScheduleTime(new Date(taskExecutionContext.getScheduleTime()).toString());
-            request.setDynamicOptions(parameters.getDynamicOptions());
-            request.setExecutionConfig(parameters.getExecutionConfig());
+            request.setScheduleTime(DateUtils.formatTimeStamp(taskExecutionContext.getScheduleTime()));
+            request.setDynamicOptions(JSONUtils.toMap(parameters.getDynamicOptions()));
+            request.setExecutionConfig(JSONUtils.toMap(parameters.getExecutionConfig()));
 
             String jobId = flinkSqlClient.refreshMaterializedTable(sessionHandle, parameters.getIdentifier(), request);
             log.info("Started refresh operation with jobId: {}", jobId);
@@ -93,6 +94,8 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
             }
 
             log.info("Materialized table refresh completed successfully");
+
+            setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
         } catch (IOException e) {
             throw new TaskException("Failed to refresh materialized table: " + e.getMessage(), e);
         } catch (InterruptedException e) {
@@ -142,6 +145,6 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
 
     @Override
     public AbstractParameters getParameters() {
-        return null;
+        return parameters;
     }
 }

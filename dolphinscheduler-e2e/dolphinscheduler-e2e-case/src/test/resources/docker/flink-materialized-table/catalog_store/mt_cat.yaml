@@ -1,0 +1,3 @@
+default-database: "mydb"
+type: "test-filesystem"
+path: "file:///catalog_store/"

@@ -1,7 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.flink.gateway.model.impl;
-
-import org.apache.dolphinscheduler.plugin.task.flink.gateway.model.Row;
-import org.apache.dolphinscheduler.plugin.task.flink.gateway.model.SqlGatewayResponse;
+package org.apache.dolphinscheduler.plugin.task.flink.gateway.model;
 
 import java.util.List;
 import java.util.Objects;

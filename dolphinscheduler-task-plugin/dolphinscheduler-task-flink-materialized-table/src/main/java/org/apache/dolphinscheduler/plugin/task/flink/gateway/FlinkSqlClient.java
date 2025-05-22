@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import jline.internal.Log;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,11 +77,14 @@ public class FlinkSqlClient {
         String url = baseUrl + "/v3/sessions";
         HttpPost request = new HttpPost(url);
         request.setHeader("Content-Type", "application/json");
-        request.setEntity(new StringEntity(objectMapper.writeValueAsString(config)));
+        if (config != null) {
+            request.setEntity(new StringEntity(objectMapper.writeValueAsString(config)));
+        }
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity);
+            log.info("open session response: ", responseBody);
             return objectMapper.readTree(responseBody).get("sessionHandle").asText();
         }
     }
@@ -189,7 +194,7 @@ public class FlinkSqlClient {
      * @throws IOException if an I/O error occurs
      */
     public String refreshMaterializedTable(String sessionHandle, String tableName,
-                                           RefreshMaterializedTableRequest request) throws IOException {
+                                           RefreshMaterializedTableRequest request) throws IOException, InterruptedException {
         String url = baseUrl + "/v3/sessions/" + sessionHandle + "/materialized-tables/" + tableName + "/refresh";
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Content-Type", "application/json");
@@ -199,7 +204,13 @@ public class FlinkSqlClient {
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity);
             JsonNode jsonNode = objectMapper.readTree(responseBody);
-            return jsonNode.get("operationHandle").asText();
+
+            Log.info("refresh materialized table response: ", responseBody);
+            String operationHandle = jsonNode.get("operationHandle").asText();
+
+            FetchResultResponseBody fetchResultResponseBody = waitForOperationResult(sessionHandle, operationHandle);
+
+            return fetchResultResponseBody.getResult().get(0).getValues().get(0);
         }
     }
 

@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.flink.gateway.MockFlinkSqlGateway;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,9 +57,9 @@ class FlinkMaterializedTableTaskTest {
         parameters = new FlinkMaterializedTableParameters();
         parameters.setIdentifier("catalog.database.table");
         parameters.setGatewayEndpoint(mockGateway.getBaseUrl());
-        parameters.setInitConfig(new HashMap<>());
-        parameters.setDynamicOptions(new HashMap<>());
-        parameters.setExecutionConfig(new HashMap<>());
+        parameters.setInitConfig("");
+        parameters.setDynamicOptions("");
+        parameters.setExecutionConfig("");
 
         // Set up task context
         when(taskExecutionContext.getTaskParams()).thenReturn(JSONUtils.toJsonString(parameters));

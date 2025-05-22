@@ -54,7 +54,7 @@ class WorkflowFlinkMaterializedTableE2ETest {
     private static final String phone = "15800000000";
     private static final String tenant = System.getProperty("user.name");
     private static final String flinkSqlGatewayUrl = "http://flink-sql-gateway:8083";
-    private static final String materializedTableIdentifier = "catalog.database.table";
+    private static final String materializedTableIdentifier = "mt_cat.mydb.full_users_shops";
 
     private static RemoteWebDriver browser;
 
@@ -110,6 +110,10 @@ class WorkflowFlinkMaterializedTableE2ETest {
                 .<FlinkMaterializedTableTaskForm> addTask(WorkflowForm.TaskType.FLINK_MATERIALIZED_TABLE)
                 .gatewayEndpoint(flinkSqlGatewayUrl)
                 .identifier(materializedTableIdentifier)
+                .staticPartitions("{}")
+                .dynamicOptions("{}")
+                .initConfig("{}")
+                .executionConfig("{}")
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
                 .submit()
