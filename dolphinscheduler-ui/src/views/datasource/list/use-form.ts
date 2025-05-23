@@ -368,6 +368,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'MYSQL',
     defaultPort: 3306
   },
+  MARIADB: {
+    value: 'MARIADB',
+    label: 'MARIADB',
+    defaultPort: 3306
+  },
   POSTGRESQL: {
     value: 'POSTGRESQL',
     label: 'POSTGRESQL',

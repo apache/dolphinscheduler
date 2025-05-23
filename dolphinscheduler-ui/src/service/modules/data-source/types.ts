@@ -17,6 +17,7 @@
 
 type IDataBase =
   | 'MYSQL'
+  | 'MARIADB'
   | 'POSTGRESQL'
   | 'HIVE'
   | 'SPARK'
@@ -46,6 +47,7 @@ type IDataBase =
 
 type IDataBaseLabel =
   | 'MYSQL'
+  | 'MARIADB'
   | 'POSTGRESQL'
   | 'HIVE'
   | 'SPARK'

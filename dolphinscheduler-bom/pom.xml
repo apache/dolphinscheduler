@@ -57,6 +57,7 @@
         <cron-utils.version>9.1.6</cron-utils.version>
         <h2.version>2.2.220</h2.version>
         <mysql-connector.version>8.0.33</mysql-connector.version>
+        <mariadb-jdbc.version>3.5.3</mariadb-jdbc.version>
         <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
         <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
@@ -393,6 +394,12 @@
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql-connector.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${mariadb-jdbc.version}</version>
             </dependency>
 
             <dependency>

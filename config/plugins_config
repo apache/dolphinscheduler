@@ -48,6 +48,7 @@ dolphinscheduler-datasource-hive
 dolphinscheduler-datasource-k8s
 dolphinscheduler-datasource-kyuubi
 dolphinscheduler-datasource-mysql
+dolphinscheduler-datasource-mariadb
 dolphinscheduler-datasource-oceanbase
 dolphinscheduler-datasource-oracle
 dolphinscheduler-datasource-postgresql
