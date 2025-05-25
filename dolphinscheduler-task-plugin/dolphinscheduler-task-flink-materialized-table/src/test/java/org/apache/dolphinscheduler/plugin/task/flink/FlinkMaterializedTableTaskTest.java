@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.flink.gateway.MockFlinkSqlGateway;
 
@@ -93,7 +92,7 @@ class FlinkMaterializedTableTaskTest {
         when(taskExecutionContext.getTaskParams()).thenReturn(JSONUtils.toJsonString(parameters));
         task.init();
 
-        assertThrows(TaskException.class, () -> task.handle(mock(TaskCallBack.class)));
+        assertThrows(FlinkMaterializedTableTaskException.class, () -> task.handle(mock(TaskCallBack.class)));
     }
 
     @Test

@@ -28,142 +28,82 @@ import javax.annotation.Nullable;
  */
 public class RefreshMaterializedTableRequest {
 
-    /**
-     * Dynamic options for the refresh operation.
-     * These options can be modified between refresh operations.
-     */
     private Map<String, String> dynamicOptions;
-
-    /**
-     * Execution configuration for the Flink job.
-     * These parameters control how the refresh job is executed.
-     */
     private Map<String, String> executionConfig;
-
-    /**
-     * Flag indicating whether this is a periodic refresh operation.
-     */
     private Boolean isPeriodic;
-
-    /**
-     * Scheduled time for the refresh operation.
-     * This is only used for periodic refreshes.
-     */
     private @Nullable String scheduleTime;
-
-    /**
-     * Static partition information for targeted refreshes.
-     * Specifies which partitions should be refreshed.
-     */
     private Map<String, String> staticPartitions;
 
     /**
-     * Constructs a new RefreshMaterializedTableRequest with empty maps.
+     * Default constructor initializing all maps.
      */
     public RefreshMaterializedTableRequest() {
-        this.executionConfig = new HashMap<>();
         this.dynamicOptions = new HashMap<>();
+        this.executionConfig = new HashMap<>();
         this.staticPartitions = new HashMap<>();
     }
 
     /**
-     * Gets the dynamic options for the refresh operation.
-     *
-     * @return Map of dynamic options
+     * All-args constructor.
      */
+    public RefreshMaterializedTableRequest(Map<String, String> dynamicOptions,
+                                           Map<String, String> executionConfig,
+                                           Boolean isPeriodic,
+                                           @Nullable String scheduleTime,
+                                           Map<String, String> staticPartitions) {
+        this.dynamicOptions = dynamicOptions != null ? dynamicOptions : new HashMap<>();
+        this.executionConfig = executionConfig != null ? executionConfig : new HashMap<>();
+        this.isPeriodic = isPeriodic;
+        this.scheduleTime = scheduleTime;
+        this.staticPartitions = staticPartitions != null ? staticPartitions : new HashMap<>();
+    }
+
     public Map<String, String> getDynamicOptions() {
         return dynamicOptions;
     }
 
-    /**
-     * Sets the dynamic options for the refresh operation.
-     *
-     * @param dynamicOptions Map of dynamic options to set
-     */
     public void setDynamicOptions(Map<String, String> dynamicOptions) {
         this.dynamicOptions = dynamicOptions;
     }
 
-    /**
-     * Gets the execution configuration for the Flink job.
-     *
-     * @return Map of execution configuration parameters
-     */
     public Map<String, String> getExecutionConfig() {
         return executionConfig;
     }
 
-    /**
-     * Sets the execution configuration for the Flink job.
-     *
-     * @param executionConfig Map of execution configuration parameters to set
-     */
     public void setExecutionConfig(Map<String, String> executionConfig) {
         this.executionConfig = executionConfig;
     }
 
-    /**
-     * Gets whether this is a periodic refresh operation.
-     *
-     * @return true if this is a periodic refresh, false otherwise
-     */
     public Boolean getIsPeriodic() {
         return isPeriodic;
     }
 
-    /**
-     * Sets whether this is a periodic refresh operation.
-     *
-     * @param isPeriodic true for periodic refresh, false otherwise
-     */
     public void setIsPeriodic(Boolean isPeriodic) {
         this.isPeriodic = isPeriodic;
     }
 
-    /**
-     * Gets the scheduled time for the refresh operation.
-     *
-     * @return The scheduled time as a string, or null if not set
-     */
     public String getScheduleTime() {
         return scheduleTime;
     }
 
-    /**
-     * Sets the scheduled time for the refresh operation.
-     *
-     * @param scheduleTime The scheduled time to set
-     */
     public void setScheduleTime(String scheduleTime) {
         this.scheduleTime = scheduleTime;
     }
 
-    /**
-     * Gets the static partition information.
-     *
-     * @return Map of static partition information
-     */
     public Map<String, String> getStaticPartitions() {
         return staticPartitions;
     }
 
-    /**
-     * Sets the static partition information.
-     *
-     * @param staticPartitions Map of static partition information to set
-     */
     public void setStaticPartitions(Map<String, String> staticPartitions) {
         this.staticPartitions = staticPartitions;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
+        if (this == o)
             return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof RefreshMaterializedTableRequest))
             return false;
-        }
         RefreshMaterializedTableRequest that = (RefreshMaterializedTableRequest) o;
         return Objects.equals(dynamicOptions, that.dynamicOptions)
                 && Objects.equals(executionConfig, that.executionConfig)
@@ -179,12 +119,12 @@ public class RefreshMaterializedTableRequest {
 
     @Override
     public String toString() {
-        return "RefreshMaterializedTableRequest{"
-                + "dynamicOptions=" + dynamicOptions
-                + ", executionConfig=" + executionConfig
-                + ", isPeriodic=" + isPeriodic
-                + ", scheduleTime='" + scheduleTime + '\''
-                + ", staticPartitions=" + staticPartitions
-                + '}';
+        return "RefreshMaterializedTableRequest{" +
+                "dynamicOptions=" + dynamicOptions +
+                ", executionConfig=" + executionConfig +
+                ", isPeriodic=" + isPeriodic +
+                ", scheduleTime='" + scheduleTime + '\'' +
+                ", staticPartitions=" + staticPartitions +
+                '}';
     }
 }

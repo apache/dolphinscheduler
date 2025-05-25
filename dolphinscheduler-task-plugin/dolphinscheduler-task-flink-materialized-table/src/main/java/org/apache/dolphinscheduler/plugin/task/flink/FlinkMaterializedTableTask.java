@@ -49,8 +49,6 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
     private FlinkSqlClient flinkSqlClient;
     private String sessionHandle;
 
-    private static final int MAX_RETRIES = 3;
-    private static final long RETRY_INTERVAL_MS = 1000;
     private static final long JOB_STATUS_CHECK_INTERVAL_MS = 5000;
 
     protected FlinkMaterializedTableTask(TaskExecutionContext taskExecutionContext) {
@@ -62,6 +60,9 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         parameters = JSONUtils.parseObject(taskParams, FlinkMaterializedTableParameters.class);
+        if (parameters == null) {
+            throw new IllegalArgumentException("FlinkMaterializedTableParameters parse error, params: " + taskParams);
+        }
         flinkSqlClient = new FlinkSqlClient(parameters.getGatewayEndpoint());
 
         log.info("Initialize flink materialized table task with task params: {}",
@@ -72,42 +73,53 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             sessionHandle = flinkSqlClient.openSession(JSONUtils.toMap(parameters.getInitConfig()));
-
-            RefreshMaterializedTableRequest request = new RefreshMaterializedTableRequest();
-            request.setIsPeriodic(Boolean.TRUE);
-            request.setScheduleTime(DateUtils.formatTimeStamp(taskExecutionContext.getScheduleTime()));
-            request.setDynamicOptions(JSONUtils.toMap(parameters.getDynamicOptions()));
-            request.setExecutionConfig(JSONUtils.toMap(parameters.getExecutionConfig()));
-
+            RefreshMaterializedTableRequest request = buildRefreshRequest();
             String jobId = flinkSqlClient.refreshMaterializedTable(sessionHandle, parameters.getIdentifier(), request);
             log.info("Started refresh operation with jobId: {}", jobId);
 
-            JobStatus jobStatus;
-            do {
-                TimeUnit.MILLISECONDS.sleep(JOB_STATUS_CHECK_INTERVAL_MS);
-                jobStatus = flinkSqlClient.describeJob(sessionHandle, jobId);
-                log.info("Current job status: {}", jobStatus);
-            } while (jobStatus == JobStatus.RUNNING);
-
+            JobStatus jobStatus = waitForJobFinish(jobId);
             if (jobStatus != JobStatus.FINISHED) {
-                throw new TaskException("Job failed with status: " + jobStatus);
+                throw new FlinkMaterializedTableTaskException("Job failed with status: " + jobStatus);
             }
-
             log.info("Materialized table refresh completed successfully");
-
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
         } catch (IOException e) {
-            throw new TaskException("Failed to refresh materialized table: " + e.getMessage(), e);
+            log.error("Failed to refresh materialized table", e);
+            throw new FlinkMaterializedTableTaskException("Failed to refresh materialized table", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new TaskException("Operation interrupted while refreshing materialized table", e);
+            throw new FlinkMaterializedTableTaskException("Failed to refresh materialized table", e);
         } finally {
-            if (flinkSqlClient != null) {
-                try {
-                    flinkSqlClient.close();
-                } catch (IOException e) {
-                    log.error("Failed to close FlinkSqlClient", e);
-                }
+            closeClientQuietly();
+        }
+    }
+
+    private RefreshMaterializedTableRequest buildRefreshRequest() {
+        RefreshMaterializedTableRequest request = new RefreshMaterializedTableRequest();
+        request.setIsPeriodic(Boolean.TRUE);
+        request.setScheduleTime(DateUtils.formatTimeStamp(taskExecutionContext.getScheduleTime()));
+        request.setDynamicOptions(JSONUtils.toMap(parameters.getDynamicOptions()));
+        request.setExecutionConfig(JSONUtils.toMap(parameters.getExecutionConfig()));
+        return request;
+    }
+
+    private JobStatus waitForJobFinish(String jobId) throws IOException, InterruptedException {
+        JobStatus jobStatus;
+        do {
+            TimeUnit.MILLISECONDS.sleep(JOB_STATUS_CHECK_INTERVAL_MS);
+            jobStatus = flinkSqlClient.describeJob(sessionHandle, jobId);
+            log.info("Current job status: {}", jobStatus);
+        } while (jobStatus == JobStatus.RUNNING);
+
+        return jobStatus;
+    }
+
+    private void closeClientQuietly() {
+        if (flinkSqlClient != null) {
+            try {
+                flinkSqlClient.close();
+            } catch (IOException e) {
+                log.error("Failed to close FlinkSqlClient", e);
             }
         }
     }

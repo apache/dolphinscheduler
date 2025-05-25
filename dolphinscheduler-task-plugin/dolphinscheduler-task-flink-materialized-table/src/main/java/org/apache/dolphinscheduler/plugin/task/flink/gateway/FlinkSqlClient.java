@@ -34,8 +34,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import jline.internal.Log;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +82,7 @@ public class FlinkSqlClient {
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity);
-            log.info("open session response: ", responseBody);
+            log.info("open session response: {}", responseBody);
             return objectMapper.readTree(responseBody).get("sessionHandle").asText();
         }
     }
@@ -158,24 +156,6 @@ public class FlinkSqlClient {
     }
 
     /**
-     * Closes a session.
-     *
-     * @param sessionHandle The session handle
-     * @throws IOException if an I/O error occurs
-     */
-    public void closeSession(String sessionHandle) throws IOException {
-        String url = baseUrl + "/v3/sessions/" + sessionHandle;
-        HttpPost request = new HttpPost(url);
-        request.setHeader("Content-Type", "application/json");
-
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new IOException("Failed to close session: " + response.getStatusLine().getReasonPhrase());
-            }
-        }
-    }
-
-    /**
      * Closes the HTTP client.
      *
      * @throws IOException if an I/O error occurs
@@ -202,10 +182,15 @@ public class FlinkSqlClient {
 
         try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
             HttpEntity entity = response.getEntity();
+            int statusCode = response.getStatusLine().getStatusCode();
             String responseBody = EntityUtils.toString(entity);
+            if (statusCode != 200) {
+                log.error("Failed to refresh materialized table, status: {}, response: {}", statusCode, responseBody);
+                throw new IOException("Failed to refresh materialized table, status: " + statusCode);
+            }
             JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-            Log.info("refresh materialized table response: ", responseBody);
+            log.info("refresh materialized table response: {}", responseBody);
             String operationHandle = jsonNode.get("operationHandle").asText();
 
             FetchResultResponseBody fetchResultResponseBody = waitForOperationResult(sessionHandle, operationHandle);
