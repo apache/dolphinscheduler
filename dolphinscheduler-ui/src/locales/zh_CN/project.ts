@@ -897,9 +897,9 @@ export default {
     is_production_tips: 'is production',
     json_format_tips: 'JSON参数格式异常',
     identifier: 'identifier',
-    identifier_tips: '刷新的 Materialized Table 的 identifier',
+    identifier_tips: '用于刷新的表名 [catalog].[database].[table]',
     gateway_endpoint: 'gateway_endpoint',
-    gateway_endpoint_tips: 'Flink SQL Gateway的 endpoint',
+    gateway_endpoint_tips: 'Flink SQL Gateway 地址',
     is_periodic: 'is_periodic',
     is_periodic_tips: '是否周期性刷新',
     dynamic_options: 'dynamic_options',
@@ -909,7 +909,7 @@ export default {
     execution_config: 'execution_config',
     execution_config_tips: '刷新任务的执行配置',
     init_config: 'init_config',
-    init_config_tips: ' session init config'
+    init_config_tips: '创建 session 的初始化配置'
   },
   menu: {
     fav: '收藏组件',

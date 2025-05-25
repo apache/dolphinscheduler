@@ -927,19 +927,20 @@ export default {
     is_production_tips: 'is production',
     json_format_tips: 'Json parameters format is abnormal',
     identifier: 'identifier',
-    identifier_tips: 'identifier',
+    identifier_tips:
+      'The table name to refresh, format: [catalog].[database].[table]',
     gateway_endpoint: 'gateway_endpoint',
-    gateway_endpoint_tips: 'gateway_endpoint',
+    gateway_endpoint_tips: 'Flink SQL Gateway address',
     is_periodic: 'is_periodic',
-    is_periodic_tips: 'is_periodic',
+    is_periodic_tips: 'Whether to refresh periodically',
     dynamic_options: 'dynamic_options',
-    dynamic_options_tips: 'dynamic_options',
+    dynamic_options_tips: 'Dynamic parameters for refresh task',
     static_partitions: 'static_partitions',
-    static_partitions_tips: 'static_partitions',
+    static_partitions_tips: 'Static partitions for refresh task',
     execution_config: 'execution_config',
-    execution_config_tips: 'execution_config',
+    execution_config_tips: 'Execution config for refresh task',
     init_config: 'init_config',
-    init_config_tips: ' session init config'
+    init_config_tips: 'Session initialization config'
   },
   menu: {
     fav: 'Favorites',
