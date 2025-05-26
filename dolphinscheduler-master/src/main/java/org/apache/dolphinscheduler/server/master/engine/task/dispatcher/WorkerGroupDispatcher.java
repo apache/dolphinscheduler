@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
@@ -79,7 +80,10 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
             try (
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
                             TaskExecutorMDCUtils.logWithMDC(taskExecutionRunnable.getId())) {
+                LogUtils.setWorkflowInstanceIdMDC(taskExecutionRunnable.getTaskInstance().getWorkflowInstanceId());
                 doDispatchTask(taskExecutionRunnable);
+            } finally {
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
