@@ -36,6 +36,7 @@ public class MariaDBDataSourceChannelTest {
         Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
                 .thenReturn(dataSourceClient);
         Assertions
-                .assertNotNull(sourceChannel.createPooledDataSourceClient(new MariaDBConnectionParam(), DbType.MARIADB));
+                .assertNotNull(
+                        sourceChannel.createPooledDataSourceClient(new MariaDBConnectionParam(), DbType.MARIADB));
     }
 }
