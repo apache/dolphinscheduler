@@ -22,17 +22,24 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractT
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class TaskPauseLifecycleEvent extends AbstractTaskLifecycleEvent {
 
     private final ITaskExecutionRunnable taskExecutionRunnable;
 
+    private TaskPauseLifecycleEvent(final ITaskExecutionRunnable taskExecutionRunnable, long delayTime) {
+        super(delayTime);
+        this.taskExecutionRunnable = taskExecutionRunnable;
+    }
+
     public static TaskPauseLifecycleEvent of(ITaskExecutionRunnable taskExecutionRunnable) {
-        return new TaskPauseLifecycleEvent(taskExecutionRunnable);
+        return of(taskExecutionRunnable, 0);
+    }
+
+    public static TaskPauseLifecycleEvent of(ITaskExecutionRunnable taskExecutionRunnable, long delayTime) {
+        return new TaskPauseLifecycleEvent(taskExecutionRunnable, delayTime);
     }
 
     @Override
