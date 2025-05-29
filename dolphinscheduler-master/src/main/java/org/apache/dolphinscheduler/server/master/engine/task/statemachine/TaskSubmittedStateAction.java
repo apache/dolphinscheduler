@@ -133,7 +133,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
         log.info("The task[id={}] is submitted and already dispatched, cannot pause, will try to pause it after 5s",
                 taskExecutionRunnable.getId());
         taskExecutionRunnable.getWorkflowEventBus()
-                .publish(TaskPauseLifecycleEvent.of(taskExecutionRunnable, TimeUnit.SECONDS.toSeconds(5)));
+                .publish(TaskPauseLifecycleEvent.of(taskExecutionRunnable, TimeUnit.SECONDS.toMillis(5)));
     }
 
     @Override
@@ -157,7 +157,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
         log.info("The task[id={}] is submitted and already dispatched, cannot kill, will kill it after 5s",
                 taskExecutionRunnable.getId());
         taskExecutionRunnable.getWorkflowEventBus()
-                .publish(TaskKillLifecycleEvent.of(taskExecutionRunnable, TimeUnit.SECONDS.toSeconds(5)));
+                .publish(TaskKillLifecycleEvent.of(taskExecutionRunnable, TimeUnit.SECONDS.toMillis(5)));
     }
 
     @Override
