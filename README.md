@@ -9,13 +9,13 @@
 
 ## About
 
-Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code. It is also provided powerful user interface,
+Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code. It also provided powerful user interface,
 dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available **out of the box**
 
 The key features for DolphinScheduler are as follows:
 
-- Easy to deploy, provide four ways to deploy which including Standalone, Cluster, Docker and Kubernetes.
-- Easy to use, workflow can be created and managed by four ways, which including Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) and Open API
+- Easy to deploy, provide four ways to deploy which includes Standalone, Cluster, Docker and Kubernetes.
+- Easy to use, workflow can be created and managed in four ways, including Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) and Open API
 - Highly reliable and high availability, decentralized architecture with multi-master and multi-worker, native supports horizontal scaling.
 - High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day
 - Cloud Native, DolphinScheduler supports orchestrating multi-cloud/data center workflow, and supports custom task type

@@ -34,6 +34,7 @@ public abstract class AbstractDelayEvent implements IEvent, Delayed {
 
     private static final long DEFAULT_DELAY_TIME = 0;
 
+    // In milliseconds
     protected long delayTime;
 
     @Builder.Default

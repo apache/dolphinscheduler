@@ -426,8 +426,9 @@ CREATE TABLE `t_ds_workflow_definition` (
   `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
+  PRIMARY KEY (`id`),
   UNIQUE KEY `workflow_unique` (`name`,`project_code`) USING BTREE,
+  UNIQUE KEY uniq_workflow_definition_code (code),
   KEY `idx_project_code` (`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 

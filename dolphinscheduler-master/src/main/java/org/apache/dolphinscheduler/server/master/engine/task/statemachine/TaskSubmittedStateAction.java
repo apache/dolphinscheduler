@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
@@ -35,7 +36,8 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueue;
+
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +52,7 @@ import org.springframework.stereotype.Component;
 public class TaskSubmittedStateAction extends AbstractTaskStateAction {
 
     @Autowired
-    private GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
+    private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -107,7 +109,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                     taskInstance.getDelayTime(),
                     remainTimeMills);
         }
-        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecutionRunnable, remainTimeMills);
+        workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }
 
     @Override
@@ -123,12 +125,15 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                                  final ITaskExecutionRunnable taskExecutionRunnable,
                                  final TaskPauseLifecycleEvent taskPauseEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        if (globalTaskDispatchWaitingQueue.markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
+        if (workerGroupDispatcherCoordinator.removeTask(taskExecutionRunnable)) {
             log.info("Success pause task: {} before dispatch", taskExecutionRunnable.getName());
             taskExecutionRunnable.getWorkflowEventBus().publish(TaskPausedLifecycleEvent.of(taskExecutionRunnable));
             return;
         }
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskPauseEvent);
+        log.info("The task[id={}] is submitted and already dispatched, cannot pause, will try to pause it after 5s",
+                taskExecutionRunnable.getId());
+        taskExecutionRunnable.getWorkflowEventBus()
+                .publish(TaskPauseLifecycleEvent.of(taskExecutionRunnable, TimeUnit.SECONDS.toMillis(5)));
     }
 
     @Override
@@ -144,12 +149,15 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                                 final ITaskExecutionRunnable taskExecutionRunnable,
                                 final TaskKillLifecycleEvent taskKillEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        if (globalTaskDispatchWaitingQueue.markTaskExecutionRunnableRemoved(taskExecutionRunnable)) {
-            log.info("Success kill task: {} before dispatch", taskExecutionRunnable.getName());
+        if (workerGroupDispatcherCoordinator.removeTask(taskExecutionRunnable)) {
+            log.info("Success kill task[id={}] before dispatch", taskExecutionRunnable.getId());
             taskExecutionRunnable.getWorkflowEventBus().publish(TaskKilledLifecycleEvent.of(taskExecutionRunnable));
             return;
         }
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskKillEvent);
+        log.info("The task[id={}] is submitted and already dispatched, cannot kill, will kill it after 5s",
+                taskExecutionRunnable.getId());
+        taskExecutionRunnable.getWorkflowEventBus()
+                .publish(TaskKillLifecycleEvent.of(taskExecutionRunnable, TimeUnit.SECONDS.toMillis(5)));
     }
 
     @Override
