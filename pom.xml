@@ -100,6 +100,7 @@
         <build.assembly.skip>true</build.assembly.skip>
         <spotless.skip>false</spotless.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <analyze.skip>false</analyze.skip>
 
         <skipUT>false</skipUT>
     </properties>
@@ -492,6 +493,25 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${maven-dependency-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>analyze-dependencies</id>
+                            <goals>
+                                <goal>analyze-only</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${analyze.skip}</skip>
+                                <ignoredDependencies>
+                                    <!-- Because of SpringBoot auto-configurations, the configuration is happening outside of your application code, so Maven believes these dependencies to be unused -->
+                                    <!-- Static code analysis tools like (maven-dependency-plugin) can not detect runtime dependencies, so you should instruct them about runtime dependencies -->
+                                    <!-- https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin -->
+                                    <ignoredDependency>org.springframework*:*</ignoredDependency>
+                                    <ignoredDependency>org.apache.dolphinscheduler:dolphinscheduler-meter</ignoredDependency>
+                                </ignoredDependencies>
+                                <ignoreNonCompile>true</ignoreNonCompile>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -783,24 +803,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>${maven-dependency-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>analyze-dependencies</id>
-                        <goals>
-                            <goal>analyze-only</goal>
-                        </goals>
-                        <configuration>
-                            <ignoredDependencies>
-                                <!-- Because of SpringBoot auto-configurations, the configuration is happening outside of your application code, so Maven believes these dependencies to be unused -->
-                                <!-- Static code analysis tools like (maven-dependency-plugin) can not detect runtime dependencies, so you should instruct them about runtime dependencies -->
-                                <!-- https://stackoverflow.com/questions/37528928/spring-boot-core-dependencies-seen-as-unused-by-maven-dependency-plugin -->
-                                <ignoredDependency>org.springframework*:*</ignoredDependency>
-                                <ignoredDependency>org.apache.dolphinscheduler:dolphinscheduler-meter</ignoredDependency>
-                            </ignoredDependencies>
-                            <ignoreNonCompile>true</ignoreNonCompile>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
