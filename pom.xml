@@ -524,6 +524,8 @@
                                 <transformers combine.children="append">
                                     <!-- The service transformer is needed to merge META-INF/services files -->
                                     <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                    <!-- Used to remove the MANIFEST.MF conflict warning -->
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
                                 </transformers>
                             </configuration>
                         </execution>
