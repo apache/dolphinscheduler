@@ -145,6 +145,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
           - name: HiveDataSourceE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
+          - name: FlinkMaterializedTableE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.WorkflowFlinkMaterializedTableE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
