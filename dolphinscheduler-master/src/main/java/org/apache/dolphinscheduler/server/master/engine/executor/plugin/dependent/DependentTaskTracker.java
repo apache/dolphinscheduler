@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.engine.executor.plugin.depende
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -111,7 +110,7 @@ public class DependentTaskTracker {
             DependResult dependResult = calculateDependResult();
             log.info("The final Dependent result is: {}", dependResult);
             if (dependResult == DependResult.SUCCESS) {
-                dependentParameters.setVarPool(JSONUtils.toJsonString(dependVarPoolPropertyMap.values()));
+                dependentParameters.setVarPool(new ArrayList<>(dependVarPoolPropertyMap.values()));
                 log.info("Set dependentParameters varPool: {}", dependentParameters.getVarPool());
                 return TaskExecutionStatus.SUCCESS;
             } else {

@@ -56,7 +56,8 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
                              final long delayTimeMills) {
         final String workerGroup = taskExecutionRunnable.getTaskInstance().getWorkerGroup();
         getOrCreateWorkerGroupDispatcher(workerGroup).dispatchTask(taskExecutionRunnable, delayTimeMills);
-        log.info("Success add Task: {} to WorkerGroupDispatcher: {}", taskExecutionRunnable.getId(), workerGroup);
+        log.info("Success add Task[id={}] to WorkerGroupDispatcher[name={}]", taskExecutionRunnable.getId(),
+                workerGroup);
     }
 
     /**
@@ -67,10 +68,10 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
         final String workerGroup = taskExecutionRunnable.getTaskInstance().getWorkerGroup();
         boolean removed = getOrCreateWorkerGroupDispatcher(workerGroup).removeTask(taskExecutionRunnable);
         if (removed) {
-            log.info("Success removed Task: {} from WorkerGroupDispatcher: {}",
+            log.info("Success removed Task[id={}] from WorkerGroupDispatcher[name={}]",
                     taskExecutionRunnable.getId(), workerGroup);
         } else {
-            log.info("Failed to remove Task: {} from WorkerGroupDispatcher: {}, this task has been dispatched",
+            log.info("Failed to remove Task[id={}] from WorkerGroupDispatcher[name={}], this task has been dispatched",
                     taskExecutionRunnable.getId(), workerGroup);
         }
         return removed;
@@ -90,7 +91,7 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
             try {
                 workerGroupDispatcher.close();
             } catch (Exception e) {
-                log.error("close WorkerGroupDispatcher: {} error", workerGroupDispatcher.getName(), e);
+                log.error("close WorkerGroupDispatcher[name={}] error", workerGroupDispatcher.getName(), e);
             }
         }
         log.info("WorkerGroupDispatcherCoordinator closed...");
