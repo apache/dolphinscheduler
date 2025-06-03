@@ -18,10 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.events.TaskDispatchDelayEntryEvent;
+import org.apache.dolphinscheduler.server.master.runner.queue.TimeBasedTaskExecutionRunnableComparableEntry;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import lombok.SneakyThrows;
@@ -31,10 +32,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * The class is used to store {@link ITaskExecutionRunnable} which needs to be dispatched. The {@link ITaskExecutionRunnable}
- * will be stored in {@link TaskDispatchEntryEventBus}, if the {@link ITaskExecutionRunnable}'s delay time is 0, then it will be
+ * will be stored in {@link DelayQueue}, if the {@link ITaskExecutionRunnable}'s delay time is 0, then it will be
  * consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
  * <p>
- * The order of {@link ITaskExecutionRunnable} in the {@link TaskDispatchEntryEventBus} is determined by {@link ITaskExecutionRunnable#compareTo}.
+ * The order of {@link ITaskExecutionRunnable} in the {@link DelayQueue} is determined by {@link ITaskExecutionRunnable#compareTo}.
  */
 @Slf4j
 @Component
@@ -42,8 +43,8 @@ public class GlobalTaskDispatchWaitingQueue {
 
     private final Set<Integer> waitingTaskInstanceIds = ConcurrentHashMap.newKeySet();
 
-    private final TaskDispatchEntryEventBus<TaskDispatchDelayEntryEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> delayQueue =
-            new TaskDispatchEntryEventBus<>();
+    private final DelayQueue<TimeBasedTaskExecutionRunnableComparableEntry> delayQueue =
+            new DelayQueue<>();
 
     /**
      * Submit a {@link ITaskExecutionRunnable} with delay time, if the delay time <= 0 then it can be consumed.
@@ -51,7 +52,7 @@ public class GlobalTaskDispatchWaitingQueue {
     public synchronized void dispatchTaskExecuteRunnableWithDelay(ITaskExecutionRunnable taskExecutionRunnable,
                                                                   long delayTimeMills) {
         waitingTaskInstanceIds.add(taskExecutionRunnable.getTaskInstance().getId());
-        delayQueue.add(new TaskDispatchDelayEntryEvent<>(delayTimeMills, taskExecutionRunnable));
+        delayQueue.add(new TimeBasedTaskExecutionRunnableComparableEntry(delayTimeMills, taskExecutionRunnable));
     }
 
     /**

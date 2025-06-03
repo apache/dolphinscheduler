@@ -615,4 +615,64 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         masterContainer.assertAllResourceReleased();
 
     }
+
+    @Test
+    public void testGlobalFailover_runningWorkflow_takeOverSubWorkflow() {
+        final String yaml = "/it/failover/running_workflowInstance_with_sub_workflow_task_running.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition mainWorkflow = context.getWorkflows().stream()
+                .filter(workflow -> workflow.getName().equals("workflow_with_one_sub_workflow_running")).findFirst()
+                .orElse(null);
+        final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
+                .filter(workflow -> workflow.getName().equals("sub_workflow_running")).findFirst().orElse(null);
+
+        assertThat(mainWorkflow).isNotNull();
+        assertThat(subWorkflow).isNotNull();
+
+        systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryAllWorkflowInstance())
+                            .hasSize(2)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryTaskInstance(mainWorkflow))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                                : TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("sub_workflow_task");
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryTaskInstance(subWorkflow))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                                : TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("fake_task_A");
+                            });
+                });
+
+        assertThat(repository.queryAllTaskInstance()).hasSize(4);
+
+        masterContainer.assertAllResourceReleased();
+
+    }
 }

@@ -229,7 +229,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void tryToDispatchTask(final ITaskExecutionRunnable taskExecutionRunnable) {
         if (isTaskNeedAcquireTaskGroupSlot(taskExecutionRunnable)) {
             acquireTaskGroupSlot(taskExecutionRunnable);
-            log.info("Task{} using taskGroup, success acquire taskGroup slot", taskExecutionRunnable.getName());
+            log.info("Task[name={}] using taskGroup, success acquire taskGroup slot", taskExecutionRunnable.getName());
             return;
         }
         taskExecutionRunnable.getWorkflowEventBus().publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));
@@ -262,7 +262,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void logWarningIfCannotDoAction(final ITaskExecutionRunnable taskExecutionRunnable,
                                               final AbstractLifecycleEvent event) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        log.warn("Task {} state is {} cannot do action on event: {}",
+        log.warn("Task[name={}] state is {} cannot do action on event: {}",
                 taskInstance.getName(),
                 taskInstance.getState(),
                 event);
