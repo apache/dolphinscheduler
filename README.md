@@ -27,10 +27,10 @@ The key features for DolphinScheduler are as follows:
 ## QuickStart
 
 - For quick experience
-  - Want to [start with standalone](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/standalone)
-  - Want to [start with Docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/start/docker)
+  - Want to [start with standalone](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/guide/installation/standalone)
+  - Want to [start with Docker](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/guide/start/docker)
 - For Kubernetes
-  - [Start with Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/kubernetes)
+  - [Start with Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/guide/installation/kubernetes)
 - For Terraform
   - [Start with Terraform](deploy/terraform/README.md) 
 
@@ -39,7 +39,7 @@ The key features for DolphinScheduler are as follows:
 * **Homepage:** Project and workflow overview, including the latest workflow instance and task instance status statistics.
 ![home](images/home.png)
 
-* **Workflow Definition:** Create and manage workflow by drag and drop, easy to build and maintain complex workflow, support [bulk of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/introduction-to-functions_menu/task_menu) out of box.
+* **Workflow Definition:** Create and manage workflow by drag and drop, easy to build and maintain complex workflow, support [bulk of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/introduction-to-functions_menu/task_menu) out of box.
 ![workflow-definition](images/workflow-definition.png)
 
 * **Workflow Tree View:** Abstract tree structure could clearer understanding of the relationship between tasks
