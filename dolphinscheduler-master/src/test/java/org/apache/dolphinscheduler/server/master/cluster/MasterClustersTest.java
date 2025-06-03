@@ -48,6 +48,54 @@ class MasterClustersTest {
     }
 
     @Test
+    void getNormalServersInAscendingOrder() {
+        final String IP_ORDER_1 = "127.0.0.1:8001";
+        final String IP_ORDER_2 = "127.0.0.1:8002";
+
+        MasterClusters masterClusters = new MasterClusters();
+        MasterServerMetadata normalMasterServerMetadata01 = MasterServerMetadata.builder()
+                .address(IP_ORDER_1)
+                .serverStatus(ServerStatus.NORMAL)
+                .build();
+
+        MasterServerMetadata normalMasterServerMetadata02 = MasterServerMetadata.builder()
+                .address(IP_ORDER_2)
+                .serverStatus(ServerStatus.NORMAL)
+                .build();
+
+        // asc
+        masterClusters.onServerAdded(normalMasterServerMetadata01);
+        masterClusters.onServerAdded(normalMasterServerMetadata02);
+
+        assertThat(masterClusters.getNormalServers().get(0).getAddress()).isEqualTo(IP_ORDER_1);
+        assertThat(masterClusters.getNormalServers().get(1).getAddress()).isEqualTo(IP_ORDER_2);
+    }
+
+    @Test
+    void getNormalServersInDescendingOrder() {
+        final String IP_ORDER_1 = "127.0.0.1:8001";
+        final String IP_ORDER_2 = "127.0.0.1:8002";
+
+        MasterClusters masterClusters = new MasterClusters();
+        MasterServerMetadata normalMasterServerMetadata01 = MasterServerMetadata.builder()
+                .address(IP_ORDER_1)
+                .serverStatus(ServerStatus.NORMAL)
+                .build();
+
+        MasterServerMetadata normalMasterServerMetadata02 = MasterServerMetadata.builder()
+                .address(IP_ORDER_2)
+                .serverStatus(ServerStatus.NORMAL)
+                .build();
+
+        //desc
+        masterClusters.onServerAdded(normalMasterServerMetadata02);
+        masterClusters.onServerAdded(normalMasterServerMetadata01);
+
+        assertThat(masterClusters.getNormalServers().get(0).getAddress()).isEqualTo(IP_ORDER_1);
+        assertThat(masterClusters.getNormalServers().get(1).getAddress()).isEqualTo(IP_ORDER_2);
+    }
+
+    @Test
     void registerListener() {
         MasterClusters masterClusters = new MasterClusters();
         AtomicBoolean addServerFlag = new AtomicBoolean(false);
