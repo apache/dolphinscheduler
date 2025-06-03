@@ -38,7 +38,7 @@ public class TaskDispatchEntryEvent<V extends Comparable<V>> extends AbstractDel
     @Override
     public int compareTo(Delayed other)  {
         if (!(other instanceof TaskDispatchEntryEvent)) {
-            throw new RuntimeException("Compared event type is not TaskDispatchPriorityEntryEvent");
+            throw new RuntimeException("The object being compared is not a TaskDispatchEntryEvent.");
         }
 
         @SuppressWarnings("unchecked")
