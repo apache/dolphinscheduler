@@ -15,21 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event;
 
 import static com.google.common.truth.Truth.assertThat;
-
-import org.apache.dolphinscheduler.server.master.runner.events.TaskDispatchPriorityEntryEvent;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
-class TaskDispatchPriorityEntryEventTest {
+class TaskDispatchEntryEventTest {
 
     @Test
     void getDelay() {
-        TaskDispatchPriorityEntryEvent<String> delayEntry = new TaskDispatchPriorityEntryEvent<>(5_000L, "Item");
+        TaskDispatchEntryEvent<String> delayEntry = new TaskDispatchEntryEvent<>(5_000L, "Item");
         assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
                 .isWithin(TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS))
                 .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
@@ -37,9 +35,9 @@ class TaskDispatchPriorityEntryEventTest {
 
     @Test
     void priorityCompare() {
-        TaskDispatchPriorityEntryEvent<String> highPriorityEntry =
-                new TaskDispatchPriorityEntryEvent<>(15_000L, "1_HIGH");
-        TaskDispatchPriorityEntryEvent<String> lowPriorityEntry = new TaskDispatchPriorityEntryEvent<>(5_000L, "3_LOW");
+        TaskDispatchEntryEvent<String> highPriorityEntry =
+                new TaskDispatchEntryEvent<>(15_000L, "1_HIGH");
+        TaskDispatchEntryEvent<String> lowPriorityEntry = new TaskDispatchEntryEvent<>(5_000L, "3_LOW");
         assertThat(highPriorityEntry.compareTo(lowPriorityEntry) < 0).isTrue();
     }
 }

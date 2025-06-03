@@ -15,22 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.TaskDispatchEntryEventBus;
-import org.apache.dolphinscheduler.server.master.runner.events.TaskDispatchPriorityEntryEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchEntryEvent;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TaskDispatchPriorityEventBusTest {
+public class TaskDispatchEntryEventBusTest {
 
-    private TaskDispatchEntryEventBus<TaskDispatchPriorityEntryEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> queue;
+    private TaskDispatchEntryEventBus<TaskDispatchEntryEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> queue;
     private ITaskExecutionRunnable taskExecutionRunnable;
 
     @BeforeEach
@@ -41,17 +40,17 @@ public class TaskDispatchPriorityEventBusTest {
 
     @Test
     public void testAdd() {
-        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchEntryEvent<>(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
 
-        queue.add(new TaskDispatchPriorityEntryEvent<>(2000, taskExecutionRunnable));
+        queue.add(new TaskDispatchEntryEvent<>(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
     }
 
     @Test
     public void testTake() throws InterruptedException {
-        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
-        TaskDispatchPriorityEntryEvent<ITaskExecutionRunnable> entry = queue.take();
+        queue.add(new TaskDispatchEntryEvent<>(1000, taskExecutionRunnable));
+        TaskDispatchEntryEvent<ITaskExecutionRunnable> entry = queue.take();
         assertNotNull(entry);
         assertEquals(0, queue.size());
 
@@ -61,14 +60,14 @@ public class TaskDispatchPriorityEventBusTest {
     public void testSize() {
         assertEquals(0, queue.size());
 
-        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchEntryEvent<>(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
     }
 
     @Test
     public void testClear() {
-        queue.add(new TaskDispatchPriorityEntryEvent<>(1000, taskExecutionRunnable));
-        queue.add(new TaskDispatchPriorityEntryEvent<>(2000, taskExecutionRunnable));
+        queue.add(new TaskDispatchEntryEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchEntryEvent<>(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
 
         queue.clear();

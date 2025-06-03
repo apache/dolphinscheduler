@@ -15,27 +15,43 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.events;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.apache.dolphinscheduler.eventbus.AbstractDelayEvent;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event;
 
 import lombok.Getter;
 
-import org.jetbrains.annotations.NotNull;
+import org.apache.dolphinscheduler.eventbus.AbstractDelayEvent;
+
+import java.util.concurrent.Delayed;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
-public abstract class AbstractTaskDispatchEntryEvent<V extends Comparable<V>> extends AbstractDelayEvent {
+public class TaskDispatchEntryEvent<V extends Comparable<V>> extends AbstractDelayEvent {
 
     protected final V data;
 
-    public AbstractTaskDispatchEntryEvent(long delayTimeMills, V data) {
+    public TaskDispatchEntryEvent(long delayTimeMills, V data) {
         super(delayTimeMills);
         this.data = checkNotNull(data, "data is null");
     }
 
-    public int compareTo(@NotNull AbstractTaskDispatchEntryEvent<V> other) {
+    @Override
+    public int compareTo(Delayed other)  {
+        if (!(other instanceof TaskDispatchEntryEvent)) {
+            throw new RuntimeException("Compared event type is not TaskDispatchPriorityEntryEvent");
+        }
+
+        @SuppressWarnings("unchecked")
+        final TaskDispatchEntryEvent<V> otherEvent = (TaskDispatchEntryEvent<V>) other;
+
+        // there should compare data first for priority
+        if (data != null && otherEvent.data != null) {
+            final int compareResult = data.compareTo(otherEvent.data);
+            if (compareResult != 0) {
+                return compareResult;
+            }
+        }
+
         return super.compareTo(other);
     }
 }

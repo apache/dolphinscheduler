@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
-import org.apache.dolphinscheduler.server.master.runner.events.AbstractTaskDispatchEntryEvent;
 
 import lombok.SneakyThrows;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchEntryEvent;
 
-public class TaskDispatchEntryEventBus<V extends AbstractTaskDispatchEntryEvent<T>, T extends Comparable<T>>
+public class TaskDispatchEntryEventBus<V extends TaskDispatchEntryEvent<T>, T extends Comparable<T>>
         extends
             AbstractDelayEventBus<V> {
 
