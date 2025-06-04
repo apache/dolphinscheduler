@@ -50,7 +50,8 @@ public class TaskKillLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskKillLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecutionRunnable.getName() + ", " +
+                "delayTime=" + delayTime +
                 '}';
     }
 }

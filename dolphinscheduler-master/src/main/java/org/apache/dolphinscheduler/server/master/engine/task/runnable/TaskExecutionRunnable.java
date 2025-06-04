@@ -72,9 +72,6 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
         this.workflowInstance = checkNotNull(taskExecutionRunnableBuilder.getWorkflowInstance());
         this.taskDefinition = checkNotNull(taskExecutionRunnableBuilder.getTaskDefinition());
         this.taskInstance = taskExecutionRunnableBuilder.getTaskInstance();
-        if (isTaskInstanceInitialized()) {
-            initializeTaskExecutionContext();
-        }
     }
 
     @Override
@@ -92,7 +89,6 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
                 .withTaskDefinition(taskDefinition)
                 .withWorkflowInstance(workflowInstance)
                 .build();
-        initializeTaskExecutionContext();
     }
 
     @Override
@@ -108,7 +104,6 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
                 .builder()
                 .withTaskInstance(taskInstance)
                 .build();
-        initializeTaskExecutionContext();
         getWorkflowEventBus().publish(TaskStartLifecycleEvent.of(this));
     }
 
@@ -124,8 +119,6 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
                 .builder()
                 .withTaskInstance(taskInstance)
                 .build();
-        initializeTaskExecutionContext();
-
         getWorkflowEventBus().publish(TaskStartLifecycleEvent.of(this));
     }
 
@@ -139,17 +132,20 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
         getWorkflowEventBus().publish(TaskKillLifecycleEvent.of(this));
     }
 
-    private void initializeTaskExecutionContext() {
-        checkState(isTaskInstanceInitialized(), "The task instance is null, can't initialize TaskExecutionContext.");
+    @Override
+    public void initializeTaskExecutionContext() {
+        checkState(isTaskInstanceInitialized(),
+                "The task instance is not initialized, can't initialize TaskExecutionContext.");
         final TaskExecutionContextCreateRequest request = TaskExecutionContextCreateRequest.builder()
+                .workflowExecutionGraph(workflowExecutionGraph)
                 .workflowDefinition(workflowDefinition)
                 .project(project)
                 .workflowInstance(workflowInstance)
                 .taskDefinition(taskDefinition)
                 .taskInstance(taskInstance)
                 .build();
-        this.taskExecutionContext = applicationContext.getBean(TaskExecutionContextFactory.class)
-                .createTaskExecutionContext(request);
+        this.taskExecutionContext =
+                applicationContext.getBean(TaskExecutionContextFactory.class).createTaskExecutionContext(request);
     }
 
     private boolean takeOverTaskFromExecutor() {

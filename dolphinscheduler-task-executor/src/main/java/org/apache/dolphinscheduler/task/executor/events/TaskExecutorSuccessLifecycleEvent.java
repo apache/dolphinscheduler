@@ -18,7 +18,10 @@
 package org.apache.dolphinscheduler.task.executor.events;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
+
+import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -43,7 +46,7 @@ public class TaskExecutorSuccessLifecycleEvent extends AbstractTaskExecutorLifec
 
     private long endTime;
 
-    private String varPool;
+    private List<Property> varPool;
 
     private Long latestReportTime;
 

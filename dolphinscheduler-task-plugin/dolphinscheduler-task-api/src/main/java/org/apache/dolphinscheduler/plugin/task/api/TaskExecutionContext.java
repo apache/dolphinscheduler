@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -89,7 +90,7 @@ public class TaskExecutionContext implements Serializable {
     private String environmentConfig;
 
     /**
-     * Include local params, global params and system built-in params
+     * Include local params, global params, varpool transport from successors, start-up params and system built-in params
      */
     private Map<String, Property> prepareParamsMap;
 
@@ -113,7 +114,7 @@ public class TaskExecutionContext implements Serializable {
 
     private ResourceContext resourceContext;
 
-    private String varPool;
+    private List<Property> varPool;
 
     private int dryRun;
 
