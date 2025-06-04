@@ -60,7 +60,6 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
         List<MasterServerMetadata> normalMasterServers = masterServerMap.values()
                 .stream()
                 .filter(masterServer -> masterServer.getServerStatus() == ServerStatus.NORMAL)
-                .sorted(MasterServerMetadata::compareTo)
                 .collect(Collectors.toList());
         return UnmodifiableList.unmodifiableList(normalMasterServers);
     }
