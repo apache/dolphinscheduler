@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus.DISPATCH;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
@@ -44,6 +46,8 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -203,9 +207,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
                                               final ITaskExecutionRunnable taskExecutionRunnable) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        final String finalVarPool = VarPoolUtils.mergeVarPoolJsonString(
+        final List<Property> finalVarPool = VarPoolUtils.mergeVarPoolJsonString(
                 Lists.newArrayList(workflowInstance.getVarPool(), taskInstance.getVarPool()));
-        workflowInstance.setVarPool(finalVarPool);
+        workflowInstance.setVarPool(VarPoolUtils.serializeVarPool(finalVarPool));
     }
 
     protected void persistentTaskInstanceSuccessEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -213,7 +217,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setEndTime(taskSuccessEvent.getEndTime());
-        taskInstance.setVarPool(taskSuccessEvent.getVarPool());
+        final List<Property> finalVarPool = VarPoolUtils.mergeVarPoolJsonString(taskInstance.getVarPool(),
+                JSONUtils.toJsonString(taskSuccessEvent.getVarPool()));
+        taskInstance.setVarPool(VarPoolUtils.serializeVarPool(finalVarPool));
         taskInstanceDao.updateById(taskInstance);
     }
 

@@ -21,18 +21,18 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
-import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
 import org.apache.dolphinscheduler.task.executor.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorStateMappings;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
+
+import java.util.ArrayList;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
         this.physicalTask.init();
 
-        this.physicalTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
+        this.physicalTask.getParameters().setVarPool(new ArrayList<>());
         log.info("Set taskVarPool: {} successfully", taskExecutionContext.getVarPool());
     }
 
@@ -121,11 +121,6 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
                 taskExecutionContext);
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: \n{}", taskExecutionContext.getResourceContext());
-
-        // todo: remove this. The cache should be deprecated
-        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperator);
-        log.info("Download upstream files: {} successfully",
-                TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN));
 
         log.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
     }

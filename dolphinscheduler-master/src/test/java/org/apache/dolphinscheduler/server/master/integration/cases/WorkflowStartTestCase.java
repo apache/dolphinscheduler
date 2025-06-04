@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
@@ -578,6 +579,59 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow contains fake task using local param will be overwrite by varpool")
+    public void testStartWorkflow_fakeTask_usingLocalParamOverWriteByVarPool() {
+        final String yaml = "/it/start/workflow_with_local_param_overwrite_by_varpool.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
+                .build();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(runWorkflowCommandParam)
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        List<Property> assertVarPools = Lists.newArrayList(
+                Property.builder().prop("output").direct(Direct.OUT).type(DataType.VARCHAR).value("1").build());
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> {
+                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                                assertThat(VarPoolUtils.deserializeVarPool(workflowInstance.getVarPool()))
+                                        .isEqualTo(assertVarPools);
+                            });
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(3)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
+                                        .isEqualTo(assertVarPools);
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
+                                assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
+                                        .isEqualTo(assertVarPools);
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("C");
+                                assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
+                                        .isEqualTo(assertVarPools);
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });

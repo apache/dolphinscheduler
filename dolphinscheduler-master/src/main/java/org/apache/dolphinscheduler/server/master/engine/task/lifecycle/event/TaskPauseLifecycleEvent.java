@@ -50,7 +50,8 @@ public class TaskPauseLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskPauseLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecutionRunnable.getName() + ", " +
+                "delayTime=" + delayTime +
                 '}';
     }
 }
