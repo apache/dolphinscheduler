@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * workflow instance mapper interface
@@ -142,9 +144,9 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
      * Update the workflow instance state from originState to destState
      */
     int updateWorkflowInstanceState(
-            @Param("workflowInstanceId") Integer workflowInstanceId,
-            @Param("originState") WorkflowExecutionStatus originState,
-            @Param("targetState") WorkflowExecutionStatus targetState);
+                                    @Param("workflowInstanceId") Integer workflowInstanceId,
+                                    @Param("originState") WorkflowExecutionStatus originState,
+                                    @Param("targetState") WorkflowExecutionStatus targetState);
 
     /**
      * update workflow instance by tenantCode
@@ -177,9 +179,9 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
      * @return ExecuteStatusCount list
      */
     List<WorkflowInstanceStatusCountDto> countWorkflowInstanceStateByProjectCodes(
-            @Param("startTime") Date startTime,
-            @Param("endTime") Date endTime,
-            @Param("projectCodes") Collection<Long> projectCodes);
+                                                                                  @Param("startTime") Date startTime,
+                                                                                  @Param("endTime") Date endTime,
+                                                                                  @Param("projectCodes") Collection<Long> projectCodes);
 
     /**
      * query workflow instance by workflowDefinitionCode
@@ -310,12 +312,12 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
      * @return ExecuteStatusCount list
      */
     List<ExecuteStatusCount> countInstanceStateV2(
-            @Param("startTime") Date startTime,
-            @Param("endTime") Date endTime,
-            @Param("projectCode") Long projectCode,
-            @Param("workflowCode") Long workflowCode,
-            @Param("model") Integer model,
-            @Param("projectIds") Set<Integer> projectIds);
+                                                  @Param("startTime") Date startTime,
+                                                  @Param("endTime") Date endTime,
+                                                  @Param("projectCode") Long projectCode,
+                                                  @Param("workflowCode") Long workflowCode,
+                                                  @Param("model") Integer model,
+                                                  @Param("projectIds") Set<Integer> projectIds);
 
     /**
      * query process list by triggerCode
