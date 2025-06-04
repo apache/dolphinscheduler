@@ -325,6 +325,10 @@ public class DependentExecute {
      */
     private WorkflowInstance findLastWorkflowInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
                                                       int testFlag) {
+        WorkflowInstance runningWorkflow = workflowInstanceDao.queryLastRunningWorkflowInterval(definitionCode, dateInterval);
+        if (runningWorkflow != null) {
+            return runningWorkflow;
+        }
 
         WorkflowInstance lastSchedulerWorkflowInstance =
                 workflowInstanceDao.queryLastSchedulerWorkflowInterval(definitionCode, taskCode, dateInterval,
