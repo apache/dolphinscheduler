@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: ['8', '11']
+        java: ['8', '11', '17']
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
