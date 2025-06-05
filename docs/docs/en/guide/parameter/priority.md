@@ -15,7 +15,7 @@ As there are multiple sources of the parameter value, it will raise parameter pr
 In the case of upstream tasks can pass parameters to the downstream, there may be multiple tasks upstream that pass the same parameter name:
 
 * Downstream nodes prefer to use parameters with non-empty values
-* If there are multiple parameters with non-empty values, select the value from the upstream task with the earliest completion time
+* If there are multiple parameters with non-empty values, select the value from the upstream task with the latest completion time
 
 ## Example
 
