@@ -109,6 +109,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                     taskInstance.getDelayTime(),
                     remainTimeMills);
         }
+        taskExecutionRunnable.initializeTaskExecutionContext();
         workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }
 

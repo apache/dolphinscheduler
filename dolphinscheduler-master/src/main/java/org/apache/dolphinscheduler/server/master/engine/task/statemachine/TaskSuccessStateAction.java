@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
@@ -51,7 +52,7 @@ public class TaskSuccessStateAction extends AbstractTaskStateAction {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         final TaskSuccessLifecycleEvent taskSuccessLifecycleEvent = TaskSuccessLifecycleEvent.builder()
                 .taskExecutionRunnable(taskExecutionRunnable)
-                .varPool(taskExecutionRunnable.getTaskInstance().getVarPool())
+                .varPool(VarPoolUtils.deserializeVarPool(taskExecutionRunnable.getTaskInstance().getVarPool()))
                 .endTime(taskExecutionRunnable.getTaskInstance().getEndTime())
                 .build();
         super.succeedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskSuccessLifecycleEvent);

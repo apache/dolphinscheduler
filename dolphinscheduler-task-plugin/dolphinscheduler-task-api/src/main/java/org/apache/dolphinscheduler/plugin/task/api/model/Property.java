@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,33 +53,5 @@ public class Property implements Serializable {
      * value
      */
     private String value;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Property property = (Property) o;
-        return Objects.equals(prop, property.prop)
-                && Objects.equals(value, property.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(prop, value);
-    }
-
-    @Override
-    public String toString() {
-        return "Property{"
-                + "prop='" + prop + '\''
-                + ", direct=" + direct
-                + ", type=" + type
-                + ", value='" + value + '\''
-                + '}';
-    }
 
 }
