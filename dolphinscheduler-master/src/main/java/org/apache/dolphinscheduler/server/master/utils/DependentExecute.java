@@ -155,7 +155,7 @@ public class DependentExecute {
         DependResult result = DependResult.FAILED;
         for (DateInterval dateInterval : dateIntervals) {
             WorkflowInstance workflowInstance =
-                    findLastWorkflowInterval(dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(),
+                    findDependentWorkflowCandidate(dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(),
                             dateInterval, testFlag);
             if (workflowInstance == null) {
                 return DependResult.WAITING;
@@ -314,17 +314,24 @@ public class DependentExecute {
     }
 
     /**
-     * find the last one workflow instance that :
-     * 1. manual run and finish between the interval
-     * 2. schedule run and schedule time between the interval
+     * find the last one workflow instance that:
+     * 1. running workflow instance in the date interval
+     * 2. manual run and finish between the interval
+     * 3. schedule run and schedule time between the interval
      *
      * @param definitionCode definition code
      * @param taskCode task code
      * @param dateInterval   date interval
      * @return workflowInstance
      */
-    private WorkflowInstance findLastWorkflowInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
-                                                      int testFlag) {
+    private WorkflowInstance findDependentWorkflowCandidate(Long definitionCode, Long taskCode,
+                                                            DateInterval dateInterval,
+                                                            int testFlag) {
+        WorkflowInstance runningWorkflow =
+                workflowInstanceDao.queryLastRunningWorkflowInterval(definitionCode, dateInterval);
+        if (runningWorkflow != null) {
+            return runningWorkflow;
+        }
 
         WorkflowInstance lastSchedulerWorkflowInstance =
                 workflowInstanceDao.queryLastSchedulerWorkflowInterval(definitionCode, taskCode, dateInterval,
