@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
-
 import java.io.File;
 import java.nio.file.Path;
 
@@ -35,7 +33,7 @@ public class ExcelUtilsTest {
     private String xlsFilePath;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         xlsFilePath = testFolder.toString();
     }
 
@@ -58,9 +56,8 @@ public class ExcelUtilsTest {
         Assertions.assertTrue(xlsFile.exists());
 
         // Invoke genExcelFile with incorrectContent, will cause RuntimeException
-        Assertions.assertThrows(AlertEmailException.class, () -> {
-            ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath));
 
     }
 
