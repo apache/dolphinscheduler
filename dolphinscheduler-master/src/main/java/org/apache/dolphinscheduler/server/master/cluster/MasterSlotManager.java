@@ -61,7 +61,8 @@ public class MasterSlotManager implements IMasterSlotReBalancer {
     @Override
     public void doReBalance(List<MasterServerMetadata> normalMasterServers) {
 
-        normalMasterServers = normalMasterServers.stream().sorted(MasterServerMetadata::compareTo).collect(Collectors.toList());
+        normalMasterServers =
+                normalMasterServers.stream().sorted(MasterServerMetadata::compareTo).collect(Collectors.toList());
 
         int tmpCurrentSlot = -1;
         for (int i = 0; i < normalMasterServers.size(); i++) {
