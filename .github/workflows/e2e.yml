@@ -84,7 +84,9 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip=true \
           -Dspotless.skip=true \
-          -Pdocker,staging -Ddocker.tag=ci
+          -Pdocker,staging \
+          -Ddocker.tag=ci \
+          -Danalyze.skip=true
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
