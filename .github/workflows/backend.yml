@@ -91,7 +91,8 @@ jobs:
           ./mvnw -B clean install \
                  -Pstaging \
                  -Dmaven.test.skip=true \
-                 -Dspotless.skip=true
+                 -Dspotless.skip=true \
+                 -Danalyze.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v4
