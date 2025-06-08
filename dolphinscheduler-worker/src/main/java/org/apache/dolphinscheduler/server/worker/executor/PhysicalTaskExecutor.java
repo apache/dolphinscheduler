@@ -84,6 +84,11 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
                 taskExecutorEventBus.publish(TaskExecutorRuntimeContextChangedLifecycleEvent.of(taskExecutor));
             }
         });
+
+        // Update the `taskExecutionContext` with the JSON-formatted `varPool`
+        // to pass the OUT-typed parameter(s) to the next task node.
+        String varPoolJSONStringUpdated = JSONUtils.toJsonString(physicalTask.getParameters().getVarPool());
+        taskExecutionContext.setVarPool(varPoolJSONStringUpdated);
     }
 
     @Override
