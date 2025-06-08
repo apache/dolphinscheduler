@@ -1028,6 +1028,13 @@ CREATE TABLE `t_ds_worker_group` (
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
+-- Add tenant_id to worker group
+ALTER TABLE t_ds_worker_group 
+ADD COLUMN tenant_id INT(11) DEFAULT NULL COMMENT 'tenant id',
+ADD INDEX idx_tenant_id (tenant_id),
+ADD CONSTRAINT fk_worker_group_tenant 
+    FOREIGN KEY (tenant_id) REFERENCES t_ds_tenant(id);
+
 -- ----------------------------
 -- Records of t_ds_worker_group
 -- ----------------------------

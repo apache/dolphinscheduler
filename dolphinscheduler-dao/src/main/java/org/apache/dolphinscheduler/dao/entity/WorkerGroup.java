@@ -49,7 +49,16 @@ public class WorkerGroup {
 
     private String description;
 
+    @TableField("tenant_id")
+    private Integer tenantId;
+
+    @TableField(exist = false)
+    private String tenantCode; // for display use only
+
     @TableField(exist = false)
     private boolean systemDefault;
+
+    public Integer getTenantId() { return tenantId; }
+    public void setTenantId(Integer tenantId) { this.tenantId = tenantId; }
 
 }

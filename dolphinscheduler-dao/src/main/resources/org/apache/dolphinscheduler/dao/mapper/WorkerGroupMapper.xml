@@ -28,6 +28,19 @@
         from t_ds_worker_group
         where name = #{name}
     </select>
+    <select id="queryAllWorkerGroupByTenant" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        SELECT * FROM t_ds_worker_group
+        WHERE tenant_id = #{tenantId}
+    </select>
+
+    <select id="queryByIdsAndTenant" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        SELECT * FROM t_ds_worker_group
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND tenant_id = #{tenantId}
+    </select>
 
     <update id="updateAddrListByWorkerGroupName">
         update t_ds_worker_group

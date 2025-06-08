@@ -229,6 +229,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     public Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+
+        Integer tenantId = loginUser.getTenantId();
+
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
         // list to index
@@ -237,12 +240,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Result result = new Result();
         List<WorkerGroupPageDetail> workerGroupPageDetails;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroupPageDetails = getUiWorkerGroupPageDetails(null);
+            workerGroupPageDetails = getUiWorkerGroupPageDetailsByTenant(null, tenantId);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
             workerGroupPageDetails =
-                    getUiWorkerGroupPageDetails(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
+            getUiWorkerGroupPageDetailsByTenant(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids), tenantId);
         }
         List<WorkerGroupPageDetail> resultDataList = new ArrayList<>();
         int total = 0;
@@ -290,11 +293,14 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Map<String, Object> result = new HashMap<>();
         List<WorkerGroupPageDetail> workerGroups;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getUiWorkerGroupPageDetails(null);
+            workerGroups = getUiWorkerGroupPageDetailsByTenant(null, loginUser.getTenantId());
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
-            workerGroups = getUiWorkerGroupPageDetails(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
+                    workerGroups = getUiWorkerGroupPageDetailsByTenant(
+                        ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids),
+                        loginUser.getTenantId()
+                    ); 
         }
         List<String> configWorkerGroupNames = getConfigWorkerGroupPageDetail().stream()
                 .map(WorkerGroupPageDetail::getName)
@@ -307,6 +313,26 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+
+    private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetailsByTenant(List<Integer> ids, Integer tenantId) {
+        List<WorkerGroup> workerGroups;
+    
+        if (ids != null) {
+            workerGroups = ids.isEmpty() ? new ArrayList<>() : workerGroupDao.queryByIdsAndTenant(ids, tenantId);
+        } else {
+            workerGroups = workerGroupDao.queryAllWorkerGroupByTenant(tenantId);
+        }
+    
+        return workerGroups.stream()
+                .map(workerGroup -> {
+                    WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail(workerGroup);
+                    workerGroupPageDetail.setSource(WorkerGroupSource.UI);
+                    workerGroupPageDetail.setSystemDefault(false);
+                    return workerGroupPageDetail;
+                }).collect(Collectors.toList());
+    }
+  
 
     private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetails(List<Integer> ids) {
         List<WorkerGroup> workerGroups;
