@@ -26,7 +26,7 @@ import java.util.concurrent.Delayed;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
-public class TaskDispatchEntryEvent<V extends Comparable<V>> extends AbstractDelayEvent {
+public class TaskReadyForDispatchEvent<V extends Comparable<V>> extends AbstractDelayEvent {
 
     protected final V data;
 
