@@ -15,17 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.rpc;
+package org.apache.dolphinscheduler.extract.common.transportor;
 
-import org.apache.dolphinscheduler.extract.common.ILogService;
-import org.apache.dolphinscheduler.extract.common.service.impl.LogServiceImpl;
+public enum LogResponseStatus {
+    /**
+     * Success status code.
+     */
+    SUCCESS,
 
-import lombok.extern.slf4j.Slf4j;
+    /**
+     * General error status code.
+     */
+    ERROR,
 
-import org.springframework.stereotype.Service;
-
-@Slf4j
-@Service
-public class MasterLogServiceImpl extends LogServiceImpl implements ILogService {
-
+    /**
+     * Log file not found status code.
+     */
+    LOG_FILE_NOT_FOUND,
 }
