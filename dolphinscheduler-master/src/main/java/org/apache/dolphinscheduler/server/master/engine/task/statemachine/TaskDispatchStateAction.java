@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
@@ -44,8 +43,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskDispatchStateAction extends AbstractTaskStateAction {
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
     @Autowired
     private TaskExecutorClient taskExecutorClient;
 

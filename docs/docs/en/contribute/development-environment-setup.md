@@ -128,7 +128,7 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA and click run main function to startup.
 
 > Note: Please check the option `Add dependencies with "provided" scope to classpath` in the startup configuration before starting, so as to avoid the problem that no dependencies can be found during startup.
 

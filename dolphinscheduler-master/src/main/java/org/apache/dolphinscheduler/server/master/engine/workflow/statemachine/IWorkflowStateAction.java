@@ -65,7 +65,7 @@ public interface IWorkflowStateAction {
                           final WorkflowPauseLifecycleEvent workflowPauseEvent);
 
     /**
-     * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowStopLifecycleEvent}.
+     * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowPausedLifecycleEvent}.
      */
     void pausedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                            final WorkflowPausedLifecycleEvent workflowPausedEvent);
