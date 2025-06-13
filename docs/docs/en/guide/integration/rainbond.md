@@ -2,11 +2,29 @@
 
 This section describes the one-click deployment of high availability DolphinScheduler clusters through the [Rainbond](https://www.rainbond.com/) cloud native application management platform. This method is suitable for users who don't know much about complex technologies such as `Kubernetes`, lowering the threshold for deploying DolphinScheduler in `Kubernetes` mode.
 
-## Prerequisites
+## Rainbond Cloud deployment
+
+If you want to deploy "DolphinScheduler" on "Rainbond Cloud" in one click, you can follow the steps below to do so.
+
+- Open the details of the [DolphinScheduler application](https://hub.grapps.cn/marketplace/apps/647)
+
+![DolphinScheduler app desc](../../../../img/rainbond/store-detail.png)
+
+- Log in to your Rainbond Cloud account. If you don't have an account, register one in advance!
+
+![Rainbond Cloud](../../../../img/rainbond/rainbond-cloud.png)
+
+- Select the version for installation
+
+![DolphinScheduler versions](../../../../img/rainbond/versions-dolphinscheduler.png)
+
+## Open-source Rainbond deployment
+
+### Prerequisites
 
 * Available Rainbond cloud native application management platform is a prerequisite，please refer to the official `Rainbond` documentation [Rainbond Quick install](https://www.rainbond.com/docs/quick-start/quick-install)
 
-## DolphinScheduler Cluster One-click Deployment
+### DolphinScheduler Cluster One-click Deployment
 
 1. Go to Rainbond **Platform Management -> App Marketplace -> Open Source App Store** and search for **dolphinScheduler** to find the DolphinScheduler application.
 
@@ -29,7 +47,7 @@ This section describes the one-click deployment of high availability DolphinSche
 
 4. Click the `access` button in the application to access the DolphinScheduler-API components through the domain name provided by Rainbond by default. Default user password is **admin/dolphinscheduler123**.
 
-## API Master Worker Node Telescopic
+### API Master Worker Node Telescopic
 
 DolphinScheduler API、Master、Worker all support scaling multiple instances, ensuring the high availability of the entire service.
 
@@ -41,23 +59,23 @@ To verify `worker` node, enter `DolphinScheduler UI -> Monitoring -> Worker` pag
 
 ![](../../../../img/rainbond/monitor-dolphinscheduler.png)
 
-## Configuration file
+### Configuration file
 
 API and Worker Services share the configuration file `/opt/dolphinscheduler/conf/common.properties`. To modify the configurations, you only need to modify that of the API service.
 
-## How to support Python 3？
+### How to support Python 3？
 
 Worker service is installed with default `Python3`，you can add environment variables `PYTHON_LAUNCHER=/usr/bin/python3`
 
-## How to support Hadoop, Spark, DataX ？
+### How to support Hadoop, Spark, DataX ？
 
 Take `DataX` as an example:
 
 1. Install the plugin。Rainbond Team View -> Plugin -> Install plugin from the App Store -> search `initialization plugin` Install.
 2. Open plugin.enter Worker component -> plugin -> open `initialization plugin` and modify the configuration.
-   * FILE_URL：http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
-   * FILE_PATH：/opt/soft
-   * LOCK_PATH：/opt/soft
+   - FILE_URL：http://datax-opensource.oss-cn-hangzhou.aliyuncs.com/datax.tar.gz
+   - FILE_PATH：/opt/soft
+   - LOCK_PATH：/opt/soft
 3. Update component, the plug-in `Datax` will be downloaded automatically and decompress to `/opt/soft`
    ![](../../../../img/rainbond/plugin.png)
 
