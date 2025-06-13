@@ -26,12 +26,18 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
@@ -63,6 +69,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
@@ -79,7 +86,12 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,6 +117,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
 
@@ -181,6 +194,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private WorkflowDefinitionLogDao workflowDefinitionLogDao;
+
+    @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
     private UserMapper userMapper;
@@ -343,11 +359,11 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .totalCount(30)
                 .build();
         when(workflowDefinitionDao.listingWorkflowDefinition(
-                Mockito.eq(0),
-                Mockito.eq(10),
-                Mockito.eq(""),
-                Mockito.eq(1),
-                Mockito.eq(projectCode))).thenReturn(pageListingResult);
+                eq(0),
+                eq(10),
+                eq(""),
+                eq(1),
+                eq(projectCode))).thenReturn(pageListingResult);
         String user1 = "user1";
         String user2 = "user2";
         when(userMapper.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
@@ -403,7 +419,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         DagData dagData = new DagData(getWorkflowDefinition(), null, null);
-        when(processService.genDagData(Mockito.any())).thenReturn(dagData);
+        when(processService.genDagData(any())).thenReturn(dagData);
 
         Map<String, Object> instanceNotexitRes =
                 processDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, 1L);
@@ -743,7 +759,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // success
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         putMsg(result, Status.SUCCESS, projectCode);
-        when(processService.genDagData(Mockito.any())).thenReturn(new DagData(workflowDefinition, null, null));
+        when(processService.genDagData(any())).thenReturn(new DagData(workflowDefinition, null, null));
         when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(workflowDefinition);
         Map<String, Object> dataNotValidRes =
                 processDefinitionService.getTaskNodeListByDefinitionCode(user, projectCode, 46L);
@@ -774,7 +790,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         workflowDefinitionList.add(workflowDefinition);
 
         when(workflowDefinitionMapper.queryByCodes(defineCodeSet)).thenReturn(workflowDefinitionList);
-        when(processService.genDagData(Mockito.any())).thenReturn(new DagData(workflowDefinition, null, null));
+        when(processService.genDagData(any())).thenReturn(new DagData(workflowDefinition, null, null));
         Project project1 = getProject(projectCode);
         List<Project> projects = new ArrayList<>();
         projects.add(project1);
@@ -881,7 +897,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         DagData dagData = new DagData(getWorkflowDefinition(), null, null);
-        when(processService.genDagData(Mockito.any())).thenReturn(dagData);
+        when(processService.genDagData(any())).thenReturn(dagData);
         processDefinitionService.batchExportWorkflowDefinitionByCodes(user, projectCode, "1", response);
         Assertions.assertNotNull(processDefinitionService.exportWorkflowDagData(workflowDefinition));
     }
@@ -917,13 +933,13 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_IMPORT))
                 .thenReturn(result);
-        when(processService.saveTaskDefine(Mockito.same(user), Mockito.eq(projectCode), Mockito.notNull(),
+        when(processService.saveTaskDefine(Mockito.same(user), eq(projectCode), Mockito.notNull(),
                 Mockito.anyBoolean())).thenReturn(2);
         when(processService.saveWorkflowDefine(Mockito.same(user), Mockito.notNull(), Mockito.notNull(),
                 Mockito.anyBoolean())).thenReturn(1);
         when(
-                processService.saveTaskRelation(Mockito.same(user), Mockito.eq(projectCode), Mockito.anyLong(),
-                        Mockito.eq(1), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean()))
+                processService.saveTaskRelation(Mockito.same(user), eq(projectCode), anyLong(),
+                        eq(1), Mockito.notNull(), Mockito.notNull(), Mockito.anyBoolean()))
                                 .thenReturn(0);
         result = processDefinitionService.importSqlWorkflowDefinition(user, projectCode, mockMultipartFile);
 
@@ -991,8 +1007,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         workflowCreateRequest.setReleaseState(releaseState);
         workflowCreateRequest.setWarningGroupId(warningGroupId);
         workflowCreateRequest.setExecutionType(executionType);
-        when(workflowDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
-        when(workflowDefinitionMapper.insert(Mockito.any())).thenReturn(1);
+        when(workflowDefinitionLogMapper.insert(any())).thenReturn(1);
+        when(workflowDefinitionMapper.insert(any())).thenReturn(1);
         WorkflowDefinition workflowDefinition =
                 processDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest);
 
@@ -1109,7 +1125,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // error update process definition mapper
         workflowUpdateRequest.setName(name);
         when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
-        when(workflowDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
+        when(workflowDefinitionLogMapper.insert(any())).thenReturn(1);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateSingleWorkflowDefinition(user, processDefinitionCode, workflowUpdateRequest));
         Assertions.assertEquals(Status.UPDATE_WORKFLOW_DEFINITION_ERROR.getCode(),
@@ -1253,5 +1269,116 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         taskMainInfo.setTaskName("task");
         taskMainInfos.add(taskMainInfo);
         return taskMainInfos;
+    }
+
+    @Test
+    public void testImportWorkflowDefinitionWithoutProjectAuth() {
+        Project project = this.getProject(projectCode);
+        Map<String, Object> successResult = new HashMap<>();
+        putMsg(successResult, Status.SUCCESS);
+        MultipartFile file = new MockMultipartFile(
+                "file", "", "application/json", "".getBytes());
+        Map<String, Object> checkProjectPermResult1 = new HashMap<>();
+        putMsg(checkProjectPermResult1, Status.USER_NO_OPERATION_PROJECT_PERM);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
+                .thenReturn(checkProjectPermResult1);
+        Map<String, Object> checkProjectPermResult = processDefinitionService.importWorkflowDefinition(
+                user, projectCode, file);
+        Assertions.assertEquals(
+                checkProjectPermResult.get(Constants.STATUS), checkProjectPermResult1.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testImportWorkflowDefinitionWithEmptyFileContent() {
+        Project project = this.getProject(projectCode);
+        Map<String, Object> successResult = new HashMap<>();
+        putMsg(successResult, Status.SUCCESS);
+        MultipartFile file = new MockMultipartFile("file", "", "application/json", "".getBytes());
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
+                .thenReturn(successResult);
+        Map<String, Object> result = processDefinitionService.importWorkflowDefinition(user, projectCode, file);
+        Assertions.assertEquals(Status.DATA_IS_NULL, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testImportWorkflowDefinitionWhenMissImportanceParams() throws URISyntaxException, IOException {
+        Project project = this.getProject(projectCode);
+        Map<String, Object> successResult = new HashMap<>();
+        putMsg(successResult, Status.SUCCESS);
+        // miss workflowTaskRelationList
+        MultipartFile checkImportanceParamsFile = createMultipartFile("workflowImport/check_importance_params.json");
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
+                .thenReturn(successResult);
+        Map<String, Object> checkImportanceParamsResult = processDefinitionService.importWorkflowDefinition(
+                user, projectCode, checkImportanceParamsFile);
+        Assertions.assertEquals(Status.DATA_IS_NULL, checkImportanceParamsResult.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testImportWorkflowDefinitionWhenNameExist() throws URISyntaxException, IOException {
+        Project project = this.getProject(projectCode);
+        Map<String, Object> successResult = new HashMap<>();
+        putMsg(successResult, Status.SUCCESS);
+        MultipartFile checkDuplicateNameFile = createMultipartFile("workflowImport/check_duplicate_name.json");
+        Map<String, Object> verifyNameResult = new HashMap<>();
+        putMsg(verifyNameResult, Status.WORKFLOW_DEFINITION_NAME_EXIST);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_IMPORT))
+                .thenReturn(successResult);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_CREATE))
+                .thenReturn(successResult);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(2);
+        workflowDefinition.setName("workflow1");
+        when(workflowDefinitionMapper.verifyByDefineName(eq(projectCode), anyString()))
+                .thenReturn(workflowDefinition);
+        Map<String, Object> checkDuplicateNameResult = processDefinitionService.importWorkflowDefinition(
+                user, projectCode, checkDuplicateNameFile);
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NAME_EXIST, checkDuplicateNameResult.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testImportWorkflowDefinitionSuccessful() throws URISyntaxException, IOException {
+        Project project = this.getProject(projectCode);
+        Map<String, Object> successResult = new HashMap<>();
+        putMsg(successResult, Status.SUCCESS);
+        MultipartFile successfulFile = createMultipartFile("workflowImport/check_successful.json");
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(),
+                ApiFuncIdentificationConstant.WORKFLOW_IMPORT))
+                        .thenReturn(successResult);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, project.getCode(), WORKFLOW_CREATE))
+                .thenReturn(successResult);
+        when(workflowDefinitionMapper.verifyByDefineName(eq(projectCode), anyString()))
+                .thenReturn(null);
+        when(taskDefinitionMapper.batchInsert(anyList())).thenReturn(1);
+        when(taskDefinitionLogMapper.batchInsert(anyList())).thenReturn(1);
+        WorkflowDefinition successWorkflowDef = new WorkflowDefinition();
+        successWorkflowDef.setCode(123);
+        when(workflowDefinitionMapper.queryByCode(anyLong())).thenReturn(successWorkflowDef);
+        when(scheduleMapper.insert(any())).thenReturn(1);
+        when(processService.saveWorkflowDefine(eq(user), any(), eq(true), eq(true)))
+                .thenReturn(Constants.VERSION_FIRST);
+        Map<String, Object> successfulResul = processDefinitionService.importWorkflowDefinition(
+                user, 1L, successfulFile);
+        Assertions.assertEquals(Status.SUCCESS, successfulResul.get(Constants.STATUS));
+    }
+
+    private MultipartFile createMultipartFile(String filePath) throws URISyntaxException, IOException {
+        Path path = Paths.get(getClass().getClassLoader().getResource(filePath).toURI());
+        byte[] content = Files.readAllBytes(path);
+
+        // 2. 创建MockMultipartFile对象
+        MultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "",
+                "application/json",
+                content);
+        return multipartFile;
     }
 }

@@ -89,6 +89,3 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-
-metrics:
-  enabled: true

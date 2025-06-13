@@ -28,4 +28,8 @@ public class TaskInstanceLogPageQueryResponse {
 
     private String logContent;
 
+    private LogResponseStatus code = LogResponseStatus.SUCCESS;
+
+    private String message;
+
 }

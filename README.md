@@ -9,13 +9,13 @@
 
 ## About
 
-Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code. It is also provided powerful user interface,
+Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code. It also provided powerful user interface,
 dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available **out of the box**
 
 The key features for DolphinScheduler are as follows:
 
-- Easy to deploy, provide four ways to deploy which including Standalone, Cluster, Docker and Kubernetes.
-- Easy to use, workflow can be created and managed by four ways, which including Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) and Open API
+- Easy to deploy, provide four ways to deploy which includes Standalone, Cluster, Docker and Kubernetes.
+- Easy to use, workflow can be created and managed in four ways, including Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) and Open API
 - Highly reliable and high availability, decentralized architecture with multi-master and multi-worker, native supports horizontal scaling.
 - High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day
 - Cloud Native, DolphinScheduler supports orchestrating multi-cloud/data center workflow, and supports custom task type
@@ -27,10 +27,10 @@ The key features for DolphinScheduler are as follows:
 ## QuickStart
 
 - For quick experience
-  - Want to [start with standalone](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/standalone)
-  - Want to [start with Docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/start/docker)
+  - Want to [start with standalone](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/guide/installation/standalone)
+  - Want to [start with Docker](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/guide/start/docker)
 - For Kubernetes
-  - [Start with Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/kubernetes)
+  - [Start with Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/guide/installation/kubernetes)
 - For Terraform
   - [Start with Terraform](deploy/terraform/README.md) 
 
@@ -39,7 +39,7 @@ The key features for DolphinScheduler are as follows:
 * **Homepage:** Project and workflow overview, including the latest workflow instance and task instance status statistics.
 ![home](images/home.png)
 
-* **Workflow Definition:** Create and manage workflow by drag and drop, easy to build and maintain complex workflow, support [bulk of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/introduction-to-functions_menu/task_menu) out of box.
+* **Workflow Definition:** Create and manage workflow by drag and drop, easy to build and maintain complex workflow, support [bulk of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/introduction-to-functions_menu/task_menu) out of box.
 ![workflow-definition](images/workflow-definition.png)
 
 * **Workflow Tree View:** Abstract tree structure could clearer understanding of the relationship between tasks

@@ -36,29 +36,29 @@ workflows:
     userId: 1
     executionType: PARALLEL
 
-workflowInstance:
-  id: 1
-  name: workflow_with_one_fake_task_success-20240816071251690
-  workflowDefinitionCode: 1
-  workflowDefinitionVersion: 1
-  projectCode: 1
-  state: FAILURE
-  recovery: NO
-  startTime: 2024-08-16 07:12:52
-  endTime: 2024-08-16 07:12:57
-  runTimes: 1
-  host: 127.0.0.1:5678
-  commandType: START_PROCESS
-  commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
-  taskDependType: TASK_POST
-  commandStartTime: 2024-08-16 07:12:52
-  isSubWorkflow: NO
-  executorId: 1
-  historyCmd: START_PROCESS
-  workerGroup: default
-  globalParams: '[]'
-  varPool: '[]'
-  dryRun: 0
+workflowInstances:
+  - id: 1
+    name: workflow_with_one_fake_task_success-20240816071251690
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
+    projectCode: 1
+    state: FAILURE
+    recovery: NO
+    startTime: 2024-08-16 07:12:52
+    endTime: 2024-08-16 07:12:57
+    runTimes: 1
+    host: 127.0.0.1:5678
+    commandType: START_PROCESS
+    commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
+    taskDependType: TASK_POST
+    commandStartTime: 2024-08-16 07:12:52
+    isSubWorkflow: NO
+    executorId: 1
+    historyCmd: START_PROCESS
+    workerGroup: default
+    globalParams: '[]'
+    varPool: '[]'
+    dryRun: 0
 
 taskInstances:
   - id: 1

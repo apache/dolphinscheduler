@@ -24,7 +24,12 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
@@ -555,4 +560,119 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         masterContainer.assertAllResourceReleased();
     }
 
+    @Test
+    public void testGlobalFailover_runningWorkflow_fromAnotherMaster() {
+        final String yaml = "/it/failover/running_workflowInstance_from_another_master.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
+
+        final String masterFailoverNodePath = RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(
+                "127.0.0.1:15678");
+        // wait failover process
+        await()
+                .atMost(Duration.ofMinutes(3))
+                .untilAsserted(() -> {
+                    assertThat(registryClient.exists(masterFailoverNodePath)).isTrue();
+                });
+
+        // check workflow's status and can stop it
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_running-20250322201900000");
+
+                                final WorkflowInstanceStopResponse stopResponse = Clients
+                                        .withService(IWorkflowControlClient.class)
+                                        .withHost(workflowInstance.getHost())
+                                        .stopWorkflowInstance(
+                                                new WorkflowInstanceStopRequest(workflowInstance.getId()));
+
+                                assertThat((stopResponse != null && stopResponse.isSuccess())).isTrue();
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.STOP);
+                                assertThat(workflowInstance.getName())
+                                        .isEqualTo("workflow_with_one_fake_task_running-20250322201900000");
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+
+    }
+
+    @Test
+    public void testGlobalFailover_runningWorkflow_takeOverSubWorkflow() {
+        final String yaml = "/it/failover/running_workflowInstance_with_sub_workflow_task_running.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition mainWorkflow = context.getWorkflows().stream()
+                .filter(workflow -> workflow.getName().equals("workflow_with_one_sub_workflow_running")).findFirst()
+                .orElse(null);
+        final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
+                .filter(workflow -> workflow.getName().equals("sub_workflow_running")).findFirst().orElse(null);
+
+        assertThat(mainWorkflow).isNotNull();
+        assertThat(subWorkflow).isNotNull();
+
+        systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryAllWorkflowInstance())
+                            .hasSize(2)
+                            .anySatisfy(workflowInstance -> {
+                                assertThat(workflowInstance.getState())
+                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryTaskInstance(mainWorkflow))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                                : TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("sub_workflow_task");
+                            });
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryTaskInstance(subWorkflow))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                                : TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("fake_task_A");
+                            });
+                });
+
+        assertThat(repository.queryAllTaskInstance()).hasSize(4);
+
+        masterContainer.assertAllResourceReleased();
+
+    }
 }
