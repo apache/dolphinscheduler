@@ -94,12 +94,9 @@
   DolphinScheduler also provides an Etcd-based registry implementation. The Etcd-based registry, implemented in the module `dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd`, leverages the Jetcd client library to interact with an Etcd cluster. This implementation provides several key functionalities:
 
   - **Event Monitoring**
-
     - **Watch API**
       The `EtcdRegistry` class uses Etcd’s Watch API to observe changes (creation, update, or deletion) on specified keys or key prefixes. Low-level Etcd watch events are translated into DolphinScheduler’s `Event` objects, triggering `SubscribeListener` callbacks for real-time notifications.
-
   - **Distributed Lock**
-
     - **Lease-Based Locking**
       The `EtcdKeepAliveLeaseManager` grants a lease with a specified TTL, continuously kept alive via Etcd’s keep-alive mechanism. If the client disconnects, the lease expires automatically, releasing the lock without manual intervention.
 
@@ -222,9 +219,7 @@ If there is a task failure in the workflow that reaches the maximum retry times,
 In the early schedule design, if there is no priority design and use the fair scheduling, the task submitted first may complete at the same time with the task submitted later, thus invalid the priority of process or task. So we have re-designed this, and the following is our current design:
 
 - According to **the priority of different process instances** prior over **priority of the same process instance** prior over **priority of tasks within the same process** prior over **tasks within the same process**, process task submission order from highest to Lowest.
-
   - The specific implementation is to parse the priority according to the JSON of the task instance, and then save the **process instance priority_process instance id_task priority_task id** information to the ZooKeeper task queue. When obtain from the task queue, we can get the highest priority task by comparing string.
-
     - The priority of the process definition is to consider that some processes need to process before other processes. Configure the priority when the process starts or schedules. There are 5 levels in total, which are HIGHEST, HIGH, MEDIUM, LOW, and LOWEST. As shown below
 
       <p align="center">
