@@ -29,9 +29,11 @@ services:
     networks:
       - e2e
     depends_on:
+      - jobmanager
+      - taskmanager
       - flink-sql-gateway
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
       timeout: 5s
       retries: 120
@@ -41,13 +43,13 @@ services:
       - "8081:8081"
     networks:
       - e2e
-    entrypoint: ['bash', '-c', '/docker/download-testfilesystem.sh && /docker-entrypoint.sh jobmanager']
+    entrypoint: ['bash', '-c', '/bin/bash /docker/download-testfilesystem.sh && /docker-entrypoint.sh jobmanager']
     environment:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
     volumes:
-      - ./download-testfilesystem.sh:/docker/download-testfilesystem.sh:rw
+      - ./download-testfilesystem.sh:/docker/download-testfilesystem.sh:rw,Z
       - ./catalog_store:/catalog_store:rw
 
   taskmanager:
@@ -56,7 +58,7 @@ services:
       - jobmanager
     networks:
       - e2e
-    entrypoint: ['bash', '-c', '/docker/download-testfilesystem.sh && /docker-entrypoint.sh taskmanager']
+    entrypoint: ['bash', '-c', '/bin/bash /docker/download-testfilesystem.sh && /docker-entrypoint.sh taskmanager']
     scale: 1
     environment:
       - |
@@ -64,13 +66,14 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 2
     volumes:
-      - ./download-testfilesystem.sh:/docker/download-testfilesystem.sh:rw
+      - ./download-testfilesystem.sh:/docker/download-testfilesystem.sh:rw,Z
       - ./catalog_store:/catalog_store:rw
   flink-sql-gateway:
     image: flink:2.0
     ports:
       - "8083:8083"
-    entrypoint: ['bash', '-c', '/docker/download-testfilesystem.sh &&  /docker-entrypoint.sh bin/sql-gateway.sh start-foreground']
+    entrypoint: ['bash', '-c', '/bin/bash /docker/download-testfilesystem.sh &&  /docker-entrypoint.sh bin/sql-gateway.sh start-foreground']
+    hostname: flink-sql-gateway
     networks:
       - e2e
     depends_on:
@@ -85,7 +88,7 @@ services:
         table.catalog-store.kind: file
         table.catalog-store.file.path: /catalog_store
     volumes:
-      - ./download-testfilesystem.sh:/docker/download-testfilesystem.sh:rw
+      - ./download-testfilesystem.sh:/docker/download-testfilesystem.sh:rw,Z
       - ./catalog_store:/catalog_store:rw
 networks:
   e2e:

@@ -84,6 +84,7 @@ dolphinscheduler-task-dms
 dolphinscheduler-task-dvc
 dolphinscheduler-task-emr
 dolphinscheduler-task-flink
+dolphinscheduler-task-flink-materialized-table
 dolphinscheduler-task-flink-stream
 dolphinscheduler-task-hivecli
 dolphinscheduler-task-http
