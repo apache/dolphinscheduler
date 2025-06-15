@@ -2,7 +2,7 @@
 
 ## Overview
 
-This node is used to perform http type tasks and also supports http request validation and other functions.
+HTTP nodes are used to perform HTTP-type tasks, supporting request methods such as GET, POST, PUT and DELETE, and providing flexible request parameter configuration and response verification functions. This node can be used in scenarios such as calling REST APIs, sending HTTP requests, and integrating with external systems.
 
 ## Create Task
 
