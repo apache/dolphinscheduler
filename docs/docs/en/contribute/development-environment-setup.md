@@ -60,8 +60,8 @@ DolphinScheduler will release new Docker images after it released, you could fin
 
 - If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
 
-> -Pstaging contains plugins, suitable for development and testing as well as offline deployment without a network environment;  
-> -Prelease does not contain plugins, suitable for production environments, and plugins can be downloaded on demand from a network that can access plugins.
+> -Pstaging contains plugins, suitable for development and testing as well as offline deployment without a network environment
+> -Prelease does not contain plugins, suitable for production environments, and plugins can be downloaded on demand from a network that can access plugins
 
 ```shell
 cd dolphinscheduler
