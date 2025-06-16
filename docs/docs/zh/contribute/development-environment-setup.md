@@ -57,8 +57,8 @@ DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Do
 
 * 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
 
->-Pstaging 包含插件，适合开发和测试以及无网络环境离线部署；  
--Prelease 不包含插件，适合生产环境，有能访问插件的网络可以按需下载；
+> -Pstaging 包含插件，适合开发和测试以及无网络环境离线部署；  
+> -Prelease 不包含插件，适合生产环境，有能访问插件的网络可以按需下载；
 
 ```shell
 cd dolphinscheduler
