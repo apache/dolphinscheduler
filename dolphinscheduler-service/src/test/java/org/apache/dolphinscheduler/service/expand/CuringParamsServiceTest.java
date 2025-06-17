@@ -66,13 +66,7 @@ public class CuringParamsServiceTest {
     private CuringParamsServiceImpl dolphinSchedulerCuringGlobalParams;
 
     @Mock
-    private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
-
-    @Mock
     private ProjectParameterMapper projectParameterMapper;
-
-    @InjectMocks
-    private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
 
     private final Map<String, String> globalParamMap = new HashMap<>();
     private final Map<String, Property> paramMap = new HashMap<>();
@@ -89,18 +83,6 @@ public class CuringParamsServiceTest {
                 .thenReturn("2022-06-26");
         String result = curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, paramMap);
         Assertions.assertNotNull(result);
-    }
-
-    @Test
-    public void testTimeFunctionNeedExpand() {
-        boolean result = curingGlobalParamsService.timeFunctionNeedExpand(placeHolderName);
-        Assertions.assertFalse(result);
-    }
-
-    @Test
-    public void testTimeFunctionExtension() {
-        String result = curingGlobalParamsService.timeFunctionExtension(1, "", placeHolderName);
-        Assertions.assertNull(result);
     }
 
     @Test

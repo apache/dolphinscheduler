@@ -57,13 +57,16 @@ DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Do
 
 * 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
 
+> -Pstaging 包含插件，适合开发和测试以及无网络环境离线部署
+> -Prelease 不包含插件，适合生产环境，有能访问插件的网络可以按需下载
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
        -Dspotless.skip=true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
@@ -77,7 +80,7 @@ cd dolphinscheduler
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 * 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件

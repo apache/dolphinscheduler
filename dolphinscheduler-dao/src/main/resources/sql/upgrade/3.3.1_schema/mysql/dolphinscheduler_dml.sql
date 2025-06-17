@@ -13,23 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.service.expand;
-
-public interface TimePlaceholderResolverExpandService {
-
-    /**
-     * check is need expand function
-     * @param placeholderName
-     * @return
-     */
-    boolean timeFunctionNeedExpand(String placeholderName);
-
-    /**
-     * time function extension
-     * @param placeholderName
-     * @return
-     */
-    String timeFunctionExtension(Integer workflowInstanceId, String timeZone, String placeholderName);
-}
+*/

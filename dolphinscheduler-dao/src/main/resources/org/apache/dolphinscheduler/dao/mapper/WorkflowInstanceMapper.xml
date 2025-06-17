@@ -50,6 +50,22 @@
         </if>
         order by id asc
     </select>
+    <select id="queryMainWorkflowByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_instance
+        where is_sub_workflow=0
+        <if test="host != null and host != ''">
+            and host=#{host}
+        </if>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        order by id asc
+    </select>
     <select id="queryNeedFailoverWorkflowInstanceHost" resultType="String">
         select distinct host
         from t_ds_workflow_instance
@@ -231,6 +247,24 @@
         on t1.id = t2.workflow_instance_id and t2.task_code=#{taskCode}
         </if>
         order by t1.end_time desc limit 1
+    </select>
+
+    <select id="queryLastRunningWorkflow" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_instance
+        where workflow_definition_code=#{workflowDefinitionCode}
+        <if test="states !=null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="startTime!=null and endTime != null ">
+            and ((schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime})
+            or (start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}))
+        </if>
+        order by start_time desc limit 1
     </select>
 
     <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">

@@ -28,7 +28,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -68,11 +67,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
         List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
         return args.stream().collect(Collectors.joining(" "));
-    }
-
-    @Override
-    protected Map<String, String> getProperties() {
-        return taskExecutionContext.getDefinedParams();
     }
 
     @Override

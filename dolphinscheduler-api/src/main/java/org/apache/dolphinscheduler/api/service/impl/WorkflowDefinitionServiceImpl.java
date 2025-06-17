@@ -1576,6 +1576,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);
+            // not allow to import an online schedule
+            schedule.setReleaseState(ReleaseState.OFFLINE);
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
                 log.error(

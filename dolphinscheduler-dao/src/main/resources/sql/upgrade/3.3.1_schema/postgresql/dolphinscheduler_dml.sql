@@ -13,22 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.service.expand;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class TimePlaceholderResolverExpandServiceImpl implements TimePlaceholderResolverExpandService {
-
-    @Override
-    public boolean timeFunctionNeedExpand(String placeholderName) {
-        return false;
-    }
-
-    @Override
-    public String timeFunctionExtension(Integer workflowInstanceId, String timeZone, String placeholderName) {
-        return null;
-    }
-}
+*/

@@ -68,6 +68,8 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
     WorkflowInstance queryLastManualWorkflowInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
                                                      int testFlag);
 
+    WorkflowInstance queryLastRunningWorkflowInterval(Long definitionCode, DateInterval dateInterval);
+
     /**
      * query first schedule workflow instance
      *
