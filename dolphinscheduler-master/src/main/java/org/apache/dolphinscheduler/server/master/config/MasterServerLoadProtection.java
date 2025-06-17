@@ -31,9 +31,20 @@ public class MasterServerLoadProtection extends BaseServerLoadProtection {
     private final int maxConcurrentWorkflowInstances;
     private final IWorkflowRepository workflowRepository;
 
-    public MasterServerLoadProtection(IWorkflowRepository workflowRepository, int maxConcurrentWorkflowInstances) {
+    public MasterServerLoadProtection(IWorkflowRepository workflowRepository,
+                                      int maxConcurrentWorkflowInstances,
+                                      double maxSystemCpuUsagePercentageThresholds,
+                                      double maxJvmCpuUsagePercentageThresholds,
+                                      double maxSystemMemoryUsagePercentageThresholds,
+                                      double maxDiskUsagePercentageThresholds,
+                                      boolean enabled) {
         this.workflowRepository = workflowRepository;
         this.maxConcurrentWorkflowInstances = maxConcurrentWorkflowInstances;
+        this.maxSystemCpuUsagePercentageThresholds = maxSystemCpuUsagePercentageThresholds;
+        this.maxJvmCpuUsagePercentageThresholds = maxJvmCpuUsagePercentageThresholds;
+        this.maxSystemMemoryUsagePercentageThresholds = maxSystemMemoryUsagePercentageThresholds;
+        this.maxDiskUsagePercentageThresholds = maxDiskUsagePercentageThresholds;
+        this.enabled = enabled;
     }
 
     @Override

@@ -32,12 +32,28 @@ public class MasterServerLoadProtectionConfig {
     @Bean
     public MasterServerLoadProtection masterServerLoadProtection(
                                                                  IWorkflowRepository workflowRepository,
-                                                                 @Value("${master.server-load-protection.max-concurrent-workflow-instances:2147483647}") int maxConcurrentWorkflowInstances) {
+                                                                 @Value("${master.server-load-protection.max-concurrent-workflow-instances:2147483647}") int maxConcurrentWorkflowInstances,
+                                                                 @Value("${master.server-load-protection.max-system-cpu-usage-percentage-thresholds:0.7}") double maxSystemCpuUsagePercentageThresholds,
+                                                                 @Value("${master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds:0.7}") double maxJvmCpuUsagePercentageThresholds,
+                                                                 @Value("${master.server-load-protection.max-system-memory-usage-percentage-thresholds:0.7}") double maxSystemMemoryUsagePercentageThresholds,
+                                                                 @Value("${master.server-load-protection.max-disk-usage-percentage-thresholds:0.7}") double maxDiskUsagePercentageThresholds,
+                                                                 @Value("${master.server-load-protection.enabled:true}") boolean enabled) {
         MasterServerLoadProtection protection =
-                new MasterServerLoadProtection(workflowRepository, maxConcurrentWorkflowInstances);
+                new MasterServerLoadProtection(workflowRepository,
+                        maxConcurrentWorkflowInstances,
+                        maxSystemCpuUsagePercentageThresholds,
+                        maxJvmCpuUsagePercentageThresholds,
+                        maxSystemMemoryUsagePercentageThresholds,
+                        maxDiskUsagePercentageThresholds,
+                        enabled);
         log.info(
-                "Initialized MasterServerLoadProtection with IWorkflowRepository and maxConcurrentWorkflowInstances={}",
-                maxConcurrentWorkflowInstances);
+                "Initialized MasterServerLoadProtection with IWorkflowRepository and maxConcurrentWorkflowInstances={}, "
+                        +
+                        "maxSystemCpuUsagePercentageThresholds={}, maxJvmCpuUsagePercentageThresholds={}, " +
+                        "maxSystemMemoryUsagePercentageThresholds={}, maxDiskUsagePercentageThresholds={}, enabled={}",
+                maxConcurrentWorkflowInstances, maxSystemCpuUsagePercentageThresholds,
+                maxJvmCpuUsagePercentageThresholds,
+                maxSystemMemoryUsagePercentageThresholds, maxDiskUsagePercentageThresholds, enabled);
         return protection;
     }
 }
