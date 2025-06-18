@@ -40,6 +40,7 @@ class MasterServerLoadProtectionTest {
     @BeforeEach
     public void setUp() {
         mockRepository = Mockito.mock(IWorkflowRepository.class);
+        Mockito.when(mockRepository.getAll()).thenReturn(Collections.emptyList());
     }
 
     @Test
