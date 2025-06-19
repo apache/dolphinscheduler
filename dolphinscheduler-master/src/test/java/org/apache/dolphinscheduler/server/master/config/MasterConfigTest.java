@@ -24,8 +24,8 @@ import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerType;
-
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -53,6 +53,7 @@ public class MasterConfigTest {
 
     @TestConfiguration
     static class TestBeans {
+
         @Bean
         public IWorkflowRepository workflowRepository() {
             return mock(IWorkflowRepository.class);
