@@ -81,7 +81,10 @@ export default defineComponent({
   render() {
     const { t } = useI18n()
     return (
-      <Card title={t('resource.file.file_details')}>
+      <Card
+          title={t('resource.file.file_details')}
+          style={{ height: '100%' }}
+      >
         {this.resourceViewRef.isReady.value ? (
           <div class={styles['file-edit-content']}>
             <h2>
