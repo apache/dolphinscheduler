@@ -123,6 +123,7 @@
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
+        <brace-expansion.version>2.0.1</brace-expansion.version>
     </properties>
 
     <dependencyManagement>
@@ -946,6 +947,12 @@
                 <groupId>org.javadelight</groupId>
                 <artifactId>delight-nashorn-sandbox</artifactId>
                 <version>${nashorn-sandbox.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>brace-expansion</artifactId>
+                <version>${brace-expansion.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
