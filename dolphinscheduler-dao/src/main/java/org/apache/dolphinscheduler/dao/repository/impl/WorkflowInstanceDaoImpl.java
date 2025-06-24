@@ -120,6 +120,16 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
                 testFlag);
     }
 
+    @Override
+    public WorkflowInstance queryLastRunningWorkflowInterval(Long definitionCode, DateInterval dateInterval) {
+        int[] runningStateArray = new int[]{WorkflowExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+                WorkflowExecutionStatus.RUNNING_EXECUTION.ordinal(),
+                WorkflowExecutionStatus.READY_PAUSE.ordinal(),
+                WorkflowExecutionStatus.READY_STOP.ordinal()};
+        return mybatisMapper.queryLastRunningWorkflow(definitionCode, dateInterval.getStartTime(),
+                dateInterval.getEndTime(), runningStateArray);
+    }
+
     /**
      * query first schedule process instance
      *

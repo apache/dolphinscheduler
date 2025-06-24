@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.expand;
+package org.apache.dolphinscheduler.extract.common.transportor;
 
-public interface TimePlaceholderResolverExpandService {
+public enum LogResponseStatus {
+    /**
+     * Success status code.
+     */
+    SUCCESS,
 
     /**
-     * check is need expand function
-     * @param placeholderName
-     * @return
+     * General error status code.
      */
-    boolean timeFunctionNeedExpand(String placeholderName);
+    ERROR,
 
     /**
-     * time function extension
-     * @param placeholderName
-     * @return
+     * Log file not found status code.
      */
-    String timeFunctionExtension(Integer workflowInstanceId, String timeZone, String placeholderName);
+    LOG_FILE_NOT_FOUND,
 }
