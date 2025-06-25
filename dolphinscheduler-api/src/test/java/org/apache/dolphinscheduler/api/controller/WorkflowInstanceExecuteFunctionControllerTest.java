@@ -81,7 +81,6 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
             Collections.singletonList(new Property("start", Direct.IN, DataType.VARCHAR, "params"));
     final Integer expectedParallelismNumber = 6;
     final int dryRun = 7;
-    final int testFlag = 0;
     final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
     final Integer version = 1;
     final boolean allLevelDependent = false;
@@ -116,7 +115,6 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("startParams", gson.toJson(startParams));
         paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
         paramsMap.add("dryRun", String.valueOf(dryRun));
-        paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
         paramsMap.add("version", String.valueOf(version));
 
@@ -156,7 +154,6 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("startParams", gson.toJson(startParams));
         paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
         paramsMap.add("dryRun", String.valueOf(dryRun));
-        paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
         paramsMap.add("version", String.valueOf(version));
 
@@ -196,7 +193,6 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
         paramsMap.add("timeout", String.valueOf(timeout));
         paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
         paramsMap.add("dryRun", String.valueOf(dryRun));
-        paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
         paramsMap.add("version", String.valueOf(version));
 

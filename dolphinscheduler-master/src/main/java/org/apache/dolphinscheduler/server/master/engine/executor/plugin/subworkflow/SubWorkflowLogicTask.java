@@ -237,7 +237,6 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 // todo: transport varpool and local params
                 .startParamList(commandParam.getCommandParams())
                 .dryRun(Flag.of(workflowInstance.getDryRun()))
-                .testFlag(Flag.of(workflowInstance.getTestFlag()))
                 .build();
         final Integer subWorkflowInstanceId = applicationContext
                 .getBean(SubWorkflowControlClient.class)

@@ -74,7 +74,6 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         workflowInstance.setEndTime(new Date());
         workflowInstance.setWorkflowDefinitionCode(1L);
         workflowInstance.setProjectCode(1L);
-        workflowInstance.setTestFlag(0);
         workflowInstanceMapper.insert(workflowInstance);
         return workflowInstance;
     }
@@ -161,15 +160,13 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         List<TaskInstance> taskInstances = taskInstanceMapper.findValidTaskListByWorkflowInstanceId(
                 task.getWorkflowInstanceId(),
-                Flag.YES,
-                workflowInstance.getTestFlag());
+                Flag.YES);
 
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 =
                 taskInstanceMapper.findValidTaskListByWorkflowInstanceId(task.getWorkflowInstanceId(),
-                        Flag.NO,
-                        workflowInstance.getTestFlag());
+                        Flag.NO);
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
         Assertions.assertNotEquals(0, taskInstances.size());

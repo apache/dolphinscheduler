@@ -98,7 +98,6 @@ public class PythonGateway {
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
     private static final ExecutionOrder DEFAULT_EXECUTION_ORDER = ExecutionOrder.DESC_ORDER;
     private static final int DEFAULT_DRY_RUN = 0;
-    private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
     // We use admin user's user_id to skip some permission issue from python gateway service
     private static final int ADMIN_USER_ID = 1;
@@ -392,7 +391,6 @@ public class PythonGateway {
                 .execType(CommandType.START_PROCESS)
                 .taskDependType(TaskDependType.TASK_POST)
                 .dryRun(Flag.NO)
-                .testFlag(Flag.NO)
                 .build();
         executorService.triggerWorkflowDefinition(workflowTriggerRequest);
     }
