@@ -108,7 +108,11 @@ public final class ExcelUtils {
                     if (values[j] instanceof Number) {
                         cell1.setCellValue(Double.parseDouble(String.valueOf(values[j])));
                     } else {
-                        cell1.setCellValue(String.valueOf(values[j]));
+                        String cellValue = String.valueOf(values[j]);
+                        if (cellValue.length() > 32767) {
+                            cellValue = cellValue.substring(0, 32760) + "...(truncated)";
+                        }
+                        cell1.setCellValue(cellValue);
                     }
                 }
             }
