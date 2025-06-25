@@ -825,7 +825,7 @@ CREATE TABLE t_ds_task_instance (
   var_pool text ,
   dry_run int DEFAULT '0' ,
   cpu_quota int DEFAULT '-1' NOT NULL,
-  memory_max int DEFAULT '-1' NOT NULL
+  memory_max int DEFAULT '-1' NOT NULL,
   PRIMARY KEY (id)
 ) ;
 
