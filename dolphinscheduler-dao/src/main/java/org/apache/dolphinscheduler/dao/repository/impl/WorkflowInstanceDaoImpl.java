@@ -91,14 +91,12 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      */
     @Override
     public WorkflowInstance queryLastSchedulerWorkflowInterval(Long workflowDefinitionCode, Long taskDefinitionCode,
-                                                               DateInterval dateInterval,
-                                                               int testFlag) {
+                                                               DateInterval dateInterval) {
         return mybatisMapper.queryLastSchedulerWorkflow(
                 workflowDefinitionCode,
                 taskDefinitionCode,
                 dateInterval.getStartTime(),
-                dateInterval.getEndTime(),
-                testFlag);
+                dateInterval.getEndTime());
     }
 
     /**
@@ -111,13 +109,11 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      */
     @Override
     public WorkflowInstance queryLastManualWorkflowInterval(Long definitionCode, Long taskCode,
-                                                            DateInterval dateInterval,
-                                                            int testFlag) {
+                                                            DateInterval dateInterval) {
         return mybatisMapper.queryLastManualWorkflow(definitionCode,
                 taskCode,
                 dateInterval.getStartTime(),
-                dateInterval.getEndTime(),
-                testFlag);
+                dateInterval.getEndTime());
     }
 
     @Override

@@ -72,7 +72,6 @@ public class TriggerWorkflowExecutorDelegate implements IExecutorDelegate<Trigge
                 .environmentCode(triggerWorkflowDTO.getEnvironmentCode())
                 .startParamList(triggerWorkflowDTO.getStartParamList())
                 .dryRun(triggerWorkflowDTO.getDryRun())
-                .testFlag(triggerWorkflowDTO.getTestFlag())
                 .build();
     }
 }

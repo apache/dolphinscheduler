@@ -84,7 +84,6 @@ public class WorkflowBackfillTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(backfillTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(backfillTriggerRequest.getDryRun().getCode());
-        workflowInstance.setTestFlag(backfillTriggerRequest.getTestFlag().getCode());
         return workflowInstance;
     }
 

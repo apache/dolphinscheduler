@@ -370,7 +370,6 @@ public class ProcessServiceImpl implements ProcessService {
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
         workflowInstance.setWarningGroupId(warningGroupId);
         workflowInstance.setDryRun(command.getDryRun());
-        workflowInstance.setTestFlag(command.getTestFlag());
 
         if (command.getScheduleTime() != null) {
             workflowInstance.setScheduleTime(command.getScheduleTime());
@@ -572,8 +571,7 @@ public class ProcessServiceImpl implements ProcessService {
             case START_FAILURE_TASK_PROCESS:
             case RECOVER_SUSPENDED_PROCESS:
                 List<TaskInstance> needToStartTaskInstances = taskInstanceDao
-                        .queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
-                                workflowInstance.getTestFlag())
+                        .queryValidTaskListByWorkflowInstanceId(workflowInstance.getId())
                         .stream()
                         .filter(taskInstance -> {
                             TaskExecutionStatus state = taskInstance.getState();
@@ -615,8 +613,7 @@ public class ProcessServiceImpl implements ProcessService {
                 // delete all the valid tasks when complement data if id is not null
                 if (workflowInstance.getId() != null) {
                     List<TaskInstance> taskInstanceList =
-                            taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
-                                    workflowInstance.getTestFlag());
+                            taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
                         taskInstanceDao.updateById(taskInstance);
@@ -637,8 +634,7 @@ public class ProcessServiceImpl implements ProcessService {
                 }
                 // delete all the valid tasks when repeat running
                 List<TaskInstance> validTaskList =
-                        taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
-                                workflowInstance.getTestFlag());
+                        taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId());
                 for (TaskInstance taskInstance : validTaskList) {
                     taskInstance.setFlag(Flag.NO);
                     taskInstanceDao.updateById(taskInstance);
@@ -1381,8 +1377,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (workflowInstance != null
                 && (workflowInstance.getState().isFailure() || workflowInstance.getState().isStop())) {
             List<TaskInstance> validTaskList =
-                    taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
-                            workflowInstance.getTestFlag());
+                    taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId());
             List<Long> instanceTaskCodeList =
                     validTaskList.stream().map(TaskInstance::getTaskCode).collect(Collectors.toList());
             List<WorkflowTaskRelation> taskRelations = findRelationByCode(workflowInstance.getWorkflowDefinitionCode(),

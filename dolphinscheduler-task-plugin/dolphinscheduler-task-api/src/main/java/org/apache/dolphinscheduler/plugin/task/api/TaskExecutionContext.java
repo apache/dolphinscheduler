@@ -122,8 +122,6 @@ public class TaskExecutionContext implements Serializable {
 
     private Integer memoryMax;
 
-    private int testFlag;
-
     private int dispatchFailTimes;
 
     private boolean failover;

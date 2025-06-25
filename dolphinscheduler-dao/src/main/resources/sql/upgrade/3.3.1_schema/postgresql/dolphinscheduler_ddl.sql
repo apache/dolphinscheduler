@@ -17,3 +17,7 @@
 
 drop index if exists workflow_definition_index;
 create unique index uniq_workflow_definition_code on t_ds_workflow_definition (code);
+ALTER TABLE t_ds_command DROP COLUMN test_flag;
+ALTER TABLE t_ds_error_command DROP COLUMN test_flag;
+ALTER TABLE t_ds_workflow_instance DROP COLUMN test_flag;
+ALTER TABLE t_ds_task_instance DROP COLUMN test_flag;

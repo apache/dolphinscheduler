@@ -28,7 +28,6 @@ import java.util.Date;
 import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -77,9 +76,6 @@ public class ErrorCommand {
 
     private int dryRun;
 
-    @TableField("test_flag")
-    private int testFlag;
-
     public ErrorCommand() {
     }
 
@@ -104,6 +100,5 @@ public class ErrorCommand {
         this.environmentCode = command.getEnvironmentCode();
         this.message = message;
         this.dryRun = command.getDryRun();
-        this.testFlag = command.getTestFlag();
     }
 }

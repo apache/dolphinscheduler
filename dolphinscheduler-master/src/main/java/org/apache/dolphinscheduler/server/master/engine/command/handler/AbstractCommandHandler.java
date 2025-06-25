@@ -148,8 +148,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     protected List<TaskInstance> getValidTaskInstance(final WorkflowInstance workflowInstance) {
         return taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
-                workflowInstance.getId(),
-                workflowInstance.getTestFlag());
+                workflowInstance.getId());
     }
 
     protected void assembleProject(
