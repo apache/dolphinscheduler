@@ -102,13 +102,15 @@ public final class ExcelUtils {
                 // setting excel body height
                 row.setHeight((short) 500);
                 rowIndex++;
+                int colIndex = 0;
                 for (int j = 0; j < values.length; j++) {
-                    Cell cell1 = row.createCell(j);
-                    cell1.setCellStyle(cellStyle);
                     if (values[j] instanceof Number) {
+                        Cell cell1 = row.createCell(j);
+                        cell1.setCellStyle(cellStyle);
                         cell1.setCellValue(Double.parseDouble(String.valueOf(values[j])));
+                        colIndex++;
                     } else {
-                        cell1.setCellValue(String.valueOf(values[j]));
+                        colIndex = setCellValueWithSplit(row, colIndex, cellStyle, values[j]);
                     }
                 }
             }
@@ -124,5 +126,35 @@ public final class ExcelUtils {
             throw new AlertEmailException("generate excel error", e);
         }
     }
-
+    /**
+     * Writes a value to Excel cells, splitting the value into multiple adjacent cells
+     * if the string length exceeds the Excel cell limit (32767 characters).
+     *
+     * @param row       the Excel row to write to
+     * @param colIndex  the starting column index
+     * @param cellStyle the cell style to apply
+     * @param value     the value to write
+     * @return the next available column index after writing
+     */
+    public static int setCellValueWithSplit(Row row, int colIndex, CellStyle cellStyle, Object value) {
+        String cellValue = String.valueOf(value);
+        int maxLen = 32767;
+        if (cellValue.length() > maxLen) {
+            int parts = (cellValue.length() + maxLen - 1) / maxLen;
+            for (int p = 0; p < parts; p++, colIndex++) {
+                int start = p * maxLen;
+                int end = Math.min(cellValue.length(), (p + 1) * maxLen);
+                String partValue = cellValue.substring(start, end);
+                Cell cell = row.createCell(colIndex);
+                cell.setCellStyle(cellStyle);
+                cell.setCellValue(partValue);
+            }
+            return colIndex;
+        } else {
+            Cell cell1 = row.createCell(colIndex);
+            cell1.setCellStyle(cellStyle);
+            cell1.setCellValue(cellValue);
+            return colIndex + 1;
+        }
+    }
 }

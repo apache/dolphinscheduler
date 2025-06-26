@@ -17,13 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import java.io.File;
-import java.nio.file.Path;
-
+import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExcelUtilsTest {
 
@@ -33,7 +41,7 @@ public class ExcelUtilsTest {
     private String xlsFilePath;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         xlsFilePath = testFolder.toString();
     }
 
@@ -56,8 +64,9 @@ public class ExcelUtilsTest {
         Assertions.assertTrue(xlsFile.exists());
 
         // Invoke genExcelFile with incorrectContent, will cause RuntimeException
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath));
+        Assertions.assertThrows(AlertEmailException.class, () -> {
+            ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
+        });
 
     }
 
@@ -73,5 +82,68 @@ public class ExcelUtilsTest {
                                 + EmailConstants.EXCEL_SUFFIX_XLSX);
         file.delete();
         Assertions.assertFalse(file.exists());
+    }
+    @Test
+    public void testSetCellValueWithSplit_NoSplit() {
+        Row row;
+        CellStyle cellStyle;
+        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            row = sheet.createRow(0);
+            cellStyle = wb.createCellStyle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String value = "short string";
+        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
+
+        assertEquals(1, nextCol);
+        assertEquals(value, row.getCell(0).getStringCellValue());
+    }
+
+    @Test
+    public void testSetCellValueWithSplit_Split() {
+        Row row;
+        CellStyle cellStyle;
+        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            row = sheet.createRow(0);
+            cellStyle = wb.createCellStyle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Generate a string longer than 32767
+        int maxLen = 32767;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < maxLen + 10; i++) {
+            sb.append('a');
+        }
+        String longValue = sb.toString();
+        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, longValue);
+
+        assertEquals(2, nextCol); // Should occupy 2 cells
+        assertEquals(longValue.substring(0, maxLen), row.getCell(0).getStringCellValue());
+        assertEquals(longValue.substring(maxLen), row.getCell(1).getStringCellValue());
+    }
+
+    @Test
+    public void testSetCellValueWithSplit_Number() {
+        Row row;
+        CellStyle cellStyle;
+        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            row = sheet.createRow(0);
+            cellStyle = wb.createCellStyle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Double value = 123.45;
+        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
+
+        assertEquals(1, nextCol);
+        assertEquals("123.45", row.getCell(0).getStringCellValue());
     }
 }
