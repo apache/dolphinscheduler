@@ -20,12 +20,17 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+
 
 public class ExcelUtilsTest {
 
@@ -79,12 +84,17 @@ public class ExcelUtilsTest {
     }
      @Test
     public void testSetCellValueWithSplit_NoSplit() {
-        SXSSFWorkbook wb = new SXSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        Row row = sheet.createRow(0);
-        CellStyle cellStyle = wb.createCellStyle();
+         Row row;
+         CellStyle cellStyle;
+         try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+             Sheet sheet = wb.createSheet();
+             row = sheet.createRow(0);
+             cellStyle = wb.createCellStyle();
+         } catch (IOException e) {
+             throw new RuntimeException(e);
+         }
 
-        String value = "short string";
+         String value = "short string";
         int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
 
         assertEquals(1, nextCol);
@@ -93,10 +103,15 @@ public class ExcelUtilsTest {
 
     @Test
     public void testSetCellValueWithSplit_Split() {
-        SXSSFWorkbook wb = new SXSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        Row row = sheet.createRow(0);
-        CellStyle cellStyle = wb.createCellStyle();
+        Row row;
+        CellStyle cellStyle;
+        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            row = sheet.createRow(0);
+            cellStyle = wb.createCellStyle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         // Generate a string longer than 32767
         int maxLen = 32767;
@@ -114,10 +129,15 @@ public class ExcelUtilsTest {
 
     @Test
     public void testSetCellValueWithSplit_Number() {
-        SXSSFWorkbook wb = new SXSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        Row row = sheet.createRow(0);
-        CellStyle cellStyle = wb.createCellStyle();
+        Row row;
+        CellStyle cellStyle;
+        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            row = sheet.createRow(0);
+            cellStyle = wb.createCellStyle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Double value = 123.45;
         int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
