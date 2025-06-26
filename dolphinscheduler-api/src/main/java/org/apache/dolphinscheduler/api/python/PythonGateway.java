@@ -179,7 +179,7 @@ public class PythonGateway {
     }
 
     public Map<String, Long> getCodeAndVersion(String projectName, String workflowDefinitionName,
-                                               String taskName) throws CodeGenerateUtils.CodeGenerateException {
+                                               String taskName) {
         Project project = projectMapper.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value

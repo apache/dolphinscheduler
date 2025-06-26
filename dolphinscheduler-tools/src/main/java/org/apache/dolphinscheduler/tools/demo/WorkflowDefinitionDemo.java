@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ProcessDefinitionDemo {
+public class WorkflowDefinitionDemo {
 
     @Value("${demo.tenant-code}")
     private String tenantCode;
@@ -65,9 +65,9 @@ public class ProcessDefinitionDemo {
     private AccessTokenMapper accessTokenMapper;
 
     @Autowired
-    private ProxyProcessDefinitionController proxyProcessDefinitionController;
+    private ProxyWorkflowDefinitionController proxyWorkflowDefinitionController;
 
-    public void createProcessDefinitionDemo() throws Exception {
+    public void createWorkflowDefinitionDemo() throws Exception {
         // get user
         User loginUser = userMapper.selectById("1");
         Date now = new Date();
@@ -81,20 +81,17 @@ public class ProcessDefinitionDemo {
         if (project != null) {
             log.warn("Project {} already exists.", project.getName());
         }
-        try {
-            project = Project
-                    .builder()
-                    .name("demo")
-                    .code(CodeGenerateUtils.genCode())
-                    .description("")
-                    .userId(loginUser.getId())
-                    .userName(loginUser.getUserName())
-                    .createTime(now)
-                    .updateTime(now)
-                    .build();
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("create project error", e);
-        }
+        project = Project
+                .builder()
+                .name("demo")
+                .code(CodeGenerateUtils.genCode())
+                .description("")
+                .userId(loginUser.getId())
+                .userName(loginUser.getUserName())
+                .createTime(now)
+                .updateTime(now)
+                .build();
+
         if (projectMapper.insert(project) > 0) {
             log.info("create project success");
         } else {
@@ -165,13 +162,10 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 1; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+        for (int i = 0; i < 1; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String absolutePath = System.getProperty("user.dir");
 
@@ -223,7 +217,7 @@ public class ProcessDefinitionDemo {
 
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
@@ -240,13 +234,11 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 2; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+
+        for (int i = 0; i < 2; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
 
@@ -316,7 +308,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogSecond.setTaskType("SHELL");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
@@ -332,13 +324,11 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 2; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+
+        for (int i = 0; i < 2; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
 
@@ -402,7 +392,7 @@ public class ProcessDefinitionDemo {
                 "{\"localParams\":[],\"rawScript\":\"echo \\\"====node start====\\\"\\r\\n\\r\\necho ${output}\\r\\n\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
@@ -418,13 +408,10 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 4; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+        for (int i = 0; i < 4; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
@@ -519,7 +506,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFourth.setTaskType("SHELL");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
@@ -535,13 +522,11 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 4; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+
+        for (int i = 0; i < 4; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
@@ -638,7 +623,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFourth.setTaskType("SHELL");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
@@ -654,13 +639,10 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 3; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+        for (int i = 0; i < 3; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
         String taskCodeThird = String.valueOf(taskCodes.get(2)).replaceAll("\\[|\\]", "");
@@ -737,7 +719,7 @@ public class ProcessDefinitionDemo {
                 .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end\\\"\",\"resourceList\":[]}");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
@@ -753,13 +735,10 @@ public class ProcessDefinitionDemo {
 
         // get demo taskcode
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < 1; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("task code get error, ", e);
+        for (int i = 0; i < 1; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         String taskCode = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
 
         WorkflowDefinitionLog processDefinitionLog = new WorkflowDefinitionLog();
@@ -810,7 +789,7 @@ public class ProcessDefinitionDemo {
 
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
-        ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
+        ProxyResult ProxyResult = proxyWorkflowDefinitionController.createProcessDefinition(token, projectCode,
                 processDefinitionLog.getName(),
                 processDefinitionLog.getDescription(),
                 processDefinitionLog.getGlobalParams(),
