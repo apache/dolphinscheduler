@@ -77,4 +77,52 @@ public class ExcelUtilsTest {
         file.delete();
         Assertions.assertFalse(file.exists());
     }
+     @Test
+    public void testSetCellValueWithSplit_NoSplit() {
+        SXSSFWorkbook wb = new SXSSFWorkbook();
+        Sheet sheet = wb.createSheet();
+        Row row = sheet.createRow(0);
+        CellStyle cellStyle = wb.createCellStyle();
+
+        String value = "short string";
+        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
+
+        assertEquals(1, nextCol);
+        assertEquals(value, row.getCell(0).getStringCellValue());
+    }
+
+    @Test
+    public void testSetCellValueWithSplit_Split() {
+        SXSSFWorkbook wb = new SXSSFWorkbook();
+        Sheet sheet = wb.createSheet();
+        Row row = sheet.createRow(0);
+        CellStyle cellStyle = wb.createCellStyle();
+
+        // Generate a string longer than 32767
+        int maxLen = 32767;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < maxLen + 10; i++) {
+            sb.append('a');
+        }
+        String longValue = sb.toString();
+        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, longValue);
+
+        assertEquals(2, nextCol); // Should occupy 2 cells
+        assertEquals(longValue.substring(0, maxLen), row.getCell(0).getStringCellValue());
+        assertEquals(longValue.substring(maxLen), row.getCell(1).getStringCellValue());
+    }
+
+    @Test
+    public void testSetCellValueWithSplit_Number() {
+        SXSSFWorkbook wb = new SXSSFWorkbook();
+        Sheet sheet = wb.createSheet();
+        Row row = sheet.createRow(0);
+        CellStyle cellStyle = wb.createCellStyle();
+
+        Double value = 123.45;
+        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
+
+        assertEquals(1, nextCol);
+        assertEquals("123.45", row.getCell(0).getStringCellValue());
+    }
 }
