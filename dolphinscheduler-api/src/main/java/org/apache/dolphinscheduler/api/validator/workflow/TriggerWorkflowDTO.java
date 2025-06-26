@@ -71,6 +71,4 @@ public class TriggerWorkflowDTO {
 
     private Flag dryRun;
 
-    private Flag testFlag;
-
 }

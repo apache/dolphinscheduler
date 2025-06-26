@@ -111,9 +111,7 @@ const ListErrorCommandTable = defineComponent({
             return h('div', [
               `Worker Group：${row.workerGroup} `,
               h('br'),
-              `Tenant Code：${row.tenantCode} `,
-              h('br'),
-              `Test Flag：${row.testFlag} `
+              `Tenant Code：${row.tenantCode} `
             ])
           }
         },

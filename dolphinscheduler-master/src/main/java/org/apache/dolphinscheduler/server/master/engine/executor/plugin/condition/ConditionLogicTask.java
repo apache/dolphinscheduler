@@ -74,7 +74,7 @@ public class ConditionLogicTask extends AbstractLogicTask<ConditionsParameters> 
 
     private DependResult calculateConditionResult() {
         final List<TaskInstance> taskInstances = taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
-                taskExecutionContext.getWorkflowInstanceId(), taskExecutionContext.getTestFlag());
+                taskExecutionContext.getWorkflowInstanceId());
         final Map<Long, TaskInstance> taskInstanceMap = taskInstances.stream()
                 .collect(Collectors.toMap(TaskInstance::getTaskCode, Function.identity()));
 
