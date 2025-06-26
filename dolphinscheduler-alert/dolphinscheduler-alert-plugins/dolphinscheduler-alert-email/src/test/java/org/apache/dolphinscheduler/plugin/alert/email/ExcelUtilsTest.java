@@ -18,19 +18,20 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import static org.junit.jupiter.api.Assertions.*;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExcelUtilsTest {
 
@@ -82,19 +83,19 @@ public class ExcelUtilsTest {
         file.delete();
         Assertions.assertFalse(file.exists());
     }
-     @Test
+    @Test
     public void testSetCellValueWithSplit_NoSplit() {
-         Row row;
-         CellStyle cellStyle;
-         try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
-             Sheet sheet = wb.createSheet();
-             row = sheet.createRow(0);
-             cellStyle = wb.createCellStyle();
-         } catch (IOException e) {
-             throw new RuntimeException(e);
-         }
+        Row row;
+        CellStyle cellStyle;
+        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            row = sheet.createRow(0);
+            cellStyle = wb.createCellStyle();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-         String value = "short string";
+        String value = "short string";
         int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
 
         assertEquals(1, nextCol);
