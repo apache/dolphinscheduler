@@ -475,10 +475,11 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         if (StringUtils.isEmpty(config)) {
             throw new ServiceException(Status.ENVIRONMENT_CONFIG_IS_NULL);
         }
-        if (!StringUtils.isEmpty(workerGroups)) {
-            List<String> workerGroupList = JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>() {
-            });
-            if (Objects.isNull(workerGroupList)) {
+        if (StringUtils.isNotEmpty(workerGroups)) {
+            try {
+                JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>() {
+                });
+            } catch (IllegalArgumentException e) {
                 throw new ServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID);
             }
         }

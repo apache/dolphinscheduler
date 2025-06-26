@@ -480,6 +480,7 @@ public class WorkflowInstanceServiceTest {
         taskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT_CONTEXT);
         DependentResultTaskInstanceContext dependentResultTaskInstanceContext =
                 new DependentResultTaskInstanceContext();
+        dependentResultTaskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT_CONTEXT);
         dependentResultTaskInstanceContext.setProjectCode(projectCode);
         dependentResultTaskInstanceContext.setDependentResult(DependResult.SUCCESS);
         taskInstanceContext.setTaskInstanceContext(
