@@ -142,7 +142,7 @@ public class ExcelUtilsTest {
             throw new RuntimeException(e);
         }
 
-        Double value = 123.45;
+        Double value = 123.45; // test double value
         int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
 
         assertEquals(1, nextCol);
