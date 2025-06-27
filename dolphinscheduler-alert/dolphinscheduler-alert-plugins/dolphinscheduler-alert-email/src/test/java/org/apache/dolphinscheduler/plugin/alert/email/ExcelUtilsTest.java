@@ -66,7 +66,7 @@ public class ExcelUtilsTest {
         Assertions.assertTrue(xlsFile.exists());
 
         // Invoke genExcelFile with incorrectContent, will cause RuntimeException
-        Assertions.assertThrows(AlertEmailException.class, () -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
         });
 
