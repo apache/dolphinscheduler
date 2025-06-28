@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
@@ -121,16 +120,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setOperator(loginUser.getId());
         env.setCreateTime(new Date());
         env.setUpdateTime(new Date());
-        long code = 0L;
-        try {
-            code = CodeGenerateUtils.genCode();
-            env.setCode(code);
-        } catch (CodeGenerateException e) {
-            log.error("Generate environment code error.", e);
-        }
-        if (code == 0L) {
-            throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating environment code");
-        }
+        env.setCode(CodeGenerateUtils.genCode());
 
         if (environmentMapper.insert(env) > 0) {
             if (!StringUtils.isEmpty(workerGroups)) {

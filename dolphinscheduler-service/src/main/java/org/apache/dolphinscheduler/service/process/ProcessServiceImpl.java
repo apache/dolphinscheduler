@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
@@ -492,7 +491,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public @Nullable WorkflowInstance constructWorkflowInstance(Command command,
-                                                                String host) throws CronParseException, CodeGenerateException {
+                                                                String host) throws CronParseException {
         WorkflowInstance workflowInstance;
         WorkflowDefinition workflowDefinition;
         CommandType commandType = command.getCommandType();
