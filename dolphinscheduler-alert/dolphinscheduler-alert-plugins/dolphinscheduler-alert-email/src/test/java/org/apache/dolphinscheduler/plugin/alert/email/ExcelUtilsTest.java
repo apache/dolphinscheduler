@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
-
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
