@@ -62,6 +62,9 @@ github:
     wiki: false
     # Enable discussions
     discussions: true
+  # Allow Dependabot to create CVEs for security issues but not for other jar updgrades
+  dependabot_alerts:  true
+  dependabot_updates: false
 
 notifications:
   commits: commits@dolphinscheduler.apache.org
