@@ -62,7 +62,7 @@ github:
     wiki: false
     # Enable discussions
     discussions: true
-  # Allow Dependabot to create CVEs for security issues but not for other jar updgrades
+  # Allow Dependabot to create PRs for security issues but not for other jar updgrades
   dependabot_alerts:  true
   dependabot_updates: false
 
