@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -138,7 +139,7 @@ public final class ExcelUtils {
      */
     public static int setCellValueWithSplit(Row row, int colIndex, CellStyle cellStyle, Object value) {
         String cellValue = String.valueOf(value);
-        int maxLen = 32767;
+        int maxLen = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
         if (cellValue.length() > maxLen) {
             int parts = (cellValue.length() + maxLen - 1) / maxLen;
             for (int p = 0; p < parts; p++, colIndex++) {
