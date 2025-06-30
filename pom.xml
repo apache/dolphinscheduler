@@ -576,9 +576,6 @@
                             <goals>
                                 <goal>aggregate</goal>
                             </goals>
-                            <configuration>
-                                <skip>${skipDepCheck}</skip>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -586,10 +583,6 @@
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -877,6 +870,20 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jdk-11</id>
+            <activation>
+                <jdk>11</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
                     </plugin>
                 </plugins>
             </build>
