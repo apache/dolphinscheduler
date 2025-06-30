@@ -242,7 +242,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-net 3.6: https://github.com/apache/commons-net, Apache 2.0
     commons-text 1.4: https://github.com/apache/commons-text, Apache 2.0
     cron-utils 9.1.6: https://mvnrepository.com/artifact/com.cronutils/cron-utils/9.1.6, Apache 2.0
-    commons-lang3 3.12.0: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.12.0, Apache 2.0
+    commons-lang3 3.17.0: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.17.0, Apache 2.0
     curator-client 5.5.0: https://mvnrepository.com/artifact/org.apache.curator/curator-client/5.5.0, Apache 2.0
     curator-framework 5.5.0: https://mvnrepository.com/artifact/org.apache.curator/curator-framework/5.5.0, Apache 2.0
     curator-recipes 5.5.0: https://mvnrepository.com/artifact/org.apache.curator/curator-recipes/5.5.0, Apache 2.0
