@@ -576,6 +576,9 @@
                             <goals>
                                 <goal>aggregate</goal>
                             </goals>
+                            <configuration>
+                                <skip>${skipDepCheck}</skip>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
