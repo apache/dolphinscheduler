@@ -70,7 +70,7 @@
         <postgresql.version>42.4.1</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <commons-io.version>2.19.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.4.6</clickhouse-jdbc.version>
         <databend-jdbc.version>0.0.7</databend-jdbc.version>

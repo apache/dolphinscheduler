@@ -236,7 +236,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
     commons-configuration2 2.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2/2.1.1, Apache 2.0
     commons-daemon 1.0.13: https://github.com/apache/commons-daemon, Apache 2.0
-    commons-io 2.11.0: https://github.com/apache/commons-io, Apache 2.0
+    commons-io 2.19.0: https://github.com/apache/commons-io, Apache 2.0
     commons-logging 1.1.1: https://github.com/apache/commons-logging, Apache 2.0
     commons-math3 3.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.1.1, Apache 2.0
     commons-net 3.6: https://github.com/apache/commons-net, Apache 2.0
