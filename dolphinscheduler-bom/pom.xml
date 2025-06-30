@@ -46,7 +46,7 @@
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-configuration.version>1.10</commons-configuration.version>
         <commons-email.version>1.5</commons-email.version>
-        <commons-collections4.version>4.5</commons-collections4.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
         <jackson.version>2.13.4</jackson.version>
