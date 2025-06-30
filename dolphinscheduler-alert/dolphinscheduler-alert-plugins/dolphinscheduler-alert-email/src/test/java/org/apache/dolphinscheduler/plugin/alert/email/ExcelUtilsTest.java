@@ -41,7 +41,7 @@ public class ExcelUtilsTest {
     private String xlsFilePath;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() {
         xlsFilePath = testFolder.toString();
     }
 
@@ -84,7 +84,7 @@ public class ExcelUtilsTest {
         Assertions.assertFalse(file.exists());
     }
     @Test
-    public void testSetCellValueWithSplit_NoSplit() {
+    void testSetCellValueWithSplit_NoSplit() {
         Row row;
         CellStyle cellStyle;
         try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
@@ -103,7 +103,7 @@ public class ExcelUtilsTest {
     }
 
     @Test
-    public void testSetCellValueWithSplit_Split() {
+    void testSetCellValueWithSplit_Split() {
         Row row;
         CellStyle cellStyle;
         try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
@@ -129,7 +129,7 @@ public class ExcelUtilsTest {
     }
 
     @Test
-    public void testSetCellValueWithSplit_Number() {
+    void testSetCellValueWithSplit_Number() {
         Row row;
         CellStyle cellStyle;
         try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
