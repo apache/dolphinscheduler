@@ -105,10 +105,10 @@ public final class ExcelUtils {
                 rowIndex++;
                 int colIndex = 0;
                 for (int j = 0; j < values.length; j++) {
+                    Cell cell1 = row.createCell(j);
+                    cell1.setCellStyle(cellStyle);
                     if (values[j] instanceof Number) {
-                        Cell cell1 = row.createCell(j);
-                        cell1.setCellStyle(cellStyle);
-                        cell1.setCellValue(Double.parseDouble(String.valueOf(values[j])));
+                        cell1.setCellValue(((Number) values[j]).doubleValue());
                         colIndex++;
                     } else {
                         colIndex = setCellValueWithSplit(row, colIndex, cellStyle, values[j]);
