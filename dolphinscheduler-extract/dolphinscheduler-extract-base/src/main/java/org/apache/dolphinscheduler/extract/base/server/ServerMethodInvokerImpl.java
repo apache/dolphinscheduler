@@ -63,7 +63,7 @@ class ServerMethodInvokerImpl implements ServerMethodInvoker {
             if (argType == null) {
                 continue;
             }
-            if (parameterTypes.get(i) != argType) {
+            if (!parameterTypes.get(i).isAssignableFrom(argType)) {
                 return false;
             }
         }

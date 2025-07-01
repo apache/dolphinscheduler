@@ -103,12 +103,12 @@ class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
                     if (standardRpcRequest.getArgs() == null || standardRpcRequest.getArgs().length == 0) {
                         args = null;
                     } else {
-                        args = new Object[standardRpcRequest.getArgs().length];
                         if (!methodInvoker.isParameterTypeValidated(standardRpcRequest.getArgsTypes())) {
                             throw new IllegalArgumentException(
                                     "Parameter types: " + Lists.newArrayList(standardRpcRequest.getArgsTypes())
                                             + " do not match the method signature.");
                         }
+                        args = new Object[standardRpcRequest.getArgs().length];
                         for (int i = 0; i < standardRpcRequest.getArgs().length; i++) {
                             args[i] = JsonSerializer.deserialize(standardRpcRequest.getArgs()[i],
                                     standardRpcRequest.getArgsTypes()[i]);
