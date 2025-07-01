@@ -139,17 +139,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             return result;
         }
 
-        long code = 0L;
-        try {
-            code = CodeGenerateUtils.genCode();
-            cluster.setCode(code);
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("Generate cluster code error.", e);
-        }
-        if (code == 0L) {
-            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating cluster code");
-            return result;
-        }
+        long code = CodeGenerateUtils.genCode();
+        cluster.setCode(code);
 
         K8sNamespace k8sNamespaceObj = new K8sNamespace();
         Date now = new Date();

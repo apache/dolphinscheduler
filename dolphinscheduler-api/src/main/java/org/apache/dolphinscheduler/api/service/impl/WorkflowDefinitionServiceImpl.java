@@ -75,7 +75,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -349,14 +348,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2WorkflowDefinition();
         this.createWorkflowValid(loginUser, workflowDefinition);
 
-        long workflowDefinitionCode;
-        try {
-            workflowDefinitionCode = CodeGenerateUtils.genCode();
-        } catch (CodeGenerateException e) {
-            throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-        }
-
-        workflowDefinition.setCode(workflowDefinitionCode);
+        workflowDefinition.setCode(CodeGenerateUtils.genCode());
         workflowDefinition.setUserId(loginUser.getId());
 
         int create = workflowDefinitionMapper.insert(workflowDefinition);
@@ -1424,7 +1416,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource,
-                                                           String sql) throws CodeGenerateException {
+                                                           String sql) {
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
         taskDefinition.setName(taskName);
         taskDefinition.setFlag(Flag.YES);
@@ -1480,15 +1472,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         workflowDefinition.setId(null);
         workflowDefinition.setProjectCode(projectCode);
         workflowDefinition.setUserId(loginUser.getId());
-        try {
-            workflowDefinition.setCode(CodeGenerateUtils.genCode());
-        } catch (CodeGenerateException e) {
-            log.error(
-                    "Save workflow definition error because generate workflow definition code error, projectCode:{}.",
-                    projectCode, e);
-            putMsg(result, Status.CREATE_WORKFLOW_DEFINITION_ERROR);
-            return false;
-        }
+        workflowDefinition.setCode(CodeGenerateUtils.genCode());
+
         List<TaskDefinition> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
         Map<Long, Long> taskCodeMap = new HashMap<>();
         Date now = new Date();
@@ -1503,16 +1488,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             taskDefinitionLog.setUpdateTime(now);
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
-            try {
-                long code = CodeGenerateUtils.genCode();
-                taskCodeMap.put(taskDefinitionLog.getCode(), code);
-                taskDefinitionLog.setCode(code);
-            } catch (CodeGenerateException e) {
-                log.error("Generate task definition code error, projectCode:{}, workflowDefinitionCode:{}",
-                        projectCode, workflowDefinition.getCode(), e);
-                putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
-                return false;
-            }
+            long code = CodeGenerateUtils.genCode();
+            taskCodeMap.put(taskDefinitionLog.getCode(), code);
+            taskDefinitionLog.setCode(code);
+
             taskDefinitionLogList.add(taskDefinitionLog);
         }
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
@@ -2120,15 +2099,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 List<TaskDefinitionLog> taskDefinitionLogs =
                         taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
-                taskDefinitionLogs.forEach(taskDefinitionLog -> {
-                    try {
-                        taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode());
-                    } catch (CodeGenerateException e) {
-                        log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
-                        putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-                        throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-                    }
-                });
+                taskDefinitionLogs.forEach(
+                        taskDefinitionLog -> taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode()));
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     taskDefinitionLog.setCode(taskCodeMap.get(taskDefinitionLog.getCode()));
                     taskDefinitionLog.setProjectCode(targetProjectCode);
@@ -2164,13 +2136,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     }
                 }
                 final long oldWorkflowDefinitionCode = workflowDefinition.getCode();
-                try {
-                    workflowDefinition.setCode(CodeGenerateUtils.genCode());
-                } catch (CodeGenerateException e) {
-                    log.error("Generate workflow definition code error, projectCode:{}.", targetProjectCode, e);
-                    putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-                    throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-                }
+                workflowDefinition.setCode(CodeGenerateUtils.genCode());
+
                 workflowDefinition.setId(null);
                 workflowDefinition.setUserId(loginUser.getId());
                 workflowDefinition.setName(getNewName(workflowDefinition.getName(), COPY_SUFFIX));

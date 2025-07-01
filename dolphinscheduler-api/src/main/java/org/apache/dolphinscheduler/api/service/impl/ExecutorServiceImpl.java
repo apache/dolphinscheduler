@@ -372,7 +372,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setExecutorId(loginUser.getId());
         command.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
         command.setWorkflowInstanceId(workflowInstanceId);
-        command.setTestFlag(workflowInstance.getTestFlag());
 
         // Add taskDependType
         command.setTaskDependType(taskDependType);

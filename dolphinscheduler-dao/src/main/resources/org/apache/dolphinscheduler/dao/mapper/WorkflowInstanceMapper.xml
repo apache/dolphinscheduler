@@ -25,7 +25,7 @@
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_workflow, executor_id, history_cmd,
         workflow_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
-        dry_run, test_flag, next_workflow_instance_id, restart_time, state_history
+        dry_run, next_workflow_instance_id, restart_time, state_history
     </sql>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
@@ -216,7 +216,7 @@
         select t1.* from (select
         <include refid="baseSql"/>
         from t_ds_workflow_instance
-        where workflow_definition_code=#{workflowDefinitionCode} and test_flag=#{testFlag}
+        where workflow_definition_code=#{workflowDefinitionCode}
         <if test="startTime != null and endTime != null ">
             and schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>) as t1
@@ -235,7 +235,7 @@
             <include refid="baseSql"/>
             from t_ds_workflow_instance
             where
-            workflow_definition_code=#{workflowDefinitionCode} and test_flag=#{testFlag}
+            workflow_definition_code=#{workflowDefinitionCode}
             and schedule_time is null
             <if test="startTime!=null and endTime != null ">
                 and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}

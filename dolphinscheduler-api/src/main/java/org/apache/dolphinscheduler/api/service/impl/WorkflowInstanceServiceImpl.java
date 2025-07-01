@@ -467,8 +467,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
-                        workflowInstance.getTestFlag());
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId);
         List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
 
@@ -917,8 +916,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES,
-                        workflowInstance.getTestFlag());
+                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES);
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
