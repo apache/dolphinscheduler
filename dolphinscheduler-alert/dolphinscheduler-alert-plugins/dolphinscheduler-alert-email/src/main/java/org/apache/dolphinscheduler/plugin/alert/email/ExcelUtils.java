@@ -106,7 +106,7 @@ public final class ExcelUtils {
                     Cell cell1 = row.createCell(j);
                     cell1.setCellStyle(cellStyle);
                     if (values[j] instanceof Number) {
-                        cell1.setCellValue(Double.parseDouble(String.valueOf(values[j])));
+                        cell1.setCellValue(((Number) values[j]).doubleValue());
                     } else {
                         cell1.setCellValue(String.valueOf(values[j]));
                     }
