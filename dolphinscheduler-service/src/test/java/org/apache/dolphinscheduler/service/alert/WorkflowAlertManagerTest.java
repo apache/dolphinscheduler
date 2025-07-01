@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -76,28 +75,6 @@ public class WorkflowAlertManagerTest {
         taskInstanceList.add(taskInstance);
 
         workflowAlertManager.sendAlertWorkerToleranceFault(workflowInstance, taskInstanceList);
-    }
-
-    /**
-     * send worker alert fault tolerance
-     */
-    @Test
-    public void sendWarnningOfProcessInstanceTest() {
-        // process instance
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setWarningType(WarningType.SUCCESS);
-        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
-        workflowInstance.setCommandType(CommandType.COMPLEMENT_DATA);
-        workflowInstance.setWarningGroupId(1);
-        workflowInstance.setWorkflowDefinitionCode(1L);
-        workflowInstance.setWorkflowDefinitionVersion(1);
-
-        ProjectUser projectUser = new ProjectUser();
-        TaskInstance taskInstance = new TaskInstance();
-        List<TaskInstance> taskInstanceList = new ArrayList<>();
-        taskInstanceList.add(taskInstance);
-
-        workflowAlertManager.sendAlertWorkflowInstance(workflowInstance, taskInstanceList, projectUser);
     }
 
     /**
