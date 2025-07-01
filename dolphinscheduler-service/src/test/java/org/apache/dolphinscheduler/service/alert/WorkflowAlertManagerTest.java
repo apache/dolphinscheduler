@@ -17,17 +17,13 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -63,7 +59,6 @@ public class WorkflowAlertManagerTest {
      */
     @Test
     public void sendWarningWorkerToleranceFaultTest() {
-        // process instance
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setName("test");
 
@@ -75,29 +70,5 @@ public class WorkflowAlertManagerTest {
         taskInstanceList.add(taskInstance);
 
         workflowAlertManager.sendAlertWorkerToleranceFault(workflowInstance, taskInstanceList);
-    }
-
-    /**
-     * send blocking alert
-     */
-    @Test
-    public void sendBlockingAlertTest() {
-        // process instance
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setId(1);
-        workflowInstance.setName("test-process-01");
-        workflowInstance.setCommandType(CommandType.START_PROCESS);
-        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        workflowInstance.setRunTimes(0);
-        workflowInstance.setStartTime(new Date());
-        workflowInstance.setEndTime(new Date());
-        workflowInstance.setHost("127.0.0.1");
-        workflowInstance.setWarningGroupId(1);
-        workflowInstance.setWorkflowDefinitionCode(1L);
-        workflowInstance.setWorkflowDefinitionVersion(1);
-
-        ProjectUser projectUser = new ProjectUser();
-
-        workflowAlertManager.sendWorkflowBlockingAlert(workflowInstance, projectUser);
     }
 }
