@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
+import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -60,6 +61,9 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     @Autowired
     protected WorkflowEventBusCoordinator workflowEventBusCoordinator;
+
+    @Autowired
+    protected WorkflowAlertManager workflowAlertManager;
 
     /**
      * Try to trigger the tasks if the trigger condition is met.
@@ -190,6 +194,7 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
         workflowCacheRepository.remove(workflowExecutionRunnable.getId());
         workflowEventBusCoordinator.unRegisterWorkflowEventBus(workflowExecutionRunnable);
+        workflowAlertManager.sendAlertWorkflowInstance(workflowExecutionRunnable.getWorkflowInstance());
 
         log.info("Successfully finalize WorkflowExecuteRunnable: {}", workflowExecutionRunnable.getName());
     }
