@@ -119,7 +119,6 @@ public final class ExcelUtils {
 
             // setting file output
             wb.write(fos);
-            wb.dispose();
         } catch (Exception e) {
             throw new AlertEmailException("generate excel error", e);
         }
