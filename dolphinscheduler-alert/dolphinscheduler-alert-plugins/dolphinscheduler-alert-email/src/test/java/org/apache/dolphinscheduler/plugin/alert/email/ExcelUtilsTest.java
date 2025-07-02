@@ -83,6 +83,7 @@ public class ExcelUtilsTest {
         file.delete();
         Assertions.assertFalse(file.exists());
     }
+    
     @Test
     void testGenExcelFile_TruncateLongString() throws Exception {
         String title = "truncate_test";
