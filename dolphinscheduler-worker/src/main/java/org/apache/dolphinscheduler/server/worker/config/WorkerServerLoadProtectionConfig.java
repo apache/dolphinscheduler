@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.config;
+package org.apache.dolphinscheduler.server.worker.config;
 
 import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtectionConfig;
 
@@ -24,8 +24,5 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MasterServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
-
-    private int maxConcurrentWorkflowInstances = Integer.MAX_VALUE;
-
+public class WorkerServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
 }

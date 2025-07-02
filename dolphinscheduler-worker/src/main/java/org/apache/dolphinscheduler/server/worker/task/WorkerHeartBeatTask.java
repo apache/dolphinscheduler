@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
 
     private final WorkerConfig workerConfig;
+    private final WorkerServerLoadProtection workerServerLoadProtection;
     private final RegistryClient registryClient;
 
     private final MetricsProvider metricsProvider;
@@ -49,10 +50,12 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
     private final ITaskExecutorContainer taskExecutorContainer;
 
     public WorkerHeartBeatTask(@NonNull WorkerConfig workerConfig,
+                               @NonNull WorkerServerLoadProtection workerServerLoadProtection,
                                @NonNull MetricsProvider metricsProvider,
                                @NonNull RegistryClient registryClient,
                                @NonNull ITaskExecutorContainer taskExecutorContainer) {
         super("WorkerHeartBeatTask", workerConfig.getMaxHeartbeatInterval().toMillis());
+        this.workerServerLoadProtection = workerServerLoadProtection;
         this.metricsProvider = metricsProvider;
         this.workerConfig = workerConfig;
         this.registryClient = registryClient;
@@ -63,7 +66,6 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
     @Override
     public WorkerHeartBeat getHeartBeat() {
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-        ServerStatus serverStatus = getServerStatus(systemMetrics, workerConfig, taskExecutorContainer);
 
         return WorkerHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
@@ -80,7 +82,8 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .processId(processId)
                 .workerHostWeight(workerConfig.getHostWeight())
                 .threadPoolUsage(taskExecutorContainer.slotUsage())
-                .serverStatus(serverStatus)
+                .serverStatus(
+                        workerServerLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL)
                 .host(NetUtils.getHost())
                 .port(workerConfig.getListenPort())
                 .workerGroup(workerConfig.getGroup())
@@ -109,13 +112,4 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 workerHeartBeatJson);
     }
 
-    private ServerStatus getServerStatus(SystemMetrics systemMetrics,
-                                         WorkerConfig workerConfig,
-                                         ITaskExecutorContainer taskExecutorContainer) {
-        if (taskExecutorContainer.slotUsage() == 1) {
-            return ServerStatus.BUSY;
-        }
-        WorkerServerLoadProtection serverLoadProtection = workerConfig.getServerLoadProtection();
-        return serverLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL;
-    }
 }
