@@ -84,66 +84,31 @@ public class ExcelUtilsTest {
         Assertions.assertFalse(file.exists());
     }
     @Test
-    void testSetCellValueWithSplit_NoSplit() {
-        Row row;
-        CellStyle cellStyle;
-        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
-            Sheet sheet = wb.createSheet();
-            row = sheet.createRow(0);
-            cellStyle = wb.createCellStyle();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        String value = "short string";
-        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
-
-        assertEquals(1, nextCol);
-        assertEquals(value, row.getCell(0).getStringCellValue());
-    }
-
-    @Test
-    void testSetCellValueWithSplit_Split() {
-        Row row;
-        CellStyle cellStyle;
-        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
-            Sheet sheet = wb.createSheet();
-            row = sheet.createRow(0);
-            cellStyle = wb.createCellStyle();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Generate a string longer than 32767
-        int maxLen = 32767;
+    void testGenExcelFile_TruncateLongString() throws Exception {
+        String title = "truncate_test";
+        String longStrKey = "longStr";
+        int maxLen = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
+        // 构造超长字符串
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < maxLen + 10; i++) {
-            sb.append('a');
+        for (int i = 0; i < maxLen + 100; i++) {
+            sb.append('X');
         }
         String longValue = sb.toString();
-        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, longValue);
-
-        assertEquals(2, nextCol); // Should occupy 2 cells
-        assertEquals(longValue.substring(0, maxLen), row.getCell(0).getStringCellValue());
-        assertEquals(longValue.substring(maxLen), row.getCell(1).getStringCellValue());
-    }
-
-    @Test
-    void testSetCellValueWithSplit_Number() {
-        Row row;
-        CellStyle cellStyle;
-        try (SXSSFWorkbook wb = new SXSSFWorkbook()) {
-            Sheet sheet = wb.createSheet();
-            row = sheet.createRow(0);
-            cellStyle = wb.createCellStyle();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        // 构造内容
+        String content = "[{\"" + longStrKey + "\":\"" + longValue + "\"}]";
+    
+        // 生成文件
+        ExcelUtils.genExcelFile(content, title, xlsFilePath);
+    
+        // 检查生成的Excel内容
+        try (SXSSFWorkbook wb = new SXSSFWorkbook(new FileInputStream(xlsFilePath + "/"+ title + ".xlsx"))) {
+            Sheet sheet = wb.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
+            Row dataRow = sheet.getRow(1);
+    
+            assertEquals(longStrKey, headerRow.getCell(0).getStringCellValue());
+            String expected = longValue.substring(0, maxLen - 67) + "...(truncated)";
+            assertEquals(expected, dataRow.getCell(0).getStringCellValue());
         }
-
-        Double value = 123.45; // test double value
-        int nextCol = ExcelUtils.setCellValueWithSplit(row, 0, cellStyle, value);
-
-        assertEquals(1, nextCol);
-        assertEquals("123.45", row.getCell(0).getStringCellValue());
     }
 }
