@@ -20,21 +20,45 @@ package org.apache.dolphinscheduler.server.master.config;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerType;
+import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.TestPropertySource;
 
 @AutoConfigureMockMvc
-@SpringBootTest(classes = MasterConfig.class)
+@SpringBootTest(classes = {
+        MasterConfig.class,
+        MasterServerLoadProtectionConfig.class,
+        MasterConfigTest.TestBeans.class
+})
+@TestPropertySource(properties = {
+        "master.server-load-protection.max-system-cpu-usage-percentage-thresholds=0.9",
+        "master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds=0.9",
+        "master.server-load-protection.max-system-memory-usage-percentage-thresholds=0.9",
+        "master.server-load-protection.max-disk-usage-percentage-thresholds=0.9"
+})
 public class MasterConfigTest {
 
     @Autowired
     private MasterConfig masterConfig;
+
+    @TestConfiguration
+    static class TestBeans {
+
+        @Bean
+        public IWorkflowRepository workflowRepository() {
+            return mock(IWorkflowRepository.class);
+        }
+    }
 
     @Test
     public void getServerLoadProtection() {
