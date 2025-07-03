@@ -26,12 +26,8 @@ import com.google.auto.service.AutoService;
 public class GrpcTaskChannelFactory implements TaskChannelFactory {
 
     @Override
-    public String getName() {
-        return "GRPC";
-    }
+    public String getName() { return "GRPC"; }
 
     @Override
-    public TaskChannel create() {
-        return new GrpcTaskChannel();
-    }
+    public TaskChannel create() { return new GrpcTaskChannel(); }
 }
