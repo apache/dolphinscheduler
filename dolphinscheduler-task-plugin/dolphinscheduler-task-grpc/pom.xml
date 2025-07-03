@@ -29,7 +29,8 @@
 
     <properties>
         <plugin.name>task.grpc</plugin.name>
-        <grpc.version>1.73.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
+        <grpc.version>1.73.0</grpc.version>
+        <!-- CURRENT_GRPC_VERSION -->
         <protobuf.version>3.25.5</protobuf.version>
         <protoc.version>3.25.5</protoc.version>
     </properties>
@@ -54,15 +55,12 @@
             <scope>provided</scope>
         </dependency>
 
-
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
@@ -98,7 +96,8 @@
             <artifactId>protobuf-java-util</artifactId>
             <version>${protobuf.version}</version>
         </dependency>
-        <dependency> <!-- Use newer version than in protobuf-java-util -->
+        <dependency>
+            <!-- Use newer version than in protobuf-java-util -->
             <groupId>com.google.j2objc</groupId>
             <artifactId>j2objc-annotations</artifactId>
             <version>3.0.0</version>
@@ -114,11 +113,7 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20250517</version>
-        </dependency>
+
     </dependencies>
 
     <build>
