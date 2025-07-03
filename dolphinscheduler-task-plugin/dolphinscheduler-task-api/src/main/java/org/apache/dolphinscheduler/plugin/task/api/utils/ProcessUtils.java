@@ -156,6 +156,7 @@ public final class ProcessUtils {
             String killCmd = String.format("kill -s %s %s", signal, pids);
             log.info("Kill command: {}, trying to terminate process", killCmd);
             killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
+            log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);
 
             // 2. Wait for the process to respond to the signal
