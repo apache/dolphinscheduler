@@ -56,6 +56,9 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 @Slf4j
 public final class ProcessUtils {
 
+    // Wait 5 seconds to check process status
+    private static final int CHECK_PROCESS_WAITING_MILLIS = 5000;
+
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -85,6 +88,11 @@ public final class ProcessUtils {
     private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
+     * PID recognition pattern
+     */
+    private static final Pattern PID_PATTERN = Pattern.compile("\\s+");
+
+    /**
      * Terminate the task process, support multi-level signal processing and fallback strategy
      * @param request Task execution context
      * @return Whether the process was successfully terminated
@@ -100,7 +108,7 @@ public final class ProcessUtils {
 
             // Get all child processes
             String pids = getPidsStr(processId);
-            String[] pidArray = pids.split("\\s+");
+            String[] pidArray = PID_PATTERN.split(pids);
             if (pidArray.length == 0) {
                 log.warn("No valid PIDs found for process: {}", processId);
                 return true;
@@ -144,14 +152,49 @@ public final class ProcessUtils {
      */
     private static boolean sendKillSignal(String signal, String pids, String tenantCode) {
         try {
+            // 1. Send the kill signal
             String killCmd = String.format("kill -s %s %s", signal, pids);
+            log.info("Kill command: {}, trying to terminate process", killCmd);
             killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
-            log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);
 
+            // 2. Wait for the process to respond to the signal
+            Thread.sleep(CHECK_PROCESS_WAITING_MILLIS);
+
+            // 3. Check if the processes are still running
+            String[] pidArray = PID_PATTERN.split(pids);
+            for (String pid : pidArray) {
+                // Check if each PID is still alive
+                if (isProcessAlive(Integer.parseInt(pid))) {
+                    log.info("Kill command: {}, kill failed, the process: {} is still running", killCmd, pid);
+                    // Return false if any process is still alive
+                    return false;
+                }
+            }
+            log.info("Kill command: {}, kill succeeded", killCmd);
+            // All processes have been successfully terminated
             return true;
         } catch (Exception e) {
             log.error("Error sending {} to process: {}", signal, pids, e);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a process with the specified PID is alive.
+     *
+     * @param pid the process ID to check
+     * @return true if the process exists and is running, false otherwise
+     */
+    private static boolean isProcessAlive(int pid) {
+        try {
+            // Use kill -0 to check if the process exists; it does not actually send a signal
+            String checkCmd = String.format("kill -0 %d", pid);
+            OSUtils.exeCmd(checkCmd);
+            // If the command executes successfully, the process exists
+            return true;
+        } catch (Exception e) {
+            // If the command fails, the process does not exist
             return false;
         }
     }
@@ -244,11 +287,12 @@ public final class ProcessUtils {
                     taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 }
                 if (CollectionUtils.isEmpty(appIds)) {
-                    log.info("The appId is empty");
+                    log.info("The appId is empty, so there is no need to kill yarn application.");
                     return;
                 }
                 ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
+                log.info("yarn application [{}] is killed or already finished", appIds);
             }
         } catch (Exception e) {
             log.error("Cancel application failed: {}", e.getMessage());
