@@ -88,7 +88,7 @@ export const TASK_TYPES_MAP = {
     alias: 'DEPENDENT'
   },
   GRPC: {
-    alias: 'GRPC',
+    alias: 'GRPC'
     // helperLinkDisable: true
   },
   HTTP: {

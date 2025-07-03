@@ -89,6 +89,17 @@ export function formatParams(data: INodeData): {
     taskParams.taskManager = data.taskManager
     taskParams.parallelism = data.parallelism
   }
+  if (data.taskType === 'GRPC') {
+    // taskParams.grpcMethodName = data.grpcMethodName
+    // taskParams.grpcServiceName = data.grpcServiceName
+    // taskParams.grpcParams = data.grpcParams
+    // taskParams.grpcAddress = data.grpcAddress
+    taskParams.condition = data.condition
+    taskParams.connectTimeout = data.connectTimeout
+    taskParams.socketTimeout = data.socketTimeout
+    // taskParams.timeoutNotifyStrategy = data.timeoutNotifyStrategy
+  }
+
   if (data.taskType === 'HTTP') {
     taskParams.httpMethod = data.httpMethod
     taskParams.httpBody = data.httpBody
