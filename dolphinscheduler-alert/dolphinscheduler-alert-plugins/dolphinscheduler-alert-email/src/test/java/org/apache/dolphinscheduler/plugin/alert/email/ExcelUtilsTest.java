@@ -89,19 +89,15 @@ public class ExcelUtilsTest {
         String title = "truncate_test";
         String longStrKey = "longStr";
         int maxLen = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
-        // 构造超长字符串
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < maxLen + 100; i++) {
             sb.append('X');
         }
         String longValue = sb.toString();
-        // 构造内容
         String content = "[{\"" + longStrKey + "\":\"" + longValue + "\"}]";
     
-        // 生成文件
         ExcelUtils.genExcelFile(content, title, xlsFilePath);
     
-        // 检查生成的Excel内容
         try (SXSSFWorkbook wb = new SXSSFWorkbook(new FileInputStream(xlsFilePath + "/"+ title + ".xlsx"))) {
             Sheet sheet = wb.getSheetAt(0);
             Row headerRow = sheet.getRow(0);
