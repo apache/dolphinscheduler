@@ -19,13 +19,11 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Assertions;
@@ -83,7 +81,7 @@ public class ExcelUtilsTest {
         file.delete();
         Assertions.assertFalse(file.exists());
     }
-    
+
     @Test
     void testGenExcelFile_TruncateLongString() throws Exception {
         String title = "truncate_test";
@@ -95,14 +93,14 @@ public class ExcelUtilsTest {
         }
         String longValue = sb.toString();
         String content = "[{\"" + longStrKey + "\":\"" + longValue + "\"}]";
-    
+
         ExcelUtils.genExcelFile(content, title, xlsFilePath);
-    
-        try (SXSSFWorkbook wb = new SXSSFWorkbook(new FileInputStream(xlsFilePath + "/"+ title + ".xlsx"))) {
+
+        try (SXSSFWorkbook wb = new SXSSFWorkbook(new FileInputStream(xlsFilePath + "/" + title + ".xlsx"))) {
             Sheet sheet = wb.getSheetAt(0);
             Row headerRow = sheet.getRow(0);
             Row dataRow = sheet.getRow(1);
-    
+
             assertEquals(longStrKey, headerRow.getCell(0).getStringCellValue());
             String expected = longValue.substring(0, maxLen - 67) + "...(truncated)";
             assertEquals(expected, dataRow.getCell(0).getStringCellValue());
