@@ -17,35 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class GrpcParameters extends AbstractParameters {
-
-    private String endpoint;
-
-    private String methodName;
-
-    private String requestMessage;
-
-    private String serviceDefinition;
-
-    private GrpcCheckCondition grpcCheckCondition = GrpcCheckCondition.STATUS_CODE_DEFAULT;
-
-    private String condition;
-
+public enum GrpcCheckCondition {
     /**
-     * Connect Timeout
-     * Unit: ms
+     * 0 status_code_default:OK
+     * 1 status_code_custom
      */
-    private int connectTimeout;
+    STATUS_CODE_DEFAULT,
+    STATUS_CODE_CUSTOM,
 
-    @Override
-    public boolean checkParameters() {
-        return true;
+    GrpcCheckCondition() {
+
     }
 }
