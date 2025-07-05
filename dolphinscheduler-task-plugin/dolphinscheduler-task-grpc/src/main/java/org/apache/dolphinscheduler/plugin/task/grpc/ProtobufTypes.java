@@ -17,21 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+public class ProtobufTypes {
 
-import com.google.auto.service.AutoService;
+    class Message {
 
-@AutoService(TaskChannelFactory.class)
-public class GrpcTaskChannelFactory implements TaskChannelFactory {
-
-    @Override
-    public String getName() {
-        return "GRPC";
-    }
-
-    @Override
-    public TaskChannel create() {
-        return new GrpcTaskChannel();
     }
 }
