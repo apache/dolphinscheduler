@@ -157,7 +157,6 @@ public final class ProcessUtils {
         try {
             // 1. Send the kill signal
             String killCmd = String.format("kill -s %s %s", signal, pids);
-            log.info("Kill command: {}, trying to terminate process", killCmd);
             killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
             log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);
@@ -169,13 +168,13 @@ public final class ProcessUtils {
             String[] pidArray = PID_PATTERN.split(pids);
             for (String pid : pidArray) {
                 // Check if each PID is still alive
-                if (isProcessAlive(Integer.parseInt(pid))) {
+                if (isProcessAlive(Integer.parseInt(pid), tenantCode)) {
                     log.info("Kill command: {}, kill failed, the process: {} is still running", killCmd, pid);
                     // Return false if any process is still alive
                     return false;
                 }
             }
-            log.info("Kill command: {}, kill succeeded", killCmd);
+            log.debug("Kill command: {}, kill succeeded", killCmd);
             // All processes have been successfully terminated
             return true;
         } catch (Exception e) {
@@ -190,10 +189,11 @@ public final class ProcessUtils {
      * @param pid the process ID to check
      * @return true if the process exists and is running, false otherwise
      */
-    private static boolean isProcessAlive(int pid) {
+    private static boolean isProcessAlive(int pid, String tenantCode) {
         try {
             // Use kill -0 to check if the process exists; it does not actually send a signal
             String checkCmd = String.format("kill -0 %d", pid);
+            checkCmd = OSUtils.getSudoCmd(tenantCode, checkCmd);
             OSUtils.exeCmd(checkCmd);
             // If the command executes successfully, the process exists
             return true;
@@ -291,7 +291,7 @@ public final class ProcessUtils {
                     taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 }
                 if (CollectionUtils.isEmpty(appIds)) {
-                    log.info("The appId is empty, so there is no need to kill yarn application.");
+                    log.info("The appId is empty");
                     return;
                 }
                 ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
