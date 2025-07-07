@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
@@ -56,8 +59,8 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 @Slf4j
 public final class ProcessUtils {
 
-    // Wait 5 seconds to check process status
-    private static final int CHECK_PROCESS_WAITING_MILLIS = 5000;
+    // The delay before checking the process status after termination (in seconds)
+    private static final Integer PROCESS_STATUS_CHECK_DELAY = PropertyUtils.getInt(Constants.PROCESS_STATUS_CHECK_DELAY, 5);
 
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
@@ -160,7 +163,7 @@ public final class ProcessUtils {
             OSUtils.exeCmd(killCmd);
 
             // 2. Wait for the process to respond to the signal
-            Thread.sleep(CHECK_PROCESS_WAITING_MILLIS);
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS * PROCESS_STATUS_CHECK_DELAY);
 
             // 3. Check if the processes are still running
             String[] pidArray = PID_PATTERN.split(pids);
