@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.server;
+package org.apache.dolphinscheduler.server.worker.config;
 
-interface ServerMethodInvoker {
+import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtectionConfig;
 
-    String getMethodIdentify();
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-    String getMethodProviderIdentify();
-
-    Object invoke(final Object... arg) throws Throwable;
-
-    boolean isParameterTypeValidated(Class<?>[] argsTypes);
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class WorkerServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
 }
