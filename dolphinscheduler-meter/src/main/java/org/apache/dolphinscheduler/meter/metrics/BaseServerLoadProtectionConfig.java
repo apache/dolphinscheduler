@@ -15,15 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.server;
+package org.apache.dolphinscheduler.meter.metrics;
 
-interface ServerMethodInvoker {
+import lombok.Data;
 
-    String getMethodIdentify();
+@Data
+public abstract class BaseServerLoadProtectionConfig {
 
-    String getMethodProviderIdentify();
+    protected boolean enabled = true;
 
-    Object invoke(final Object... arg) throws Throwable;
+    protected double maxSystemCpuUsagePercentageThresholds = 0.7;
 
-    boolean isParameterTypeValidated(Class<?>[] argsTypes);
+    protected double maxJvmCpuUsagePercentageThresholds = 0.7;
+
+    protected double maxSystemMemoryUsagePercentageThresholds = 0.7;
+
+    protected double maxDiskUsagePercentageThresholds = 0.7;
+
 }

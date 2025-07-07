@@ -17,43 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtectionConfig;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class MasterServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
 
-@Slf4j
-@Configuration
-public class MasterServerLoadProtectionConfig {
+    private int maxConcurrentWorkflowInstances = Integer.MAX_VALUE;
 
-    @Bean
-    public MasterServerLoadProtection masterServerLoadProtection(
-                                                                 IWorkflowRepository workflowRepository,
-                                                                 @Value("${master.server-load-protection.max-concurrent-workflow-instances:2147483647}") int maxConcurrentWorkflowInstances,
-                                                                 @Value("${master.server-load-protection.max-system-cpu-usage-percentage-thresholds:0.7}") double maxSystemCpuUsagePercentageThresholds,
-                                                                 @Value("${master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds:0.7}") double maxJvmCpuUsagePercentageThresholds,
-                                                                 @Value("${master.server-load-protection.max-system-memory-usage-percentage-thresholds:0.7}") double maxSystemMemoryUsagePercentageThresholds,
-                                                                 @Value("${master.server-load-protection.max-disk-usage-percentage-thresholds:0.7}") double maxDiskUsagePercentageThresholds,
-                                                                 @Value("${master.server-load-protection.enabled:true}") boolean enabled) {
-        MasterServerLoadProtection protection =
-                new MasterServerLoadProtection(workflowRepository,
-                        maxConcurrentWorkflowInstances,
-                        maxSystemCpuUsagePercentageThresholds,
-                        maxJvmCpuUsagePercentageThresholds,
-                        maxSystemMemoryUsagePercentageThresholds,
-                        maxDiskUsagePercentageThresholds,
-                        enabled);
-        log.info(
-                "Initialized MasterServerLoadProtection with IWorkflowRepository and maxConcurrentWorkflowInstances={}, "
-                        +
-                        "maxSystemCpuUsagePercentageThresholds={}, maxJvmCpuUsagePercentageThresholds={}, " +
-                        "maxSystemMemoryUsagePercentageThresholds={}, maxDiskUsagePercentageThresholds={}, enabled={}",
-                maxConcurrentWorkflowInstances, maxSystemCpuUsagePercentageThresholds,
-                maxJvmCpuUsagePercentageThresholds,
-                maxSystemMemoryUsagePercentageThresholds, maxDiskUsagePercentageThresholds, enabled);
-        return protection;
-    }
 }

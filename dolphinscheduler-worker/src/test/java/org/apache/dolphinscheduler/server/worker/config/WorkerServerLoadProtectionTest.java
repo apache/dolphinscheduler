@@ -26,7 +26,8 @@ class WorkerServerLoadProtectionTest {
 
     @Test
     void isOverload() {
-        WorkerServerLoadProtection workerServerLoadProtection = new WorkerServerLoadProtection();
+        WorkerConfig workerConfig = new WorkerConfig();
+        WorkerServerLoadProtection workerServerLoadProtection = new WorkerServerLoadProtection(workerConfig);
         SystemMetrics systemMetrics = SystemMetrics.builder()
                 .jvmMemoryUsedPercentage(0.71)
                 .systemMemoryUsedPercentage(0.71)
@@ -34,10 +35,11 @@ class WorkerServerLoadProtectionTest {
                 .jvmCpuUsagePercentage(0.71)
                 .diskUsedPercentage(0.71)
                 .build();
-        workerServerLoadProtection.setEnabled(false);
+
+        workerConfig.getServerLoadProtection().setEnabled(false);
         Assertions.assertFalse(workerServerLoadProtection.isOverload(systemMetrics));
 
-        workerServerLoadProtection.setEnabled(true);
+        workerConfig.getServerLoadProtection().setEnabled(true);
         Assertions.assertTrue(workerServerLoadProtection.isOverload(systemMetrics));
     }
 }
