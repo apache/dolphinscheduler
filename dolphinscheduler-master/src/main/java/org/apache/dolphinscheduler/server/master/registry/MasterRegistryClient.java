@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -30,6 +28,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +51,9 @@ public class MasterRegistryClient implements AutoCloseable {
     private MasterConfig masterConfig;
 
     @Autowired
+    private MasterServerLoadProtection masterServerLoadProtection;
+
+    @Autowired
     private MetricsProvider metricsProvider;
 
     @Autowired
@@ -61,8 +63,8 @@ public class MasterRegistryClient implements AutoCloseable {
 
     public void start() {
         try {
-            this.masterHeartBeatTask =
-                    new MasterHeartBeatTask(masterConfig, metricsProvider, registryClient, masterCoordinator);
+            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, masterServerLoadProtection,
+                    metricsProvider, registryClient, masterCoordinator);
             // master registry
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(registryClient));
@@ -94,13 +96,6 @@ public class MasterRegistryClient implements AutoCloseable {
         log.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
 
-        MasterHeartBeat heartBeat = masterHeartBeatTask.getHeartBeat();
-        while (ServerStatus.BUSY.equals(heartBeat.getServerStatus())) {
-            log.warn("Master node is BUSY: {}", heartBeat);
-            heartBeat = masterHeartBeatTask.getHeartBeat();
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-        }
-
         // remove before persist
         registryClient.remove(masterRegistryPath);
         registryClient.persistEphemeral(masterRegistryPath, JSONUtils.toJsonString(masterHeartBeatTask.getHeartBeat()));
@@ -109,9 +104,6 @@ public class MasterRegistryClient implements AutoCloseable {
             log.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
-
-        // sleep 1s, waiting master failover remove
-        ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
         masterHeartBeatTask.start();
         log.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());

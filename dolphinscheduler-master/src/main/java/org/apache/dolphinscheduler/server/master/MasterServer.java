@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.engine.WorkflowEngine;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBusFireWorker;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
@@ -99,6 +100,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterCoordinator masterCoordinator;
 
+    @Autowired
+    private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -129,6 +133,7 @@ public class MasterServer implements IStoppable {
         this.masterCoordinator.start();
 
         this.clusterManager.start();
+
         this.clusterStateMonitors.start();
 
         this.workflowEngine.start();
@@ -183,7 +188,9 @@ public class MasterServer implements IStoppable {
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
-                SpringApplicationContext closedSpringContext = springApplicationContext) {
+                SpringApplicationContext closedSpringContext = springApplicationContext;
+                WorkerGroupDispatcherCoordinator closeWorkerGroupDispatcherCoordinator =
+                        workerGroupDispatcherCoordinator) {
 
             log.info("MasterServer is stopping, current cause : {}", cause);
         } catch (Exception e) {

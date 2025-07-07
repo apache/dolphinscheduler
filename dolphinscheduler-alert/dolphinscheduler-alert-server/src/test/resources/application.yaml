@@ -90,9 +90,6 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
-metrics:
-  enabled: true
-
 # Override by profile
 
 ---

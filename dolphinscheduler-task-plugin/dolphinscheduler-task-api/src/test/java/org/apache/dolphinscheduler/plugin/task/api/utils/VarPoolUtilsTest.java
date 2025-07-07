@@ -32,7 +32,7 @@ class VarPoolUtilsTest {
 
     @Test
     void mergeVarPool() {
-        Truth.assertThat(VarPoolUtils.mergeVarPool(null)).isNull();
+        Truth.assertThat(VarPoolUtils.mergeVarPool(null)).isEmpty();
 
         // Override the value of the same property
         // Merge the property with different key.
@@ -51,7 +51,8 @@ class VarPoolUtilsTest {
     @Test
     void subtractVarPool() {
         Truth.assertThat(VarPoolUtils.subtractVarPool(null, null)).isNull();
-        List<Property> varpool1 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"),
+        List<Property> varpool1 = Lists.newArrayList(
+                new Property("name", Direct.OUT, DataType.VARCHAR, "tom"),
                 new Property("age", Direct.OUT, DataType.INTEGER, "10"));
         List<Property> varpool2 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"));
         List<Property> varpool3 = Lists.newArrayList(new Property("location", Direct.OUT, DataType.VARCHAR, "china"));

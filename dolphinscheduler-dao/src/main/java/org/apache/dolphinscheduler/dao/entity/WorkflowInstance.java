@@ -158,8 +158,6 @@ public class WorkflowInstance {
 
     private Date restartTime;
 
-    private int testFlag;
-
     /**
      * set the process name with process define version and timestamp
      *

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.engine.executor.plugin.depende
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -111,7 +110,7 @@ public class DependentTaskTracker {
             DependResult dependResult = calculateDependResult();
             log.info("The final Dependent result is: {}", dependResult);
             if (dependResult == DependResult.SUCCESS) {
-                dependentParameters.setVarPool(JSONUtils.toJsonString(dependVarPoolPropertyMap.values()));
+                dependentParameters.setVarPool(new ArrayList<>(dependVarPoolPropertyMap.values()));
                 log.info("Set dependentParameters varPool: {}", dependentParameters.getVarPool());
                 return TaskExecutionStatus.SUCCESS;
             } else {
@@ -219,7 +218,7 @@ public class DependentTaskTracker {
         Map<String, Long> dependVarPoolEndTimeMap = new HashMap<>();
         for (DependentExecute dependentExecute : dependentTaskList) {
             DependResult dependResult =
-                    dependentExecute.getModelDependResult(dependentDate, workflowInstance.getTestFlag());
+                    dependentExecute.getModelDependResult(dependentDate);
             if (dependResult == DependResult.SUCCESS) {
                 Map<String, Property> varPoolPropertyMap = dependentExecute.getDependTaskVarPoolPropertyMap();
                 Map<String, Long> varPoolEndTimeMap = dependentExecute.getDependTaskVarPoolEndTimeMap();
@@ -235,7 +234,7 @@ public class DependentTaskTracker {
     private boolean isAllDependentTaskFinished() {
         boolean isAllDependentTaskFinished = true;
         for (DependentExecute dependentExecute : dependentTaskList) {
-            if (!dependentExecute.finish(dependentDate, workflowInstance.getTestFlag(),
+            if (!dependentExecute.finish(dependentDate,
                     dependentParameters.getDependence().getFailurePolicy(),
                     dependentParameters.getDependence().getFailureWaitingTime())) {
                 isAllDependentTaskFinished = false;

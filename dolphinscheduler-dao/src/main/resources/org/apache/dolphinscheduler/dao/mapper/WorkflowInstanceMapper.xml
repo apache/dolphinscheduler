@@ -25,7 +25,7 @@
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_workflow, executor_id, history_cmd,
         workflow_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
-        dry_run, test_flag, next_workflow_instance_id, restart_time, state_history
+        dry_run, next_workflow_instance_id, restart_time, state_history
     </sql>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
@@ -39,6 +39,22 @@
         <include refid="baseSql"/>
         from t_ds_workflow_instance
         where 1=1
+        <if test="host != null and host != ''">
+            and host=#{host}
+        </if>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        order by id asc
+    </select>
+    <select id="queryMainWorkflowByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_instance
+        where is_sub_workflow=0
         <if test="host != null and host != ''">
             and host=#{host}
         </if>
@@ -200,7 +216,7 @@
         select t1.* from (select
         <include refid="baseSql"/>
         from t_ds_workflow_instance
-        where workflow_definition_code=#{workflowDefinitionCode} and test_flag=#{testFlag}
+        where workflow_definition_code=#{workflowDefinitionCode}
         <if test="startTime != null and endTime != null ">
             and schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>) as t1
@@ -219,7 +235,7 @@
             <include refid="baseSql"/>
             from t_ds_workflow_instance
             where
-            workflow_definition_code=#{workflowDefinitionCode} and test_flag=#{testFlag}
+            workflow_definition_code=#{workflowDefinitionCode}
             and schedule_time is null
             <if test="startTime!=null and endTime != null ">
                 and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
@@ -231,6 +247,24 @@
         on t1.id = t2.workflow_instance_id and t2.task_code=#{taskCode}
         </if>
         order by t1.end_time desc limit 1
+    </select>
+
+    <select id="queryLastRunningWorkflow" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_workflow_instance
+        where workflow_definition_code=#{workflowDefinitionCode}
+        <if test="states !=null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="startTime!=null and endTime != null ">
+            and ((schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime})
+            or (start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}))
+        </if>
+        order by start_time desc limit 1
     </select>
 
     <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">

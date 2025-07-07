@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -80,26 +81,17 @@ public class TaskExecutionContext implements Serializable {
 
     private int executorId;
 
-    private int cmdTypeIfComplement;
-
     private String tenantCode;
 
     private int workflowDefinitionId;
-
-    private int projectId;
-
-    private long projectCode;
 
     private String taskParams;
 
     private String environmentConfig;
 
     /**
-     * definedParams
-     * // todo: we need to rename definedParams, prepareParamsMap, paramsMap, this is confusing
+     * Include local params, global params, varpool transport from successors, start-up params and system built-in params
      */
-    private Map<String, String> definedParams;
-
     private Map<String, Property> prepareParamsMap;
 
     // Please use task instanceId
@@ -122,19 +114,13 @@ public class TaskExecutionContext implements Serializable {
 
     private ResourceContext resourceContext;
 
-    private String varPool;
+    private List<Property> varPool;
 
     private int dryRun;
-
-    private Map<String, Property> paramsMap;
 
     private Integer cpuQuota;
 
     private Integer memoryMax;
-
-    private int testFlag;
-
-    private boolean logBufferEnable;
 
     private int dispatchFailTimes;
 

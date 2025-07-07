@@ -38,7 +38,7 @@ public class MasterConfigTest {
 
     @Test
     public void getServerLoadProtection() {
-        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
+        MasterServerLoadProtectionConfig serverLoadProtection = masterConfig.getServerLoadProtection();
         assertTrue(serverLoadProtection.isEnabled());
         assertEquals(0.9, serverLoadProtection.getMaxSystemCpuUsagePercentageThresholds());
         assertEquals(0.9, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());

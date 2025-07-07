@@ -61,6 +61,4 @@ public class WorkflowTriggerRequest {
     private String startParamList;
 
     private Flag dryRun;
-
-    private Flag testFlag;
 }

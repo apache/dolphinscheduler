@@ -54,7 +54,6 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
                 .startParamList(
                         PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList()))
                 .dryRun(workflowTriggerRequest.getDryRun())
-                .testFlag(workflowTriggerRequest.getTestFlag())
                 .build();
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao

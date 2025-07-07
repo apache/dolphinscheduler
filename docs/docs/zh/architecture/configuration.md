@@ -291,6 +291,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.7                          | master最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的JVM CPU |
 | master.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.7                          | master最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统内存          |
 | master.server-load-protection.max-disk-usage-percentage-thresholds          | 0.7                          | master最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统磁盘空间         |
+| master.server-load-protection.max-concurrent-workflow-instances             | 2147483647                   | Master最大并发工作流实例数. 当Master的工作流实例数达到或超过此值时，Master服务将被标记为繁忙.                               |
 | master.failover-interval                                                    | 10                           | failover间隔，单位为分钟                                                                        |
 | master.kill-application-when-task-failover                                  | true                         | 当任务实例failover时，是否kill掉yarn或k8s application                                              |
 | master.master.worker-group-refresh-interval                                 | 10s                          | 定期将workerGroup从数据库中同步到内存的时间间隔                                                           |
@@ -309,10 +310,10 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | worker.host-weight                                                          | 100       | 派发任务时，worker主机的权重                                                                       |
 | worker.tenant-auto-create                                                   | true      | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
 | worker.server-load-protection.enabled                                       | true      | 是否开启系统保护策略                                                                              |
-| worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.7       | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统CPU       |
-| worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.7       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的JVM CPU |
-| worker.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.7       | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统内存          |
-| worker.server-load-protection.max-disk-usage-percentage-thresholds          | 0.7       | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.7: 会使用70%的操作系统磁盘空间         |
+| worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.8       | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统CPU       |
+| worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.8       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的JVM CPU |
+| worker.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.8       | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统内存          |
+| worker.server-load-protection.max-disk-usage-percentage-thresholds          | 0.8       | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统磁盘空间         |
 | worker.alert-listen-host                                                    | localhost | alert监听host                                                                             |
 | worker.alert-listen-port                                                    | 50052     | alert监听端口                                                                               |
 | worker.physical-task-config.task-executor-thread-size                       | 100       | Worker中任务最大并发度                                                                          |

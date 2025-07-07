@@ -334,7 +334,6 @@ CREATE TABLE t_ds_command
     dry_run                    int NULL DEFAULT 0,
     workflow_instance_id        int(11) DEFAULT 0,
     workflow_definition_version int(11) DEFAULT 0,
-    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id),
     KEY                        priority_id_index (workflow_instance_priority, id)
 );
@@ -391,7 +390,6 @@ CREATE TABLE t_ds_error_command
     dry_run                    int NULL DEFAULT 0,
     workflow_instance_id        int(11) DEFAULT 0,
     workflow_definition_version int(11) DEFAULT 0,
-    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -423,7 +421,7 @@ CREATE TABLE t_ds_workflow_definition
     update_time      datetime     DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY workflow_unique (name,project_code) USING BTREE,
-    UNIQUE KEY code_unique (code)
+    UNIQUE KEY uniq_workflow_definition_code (code)
 );
 
 -- ----------------------------
@@ -617,7 +615,6 @@ CREATE TABLE t_ds_workflow_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
-    test_flag                  int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -917,7 +914,6 @@ CREATE TABLE t_ds_task_instance
     dry_run                 int NULL DEFAULT 0,
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
-    test_flag               int NULL DEFAULT 0,
     PRIMARY KEY (id)
 );
 

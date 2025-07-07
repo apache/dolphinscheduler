@@ -181,6 +181,10 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     @Override
     public boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable) {
+        if (isTaskExecutionRunnableActive(taskExecutionRunnable)
+                || isTaskExecutionRunnableInActive(taskExecutionRunnable)) {
+            return false;
+        }
         return getPredecessors(taskExecutionRunnable.getName())
                 .stream()
                 .allMatch(predecessor -> isTaskExecutionRunnableInActive(predecessor)

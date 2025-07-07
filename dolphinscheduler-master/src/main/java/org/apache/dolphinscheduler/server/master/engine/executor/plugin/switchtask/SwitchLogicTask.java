@@ -117,6 +117,9 @@ public class SwitchLogicTask extends AbstractLogicTask<SwitchParameters> {
         if (nextBranch == null) {
             log.info("All switch item is not satisfied");
             moveToDefaultBranch();
+        } else {
+            log.info("The condition is satisfied, move to the next branch: {}", getTaskName(nextBranch));
+            taskParameters.setNextBranch(nextBranch);
         }
     }
 

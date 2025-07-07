@@ -60,13 +60,16 @@ DolphinScheduler will release new Docker images after it released, you could fin
 
 - If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
 
+> -Pstaging contains plugins, suitable for development and testing as well as offline deployment without a network environment
+> -Prelease does not contain plugins, suitable for production environments, and plugins can be downloaded on demand from a network that can access plugins
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 When the command is finished you could find them by command `docker images`.
@@ -80,7 +83,7 @@ cd dolphinscheduler
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 - If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.
@@ -128,7 +131,7 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA and click run main function to startup.
 
 > Note: Please check the option `Add dependencies with "provided" scope to classpath` in the startup configuration before starting, so as to avoid the problem that no dependencies can be found during startup.
 

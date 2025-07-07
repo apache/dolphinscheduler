@@ -221,8 +221,21 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
     }
 
     @Override
-    public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
-        resourceAbsolutePath = transformCOSKeyToAbsolutePath(resourceAbsolutePath);
+    public List<StorageEntity> listStorageEntity(String path) {
+        /*
+         * If the incoming path ends with File.separator, it is assumed that the incoming intent is to access the
+         * directory and direct query If the incoming path does not end with `File.separator`, it is considered that the
+         * incoming intent could be either a file or a directory, and a determination needs to be made. If the object is
+         * queried as a file, return the file; otherwise, query it as a directory.
+         */
+        if (!path.endsWith(File.separator)) {
+            boolean objectExists = cosClient.doesObjectExist(bucketName, path);
+            if (!objectExists) {
+                path = path + File.separator;
+            }
+        }
+
+        String resourceAbsolutePath = path;
 
         ListObjectsRequest request = new ListObjectsRequest();
         request.setBucketName(bucketName);
@@ -230,9 +243,22 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
         request.setDelimiter(File.separator);
 
         ObjectListing result = cosClient.listObjects(request);
-
-        return result.getObjectSummaries()
+        List<StorageEntity> storageEntitys = new ArrayList<>();
+        // add directories
+        storageEntitys.addAll(result.getCommonPrefixes()
                 .stream()
+                .filter(x -> !resourceAbsolutePath.equals(x))
+                .map(key -> {
+                    ObjectMetadata metadata = new ObjectMetadata();
+                    COSObject object = new COSObject();
+                    object.setObjectMetadata(metadata);
+                    object.setKey(key);
+                    return transformCOSObjectToStorageEntity(object);
+                }).collect(Collectors.toList()));
+        // add files
+        storageEntitys.addAll(result.getObjectSummaries()
+                .stream()
+                .filter(x -> !x.getKey().endsWith(File.separator))
                 .map((COSObjectSummary summary) -> {
                     ObjectMetadata metadata = new ObjectMetadata();
                     metadata.setContentLength(summary.getSize());
@@ -242,7 +268,8 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
                     object.setKey(summary.getKey());
                     return transformCOSObjectToStorageEntity(object);
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+        return storageEntitys;
     }
 
     @Override

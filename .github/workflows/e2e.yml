@@ -40,7 +40,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+      - uses: dorny/paths-filter@v3.0.2
         id: filter
         with:
           filters: |
@@ -84,7 +84,9 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip=true \
           -Dspotless.skip=true \
-          -Pdocker,staging -Ddocker.tag=ci
+          -Pdocker,staging \
+          -Ddocker.tag=ci \
+          -Danalyze.skip=true
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
@@ -146,6 +148,19 @@ jobs:
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 30720
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
       - uses: actions/checkout@v4
         with:
           submodules: true

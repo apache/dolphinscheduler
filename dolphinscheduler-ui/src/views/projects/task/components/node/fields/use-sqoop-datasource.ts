@@ -48,7 +48,7 @@ export function useDatasource(
         : ''
       model.targetMysqlType = type
     }
-    const params = { type, testFlag: 0 } as TypeReq
+    const params = { type } as TypeReq
     const result = await queryDataSourceList(params)
     dataSourceList.value = result.map((item: { name: string; id: number }) => ({
       label: item.name,

@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -54,7 +53,6 @@ class ErrorCommandTest {
         command.setTenantCode("root");
         command.setEnvironmentCode(1L);
         command.setDryRun(1);
-        command.setTestFlag(Flag.NO.getCode());
 
         ErrorCommand errorCommand = new ErrorCommand(command, "test");
         assertEquals(command.getCommandType(), errorCommand.getCommandType());
@@ -75,7 +73,6 @@ class ErrorCommandTest {
         assertEquals(command.getTenantCode(), errorCommand.getTenantCode());
         assertEquals(command.getEnvironmentCode(), errorCommand.getEnvironmentCode());
         assertEquals(command.getDryRun(), errorCommand.getDryRun());
-        assertEquals(command.getTestFlag(), errorCommand.getTestFlag());
         assertEquals("test", errorCommand.getMessage());
     }
 
