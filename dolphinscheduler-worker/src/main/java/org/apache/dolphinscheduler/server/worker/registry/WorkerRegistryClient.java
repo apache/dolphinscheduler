@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutorContainerProvider;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 
@@ -53,6 +54,9 @@ public class WorkerRegistryClient implements AutoCloseable {
     private WorkerConfig workerConfig;
 
     @Autowired
+    private WorkerServerLoadProtection workerServerLoadProtection;
+
+    @Autowired
     private PhysicalTaskExecutorContainerProvider physicalTaskExecutorContainerDelegator;
 
     @Autowired
@@ -67,6 +71,7 @@ public class WorkerRegistryClient implements AutoCloseable {
     public void initWorkRegistry() {
         this.workerHeartBeatTask = new WorkerHeartBeatTask(
                 workerConfig,
+                workerServerLoadProtection,
                 metricsProvider,
                 registryClient,
                 physicalTaskExecutorContainerDelegator.getExecutorContainer());

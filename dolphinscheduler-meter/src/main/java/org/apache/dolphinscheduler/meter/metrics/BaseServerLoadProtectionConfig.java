@@ -15,17 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.config;
-
-import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtectionConfig;
+package org.apache.dolphinscheduler.meter.metrics;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class MasterServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
+public abstract class BaseServerLoadProtectionConfig {
 
-    private int maxConcurrentWorkflowInstances = Integer.MAX_VALUE;
+    protected boolean enabled = true;
+
+    protected double maxSystemCpuUsagePercentageThresholds = 0.7;
+
+    protected double maxJvmCpuUsagePercentageThresholds = 0.7;
+
+    protected double maxSystemMemoryUsagePercentageThresholds = 0.7;
+
+    protected double maxDiskUsagePercentageThresholds = 0.7;
 
 }

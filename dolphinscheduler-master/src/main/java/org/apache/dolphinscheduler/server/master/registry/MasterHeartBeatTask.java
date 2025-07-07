@@ -41,6 +41,8 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
 
     private final MasterConfig masterConfig;
 
+    private MasterServerLoadProtection masterServerLoadProtection;
+
     private final MetricsProvider metricsProvider;
 
     private final RegistryClient registryClient;
@@ -52,11 +54,13 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     private final int processId;
 
     public MasterHeartBeatTask(@NonNull MasterConfig masterConfig,
+                               @NonNull MasterServerLoadProtection masterServerLoadProtection,
                                @NonNull MetricsProvider metricsProvider,
                                @NonNull RegistryClient registryClient,
                                @NonNull MasterCoordinator masterCoordinator) {
         super("MasterHeartBeatTask", masterConfig.getMaxHeartbeatInterval().toMillis());
         this.masterConfig = masterConfig;
+        this.masterServerLoadProtection = masterServerLoadProtection;
         this.metricsProvider = metricsProvider;
         this.registryClient = registryClient;
         this.masterCoordinator = masterCoordinator;
@@ -67,7 +71,6 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     @Override
     public MasterHeartBeat getHeartBeat() {
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-        ServerStatus serverStatus = getServerStatus(systemMetrics, masterConfig.getServerLoadProtection());
         return MasterHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())
@@ -81,7 +84,8 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
                 .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
                 .diskUsage(systemMetrics.getDiskUsedPercentage())
                 .processId(processId)
-                .serverStatus(serverStatus)
+                .serverStatus(
+                        masterServerLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL)
                 .host(NetUtils.getHost())
                 .port(masterConfig.getListenPort())
                 .isCoordinator(masterCoordinator.isActive())
@@ -108,8 +112,4 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
                 masterHeartBeatJson);
     }
 
-    private ServerStatus getServerStatus(final SystemMetrics systemMetrics,
-                                         final MasterServerLoadProtection masterServerLoadProtection) {
-        return masterServerLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL;
-    }
 }
