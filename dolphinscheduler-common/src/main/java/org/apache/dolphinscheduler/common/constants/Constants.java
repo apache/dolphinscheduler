@@ -70,6 +70,11 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE = "development.state";
 
     /**
+     * process.status.check.delay.time
+     */
+    public static final String PROCESS_STATUS_CHECK_DELAY = "process.status.check.delay";
+
+    /**
      * sudo enable
      */
     public static final String SUDO_ENABLE = "sudo.enable";
