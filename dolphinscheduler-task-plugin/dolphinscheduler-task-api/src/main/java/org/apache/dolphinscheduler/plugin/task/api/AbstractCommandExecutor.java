@@ -221,6 +221,9 @@ public abstract class AbstractCommandExecutor {
             log.error("Failed to kill process tree for task: {}, pid: {}",
                     taskRequest.getTaskAppId(), taskRequest.getProcessId());
         }
+
+        // Try to kill yarn or k8s application
+        ProcessUtils.cancelApplication(taskRequest);
     }
 
     private void collectPodLogIfNeeded() {
