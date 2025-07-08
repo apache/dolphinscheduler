@@ -21,49 +21,41 @@ import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.stereotype.Component;
+
 @Slf4j
-@Getter
+@Component
 public class MasterServerLoadProtection extends BaseServerLoadProtection {
 
-    private final int maxConcurrentWorkflowInstances;
     private final IWorkflowRepository workflowRepository;
 
+    private final MasterServerLoadProtectionConfig masterServerLoadProtectionConfig;
+
     public MasterServerLoadProtection(IWorkflowRepository workflowRepository,
-                                      int maxConcurrentWorkflowInstances,
-                                      double maxSystemCpuUsagePercentageThresholds,
-                                      double maxJvmCpuUsagePercentageThresholds,
-                                      double maxSystemMemoryUsagePercentageThresholds,
-                                      double maxDiskUsagePercentageThresholds,
-                                      boolean enabled) {
+                                      MasterConfig masterConfig) {
+        super(masterConfig.getServerLoadProtection());
+        this.masterServerLoadProtectionConfig = masterConfig.getServerLoadProtection();
         this.workflowRepository = workflowRepository;
-        this.maxConcurrentWorkflowInstances = maxConcurrentWorkflowInstances;
-        this.maxSystemCpuUsagePercentageThresholds = maxSystemCpuUsagePercentageThresholds;
-        this.maxJvmCpuUsagePercentageThresholds = maxJvmCpuUsagePercentageThresholds;
-        this.maxSystemMemoryUsagePercentageThresholds = maxSystemMemoryUsagePercentageThresholds;
-        this.maxDiskUsagePercentageThresholds = maxDiskUsagePercentageThresholds;
-        this.enabled = enabled;
     }
 
     @Override
     public boolean isOverload(SystemMetrics systemMetrics) {
-        if (!enabled) {
+        if (!masterServerLoadProtectionConfig.isEnabled()) {
             return false;
         }
 
-        // Check system metrics first
         if (super.isOverload(systemMetrics)) {
             return true;
         }
 
         // Check workflow instance count
         int currentWorkflowInstanceCount = workflowRepository.getAll().size();
-        if (currentWorkflowInstanceCount >= maxConcurrentWorkflowInstances) {
+        if (currentWorkflowInstanceCount >= masterServerLoadProtectionConfig.getMaxConcurrentWorkflowInstances()) {
             log.info(
                     "OverLoad: the workflow instance count: {} exceeds the maxConcurrentWorkflowInstances {}",
-                    currentWorkflowInstanceCount, maxConcurrentWorkflowInstances);
+                    currentWorkflowInstanceCount, masterServerLoadProtectionConfig.getMaxConcurrentWorkflowInstances());
             return true;
         }
         return false;
