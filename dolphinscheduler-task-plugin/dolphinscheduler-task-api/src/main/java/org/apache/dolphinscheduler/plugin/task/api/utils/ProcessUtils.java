@@ -60,7 +60,8 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 public final class ProcessUtils {
 
     // The delay before checking the process status after termination (in seconds)
-    private static final Integer PROCESS_STATUS_CHECK_DELAY = PropertyUtils.getInt(Constants.PROCESS_STATUS_CHECK_DELAY, 5);
+    private static final Integer PROCESS_STATUS_CHECK_DELAY =
+            PropertyUtils.getInt(Constants.PROCESS_STATUS_CHECK_DELAY, 5);
 
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
