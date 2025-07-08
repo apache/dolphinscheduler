@@ -134,7 +134,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."datasource.encryption.enable" | bool | `false` | datasource encryption enable |
 | conf.common."datasource.encryption.salt" | string | `"!@#$%^&*"` | datasource encryption salt |
 | conf.common."development.state" | bool | `false` | development state |
-| conf.common."process.status.check.delay" | int | `5` | The delay before checking the shell process status after termination (in seconds) |
 | conf.common."hadoop.security.authentication.startup.state" | bool | `false` | whether to startup kerberos |
 | conf.common."java.security.krb5.conf.path" | string | `"/opt/krb5.conf"` | java.security.krb5.conf path |
 | conf.common."kerberos.expire.time" | int | `2` | kerberos expire time, the unit is hour |
@@ -142,6 +141,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."login.user.keytab.username" | string | `"hdfs-mycluster@ESZ.COM"` | login user from keytab username |
 | conf.common."ml.mlflow.preset_repository" | string | `"https://github.com/apache/dolphinscheduler-mlflow"` | mlflow task plugin preset repository |
 | conf.common."ml.mlflow.preset_repository_version" | string | `"main"` | mlflow task plugin preset repository version |
+| conf.common."process.status.check.delay" | int | `5` | The delay before checking the shell process status after termination (in seconds) |
 | conf.common."resource.alibaba.cloud.access.key.id" | string | `"<your-access-key-id>"` | alibaba cloud access key id, required if you set resource.storage.type=OSS |
 | conf.common."resource.alibaba.cloud.access.key.secret" | string | `"<your-access-key-secret>"` | alibaba cloud access key secret, required if you set resource.storage.type=OSS |
 | conf.common."resource.alibaba.cloud.oss.bucket.name" | string | `"dolphinscheduler"` | oss bucket name, required if you set resource.storage.type=OSS |
