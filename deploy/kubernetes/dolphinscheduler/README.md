@@ -134,7 +134,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."datasource.encryption.enable" | bool | `false` | datasource encryption enable |
 | conf.common."datasource.encryption.salt" | string | `"!@#$%^&*"` | datasource encryption salt |
 | conf.common."development.state" | bool | `false` | development state |
-| conf.common."process.status.check.delay" | int | `5` | The delay before checking the process status after termination (in seconds) |
+| conf.common."process.status.check.delay" | int | `5` | The delay before checking the shell process status after termination (in seconds) |
 | conf.common."hadoop.security.authentication.startup.state" | bool | `false` | whether to startup kerberos |
 | conf.common."java.security.krb5.conf.path" | string | `"/opt/krb5.conf"` | java.security.krb5.conf path |
 | conf.common."kerberos.expire.time" | int | `2` | kerberos expire time, the unit is hour |
