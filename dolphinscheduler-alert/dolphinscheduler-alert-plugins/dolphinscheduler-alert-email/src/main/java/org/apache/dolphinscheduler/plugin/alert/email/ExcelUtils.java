@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -108,7 +109,12 @@ public final class ExcelUtils {
                     if (values[j] instanceof Number) {
                         cell1.setCellValue(((Number) values[j]).doubleValue());
                     } else {
-                        cell1.setCellValue(String.valueOf(values[j]));
+                        String cellValue = String.valueOf(values[j]);
+                        int maxLen = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
+                        if (cellValue.length() > maxLen) {
+                            cellValue = cellValue.substring(0, maxLen - 67) + "...(truncated)";
+                        }
+                        cell1.setCellValue(cellValue);
                     }
                 }
             }
