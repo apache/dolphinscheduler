@@ -19,11 +19,14 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Assertions;
@@ -96,7 +99,10 @@ public class ExcelUtilsTest {
 
         ExcelUtils.genExcelFile(content, title, xlsFilePath);
 
-        try (SXSSFWorkbook wb = new SXSSFWorkbook(new FileInputStream(xlsFilePath + "/" + title + ".xlsx"))) {
+        try (
+                FileInputStream fis = new FileInputStream(xlsFilePath + "/" + title + ".xlsx");
+                Workbook wb = WorkbookFactory.create(fis)) {
+
             Sheet sheet = wb.getSheetAt(0);
             Row headerRow = sheet.getRow(0);
             Row dataRow = sheet.getRow(1);
