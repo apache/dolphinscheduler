@@ -70,9 +70,9 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE = "development.state";
 
     /**
-     * process.status.check.delay.time
+     * shell.kill.wait.timeout
      */
-    public static final String PROCESS_STATUS_CHECK_DELAY = "process.status.check.delay";
+    public static final String SHELL_KILL_WAIT_TIMEOUT = "shell.kill.wait.timeout";
 
     /**
      * sudo enable

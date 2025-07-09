@@ -51,6 +51,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +60,9 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 @Slf4j
 public final class ProcessUtils {
 
-    // The delay before checking the shell process status after termination (in seconds)
-    private static final Integer PROCESS_STATUS_CHECK_DELAY =
-            PropertyUtils.getInt(Constants.PROCESS_STATUS_CHECK_DELAY, 5);
+    // If the shell process is still active after this timeout value (in seconds), then will use kill -9 to kill it
+    private static final Integer SHELL_KILL_WAIT_TIMEOUT =
+            PropertyUtils.getInt(Constants.SHELL_KILL_WAIT_TIMEOUT, 10);
 
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
@@ -118,15 +119,25 @@ public final class ProcessUtils {
                 return true;
             }
 
+            // Convert PID string to list of integers
+            List<Integer> pidList = new ArrayList<>();
+            for (String pidStr : pidArray) {
+                try {
+                    pidList.add(Integer.parseInt(pidStr));
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid PID: {}", pidStr);
+                }
+            }
+
             // 1. Try to terminate gracefully (SIGINT)
-            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pids, request.getTenantCode());
+            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pidList, request.getTenantCode());
             if (gracefulKillSuccess) {
                 log.info("Successfully killed process tree using SIGINT, processId: {}", processId);
                 return true;
             }
 
             // 2. Try to terminate forcefully (SIGTERM)
-            boolean termKillSuccess = sendKillSignal("SIGTERM", pids, request.getTenantCode());
+            boolean termKillSuccess = sendKillSignal("SIGTERM", pidList, request.getTenantCode());
             if (termKillSuccess) {
                 log.info("Successfully killed process tree using SIGTERM, processId: {}", processId);
                 return true;
@@ -134,7 +145,7 @@ public final class ProcessUtils {
 
             // 3. As a last resort, use `kill -9`
             log.warn("SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}", processId);
-            boolean forceKillSuccess = sendKillSignal("SIGKILL", pids, request.getTenantCode());
+            boolean forceKillSuccess = sendKillSignal("SIGKILL", pidList, request.getTenantCode());
             if (forceKillSuccess) {
                 log.info("Successfully sent SIGKILL signal to process tree, processId: {}", processId);
             } else {
@@ -151,10 +162,20 @@ public final class ProcessUtils {
     /**
      * Send a kill signal to a process group
      * @param signal Signal type (SIGINT, SIGTERM, SIGKILL)
-     * @param pids Process ID list
+     * @param pidList Process ID list
      * @param tenantCode Tenant code
      */
-    private static boolean sendKillSignal(String signal, String pids, String tenantCode) {
+    private static boolean sendKillSignal(String signal, List<Integer> pidList, String tenantCode) {
+        if (pidList == null || pidList.isEmpty()) {
+            log.info("No process needs to be killed.");
+            return true;
+        }
+
+        // Build the pids string once
+        String pids = pidList.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(" "));
+
         try {
             // 1. Send the kill signal
             String killCmd = String.format("kill -s %s %s", signal, pids);
@@ -162,22 +183,33 @@ public final class ProcessUtils {
             log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);
 
-            // 2. Wait for the process to respond to the signal
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS * PROCESS_STATUS_CHECK_DELAY);
+            // 2. Wait for the processes to terminate with a timeout-based polling mechanism
+            // Max wait time
+            long timeoutMillis = SLEEP_TIME_MILLIS * SHELL_KILL_WAIT_TIMEOUT;
 
-            // 3. Check if the processes are still running
-            String[] pidArray = PID_PATTERN.split(pids);
-            for (String pid : pidArray) {
-                // Check if each PID is still alive
-                if (isProcessAlive(Integer.parseInt(pid), tenantCode)) {
-                    log.info("Kill command: {}, kill failed, the process: {} is still running", killCmd, pid);
-                    // Return false if any process is still alive
-                    return false;
+            long startTime = System.currentTimeMillis();
+            while (!pidList.isEmpty() && (System.currentTimeMillis() - startTime < timeoutMillis)) {
+                // Remove if process is no longer alive
+                pidList.removeIf(pid -> !isProcessAlive(pid, tenantCode));
+                if (!pidList.isEmpty()) {
+                    // Wait for a short interval before checking process statuses again, to avoid excessive CPU usage
+                    // from tight-loop polling.
+                    ThreadUtils.sleep(SLEEP_TIME_MILLIS);
                 }
             }
-            log.debug("Kill command: {}, kill succeeded", killCmd);
-            // All processes have been successfully terminated
-            return true;
+
+            // 3. Return final result based on whether all processes were terminated
+            if (pidList.isEmpty()) {
+                // All processes have been successfully terminated
+                log.debug("Kill command: {}, kill succeeded", killCmd);
+                return true;
+            } else {
+                String remainingPids = pidList.stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(" "));
+                log.info("Kill command: {}, timed out, still running PIDs: {}", killCmd, remainingPids);
+                return false;
+            }
         } catch (Exception e) {
             log.error("Error sending {} to process: {}", signal, pids, e);
             return false;
