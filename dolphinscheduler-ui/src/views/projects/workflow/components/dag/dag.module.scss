@@ -126,6 +126,9 @@ $bgLight: #ffffff;
     &.icon-dependent {
       background-image: url('/images/task-icons/dependent.png');
     }
+    &.icon-grpc {
+      background-image: url('/images/task-icons/grpc.png');
+    }
     &.icon-http {
       background-image: url('/images/task-icons/http.png');
     }
@@ -235,6 +238,9 @@ $bgLight: #ffffff;
       }
       &.icon-dependent {
         background-image: url('/images/task-icons/dependent_hover.png');
+      }
+      &.icon-grpc {
+        background-image: url('/images/task-icons/grpc_hover.png');
       }
       &.icon-http {
         background-image: url('/images/task-icons/http_hover.png');
