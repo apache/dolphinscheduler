@@ -43,6 +43,7 @@ export function useGrpc({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
+    url: '',
     condition: '',
     connectTimeout: 60000,
     socketTimeout: 60000,
@@ -62,7 +63,7 @@ export function useGrpc({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useGrpc(model),
+      ...Fields.useGrpc(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

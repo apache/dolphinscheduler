@@ -14,17 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 // import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
-import { ref } from 'vue'
+// import { ref } from 'vue'
 
 export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
   //TODO: Implement gRPC specific logic
-  // const { t } = useI18n()
-  const grpcItems = ref<IJsonItem[]>([])
+  const { t } = useI18n()
+  // const grpcItems = ref<IJsonItem[]>([])
 
   model.grpcMethod = model.grpcMethod || 'UNARY'
 
-  return grpcItems.value
+  return [
+    {
+      type: 'input',
+      class: 'input-url-name',
+      field: 'url',
+      name: '服务器地址', //t('project.node.http_url'),
+      props: {
+        placeholder: t('project.node.http_url_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(validate: any, value: string) {
+          if (!value) {
+            return new Error(t('project.node.http_url_tips'))
+          }
+          if (value.search(new RegExp(/http[s]{0,1}:\/\/\S*/, 'i'))) {
+            return new Error(t('project.node.http_url_validator'))
+          }
+        }
+      }
+    }
+  ]
 }
