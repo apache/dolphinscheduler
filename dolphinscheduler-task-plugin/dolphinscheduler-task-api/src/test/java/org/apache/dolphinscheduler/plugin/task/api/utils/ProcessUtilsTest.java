@@ -132,7 +132,7 @@ public class ProcessUtilsTest {
         boolean result = ProcessUtils.kill(taskRequest);
 
         // Assert
-        Assertions.assertFalse(result);
+        Assertions.assertTrue(result);
         // Verify SIGKILL was never called
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345"), Mockito.never());
     }
