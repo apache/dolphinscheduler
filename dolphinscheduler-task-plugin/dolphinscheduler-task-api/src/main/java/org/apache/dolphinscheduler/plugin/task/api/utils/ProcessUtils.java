@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -122,11 +123,7 @@ public final class ProcessUtils {
             // Convert PID string to list of integers
             List<Integer> pidList = new ArrayList<>();
             for (String pidStr : pidArray) {
-                try {
-                    pidList.add(Integer.parseInt(pidStr));
-                } catch (NumberFormatException e) {
-                    log.warn("Invalid PID: {}", pidStr);
-                }
+                pidList.add(Integer.parseInt(pidStr));
             }
 
             // 1. Try to terminate gracefully (SIGINT)
@@ -171,8 +168,13 @@ public final class ProcessUtils {
             return true;
         }
 
-        // Build the pids string once
-        String pids = pidList.stream()
+        List<Integer> alivePidList = getAlivePidList(pidList, tenantCode);
+        if (alivePidList.isEmpty()) {
+            log.info("All processes already terminated.");
+            return true;
+        }
+        
+        String pids = alivePidList.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(" "));
 
@@ -185,13 +187,13 @@ public final class ProcessUtils {
 
             // 2. Wait for the processes to terminate with a timeout-based polling mechanism
             // Max wait time
-            long timeoutMillis = SLEEP_TIME_MILLIS * SHELL_KILL_WAIT_TIMEOUT;
+            long timeoutMillis = TimeUnit.SECONDS.toMillis(SHELL_KILL_WAIT_TIMEOUT);
 
             long startTime = System.currentTimeMillis();
-            while (!pidList.isEmpty() && (System.currentTimeMillis() - startTime < timeoutMillis)) {
+            while (!alivePidList.isEmpty() && (System.currentTimeMillis() - startTime < timeoutMillis)) {
                 // Remove if process is no longer alive
-                pidList.removeIf(pid -> !isProcessAlive(pid, tenantCode));
-                if (!pidList.isEmpty()) {
+                alivePidList.removeIf(pid -> !isProcessAlive(pid, tenantCode));
+                if (!alivePidList.isEmpty()) {
                     // Wait for a short interval before checking process statuses again, to avoid excessive CPU usage
                     // from tight-loop polling.
                     ThreadUtils.sleep(SLEEP_TIME_MILLIS);
@@ -199,12 +201,12 @@ public final class ProcessUtils {
             }
 
             // 3. Return final result based on whether all processes were terminated
-            if (pidList.isEmpty()) {
+            if (alivePidList.isEmpty()) {
                 // All processes have been successfully terminated
                 log.debug("Kill command: {}, kill succeeded", killCmd);
                 return true;
             } else {
-                String remainingPids = pidList.stream()
+                String remainingPids = alivePidList.stream()
                         .map(String::valueOf)
                         .collect(Collectors.joining(" "));
                 log.info("Kill command: {}, timed out, still running PIDs: {}", killCmd, remainingPids);
@@ -214,6 +216,21 @@ public final class ProcessUtils {
             log.error("Error sending {} to process: {}", signal, pids, e);
             return false;
         }
+    }
+
+    /**
+     * Returns a list of process IDs that are still running.
+     * This method filters the provided list of PIDs by checking whether each process is still active
+     *
+     * @param pidList   the list of process IDs to check
+     * @param tenantCode the tenant identifier used for permission control or logging context
+     * @return a new list containing only the PIDs of processes that are still running;
+     *         returns an empty list if none are alive
+     */
+    private static List<Integer> getAlivePidList(List<Integer> pidList, String tenantCode) {
+        return pidList.stream()
+                .filter(pid -> isProcessAlive(pid, tenantCode))
+                .collect(Collectors.toList());
     }
 
     /**
