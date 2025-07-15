@@ -173,7 +173,7 @@ public final class ProcessUtils {
             log.info("All processes already terminated.");
             return true;
         }
-        
+
         String pids = alivePidList.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(" "));
