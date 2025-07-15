@@ -54,7 +54,6 @@ pre-commit install
 
 Now, every time you commit your code, `pre-commit` will automatically run `Spotless` to check the code style and formatting.
 
-
 ### Helm Template Guidelines
 
 After modifying files related to Helm templates, you can use the following command to debug the Helm templates:
@@ -68,7 +67,6 @@ Once the Helm templates are debugged and verified, use the following command to 
 ```shell
 ./mvnw validate -P helm-doc -pl :dolphinscheduler
 ```
-
 
 ## Docker image build
 

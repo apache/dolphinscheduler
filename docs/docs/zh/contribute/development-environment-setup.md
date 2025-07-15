@@ -51,7 +51,6 @@ pre-commit install
 
 现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
 
-
 ### Helm 模板规范
 
 当您修改了Helm模板相关的文件后， 可以使用如下命令来调试 Helm 模板：
