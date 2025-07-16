@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -131,7 +133,10 @@ public class ProcessUtilsTest {
 
         // Assert
         Assertions.assertTrue(result);
-        // Verify SIGKILL was never called
+
+        // Verify SIGINT, SIGTERM, SIGKILL never called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.never());
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.never());
     }
 
@@ -153,18 +158,30 @@ public class ProcessUtilsTest {
         // Mock kill -0
         mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
                 .thenReturn("kill -0 12345");
+        // Initialize a counter to track how many times the method is invoked
+        AtomicInteger callCount = new AtomicInteger(0);
+        // Mock the static method OSUtils.exeCmd that matches "kill -0" command
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
-                .thenThrow(new RuntimeException("Command failed"));
-
-        // Mock process check - process dies after SIGINT
-        mockedOSUtils.when(() -> OSUtils.exeCmd("ps -p 12345")).thenReturn(null);
+                .thenAnswer(invocation -> {
+                    int count = callCount.incrementAndGet();
+                    // these calls will succeed (simulate process is alive)
+                    if (count == 1 || count == 2) {
+                        return "";
+                    } else {
+                        throw new RuntimeException("Command failed");
+                    }
+                });
 
         // Act
         boolean result = ProcessUtils.kill(taskRequest);
 
         // Assert
         Assertions.assertTrue(result);
-        // Verify SIGKILL was never called
+
+        // Verify SIGINT was called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.times(1));
+        // Verify SIGTERM,SIGKILL was never called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.never());
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.never());
     }
 
@@ -177,11 +194,6 @@ public class ProcessUtilsTest {
 
         // Mock getPidsStr
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345"))).thenReturn("1234 12345");
-
-        // Mock kill -0
-        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
-                .thenReturn("kill -0 12345");
-        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*"))).thenReturn("");
 
         // Mock SIGINT command
         mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGINT.*")))
@@ -198,11 +210,17 @@ public class ProcessUtilsTest {
                 .thenReturn("kill -s SIGKILL 12345");
         mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGKILL 12345")).thenReturn("");
 
+        // Mock kill -0
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*"))).thenReturn("");
+
         // Act
         boolean result = ProcessUtils.kill(taskRequest);
 
         // Assert
         Assertions.assertFalse(result);
+
         // Verify SIGINT, SIGTERM, SIGKILL was called
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.times(1));
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.times(1));
