@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
+import org.apache.dolphinscheduler.api.security.impl.oidc.OidcAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.sso.CasdoorAuthenticator;
 
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 @Slf4j
@@ -57,6 +59,7 @@ public class SecurityConfig {
     }
 
     @Bean(name = "authenticator")
+    @Primary
     public Authenticator authenticator() {
         setAuthenticationType(type);
         Authenticator authenticator;
@@ -69,6 +72,9 @@ public class SecurityConfig {
                 break;
             case CASDOOR_SSO:
                 authenticator = new CasdoorAuthenticator();
+                break;
+            case OIDC:
+                authenticator = new OidcAuthenticator();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);

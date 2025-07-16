@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.oidc;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import java.util.Map;
+
+import lombok.Data;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- * authentication type
+ * OIDC configuration properties
  */
-public enum AuthenticationType {
+@Data
+@Component
+@ConfigurationProperties(prefix = "security.authentication.oidc")
+public class OidcConfigProperties {
 
-    PASSWORD(0, "verify via user name and password"),
-    LDAP(1, "verify via LDAP server"),
-    CASDOOR_SSO(2, "verify via casdoor sso provider"),
-    OIDC(3, "verify via OpenID Connect provider");
-
-    AuthenticationType(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    @EnumValue
-    private final int code;
-    private final String desc;
+    private boolean enable = false;
+    private Map<String, OidcProviderConfig> providers;
+    private OidcUserConfig user = new OidcUserConfig();
 }

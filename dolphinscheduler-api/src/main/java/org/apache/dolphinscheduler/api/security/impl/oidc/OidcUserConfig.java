@@ -15,26 +15,35 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.oidc;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import java.util.List;
+
+import lombok.Data;
 
 /**
- * authentication type
+ * OIDC user configuration
  */
-public enum AuthenticationType {
+@Data
+public class OidcUserConfig {
 
-    PASSWORD(0, "verify via user name and password"),
-    LDAP(1, "verify via LDAP server"),
-    CASDOOR_SSO(2, "verify via casdoor sso provider"),
-    OIDC(3, "verify via OpenID Connect provider");
+    /**
+     * Whether to auto-create users if they don't exist
+     */
+    private boolean autoCreate = false;
 
-    AuthenticationType(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
+    /**
+     * Default tenant code for auto-created users
+     */
+    private String defaultTenantCode = "default";
 
-    @EnumValue
-    private final int code;
-    private final String desc;
+    /**
+     * Default queue for auto-created users
+     */
+    private String defaultQueue = "default";
+
+    /**
+     * Groups that map to an administrator role
+     */
+    private List<String> adminGroupMapping;
 }
