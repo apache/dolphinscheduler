@@ -132,7 +132,7 @@ public class ProcessUtilsTest {
         // Assert
         Assertions.assertTrue(result);
         // Verify SIGKILL was never called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.never());
     }
 
     @Test
@@ -203,8 +203,10 @@ public class ProcessUtilsTest {
 
         // Assert
         Assertions.assertFalse(result);
-        // Verify SIGKILL was called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.atLeastOnce());
+        // Verify SIGINT, SIGTERM, SIGKILL was called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.times(1));
     }
 
     @Test
