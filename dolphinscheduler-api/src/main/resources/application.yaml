@@ -129,6 +129,7 @@ registry:
     digest: ~
 
 api:
+  # The base URL for the API server, used for constructing callback URLs for features like OIDC.
   # This should be the public-facing URL of the DolphinScheduler API.
   base-url: http://127.0.0.1:12345/dolphinscheduler
   ui-url: http://127.0.0.1:5173
@@ -225,7 +226,7 @@ security:
         # registrationId used in URLs and internal mapping
         keycloak:
           display-name: "Login with Keycloak" # Text for UI Button
-#          issuer-uri: https://my-keycloak.example.com/auth/realms/myrealm
+          # issuer-uri: https://my-keycloak.example.com/auth/realms/myrealm
           issuer-uri: http://localhost:8080/realms/dolphinscheduler
           client-id: dolphinscheduler-client
           client-secret: dolphinscheduler-client-secret
@@ -268,7 +269,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
     username: root
-    password: Aryan@1234
+    password: root
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
