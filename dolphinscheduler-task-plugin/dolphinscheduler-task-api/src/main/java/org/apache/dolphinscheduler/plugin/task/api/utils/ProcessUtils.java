@@ -121,10 +121,7 @@ public final class ProcessUtils {
             }
 
             // Convert PID string to list of integers
-            List<Integer> pidList = new ArrayList<>();
-            for (String pidStr : pidArray) {
-                pidList.add(Integer.parseInt(pidStr));
-            }
+            List<Integer> pidList = Arrays.stream(pidArray).map(Integer::parseInt).collect(Collectors.toList());
 
             // 1. Try to terminate gracefully (SIGINT)
             boolean gracefulKillSuccess = sendKillSignal("SIGINT", pidList, request.getTenantCode());
