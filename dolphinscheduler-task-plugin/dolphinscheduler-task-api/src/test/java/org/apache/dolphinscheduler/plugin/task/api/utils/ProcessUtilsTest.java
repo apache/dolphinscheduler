@@ -111,6 +111,31 @@ public class ProcessUtilsTest {
     }
 
     @Test
+    void testKillProcessSuccessWithNoAlivePids() throws Exception {
+        // Arrange
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        // Mock getPidsStr
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345"))).thenReturn("1234 12345");
+
+        // Mock kill -0
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
+                .thenThrow(new RuntimeException("Command failed"));
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert
+        Assertions.assertTrue(result);
+        // Verify SIGKILL was never called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345"), Mockito.never());
+    }
+
+    @Test
     void testKillProcessSuccessWithSigInt() throws Exception {
         // Arrange
         TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
@@ -125,6 +150,12 @@ public class ProcessUtilsTest {
                 .thenReturn("kill -s SIGINT 12345");
         mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGINT 12345")).thenReturn("");
 
+        // Mock kill -0
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
+                .thenThrow(new RuntimeException("Command failed"));
+
         // Mock process check - process dies after SIGINT
         mockedOSUtils.when(() -> OSUtils.exeCmd("ps -p 12345")).thenReturn(null);
 
@@ -132,9 +163,48 @@ public class ProcessUtilsTest {
         boolean result = ProcessUtils.kill(taskRequest);
 
         // Assert
-        Assertions.assertFalse(result);
+        Assertions.assertTrue(result);
         // Verify SIGKILL was never called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.never());
+    }
+
+    @Test
+    void testKillProcessFail() throws Exception {
+        // Arrange
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        // Mock getPidsStr
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345"))).thenReturn("1234 12345");
+
+        // Mock kill -0
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*"))).thenReturn("");
+
+        // Mock SIGINT command
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGINT.*")))
+                .thenReturn("kill -s SIGINT 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGINT 12345")).thenReturn("");
+
+        // Mock SIGTERM command
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGTERM.*")))
+                .thenReturn("kill -s SIGTERM 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGTERM 12345")).thenReturn("");
+
+        // Mock SIGKILL command
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGKILL.*")))
+                .thenReturn("kill -s SIGKILL 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGKILL 12345")).thenReturn("");
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert
+        Assertions.assertFalse(result);
+        // Verify SIGKILL was called
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.atLeastOnce());
     }
 
     @Test
