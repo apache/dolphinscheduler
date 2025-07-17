@@ -494,7 +494,7 @@ export default {
     grpc_url: '请求地址',
     grpc_url_tips: '请输入请求地址(必填)',
     grpc_method: '方法名称',
-    grpc_method_tips: '请输入方法名称(必填)，例如: org.example.Service/Method',
+    grpc_method_tips: '请输入方法名称(必填)，例如: org.example.Greeter/SayHello',
     grpc_service_definition: 'Protobuf 定义',
     grpc_service_definition_tips: '请输入Protobuf定义(必填)',
     grpc_message: '消息内容',
