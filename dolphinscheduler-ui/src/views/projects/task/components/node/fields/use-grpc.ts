@@ -43,16 +43,16 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       class: 'input-url-name',
       field: 'url',
-      name: '请求地址', //t('project.node.http_url'),
+      name: t('project.node.grpc_url'),
       props: {
-        placeholder: t('project.node.http_url_tips')
+        placeholder: t('project.node.grpc_url_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
           if (!value) {
-            return new Error(t('project.node.http_url_tips'))
+            return new Error(t('project.node.grpc_url_tips'))
           }
           if (value.search(new RegExp(/http[s]{0,1}:\/\/\S*/, 'i'))) {
             return new Error(t('project.node.http_url_validator'))
@@ -64,41 +64,36 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
       type: 'editor',
       class: 'input-url-name',
       field: 'serviceDefinition',
-      name: 'Protobuf 定义', //t('project.node.http_url'),
+      name: t('project.node.grpc_service_definition'),
       props: {
         languages: 'protobuf',
-        placeholder: 'Protobuf Text' //t('project.node.http_url_tips')
+        placeholder: t('project.node.grpc_service_definition_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
           if (!value) {
-            return new Error(t('project.node.http_url_tips'))
-          }
-          if (value.search(new RegExp(/http[s]{0,1}:\/\/\S*/, 'i'))) {
-            return new Error(t('project.node.http_url_validator'))
+            return new Error(t('project.node.grpc_service_definition_tips'))
           }
         }
       }
     },
     {
-      type: 'select',
+      type: 'input',
       class: 'input-url-name',
       field: 'methodName',
-      name: '方法名称', //t('project.node.http_url'),
+      name: t('project.node.grpc_method'),
+      options: grpcMethods,
       props: {
-        placeholder: '服务/方法' //t('project.node.http_url_tips')
+        placeholder: t('project.node.grpc_method_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
           if (!value) {
-            return new Error(t('project.node.http_url_tips'))
-          }
-          if (value.search(new RegExp(/http[s]{0,1}:\/\/\S*/, 'i'))) {
-            return new Error(t('project.node.http_url_validator'))
+            return new Error(t('project.node.grpc_method_tips'))
           }
         }
       }
@@ -107,22 +102,23 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
       type: 'editor',
       class: 'input-url-name',
       field: 'requestMessage',
-      name: 'Message 内容', //t('project.node.http_url'),
+      name: t('project.node.grpc_message'),
       props: {
         languages: 'json',
-        placeholder: 'Compose Message' //t('project.node.http_url_tips')
+        placeholder: t('project.node.grpc_message_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
           if (!value) {
-            //TODO if JSON is not valid
-            return new Error(t('project.node.http_url_tips'))
+            return new Error(t('project.node.grpc_message_tips'))
           }
-          if (value.search(new RegExp(/http[s]{0,1}:\/\/\S*/, 'i'))) {
-            //TODO if JSON is not compliant to proto format
-            return new Error(t('project.node.http_url_validator'))
+          //check value is a valid json format
+          try {
+            JSON.parse(value)
+          } catch (e) {
+            return new Error(t('project.node.grpc_message_tips_invalid_json'))
           }
         }
       }
@@ -130,7 +126,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'select',
       field: 'grpcCheckCondition',
-      name: t('project.node.http_check_condition'),
+      name: t('project.node.grpc_check_condition'),
       options: GRPC_CHECK_CONDITIONS
     },
     {
@@ -154,6 +150,19 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
             )
           }
         }
+      }
+    },
+    {
+      type: 'input',
+      class: 'input-url-name',
+      field: 'methodName',
+      name: t('project.node.grpc_condition'),
+      options: grpcMethods,
+      props: {
+        placeholder: t('project.node.grpc_condition_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur']
       }
     },
     ...useCustomParams({
