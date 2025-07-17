@@ -17,8 +17,6 @@
 import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
-import { languages } from 'monaco-editor'
-// import { ref } from 'vue'
 
 export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
   //TODO: Implement gRPC specific logic
@@ -84,7 +82,6 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
       class: 'input-url-name',
       field: 'methodName',
       name: t('project.node.grpc_method'),
-      options: grpcMethods,
       props: {
         placeholder: t('project.node.grpc_method_tips')
       },
@@ -155,9 +152,8 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       class: 'input-url-name',
-      field: 'methodName',
+      field: 'condition',
       name: t('project.node.grpc_condition'),
-      options: grpcMethods,
       props: {
         placeholder: t('project.node.grpc_condition_tips')
       },
