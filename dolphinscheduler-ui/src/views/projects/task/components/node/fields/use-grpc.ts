@@ -25,11 +25,11 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
 
   const GRPC_CHECK_CONDITIONS = [
     {
-      label: t('project.node.status_code_default'),
+      label: t('project.node.grpc_status_code_default'),
       value: 'STATUS_CODE_DEFAULT'
     },
     {
-      label: t('project.node.status_code_custom'),
+      label: t('project.node.grpc_status_code_custom'),
       value: 'STATUS_CODE_CUSTOM'
     }
   ]
