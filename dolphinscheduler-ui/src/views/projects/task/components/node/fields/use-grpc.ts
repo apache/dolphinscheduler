@@ -95,7 +95,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'editor',
-      field: 'requestMessage',
+      field: 'message',
       name: t('project.node.grpc_message'),
       props: {
         languages: 'json',

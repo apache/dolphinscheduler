@@ -28,11 +28,11 @@ public class GrpcParameters extends AbstractParameters {
 
     private String url; // http://domain:port
 
+    private String serviceDefinition; // protobuf service definition
+
     private String methodName; // e.g. com.example.service.ExampleService/ExampleMethod
 
-    private String requestMessage; // e.g. {"key1": "value1", "key2": "value2"}
-
-    private String serviceDefinition; // protobuf service definition
+    private String message; // e.g. {"key1": "value1", "key2": "value2"}
 
     private GrpcCheckCondition grpcCheckCondition = GrpcCheckCondition.STATUS_CODE_DEFAULT;
 
