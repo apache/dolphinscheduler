@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import org.apache.commons.lang3.SystemUtils;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -160,19 +158,12 @@ public class ProcessUtilsTest {
         // Mock kill -0
         mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
                 .thenReturn("kill -0 12345");
-        // Initialize a counter to track how many times the method is invoked
-        AtomicInteger callCount = new AtomicInteger(0);
         // Mock the static method OSUtils.exeCmd that matches "kill -0" command
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
-                .thenAnswer(invocation -> {
-                    int count = callCount.incrementAndGet();
-                    // these calls will succeed (simulate process is alive)
-                    if (count == 1 || count == 2) {
-                        return "";
-                    } else {
-                        throw new RuntimeException("Command failed");
-                    }
-                });
+                .thenReturn("") // First invocation succeeds (process is alive)
+                .thenReturn("") // Second invocation succeeds (process is alive)
+                .thenThrow(new RuntimeException("Command failed")); // Subsequent invocations fail (process is no longer
+                                                                    // alive)
 
         // Act
         boolean result = ProcessUtils.kill(taskRequest);
