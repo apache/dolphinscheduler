@@ -86,7 +86,7 @@ public final class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSPATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
      * Expression of PID recognition in Linux scene
