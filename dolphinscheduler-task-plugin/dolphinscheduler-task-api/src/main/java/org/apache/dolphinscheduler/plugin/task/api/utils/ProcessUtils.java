@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
@@ -46,8 +49,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +60,10 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 @Slf4j
 public final class ProcessUtils {
+
+    // If the shell process is still active after this timeout value (in seconds), then will use kill -9 to kill it
+    private static final Integer SHELL_KILL_WAIT_TIMEOUT =
+            PropertyUtils.getInt(Constants.SHELL_KILL_WAIT_TIMEOUT, 10);
 
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
@@ -77,12 +86,17 @@ public final class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSPATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
      * Expression of PID recognition in Linux scene
      */
     private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
+
+    /**
+     * PID recognition pattern
+     */
+    private static final Pattern PID_PATTERN = Pattern.compile("\\s+");
 
     /**
      * Terminate the task process, support multi-level signal processing and fallback strategy
@@ -100,21 +114,24 @@ public final class ProcessUtils {
 
             // Get all child processes
             String pids = getPidsStr(processId);
-            String[] pidArray = pids.split("\\s+");
+            String[] pidArray = PID_PATTERN.split(pids);
             if (pidArray.length == 0) {
                 log.warn("No valid PIDs found for process: {}", processId);
                 return true;
             }
 
+            // Convert PID string to list of integers
+            List<Integer> pidList = Arrays.stream(pidArray).map(Integer::parseInt).collect(Collectors.toList());
+
             // 1. Try to terminate gracefully (SIGINT)
-            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pids, request.getTenantCode());
+            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pidList, request.getTenantCode());
             if (gracefulKillSuccess) {
                 log.info("Successfully killed process tree using SIGINT, processId: {}", processId);
                 return true;
             }
 
             // 2. Try to terminate forcefully (SIGTERM)
-            boolean termKillSuccess = sendKillSignal("SIGTERM", pids, request.getTenantCode());
+            boolean termKillSuccess = sendKillSignal("SIGTERM", pidList, request.getTenantCode());
             if (termKillSuccess) {
                 log.info("Successfully killed process tree using SIGTERM, processId: {}", processId);
                 return true;
@@ -122,7 +139,7 @@ public final class ProcessUtils {
 
             // 3. As a last resort, use `kill -9`
             log.warn("SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}", processId);
-            boolean forceKillSuccess = sendKillSignal("SIGKILL", pids, request.getTenantCode());
+            boolean forceKillSuccess = sendKillSignal("SIGKILL", pidList, request.getTenantCode());
             if (forceKillSuccess) {
                 log.info("Successfully sent SIGKILL signal to process tree, processId: {}", processId);
             } else {
@@ -139,19 +156,96 @@ public final class ProcessUtils {
     /**
      * Send a kill signal to a process group
      * @param signal Signal type (SIGINT, SIGTERM, SIGKILL)
-     * @param pids Process ID list
+     * @param pidList Process ID list
      * @param tenantCode Tenant code
      */
-    private static boolean sendKillSignal(String signal, String pids, String tenantCode) {
+    private static boolean sendKillSignal(String signal, List<Integer> pidList, String tenantCode) {
+        if (pidList == null || pidList.isEmpty()) {
+            log.info("No process needs to be killed.");
+            return true;
+        }
+
+        List<Integer> alivePidList = getAlivePidList(pidList, tenantCode);
+        if (alivePidList.isEmpty()) {
+            log.info("All processes already terminated.");
+            return true;
+        }
+
+        String pids = alivePidList.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(" "));
+
         try {
+            // 1. Send the kill signal
             String killCmd = String.format("kill -s %s %s", signal, pids);
             killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
             log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);
 
-            return true;
+            // 2. Wait for the processes to terminate with a timeout-based polling mechanism
+            // Max wait time
+            long timeoutMillis = TimeUnit.SECONDS.toMillis(SHELL_KILL_WAIT_TIMEOUT);
+
+            long startTime = System.currentTimeMillis();
+            while (!alivePidList.isEmpty() && (System.currentTimeMillis() - startTime < timeoutMillis)) {
+                // Remove if process is no longer alive
+                alivePidList.removeIf(pid -> !isProcessAlive(pid, tenantCode));
+                if (!alivePidList.isEmpty()) {
+                    // Wait for a short interval before checking process statuses again, to avoid excessive CPU usage
+                    // from tight-loop polling.
+                    ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+                }
+            }
+
+            // 3. Return final result based on whether all processes were terminated
+            if (alivePidList.isEmpty()) {
+                // All processes have been successfully terminated
+                log.debug("Kill command: {}, kill succeeded", killCmd);
+                return true;
+            } else {
+                String remainingPids = alivePidList.stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(" "));
+                log.info("Kill command: {}, timed out, still running PIDs: {}", killCmd, remainingPids);
+                return false;
+            }
         } catch (Exception e) {
             log.error("Error sending {} to process: {}", signal, pids, e);
+            return false;
+        }
+    }
+
+    /**
+     * Returns a list of process IDs that are still running.
+     * This method filters the provided list of PIDs by checking whether each process is still active
+     *
+     * @param pidList   the list of process IDs to check
+     * @param tenantCode the tenant identifier used for permission control or logging context
+     * @return a new list containing only the PIDs of processes that are still running;
+     *         returns an empty list if none are alive
+     */
+    private static List<Integer> getAlivePidList(List<Integer> pidList, String tenantCode) {
+        return pidList.stream()
+                .filter(pid -> isProcessAlive(pid, tenantCode))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Check if a process with the specified PID is alive.
+     *
+     * @param pid the process ID to check
+     * @return true if the process exists and is running, false otherwise
+     */
+    private static boolean isProcessAlive(int pid, String tenantCode) {
+        try {
+            // Use kill -0 to check if the process exists; it does not actually send a signal
+            String checkCmd = String.format("kill -0 %d", pid);
+            checkCmd = OSUtils.getSudoCmd(tenantCode, checkCmd);
+            OSUtils.exeCmd(checkCmd);
+            // If the command executes successfully, the process exists
+            return true;
+        } catch (Exception e) {
+            // If the command fails, the process does not exist
             return false;
         }
     }
@@ -249,6 +343,7 @@ public final class ProcessUtils {
                 }
                 ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
+                log.info("yarn application [{}] is killed or already finished", appIds);
             }
         } catch (Exception e) {
             log.error("Cancel application failed: {}", e.getMessage());
