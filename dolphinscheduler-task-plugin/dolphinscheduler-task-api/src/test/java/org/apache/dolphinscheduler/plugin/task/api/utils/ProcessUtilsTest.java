@@ -111,7 +111,7 @@ public class ProcessUtilsTest {
     }
 
     @Test
-    void testKillProcessSuccessWithNoAlivePids() throws Exception {
+    void testKillProcessSuccessWithNoAlivePids() {
         // Arrange
         TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
@@ -140,7 +140,7 @@ public class ProcessUtilsTest {
     }
 
     @Test
-    void testKillProcessSuccessWithSigInt() throws Exception {
+    void testKillProcessSuccessWithSigInt() {
         // Arrange
         TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
@@ -162,8 +162,8 @@ public class ProcessUtilsTest {
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
                 .thenReturn("") // First invocation succeeds (process is alive)
                 .thenReturn("") // Second invocation succeeds (process is alive)
-                .thenThrow(new RuntimeException("Command failed")); // Subsequent invocations fail (process is no longer
-                                                                    // alive)
+                // Subsequent invocations fail (process is no longer alive)
+                .thenThrow(new RuntimeException("Command failed"));
 
         // Act
         boolean result = ProcessUtils.kill(taskRequest);
@@ -179,7 +179,7 @@ public class ProcessUtilsTest {
     }
 
     @Test
-    void testKillProcessFail() throws Exception {
+    void testKillProcessFail() {
         // Arrange
         TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
