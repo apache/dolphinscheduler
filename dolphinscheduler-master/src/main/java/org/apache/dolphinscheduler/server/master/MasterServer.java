@@ -117,7 +117,6 @@ public class MasterServer implements IStoppable {
     @PostConstruct
     public void initialized() {
         ServerLifeCycleManager.toRunning();
-        final long startupTime = System.currentTimeMillis();
 
         // init rpc server
         this.masterRPCServer.start();
@@ -140,7 +139,8 @@ public class MasterServer implements IStoppable {
 
         this.schedulerApi.start();
 
-        this.systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date(startupTime)));
+        this.systemEventBus
+                .publish(GlobalMasterFailoverEvent.of(new Date(ServerLifeCycleManager.getServerStartupTime())));
         this.systemEventBusFireWorker.start();
 
         MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
@@ -161,7 +161,8 @@ public class MasterServer implements IStoppable {
                 close("MasterServer shutdownHook");
             }
         }));
-        log.info("MasterServer initialized successfully in {} ms", System.currentTimeMillis() - startupTime);
+        log.info("MasterServer initialized successfully in {} ms",
+                System.currentTimeMillis() - ServerLifeCycleManager.getServerStartupTime());
     }
 
     @PreDestroy
