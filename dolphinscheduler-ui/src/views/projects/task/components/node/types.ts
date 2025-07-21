@@ -286,6 +286,11 @@ interface ITaskParams {
   executorCores?: number
   mainArgs?: string
   others?: string
+  grpcServiceDefinition?: string
+  grpcServiceDefinitionJSON?: string
+  methodName?: string
+  message?: string
+  grpcCheckCondition?: string
   httpMethod?: string
   httpBody?: string
   httpCheckCondition?: string

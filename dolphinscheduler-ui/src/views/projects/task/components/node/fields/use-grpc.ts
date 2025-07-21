@@ -21,7 +21,6 @@ import type { IJsonItem } from '../types'
 export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
   //TODO: Implement gRPC specific logic
   const { t } = useI18n()
-  // const grpcItems = ref<IJsonItem[]>([])
 
   const GRPC_CHECK_CONDITIONS = [
     {
@@ -60,7 +59,9 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'editor',
-      field: 'serviceDefinition',
+      // 输入直接绑定到 field，如何处理用户输入的 protobuf 定义和parse后的json结构，
+      // 目前方案：两个都存，仅允许protobuf的控件输入，json只做显示，然后准备一个变量存储
+      field: 'grpcServiceDefinition',
       name: t('project.node.grpc_service_definition'),
       props: {
         languages: 'protobuf',
@@ -124,6 +125,17 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
       options: GRPC_CHECK_CONDITIONS
     },
     {
+      type: 'input',
+      field: 'condition',
+      name: t('project.node.grpc_condition'),
+      props: {
+        placeholder: t('project.node.grpc_condition_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur']
+      }
+    },
+    {
       type: 'input-number',
       field: 'connectTimeout',
       name: t('project.node.connect_timeout'),
@@ -144,17 +156,6 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
             )
           }
         }
-      }
-    },
-    {
-      type: 'input',
-      field: 'condition',
-      name: t('project.node.grpc_condition'),
-      props: {
-        placeholder: t('project.node.grpc_condition_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur']
       }
     },
     ...useCustomParams({

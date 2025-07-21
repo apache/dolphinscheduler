@@ -26,6 +26,7 @@ import type {
   IDependentParameters
 } from './types'
 import { ref } from 'vue'
+import * as proto from 'protobufjs'
 
 export function formatParams(data: INodeData): {
   workflowDefinitionCode: string
@@ -90,14 +91,17 @@ export function formatParams(data: INodeData): {
     taskParams.parallelism = data.parallelism
   }
   if (data.taskType === 'GRPC') {
-    // taskParams.grpcMethodName = data.grpcMethodName
-    // taskParams.grpcServiceName = data.grpcServiceName
-    // taskParams.grpcParams = data.grpcParams
-    // taskParams.grpcAddress = data.grpcAddress
+    taskParams.url = data.url
+    taskParams.grpcServiceDefinition = data.grpcServiceDefinition
+    const root = proto.parse(data.grpcServiceDefinition || '').root
+    const grpcServiceDefinitionJSON = JSON.stringify(root.toJSON()) || '{}'
+    taskParams.grpcServiceDefinitionJSON = grpcServiceDefinitionJSON
+    taskParams.methodName = data.methodName
+    taskParams.message = data.message
+    taskParams.grpcCheckCondition = data.grpcCheckCondition
     taskParams.condition = data.condition
     taskParams.connectTimeout = data.connectTimeout
     taskParams.socketTimeout = data.socketTimeout
-    // taskParams.timeoutNotifyStrategy = data.timeoutNotifyStrategy
   }
 
   if (data.taskType === 'HTTP') {

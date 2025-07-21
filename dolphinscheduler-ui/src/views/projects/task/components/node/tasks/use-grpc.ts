@@ -44,6 +44,7 @@ export function useGrpc({
     delayTime: 0,
     timeout: 30,
     grpcCheckCondition: 'STATUS_CODE_DEFAULT',
+    grpcServiceDefinitionJSON: '',
     url: '',
     condition: '',
     connectTimeout: 60000,
