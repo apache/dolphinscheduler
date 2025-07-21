@@ -94,8 +94,12 @@ public enum WorkflowExecutionStatus {
                 || this == SERIAL_WAIT;
     }
 
-    public boolean canFailover() {
-        return Arrays.stream(NEED_FAILOVER_STATES).anyMatch(x -> x == this.getCode());
+    /**
+     * status can be take over on sub-workflow
+     * @return bool
+     */
+    public boolean canTakeover() {
+        return Arrays.stream(NEED_FAILOVER_STATES).anyMatch(x -> x == this.getCode()) || this == FAILOVER;
     }
 
     public boolean canDirectPauseInDB() {
