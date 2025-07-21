@@ -568,7 +568,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
-        final String masterFailoverNodePath = RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(
+        final String masterFailoverNodePath = RegistryUtils.getGlobalMasterFailoverNodePath(
                 "127.0.0.1:15678");
         // wait failover process
         await()
