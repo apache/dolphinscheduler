@@ -856,7 +856,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .address(subWorkflowInstance.getHost())
                 .build();
 
-        // first start sub-workflow to simulate the normal parent workflow
+        // first start sub-workflow to simulate the normal child workflow
         systemEventBus.publish(MasterFailoverEvent.of(masterServerSub, new Date(), 0));
 
         final String subMasterFailoverNodePath = RegistryUtils.getFailoveredNodePath(
