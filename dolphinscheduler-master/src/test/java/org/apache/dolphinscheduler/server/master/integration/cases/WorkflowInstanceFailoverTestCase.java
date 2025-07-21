@@ -43,11 +43,9 @@ import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseCon
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.h2.util.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -686,7 +684,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     }
 
-
     @Test
     public void testMasterFailover_runningWorkflow_takeOverSubWorkflowOnParentHealthy() {
         final String yaml = "/it/failover/running_workflowInstance_with_sub_workflow_task_running_in_diff_master.yaml";
@@ -697,20 +694,19 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
                 .filter(workflow -> workflow.getName().equals("sub_workflow_running")).findFirst().orElse(null);
 
-
         final WorkflowInstance mainWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("workflow_with_one_sub_workflow_running-20250424180000000")).findFirst()
+                .filter(workflow -> workflow.getName()
+                        .equals("workflow_with_one_sub_workflow_running-20250424180000000"))
+                .findFirst()
                 .orElse(null);
         final WorkflowInstance subWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_running-20250424180000000")).findFirst().orElse(null);
-
+                .filter(workflow -> workflow.getName().equals("sub_workflow_running-20250424180000000")).findFirst()
+                .orElse(null);
 
         assertThat(mainWorkflow).isNotNull();
         assertThat(subWorkflow).isNotNull();
         assertThat(mainWorkflowInstance).isNotNull();
         assertThat(subWorkflowInstance).isNotNull();
-
-
 
         MasterServerMetadata masterServerMain = MasterServerMetadata.builder()
                 .cpuUsage(0.2)
@@ -724,9 +720,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .serverStatus(ServerStatus.NORMAL)
                 .address(subWorkflowInstance.getHost())
                 .build();
-
-
-
 
         // first start workflow to simulate the normal parent workflow
         systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
@@ -767,7 +760,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                                         .isEqualTo("sub_workflow_task");
                             });
                 });
-
 
         // failover sub-workflow
         systemEventBus.publish(MasterFailoverEvent.of(masterServerSub, new Date(), 0));
@@ -817,7 +809,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     }
 
-
     @Test
     public void testMasterFailover_runningWorkflow_takeOverSubWorkflowOnChildHealthy() {
         final String yaml = "/it/failover/running_workflowInstance_with_sub_workflow_task_running_in_diff_master.yaml";
@@ -828,20 +819,19 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
                 .filter(workflow -> workflow.getName().equals("sub_workflow_running")).findFirst().orElse(null);
 
-
         final WorkflowInstance mainWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("workflow_with_one_sub_workflow_running-20250424180000000")).findFirst()
+                .filter(workflow -> workflow.getName()
+                        .equals("workflow_with_one_sub_workflow_running-20250424180000000"))
+                .findFirst()
                 .orElse(null);
         final WorkflowInstance subWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_running-20250424180000000")).findFirst().orElse(null);
-
+                .filter(workflow -> workflow.getName().equals("sub_workflow_running-20250424180000000")).findFirst()
+                .orElse(null);
 
         assertThat(mainWorkflow).isNotNull();
         assertThat(subWorkflow).isNotNull();
         assertThat(mainWorkflowInstance).isNotNull();
         assertThat(subWorkflowInstance).isNotNull();
-
-
 
         MasterServerMetadata masterServerMain = MasterServerMetadata.builder()
                 .cpuUsage(0.2)
@@ -880,7 +870,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                                         .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                             });
                 });
-
 
         // failover main-workflow
         systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
@@ -930,7 +919,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     }
 
-
     @Test
     public void testMasterFailover_runningWorkflow_takeOverSubWorkflowOnChildNotHealthy() {
         final String yaml = "/it/failover/running_workflowInstance_with_sub_workflow_not_running_in_diff_master.yaml";
@@ -941,19 +929,21 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
                 .filter(workflow -> workflow.getName().equals("sub_workflow")).findFirst().orElse(null);
 
-
         final WorkflowInstance mainWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("workflow_with_sub_workflow_running-20250424180000000")).findFirst()
+                .filter(workflow -> workflow.getName().equals("workflow_with_sub_workflow_running-20250424180000000"))
+                .findFirst()
                 .orElse(null);
         final WorkflowInstance submittedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_submitted-20250424180000000")).findFirst().orElse(null);
+                .filter(workflow -> workflow.getName().equals("sub_workflow_submitted-20250424180000000")).findFirst()
+                .orElse(null);
 
         final WorkflowInstance stopppedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_stopped-20250424180000000")).findFirst().orElse(null);
+                .filter(workflow -> workflow.getName().equals("sub_workflow_stopped-20250424180000000")).findFirst()
+                .orElse(null);
 
         final WorkflowInstance pausedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_paused-20250424180000000")).findFirst().orElse(null);
-
+                .filter(workflow -> workflow.getName().equals("sub_workflow_paused-20250424180000000")).findFirst()
+                .orElse(null);
 
         assertThat(mainWorkflow).isNotNull();
         assertThat(subWorkflow).isNotNull();
@@ -961,8 +951,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         assertThat(submittedSubWorkflowInstance).isNotNull();
         assertThat(stopppedSubWorkflowInstance).isNotNull();
         assertThat(pausedSubWorkflowInstance).isNotNull();
-
-
 
         MasterServerMetadata masterServerMain = MasterServerMetadata.builder()
                 .cpuUsage(0.2)
@@ -976,9 +964,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .serverStatus(ServerStatus.NORMAL)
                 .address(submittedSubWorkflowInstance.getHost())
                 .build();
-
-
-
 
         // first start workflow to simulate the normal parent workflow
         systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
@@ -1033,7 +1018,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     }
 
-
     @Test
     public void testMasterFailover_readyStopWorkflow_takeOverSubWorkflowOnChildNotHealthy() {
         final String yaml = "/it/failover/readyStop_workflowInstance_with_sub_workflow_not_running_in_diff_master.yaml";
@@ -1044,19 +1028,21 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
                 .filter(workflow -> workflow.getName().equals("sub_workflow")).findFirst().orElse(null);
 
-
         final WorkflowInstance mainWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("workflow_with_sub_workflow_running-20250424180000000")).findFirst()
+                .filter(workflow -> workflow.getName().equals("workflow_with_sub_workflow_running-20250424180000000"))
+                .findFirst()
                 .orElse(null);
         final WorkflowInstance submittedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_submitted-20250424180000000")).findFirst().orElse(null);
+                .filter(workflow -> workflow.getName().equals("sub_workflow_submitted-20250424180000000")).findFirst()
+                .orElse(null);
 
         final WorkflowInstance stopppedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_stopped-20250424180000000")).findFirst().orElse(null);
+                .filter(workflow -> workflow.getName().equals("sub_workflow_stopped-20250424180000000")).findFirst()
+                .orElse(null);
 
         final WorkflowInstance pausedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_paused-20250424180000000")).findFirst().orElse(null);
-
+                .filter(workflow -> workflow.getName().equals("sub_workflow_paused-20250424180000000")).findFirst()
+                .orElse(null);
 
         assertThat(mainWorkflow).isNotNull();
         assertThat(subWorkflow).isNotNull();
@@ -1064,8 +1050,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         assertThat(submittedSubWorkflowInstance).isNotNull();
         assertThat(stopppedSubWorkflowInstance).isNotNull();
         assertThat(pausedSubWorkflowInstance).isNotNull();
-
-
 
         MasterServerMetadata masterServerMain = MasterServerMetadata.builder()
                 .cpuUsage(0.2)
@@ -1079,9 +1063,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .serverStatus(ServerStatus.NORMAL)
                 .address(submittedSubWorkflowInstance.getHost())
                 .build();
-
-
-
 
         systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
         systemEventBus.publish(MasterFailoverEvent.of(masterServerSub, new Date(), 0));
@@ -1123,7 +1104,8 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     @Test
     public void testMasterFailover_readyPauseWorkflow_takeOverSubWorkflowOnChildNotHealthy() {
-        final String yaml = "/it/failover/readyPause_workflowInstance_with_sub_workflow_not_running_in_diff_master.yaml";
+        final String yaml =
+                "/it/failover/readyPause_workflowInstance_with_sub_workflow_not_running_in_diff_master.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition mainWorkflow = context.getWorkflows().stream()
                 .filter(workflow -> workflow.getName().equals("workflow_with_one_sub_workflows")).findFirst()
@@ -1131,19 +1113,21 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         final WorkflowDefinition subWorkflow = context.getWorkflows().stream()
                 .filter(workflow -> workflow.getName().equals("sub_workflow")).findFirst().orElse(null);
 
-
         final WorkflowInstance mainWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("workflow_with_sub_workflow_running-20250424180000000")).findFirst()
+                .filter(workflow -> workflow.getName().equals("workflow_with_sub_workflow_running-20250424180000000"))
+                .findFirst()
                 .orElse(null);
         final WorkflowInstance submittedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_submitted-20250424180000000")).findFirst().orElse(null);
+                .filter(workflow -> workflow.getName().equals("sub_workflow_submitted-20250424180000000")).findFirst()
+                .orElse(null);
 
         final WorkflowInstance stopppedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_stopped-20250424180000000")).findFirst().orElse(null);
+                .filter(workflow -> workflow.getName().equals("sub_workflow_stopped-20250424180000000")).findFirst()
+                .orElse(null);
 
         final WorkflowInstance pausedSubWorkflowInstance = context.getWorkflowInstances().stream()
-                .filter(workflow -> workflow.getName().equals("sub_workflow_paused-20250424180000000")).findFirst().orElse(null);
-
+                .filter(workflow -> workflow.getName().equals("sub_workflow_paused-20250424180000000")).findFirst()
+                .orElse(null);
 
         assertThat(mainWorkflow).isNotNull();
         assertThat(subWorkflow).isNotNull();
@@ -1151,8 +1135,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         assertThat(submittedSubWorkflowInstance).isNotNull();
         assertThat(stopppedSubWorkflowInstance).isNotNull();
         assertThat(pausedSubWorkflowInstance).isNotNull();
-
-
 
         MasterServerMetadata masterServerMain = MasterServerMetadata.builder()
                 .cpuUsage(0.2)
@@ -1166,9 +1148,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .serverStatus(ServerStatus.NORMAL)
                 .address(submittedSubWorkflowInstance.getHost())
                 .build();
-
-
-
 
         systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
         systemEventBus.publish(MasterFailoverEvent.of(masterServerSub, new Date(), 0));
