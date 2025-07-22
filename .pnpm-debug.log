@@ -1,0 +1,14 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_SCRIPT",
+    "err": {
+      "name": "pnpm",
+      "message": "Missing script: dev",
+      "code": "ERR_PNPM_NO_SCRIPT",
+      "stack": "pnpm: Missing script: dev\n    at Object.handler (/Users/sbloodys/.nvm/versions/node/v16.14.0/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@7.1.0/node_modules/pnpm/dist/pnpm.cjs:171908:15)\n    at async /Users/sbloodys/.nvm/versions/node/v16.14.0/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@7.1.0/node_modules/pnpm/dist/pnpm.cjs:176441:21\n    at async run (/Users/sbloodys/.nvm/versions/node/v16.14.0/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@7.1.0/node_modules/pnpm/dist/pnpm.cjs:176415:34)\n    at async runPnpm (/Users/sbloodys/.nvm/versions/node/v16.14.0/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@7.1.0/node_modules/pnpm/dist/pnpm.cjs:176633:5)\n    at async /Users/sbloodys/.nvm/versions/node/v16.14.0/pnpm-global/5/node_modules/.pnpm/registry.npmmirror.com+pnpm@7.1.0/node_modules/pnpm/dist/pnpm.cjs:176625:7"
+    }
+  }
+}
