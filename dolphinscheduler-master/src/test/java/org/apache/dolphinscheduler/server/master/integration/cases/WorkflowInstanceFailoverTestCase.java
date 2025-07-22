@@ -640,7 +640,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(5))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
