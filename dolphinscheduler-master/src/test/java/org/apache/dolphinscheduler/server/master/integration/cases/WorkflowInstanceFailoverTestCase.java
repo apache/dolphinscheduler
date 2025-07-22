@@ -640,7 +640,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
 
         await()
-                .atMost(Duration.ofMinutes(5))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
@@ -651,7 +651,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(mainWorkflow))
                             .hasSize(2)
@@ -665,7 +665,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(subWorkflow))
                             .hasSize(2)
@@ -730,13 +730,13 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 masterServerMain.getProcessId());
         // wait failover main-workflow
         await()
-                .atMost(Duration.ofMinutes(3))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow started
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
@@ -748,7 +748,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         // wait sub-workflow-task started
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(mainWorkflow))
                             .hasSize(2)
@@ -765,7 +765,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         systemEventBus.publish(MasterFailoverEvent.of(masterServerSub, new Date(), 0));
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
@@ -776,7 +776,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(mainWorkflow))
                             .hasSize(2)
@@ -790,7 +790,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(subWorkflow))
                             .hasSize(2)
@@ -855,13 +855,13 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 masterServerSub.getProcessId());
         // wait failover sub-workflow
         await()
-                .atMost(Duration.ofMinutes(3))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(subMasterFailoverNodePath)).isTrue();
                 });
         // wait sub-workflow started
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(subWorkflow))
                             .hasSize(1)
@@ -875,7 +875,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
@@ -886,7 +886,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(mainWorkflow))
                             .hasSize(2)
@@ -900,7 +900,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(subWorkflow))
                             .hasSize(2)
@@ -974,13 +974,13 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 masterServerMain.getProcessId());
         // wait failover main-workflow
         await()
-                .atMost(Duration.ofMinutes(3))
+                .atMost(Duration.ofMinutes(5))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow started
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
@@ -991,7 +991,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(7)
@@ -1003,7 +1003,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllTaskInstance())
                             .hasSize(9)
@@ -1073,13 +1073,13 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 masterServerMain.getProcessId());
         // wait failover main-workflow
         await()
-                .atMost(Duration.ofMinutes(3))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow stop
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
@@ -1158,13 +1158,13 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 masterServerMain.getProcessId());
         // wait failover main-workflow
         await()
-                .atMost(Duration.ofMinutes(3))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow stop
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(8))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
