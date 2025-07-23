@@ -1320,8 +1320,7 @@ CREATE TABLE t_ds_workflow_task_lineage (
     dept_workflow_definition_code bigint NOT NULL DEFAULT 0,
     dept_task_definition_code bigint NOT NULL DEFAULT 0,
     create_time timestamp NOT NULL DEFAULT current_timestamp,
-    update_time timestamp NOT NULL DEFAULT current_timestamp,
-    PRIMARY KEY (id)
+    update_time timestamp NOT NULL DEFAULT current_timestamp
 );
 
 create index idx_workflow_code_version on t_ds_workflow_task_lineage (workflow_definition_code,workflow_definition_version);
