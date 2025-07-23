@@ -17,5 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.mockito.Mockito;
+
 public class GrpcTaskTest {
+    private GrpcTask generateGrpcTask(){
+        return genrateGrpcTaskWithJSONDefinition();
+    }
+
+    private GrpcTask genrateGrpcTaskWithJSONDefinition(){
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        return new GrpcTask(taskExecutionContext);
+    }
 }
