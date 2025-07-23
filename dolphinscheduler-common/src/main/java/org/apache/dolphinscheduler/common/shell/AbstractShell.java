@@ -201,8 +201,10 @@ public abstract class AbstractShell {
             completed.compareAndSet(false, true);
             // the timeout thread handling
             // taken care in finally block
-            if (exitCode != 0 || errMsg.length() > 0) {
+            if (exitCode != 0) {
                 throw new ExitCodeException(exitCode, errMsg.toString());
+            } else if (errMsg.length() > 0) {
+                log.warn("Warn message: {}", errMsg);
             }
         } catch (InterruptedException ie) {
             throw new IOException(ie.toString());
