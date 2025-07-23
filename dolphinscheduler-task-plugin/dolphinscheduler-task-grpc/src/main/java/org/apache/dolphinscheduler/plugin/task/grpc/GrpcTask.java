@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import io.grpc.ManagedChannel;
+import lombok.val;
+import org.apache.dolphinscheduler.common.model.OkHttpResponse;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -24,10 +28,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
 
 @Slf4j
 public class GrpcTask extends AbstractTask {
 
+    private GrpcParameters grpcParameters;
     private TaskExecutionContext taskExecutionContext;
 
     /**
@@ -41,17 +48,39 @@ public class GrpcTask extends AbstractTask {
     }
 
     @Override
-    public void handle(TaskCallBack taskCallBack) throws TaskException {
+    public void init() {
+        this.grpcParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), GrpcParameters.class);
+        log.info("Initialize gRPC task params: {}", JSONUtils.toPrettyJsonString(grpcParameters));
 
+        if (grpcParameters == null || !grpcParameters.checkParameters()) {
+            throw new RuntimeException("gRPC task params is not valid");
+        }
+    }
+
+    @Override
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
+        try {
+            val channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
+            val fileDesc = JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
+            val stubService = new GrpcDynamicService(channel, fileDesc);
+            stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage());
+        } catch (Exception e) {
+            throw new TaskException("grpc handle exception:", e);
+        }
+
+//        OkHttpResponse httpResponse = sendRequest();
+//
+//        validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
     }
 
     @Override
     public void cancel() throws TaskException {
-
     }
 
     @Override
     public AbstractParameters getParameters() {
-        return null;
+        return this.grpcParameters;
     }
+
+
 }

@@ -24,8 +24,4 @@ public enum GrpcCheckCondition {
      */
     STATUS_CODE_DEFAULT,
     STATUS_CODE_CUSTOM,
-
-    GrpcCheckCondition() {
-
-    }
 }
