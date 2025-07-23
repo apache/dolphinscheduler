@@ -1311,7 +1311,7 @@ CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_wor
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_workflow_task_lineage;
 CREATE TABLE t_ds_workflow_task_lineage (
-    id SERIAL PRIMARY KEY NOT NULL,
+    id SERIAL NOT NULL,
     workflow_definition_code bigint NOT NULL DEFAULT 0,
     workflow_definition_version int NOT NULL DEFAULT 0,
     task_definition_code bigint NOT NULL DEFAULT 0,
@@ -1320,7 +1320,8 @@ CREATE TABLE t_ds_workflow_task_lineage (
     dept_workflow_definition_code bigint NOT NULL DEFAULT 0,
     dept_task_definition_code bigint NOT NULL DEFAULT 0,
     create_time timestamp NOT NULL DEFAULT current_timestamp,
-    update_time timestamp NOT NULL DEFAULT current_timestamp
+    update_time timestamp NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (id)
 );
 
 create index idx_workflow_code_version on t_ds_workflow_task_lineage (workflow_definition_code,workflow_definition_version);
