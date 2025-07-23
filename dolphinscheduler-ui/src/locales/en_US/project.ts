@@ -508,7 +508,8 @@ export default {
     grpc_url: 'gRPC Url',
     grpc_url_tips: 'Please Enter gRPC Url',
     grpc_method: 'gRPC Method',
-    grpc_method_tips: 'Please Enter gRPC Method (required), eg: org.example.Greeter/SayHello',
+    grpc_method_tips:
+      'Please Enter gRPC Method (required, Service/Method), eg: Greeter/SayHello',
     grpc_service_definition: 'Protobuf Definition',
     grpc_service_definition_tips: 'Please Enter Protobuf Definition (required)',
     grpc_message: 'Message',
