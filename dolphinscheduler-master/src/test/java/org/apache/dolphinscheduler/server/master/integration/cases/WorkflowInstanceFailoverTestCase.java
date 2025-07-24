@@ -661,7 +661,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                             .isEqualTo("sub_workflow_task");
                 });
 
-
         assertThat(repository.queryTaskInstance(subWorkflow))
                 .hasSize(2)
                 .allSatisfy(taskInstance -> {
@@ -928,7 +927,8 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .atMost(Duration.ofMinutes(1))
                 .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
-                    assertThat(repository.queryWorkflowInstance(1).getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(repository.queryWorkflowInstance(1).getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
                 });
         await()
                 .atMost(Duration.ofMinutes(1))
