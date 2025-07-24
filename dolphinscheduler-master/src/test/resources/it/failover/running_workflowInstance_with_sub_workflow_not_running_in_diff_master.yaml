@@ -58,28 +58,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
-  - name: sub_workflow_task_stopped
-    code: 2
-    version: 1
-    projectCode: 1
-    userId: 1
-    taskType: SUB_WORKFLOW
-    taskParams: '{"localParams":[],"resourceList":[],"workflowDefinitionCode":2}'
-    workerGroup: default
-    createTime: 2025-04-24 00:00:00
-    updateTime: 2025-04-24 00:00:00
-    taskExecuteType: BATCH
-  - name: sub_workflow_task_paused
-    code: 3
-    version: 1
-    projectCode: 1
-    userId: 1
-    taskType: SUB_WORKFLOW
-    taskParams: '{"localParams":[],"resourceList":[],"workflowDefinitionCode":2}'
-    workerGroup: default
-    createTime: 2025-04-24 00:00:00
-    updateTime: 2025-04-24 00:00:00
-    taskExecuteType: BATCH
+    taskPriority: MEDIUM
   - name: fake_task_A
     code: 4
     version: 1
@@ -91,6 +70,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
 
 
 workflowInstances:
@@ -138,105 +118,11 @@ workflowInstances:
     globalParams: '[]'
     varPool: '[]'
     dryRun: 0
-  - id: 3
-    name: sub_workflow_stopped-20250424180000000
-    workflowDefinitionCode: 2
-    workflowDefinitionVersion: 1
-    projectCode: 1
-    state: STOP
-    recovery: NO
-    startTime: 2025-04-24 18:00:00
-    endTime: null
-    runTimes: 1
-    host: 5.6.7.8:5678
-    commandType: START_PROCESS
-    commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
-    taskDependType: TASK_POST
-    commandStartTime: 2025-04-24 18:00:00
-    isSubWorkflow: YES
-    executorId: 1
-    historyCmd: START_PROCESS
-    workerGroup: default
-    globalParams: '[]'
-    varPool: '[]'
-    dryRun: 0
-  - id: 4
-    name: sub_workflow_paused-20250424180000000
-    workflowDefinitionCode: 2
-    workflowDefinitionVersion: 1
-    projectCode: 1
-    state: PAUSE
-    recovery: NO
-    startTime: 2025-04-24 18:00:00
-    endTime: null
-    runTimes: 1
-    host: 5.6.7.8:5678
-    commandType: START_PROCESS
-    commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
-    taskDependType: TASK_POST
-    commandStartTime: 2025-04-24 18:00:00
-    isSubWorkflow: YES
-    executorId: 1
-    historyCmd: START_PROCESS
-    workerGroup: default
-    globalParams: '[]'
-    varPool: '[]'
-    dryRun: 0
 
 
 taskInstances:
   - id: 1
     name: sub_workflow_task_submitted
-    taskType: SUB_WORKFLOW
-    workflowInstanceId: 1
-    workflowInstanceName: workflow_with_one_sub_workflow_running-20240816071251690
-    projectCode: 1
-    taskCode: 1
-    taskDefinitionVersion: 1
-    state: RUNNING_EXECUTION
-    firstSubmitTime: 2025-04-24 18:00:00
-    submitTime: 2025-04-24 18:00:00
-    startTime: 2025-04-24 18:00:00
-    retryTimes: 0
-    host: 127.0.0.1:1234
-    maxRetryTimes: 0
-    taskParams: '{"localParams":null,"varPool":[],"workflowDefinitionCode":1}'
-    flag: YES
-    retryInterval: 0
-    delayTime: 0
-    workerGroup: default
-    executorId: 1
-    varPool: '[]'
-    taskExecuteType: BATCH
-    appLink: '{"subWorkflowInstanceId":2}'
-    taskInstancePriority: MEDIUM
-  - id: 2
-    name: sub_workflow_task_stopped
-    taskType: SUB_WORKFLOW
-    workflowInstanceId: 1
-    workflowInstanceName: workflow_with_one_sub_workflow_running-20240816071251690
-    projectCode: 1
-    taskCode: 1
-    taskDefinitionVersion: 1
-    state: RUNNING_EXECUTION
-    firstSubmitTime: 2025-04-24 18:00:00
-    submitTime: 2025-04-24 18:00:00
-    startTime: 2025-04-24 18:00:00
-    retryTimes: 0
-    host: 127.0.0.1:1234
-    maxRetryTimes: 0
-    taskParams: '{"localParams":null,"varPool":[],"workflowDefinitionCode":1}'
-    flag: YES
-    retryInterval: 0
-    delayTime: 0
-    workerGroup: default
-    executorId: 1
-    varPool: '[]'
-    taskExecuteType: BATCH
-    appLink: '{"subWorkflowInstanceId":2}'
-    taskInstancePriority: MEDIUM
-  - id: 3
-    name: sub_workflow_task_paused
     taskType: SUB_WORKFLOW
     workflowInstanceId: 1
     workflowInstanceName: workflow_with_one_sub_workflow_running-20240816071251690
@@ -268,24 +154,6 @@ taskRelations:
     preTaskCode: 0
     preTaskVersion: 0
     postTaskCode: 1
-    postTaskVersion: 1
-    createTime: 2025-04-24 00:00:00
-    updateTime: 2025-04-24 00:00:00
-  - projectCode: 1
-    workflowDefinitionCode: 1
-    workflowDefinitionVersion: 1
-    preTaskCode: 0
-    preTaskVersion: 0
-    postTaskCode: 2
-    postTaskVersion: 1
-    createTime: 2025-04-24 00:00:00
-    updateTime: 2025-04-24 00:00:00
-  - projectCode: 1
-    workflowDefinitionCode: 1
-    workflowDefinitionVersion: 1
-    preTaskCode: 0
-    preTaskVersion: 0
-    postTaskCode: 3
     postTaskVersion: 1
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00

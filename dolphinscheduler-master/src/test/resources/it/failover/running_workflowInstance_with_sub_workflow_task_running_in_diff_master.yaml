@@ -58,6 +58,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
   - name: fake_task_A
     code: 2
     version: 1
@@ -69,6 +70,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
 
 
 workflowInstances:
@@ -143,6 +145,7 @@ taskInstances:
     varPool: '[]'
     taskExecuteType: BATCH
     appLink: '{"subWorkflowInstanceId":2}'
+    taskInstancePriority: MEDIUM
   - id: 2
     name: fake_task_A
     taskType: LogicFakeTask
@@ -166,6 +169,7 @@ taskInstances:
     executorId: 1
     varPool: '[]'
     taskExecuteType: BATCH
+    taskInstancePriority: MEDIUM
 
 taskRelations:
   - projectCode: 1

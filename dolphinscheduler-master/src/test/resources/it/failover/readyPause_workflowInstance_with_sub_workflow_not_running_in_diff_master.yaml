@@ -58,6 +58,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
   - name: sub_workflow_task_stopped
     code: 2
     version: 1
@@ -69,6 +70,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
   - name: sub_workflow_task_paused
     code: 3
     version: 1
@@ -80,6 +82,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
   - name: fake_task_A
     code: 4
     version: 1
@@ -91,6 +94,7 @@ tasks:
     createTime: 2025-04-24 00:00:00
     updateTime: 2025-04-24 00:00:00
     taskExecuteType: BATCH
+    taskPriority: MEDIUM
 
 
 workflowInstances:
@@ -233,7 +237,7 @@ taskInstances:
     executorId: 1
     varPool: '[]'
     taskExecuteType: BATCH
-    appLink: '{"subWorkflowInstanceId":2}'
+    appLink: '{"subWorkflowInstanceId":3}'
     taskInstancePriority: MEDIUM
   - id: 3
     name: sub_workflow_task_paused
@@ -258,7 +262,7 @@ taskInstances:
     executorId: 1
     varPool: '[]'
     taskExecuteType: BATCH
-    appLink: '{"subWorkflowInstanceId":2}'
+    appLink: '{"subWorkflowInstanceId":4}'
     taskInstancePriority: MEDIUM
 
 taskRelations:

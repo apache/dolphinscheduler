@@ -99,7 +99,14 @@ public enum WorkflowExecutionStatus {
      * @return bool
      */
     public boolean canTakeover() {
-        return Arrays.stream(NEED_FAILOVER_STATES).anyMatch(x -> x == this.getCode()) || this == FAILOVER;
+        return this == RUNNING_EXECUTION
+                || this == READY_PAUSE
+                || this == PAUSE
+                || this == READY_STOP
+                || this == STOP
+                || this == FAILURE
+                || this == SUCCESS
+                || this == FAILOVER;
     }
 
     public boolean canDirectPauseInDB() {
