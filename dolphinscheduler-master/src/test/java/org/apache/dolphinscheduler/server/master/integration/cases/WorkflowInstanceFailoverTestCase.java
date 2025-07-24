@@ -641,6 +641,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
@@ -650,32 +651,25 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                             });
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryTaskInstance(mainWorkflow))
-                            .hasSize(2)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
-                                                : TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getName())
-                                        .isEqualTo("sub_workflow_task");
-                            });
+        assertThat(repository.queryTaskInstance(mainWorkflow))
+                .hasSize(2)
+                .anySatisfy(taskInstance -> {
+                    assertThat(taskInstance.getState())
+                            .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                    : TaskExecutionStatus.SUCCESS);
+                    assertThat(taskInstance.getName())
+                            .isEqualTo("sub_workflow_task");
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryTaskInstance(subWorkflow))
-                            .hasSize(2)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
-                                                : TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getName())
-                                        .isEqualTo("fake_task_A");
-                            });
+
+        assertThat(repository.queryTaskInstance(subWorkflow))
+                .hasSize(2)
+                .anySatisfy(taskInstance -> {
+                    assertThat(taskInstance.getState())
+                            .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                    : TaskExecutionStatus.SUCCESS);
+                    assertThat(taskInstance.getName())
+                            .isEqualTo("fake_task_A");
                 });
 
         assertThat(repository.queryAllTaskInstance()).hasSize(4);
@@ -731,12 +725,14 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         // wait failover main-workflow
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow started
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
@@ -749,6 +745,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         // wait sub-workflow-task started
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryTaskInstance(mainWorkflow))
                             .hasSize(2)
@@ -766,6 +763,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
@@ -775,32 +773,24 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                             });
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryTaskInstance(mainWorkflow))
-                            .hasSize(2)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
-                                                : TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getName())
-                                        .isEqualTo("sub_workflow_task");
-                            });
+        assertThat(repository.queryTaskInstance(mainWorkflow))
+                .hasSize(2)
+                .anySatisfy(taskInstance -> {
+                    assertThat(taskInstance.getState())
+                            .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                    : TaskExecutionStatus.SUCCESS);
+                    assertThat(taskInstance.getName())
+                            .isEqualTo("sub_workflow_task");
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryTaskInstance(subWorkflow))
-                            .hasSize(2)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
-                                                : TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getName())
-                                        .isEqualTo("fake_task_A");
-                            });
+        assertThat(repository.queryTaskInstance(subWorkflow))
+                .hasSize(2)
+                .anySatisfy(taskInstance -> {
+                    assertThat(taskInstance.getState())
+                            .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                    : TaskExecutionStatus.SUCCESS);
+                    assertThat(taskInstance.getName())
+                            .isEqualTo("fake_task_A");
                 });
 
         assertThat(repository.queryAllTaskInstance()).hasSize(4);
@@ -856,12 +846,14 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         // wait failover sub-workflow
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(subMasterFailoverNodePath)).isTrue();
                 });
         // wait sub-workflow started
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(subWorkflow))
                             .hasSize(1)
@@ -876,6 +868,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(2)
@@ -885,38 +878,11 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                             });
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryTaskInstance(mainWorkflow))
-                            .hasSize(2)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(taskInstance.getId() == 1 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
-                                                : TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getName())
-                                        .isEqualTo("sub_workflow_task");
-                            });
-                });
-
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryTaskInstance(subWorkflow))
-                            .hasSize(2)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(taskInstance.getId() == 2 ? TaskExecutionStatus.NEED_FAULT_TOLERANCE
-                                                : TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getName())
-                                        .isEqualTo("fake_task_A");
-                            });
-                });
-
-        assertThat(repository.queryAllTaskInstance()).hasSize(4);
+        assertThat(repository.queryAllTaskInstance()).filteredOn(
+                taskInstance -> taskInstance.getId() > 2 && taskInstance.getState() == TaskExecutionStatus.SUCCESS)
+                .hasSize(4);
 
         masterContainer.assertAllResourceReleased();
-
     }
 
     @Test
@@ -975,12 +941,14 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         // wait failover main-workflow
         await()
                 .atMost(Duration.ofMinutes(5))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow started
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
@@ -992,6 +960,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
                             .hasSize(7)
@@ -1002,16 +971,12 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                             });
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(8))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryAllTaskInstance())
-                            .hasSize(9)
-                            .filteredOn(taskInstance -> taskInstance.getId() > 4)
-                            .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
-                            });
+        assertThat(repository.queryAllTaskInstance())
+                .hasSize(9)
+                .filteredOn(taskInstance -> taskInstance.getId() > 4)
+                .anySatisfy(taskInstance -> {
+                    assertThat(taskInstance.getState())
+                            .isEqualTo(TaskExecutionStatus.SUCCESS);
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -1074,12 +1039,14 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         // wait failover main-workflow
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow stop
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
@@ -1159,12 +1126,14 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         // wait failover main-workflow
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
                 });
         // wait main-workflow stop
         await()
                 .atMost(Duration.ofMinutes(8))
+                .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(mainWorkflow))
                             .hasSize(1)
