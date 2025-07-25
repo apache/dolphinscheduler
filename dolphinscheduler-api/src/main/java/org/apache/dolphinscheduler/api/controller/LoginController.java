@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
+import org.apache.dolphinscheduler.api.security.impl.oidc.OidcAuthenticator;
+import org.apache.dolphinscheduler.api.security.impl.oidc.OidcConfigProperties;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -42,6 +44,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,8 +62,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,8 +96,14 @@ public class LoginController extends BaseController {
     @Autowired(required = false)
     private OAuth2Configuration oAuth2Configuration;
 
+    @Autowired(required = false)
+    private OidcConfigProperties oidcConfigProperties;
+
     @Autowired
     private UsersService usersService;
+
+    @Value("${api.ui-url:http://localhost:5173}")
+    private String uiUrl;
 
     /**
      * login
@@ -152,6 +163,10 @@ public class LoginController extends BaseController {
     @GetMapping(value = "/login/sso")
     @ApiException(NOT_SUPPORT_SSO)
     public Result ssoLogin(HttpServletRequest request) {
+        if (authenticator instanceof OidcAuthenticator) {
+            return Result.success(null);
+        }
+
         if (authenticator instanceof AbstractSsoAuthenticator) {
             String randomState = UUID.randomUUID().toString();
             HttpSession session = request.getSession();
@@ -204,6 +219,30 @@ public class LoginController extends BaseController {
             oAuth2ClientProperties.setIconUri(e.getIconUri());
             return oAuth2ClientProperties;
         }).collect(Collectors.toList());
+        return Result.success(providers);
+    }
+
+    /**
+     * Get OIDC providers
+     * @return list of OIDC providers
+     */
+    @Operation(summary = "getOidcProviders", description = "GET_OIDC_PROVIDERS")
+    @GetMapping("oidc-providers")
+    public Result<List<Map<String, String>>> oidcProviders() {
+        if (oidcConfigProperties == null || !oidcConfigProperties.isEnable()
+                || oidcConfigProperties.getProviders() == null) {
+            return Result.success(new ArrayList<>());
+        }
+
+        List<Map<String, String>> providers = oidcConfigProperties.getProviders().entrySet().stream()
+                .map(entry -> {
+                    Map<String, String> provider = new HashMap<>();
+                    provider.put("id", entry.getKey());
+                    provider.put("displayName", entry.getValue().getDisplayName());
+                    return provider;
+                })
+                .collect(Collectors.toList());
+
         return Result.success(providers);
     }
 
@@ -262,5 +301,78 @@ public class LoginController extends BaseController {
             response.sendRedirect(String.format("%s?authType=%s&error=%s", oAuth2ClientProperties.getCallbackUrl(),
                     "oauth2", "oauth2 auth error"));
         }
+    }
+
+    /**
+     * Handle OIDC callback
+     *
+     * @param code       authorization code
+     * @param state      state parameter
+     * @param providerId OIDC provider ID
+     * @param request    HTTP request
+     * @param response   HTTP response
+     */
+    @SneakyThrows
+    @Operation(summary = "handleOidcCallback", description = "HANDLE_OIDC_CALLBACK")
+    @GetMapping("login/oauth2/code/{providerId}")
+    public void handleOidcCallback(@RequestParam(name = "code", required = false) String code,
+                                   @RequestParam(name = "error", required = false) String error,
+                                   @RequestParam(name = "state") String state,
+                                   @PathVariable String providerId,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException {
+
+        // Handle login failure from OIDC provider
+        if (error != null) {
+            log.error("OIDC login failed with error: {}.", error);
+            response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_login_failed");
+            return;
+        }
+
+        // Handle the case where code is missing without an error
+        if (code == null) {
+            log.error("OIDC login failed: The authorization code was not provided.");
+            response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_missing_code");
+            return;
+        }
+
+        try {
+            if (!(authenticator instanceof OidcAuthenticator)) {
+                log.error("OIDC authentication is not active or authenticator type is incorrect.");
+                response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_not_enabled");
+                return;
+            }
+
+            User user = ((OidcAuthenticator) authenticator).login(state, code);
+
+            if (user == null) {
+                log.error("OIDC authentication failed. User could not be authenticated or created.");
+                response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_authentication_failed");
+                return;
+            }
+
+            Session session = sessionService.createSessionIfAbsent(user);
+
+            response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+            response.sendRedirect(String.format("%s/login?sessionId=%s&authType=%s",
+                    uiUrl, session.getId(), "oidc"));
+        } catch (Exception ex) {
+            log.error("A critical error occurred during the OIDC callback process.", ex);
+            try {
+                response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_critical_error");
+            } catch (IOException e) {
+                log.error("Failed to redirect to login page after a critical error.", e);
+            }
+        }
+    }
+
+    @Operation(summary = "redirectToOidc", description = "REDIRECT_TO_OIDC_LOGIN")
+    @GetMapping("/oauth2/authorization/{providerId}")
+    public void redirectToOidc(@PathVariable String providerId, HttpServletRequest request,
+                               HttpServletResponse response) throws IOException {
+        String state = providerId + ":" + UUID.randomUUID().toString();
+        request.getSession().setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
+        String authorizationUrl = ((OidcAuthenticator) authenticator).getSignInUrl(state);
+        response.sendRedirect(authorizationUrl);
     }
 }
