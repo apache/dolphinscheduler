@@ -84,7 +84,7 @@ workflowInstances:
     startTime: 2025-04-24 18:00:00
     endTime: null
     runTimes: 1
-    host: 127.0.0.1:5678
+    host: 1.2.3.4:5678
     commandType: START_PROCESS
     commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
     taskDependType: TASK_POST
@@ -106,7 +106,7 @@ workflowInstances:
     startTime: 2025-04-24 18:00:00
     endTime: null
     runTimes: 1
-    host: 127.0.0.1:5678
+    host: 5.6.7.8:5678
     commandType: START_PROCESS
     commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
     taskDependType: TASK_POST
