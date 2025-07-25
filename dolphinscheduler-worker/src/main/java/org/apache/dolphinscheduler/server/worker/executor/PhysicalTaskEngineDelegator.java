@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.task.executor.TaskEngine;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorReassignMasterRequest;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
@@ -76,9 +78,14 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
         final int taskInstanceId = taskExecutorReassignMasterRequest.getTaskInstanceId();
         final String workflowHost = taskExecutorReassignMasterRequest.getWorkflowHost();
         // todo: Is this reassign can make sure there is no concurrent problem?
-        physicalTaskExecutorRepository.get(taskInstanceId).ifPresent(
-                taskExecutor -> taskExecutor.getTaskExecutionContext().setWorkflowInstanceHost(workflowHost));
-        return physicalTaskExecutorEventReporter.reassignWorkflowInstanceHost(taskInstanceId, workflowHost);
+        Optional<ITaskExecutor> taskExecutorOptional = physicalTaskExecutorRepository.get(taskInstanceId);
+        physicalTaskExecutorEventReporter.reassignWorkflowInstanceHost(taskInstanceId, workflowHost);
+        if (taskExecutorOptional.isPresent()) {
+            ITaskExecutor taskExecutor = taskExecutorOptional.get();
+            taskExecutor.getTaskExecutionContext().setWorkflowInstanceHost(workflowHost);
+            return true;
+        }
+        return false;
     }
 
     @Override
