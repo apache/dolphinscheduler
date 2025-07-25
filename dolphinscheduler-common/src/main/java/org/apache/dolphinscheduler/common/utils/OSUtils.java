@@ -308,7 +308,6 @@ public class OSUtils {
         if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
-        // Add the -i option to simulate a login, which loads the target user's environment.
         return String.format("sudo -u %s -i %s", tenantCode, command);
     }
 
