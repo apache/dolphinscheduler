@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -76,6 +77,28 @@ public class LoginControllerTest extends AbstractControllerTest {
         Map<String, String> data = (Map<String, String>) result.getData();
         Assertions.assertEquals(Constants.SECURITY_CONFIG_TYPE_PASSWORD, data.get(Constants.SECURITY_CONFIG_TYPE));
         Assertions.assertNotEquals(Constants.SECURITY_CONFIG_TYPE_LDAP, data.get(Constants.SECURITY_CONFIG_TYPE));
+    }
+
+    @Test
+    public void testLogin_withNullUserName() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userName", "");
+        paramsMap.add("userPassword", "dolphinscheduler123");
+
+        mockMvc.perform(post("/login").params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.USER_NAME_NULL.getCode()));
+    }
+
+    @Test
+    public void testLogin_withInvalidCredentials() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userName", "admin");
+        paramsMap.add("userPassword", "invalid_password");
+
+        mockMvc.perform(post("/login").params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.USER_NAME_PASSWD_ERROR.getCode()));
     }
 
     @Test
