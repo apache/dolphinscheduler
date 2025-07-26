@@ -230,7 +230,8 @@ public class OidcAuthenticatorTest {
         Assertions.assertTrue(signInUrl.contains("client_id=test-client"), "URL should contain client_id=test-client");
 
         String encodedState = state.replace(":", "%3A");
-        Assertions.assertTrue(signInUrl.contains("state=" + encodedState), "URL should contain encoded state=" + encodedState);
+        Assertions.assertTrue(signInUrl.contains("state=" + encodedState),
+                "URL should contain encoded state=" + encodedState);
     }
 
     @Test
@@ -244,20 +245,24 @@ public class OidcAuthenticatorTest {
 
     @Test
     public void testParseScope() throws Exception {
-        java.lang.reflect.Method parseScopeMethod = OidcAuthenticator.class.getDeclaredMethod("parseScope", String.class);
+        java.lang.reflect.Method parseScopeMethod =
+                OidcAuthenticator.class.getDeclaredMethod("parseScope", String.class);
         ReflectionUtils.makeAccessible(parseScopeMethod);
 
-        com.nimbusds.oauth2.sdk.Scope scope1 = (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, (String) null);
+        com.nimbusds.oauth2.sdk.Scope scope1 =
+                (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, (String) null);
         Assertions.assertTrue(scope1.contains("openid"));
         Assertions.assertTrue(scope1.contains("profile"));
         Assertions.assertTrue(scope1.contains("email"));
 
-        com.nimbusds.oauth2.sdk.Scope scope2 = (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, "");
+        com.nimbusds.oauth2.sdk.Scope scope2 =
+                (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, "");
         Assertions.assertTrue(scope2.contains("openid"));
         Assertions.assertTrue(scope2.contains("profile"));
         Assertions.assertTrue(scope2.contains("email"));
 
-        com.nimbusds.oauth2.sdk.Scope scope3 = (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, "openid,custom");
+        com.nimbusds.oauth2.sdk.Scope scope3 =
+                (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, "openid,custom");
         Assertions.assertTrue(scope3.contains("openid"));
         Assertions.assertTrue(scope3.contains("custom"));
         Assertions.assertFalse(scope3.contains("profile"));
@@ -266,8 +271,9 @@ public class OidcAuthenticatorTest {
     @Test
     public void testExtractUsername() throws Exception {
         java.lang.reflect.Method extractUsernameMethod = OidcAuthenticator.class.getDeclaredMethod(
-            "extractUsername", OidcProviderConfig.class, com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class, 
-            com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
+                "extractUsername", OidcProviderConfig.class,
+                com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class,
+                com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
         ReflectionUtils.makeAccessible(extractUsernameMethod);
 
         OidcProviderConfig providerConfig = new OidcProviderConfig();
@@ -276,62 +282,73 @@ public class OidcAuthenticatorTest {
         com.nimbusds.oauth2.sdk.id.Subject subject = new com.nimbusds.oauth2.sdk.id.Subject("subject-id");
 
         com.nimbusds.jwt.JWTClaimsSet claimsSet1 = new com.nimbusds.jwt.JWTClaimsSet.Builder()
-            .subject(subject.getValue())
-            .issuer("https://issuer.example.com")
-            .audience("client-id")
-            .expirationTime(new Date(System.currentTimeMillis() + 60000))
-            .issueTime(new Date())
-            .claim("preferred_username", "test-username")
-            .build();
+                .subject(subject.getValue())
+                .issuer("https://issuer.example.com")
+                .audience("client-id")
+                .expirationTime(new Date(System.currentTimeMillis() + 60000))
+                .issueTime(new Date())
+                .claim("preferred_username", "test-username")
+                .build();
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 = mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 =
+                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
         when(idTokenClaims1.getSubject()).thenReturn(subject);
         when(idTokenClaims1.getClaim("preferred_username")).thenReturn("test-username");
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 = new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 =
+                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
         userInfo1.setClaim("preferred_username", "user-info-username");
 
-        String username1 = (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims1, userInfo1);
+        String username1 =
+                (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims1, userInfo1);
         Assertions.assertEquals("test-username", username1);
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 = mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 =
+                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
         when(idTokenClaims2.getSubject()).thenReturn(subject);
         when(idTokenClaims2.getClaim("preferred_username")).thenReturn(null);
 
-        String username2 = (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo1);
+        String username2 =
+                (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo1);
         Assertions.assertEquals("user-info-username", username2);
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 = new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 =
+                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
 
-        String username3 = (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo2);
+        String username3 =
+                (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo2);
         Assertions.assertEquals("subject-id", username3);
     }
 
     @Test
     public void testExtractEmail() throws Exception {
         java.lang.reflect.Method extractEmailMethod = OidcAuthenticator.class.getDeclaredMethod(
-            "extractEmail", com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class, 
-            com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
+                "extractEmail", com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class,
+                com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
         ReflectionUtils.makeAccessible(extractEmailMethod);
 
         com.nimbusds.oauth2.sdk.id.Subject subject = new com.nimbusds.oauth2.sdk.id.Subject("subject-id");
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 = mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 =
+                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
         when(idTokenClaims1.getClaim("email")).thenReturn("test@example.com");
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 = new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 =
+                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
         userInfo1.setClaim("email", "userinfo@example.com");
 
         String email1 = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims1, userInfo1);
         Assertions.assertEquals("test@example.com", email1);
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 = mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 =
+                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
         when(idTokenClaims2.getClaim("email")).thenReturn(null);
 
         String email2 = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims2, userInfo1);
         Assertions.assertEquals("userinfo@example.com", email2);
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 = new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 =
+                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
 
         String email3 = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims2, userInfo2);
         Assertions.assertNull(email3);
@@ -340,8 +357,9 @@ public class OidcAuthenticatorTest {
     @Test
     public void testExtractGroups() throws Exception {
         java.lang.reflect.Method extractGroupsMethod = OidcAuthenticator.class.getDeclaredMethod(
-            "extractGroups", OidcProviderConfig.class, com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class, 
-            com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
+                "extractGroups", OidcProviderConfig.class,
+                com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class,
+                com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
         ReflectionUtils.makeAccessible(extractGroupsMethod);
 
         OidcProviderConfig providerConfig = new OidcProviderConfig();
@@ -351,44 +369,52 @@ public class OidcAuthenticatorTest {
 
         List<String> idTokenGroups = Arrays.asList("group1", "group2");
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 = mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 =
+                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
         when(idTokenClaims1.getClaim("groups")).thenReturn(idTokenGroups);
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 = new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 =
+                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
         userInfo1.setClaim("groups", Arrays.asList("group3", "group4"));
 
         @SuppressWarnings("unchecked")
-        List<String> groups1 = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims1, userInfo1);
+        List<String> groups1 =
+                (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims1, userInfo1);
         Assertions.assertEquals(idTokenGroups, groups1);
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 = mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 =
+                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
         when(idTokenClaims2.getClaim("groups")).thenReturn(null);
 
         List<String> userInfoGroups = Arrays.asList("group3", "group4");
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 = new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 =
+                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
         userInfo2.setClaim("groups", userInfoGroups);
 
         @SuppressWarnings("unchecked")
-        List<String> groups2 = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo2);
+        List<String> groups2 =
+                (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo2);
         Assertions.assertEquals(userInfoGroups, groups2);
 
         OidcProviderConfig providerConfig2 = new OidcProviderConfig();
         providerConfig2.setGroupsClaim(null);
 
         @SuppressWarnings("unchecked")
-        List<String> groups3 = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig2, idTokenClaims1, userInfo1);
+        List<String> groups3 = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig2,
+                idTokenClaims1, userInfo1);
         Assertions.assertTrue(groups3.isEmpty());
 
         @SuppressWarnings("unchecked")
-        List<String> groups4 = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, 
-            new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject));
+        List<String> groups4 =
+                (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2,
+                        new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject));
         Assertions.assertTrue(groups4.isEmpty());
     }
 
     @Test
     public void testDetermineUserType() throws Exception {
         java.lang.reflect.Method determineUserTypeMethod = OidcAuthenticator.class.getDeclaredMethod(
-            "determineUserType", List.class);
+                "determineUserType", List.class);
         ReflectionUtils.makeAccessible(determineUserTypeMethod);
 
         OidcUserConfig userConfig = new OidcUserConfig();
@@ -396,22 +422,22 @@ public class OidcAuthenticatorTest {
         when(oidcConfigProperties.getUser()).thenReturn(userConfig);
 
         List<String> adminGroups = Arrays.asList("user-group", "admin-group");
-        UserType userType1 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[] { adminGroups });
+        UserType userType1 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[]{adminGroups});
         Assertions.assertEquals(UserType.ADMIN_USER, userType1);
 
         List<String> regularGroups = Arrays.asList("user-group", "another-group");
-        UserType userType2 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[] { regularGroups });
+        UserType userType2 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[]{regularGroups});
         Assertions.assertEquals(UserType.GENERAL_USER, userType2);
 
-        UserType userType3 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[] { null });
+        UserType userType3 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[]{null});
         Assertions.assertEquals(UserType.GENERAL_USER, userType3);
 
         userConfig.setAdminGroupMapping(Collections.emptyList());
-        UserType userType4 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[] { adminGroups });
+        UserType userType4 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[]{adminGroups});
         Assertions.assertEquals(UserType.GENERAL_USER, userType4);
 
         userConfig.setAdminGroupMapping(null);
-        UserType userType5 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[] { adminGroups });
+        UserType userType5 = (UserType) determineUserTypeMethod.invoke(oidcAuthenticator, new Object[]{adminGroups});
         Assertions.assertEquals(UserType.GENERAL_USER, userType5);
     }
 
