@@ -43,7 +43,7 @@
                 <file>${taskInstanceLogFullPath}</file>
                 <encoder>
                     <pattern>
-                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %message%n
+                        %date{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %message%n
                     </pattern>
                     <charset>UTF-8</charset>
                 </encoder>
