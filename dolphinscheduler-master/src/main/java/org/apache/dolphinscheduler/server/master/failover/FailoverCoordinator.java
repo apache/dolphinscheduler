@@ -83,7 +83,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                 doMasterFailover(
                         masterAddress,
                         aliveMasterServerMetadata.getServerStartupTime(),
-                        RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(
+                        RegistryUtils.getGlobalMasterFailoverNodePath(
                                 masterAddress));
             } else {
                 // If the master is not alive, then we use the event time as the failover deadline.
@@ -91,7 +91,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                 doMasterFailover(
                         masterAddress,
                         globalMasterFailoverEvent.getEventTime().getTime(),
-                        RegistryUtils.getFailoveredNodePathWhichStartupTimeIsUnknown(masterAddress));
+                        RegistryUtils.getGlobalMasterFailoverNodePath(masterAddress));
             }
         }
 

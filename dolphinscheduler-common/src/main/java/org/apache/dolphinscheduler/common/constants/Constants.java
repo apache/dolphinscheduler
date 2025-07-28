@@ -70,6 +70,11 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE = "development.state";
 
     /**
+     * shell.kill.wait.timeout: this property defines the wait timeout in seconds before using SIGKILL.
+     */
+    public static final String SHELL_KILL_WAIT_TIMEOUT = "shell.kill.wait.timeout";
+
+    /**
      * sudo enable
      */
     public static final String SUDO_ENABLE = "sudo.enable";
