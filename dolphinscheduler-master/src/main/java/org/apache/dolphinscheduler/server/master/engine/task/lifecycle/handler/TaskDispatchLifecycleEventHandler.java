@@ -37,7 +37,7 @@ public class TaskDispatchLifecycleEventHandler extends AbstractTaskLifecycleEven
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskDispatchLifecycleEvent event) {
-        taskStateAction.dispatchEventAction(workflowExecutionRunnable, taskExecutionRunnable, event);
+        taskStateAction.onDispatchEvent(workflowExecutionRunnable, taskExecutionRunnable, event);
     }
 
     @Override

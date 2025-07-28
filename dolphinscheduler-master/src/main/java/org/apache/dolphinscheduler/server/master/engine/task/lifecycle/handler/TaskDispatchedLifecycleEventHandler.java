@@ -48,7 +48,7 @@ public class TaskDispatchedLifecycleEventHandler
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
-        taskStateAction.dispatchedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskDispatchedEvent);
+        taskStateAction.onDispatchedEvent(workflowExecutionRunnable, taskExecutionRunnable, taskDispatchedEvent);
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecutionRunnable,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
