@@ -37,7 +37,7 @@ public class TaskRetryLifecycleEventHandler extends AbstractTaskLifecycleEventHa
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskRetryLifecycleEvent taskRetryLifecycleEvent) {
-        taskStateAction.retryEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskRetryLifecycleEvent);
+        taskStateAction.onRetryEvent(workflowExecutionRunnable, taskExecutionRunnable, taskRetryLifecycleEvent);
     }
 
     @Override
