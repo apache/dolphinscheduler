@@ -37,7 +37,7 @@ public class WorkflowSucceedLifecycleEventHandler
     public void handle(final IWorkflowStateAction workflowStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowSucceedLifecycleEvent workflowSucceedEvent) {
-        workflowStateAction.succeedEventAction(workflowExecutionRunnable, workflowSucceedEvent);
+        workflowStateAction.onSucceedEvent(workflowExecutionRunnable, workflowSucceedEvent);
     }
 
     @Override

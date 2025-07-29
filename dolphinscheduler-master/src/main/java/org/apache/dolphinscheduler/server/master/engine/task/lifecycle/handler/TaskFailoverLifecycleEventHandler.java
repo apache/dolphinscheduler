@@ -34,7 +34,7 @@ public class TaskFailoverLifecycleEventHandler extends AbstractTaskLifecycleEven
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskFailoverLifecycleEvent taskFailoverEvent) {
-        taskStateAction.failoverEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskFailoverEvent);
+        taskStateAction.onFailoverEvent(workflowExecutionRunnable, taskExecutionRunnable, taskFailoverEvent);
     }
 
     @Override
