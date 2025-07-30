@@ -37,7 +37,7 @@ public class WorkflowStoppedLifecycleEventHandler
     public void handle(final IWorkflowStateAction workflowStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowStoppedLifecycleEvent workflowStoppedEvent) {
-        workflowStateAction.stoppedEventAction(workflowExecutionRunnable, workflowStoppedEvent);
+        workflowStateAction.onStoppedEvent(workflowExecutionRunnable, workflowStoppedEvent);
     }
 
     @Override

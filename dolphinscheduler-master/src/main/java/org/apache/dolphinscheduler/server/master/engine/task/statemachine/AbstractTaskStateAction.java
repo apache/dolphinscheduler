@@ -98,9 +98,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void dispatchedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                      final ITaskExecutionRunnable taskExecutionRunnable,
-                                      final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
+    public void onDispatchedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                  final ITaskExecutionRunnable taskExecutionRunnable,
+                                  final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         taskInstance.setState(DISPATCH);
         taskInstance.setHost(taskDispatchedEvent.getExecutorHost());
@@ -108,9 +108,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void runtimeContextChangedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                                 final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent) {
+    public void onRuntimeContextChangedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                             final ITaskExecutionRunnable taskExecutionRunnable,
+                                             final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         if (StringUtils.isNotEmpty(taskRuntimeContextChangedEvent.getRuntimeContext())) {
             taskInstance.setAppLink(taskRuntimeContextChangedEvent.getRuntimeContext());
@@ -128,9 +128,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void pausedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskPausedLifecycleEvent taskPausedEvent) {
+    public void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskPausedLifecycleEvent taskPausedEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstancePausedEventToDB(taskExecutionRunnable, taskPausedEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainPause(taskExecutionRunnable);
@@ -145,9 +145,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void killedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskKilledLifecycleEvent taskInstanceKillEvent) {
+    public void onKilledEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskKilledLifecycleEvent taskInstanceKillEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceKilledEventToDB(taskExecutionRunnable, taskInstanceKillEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainKill(taskExecutionRunnable);
@@ -164,9 +164,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void failedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskFailedLifecycleEvent taskFailedEvent) {
+    public void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskFailedLifecycleEvent taskFailedEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceFailedEventToDB(taskExecutionRunnable, taskFailedEvent);
 
@@ -194,9 +194,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void succeedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final ITaskExecutionRunnable taskExecutionRunnable,
-                                   final TaskSuccessLifecycleEvent taskSuccessEvent) {
+    public void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                               final ITaskExecutionRunnable taskExecutionRunnable,
+                               final TaskSuccessLifecycleEvent taskSuccessEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceSuccessEventToDB(taskExecutionRunnable, taskSuccessEvent);
         mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);

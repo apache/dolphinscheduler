@@ -37,7 +37,7 @@ public class TaskKillLifecycleEventHandler extends AbstractTaskLifecycleEventHan
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskKillLifecycleEvent taskKillEvent) {
-        taskStateAction.killEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskKillEvent);
+        taskStateAction.onKillEvent(workflowExecutionRunnable, taskExecutionRunnable, taskKillEvent);
     }
 
     @Override

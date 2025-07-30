@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,8 +93,19 @@ public enum WorkflowExecutionStatus {
                 || this == SERIAL_WAIT;
     }
 
-    public boolean canFailover() {
-        return Arrays.stream(NEED_FAILOVER_STATES).anyMatch(x -> x == this.getCode());
+    /**
+     * status can be take over on sub-workflow
+     * @return bool
+     */
+    public boolean canTakeover() {
+        return this == RUNNING_EXECUTION
+                || this == READY_PAUSE
+                || this == PAUSE
+                || this == READY_STOP
+                || this == STOP
+                || this == FAILURE
+                || this == SUCCESS
+                || this == FAILOVER;
     }
 
     public boolean canDirectPauseInDB() {
