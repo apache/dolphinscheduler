@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TaskExecutorRepository implements ITaskExecutorRepository {
 
     private final Map<Integer, ITaskExecutor> taskExecutorMap = new ConcurrentHashMap<>();
+    private final Map<Integer, ITaskExecutor> invalidTaskExecutorMap = new ConcurrentHashMap<>();
 
     @Override
     public void put(final ITaskExecutor taskExecutor) {
@@ -36,7 +37,8 @@ public class TaskExecutorRepository implements ITaskExecutorRepository {
 
     @Override
     public Optional<ITaskExecutor> get(final Integer taskExecutorId) {
-        return Optional.ofNullable(taskExecutorMap.get(taskExecutorId));
+        final Optional<ITaskExecutor> validValue = Optional.ofNullable(taskExecutorMap.get(taskExecutorId));
+        return validValue.isPresent() ? validValue : Optional.ofNullable(invalidTaskExecutorMap.get(taskExecutorId));
     }
 
     @Override
@@ -46,17 +48,32 @@ public class TaskExecutorRepository implements ITaskExecutorRepository {
 
     @Override
     public boolean contains(final Integer taskExecutorId) {
-        return taskExecutorMap.containsKey(taskExecutorId);
+        return taskExecutorMap.containsKey(taskExecutorId) || invalidTaskExecutorMap.containsKey(taskExecutorId);
     }
 
     @Override
     public void remove(final Integer taskExecutorId) {
-        taskExecutorMap.remove(taskExecutorId);
+        invalidTaskExecutorMap.remove(taskExecutorId);
     }
 
     @Override
     public void clear() {
         taskExecutorMap.clear();
+        invalidTaskExecutorMap.clear();
     }
 
+    @Override
+    public boolean isInvalid(final Integer taskExecutorId) {
+        return invalidTaskExecutorMap.containsKey(taskExecutorId);
+    }
+
+    @Override
+    public void invalidate(final Integer taskExecutorId) {
+        invalidTaskExecutorMap.put(taskExecutorId, taskExecutorMap.remove(taskExecutorId));
+    }
+
+    @Override
+    public Collection<ITaskExecutor> getAllInvalid() {
+        return invalidTaskExecutorMap.values();
+    }
 }

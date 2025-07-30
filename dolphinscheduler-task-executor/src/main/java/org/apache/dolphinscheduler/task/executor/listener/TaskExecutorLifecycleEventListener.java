@@ -79,7 +79,7 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
 
     @Override
     public void onTaskExecutorPausedLifecycleEvent(final TaskExecutorPausedLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
@@ -90,17 +90,17 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
 
     @Override
     public void onTaskExecutorKilledLifecycleEvent(final TaskExecutorKilledLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
     public void onTaskExecutorSuccessLifecycleEvent(final TaskExecutorSuccessLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
     public void onTaskExecutorFailLifecycleEvent(TaskExecutorFailedLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
@@ -108,7 +108,9 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
         TaskInstanceLogHeader.printFinalizeTaskHeader();
         final ITaskExecutor taskExecutor = getTaskExecutor(event);
 
-        taskExecutorRepository.remove(taskExecutor.getId());
+        // we don't remove taskExecutor here
+        // to make sure the taskExecutor's lifecycle contains ReportableTaskExecutorLifecycleEventChannel.
+        taskExecutorRepository.invalidate(taskExecutor.getId());
 
         final ITaskExecutorContainer executorContainer = taskExecutorContainerDelegator.getExecutorContainer();
         executorContainer.finalize(taskExecutor);
