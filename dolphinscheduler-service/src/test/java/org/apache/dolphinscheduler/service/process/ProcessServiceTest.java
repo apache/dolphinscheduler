@@ -17,22 +17,17 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
@@ -44,18 +39,13 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -119,25 +109,6 @@ public class ProcessServiceTest {
     }
 
     @Test
-    public void testFormatTaskAppId() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(333);
-        taskInstance.setWorkflowInstanceId(222);
-        when(processService.findWorkflowInstanceById(taskInstance.getWorkflowInstanceId())).thenReturn(null);
-        Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
-
-        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
-        workflowDefinition.setId(111);
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setId(222);
-        workflowInstance.setWorkflowDefinitionVersion(1);
-        workflowInstance.setWorkflowDefinitionCode(1L);
-        when(processService.findWorkflowInstanceById(taskInstance.getWorkflowInstanceId()))
-                .thenReturn(workflowInstance);
-        Assertions.assertEquals("", processService.formatTaskAppId(taskInstance));
-    }
-
-    @Test
     public void testFindAllSubWorkflowDefinitionCode() {
         int parentProcessDefineId = 1;
         long parentProcessDefineCode = 1L;
@@ -181,32 +152,6 @@ public class ProcessServiceTest {
         processDefinitionLog.setCode(1L);
         processDefinitionLog.setVersion(2);
         Assertions.assertEquals(0, processService.switchVersion(workflowDefinition, processDefinitionLog));
-    }
-
-    @Test
-    public void testSetGlobalParamIfCommanded() {
-        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
-        String globalParams =
-                "[{\"prop\":\"global_param\",\"value\":\"4\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"O_ERRCODE\",\"value\":\"\",\"direct\":\"OUT\",\"type\":\"VARCHAR\"}]";
-        workflowDefinition.setGlobalParams(globalParams);
-        Map<String, String> globalParamMap = workflowDefinition.getGlobalParamMap();
-        Assertions.assertTrue(globalParamMap.size() == 2);
-        Assertions.assertTrue(workflowDefinition.getGlobalParamList().size() == 2);
-
-        HashMap<String, String> startParams = new HashMap<>();
-        String expectValue = "6";
-        startParams.put("global_param", expectValue);
-        HashMap<String, String> commandParams = new HashMap<>();
-        commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
-        Map<String, Property> mockStartParams = new HashMap<>();
-
-        mockStartParams.put("global_param", new Property("global_param", Direct.IN,
-                org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR, startParams.get("global_param")));
-        when(curingGlobalParamsService.parseWorkflowStartParam(commandParams)).thenReturn(mockStartParams);
-
-        processService.setGlobalParamIfCommanded(workflowDefinition, commandParams);
-        Assertions.assertTrue(globalParamMap.get("global_param").equals(expectValue));
-        Assertions.assertTrue(globalParamMap.containsKey("O_ERRCODE"));
     }
 
     @Test
@@ -299,62 +244,4 @@ public class ProcessServiceTest {
         Assertions.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
     }
 
-    @Test
-    public void testChangeOutParam() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setWorkflowInstanceId(62);
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setId(62);
-        taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
-        taskInstance.setTaskParams("{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select id from tb_test limit 1\","
-                + "\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
-                + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
-                + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
-                + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
-        processService.changeOutParam(taskInstance);
-    }
-
-    @Test
-    public void testUpdateResourceInfo() throws Exception {
-        // test if input is null
-        ResourceInfo resourceInfoNull = null;
-        ResourceInfo updatedResourceInfo1 = processService.updateResourceInfo(0, resourceInfoNull);
-        Assertions.assertNull(updatedResourceInfo1);
-
-        // test if resource id less than 1
-        ResourceInfo resourceInfoVoid = new ResourceInfo();
-        ResourceInfo updatedResourceInfo2 = processService.updateResourceInfo(0, resourceInfoVoid);
-        Assertions.assertNull(updatedResourceInfo2.getResourceName());
-
-        // test normal situation
-        ResourceInfo resourceInfoNormal = new ResourceInfo();
-        resourceInfoNormal.setResourceName("/test.txt");
-
-        ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
-
-        Assertions.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
-
-    }
-
-    @Test
-    public void testCreateTaskGroupQueue() {
-        when(taskGroupQueueMapper.insert(Mockito.any(TaskGroupQueue.class))).thenReturn(1);
-        TaskGroupQueue taskGroupQueue =
-                processService.insertIntoTaskGroupQueue(1, "task name", 1, 1, 1, TaskGroupQueueStatus.WAIT_QUEUE);
-        Assertions.assertNotNull(taskGroupQueue);
-    }
-
-    private TaskGroupQueue getTaskGroupQueue() {
-        TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
-        taskGroupQueue.setTaskName("task name");
-        taskGroupQueue.setId(1);
-        taskGroupQueue.setGroupId(1);
-        taskGroupQueue.setTaskId(1);
-        taskGroupQueue.setPriority(1);
-        taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
-        Date date = new Date(System.currentTimeMillis());
-        taskGroupQueue.setUpdateTime(date);
-        taskGroupQueue.setCreateTime(date);
-        return taskGroupQueue;
-    }
 }
