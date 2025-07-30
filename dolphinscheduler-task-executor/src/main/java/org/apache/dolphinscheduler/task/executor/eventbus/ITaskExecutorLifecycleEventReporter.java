@@ -48,6 +48,10 @@ public interface ITaskExecutorLifecycleEventReporter extends AutoCloseable {
     void receiveTaskExecutorLifecycleEventACK(final TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
 
     /**
+     * When taskExecutor is inactive, awake reporter to check the channel
+     */
+    void wake();
+    /**
      * Shutdown the reporter.
      */
     @Override

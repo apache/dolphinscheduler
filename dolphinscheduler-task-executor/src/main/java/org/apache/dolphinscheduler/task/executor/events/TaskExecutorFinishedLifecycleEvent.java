@@ -17,28 +17,26 @@
 
 package org.apache.dolphinscheduler.task.executor.events;
 
-public enum TaskExecutorLifecycleEventType {
+import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
-    DISPATCHED,
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-    RUNNING,
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+public class TaskExecutorFinishedLifecycleEvent extends AbstractTaskExecutorLifecycleEvent {
 
-    RUNTIME_CONTEXT_CHANGE,
-
-    PAUSE,
-
-    PAUSED,
-
-    KILL,
-
-    KILLED,
-
-    SUCCESS,
-
-    FAILED,
-
-    FINALIZE,
-
-    FINISHED;
+    public static TaskExecutorFinishedLifecycleEvent of(final ITaskExecutor taskExecutor) {
+        return TaskExecutorFinishedLifecycleEvent.builder()
+                .taskInstanceId(taskExecutor.getId())
+                .type(TaskExecutorLifecycleEventType.FINISHED)
+                .build();
+    }
 
 }

@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.task.executor.events.ITaskExecutorLifecycleEv
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinishedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
@@ -177,6 +178,10 @@ public class TaskExecutorEventBusCoordinator implements ITaskExecutorEventBusCoo
                         case FAILED:
                             taskExecutorLifecycleEventListener.onTaskExecutorFailLifecycleEvent(
                                     ((TaskExecutorFailedLifecycleEvent) taskExecutorLifecycleEvent));
+                            break;
+                        case FINISHED:
+                            taskExecutorLifecycleEventListener.onTaskExecutorFinishedLifecycleEvent(
+                                    ((TaskExecutorFinishedLifecycleEvent) taskExecutorLifecycleEvent));
                             break;
                         case FINALIZE:
                             taskExecutorLifecycleEventListener.onTaskExecutorFinalizeLifecycleEvent(

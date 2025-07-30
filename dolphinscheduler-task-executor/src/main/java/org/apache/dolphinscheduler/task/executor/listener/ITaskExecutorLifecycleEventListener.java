@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.task.executor.listener;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinishedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
@@ -47,6 +48,8 @@ public interface ITaskExecutorLifecycleEventListener {
     void onTaskExecutorSuccessLifecycleEvent(final TaskExecutorSuccessLifecycleEvent event);
 
     void onTaskExecutorFailLifecycleEvent(final TaskExecutorFailedLifecycleEvent event);
+
+    void onTaskExecutorFinishedLifecycleEvent(final TaskExecutorFinishedLifecycleEvent event);
 
     void onTaskExecutorFinalizeLifecycleEvent(final TaskExecutorFinalizeLifecycleEvent event);
 
