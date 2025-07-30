@@ -48,7 +48,7 @@ public class TaskRuntimeContextChangedLifecycleEventHandler
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskRuntimeContextChangedEvent event) {
-        taskStateAction.runtimeContextChangedEventAction(workflowExecutionRunnable, taskExecutionRunnable, event);
+        taskStateAction.onRuntimeContextChangedEvent(workflowExecutionRunnable, taskExecutionRunnable, event);
 
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecutionRunnable,

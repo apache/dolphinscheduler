@@ -38,7 +38,7 @@ public class WorkflowStartLifecycleEventHandler
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowStartLifecycleEvent workflowStartEvent) {
 
-        workflowStateAction.startEventAction(workflowExecutionRunnable, workflowStartEvent);
+        workflowStateAction.onStartEvent(workflowExecutionRunnable, workflowStartEvent);
     }
 
     @Override

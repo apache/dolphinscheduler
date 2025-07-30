@@ -51,7 +51,7 @@ public class WorkflowFinalizeLifecycleEventHandler
     public void handle(final IWorkflowStateAction workflowStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowFinalizeLifecycleEvent workflowFinalizeEvent) {
-        workflowStateAction.finalizeEventAction(workflowExecutionRunnable, workflowFinalizeEvent);
+        workflowStateAction.onFinalizeEvent(workflowExecutionRunnable, workflowFinalizeEvent);
     }
 
     @Override

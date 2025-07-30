@@ -49,56 +49,56 @@ public interface IWorkflowStateAction {
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowStartLifecycleEvent}.
      */
-    void startEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                          final WorkflowStartLifecycleEvent workflowStartEvent);
+    void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                      final WorkflowStartLifecycleEvent workflowStartEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent}.
      */
-    void topologyLogicalTransitionEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                              final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent);
+    void onTopologyLogicalTransitionEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                          final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowPauseLifecycleEvent}.
      */
-    void pauseEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                          final WorkflowPauseLifecycleEvent workflowPauseEvent);
+    void onPauseEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                      final WorkflowPauseLifecycleEvent workflowPauseEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowPausedLifecycleEvent}.
      */
-    void pausedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                           final WorkflowPausedLifecycleEvent workflowPausedEvent);
+    void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       final WorkflowPausedLifecycleEvent workflowPausedEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowStopLifecycleEvent}.
      */
-    void stopEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                         final WorkflowStopLifecycleEvent workflowStopEvent);
+    void onStopEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                     final WorkflowStopLifecycleEvent workflowStopEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowStoppedLifecycleEvent}.
      */
-    void stoppedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                            final WorkflowStoppedLifecycleEvent workflowStoppedEvent);
+    void onStoppedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                        final WorkflowStoppedLifecycleEvent workflowStoppedEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowSucceedLifecycleEvent}.
      */
-    void succeedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                            final WorkflowSucceedLifecycleEvent workflowSucceedEvent);
+    void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                        final WorkflowSucceedLifecycleEvent workflowSucceedEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowFailedLifecycleEvent}.
      */
-    void failedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                           final WorkflowFailedLifecycleEvent workflowFailedEvent);
+    void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       final WorkflowFailedLifecycleEvent workflowFailedEvent);
 
     /**
      * Perform the necessary actions when the workflow in a certain state receive a {@link WorkflowFinalizeLifecycleEvent}.
      */
-    void finalizeEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                             final WorkflowFinalizeLifecycleEvent workflowFinalizeEvent);
+    void onFinalizeEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                         final WorkflowFinalizeLifecycleEvent workflowFinalizeEvent);
 
     /**
      * Get the {@link WorkflowExecutionStatus} that this action match.

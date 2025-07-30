@@ -43,7 +43,7 @@ public class TaskSuccessLifecycleEventHandler extends AbstractTaskLifecycleEvent
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskSuccessLifecycleEvent taskSuccessEvent) {
-        taskStateAction.succeedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskSuccessEvent);
+        taskStateAction.onSucceedEvent(workflowExecutionRunnable, taskExecutionRunnable, taskSuccessEvent);
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecutionRunnable,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
