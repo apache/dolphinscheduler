@@ -34,4 +34,9 @@ public interface ITaskExecutorRepository {
 
     void clear();
 
+    boolean isInvalid(final Integer taskExecutorId);
+
+    void invalidate(final Integer taskExecutorId);
+
+    Collection<ITaskExecutor> getAllInvalid();
 }

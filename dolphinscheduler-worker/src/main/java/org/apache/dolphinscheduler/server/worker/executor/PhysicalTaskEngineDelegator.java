@@ -77,12 +77,9 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
     public boolean reassignWorkflowInstanceHost(final TaskExecutorReassignMasterRequest taskExecutorReassignMasterRequest) {
         final int taskInstanceId = taskExecutorReassignMasterRequest.getTaskInstanceId();
         final String workflowHost = taskExecutorReassignMasterRequest.getWorkflowHost();
-        // todo: Is this reassign can make sure there is no concurrent problem?
         final Optional<ITaskExecutor> taskExecutorOptional = physicalTaskExecutorRepository.get(taskInstanceId);
-        physicalTaskExecutorEventReporter.reassignWorkflowInstanceHost(taskInstanceId, workflowHost);
         if (taskExecutorOptional.isPresent()) {
-            final ITaskExecutor taskExecutor = taskExecutorOptional.get();
-            taskExecutor.getTaskExecutionContext().setWorkflowInstanceHost(workflowHost);
+            taskExecutorOptional.get().getTaskExecutionContext().setWorkflowInstanceHost(workflowHost);
             return true;
         }
         return false;
