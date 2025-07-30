@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.Abstract
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.failover.WorkflowFailover;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
@@ -168,9 +167,9 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(
                 subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
 
-        if (subWorkflowInstance != null && subWorkflowInstance.getState().canFailover()) {
-            // Only handle sub-workflow's fail-over in SubWorkflowLogicTask's fail-over
-            applicationContext.getBean(WorkflowFailover.class).failoverWorkflow(subWorkflowInstance);
+        if (subWorkflowInstance != null && subWorkflowInstance.getState().canTakeover()) {
+            // Here we only need to take over the runtime context of sub-workflow,
+            // the sub-workflow will be failover by master-server when needed.
             return subWorkflowLogicTaskRuntimeContext;
         }
 
