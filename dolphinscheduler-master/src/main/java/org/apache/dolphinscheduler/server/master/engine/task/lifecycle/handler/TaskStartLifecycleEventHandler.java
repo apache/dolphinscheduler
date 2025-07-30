@@ -53,7 +53,7 @@ public class TaskStartLifecycleEventHandler extends AbstractTaskLifecycleEventHa
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskStartLifecycleEvent event) {
-        taskStateAction.startEventAction(workflowExecutionRunnable, taskExecutionRunnable, event);
+        taskStateAction.onStartEvent(workflowExecutionRunnable, taskExecutionRunnable, event);
     }
 
     @Override

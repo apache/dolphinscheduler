@@ -43,7 +43,7 @@ public class TaskPausedLifecycleEventHandler extends AbstractTaskLifecycleEventH
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskPausedLifecycleEvent event) {
-        taskStateAction.pausedEventAction(workflowExecutionRunnable, taskExecutionRunnable, event);
+        taskStateAction.onPausedEvent(workflowExecutionRunnable, taskExecutionRunnable, event);
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecutionRunnable,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
