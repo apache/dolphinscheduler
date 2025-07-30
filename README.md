@@ -58,7 +58,7 @@ Follow [this guide](https://github.com/apache/dolphinscheduler/issues/new/choose
 ## Contributing
 
 The community welcomes contributions from everyone. Please refer to this page to find out more details: [How to contribute](docs/docs/en/contribute/join/contribute.md).
-Check out good first issues in [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
+Check out good first issue in [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
 
 ## Community
 
