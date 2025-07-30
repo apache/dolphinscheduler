@@ -34,9 +34,9 @@ public interface ITaskExecutorRepository {
 
     void clear();
 
-    boolean isInvalid(final Integer taskExecutorId);
+    void waitingReport(final Integer taskExecutorId);
 
-    void invalidate(final Integer taskExecutorId);
+    void finishReport(final Integer taskExecutorId);
 
-    Collection<ITaskExecutor> getAllInvalid();
+    Collection<ITaskExecutor> getAllWaitingReport();
 }

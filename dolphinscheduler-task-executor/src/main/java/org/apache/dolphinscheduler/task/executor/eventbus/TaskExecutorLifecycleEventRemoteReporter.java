@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
@@ -89,7 +90,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
                     }
                     handleTaskExecutionEventChannel(eventChannel);
                 }
-                cleanupInvalidTaskExecutors();
+                finalizeFinishedTaskExecutors();
                 tryToWaitIfAllTaskExecutionEventChannelEmpty();
                 waitIfAnyTaskExecutionEventChannelRetryIntervalPassed();
             } catch (InterruptedException e) {
@@ -147,6 +148,16 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     }
 
     @Override
+    public void wake() {
+        eventChannelsLock.lock();
+        try {
+            taskExecutionEventEmptyCondition.signalAll();
+        } finally {
+            eventChannelsLock.unlock();
+        }
+    }
+
+    @Override
     public void close() {
         // shutdown the thread
         runningFlag = false;
@@ -160,16 +171,17 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     /**
      * Extend the lifecycle of the TaskExecutor to span the entire processing cycle of the task.
-     * before TaskExecutor changes to invalid, all events will put into channel,
+     * before TaskExecutor changes to inactive, all events will put into channel,
      * so we can just remove the TaskExecutor after the associated channel has been removed.
      */
-    private void cleanupInvalidTaskExecutors() {
+    private void finalizeFinishedTaskExecutors() {
         eventChannelsLock.lock();
-        // check if the taskExecutor is invalid and no channel exist, then we can remove it.
-        for (final ITaskExecutor taskExecutor : taskExecutorRepository.getAllInvalid()) {
+        // check if the taskExecutor is inactive and no channel exist, then we can publish finalize event.
+        for (final ITaskExecutor taskExecutor : taskExecutorRepository.getAllWaitingReport()) {
             final Integer taskExecutorId = taskExecutor.getId();
             if (!eventChannels.containsKey(taskExecutorId)) {
-                taskExecutorRepository.remove(taskExecutorId);
+                taskExecutorRepository.finishReport(taskExecutorId);
+                taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorFinalizeLifecycleEvent.of(taskExecutor));
             }
         }
         eventChannelsLock.unlock();
@@ -221,7 +233,8 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         return eventChannels
                 .values()
                 .stream()
-                .allMatch(ReportableTaskExecutorLifecycleEventChannel::isEmpty);
+                .allMatch(ReportableTaskExecutorLifecycleEventChannel::isEmpty)
+                && taskExecutorRepository.getAllWaitingReport().isEmpty();
     }
 
     private long getOldestReportTime() {
