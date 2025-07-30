@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TaskExecutorEventRemoteReporterClient implements ITaskExecutorEventRemoteReporterClient {
 
+    @Override
     public void reportTaskExecutionEventToMaster(final String masterAddress,
                                                  final IReportableTaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
         try {
