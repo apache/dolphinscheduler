@@ -84,7 +84,13 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
     public void onStoppedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                final WorkflowStoppedLifecycleEvent workflowStoppedEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowStoppedEvent);
+        // [Fix-17354]
+        if (!workflowExecutionRunnable.getWorkflowExecutionGraph().isExistKilledTaskExecutionRunnableChain()) {
+            throw new IllegalStateException(
+                    "The workflow: " + workflowExecutionRunnable.getName()
+                            + " does not exist tasks chain which is killed");
+        }
+        super.workflowFinish(workflowExecutionRunnable, WorkflowExecutionStatus.STOP);
     }
 
     @Override
@@ -142,6 +148,16 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
             return;
         }
 
+        // [Fix-17354]
+        // If there exist tasks which has set timeout failed, then will publish a kill event to kill the task.
+        // So there might exist task which is killed, and the workflow instance state is running.
+        // This is a special case, the workflow instance can transform from running to stop state.
+        // Is there better way to handle this case?
+        if (workflowExecutionGraph.isExistKilledTaskExecutionRunnableChain()) {
+            workflowEventBus.publish(WorkflowStoppedLifecycleEvent.of(workflowExecutionRunnable));
+            return;
+        }
+
         if (workflowExecutionGraph.isAllTaskExecutionRunnableChainSuccess()) {
             workflowEventBus.publish(WorkflowSucceedLifecycleEvent.of(workflowExecutionRunnable));
             return;
@@ -149,6 +165,6 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
 
         throw new IllegalStateException("The workflow: " + workflowExecutionRunnable.getName() +
                 " state is " + workflowExecutionRunnable.getState()
-                + " can only finish with success/failed but exist task which state is not success and failure");
+                + " can only finish with task success/failed/killed but exist task which state is not success、failure、killed");
     }
 }
