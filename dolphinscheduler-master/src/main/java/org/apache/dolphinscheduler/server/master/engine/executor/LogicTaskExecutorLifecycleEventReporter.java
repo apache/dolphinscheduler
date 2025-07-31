@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor;
 
-import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.eventbus.TaskExecutorLifecycleEventRemoteReporter;
 
 import org.springframework.stereotype.Component;
@@ -27,7 +26,7 @@ public class LogicTaskExecutorLifecycleEventReporter extends TaskExecutorLifecyc
 
     public LogicTaskExecutorLifecycleEventReporter(
                                                    final LogicTaskExecutorEventRemoteReporterClient logicTaskExecutorEventRemoteReporterClient,
-                                                   final ITaskExecutorRepository taskExecutorRepository) {
+                                                   final LogicTaskExecutorRepository taskExecutorRepository) {
         super("LogicTaskExecutorLifecycleEventReporter", logicTaskExecutorEventRemoteReporterClient,
                 taskExecutorRepository);
     }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.executor;
 
-import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.eventbus.TaskExecutorLifecycleEventRemoteReporter;
 
 import org.springframework.stereotype.Component;
@@ -27,7 +26,7 @@ public class PhysicalTaskExecutorLifecycleEventReporter extends TaskExecutorLife
 
     public PhysicalTaskExecutorLifecycleEventReporter(
                                                       final PhysicalTaskExecutorEventRemoteReporterClient physicalTaskExecutorEventRemoteReporterClient,
-                                                      final ITaskExecutorRepository taskExecutorRepository) {
+                                                      final PhysicalTaskExecutorRepository taskExecutorRepository) {
         super("PhysicalTaskExecutorLifecycleEventReporter", physicalTaskExecutorEventRemoteReporterClient,
                 taskExecutorRepository);
     }
