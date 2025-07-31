@@ -152,7 +152,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     }
 
     @Override
-    public void resetAndReadyChannelEvents(int taskInstanceId) {
+    public void onWorkflowInstanceHostChanged(int taskInstanceId) {
         eventChannelsLock.lock();
         try {
             final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskInstanceId);

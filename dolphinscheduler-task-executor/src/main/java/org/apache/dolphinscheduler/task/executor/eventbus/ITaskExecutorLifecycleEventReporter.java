@@ -50,7 +50,7 @@ public interface ITaskExecutorLifecycleEventReporter extends AutoCloseable {
     /**
      * Reset the events in the channel to allow them to be reported immediately.
      */
-    void resetAndReadyChannelEvents(int taskInstanceId);
+    void onWorkflowInstanceHostChanged(int taskInstanceId);
 
     /**
      * Shutdown the reporter.
