@@ -90,7 +90,6 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
                     }
                     handleTaskExecutionEventChannel(eventChannel);
                 }
-                finalizeFinishedTaskExecutors();
                 tryToWaitIfAllTaskExecutionEventChannelEmpty();
                 waitIfAnyTaskExecutionEventChannelRetryIntervalPassed();
             } catch (InterruptedException e) {
@@ -138,6 +137,11 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
                 log.info("Failed removed ReportableTaskExecutorLifecycleEvent by ack: {}", eventAck);
             }
             if (eventChannel.isEmpty()) {
+                // Extend the lifecycle of the TaskExecutor to span the entire processing cycle of the task.
+                // so we can finalize the TaskExecutor after the associated channel has been removed.
+                if (removed != null && removed.getType().isFinished()) {
+                    finalizeTaskExecutor(removed.getTaskInstanceId());
+                }
                 eventChannels.remove(taskExecutorId);
                 log.debug("Removed ReportableTaskExecutorLifecycleEventChannel: {}", taskExecutorId);
             }
@@ -148,10 +152,14 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     }
 
     @Override
-    public void wake() {
+    public void resetAndReadyChannelEvents(int taskInstanceId) {
         eventChannelsLock.lock();
         try {
-            taskExecutionEventEmptyCondition.signalAll();
+            final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskInstanceId);
+            if (eventChannel != null) {
+                eventChannel.taskExecutionEventsQueue.forEach(event -> event.setLatestReportTime(null));
+                taskExecutionEventEmptyCondition.signalAll();
+            }
         } finally {
             eventChannelsLock.unlock();
         }
@@ -169,22 +177,14 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         return eventChannels;
     }
 
-    /**
-     * Extend the lifecycle of the TaskExecutor to span the entire processing cycle of the task.
-     * before TaskExecutor changes to inactive, all events will put into channel,
-     * so we can just remove the TaskExecutor after the associated channel has been removed.
-     */
-    private void finalizeFinishedTaskExecutors() {
-        eventChannelsLock.lock();
-        // check if the taskExecutor is inactive and no channel exist, then we can publish finalize event.
-        for (final ITaskExecutor taskExecutor : taskExecutorRepository.getAllWaitingReport()) {
-            final Integer taskExecutorId = taskExecutor.getId();
-            if (!eventChannels.containsKey(taskExecutorId)) {
-                taskExecutorRepository.finishReport(taskExecutorId);
-                taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorFinalizeLifecycleEvent.of(taskExecutor));
-            }
+    private void finalizeTaskExecutor(final Integer taskExecutorId) {
+        final Optional<ITaskExecutor> taskExecutorOptional = taskExecutorRepository.get(taskExecutorId);
+        if (taskExecutorOptional.isPresent()) {
+            taskExecutorOptional.get().getTaskExecutorEventBus()
+                    .publish(TaskExecutorFinalizeLifecycleEvent.of(taskExecutorOptional.get()));
+        } else {
+            log.warn("TaskExecutor is not exists: {}", taskExecutorId);
         }
-        eventChannelsLock.unlock();
     }
 
     private void handleTaskExecutionEventChannel(final ReportableTaskExecutorLifecycleEventChannel reportableTaskExecutorLifecycleEventChannel) {
@@ -233,8 +233,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         return eventChannels
                 .values()
                 .stream()
-                .allMatch(ReportableTaskExecutorLifecycleEventChannel::isEmpty)
-                && taskExecutorRepository.getAllWaitingReport().isEmpty();
+                .allMatch(ReportableTaskExecutorLifecycleEventChannel::isEmpty);
     }
 
     private long getOldestReportTime() {

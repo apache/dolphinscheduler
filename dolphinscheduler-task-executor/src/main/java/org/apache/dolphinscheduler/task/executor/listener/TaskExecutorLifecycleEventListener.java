@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.task.executor.events.ITaskExecutorLifecycleEv
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinishedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
@@ -102,15 +101,6 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
     @Override
     public void onTaskExecutorFailLifecycleEvent(TaskExecutorFailedLifecycleEvent event) {
         reportTaskExecutorLifecycleEventToMaster(event);
-    }
-
-    @Override
-    public void onTaskExecutorFinishedLifecycleEvent(final TaskExecutorFinishedLifecycleEvent event) {
-        final ITaskExecutor taskExecutor = getTaskExecutor(event);
-        // we don't remove taskExecutor on onTaskExecutorFinished
-        // to make sure the taskExecutor's lifecycle contains ReportableTaskExecutorLifecycleEventChannel.
-        taskExecutorRepository.waitingReport(taskExecutor.getId());
-        taskExecutorLifecycleEventReporter.wake();
     }
 
     @Override
