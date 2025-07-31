@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TaskExecutorRepository implements ITaskExecutorRepository {
 
     private final Map<Integer, ITaskExecutor> taskExecutorMap = new ConcurrentHashMap<>();
-    private final Map<Integer, ITaskExecutor> waitingReportTaskExecutorMap = new ConcurrentHashMap<>();
 
     @Override
     public void put(final ITaskExecutor taskExecutor) {
@@ -58,21 +57,6 @@ public class TaskExecutorRepository implements ITaskExecutorRepository {
     @Override
     public void clear() {
         taskExecutorMap.clear();
-        waitingReportTaskExecutorMap.clear();
     }
 
-    @Override
-    public void waitingReport(final Integer taskExecutorId) {
-        waitingReportTaskExecutorMap.put(taskExecutorId, taskExecutorMap.get(taskExecutorId));
-    }
-
-    @Override
-    public void finishReport(final Integer taskExecutorId) {
-        waitingReportTaskExecutorMap.remove(taskExecutorId);
-    }
-
-    @Override
-    public Collection<ITaskExecutor> getAllWaitingReport() {
-        return waitingReportTaskExecutorMap.values();
-    }
 }

@@ -34,9 +34,4 @@ public interface ITaskExecutorRepository {
 
     void clear();
 
-    void waitingReport(final Integer taskExecutorId);
-
-    void finishReport(final Integer taskExecutorId);
-
-    Collection<ITaskExecutor> getAllWaitingReport();
 }
