@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package org.example.protobuf;
+package org.apache.dolphinscheduler.task.grpc.proto;
 
-option java_package = "org.example.protobuf";
+option java_package = "org.apache.dolphinscheduler.task.grpc.proto";
 option java_multiple_files = true;
-option java_outer_classname = "ProtoRepo";
+option java_outer_classname = "TestProtobufDefinitions";
 
 // The greeting service definition.
 service Greeter {
