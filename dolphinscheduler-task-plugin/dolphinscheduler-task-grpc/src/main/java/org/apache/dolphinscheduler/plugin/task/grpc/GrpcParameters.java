@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,8 +51,9 @@ public class GrpcParameters extends AbstractParameters {
     @Override
     public boolean checkParameters() {
 
-        if(StringUtils.isEmpty(url) || connectTimeout <= 0) return false;
-        //TODO Check apply message to definition to test
+        if (StringUtils.isEmpty(url) || connectTimeout <= 0)
+            return false;
+        // TODO Check apply message to definition to test
         return true;
     }
 }

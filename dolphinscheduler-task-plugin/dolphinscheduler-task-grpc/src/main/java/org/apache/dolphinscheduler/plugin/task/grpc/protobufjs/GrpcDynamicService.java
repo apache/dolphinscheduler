@@ -1,14 +1,32 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
+
+import io.grpc.*;
+import lombok.Getter;
+import lombok.val;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
-import io.grpc.*;
 import io.grpc.protobuf.ProtoUtils;
-import lombok.Getter;
-import lombok.val;
 
 public class GrpcDynamicService {
 
@@ -19,7 +37,6 @@ public class GrpcDynamicService {
         this.fileDescriptor = fileDesc;
         this.channel = channel;
     }
-
 
     public DynamicMessage call(String methodNameWithService, String messageJSON) throws InvalidProtocolBufferException {
         val methodNameData = new MethodName(methodNameWithService);
@@ -33,14 +50,14 @@ public class GrpcDynamicService {
         JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
         val request = requestBuilder.build();
         val callOptions = CallOptions.DEFAULT;
-        responseBuilder.mergeFrom((Message) io.grpc.stub.ClientCalls.blockingUnaryCall(channel, methodDescriptor, callOptions, request));
+        responseBuilder.mergeFrom(
+                (Message) io.grpc.stub.ClientCalls.blockingUnaryCall(channel, methodDescriptor, callOptions, request));
         return responseBuilder.build();
     }
 
     static MethodDescriptor methodFromProtobuf(
-            Descriptors.ServiceDescriptor serviceDesc,
-            Descriptors.MethodDescriptor methodDesc
-    ) {
+                                               Descriptors.ServiceDescriptor serviceDesc,
+                                               Descriptors.MethodDescriptor methodDesc) {
         return MethodDescriptor.<DynamicMessage, DynamicMessage>newBuilder()
                 .setType(getMethodTypeFromDesc(methodDesc))
                 .setFullMethodName(MethodDescriptor.generateFullMethodName(
@@ -53,8 +70,7 @@ public class GrpcDynamicService {
     }
 
     static MethodDescriptor.MethodType getMethodTypeFromDesc(
-            Descriptors.MethodDescriptor methodDesc
-    ) {
+                                                             Descriptors.MethodDescriptor methodDesc) {
         if (!methodDesc.isServerStreaming()
                 && !methodDesc.isClientStreaming()) {
             return MethodDescriptor.MethodType.UNARY;
@@ -69,6 +85,7 @@ public class GrpcDynamicService {
     }
 
     public static class MethodName {
+
         @Getter
         String serviceName = null;
         @Getter
@@ -81,8 +98,10 @@ public class GrpcDynamicService {
 
         private boolean checkMethodName(String methodNameWithService) {
             String[] path = methodNameWithService.split("/");
-            if (path.length == 0) return false;
-            if (path.length == 1) methodName = path[0];
+            if (path.length == 0)
+                return false;
+            if (path.length == 1)
+                methodName = path[0];
             if (path.length == 2) {
                 serviceName = path[0];
                 methodName = path[1];
@@ -99,8 +118,8 @@ public class GrpcDynamicService {
         }
     }
 
-
     public static class ChannelFactory {
+
         public static ManagedChannel createChannel(String targetAddr) {
             return createChannel(targetAddr, InsecureChannelCredentials.create());
         }
@@ -110,6 +129,5 @@ public class GrpcDynamicService {
                     .build();
         }
     }
-
 
 }

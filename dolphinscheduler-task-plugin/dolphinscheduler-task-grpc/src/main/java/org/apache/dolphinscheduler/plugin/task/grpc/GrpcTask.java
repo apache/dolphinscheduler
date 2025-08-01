@@ -17,19 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import io.grpc.ManagedChannel;
-import lombok.val;
-import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
+
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 public class GrpcTask extends AbstractTask {
@@ -68,9 +66,9 @@ public class GrpcTask extends AbstractTask {
             throw new TaskException("grpc handle exception:", e);
         }
 
-//        OkHttpResponse httpResponse = sendRequest();
-//
-//        validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
+        // OkHttpResponse httpResponse = sendRequest();
+        //
+        // validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
     }
 
     @Override
@@ -81,6 +79,5 @@ public class GrpcTask extends AbstractTask {
     public AbstractParameters getParameters() {
         return this.grpcParameters;
     }
-
 
 }
