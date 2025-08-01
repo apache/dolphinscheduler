@@ -497,6 +497,7 @@ export default {
     grpc_method_tips: '请输入方法名称(必填，服务/方法)，例如: Greeter/SayHello',
     grpc_service_definition: 'Protobuf 定义',
     grpc_service_definition_tips: '请输入Protobuf定义(必填)',
+    grpc_service_definition_invalid: '无效的Protobuf定义',
     grpc_message: '消息内容',
     grpc_message_tips: '请输入消息内容(JSON 格式)',
     grpc_message_tips_invalid_json: '消息内容不是有效的JSON格式',

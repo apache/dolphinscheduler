@@ -17,6 +17,7 @@
 import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
+import * as proto from 'protobufjs'
 
 export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
   //TODO: Implement gRPC specific logic
@@ -73,6 +74,11 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
         validator(validate: any, value: string) {
           if (!value) {
             return new Error(t('project.node.grpc_service_definition_tips'))
+          }
+          try {
+            proto.parse(value || '')
+          } catch (e) {
+            return new Error(t('project.node.grpc_service_definition_invalid'))
           }
         }
       }

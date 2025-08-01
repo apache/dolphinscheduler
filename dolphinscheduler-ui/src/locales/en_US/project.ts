@@ -512,6 +512,7 @@ export default {
       'Please Enter gRPC Method (required, Service/Method), eg: Greeter/SayHello',
     grpc_service_definition: 'Protobuf Definition',
     grpc_service_definition_tips: 'Please Enter Protobuf Definition (required)',
+    grpc_service_definition_invalid: 'Invalid Protobuf Definition',
     grpc_message: 'Message',
     grpc_message_tips: 'Please Enter Message(JSON format)',
     grpc_message_tips_invalid_json: 'Message is not in valid JSON format',
