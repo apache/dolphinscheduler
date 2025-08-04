@@ -30,19 +30,19 @@ public class TaskReadyForDispatchEvent<V extends Comparable<V>> extends Abstract
 
     protected final V data;
 
-    public TaskDispatchEntryEvent(long delayTimeMills, V data) {
+    public TaskReadyForDispatchEvent(long delayTimeMills, V data) {
         super(delayTimeMills);
         this.data = checkNotNull(data, "data is null");
     }
 
     @Override
     public int compareTo(Delayed other)  {
-        if (!(other instanceof TaskDispatchEntryEvent)) {
+        if (!(other instanceof TaskReadyForDispatchEvent)) {
             throw new RuntimeException("The object being compared is not a TaskDispatchEntryEvent.");
         }
 
         @SuppressWarnings("unchecked")
-        final TaskDispatchEntryEvent<V> otherEvent = (TaskDispatchEntryEvent<V>) other;
+        final TaskReadyForDispatchEvent<V> otherEvent = (TaskReadyForDispatchEvent<V>) other;
 
         // there should compare data first for priority
         if (data != null && otherEvent.data != null) {
