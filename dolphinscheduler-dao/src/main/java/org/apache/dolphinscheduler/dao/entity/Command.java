@@ -119,13 +119,6 @@ public class Command {
     @TableField("dry_run")
     private int dryRun;
 
-    /**
-     * test flag
-     */
-    @Deprecated
-    @TableField("test_flag")
-    private int testFlag;
-
     public Command(
                    CommandType commandType,
                    TaskDependType taskDependType,
@@ -141,8 +134,7 @@ public class Command {
                    Priority workflowInstancePriority,
                    int dryRun,
                    int workflowInstanceId,
-                   int workflowDefinitionVersion,
-                   int testFlag) {
+                   int workflowDefinitionVersion) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.workflowDefinitionCode = workflowDefinitionCode;
@@ -160,6 +152,5 @@ public class Command {
         this.dryRun = dryRun;
         this.workflowInstanceId = workflowInstanceId;
         this.workflowDefinitionVersion = workflowDefinitionVersion;
-        this.testFlag = testFlag;
     }
 }

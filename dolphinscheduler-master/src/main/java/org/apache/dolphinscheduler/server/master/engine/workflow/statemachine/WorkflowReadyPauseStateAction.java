@@ -40,8 +40,8 @@ import org.springframework.stereotype.Component;
 public class WorkflowReadyPauseStateAction extends AbstractWorkflowStateAction {
 
     @Override
-    public void startEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                 final WorkflowStartLifecycleEvent workflowStartEvent) {
+    public void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final WorkflowStartLifecycleEvent workflowStartEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         final IWorkflowExecutionGraph workflowExecutionGraph =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
@@ -49,59 +49,59 @@ public class WorkflowReadyPauseStateAction extends AbstractWorkflowStateAction {
     }
 
     @Override
-    public void topologyLogicalTransitionEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                                     final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
+    public void onTopologyLogicalTransitionEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                 final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         super.tryToTriggerSuccessorsAfterTaskFinish(workflowExecutionRunnable,
                 workflowTopologyLogicalTransitionWithTaskFinishEvent.getTaskExecutionRunnable());
     }
 
     @Override
-    public void pauseEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                 final WorkflowPauseLifecycleEvent workflowPauseEvent) {
+    public void onPauseEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final WorkflowPauseLifecycleEvent workflowPauseEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         logWarningIfCannotDoAction(workflowExecutionRunnable, workflowPauseEvent);
     }
 
     @Override
-    public void pausedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final WorkflowPausedLifecycleEvent workflowPausedEvent) {
+    public void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final WorkflowPausedLifecycleEvent workflowPausedEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         workflowFinish(workflowExecutionRunnable, WorkflowExecutionStatus.PAUSE);
 
     }
 
     @Override
-    public void stopEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final WorkflowStopLifecycleEvent workflowStopEvent) {
+    public void onStopEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                            final WorkflowStopLifecycleEvent workflowStopEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         logWarningIfCannotDoAction(workflowExecutionRunnable, workflowStopEvent);
     }
 
     @Override
-    public void stoppedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final WorkflowStoppedLifecycleEvent workflowStoppedEvent) {
+    public void onStoppedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                               final WorkflowStoppedLifecycleEvent workflowStoppedEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         logWarningIfCannotDoAction(workflowExecutionRunnable, workflowStoppedEvent);
     }
 
     @Override
-    public void succeedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final WorkflowSucceedLifecycleEvent workflowSucceedEvent) {
+    public void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                               final WorkflowSucceedLifecycleEvent workflowSucceedEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         super.workflowFinish(workflowExecutionRunnable, WorkflowExecutionStatus.SUCCESS);
     }
 
     @Override
-    public void failedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final WorkflowFailedLifecycleEvent workflowFailedEvent) {
+    public void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final WorkflowFailedLifecycleEvent workflowFailedEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         super.workflowFinish(workflowExecutionRunnable, WorkflowExecutionStatus.FAILURE);
     }
 
     @Override
-    public void finalizeEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                    final WorkflowFinalizeLifecycleEvent workflowFinalizeEvent) {
+    public void onFinalizeEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                final WorkflowFinalizeLifecycleEvent workflowFinalizeEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         logWarningIfCannotDoAction(workflowExecutionRunnable, workflowFinalizeEvent);
     }

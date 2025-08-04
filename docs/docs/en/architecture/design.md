@@ -22,7 +22,7 @@
 
 ### Architecture Description
 
-* **MasterServer**
+- **MasterServer**
 
   MasterServer adopts a distributed and decentralized design concept. MasterServer is mainly responsible for DAG task segmentation, task submission monitoring, and monitoring the health status of other MasterServer and WorkerServer at the same time.
   When the MasterServer service starts, register a temporary node with ZooKeeper, and perform fault tolerance by monitoring changes in the temporary node of ZooKeeper.
@@ -44,7 +44,7 @@
 
   - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
 
-* **WorkerServer**
+- **WorkerServer**
 
   WorkerServer also adopts a distributed and decentralized design concept. WorkerServer is mainly responsible for task execution and providing log services.
 
@@ -59,21 +59,70 @@
 
   - **RetryReportTaskStatusThread** is mainly responsible for regularly polling to report the task status to the Master until the Master replies to the status ack to avoid the loss of the task status;
 
-* **ZooKeeper**
+- **ZooKeeper**
 
-  ZooKeeper service, MasterServer and WorkerServer nodes in the system all use ZooKeeper for cluster management and fault tolerance. In addition, the system implements event monitoring and distributed locks based on ZooKeeper.
+  ZooKeeper service, MasterServer and WorkerServer nodes in the system all use ZooKeeper for cluster management and fault tolerance. With evolving needs and modern deployment environments, DolphinScheduler now supports event monitoring and distributed locks not only based on ZooKeeper, but also on **JDBC** and **Etcd** implementations.
+
+- **JDBC**
+  DolphinScheduler also provides a JDBC-based registry implementation, located in the `dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc` module. Unlike external systems such as ZooKeeper or Etcd, the JDBC approach leverages a relational database to support event monitoring and distributed locking, making it well-suited for environments that already rely on SQL databases.
+
+  - **Event Monitoring**
+
+    - **Subscribe Method**
+      The `subscribe(String watchedPath, SubscribeListener listener)` method in `JdbcRegistry` registers a data change listener using the `JdbcRegistryDataChangeListenerAdapter`. When changes (such as creation, update, or deletion) occur for the specified key or path in the database, the adapter converts these changes into DolphinScheduler `Event` notifications and triggers the `SubscribeListener` callback.
+
+    - **Polling/Trigger Mechanism**
+      Internally, the system uses periodic polling or a trigger-based mechanism to detect changes in the registry data stored in the database, simulating a Watcher-like behavior similar to ZooKeeper.
+
+  - **Distributed Lock**
+
+    - **Lock Acquisition and Release**
+      The JDBC registry offers both `acquireLock(String key)` and `acquireLock(String key, long timeout)` methods, which correspond to blocking and timeout-based lock acquisition respectively. These methods internally call `JdbcRegistryClient.acquireJdbcRegistryLock(...)` to manage locks via database records, ensuring mutual exclusion in a distributed environment.
+
+    - **Ephemeral vs. Persistent Locks**
+      Data entries are classified as either **EPHEMERAL** or **PERSISTENT**. For ephemeral locks, if the client disconnects or fails, heartbeat mechanisms detect the lapse and clean up the lock record automatically, thus releasing the lock.
+
+    - **Lock Management**
+      Under the hood, components like `JdbcRegistryLockManager` (or equivalent) use row-level locking or specific database fields to ensure atomic lock operations, maintaining consistency even when multiple masters/workers compete for the same lock.
+
+    ***
+
+    By leveraging JDBC for both **event monitoring** and **distributed locking**, DolphinScheduler can achieve reliable task coordination and scheduling without relying on external registry centers, making it an attractive option for environments that prefer or already have robust database infrastructure.
+
+- **Etcd**
+
+  DolphinScheduler also provides an Etcd-based registry implementation. The Etcd-based registry, implemented in the module `dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd`, leverages the Jetcd client library to interact with an Etcd cluster. This implementation provides several key functionalities:
+
+  - **Event Monitoring**
+    - **Watch API**
+      The `EtcdRegistry` class uses Etcd’s Watch API to observe changes (creation, update, or deletion) on specified keys or key prefixes. Low-level Etcd watch events are translated into DolphinScheduler’s `Event` objects, triggering `SubscribeListener` callbacks for real-time notifications.
+  - **Distributed Lock**
+    - **Lease-Based Locking**
+      The `EtcdKeepAliveLeaseManager` grants a lease with a specified TTL, continuously kept alive via Etcd’s keep-alive mechanism. If the client disconnects, the lease expires automatically, releasing the lock without manual intervention.
+
+    - **Connection Health Monitoring**
+      The `EtcdConnectionStateListener` tracks the connection state between DolphinScheduler and the Etcd cluster. Upon disconnection or reconnection, it re-establishes locks or re-registers services as needed.
+
+  - **Configuration**
+
+    - **Flexible Configuration**
+      The behavior of the Etcd registry is controlled by `EtcdRegistryProperties`, which maps various settings (endpoints, namespace, SSL, authentication, etc.) from configuration files. These settings are integrated into the Spring Boot auto-configuration process via `EtcdRegistryAutoConfiguration`, ensuring that the Etcd registry is instantiated automatically when `registry.type` is set to `"etcd"`.
+
+    Together, these components ensure that DolphinScheduler can reliably use Etcd as an alternative registry center. This is especially useful in cloud-native environments where low latency, high scalability, and ease of deployment are critical.
+
+    ***
 
   We have also implemented queues based on Redis, but we hope DolphinScheduler depends on as few components as possible, so we finally removed the Redis implementation.
 
-* **AlertServer**
+- **AlertServer**
 
   Provides alarm services, and implements rich alarm methods through alarm plugins.
 
-* **API**
+- **API**
 
   The API interface layer is mainly responsible for processing requests from the front-end UI layer. The service uniformly provides RESTful APIs to provide request services to external.
 
-* **UI**
+- **UI**
 
   The front-end page of the system provides various visual operation interfaces of the system, see more at [Introduction to Functions](../guide/homepage.md) section.
 
@@ -222,4 +271,3 @@ In the early schedule design, if there is no priority design and use the fair sc
 ## Sum Up
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation ideas of the big data distributed workflow scheduling system: DolphinScheduler. To be continued.
-

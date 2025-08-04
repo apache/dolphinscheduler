@@ -76,7 +76,6 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
                 .startParamList(
                         PropertyUtils.startParamsTransformPropertyList(workflowBackFillRequest.getStartParamList()))
                 .dryRun(workflowBackFillRequest.getDryRun())
-                .testFlag(workflowBackFillRequest.getTestFlag())
                 .triggerCode(CodeGenerateUtils.genCode())
                 .backfillParams(backfillParams)
                 .build();

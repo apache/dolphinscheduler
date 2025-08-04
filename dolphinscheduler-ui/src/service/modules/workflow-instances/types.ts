@@ -100,7 +100,6 @@ interface IWorkflowInstance {
   count?: number
   disabled?: boolean
   buttonType?: string
-  testFlag: number
 }
 
 export {

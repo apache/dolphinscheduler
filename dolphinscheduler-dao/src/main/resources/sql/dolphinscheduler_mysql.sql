@@ -342,7 +342,6 @@ CREATE TABLE `t_ds_command` (
   `tenant_code`               varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code`          bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `dry_run`                   tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
-  `test_flag`                 tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
   KEY `priority_id_index` (`workflow_instance_priority`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
@@ -397,7 +396,6 @@ CREATE TABLE `t_ds_error_command` (
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `message` text COMMENT 'message',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
-  `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
@@ -625,7 +623,6 @@ CREATE TABLE `t_ds_workflow_instance` (
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `next_workflow_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next workflowInstanceId',
   `restart_time` datetime DEFAULT NULL COMMENT 'workflow instance restart time',
-  `test_flag`  tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
   KEY `workflow_instance_index` (`workflow_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
@@ -916,7 +913,6 @@ CREATE TABLE `t_ds_task_instance` (
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
   `cpu_quota` int(11) DEFAULT '-1' NOT NULL COMMENT 'cpuQuota(%): -1:Infinity',
   `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
-  `test_flag`  tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
   KEY `workflow_instance_id` (`workflow_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE

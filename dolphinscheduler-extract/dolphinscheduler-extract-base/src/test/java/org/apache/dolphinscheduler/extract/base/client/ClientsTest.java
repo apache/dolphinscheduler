@@ -24,14 +24,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcMethodRetryStrategy;
 import org.apache.dolphinscheduler.extract.base.RpcService;
+import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
 
 import org.awaitility.Awaitility;
@@ -96,6 +99,20 @@ public class ClientsTest {
                 .withService(IService.class)
                 .withHost(serverAddress);
         assertDoesNotThrow(proxyClient::voidMethod);
+    }
+
+    @Test
+    public void testIllegalArgsType() throws Throwable {
+        final Method method = IService.class.getMethod("ping", String.class);
+        final SyncClientMethodInvoker methodInvoker = new SyncClientMethodInvoker(Host.of(serverAddress), method,
+                new NettyRemotingClient(new NettyClientConfig()));
+        final Integer[] args = {1}; // Invalid argument type, should be String;
+        MethodInvocationException methodInvocationException = assertThrows(
+                MethodInvocationException.class,
+                () -> methodInvoker.invoke(null, method, args));
+        assertEquals("Parameter types: [class java.lang.Integer] do not match the method signature.",
+                methodInvocationException.getMessage());
+
     }
 
     @AfterEach

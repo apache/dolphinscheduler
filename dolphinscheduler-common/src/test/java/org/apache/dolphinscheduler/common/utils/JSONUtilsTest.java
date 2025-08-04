@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,8 +33,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JSONUtilsTest {
@@ -92,7 +96,7 @@ public class JSONUtilsTest {
     @Test
     public void testParseObject() {
         Assertions.assertNull(JSONUtils.parseObject(""));
-        Assertions.assertNull(JSONUtils.parseObject("foo", String.class));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> JSONUtils.parseObject("foo", String.class));
     }
 
     @Test
@@ -109,10 +113,8 @@ public class JSONUtilsTest {
 
     @Test
     public void testToList() {
-        Assertions.assertEquals(new ArrayList(),
-                JSONUtils.toList("A1B2C3", null));
-        Assertions.assertEquals(new ArrayList(),
-                JSONUtils.toList("", null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> JSONUtils.toList("A1B2C3", null));
+        Assertions.assertEquals(new ArrayList<>(), JSONUtils.toList("", String.class));
     }
 
     @Test
@@ -126,7 +128,7 @@ public class JSONUtilsTest {
         Assertions.assertNotEquals(map, JSONUtils.toMap(
                 "{\n" + "\"bar\": \"foo\"\n" + "}"));
 
-        Assertions.assertNull(JSONUtils.toMap("3"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> JSONUtils.toMap("3"));
         Assertions.assertNull(JSONUtils.toMap(null));
 
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
@@ -194,4 +196,68 @@ public class JSONUtilsTest {
         Assertions.assertEquals(localDateTime, timeList.get(0));
     }
 
+    @Test
+    public void testNodeString() {
+        Assertions.assertEquals("", JSONUtils.getNodeString("", "key"));
+        Assertions.assertEquals("", JSONUtils.getNodeString("abc", "key"));
+        Assertions.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
+        Assertions.assertEquals("foo", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+        Assertions.assertEquals("[1,2,3]", JSONUtils.getNodeString("{\"bar\": [1,2,3]}", "bar"));
+        Assertions.assertEquals("{\"1\":\"2\",\"2\":3}",
+                JSONUtils.getNodeString("{\"bar\": {\"1\":\"2\",\"2\":3}}", "bar"));
+    }
+
+    @Test
+    public void testCheckJsonValid() {
+        Assertions.assertTrue(JSONUtils.checkJsonValid("3"));
+        Assertions.assertFalse(JSONUtils.checkJsonValid(""));
+    }
+
+    @Test
+    public void testFindValue() {
+        Assertions.assertNull(JSONUtils.findValue(
+                new ArrayNode(new JsonNodeFactory(true)), null));
+    }
+
+    @Test
+    public void dateToString() {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        TimeZone.setDefault(timeZone);
+        JSONUtils.setTimeZone(timeZone);
+
+        String time = "2022-02-22 13:38:24";
+        Date date = DateUtils.stringToDate(time);
+        String json = JSONUtils.toJsonString(date);
+        Assertions.assertEquals("\"" + time + "\"", json);
+
+        String errorFormatTime = "Tue Feb 22 03:50:00 UTC 2022";
+        Assertions.assertNull(DateUtils.stringToDate(errorFormatTime));
+    }
+
+    @Test
+    public void stringToDate() {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        TimeZone.setDefault(timeZone);
+        JSONUtils.setTimeZone(timeZone);
+
+        String json = "\"2022-02-22 13:38:24\"";
+        Date date = JSONUtils.parseObject(json, Date.class);
+        Assertions.assertEquals(DateUtils.stringToDate("2022-02-22 13:38:24"), date);
+
+    }
+
+    @Test
+    public void toOffsetDateTimeNodeTest() {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        JSONUtils.setTimeZone(timeZone);
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 7, 10, 15, 0, 0);
+        OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.ofHours(0));
+        Map<String, OffsetDateTime> map = new HashMap<>();
+        map.put("time", offsetDateTime);
+        JsonNode jsonNodes = JSONUtils.toJsonNode(map);
+        String s = JSONUtils.toJsonString(jsonNodes);
+
+        String json = "{\"time\":\"2024-07-10T15:00:00Z\"}";
+        Assertions.assertEquals(json, s);
+    }
 }

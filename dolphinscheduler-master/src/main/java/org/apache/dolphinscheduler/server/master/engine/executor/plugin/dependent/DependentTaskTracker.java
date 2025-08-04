@@ -218,7 +218,7 @@ public class DependentTaskTracker {
         Map<String, Long> dependVarPoolEndTimeMap = new HashMap<>();
         for (DependentExecute dependentExecute : dependentTaskList) {
             DependResult dependResult =
-                    dependentExecute.getModelDependResult(dependentDate, workflowInstance.getTestFlag());
+                    dependentExecute.getModelDependResult(dependentDate);
             if (dependResult == DependResult.SUCCESS) {
                 Map<String, Property> varPoolPropertyMap = dependentExecute.getDependTaskVarPoolPropertyMap();
                 Map<String, Long> varPoolEndTimeMap = dependentExecute.getDependTaskVarPoolEndTimeMap();
@@ -234,7 +234,7 @@ public class DependentTaskTracker {
     private boolean isAllDependentTaskFinished() {
         boolean isAllDependentTaskFinished = true;
         for (DependentExecute dependentExecute : dependentTaskList) {
-            if (!dependentExecute.finish(dependentDate, workflowInstance.getTestFlag(),
+            if (!dependentExecute.finish(dependentDate,
                     dependentParameters.getDependence().getFailurePolicy(),
                     dependentParameters.getDependence().getFailureWaitingTime())) {
                 isAllDependentTaskFinished = false;

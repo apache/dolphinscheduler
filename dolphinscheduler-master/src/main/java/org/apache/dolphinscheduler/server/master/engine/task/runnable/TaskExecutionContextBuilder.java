@@ -68,7 +68,6 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());
-        taskExecutionContext.setTestFlag(taskInstance.getTestFlag());
         taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
         taskExecutionContext.setMemoryMax(taskInstance.getMemoryMax());
         taskExecutionContext.setAppIds(taskInstance.getAppLink());
@@ -125,7 +124,7 @@ public class TaskExecutionContextBuilder {
     }
 
     /**
-     * The runtime params, include local params from task, global params from workflow, startup params from command, varpool params from pre-task, built-in params from system  
+     * The runtime params, include local params from task, global params from workflow, startup params from command, varpool params from pre-task, built-in params from system
      *
      */
     public TaskExecutionContextBuilder buildPrepareParams(final Map<String, Property> propertyMap) {

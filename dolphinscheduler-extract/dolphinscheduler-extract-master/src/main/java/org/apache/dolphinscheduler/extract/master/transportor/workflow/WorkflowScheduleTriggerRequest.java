@@ -69,7 +69,4 @@ public class WorkflowScheduleTriggerRequest {
     @Builder.Default
     private Flag dryRun = Flag.NO;
 
-    @Builder.Default
-    private Flag testFlag = Flag.NO;
-
 }

@@ -74,7 +74,6 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("userName", "root");
         paramsMap.put("password", "123456");
         paramsMap.put("other", new HashMap<>());
-        paramsMap.put("testFlag", 1);
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources")
                 .header("sessionId", sessionId)
@@ -103,7 +102,6 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("userName", "root");
         paramsMap.put("password", "root@123");
         paramsMap.put("other", new HashMap<>());
-        paramsMap.put("testFlag", 0);
         paramsMap.put("bindTestId", 1);
         MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
                 .header("sessionId", sessionId)
@@ -136,7 +134,6 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     public void testQueryDataSourceList(String key, String dbType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add(key, dbType);
-        paramsMap.add("testFlag", "0");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -177,7 +174,6 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("userName", "root");
         paramsMap.put("password", "123456");
         paramsMap.put("other", null);
-        paramsMap.put("testFlag", 1);
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
                 .header("sessionId", sessionId)

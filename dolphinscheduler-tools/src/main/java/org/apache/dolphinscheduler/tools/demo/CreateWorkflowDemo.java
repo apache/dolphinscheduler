@@ -33,10 +33,10 @@ import org.springframework.stereotype.Component;
                 "org.apache.dolphinscheduler.tools.datasource.*",
         })
 })
-public class CreateProcessDemo {
+public class CreateWorkflowDemo {
 
     public static void main(String[] args) {
-        SpringApplication.run(CreateProcessDemo.class, args);
+        SpringApplication.run(CreateWorkflowDemo.class, args);
     }
 
     @Component
@@ -44,16 +44,16 @@ public class CreateProcessDemo {
     @Slf4j
     static class DemoRunner implements CommandLineRunner {
 
-        private final ProcessDefinitionDemo processDefinitionDemo;
+        private final WorkflowDefinitionDemo workflowDefinitionDemo;
 
-        DemoRunner(ProcessDefinitionDemo processDefinitionDemo) {
-            this.processDefinitionDemo = processDefinitionDemo;
+        DemoRunner(WorkflowDefinitionDemo workflowDefinitionDemo) {
+            this.workflowDefinitionDemo = workflowDefinitionDemo;
         }
 
         @Override
         public void run(String... args) throws Exception {
-            processDefinitionDemo.createProcessDefinitionDemo();
-            log.info("create process definition demo success");
+            workflowDefinitionDemo.createWorkflowDefinitionDemo();
+            log.info("create workflow definition demo success");
         }
     }
 }

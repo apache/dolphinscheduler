@@ -81,7 +81,6 @@ public class WorkflowManualTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(workflowManualTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(workflowManualTriggerRequest.getDryRun().getCode());
-        workflowInstance.setTestFlag(workflowManualTriggerRequest.getTestFlag().getCode());
         return workflowInstance;
     }
 

@@ -23,12 +23,12 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
+import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.TimeZone;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class JsonSerializer {
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new JSONUtils.LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new JSONUtils.LocalDateTimeDeserializer()))
-            .defaultTimeZone(TimeZone.getDefault())
+            .defaultTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();
 

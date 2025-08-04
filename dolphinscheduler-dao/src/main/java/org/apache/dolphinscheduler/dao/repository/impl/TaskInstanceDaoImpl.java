@@ -125,8 +125,7 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
             return true;
         }
         List<TaskInstance> taskInstances =
-                this.queryValidTaskListByWorkflowInstanceId(taskInstance.getWorkflowInstanceId(),
-                        taskInstance.getTestFlag());
+                this.queryValidTaskListByWorkflowInstanceId(taskInstance.getWorkflowInstanceId());
 
         for (TaskInstance task : taskInstances) {
             if (task.getState() == TaskExecutionStatus.FAILURE
@@ -138,8 +137,8 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     }
 
     @Override
-    public List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag) {
-        return mybatisMapper.findValidTaskListByWorkflowInstanceId(processInstanceId, Flag.YES, testFlag);
+    public List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId) {
+        return mybatisMapper.findValidTaskListByWorkflowInstanceId(processInstanceId, Flag.YES);
     }
 
     @Override
@@ -150,8 +149,7 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     @Override
     public List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer workflowInstanceId) {
         WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
-        return mybatisMapper.findValidTaskListByWorkflowInstanceId(workflowInstanceId, Flag.NO,
-                workflowInstance.getTestFlag());
+        return mybatisMapper.findValidTaskListByWorkflowInstanceId(workflowInstanceId, Flag.NO);
     }
 
     @Override
@@ -166,15 +164,13 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
 
     @Override
     public List<TaskInstance> queryLastTaskInstanceListIntervalInWorkflowInstance(Integer workflowInstanceId,
-                                                                                  Set<Long> taskCodes,
-                                                                                  int testFlag) {
-        return mybatisMapper.findLastTaskInstances(workflowInstanceId, taskCodes, testFlag);
+                                                                                  Set<Long> taskCodes) {
+        return mybatisMapper.findLastTaskInstances(workflowInstanceId, taskCodes);
     }
 
     @Override
-    public TaskInstance queryLastTaskInstanceIntervalInWorkflowInstance(Integer workflowInstanceId, long depTaskCode,
-                                                                        int testFlag) {
-        return mybatisMapper.findLastTaskInstance(workflowInstanceId, depTaskCode, testFlag);
+    public TaskInstance queryLastTaskInstanceIntervalInWorkflowInstance(Integer workflowInstanceId, long depTaskCode) {
+        return mybatisMapper.findLastTaskInstance(workflowInstanceId, depTaskCode);
     }
 
     @Override

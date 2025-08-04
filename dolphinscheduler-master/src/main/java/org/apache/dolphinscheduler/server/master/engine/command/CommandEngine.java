@@ -69,6 +69,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     private MasterConfig masterConfig;
 
     @Autowired
+    private MasterServerLoadProtection masterServerLoadProtection;
+
+    @Autowired
     private IWorkflowRepository workflowRepository;
 
     @Autowired
@@ -107,12 +110,11 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
 
     @Override
     public void run() {
-        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         while (flag) {
             try {
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-                if (serverLoadProtection.isOverload(systemMetrics)) {
+                if (masterServerLoadProtection.isOverload(systemMetrics)) {
                     log.warn("The current server is overload, cannot consumes commands.");
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);

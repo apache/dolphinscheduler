@@ -125,7 +125,6 @@ export default {
     complement_data: 'Complement Data',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
-    whether_test: 'Whether Test',
     continue: 'Continue',
     end: 'End',
     none_send: 'None',

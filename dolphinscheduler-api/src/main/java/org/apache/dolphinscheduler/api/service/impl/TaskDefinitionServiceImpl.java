@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -862,14 +861,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         List<Long> taskCodes = new ArrayList<>();
-        try {
-            for (int i = 0; i < genNum; i++) {
-                taskCodes.add(CodeGenerateUtils.genCode());
-            }
-        } catch (CodeGenerateException e) {
-            log.error("Generate task definition code error.", e);
-            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
+
+        for (int i = 0; i < genNum; i++) {
+            taskCodes.add(CodeGenerateUtils.genCode());
         }
+
         putMsg(result, Status.SUCCESS);
         // return workflowDefinitionCode
         result.put(Constants.DATA_LIST, taskCodes);

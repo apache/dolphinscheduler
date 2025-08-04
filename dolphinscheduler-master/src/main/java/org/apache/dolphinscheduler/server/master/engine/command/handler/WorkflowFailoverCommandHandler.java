@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecut
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -89,6 +90,7 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
             throw new IllegalArgumentException(
                     "The WorkflowFailoverCommandParam: " + command.getCommandParam() + " is invalid");
         }
+        workflowInstance.setRestartTime(new Date());
         workflowInstance.setState(workflowFailoverCommandParam.getWorkflowExecutionStatus());
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstanceDao.updateById(workflowInstance);

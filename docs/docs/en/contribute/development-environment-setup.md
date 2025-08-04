@@ -54,11 +54,28 @@ pre-commit install
 
 Now, every time you commit your code, `pre-commit` will automatically run `Spotless` to check the code style and formatting.
 
+### Helm Template Guidelines
+
+After modifying files related to Helm templates, you can use the following command to debug the Helm templates:
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Once the Helm templates are debugged and verified, use the following command to automatically update the README.md file (manually updating may likely result in incorrect formatting):
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker image build
 
 DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).
 
 - If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
+
+> -Pstaging contains plugins, suitable for development and testing as well as offline deployment without a network environment
+> -Prelease does not contain plugins, suitable for production environments, and plugins can be downloaded on demand from a network that can access plugins
 
 ```shell
 cd dolphinscheduler
@@ -66,7 +83,7 @@ cd dolphinscheduler
        -Dmaven.test.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 When the command is finished you could find them by command `docker images`.
@@ -80,7 +97,7 @@ cd dolphinscheduler
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 - If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.

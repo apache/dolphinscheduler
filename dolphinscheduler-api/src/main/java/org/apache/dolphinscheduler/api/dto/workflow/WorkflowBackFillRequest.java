@@ -67,8 +67,6 @@ public class WorkflowBackFillRequest {
 
     private Flag dryRun;
 
-    private Flag testFlag;
-
     private RunMode backfillRunMode;
 
     private BackfillTime backfillTime;

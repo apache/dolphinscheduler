@@ -76,24 +76,22 @@ public class FeiShuSenderTest {
     public void testSendWithFormatException() {
         AlertData alertData = new AlertData();
         alertData.setTitle("feishu test title");
-        alertData.setContent("feishu test content");
-        FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
-        String alertResult = feiShuSender.formatContent(alertData);
-        Assertions.assertEquals(alertResult, alertData.getTitle() + alertData.getContent());
+        alertData.setContent("[{\"content\":\"feishu test content\"}]");
+        String alertResult = FeiShuSender.formatContent(alertData);
+        Assertions.assertEquals(alertResult, "`feishu test title`\ncontent:feishu test content\n");
     }
 
     @Test
     public void testCheckSendFeiShuSendMsgResult() {
 
-        FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
-        AlertResult alertResult = feiShuSender.checkSendFeiShuSendMsgResult("");
+        AlertResult alertResult = FeiShuSender.checkSendFeiShuSendMsgResult("");
         Assertions.assertFalse(alertResult.isSuccess());
-        AlertResult alertResult2 = feiShuSender.checkSendFeiShuSendMsgResult("123");
-        Assertions.assertEquals("send feishu msg error: feishu server resp parse error is null.",
+        AlertResult alertResult2 = FeiShuSender.checkSendFeiShuSendMsgResult("{\"code\":123}");
+        Assertions.assertEquals("alert send feishu msg error: null",
                 alertResult2.getMessage());
 
         String response = "{\"code\":\"0\",\"data\":{},\"msg\":\"success\"}";
-        AlertResult alertResult3 = feiShuSender.checkSendFeiShuSendMsgResult(response);
+        AlertResult alertResult3 = FeiShuSender.checkSendFeiShuSendMsgResult(response);
         Assertions.assertTrue(alertResult3.isSuccess());
     }
 }

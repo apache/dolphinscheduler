@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -46,7 +45,7 @@ import java.util.Optional;
 public interface ProcessService {
 
     WorkflowInstance constructWorkflowInstance(Command command,
-                                               String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
+                                               String host) throws CronParseException;
 
     Optional<WorkflowInstance> findWorkflowInstanceDetailById(int workflowInstanceId);
 

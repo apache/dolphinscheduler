@@ -319,6 +319,17 @@
         <dependency>
             <groupId>org.javadelight</groupId>
             <artifactId>delight-nashorn-sandbox</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars.npm</groupId>
+                    <artifactId>brace-expansion</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>brace-expansion</artifactId>
         </dependency>
 
         <!-- TODO: Have to use spring-cloud-starter-kubernetes-fabric8-config after upgrading to Spring 3.x to unify kubernetes client (fabric8)  -->

@@ -55,7 +55,7 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
      * @return workflow instance
      */
     WorkflowInstance queryLastSchedulerWorkflowInterval(Long workflowDefinitionCode, Long taskDefinitionCode,
-                                                        DateInterval dateInterval, int testFlag);
+                                                        DateInterval dateInterval);
 
     /**
      * find last manual workflow instance interval
@@ -65,8 +65,7 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
      * @param dateInterval   dateInterval
      * @return workflow instance
      */
-    WorkflowInstance queryLastManualWorkflowInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
-                                                     int testFlag);
+    WorkflowInstance queryLastManualWorkflowInterval(Long definitionCode, Long taskCode, DateInterval dateInterval);
 
     WorkflowInstance queryLastRunningWorkflowInterval(Long definitionCode, DateInterval dateInterval);
 

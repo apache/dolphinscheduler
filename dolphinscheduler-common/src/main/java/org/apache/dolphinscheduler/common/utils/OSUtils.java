@@ -308,7 +308,7 @@ public class OSUtils {
         if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
-        return String.format("sudo -u %s %s", tenantCode, command);
+        return String.format("sudo -u %s -i %s", tenantCode, command);
     }
 
     public static boolean isSudoEnable() {

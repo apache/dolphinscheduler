@@ -125,7 +125,6 @@ export default {
     complement_data: '补数',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
-    whether_test: '是否测试',
     continue: '继续',
     end: '结束',
     none_send: '都不发',

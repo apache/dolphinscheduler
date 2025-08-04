@@ -57,16 +57,6 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
                                                 @Param("states") int[] stateArray);
 
     /**
-     * query workflow instance by host and stateArray which is not sub workflow
-     *
-     * @param host       host
-     * @param stateArray stateArray
-     * @return workflow instance list
-     */
-    List<WorkflowInstance> queryMainWorkflowByHostAndStatus(@Param("host") String host,
-                                                            @Param("states") int[] stateArray);
-
-    /**
      * query workflow instance host by stateArray
      *
      * @param stateArray
@@ -200,14 +190,12 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
      * @param taskDefinitionCode     definitionCode
      * @param startTime              startTime
      * @param endTime                endTime
-     * @param testFlag               testFlag
      * @return workflow instance
      */
     WorkflowInstance queryLastSchedulerWorkflow(@Param("workflowDefinitionCode") Long workflowDefinitionCode,
                                                 @Param("taskDefinitionCode") Long taskDefinitionCode,
                                                 @Param("startTime") Date startTime,
-                                                @Param("endTime") Date endTime,
-                                                @Param("testFlag") int testFlag);
+                                                @Param("endTime") Date endTime);
 
     /**
      * query last manual workflow instance
@@ -216,14 +204,12 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
      * @param taskCode               taskCode
      * @param startTime              startTime
      * @param endTime                endTime
-     * @param testFlag               testFlag
      * @return workflow instance
      */
     WorkflowInstance queryLastManualWorkflow(@Param("workflowDefinitionCode") Long workflowDefinitionCode,
                                              @Param("taskCode") Long taskCode,
                                              @Param("startTime") Date startTime,
-                                             @Param("endTime") Date endTime,
-                                             @Param("testFlag") int testFlag);
+                                             @Param("endTime") Date endTime);
 
     WorkflowInstance queryLastRunningWorkflow(@Param("workflowDefinitionCode") Long workflowDefinitionCode,
                                               @Param("startTime") Date startTime,
