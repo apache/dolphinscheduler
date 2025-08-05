@@ -37,8 +37,6 @@ public class TaskExecutorStartedLifecycleEvent extends AbstractTaskExecutorLifec
 
     private int workflowInstanceId;
 
-    private String workflowInstanceHost;
-
     private String taskInstanceHost;
 
     private long startTime;
@@ -57,7 +55,6 @@ public class TaskExecutorStartedLifecycleEvent extends AbstractTaskExecutorLifec
                 .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceHost(taskExecutionContext.getHost())
                 .startTime(taskExecutor.getTaskExecutionContext().getStartTime())
-                .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .logPath(taskExecutionContext.getLogPath())
                 .executePath(taskExecutionContext.getExecutePath())
                 .type(TaskExecutorLifecycleEventType.RUNNING)
