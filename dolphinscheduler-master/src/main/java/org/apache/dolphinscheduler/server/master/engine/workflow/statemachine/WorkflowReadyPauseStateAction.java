@@ -120,13 +120,13 @@ public class WorkflowReadyPauseStateAction extends AbstractWorkflowStateAction {
         }
 
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
-        if (workflowExecutionGraph.isExistFailureTaskExecutionRunnableChain()) {
-            workflowEventBus.publish(WorkflowFailedLifecycleEvent.of(workflowExecutionRunnable));
+        if (workflowExecutionGraph.isExistPausedTaskExecutionRunnableChain()) {
+            workflowEventBus.publish(WorkflowPausedLifecycleEvent.of(workflowExecutionRunnable));
             return;
         }
 
-        if (workflowExecutionGraph.isExistPauseTaskExecutionRunnableChain()) {
-            workflowEventBus.publish(WorkflowPausedLifecycleEvent.of(workflowExecutionRunnable));
+        if (workflowExecutionGraph.isExistFailureTaskExecutionRunnableChain()) {
+            workflowEventBus.publish(WorkflowFailedLifecycleEvent.of(workflowExecutionRunnable));
             return;
         }
 
