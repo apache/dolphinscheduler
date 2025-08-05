@@ -79,7 +79,7 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
 
     @Override
     public void onTaskExecutorPausedLifecycleEvent(final TaskExecutorPausedLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
@@ -90,17 +90,17 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
 
     @Override
     public void onTaskExecutorKilledLifecycleEvent(final TaskExecutorKilledLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
     public void onTaskExecutorSuccessLifecycleEvent(final TaskExecutorSuccessLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override
     public void onTaskExecutorFailLifecycleEvent(TaskExecutorFailedLifecycleEvent event) {
-        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);
+        reportTaskExecutorLifecycleEventToMaster(event);
     }
 
     @Override

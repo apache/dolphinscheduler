@@ -37,8 +37,6 @@ public class TaskExecutorPausedLifecycleEvent extends AbstractTaskExecutorLifecy
 
     private int workflowInstanceId;
 
-    private String workflowInstanceHost;
-
     private String taskInstanceHost;
 
     private long endTime;
@@ -51,7 +49,6 @@ public class TaskExecutorPausedLifecycleEvent extends AbstractTaskExecutorLifecy
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceHost(taskExecutionContext.getHost())
-                .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .endTime(taskExecutionContext.getEndTime())
                 .type(TaskExecutorLifecycleEventType.PAUSED)
                 .build();
