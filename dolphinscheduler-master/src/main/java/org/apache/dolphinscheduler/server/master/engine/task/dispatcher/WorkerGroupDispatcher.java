@@ -42,7 +42,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final ITaskExecutorClient taskExecutorClient;
 
-    private final WorkerGroupEventBus<TaskReadyForDispatchEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupQueue;
+    private final WorkerGroupEventBus<TaskReadyForDispatchEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupEventBus;
 
     private final Set<Integer> waitingDispatchTaskIds;
 
@@ -51,7 +51,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
-        this.workerGroupQueue = new WorkerGroupEventBus<>();
+        this.workerGroupEventBus = new WorkerGroupEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
@@ -70,7 +70,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     @Override
     public void run() {
         while (runningFlag.get()) {
-            TaskReadyForDispatchEvent<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
+            TaskReadyForDispatchEvent<ITaskExecutionRunnable> taskEntry = workerGroupEventBus.take();
             ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
             try (
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
@@ -115,7 +115,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      */
     public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable, final long delayTimeMills) {
         waitingDispatchTaskIds.add(taskExecutionRunnable.getId());
-        workerGroupQueue.add(new TaskReadyForDispatchEvent<>(delayTimeMills, taskExecutionRunnable));
+        workerGroupEventBus.add(new TaskReadyForDispatchEvent<>(delayTimeMills, taskExecutionRunnable));
     }
 
     public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
@@ -136,6 +136,6 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     }
 
     int queueSize() {
-        return this.workerGroupQueue.size();
+        return this.workerGroupEventBus.size();
     }
 }
