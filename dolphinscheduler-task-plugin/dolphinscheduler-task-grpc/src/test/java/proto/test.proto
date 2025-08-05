@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package org.apache.dolphinscheduler.task.grpc.proto;
+
+option java_package = "org.apache.dolphinscheduler.plugin.task.grpc.proto";
+option java_multiple_files = true;
+option java_outer_classname = "TestProtobuf";
+
+service TaskTester {
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc SayHelloAgain (HelloRequest) returns (HelloReply) {}
+}
+
+message HelloRequest {
+  string username = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
+
+enum G {
+  H=0;
+  K=3;
+}
+
+
+
+// The greeting service definition.
+service ParserTester {
+
+}
+
+message BasicTypeRequest {
+
+}
+
+message DefaultResponse {
+  string resp = 1;
+}
+
+

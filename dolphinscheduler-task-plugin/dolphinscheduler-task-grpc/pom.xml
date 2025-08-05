@@ -113,6 +113,12 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.25.5</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -145,8 +151,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>compile</goal>
-                            <goal>compile-custom</goal>
+                            <goal>test-compile</goal>
                         </goals>
                     </execution>
                 </executions>
