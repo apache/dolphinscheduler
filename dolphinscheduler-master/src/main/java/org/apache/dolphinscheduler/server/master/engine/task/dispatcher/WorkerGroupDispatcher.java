@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchEntryEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskReadyForDispatchEvent;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Set;
@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * WorkerGroupTaskDispatcher is responsible for dispatching tasks from the task queue.
  * The main responsibilities include:
- * 1. Continuously fetching tasks from the {@link TaskDispatchEntryEvent} for dispatch.
+ * 1. Continuously fetching tasks from the {@link TaskReadyForDispatchEvent} for dispatch.
  * 2. Re-queuing tasks that fail to dispatch according to retry logic.
  * 3. Ensuring thread safety and correct state transitions during task processing.
  */
@@ -42,7 +42,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final ITaskExecutorClient taskExecutorClient;
 
-    private final TaskDispatchEntryEventBus<TaskDispatchEntryEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupQueue;
+    private final WorkerGroupEventBus<TaskReadyForDispatchEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupQueue;
 
     private final Set<Integer> waitingDispatchTaskIds;
 
@@ -51,7 +51,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
-        this.workerGroupQueue = new TaskDispatchEntryEventBus<>();
+        this.workerGroupQueue = new WorkerGroupEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
@@ -70,7 +70,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     @Override
     public void run() {
         while (runningFlag.get()) {
-            TaskDispatchEntryEvent<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
+            TaskReadyForDispatchEvent<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
             ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
             try (
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
@@ -115,7 +115,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      */
     public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable, final long delayTimeMills) {
         waitingDispatchTaskIds.add(taskExecutionRunnable.getId());
-        workerGroupQueue.add(new TaskDispatchEntryEvent<>(delayTimeMills, taskExecutionRunnable));
+        workerGroupQueue.add(new TaskReadyForDispatchEvent<>(delayTimeMills, taskExecutionRunnable));
     }
 
     public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {

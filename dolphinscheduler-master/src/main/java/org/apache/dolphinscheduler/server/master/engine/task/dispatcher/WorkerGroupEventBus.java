@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
 
 import lombok.SneakyThrows;
-import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchEntryEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskReadyForDispatchEvent;
 
-public class WorkerGroupEventBus<V extends TaskDispatchEntryEvent<T>, T extends Comparable<T>>
+public class WorkerGroupEventBus<V extends TaskReadyForDispatchEvent<T>, T extends Comparable<T>>
         extends
             AbstractDelayEventBus<V> {
 

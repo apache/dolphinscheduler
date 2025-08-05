@@ -38,7 +38,7 @@ public class TaskReadyForDispatchEvent<V extends Comparable<V>> extends Abstract
     @Override
     public int compareTo(Delayed other)  {
         if (!(other instanceof TaskReadyForDispatchEvent)) {
-            throw new RuntimeException("The object being compared is not a TaskDispatchEntryEvent.");
+            throw new RuntimeException("The object being compared is not a TaskReadyForDispatchEvent.");
         }
 
         @SuppressWarnings("unchecked")

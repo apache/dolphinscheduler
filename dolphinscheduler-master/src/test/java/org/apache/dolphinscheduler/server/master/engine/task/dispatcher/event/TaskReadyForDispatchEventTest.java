@@ -23,11 +23,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
-class TaskDispatchEntryEventTest {
+class TaskReadyForDispatchEventTest {
 
     @Test
     void getDelay() {
-        TaskDispatchEntryEvent<String> delayEntry = new TaskDispatchEntryEvent<>(5_000L, "Item");
+        TaskReadyForDispatchEvent<String> delayEntry = new TaskReadyForDispatchEvent<>(5_000L, "Item");
         assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
                 .isWithin(TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS))
                 .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
@@ -35,9 +35,9 @@ class TaskDispatchEntryEventTest {
 
     @Test
     void priorityCompare() {
-        TaskDispatchEntryEvent<String> highPriorityEntry =
-                new TaskDispatchEntryEvent<>(15_000L, "1_HIGH");
-        TaskDispatchEntryEvent<String> lowPriorityEntry = new TaskDispatchEntryEvent<>(5_000L, "3_LOW");
+        TaskReadyForDispatchEvent<String> highPriorityEntry =
+                new TaskReadyForDispatchEvent<>(15_000L, "1_HIGH");
+        TaskReadyForDispatchEvent<String> lowPriorityEntry = new TaskReadyForDispatchEvent<>(5_000L, "3_LOW");
         assertThat(highPriorityEntry.compareTo(lowPriorityEntry) < 0).isTrue();
     }
 }
