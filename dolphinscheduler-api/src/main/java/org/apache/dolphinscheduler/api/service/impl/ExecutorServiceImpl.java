@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_WORKFLOW_ID_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
@@ -72,6 +71,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -101,6 +101,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Splitter;
 
 @Service
@@ -222,9 +223,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Set<Long> workflowDefinitionCodeSet = new HashSet<>();
         taskDefinitions.stream()
                 .filter(task -> TaskTypeUtils.isSubWorkflowTask(task.getTaskType())).forEach(
-                        taskDefinition -> workflowDefinitionCodeSet.add(Long.valueOf(
-                                JSONUtils.getNodeString(taskDefinition.getTaskParams(),
-                                        CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE))));
+                        taskDefinition -> workflowDefinitionCodeSet.add(
+                                JSONUtils.parseObject(taskDefinition.getTaskParams(),
+                                        new TypeReference<SubWorkflowParameters>() {
+                                        }).getWorkflowDefinitionCode()));
         if (workflowDefinitionCodeSet.isEmpty()) {
             return true;
         }
