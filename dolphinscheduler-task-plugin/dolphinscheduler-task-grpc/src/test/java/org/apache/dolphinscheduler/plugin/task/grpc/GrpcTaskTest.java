@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.grpc;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
+import org.apache.dolphinscheduler.plugin.task.grpc.generated.TaskTesterGrpc;
+import org.apache.dolphinscheduler.plugin.task.grpc.generated.TaskTesterProto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -44,10 +46,43 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * Test GrpcTask
  */
-@RunWith(JUnit4.class)
 @ExtendWith(MockitoExtension.class)
 public class GrpcTaskTest {
 
+    @Rule
+    public final GrpcCleanupRule grpcCleanup = new GrpcCleanupRule();
+
+    private final TaskTesterGrpc.TaskTesterImplBase serviceImpl =
+            mock(TaskTesterGrpc.TaskTesterImplBase.class, delegatesTo(
+                    new TaskTesterGrpc.TaskTesterImplBase() {
+                        // By default the client will receive Status.UNIMPLEMENTED for all RPCs.
+                        // You might need to implement necessary behaviors for your test here, like this:
+                        //
+                        // @Override
+                        // public void sayHello(HelloRequest request, StreamObserver<HelloReply> respObserver) {
+                        //   respObserver.onNext(HelloReply.getDefaultInstance());
+                        //   respObserver.onCompleted();
+                        // }
+                    }));
+
+//    private HelloWorldClient client;
+
+    @Before
+    public void setUp() throws Exception {
+        // Generate a unique in-process server name.
+        String serverName = InProcessServerBuilder.generateName();
+
+        // Create a server, add service, start, and register for automatic graceful shutdown.
+        grpcCleanup.register(InProcessServerBuilder
+                .forName(serverName).directExecutor().addService(serviceImpl).build().start());
+
+        // Create a client channel and register for automatic graceful shutdown.
+        ManagedChannel channel = grpcCleanup.register(
+                InProcessChannelBuilder.forName(serverName).directExecutor().build());
+
+        // Create a HelloWorldClient using the in-process channel;
+//        client = new HelloWorldClient(channel);
+    }
 
     @Test
     public void testHandleStatusCodeDefaultOK() throws Exception {
@@ -65,10 +100,10 @@ public class GrpcTaskTest {
     }
 
     private GrpcTask generateGrpcTask() {
-        return genrateGrpcTaskWithJSONDefinition();
+        return generateGrpcTaskWithJSONDefinition();
     }
 
-    private GrpcTask genrateGrpcTaskWithJSONDefinition() {
+    private GrpcTask generateGrpcTaskWithJSONDefinition() {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         return new GrpcTask(taskExecutionContext);
     }

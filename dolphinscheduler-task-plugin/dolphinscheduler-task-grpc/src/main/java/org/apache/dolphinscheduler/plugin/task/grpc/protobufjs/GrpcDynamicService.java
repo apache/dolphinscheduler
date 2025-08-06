@@ -39,17 +39,17 @@ public class GrpcDynamicService {
     }
 
     public DynamicMessage call(String methodNameWithService, String messageJSON) throws InvalidProtocolBufferException {
-        val methodNameData = new MethodName(methodNameWithService);
-        val pServiceDescriptor = fileDescriptor.findServiceByName(methodNameData.serviceName);
-        val pMethodDescriptor = pServiceDescriptor.findMethodByName(methodNameData.methodName);
-        val methodDescriptor = methodFromProtobuf(pServiceDescriptor, pMethodDescriptor);
-        val requestMessageType = pMethodDescriptor.getInputType();
-        val responseMessageType = pMethodDescriptor.getOutputType();
-        val requestBuilder = DynamicMessage.newBuilder(requestMessageType);
-        val responseBuilder = DynamicMessage.newBuilder(responseMessageType);
+        MethodName methodNameData = new MethodName(methodNameWithService);
+        Descriptors.ServiceDescriptor pServiceDescriptor = fileDescriptor.findServiceByName(methodNameData.serviceName);
+        Descriptors.MethodDescriptor pMethodDescriptor = pServiceDescriptor.findMethodByName(methodNameData.methodName);
+        MethodDescriptor methodDescriptor = methodFromProtobuf(pServiceDescriptor, pMethodDescriptor);
+        Descriptors.Descriptor requestMessageType = pMethodDescriptor.getInputType();
+        Descriptors.Descriptor responseMessageType = pMethodDescriptor.getOutputType();
+        DynamicMessage.Builder requestBuilder = DynamicMessage.newBuilder(requestMessageType);
+        DynamicMessage.Builder responseBuilder = DynamicMessage.newBuilder(responseMessageType);
         JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
-        val request = requestBuilder.build();
-        val callOptions = CallOptions.DEFAULT;
+        DynamicMessage request = requestBuilder.build();
+        CallOptions callOptions = CallOptions.DEFAULT;
         responseBuilder.mergeFrom(
                 (Message) io.grpc.stub.ClientCalls.blockingUnaryCall(channel, methodDescriptor, callOptions, request));
         return responseBuilder.build();
