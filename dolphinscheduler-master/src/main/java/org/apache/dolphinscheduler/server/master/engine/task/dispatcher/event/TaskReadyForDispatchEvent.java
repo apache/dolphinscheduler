@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event;
 
-import lombok.Getter;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.eventbus.AbstractDelayEvent;
 
 import java.util.concurrent.Delayed;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import lombok.Getter;
 
 @Getter
 public class TaskReadyForDispatchEvent<V extends Comparable<V>> extends AbstractDelayEvent {
@@ -36,7 +36,7 @@ public class TaskReadyForDispatchEvent<V extends Comparable<V>> extends Abstract
     }
 
     @Override
-    public int compareTo(Delayed other)  {
+    public int compareTo(Delayed other) {
         if (!(other instanceof TaskReadyForDispatchEvent)) {
             throw new RuntimeException("The object being compared is not a TaskReadyForDispatchEvent.");
         }
