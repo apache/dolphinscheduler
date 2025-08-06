@@ -22,44 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TaskInstanceLogHeader {
 
-    private static final String INITIALIZE_TASK_CONTEXT_HEADER = new StringBuilder()
-            .append("\n")
-            .append("************************************************************************************************")
-            .append("\n")
-            .append("*********************************  Initialize task context  ************************************")
-            .append("\n")
-            .append("************************************************************************************************")
-            .toString();
-    private static final String LOAD_TASK_INSTANCE_PLUGIN_HEADER = new StringBuilder()
-            .append("\n")
-            .append("***********************************************************************************************")
-            .append("\n")
-            .append("*********************************  Load task instance plugin  *********************************")
-            .append("\n")
-            .append("***********************************************************************************************")
-            .toString();
+    public static final String DOLPHIN_EMOJI = "\uD83D\uDC2C";
+
+    private static final String INITIALIZE_TASK_CONTEXT_HEADER = DOLPHIN_EMOJI + " Initialize Task Context";
+    private static final String LOAD_TASK_INSTANCE_PLUGIN_HEADER = DOLPHIN_EMOJI + " Load Task Instance Plugin";
+    private static final String EXECUTE_TASK_HEADER = DOLPHIN_EMOJI + " Execute Task Instance";
+    private static final String FINALIZE_TASK_HEADER = DOLPHIN_EMOJI + " Finalize Task Instance";
 
     public static void printInitializeTaskContextHeader() {
         log.info(INITIALIZE_TASK_CONTEXT_HEADER);
     }
-
-    private static final String EXECUTE_TASK_HEADER = new StringBuilder()
-            .append("\n")
-            .append("************************************************************************************************")
-            .append("\n")
-            .append("*********************************  Execute task instance  *************************************")
-            .append("\n")
-            .append("***********************************************************************************************")
-            .toString();
-
-    private static final String FINALIZE_TASK_HEADER = new StringBuilder()
-            .append("\n")
-            .append("************************************************************************************************")
-            .append("\n")
-            .append("*********************************  Finalize task instance  ************************************")
-            .append("\n")
-            .append("***********************************************************************************************")
-            .toString();
 
     public static void printLoadTaskInstancePluginHeader() {
         log.info(LOAD_TASK_INSTANCE_PLUGIN_HEADER);

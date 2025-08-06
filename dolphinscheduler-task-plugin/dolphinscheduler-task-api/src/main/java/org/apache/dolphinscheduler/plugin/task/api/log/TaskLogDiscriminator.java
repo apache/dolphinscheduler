@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.MDC;
@@ -30,6 +32,8 @@ import ch.qos.logback.core.sift.AbstractDiscriminator;
  * Task Log Discriminator
  */
 @Slf4j
+@Getter
+@Setter
 public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
     private String key;
@@ -43,27 +47,5 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
             log.error("The task instance log path is null, please check the logback configuration, log: {}", event);
         }
         return taskInstanceLogPath;
-    }
-
-    @Override
-    public void start() {
-        started = true;
-    }
-
-    @Override
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getLogBase() {
-        return logBase;
-    }
-
-    public void setLogBase(String logBase) {
-        this.logBase = logBase;
     }
 }

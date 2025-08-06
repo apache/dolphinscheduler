@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.task.executor.eventbus;
 import org.apache.dolphinscheduler.common.exception.BaseException;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
@@ -107,7 +108,8 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     public void reportTaskExecutorLifecycleEvent(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
         eventChannelsLock.lock();
         try {
-            log.debug("Report : {}", JSONUtils.toPrettyJsonString(reportableTaskExecutorLifecycleEvent));
+            log.info(TaskLogMarkers.excludeInTaskLog(), "Report : {}",
+                    JSONUtils.toPrettyJsonString(reportableTaskExecutorLifecycleEvent));
             int taskInstanceId = reportableTaskExecutorLifecycleEvent.getTaskInstanceId();
             eventChannels.computeIfAbsent(
                     taskInstanceId,
