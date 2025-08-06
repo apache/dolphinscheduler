@@ -18,16 +18,12 @@
 package org.apache.dolphinscheduler.service.process;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -35,17 +31,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface ProcessService {
-
-    WorkflowInstance constructWorkflowInstance(Command command,
-                                               String host) throws CronParseException;
 
     Optional<WorkflowInstance> findWorkflowInstanceDetailById(int workflowInstanceId);
 
@@ -53,27 +44,15 @@ public interface ProcessService {
 
     WorkflowDefinition findWorkflowDefinition(Long workflowDefinitionCode, int workflowDefinitionVersion);
 
-    WorkflowDefinition findWorkflowDefinitionByCode(Long workflowDefinitionCode);
-
     int deleteWorkflowInstanceById(int workflowInstanceId);
-
-    int deleteAllSubWorkflowByParentId(int workflowInstanceId);
-
-    void removeTaskLogFile(Integer workflowInstanceId);
 
     List<Long> findAllSubWorkflowDefinitionCode(long workflowDefinitionCode);
 
     String getTenantForWorkflow(String tenantCode, int userId);
 
-    int deleteWorkflowMapByParentId(int parentWorkflowId);
-
     WorkflowInstance findSubWorkflowInstance(Integer parentWorkflowInstanceId, Integer parentTaskId);
 
     WorkflowInstance findParentWorkflowInstance(Integer subWorkflowInstanceId);
-
-    void changeOutParam(TaskInstance taskInstance);
-
-    Schedule querySchedule(int id);
 
     List<Schedule> queryReleaseSchedulerListByWorkflowDefinitionCode(long workflowDefinitionCode);
 
@@ -83,15 +62,11 @@ public interface ProcessService {
 
     User getUserById(int userId);
 
-    String formatTaskAppId(TaskInstance taskInstance);
-
     int switchVersion(WorkflowDefinition workflowDefinition, WorkflowDefinitionLog workflowDefinitionLog);
 
     int switchWorkflowTaskRelationVersion(WorkflowDefinition workflowDefinition);
 
     int switchTaskDefinitionVersion(long taskCode, int taskVersion);
-
-    String getResourceIds(TaskDefinition taskDefinition);
 
     int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine);
 
@@ -113,16 +88,8 @@ public interface ProcessService {
     List<TaskNode> transformTask(List<WorkflowTaskRelation> taskRelationList,
                                  List<TaskDefinitionLog> taskDefinitionLogs);
 
-    TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
-                                            String taskName,
-                                            Integer groupId,
-                                            Integer workflowInstanceId,
-                                            Integer priority,
-                                            TaskGroupQueueStatus status);
-
     String findConfigYamlByName(String clusterName);
 
     void forceWorkflowInstanceSuccessByTaskInstanceId(TaskInstance taskInstance);
 
-    void setGlobalParamIfCommanded(WorkflowDefinition workflowDefinition, Map<String, String> cmdParam);
 }

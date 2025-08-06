@@ -15,22 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.task.executor.eventbus;
+package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
-import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
-import org.apache.dolphinscheduler.task.executor.events.AbstractTaskExecutorLifecycleEvent;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
-import lombok.extern.slf4j.Slf4j;
+public class TaskLogMarkers {
 
-@Slf4j
-public class TaskExecutorEventBus extends AbstractDelayEventBus<AbstractTaskExecutorLifecycleEvent> {
+    private static final Marker TASK_LOGGER_EXCLUDE_MARKER = MarkerFactory.getMarker("TASK_LOGGER_EXCLUDE");
 
-    public void publish(final AbstractTaskExecutorLifecycleEvent event) {
-        super.publish(event);
-        log.info(TaskLogMarkers.excludeInTaskLog(), "Publish {}: {}", event.getClass().getSimpleName(),
-                JSONUtils.toPrettyJsonString(event));
+    private static final Marker TASK_LOGGER_INCLUDE_MARKER = MarkerFactory.getMarker("TASK_LOGGER_INCLUDE");
+
+    /**
+     * The marker used to exclude logs from the task instance log file.
+     */
+    public static Marker excludeInTaskLog() {
+        return TASK_LOGGER_EXCLUDE_MARKER;
     }
 
+    public static Marker includeInTaskLog() {
+        return TASK_LOGGER_INCLUDE_MARKER;
+
+    }
 }

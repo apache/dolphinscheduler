@@ -182,12 +182,12 @@ public interface IWorkflowExecutionGraph {
     /**
      * Whether there exist the TaskExecutionRunnable chain in the graph is finish with paused.
      */
-    boolean isExistPauseTaskExecutionRunnableChain();
+    boolean isExistPausedTaskExecutionRunnableChain();
 
     /**
      * Whether there exist the TaskExecutionRunnable chain in the graph is finish with kill.
      */
-    boolean isExistKillTaskExecutionRunnableChain();
+    boolean isExistKilledTaskExecutionRunnableChain();
 
     /**
      * Check whether the given task is the end of the task chain.

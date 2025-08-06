@@ -9,20 +9,20 @@
 
 ## About
 
-Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code. It also provided powerful user interface,
-dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available **out of the box**
+Apache DolphinScheduler is a modern data orchestration platform that empowers agile, low-code development of high-performance workflows.
+It is dedicated to handling complex task dependencies in data pipelines, and provides a wide range of built-in job types ** out of the box**
 
-The key features for DolphinScheduler are as follows:
+Key features for DolphinScheduler are as follows:
 
-- Easy to deploy, provide four ways to deploy which includes Standalone, Cluster, Docker and Kubernetes.
-- Easy to use, workflow can be created and managed in four ways, including Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) and Open API
-- Highly reliable and high availability, decentralized architecture with multi-master and multi-worker, native supports horizontal scaling.
-- High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day
-- Cloud Native, DolphinScheduler supports orchestrating multi-cloud/data center workflow, and supports custom task type
-- Versioning both workflow and workflow instance(including tasks)
-- Various state control of workflow and task, support pause/stop/recover them in any time
+- Easy to deploy, provides four deployment modes including Standalone, Cluster, Docker and Kubernetes.
+- Easy to use, workflows can be created and managed via Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) or Open API
+- Highly reliable and high availability, with a decentralized, multi-master and multi-worker architecture and native supports for horizontal scaling.
+- High performance, its performance is several times faster than other orchestration platforms, and it is capable of handling tens of millions of tasks per day
+- Cloud Native, DolphinScheduler supports orchestrating workflows cross multiple clouds and data centers, and allows custom task types
+- Workflow Versioning, provides version control for both workflows and individual workflow instances, including tasks.
+- Flexible state control of workflows and tasks, supports pause/stop/recover them in any time
 - Multi-tenancy support
-- Others like backfill support(Web UI native), permission control including project and data source
+- Additional features, backfill support(Web UI native), permission control including project and data source etc.
 
 ## QuickStart
 
@@ -39,13 +39,13 @@ The key features for DolphinScheduler are as follows:
 * **Homepage:** Project and workflow overview, including the latest workflow instance and task instance status statistics.
 ![home](images/home.png)
 
-* **Workflow Definition:** Create and manage workflow by drag and drop, easy to build and maintain complex workflow, support [bulk of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/introduction-to-functions_menu/task_menu) out of box.
+* **Workflow Definition:** Create and manage workflows by drag and drop, easy to build and maintain complex workflows, support [a wide range of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.3.0-alpha/introduction-to-functions_menu/task_menu) out of box.
 ![workflow-definition](images/workflow-definition.png)
 
-* **Workflow Tree View:** Abstract tree structure could clearer understanding of the relationship between tasks
+* **Workflow Tree View:** Abstract tree structure could provide a clearer understanding of task relationships
 ![workflow-tree](images/workflow-tree.png)
 
-* **Data source:** Manage support multiple external data sources, provide unified data access capabilities for such as MySQL, PostgreSQL, Hive, Trino, etc.
+* **Data source:** Supports multiple external data sources, provides unified data access capabilities for MySQL, PostgreSQL, Hive, Trino, etc.
 ![data-source](images/data-source.png)
 
 * **Monitor:** View the status of the master, worker and database in real time, including server resource usage and load, do quick health check without logging in to the server.
@@ -57,8 +57,8 @@ Follow [this guide](https://github.com/apache/dolphinscheduler/issues/new/choose
 
 ## Contributing
 
-The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](docs/docs/en/contribute/join/contribute.md),
-find the good first issue in [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
+The community welcomes contributions from everyone. Please refer to this page to find out more details: [How to contribute](docs/docs/en/contribute/join/contribute.md).
+Check out good first issue in [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
 
 ## Community
 
@@ -66,7 +66,7 @@ Welcome to join the Apache DolphinScheduler community by:
 
 - Join the [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack) to keep in touch with the community
 - Follow the [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) and get the latest news <!-- markdown-link-check-disable-line -->
-- Subscribe DolphinScheduler mail list, [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) for user and [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org) for developer
+- Subscribe DolphinScheduler mail list, [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) for users and [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org) for developers
 
 # Landscapes
 

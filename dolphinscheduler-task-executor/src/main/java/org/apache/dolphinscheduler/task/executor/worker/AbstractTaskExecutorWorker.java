@@ -22,7 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPausedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorSuccessLifecycleEvent;
@@ -85,7 +84,6 @@ public abstract class AbstractTaskExecutorWorker implements ITaskExecutorWorker 
 
     protected void onTaskExecutorFinished(final ITaskExecutor taskExecutor) {
         unFireTaskExecutor(taskExecutor);
-        taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorFinalizeLifecycleEvent.of(taskExecutor));
     }
 
 }

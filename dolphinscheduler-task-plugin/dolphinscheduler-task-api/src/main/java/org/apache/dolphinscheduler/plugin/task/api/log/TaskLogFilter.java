@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.api.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.MDC;
+import org.slf4j.Marker;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
@@ -35,6 +38,24 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
 
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        return MDC.get(LogUtils.TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY) == null ? FilterReply.DENY : FilterReply.ACCEPT;
+        String taskInstanceLogPath = MDC.get(LogUtils.TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+        // If the taskInstanceLogPath is empty, it means that the log is not related to a task instance.
+        if (StringUtils.isEmpty(taskInstanceLogPath)) {
+            return FilterReply.DENY;
+        }
+
+        // todo: Only when the master is includeInTaskLog, the log should be included in the task instance log, we can
+        // remove `excludeInTaskLog` after change the log in plugin
+        final Marker marker = event.getMarker();
+        if (marker == null) {
+            return FilterReply.ACCEPT;
+        }
+        if (marker.contains(TaskLogMarkers.includeInTaskLog())) {
+            return FilterReply.ACCEPT;
+        }
+        if (marker.contains(TaskLogMarkers.excludeInTaskLog())) {
+            return FilterReply.DENY;
+        }
+        return FilterReply.ACCEPT;
     }
 }
