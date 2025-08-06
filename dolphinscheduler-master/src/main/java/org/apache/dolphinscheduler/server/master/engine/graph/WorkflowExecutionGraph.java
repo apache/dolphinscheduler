@@ -204,8 +204,8 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
             return false;
         }
         return !isExistFailureTaskExecutionRunnableChain()
-                && !isExistPauseTaskExecutionRunnableChain()
-                && !isExistKillTaskExecutionRunnableChain();
+                && !isExistPausedTaskExecutionRunnableChain()
+                && !isExistKilledTaskExecutionRunnableChain();
     }
 
     @Override
@@ -214,12 +214,12 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     }
 
     @Override
-    public boolean isExistPauseTaskExecutionRunnableChain() {
+    public boolean isExistPausedTaskExecutionRunnableChain() {
         return CollectionUtils.isNotEmpty(pausedTaskChains);
     }
 
     @Override
-    public boolean isExistKillTaskExecutionRunnableChain() {
+    public boolean isExistKilledTaskExecutionRunnableChain() {
         return CollectionUtils.isNotEmpty(killedTaskChains);
     }
 
