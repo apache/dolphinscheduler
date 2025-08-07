@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.IOException;
@@ -32,10 +33,10 @@ public class GrpcParametersTest {
     @Test
     public void testGenerator() throws IOException {
         String paramData = "{" +
-                "\"localParams\":[],\"" +
+                "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
                 "\"grpcServiceDefinition\":\"\"," +
-                "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json")) + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
@@ -54,10 +55,10 @@ public class GrpcParametersTest {
     @Test
     public void testCheckParameters() throws IOException {
         String paramData = "{" +
-                "\"localParams\":[],\"" +
+                "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
                 "\"grpcServiceDefinition\":\"\"," +
-                "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json")) + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
@@ -77,10 +78,10 @@ public class GrpcParametersTest {
     @Test
     public void testCheckValues() throws IOException {
         String paramData = "{" +
-                "\"localParams\":[],\"" +
+                "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
                 "\"grpcServiceDefinition\":\"\"," +
-                "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json")) + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
@@ -96,5 +97,9 @@ public class GrpcParametersTest {
         Assertions.assertEquals("", grpcParameters.getCondition());
         Assertions.assertEquals(0, grpcParameters.getLocalParametersMap().size());
         Assertions.assertEquals(0, grpcParameters.getResourceFilesList().size());
+    }
+
+    public static String toJSONLiteral(String input) {
+        return StringEscapeUtils.escapeEcmaScript(input);
     }
 }
