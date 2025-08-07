@@ -52,8 +52,8 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
           if (!value) {
             return new Error(t('project.node.grpc_url_tips'))
           }
-          if (value.search(new RegExp(/http[s]{0,1}:\/\/\S*/, 'i'))) {
-            return new Error(t('project.node.http_url_validator'))
+          if (value.search(new RegExp(/^\S*:\d+$/, 'i'))) {
+            return new Error(t('project.node.grpc_url_format_tips'))
           }
         }
       }

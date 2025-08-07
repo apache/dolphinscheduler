@@ -493,6 +493,7 @@ export default {
     task_manager_number_tips: '请输入TaskManager数量',
     grpc_url: '请求地址',
     grpc_url_tips: '请输入请求地址(必填)',
+    grpc_url_format_tips: '请求地址格式不正确, gRPC仅允许host:port格式',
     grpc_method: '方法名称',
     grpc_method_tips: '请输入方法名称(必填，服务/方法)，例如: Greeter/SayHello',
     grpc_service_definition: 'Protobuf 定义',

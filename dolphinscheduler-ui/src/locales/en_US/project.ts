@@ -507,6 +507,8 @@ export default {
     task_manager_number_tips: 'Please enter TaskManager number',
     grpc_url: 'gRPC Url',
     grpc_url_tips: 'Please Enter gRPC Url',
+    grpc_url_format_tips:
+      'Request address format is incorrect, gRPC only allows host:port format',
     grpc_method: 'gRPC Method',
     grpc_method_tips:
       'Please Enter gRPC Method (required, Service/Method), eg: Greeter/SayHello',
