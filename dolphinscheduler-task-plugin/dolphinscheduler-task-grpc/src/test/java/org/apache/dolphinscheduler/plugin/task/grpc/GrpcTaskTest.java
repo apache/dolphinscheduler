@@ -60,15 +60,15 @@ import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
-import io.grpc.testing.GrpcCleanupRule;
 
 /**
  * Test GrpcTask
  */
+@ExtendWith(GrpcCleanupExtension.class)
 @ExtendWith(MockitoExtension.class)
 public class GrpcTaskTest {
 
-    private final TaskTesterGrpc.TaskTesterImplBase SERVICE_IMPL =
+    private TaskTesterGrpc.TaskTesterImplBase serviceImpl =
             mock(TaskTesterGrpc.TaskTesterImplBase.class, delegatesTo(
                     new TaskTesterGrpc.TaskTesterImplBase() {
 
@@ -82,49 +82,51 @@ public class GrpcTaskTest {
 
                         @Override
                         public void testUNIMPLEMENTED(StringRequest request, StreamObserver<StringReply> respObserver) {
-                            // respObserver.onNext(StringReply.getDefaultInstance());
                             respObserver.onError(new StatusRuntimeException(Status.UNIMPLEMENTED));
                             respObserver.onCompleted();
                         }
                     }));
 
-    private final ExecutorService EXECUTOR = Executors.newFixedThreadPool(2);
-    private final Server SERVER = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
-            .executor(EXECUTOR)
-            .addService(SERVICE_IMPL)
-            .build()
-            .start();
-    private final int SERVER_PORT = SERVER.getPort();
+    private ExecutorService executor = Executors.newFixedThreadPool(2);
+    private Server server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+            .executor(executor)
+            .addService(serviceImpl)
+            .build();
+    private int serverPort = 0;
 
     public GrpcTaskTest() throws IOException {
     }
 
     @BeforeEach
     public void setUp() throws Exception {
+        executor = Executors.newFixedThreadPool(2);
+        server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
+                .executor(executor)
+                .addService(serviceImpl)
+                .build();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                if (SERVER != null) {
-                    SERVER.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+                if (server != null) {
+                    server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
                 }
             } catch (InterruptedException e) {
-                SERVER.shutdownNow();
+                server.shutdownNow();
                 e.printStackTrace(System.err);
             } finally {
-                EXECUTOR.shutdown();
+                executor.shutdown();
             }
         }));
-
-        SERVER.start();
-        SERVER.awaitTermination();
+        server.start();
+        serverPort = server.getPort();
     }
 
     @AfterEach
     public void after() {
-        if (SERVER != null && !SERVER.isShutdown()) {
-            SERVER.shutdownNow();
+        if (server != null && !server.isShutdown()) {
+            server.shutdownNow();
         }
-        if (!EXECUTOR.isShutdown()) {
-            EXECUTOR.shutdownNow();
+        if (!executor.isShutdown()) {
+            executor.shutdownNow();
         }
     }
 
@@ -169,7 +171,7 @@ public class GrpcTaskTest {
                                       Map<String, String> prepareParamsMap,
                                       GrpcCheckCondition grpcCheckCondition, String condition) throws IOException {
         String paramData =
-                generateGrpcParameters("127.0.0.1:" + SERVER_PORT, methodName, requestMessage, grpcCheckCondition,
+                generateGrpcParameters("127.0.0.1:" + serverPort, methodName, requestMessage, grpcCheckCondition,
                         condition);
         return generateGrpcTaskFromParamData(paramData, prepareParamsMap);
     }
@@ -177,7 +179,7 @@ public class GrpcTaskTest {
     private GrpcTask generateGrpcTask(String methodName, String requestMessage,
                                       GrpcCheckCondition grpcCheckCondition, String condition) throws IOException {
         String paramData =
-                generateGrpcParameters("127.0.0.1:" + SERVER_PORT, methodName, requestMessage, grpcCheckCondition,
+                generateGrpcParameters("127.0.0.1:" + serverPort, methodName, requestMessage, grpcCheckCondition,
                         condition);
         return generateGrpcTaskFromParamData(paramData, null);
     }
