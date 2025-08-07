@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -23,13 +23,21 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
-class DelayEntryTest {
+class TaskDispatchableEventTest {
 
     @Test
     void getDelay() {
-        DelayEntry<String> delayEntry = new DelayEntry<>(5_000L, "Item");
+        TaskDispatchableEvent<String> delayEntry = new TaskDispatchableEvent<>(5_000L, "Item");
         assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
                 .isWithin(TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS))
                 .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void priorityCompare() {
+        TaskDispatchableEvent<String> highPriorityEntry =
+                new TaskDispatchableEvent<>(15_000L, "1_HIGH");
+        TaskDispatchableEvent<String> lowPriorityEntry = new TaskDispatchableEvent<>(5_000L, "3_LOW");
+        assertThat(highPriorityEntry.compareTo(lowPriorityEntry) < 0).isTrue();
     }
 }

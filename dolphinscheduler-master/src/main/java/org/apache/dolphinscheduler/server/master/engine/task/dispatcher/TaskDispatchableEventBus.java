@@ -15,36 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
+import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.SneakyThrows;
 
-public class PriorityAndDelayBasedTaskEntry<V extends Comparable<V>> extends DelayEntry<V> {
+public class TaskDispatchableEventBus<V extends TaskDispatchableEvent<T>, T extends Comparable<T>>
+        extends
+            AbstractDelayEventBus<V> {
 
-    public PriorityAndDelayBasedTaskEntry(long delayTimeMills, V data) {
-        super(delayTimeMills, data);
+    public void add(V v) {
+        super.publish(v);
     }
 
-    @Override
-    public long getDelay(@NotNull TimeUnit unit) {
-        return super.getDelay(unit);
+    @SneakyThrows
+    public V take() {
+        return super.take();
     }
 
-    @Override
-    public int compareTo(@NotNull Delayed o) {
-        return super.compareTo(o);
+    // Only use in test
+    public int size() {
+        return delayEventQueue.size();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    // Only use in test
+    public void clear() {
+        delayEventQueue.clear();
     }
 }
