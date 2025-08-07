@@ -43,7 +43,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -65,9 +67,6 @@ import io.grpc.testing.GrpcCleanupRule;
  */
 @ExtendWith(MockitoExtension.class)
 public class GrpcTaskTest {
-
-    @Rule
-    public final GrpcCleanupRule GRPCCLEANUP = new GrpcCleanupRule();
 
     private final TaskTesterGrpc.TaskTesterImplBase SERVICE_IMPL =
             mock(TaskTesterGrpc.TaskTesterImplBase.class, delegatesTo(
@@ -100,7 +99,7 @@ public class GrpcTaskTest {
     public GrpcTaskTest() throws IOException {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
@@ -119,7 +118,7 @@ public class GrpcTaskTest {
         SERVER.awaitTermination();
     }
 
-    @After
+    @AfterEach
     public void after() {
         if (SERVER != null && !SERVER.isShutdown()) {
             SERVER.shutdownNow();
