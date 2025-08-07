@@ -17,17 +17,24 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import static java.util.Objects.isNull;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+
+import com.google.protobuf.Descriptors;
+
+import io.grpc.ManagedChannel;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 
 @Slf4j
 public class GrpcTask extends AbstractTask {
@@ -58,21 +65,60 @@ public class GrpcTask extends AbstractTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            val channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
-            val fileDesc = JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
-            val stubService = new GrpcDynamicService(channel, fileDesc);
+            ManagedChannel channel =
+                    isNull(this.channel) ? GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl())
+                            : this.channel;
+            Descriptors.FileDescriptor fileDesc =
+                    JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
+            GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
             stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage());
+        } catch (StatusRuntimeException statusre) {
+            validateResponse(statusre.getStatus());
+            return;
         } catch (Exception e) {
             throw new TaskException("grpc handle exception:", e);
         }
-
-        // OkHttpResponse httpResponse = sendRequest();
-        //
-        // validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
+        validateResponse(Status.OK);
     }
+
+    @Setter
+    public ManagedChannel channel = null;
 
     @Override
     public void cancel() throws TaskException {
+    }
+
+    private void validateResponse(Status statusCode) {
+        switch (grpcParameters.getGrpcCheckCondition()) {
+            case STATUS_CODE_DEFAULT:
+                if (!statusCode.isOk()) {
+                    log.error(
+                            "grpc request failed, url: {}, method: {}, statusCode: {} (expected OK), checkCondition: {}",
+                            grpcParameters.getUrl(), grpcParameters.getMethodName(), statusCode.getCode(),
+                            GrpcCheckCondition.STATUS_CODE_DEFAULT.name());
+                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                    return;
+                }
+                break;
+            case STATUS_CODE_CUSTOM:
+                Status expectedCode = Status.fromCode(Status.Code.valueOf(grpcParameters.getCondition()));
+                if (statusCode != expectedCode) {
+                    log.error(
+                            "grpc request failed, url: {}, method: {}, statusCode: {} (expect {}), checkCondition: {}",
+                            grpcParameters.getUrl(), grpcParameters.getMethodName(), statusCode.getCode(), expectedCode,
+                            GrpcCheckCondition.STATUS_CODE_DEFAULT.name());
+                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                    return;
+                }
+                break;
+            default:
+                throw new TaskException(String.format("grpc check condition %s not supported",
+                        grpcParameters.getGrpcCheckCondition()));
+        }
+        // default success log
+        log.info("grpc request success, url: {}, method: {}, statusCode: {}", grpcParameters.getUrl(),
+                grpcParameters.getMethodName(), statusCode.getCode());
+        exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
     }
 
     @Override
@@ -80,4 +126,13 @@ public class GrpcTask extends AbstractTask {
         return this.grpcParameters;
     }
 
+    public void addDefaultOutput(String response) {
+        // put response in output
+        Property outputProperty = new Property();
+        outputProperty.setProp(String.format("%s.%s", taskExecutionContext.getTaskName(), "response"));
+        outputProperty.setDirect(Direct.OUT);
+        outputProperty.setType(DataType.VARCHAR);
+        outputProperty.setValue(response);
+        grpcParameters.addPropertyToValPool(outputProperty);
+    }
 }

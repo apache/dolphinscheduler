@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.grpc;
 import org.junit.jupiter.api.Test;
 
 public class GrpcParametersTest {
+
     @Test
     public void testGenerator() {
 

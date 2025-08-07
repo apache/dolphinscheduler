@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 
-import io.grpc.*;
+import static java.util.Objects.isNull;
+
+import java.util.Arrays;
+
 import lombok.Getter;
-import lombok.val;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
@@ -38,16 +40,31 @@ public class GrpcDynamicService {
         this.channel = channel;
     }
 
-    public DynamicMessage call(String methodNameWithService, String messageJSON) throws InvalidProtocolBufferException {
+    public DynamicMessage call(String methodNameWithService, String messageJSON) {
         MethodName methodNameData = new MethodName(methodNameWithService);
-        Descriptors.ServiceDescriptor pServiceDescriptor = fileDescriptor.findServiceByName(methodNameData.serviceName);
-        Descriptors.MethodDescriptor pMethodDescriptor = pServiceDescriptor.findMethodByName(methodNameData.methodName);
+        Descriptors.ServiceDescriptor pServiceDescriptor =
+                fileDescriptor.findServiceByName(methodNameData.getServiceName());
+        if (isNull(pServiceDescriptor))
+            throw new RuntimeException(
+                    "cannot find service <" + methodNameData.getServiceName() + "> from service definition");
+        Descriptors.MethodDescriptor pMethodDescriptor =
+                pServiceDescriptor.findMethodByName(methodNameData.getMethodName());
+        if (isNull(pMethodDescriptor))
+            throw new RuntimeException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
+                    + methodNameData.getServiceName() + "> with method list: " + Arrays.toString(pServiceDescriptor
+                            .getMethods().stream().map(Descriptors.MethodDescriptor::getName).toArray()));
         MethodDescriptor methodDescriptor = methodFromProtobuf(pServiceDescriptor, pMethodDescriptor);
         Descriptors.Descriptor requestMessageType = pMethodDescriptor.getInputType();
         Descriptors.Descriptor responseMessageType = pMethodDescriptor.getOutputType();
         DynamicMessage.Builder requestBuilder = DynamicMessage.newBuilder(requestMessageType);
         DynamicMessage.Builder responseBuilder = DynamicMessage.newBuilder(responseMessageType);
-        JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
+        try {
+            JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
+        } catch (InvalidProtocolBufferException ipbe) {
+            throw new RuntimeException(
+                    "cannot merge json message to protobuf definition type <" + requestMessageType.getName() + ">",
+                    ipbe);
+        }
         DynamicMessage request = requestBuilder.build();
         CallOptions callOptions = CallOptions.DEFAULT;
         responseBuilder.mergeFrom(
@@ -93,7 +110,7 @@ public class GrpcDynamicService {
 
         public MethodName(String methodNameWithService) {
             if (!checkMethodName(methodNameWithService))
-                throw new RuntimeException("grpc task method name is not acceptable");
+                throw new RuntimeException("grpc task method name is invalid");
         }
 
         private boolean checkMethodName(String methodNameWithService) {

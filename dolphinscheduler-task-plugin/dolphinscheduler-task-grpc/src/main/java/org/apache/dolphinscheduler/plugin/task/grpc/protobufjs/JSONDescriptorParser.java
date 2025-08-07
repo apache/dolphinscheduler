@@ -24,7 +24,6 @@ import java.util.List;
 
 import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.*;
 
 public class JSONDescriptorParser {
 
@@ -169,20 +168,20 @@ public class JSONDescriptorParser {
         return fieldDescriptorProtoBuilder;
     }
 
-//    private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
-//        DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
-//                DescriptorProtos.FieldDescriptorProto.newBuilder()
-//                        .setName(selfName);
-//        // .setType(T);
-//        throw new NotImplementedException();
-//        // return mapFieldDescriptorProtoBuilder;
-//    }
+    // private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
+    // DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
+    // DescriptorProtos.FieldDescriptorProto.newBuilder()
+    // .setName(selfName);
+    // // .setType(T);
+    // throw new NotImplementedException();
+    // // return mapFieldDescriptorProtoBuilder;
+    // }
 
-//    private DescriptorProtos.OneofDescriptorProto.Builder parseOneof(String selfName, OneOf oneof, Type parent) {
-//        DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =
-//                DescriptorProtos.OneofDescriptorProto.newBuilder()
-//                        .setName(selfName);
-//        throw new NotImplementedException();
-//        // return oneofDescriptorProtoBuilder;
-//    }
+    // private DescriptorProtos.OneofDescriptorProto.Builder parseOneof(String selfName, OneOf oneof, Type parent) {
+    // DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =
+    // DescriptorProtos.OneofDescriptorProto.newBuilder()
+    // .setName(selfName);
+    // throw new NotImplementedException();
+    // // return oneofDescriptorProtoBuilder;
+    // }
 }

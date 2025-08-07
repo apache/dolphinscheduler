@@ -7,14 +7,22 @@ option java_multiple_files = true;
 option java_outer_classname = "TaskTesterProto";
 
 service TaskTester {
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
-  rpc SayHelloAgain (HelloRequest) returns (HelloReply) {}
+  rpc TestOK (StringRequest) returns (StringReply) {}
+  rpc TestUNIMPLEMENTED (StringRequest) returns (StringReply) {}
 }
 
-message HelloRequest {
+message StringRequest {
   string username = 1;
 }
 
-message HelloReply {
+message StringReply {
   string message = 1;
+}
+
+message NoneRequest {
+
+}
+
+message NoneReply {
+
 }
