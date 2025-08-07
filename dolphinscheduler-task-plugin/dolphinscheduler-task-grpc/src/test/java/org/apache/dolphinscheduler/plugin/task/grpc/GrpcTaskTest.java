@@ -22,8 +22,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.Mockito.mock;
 
+import io.grpc.*;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.StringReply;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.StringRequest;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.TaskTesterGrpc;
@@ -34,11 +38,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -142,7 +150,19 @@ public class GrpcTaskTest {
 
     @Test
     public void testAddDefaultOutput() throws Exception {
-
+        GrpcTask grpcTask = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+        String response = "{\"message\":\"test reply: test username\"}";
+        AbstractParameters grpcParameters = grpcTask.getParameters();
+        grpcTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
+        List<Property> varPool = grpcParameters.getVarPool();
+        Assertions.assertEquals(1, varPool.size());
+        Property property = varPool.get(0);
+        Assertions.assertEquals("null.response", property.getProp());
+        Assertions.assertEquals(Direct.OUT, property.getDirect());
+        Assertions.assertEquals(DataType.VARCHAR, property.getType());
+        Assertions.assertEquals(response, property.getValue());
     }
 
     private GrpcTask generateGrpcTask(String methodName, String requestMessage,

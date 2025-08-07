@@ -19,7 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.grpc;
 
 import static java.util.Objects.isNull;
 
+import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.util.JsonFormat;
+import com.google.protobuf.util.JsonFormat.Printer;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -31,6 +39,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.protobuf.Descriptors;
+
 
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
@@ -71,7 +80,9 @@ public class GrpcTask extends AbstractTask {
             Descriptors.FileDescriptor fileDesc =
                     JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
             GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
-            stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage());
+            DynamicMessage message = stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage());
+            Printer printer = JsonFormat.printer().omittingInsignificantWhitespace();
+            addDefaultOutput(printer.print(message));
         } catch (StatusRuntimeException statusre) {
             validateResponse(statusre.getStatus());
             return;
