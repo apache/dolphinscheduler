@@ -37,7 +37,7 @@ public class GrpcParametersTest {
                 "\"grpcServiceDefinition\":\"\"," +
                 "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
-                "\"message\":\"{ \"username\":\"test username\" }\"" +
+                "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
                 "\"condition\":\"\"," +
                 "\"connectTimeout\":\"10000\"" +
@@ -59,7 +59,7 @@ public class GrpcParametersTest {
                 "\"grpcServiceDefinition\":\"\"," +
                 "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
-                "\"message\":\"{ \"username\":\"test username\" }\"" +
+                "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
                 "\"condition\":\"\"," +
                 "\"connectTimeout\":\"10000\"" +
@@ -82,7 +82,7 @@ public class GrpcParametersTest {
                 "\"grpcServiceDefinition\":\"\"," +
                 "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
-                "\"message\":\"{ \"username\":\"test username\" }\"" +
+                "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
                 "\"condition\":\"\"," +
                 "\"connectTimeout\":\"10000\"" +
