@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 import static java.util.Objects.isNull;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 
@@ -47,7 +48,7 @@ public class GrpcDynamicService {
         this.channel = channel;
     }
 
-    public DynamicMessage call(String methodNameWithService, String messageJSON) {
+    public DynamicMessage call(String methodNameWithService, String messageJSON, long timeout) {
         MethodName methodNameData = new MethodName(methodNameWithService);
         Descriptors.ServiceDescriptor pServiceDescriptor =
                 fileDescriptor.findServiceByName(methodNameData.getServiceName());
@@ -73,7 +74,8 @@ public class GrpcDynamicService {
                     ipbe);
         }
         DynamicMessage request = requestBuilder.build();
-        CallOptions callOptions = CallOptions.DEFAULT;
+        CallOptions callOptions = timeout > 0 ? CallOptions.DEFAULT.withDeadlineAfter(timeout, TimeUnit.MILLISECONDS)
+                : CallOptions.DEFAULT;
         responseBuilder.mergeFrom(
                 (Message) io.grpc.stub.ClientCalls.blockingUnaryCall(channel, methodDescriptor, callOptions, request));
         return responseBuilder.build();

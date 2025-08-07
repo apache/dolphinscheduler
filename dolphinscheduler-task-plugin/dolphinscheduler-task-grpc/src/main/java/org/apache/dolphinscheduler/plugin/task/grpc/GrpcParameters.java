@@ -46,7 +46,7 @@ public class GrpcParameters extends AbstractParameters {
      * Connect Timeout
      * Unit: ms
      */
-    private int connectTimeout;
+    private int connectTimeout = 0; // use default timeout
 
     @Override
     public boolean checkParameters() {
