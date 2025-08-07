@@ -17,22 +17,83 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
+/**
+ * Test GrpcTask
+ */
 public class GrpcParametersTest {
 
     @Test
-    public void testGenerator() {
-
+    public void testGenerator() throws IOException {
+        String paramData = "{" +
+                "\"localParams\":[],\"" +
+                "\"url\":\"127.0.0.1:50010\"," +
+                "\"grpcServiceDefinition\":\"\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
+                "\"methodName\":\"TaskTester/TestOK\"," +
+                "\"message\":\"{ \"username\":\"test username\" }\"" +
+                "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
+                "\"condition\":\"\"," +
+                "\"connectTimeout\":\"10000\"" +
+                "}";
+        GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
+        Assertions.assertEquals(10000, grpcParameters.getConnectTimeout());
+        Assertions.assertEquals("127.0.0.1:50010", grpcParameters.getUrl());
+        Assertions.assertEquals("TaskTester/TestOK", grpcParameters.getMethodName());
+        Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());
+        Assertions.assertEquals(GrpcCheckCondition.STATUS_CODE_DEFAULT, grpcParameters.getGrpcCheckCondition());
+        Assertions.assertEquals("", grpcParameters.getCondition());
     }
 
     @Test
-    public void testCheckParameters() {
-
+    public void testCheckParameters() throws IOException {
+        String paramData = "{" +
+                "\"localParams\":[],\"" +
+                "\"url\":\"127.0.0.1:50010\"," +
+                "\"grpcServiceDefinition\":\"\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
+                "\"methodName\":\"TaskTester/TestOK\"," +
+                "\"message\":\"{ \"username\":\"test username\" }\"" +
+                "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
+                "\"condition\":\"\"," +
+                "\"connectTimeout\":\"10000\"" +
+                "}";
+        GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
+        Assertions.assertTrue(grpcParameters.checkParameters());
+        Assertions.assertEquals(10000, grpcParameters.getConnectTimeout());
+        Assertions.assertEquals("127.0.0.1:50010", grpcParameters.getUrl());
+        Assertions.assertEquals("TaskTester/TestOK", grpcParameters.getMethodName());
+        Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());
+        Assertions.assertEquals(GrpcCheckCondition.STATUS_CODE_DEFAULT, grpcParameters.getGrpcCheckCondition());
+        Assertions.assertEquals("", grpcParameters.getCondition());
     }
 
     @Test
-    public void testCheckValues() {
-
+    public void testCheckValues() throws IOException {
+        String paramData = "{" +
+                "\"localParams\":[],\"" +
+                "\"url\":\"127.0.0.1:50010\"," +
+                "\"grpcServiceDefinition\":\"\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + GrpcTaskTest.readResourceTextFile("taskTester.json") + "\"," +
+                "\"methodName\":\"TaskTester/TestOK\"," +
+                "\"message\":\"{ \"username\":\"test username\" }\"" +
+                "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
+                "\"condition\":\"\"," +
+                "\"connectTimeout\":\"10000\"" +
+                "}";
+        GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
+        Assertions.assertEquals(10000, grpcParameters.getConnectTimeout());
+        Assertions.assertEquals("127.0.0.1:50010", grpcParameters.getUrl());
+        Assertions.assertEquals("TaskTester/TestOK", grpcParameters.getMethodName());
+        Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());
+        Assertions.assertEquals(GrpcCheckCondition.STATUS_CODE_DEFAULT, grpcParameters.getGrpcCheckCondition());
+        Assertions.assertEquals("", grpcParameters.getCondition());
+        Assertions.assertEquals(0, grpcParameters.getLocalParametersMap().size());
+        Assertions.assertEquals(0, grpcParameters.getResourceFilesList().size());
     }
 }

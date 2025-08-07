@@ -22,7 +22,11 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.Mockito.mock;
 
-import io.grpc.*;
+import io.grpc.Status;
+import io.grpc.Server;
+import io.grpc.StatusRuntimeException;
+import io.grpc.Grpc;
+import io.grpc.InsecureServerCredentials;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -215,7 +219,7 @@ public class GrpcTaskTest {
         return mapper.writeValueAsString(grpcParameters);
     }
 
-    public String readResourceTextFile(String pathInResource) throws IOException {
+    public static String readResourceTextFile(String pathInResource) throws IOException {
         ClassPathResource resource = new ClassPathResource(pathInResource);
         InputStream inputStream = resource.getInputStream();
         StringBuilder resultStringBuilder = new StringBuilder();
