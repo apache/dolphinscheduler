@@ -18,10 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test GrpcTask

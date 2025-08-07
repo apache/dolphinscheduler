@@ -19,15 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.grpc;
 
 import static java.util.Objects.isNull;
 
-import com.google.protobuf.DynamicMessage;
-import com.google.protobuf.util.JsonFormat;
-import com.google.protobuf.util.JsonFormat.Printer;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -39,7 +36,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.protobuf.Descriptors;
-
+import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.util.JsonFormat;
+import com.google.protobuf.util.JsonFormat.Printer;
 
 import io.grpc.ManagedChannel;
 import io.grpc.Status;

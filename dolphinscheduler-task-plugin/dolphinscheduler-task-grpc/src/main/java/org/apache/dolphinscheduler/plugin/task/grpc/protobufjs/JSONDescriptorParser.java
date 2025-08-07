@@ -18,21 +18,20 @@
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Enum;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Field;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Method;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Namespace;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.OneOf;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.ReflectionObject;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Root;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Service;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Namespace;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.ReflectionObject;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Root;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Service;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Method;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Field;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.OneOf;
-
 
 public class JSONDescriptorParser {
 

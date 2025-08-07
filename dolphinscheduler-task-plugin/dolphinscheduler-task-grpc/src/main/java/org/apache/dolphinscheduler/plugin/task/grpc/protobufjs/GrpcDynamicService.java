@@ -21,20 +21,20 @@ import static java.util.Objects.isNull;
 
 import java.util.Arrays;
 
-import io.grpc.MethodDescriptor;
-import io.grpc.ManagedChannel;
-import io.grpc.CallOptions;
-import io.grpc.Grpc;
-import io.grpc.InsecureChannelCredentials;
-import io.grpc.ChannelCredentials;
 import lombok.Getter;
-
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
+
+import io.grpc.CallOptions;
+import io.grpc.ChannelCredentials;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
+import io.grpc.MethodDescriptor;
 import io.grpc.protobuf.ProtoUtils;
 
 public class GrpcDynamicService {
