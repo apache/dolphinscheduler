@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 
@@ -36,7 +37,8 @@ public class GrpcParametersTest {
                 "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
                 "\"grpcServiceDefinition\":\"\"," +
-                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json")) + "\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json"))
+                + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
@@ -58,7 +60,8 @@ public class GrpcParametersTest {
                 "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
                 "\"grpcServiceDefinition\":\"\"," +
-                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json")) + "\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json"))
+                + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
@@ -81,7 +84,8 @@ public class GrpcParametersTest {
                 "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
                 "\"grpcServiceDefinition\":\"\"," +
-                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json")) + "\"," +
+                "\"grpcServiceDefinitionJSON\":\"" + toJSONLiteral(GrpcTaskTest.readResourceTextFile("taskTester.json"))
+                + "\"," +
                 "\"methodName\":\"TaskTester/TestOK\"," +
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
