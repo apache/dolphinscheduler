@@ -26,23 +26,23 @@ import java.util.concurrent.Delayed;
 import lombok.Getter;
 
 @Getter
-public class TaskReadyForDispatchEvent<V extends Comparable<V>> extends AbstractDelayEvent {
+public class TaskDispatchableEvent<V extends Comparable<V>> extends AbstractDelayEvent {
 
     protected final V data;
 
-    public TaskReadyForDispatchEvent(long delayTimeMills, V data) {
+    public TaskDispatchableEvent(long delayTimeMills, V data) {
         super(delayTimeMills);
         this.data = checkNotNull(data, "data is null");
     }
 
     @Override
     public int compareTo(Delayed other) {
-        if (!(other instanceof TaskReadyForDispatchEvent)) {
+        if (!(other instanceof TaskDispatchableEvent)) {
             throw new RuntimeException("The object being compared is not a TaskReadyForDispatchEvent.");
         }
 
         @SuppressWarnings("unchecked")
-        final TaskReadyForDispatchEvent<V> otherEvent = (TaskReadyForDispatchEvent<V>) other;
+        final TaskDispatchableEvent<V> otherEvent = (TaskDispatchableEvent<V>) other;
 
         // there should compare data first for priority
         if (data != null && otherEvent.data != null) {

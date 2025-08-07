@@ -21,36 +21,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskReadyForDispatchEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class WorkerGroupEventBusTest {
+public class TaskDispatchableEventBusTest {
 
-    private WorkerGroupEventBus<TaskReadyForDispatchEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> queue;
+    private TaskDispatchableEventBus<TaskDispatchableEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> queue;
     private ITaskExecutionRunnable taskExecutionRunnable;
 
     @BeforeEach
     public void setUp() {
-        queue = new WorkerGroupEventBus<>();
+        queue = new TaskDispatchableEventBus<>();
         taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
     }
 
     @Test
     public void testAdd() {
-        queue.add(new TaskReadyForDispatchEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchableEvent<>(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
 
-        queue.add(new TaskReadyForDispatchEvent<>(2000, taskExecutionRunnable));
+        queue.add(new TaskDispatchableEvent<>(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
     }
 
     @Test
     public void testTake() throws InterruptedException {
-        queue.add(new TaskReadyForDispatchEvent<>(1000, taskExecutionRunnable));
-        TaskReadyForDispatchEvent<ITaskExecutionRunnable> entry = queue.take();
+        queue.add(new TaskDispatchableEvent<>(1000, taskExecutionRunnable));
+        TaskDispatchableEvent<ITaskExecutionRunnable> entry = queue.take();
         assertNotNull(entry);
         assertEquals(0, queue.size());
 
@@ -60,14 +60,14 @@ public class WorkerGroupEventBusTest {
     public void testSize() {
         assertEquals(0, queue.size());
 
-        queue.add(new TaskReadyForDispatchEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchableEvent<>(1000, taskExecutionRunnable));
         assertEquals(1, queue.size());
     }
 
     @Test
     public void testClear() {
-        queue.add(new TaskReadyForDispatchEvent<>(1000, taskExecutionRunnable));
-        queue.add(new TaskReadyForDispatchEvent<>(2000, taskExecutionRunnable));
+        queue.add(new TaskDispatchableEvent<>(1000, taskExecutionRunnable));
+        queue.add(new TaskDispatchableEvent<>(2000, taskExecutionRunnable));
         assertEquals(2, queue.size());
 
         queue.clear();

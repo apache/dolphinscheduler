@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
-import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskReadyForDispatchEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 
 import lombok.SneakyThrows;
 
-public class WorkerGroupEventBus<V extends TaskReadyForDispatchEvent<T>, T extends Comparable<T>>
+public class TaskDispatchableEventBus<V extends TaskDispatchableEvent<T>, T extends Comparable<T>>
         extends
             AbstractDelayEventBus<V> {
 
