@@ -60,8 +60,6 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'editor',
-      // 输入直接绑定到 field，如何处理用户输入的 protobuf 定义和parse后的json结构，
-      // 目前方案：两个都存，仅允许protobuf的控件输入，json只做显示，然后准备一个变量存储
       field: 'grpcServiceDefinition',
       name: t('project.node.grpc_service_definition'),
       props: {
