@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Enum;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Field;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.MapField;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Method;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Namespace;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.OneOf;
@@ -105,7 +106,11 @@ public class JSONDescriptorParser {
         if (type.fields != null)
             type.fields.forEach((name, pbObject) -> {
                 if (pbObject instanceof Field) {
-                    descriptorProtoBuilder.addField(parseField(name, (Field) pbObject));
+                    if (pbObject instanceof MapField) {
+                        descriptorProtoBuilder.addField(parseMapField(name, (MapField) pbObject));
+                    } else {
+                        descriptorProtoBuilder.addField(parseField(name, (Field) pbObject));
+                    }
                 }
             });
         if (type.nested != null)
@@ -169,14 +174,17 @@ public class JSONDescriptorParser {
         return fieldDescriptorProtoBuilder;
     }
 
-    // private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
-    // DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
-    // DescriptorProtos.FieldDescriptorProto.newBuilder()
-    // .setName(selfName);
-    // // .setType(T);
-    // throw new NotImplementedException();
-    // // return mapFieldDescriptorProtoBuilder;
-    // }
+    private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
+        DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
+                DescriptorProtos.FieldDescriptorProto.newBuilder();
+        try {
+            mapFieldDescriptorProtoBuilder
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.valueOf("TYPE_" + mapField.type.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            mapFieldDescriptorProtoBuilder.setTypeName(mapField.type);
+        }
+        return mapFieldDescriptorProtoBuilder;
+    }
 
     // private DescriptorProtos.OneofDescriptorProto.Builder parseOneof(String selfName, OneOf oneof, Type parent) {
     // DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =
