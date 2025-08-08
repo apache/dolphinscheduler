@@ -34,8 +34,6 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     }
   ]
 
-  model.grpcMethod = model.grpcMethod || 'UNARY'
-
   return [
     {
       type: 'input',
