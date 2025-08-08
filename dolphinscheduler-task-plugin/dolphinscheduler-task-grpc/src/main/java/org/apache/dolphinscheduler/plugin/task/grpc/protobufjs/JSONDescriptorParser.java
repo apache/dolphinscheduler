@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Field;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Method;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Namespace;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.OneOf;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.ReflectionObject;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Root;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Service;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
@@ -39,18 +38,12 @@ public class JSONDescriptorParser {
         return parseRoot(root);
     }
 
-    private void parse(String name, ReflectionObject pbObject) {
-
-    }
-
-    private Namespace parseNamespace(Namespace ns) {
-        List<String> packageNameNS = new ArrayList<>();
+    private Namespace findInnerNamespace(Namespace ns) {
         while (true) {
             if (ns.nested != null && ns.nested.values().size() == 1
                     && ns.nested.values().toArray()[0] instanceof Namespace && !(ns.nested instanceof Type)
                     && !(ns.nested instanceof Service)) {
                 ns = (Namespace) ns.nested.values().toArray()[0];
-                packageNameNS.add((String) ns.nested.keySet().toArray()[0]);
             } else {
                 break;
             }
@@ -78,7 +71,7 @@ public class JSONDescriptorParser {
         DescriptorProtos.FileDescriptorProto.Builder fileDescriptorProtoBuilder =
                 DescriptorProtos.FileDescriptorProto.newBuilder()
                         .setPackage(readPackageName(root));
-        Namespace innerNS = parseNamespace(root);
+        Namespace innerNS = findInnerNamespace(root);
         if (innerNS.nested != null)
             innerNS.nested.forEach((name, pbObject) -> {
                 if (pbObject instanceof Namespace) {

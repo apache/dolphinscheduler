@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import static java.util.Objects.isNull;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -32,7 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.protobuf.Descriptors;
@@ -74,8 +71,7 @@ public class GrpcTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             ManagedChannel channel =
-                    isNull(this.channel) ? GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl())
-                            : this.channel;
+                    GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
             Descriptors.FileDescriptor fileDesc =
                     JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
             GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
@@ -91,9 +87,6 @@ public class GrpcTask extends AbstractTask {
         }
         validateResponse(Status.OK);
     }
-
-    @Setter
-    public ManagedChannel channel = null;
 
     @Override
     public void cancel() throws TaskException {
