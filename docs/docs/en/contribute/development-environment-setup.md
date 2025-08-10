@@ -54,6 +54,20 @@ pre-commit install
 
 Now, every time you commit your code, `pre-commit` will automatically run `Spotless` to check the code style and formatting.
 
+### Helm Template Guidelines
+
+After modifying files related to Helm templates, you can use the following command to debug the Helm templates:
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Once the Helm templates are debugged and verified, use the following command to automatically update the README.md file (manually updating may likely result in incorrect formatting):
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker image build
 
 DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).

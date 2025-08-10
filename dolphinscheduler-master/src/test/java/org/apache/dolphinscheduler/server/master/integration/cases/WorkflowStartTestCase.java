@@ -1004,4 +1004,35 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 });
         masterContainer.assertAllResourceReleased();
     }
+
+    @Test
+    @DisplayName("Test start a workflow which contains a dep task with timeout kill strategy")
+    public void testStartWorkflow_withTimeoutKillTask() {
+        final String yaml = "/it/start/workflow_with_timeout_kill_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_kill_task");
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.STOP));
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("dep_task_with_timeout_killed");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
 }

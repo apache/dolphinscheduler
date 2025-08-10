@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityAndDelayBasedTaskEntry;
-import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Set;
@@ -34,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * WorkerGroupTaskDispatcher is responsible for dispatching tasks from the task queue.
  * The main responsibilities include:
- * 1. Continuously fetching tasks from the {@link PriorityDelayQueue} for dispatch.
+ * 1. Continuously fetching tasks from the {@link TaskDispatchableEvent} for dispatch.
  * 2. Re-queuing tasks that fail to dispatch according to retry logic.
  * 3. Ensuring thread safety and correct state transitions during task processing.
  */
@@ -43,11 +42,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final ITaskExecutorClient taskExecutorClient;
 
-    // TODO The current queue is flawed. When a high-priority task fails,
-    // it will be delayed and will not return to the first or second position.
-    // Tasks with the same priority will preempt its position.
-    // If it needs to be placed at the front of the queue, the queue needs to be re-implemented.
-    private final PriorityDelayQueue<PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable>> workerGroupQueue;
+    private final TaskDispatchableEventBus<TaskDispatchableEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupEventBus;
 
     private final Set<Integer> waitingDispatchTaskIds;
 
@@ -56,7 +51,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
-        this.workerGroupQueue = new PriorityDelayQueue<>();
+        this.workerGroupEventBus = new TaskDispatchableEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
@@ -75,7 +70,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     @Override
     public void run() {
         while (runningFlag.get()) {
-            PriorityAndDelayBasedTaskEntry<ITaskExecutionRunnable> taskEntry = workerGroupQueue.take();
+            TaskDispatchableEvent<ITaskExecutionRunnable> taskEntry = workerGroupEventBus.take();
             ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
             try (
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
@@ -120,7 +115,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      */
     public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable, final long delayTimeMills) {
         waitingDispatchTaskIds.add(taskExecutionRunnable.getId());
-        workerGroupQueue.add(new PriorityAndDelayBasedTaskEntry<>(delayTimeMills, taskExecutionRunnable));
+        workerGroupEventBus.add(new TaskDispatchableEvent<>(delayTimeMills, taskExecutionRunnable));
     }
 
     public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
@@ -141,6 +136,6 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     }
 
     int queueSize() {
-        return this.workerGroupQueue.size();
+        return this.workerGroupEventBus.size();
     }
 }

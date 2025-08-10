@@ -58,9 +58,9 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     private TaskInstanceDao taskInstanceDao;
 
     @Override
-    public void startEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                 final TaskStartLifecycleEvent taskStartEvent) {
+    public void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final ITaskExecutionRunnable taskExecutionRunnable,
+                             final TaskStartLifecycleEvent taskStartEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
 
         if (workflowExecutionRunnable.isWorkflowReadyPause()) {
@@ -77,25 +77,25 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     }
 
     @Override
-    public void startedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final ITaskExecutionRunnable taskExecutionRunnable,
-                                   final TaskRunningLifecycleEvent taskRunningEvent) {
+    public void onStartedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                               final ITaskExecutionRunnable taskExecutionRunnable,
+                               final TaskRunningLifecycleEvent taskRunningEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         logWarningIfCannotDoAction(taskExecutionRunnable, taskRunningEvent);
     }
 
     @Override
-    public void retryEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                 final TaskRetryLifecycleEvent taskRetryEvent) {
+    public void onRetryEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final ITaskExecutionRunnable taskExecutionRunnable,
+                             final TaskRetryLifecycleEvent taskRetryEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         logWarningIfCannotDoAction(taskExecutionRunnable, taskRetryEvent);
     }
 
     @Override
-    public void dispatchEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                    final ITaskExecutionRunnable taskExecutionRunnable,
-                                    final TaskDispatchLifecycleEvent taskDispatchEvent) {
+    public void onDispatchEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                final ITaskExecutionRunnable taskExecutionRunnable,
+                                final TaskDispatchLifecycleEvent taskDispatchEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         long remainTimeMills = DateUtils.getRemainTime(
@@ -114,17 +114,17 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     }
 
     @Override
-    public void dispatchedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                      final ITaskExecutionRunnable taskExecutionRunnable,
-                                      final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
+    public void onDispatchedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                  final ITaskExecutionRunnable taskExecutionRunnable,
+                                  final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        super.dispatchedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskDispatchedEvent);
+        super.onDispatchedEvent(workflowExecutionRunnable, taskExecutionRunnable, taskDispatchedEvent);
     }
 
     @Override
-    public void pauseEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                 final TaskPauseLifecycleEvent taskPauseEvent) {
+    public void onPauseEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final ITaskExecutionRunnable taskExecutionRunnable,
+                             final TaskPauseLifecycleEvent taskPauseEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         if (workerGroupDispatcherCoordinator.removeTask(taskExecutionRunnable)) {
             log.info("Success pause task: {} before dispatch", taskExecutionRunnable.getName());
@@ -138,17 +138,17 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     }
 
     @Override
-    public void pausedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskPausedLifecycleEvent taskPausedEvent) {
+    public void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskPausedLifecycleEvent taskPausedEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        super.pausedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskPausedEvent);
+        super.onPausedEvent(workflowExecutionRunnable, taskExecutionRunnable, taskPausedEvent);
     }
 
     @Override
-    public void killEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final ITaskExecutionRunnable taskExecutionRunnable,
-                                final TaskKillLifecycleEvent taskKillEvent) {
+    public void onKillEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                            final ITaskExecutionRunnable taskExecutionRunnable,
+                            final TaskKillLifecycleEvent taskKillEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         if (workerGroupDispatcherCoordinator.removeTask(taskExecutionRunnable)) {
             log.info("Success kill task[id={}] before dispatch", taskExecutionRunnable.getId());
@@ -162,33 +162,33 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     }
 
     @Override
-    public void killedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskKilledLifecycleEvent taskKilledEvent) {
+    public void onKilledEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskKilledLifecycleEvent taskKilledEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        super.killedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskKilledEvent);
+        super.onKilledEvent(workflowExecutionRunnable, taskExecutionRunnable, taskKilledEvent);
     }
 
     @Override
-    public void failedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskFailedLifecycleEvent taskFailedEvent) {
+    public void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskFailedLifecycleEvent taskFailedEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        super.failedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskFailedEvent);
+        super.onFailedEvent(workflowExecutionRunnable, taskExecutionRunnable, taskFailedEvent);
     }
 
     @Override
-    public void succeedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final ITaskExecutionRunnable taskExecutionRunnable,
-                                   final TaskSuccessLifecycleEvent taskSuccessEvent) {
+    public void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                               final ITaskExecutionRunnable taskExecutionRunnable,
+                               final TaskSuccessLifecycleEvent taskSuccessEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         logWarningIfCannotDoAction(taskExecutionRunnable, taskSuccessEvent);
     }
 
     @Override
-    public void failoverEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                    final ITaskExecutionRunnable taskExecutionRunnable,
-                                    final TaskFailoverLifecycleEvent taskFailoverEvent) {
+    public void onFailoverEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                final ITaskExecutionRunnable taskExecutionRunnable,
+                                final TaskFailoverLifecycleEvent taskFailoverEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         logWarningIfCannotDoAction(taskExecutionRunnable, taskFailoverEvent);
     }

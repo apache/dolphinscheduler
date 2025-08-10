@@ -51,6 +51,20 @@ pre-commit install
 
 现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
 
+### Helm 模板规范
+
+当您修改了Helm模板相关的文件后， 可以使用如下命令来调试 Helm 模板：
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Helm模板调试通过之后，需要使用如下命令来自动更新README.md文件（手动更新很可能格式不符合要求）：
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像

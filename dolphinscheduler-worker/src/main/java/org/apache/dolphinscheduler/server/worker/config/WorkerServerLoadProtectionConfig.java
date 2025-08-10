@@ -15,30 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.worker.config;
 
-import java.util.concurrent.DelayQueue;
+import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtectionConfig;
 
-import lombok.SneakyThrows;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public class PriorityDelayQueue<V extends DelayEntry> {
-
-    private final DelayQueue<V> queue = new DelayQueue<>();
-
-    public void add(V v) {
-        queue.put(v);
-    }
-
-    @SneakyThrows
-    public V take() {
-        return queue.take();
-    }
-
-    public int size() {
-        return queue.size();
-    }
-
-    public void clear() {
-        queue.clear();
-    }
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class WorkerServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
 }

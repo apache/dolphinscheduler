@@ -40,8 +40,6 @@ public class TaskExecutorSuccessLifecycleEvent extends AbstractTaskExecutorLifec
 
     private int workflowInstanceId;
 
-    private String workflowInstanceHost;
-
     private String taskInstanceHost;
 
     private long endTime;
@@ -54,7 +52,6 @@ public class TaskExecutorSuccessLifecycleEvent extends AbstractTaskExecutorLifec
         final TaskExecutionContext taskExecutionContext = taskExecutor.getTaskExecutionContext();
         return TaskExecutorSuccessLifecycleEvent.builder()
                 .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
-                .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .taskInstanceHost(taskExecutionContext.getHost())
                 .varPool(taskExecutionContext.getVarPool())

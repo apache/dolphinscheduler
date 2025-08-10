@@ -232,17 +232,17 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-beanutils 1.9.4 https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils/1.9.4, Apache 2.0
     commons-cli 1.2: https://mvnrepository.com/artifact/commons-cli/commons-cli/1.2, Apache 2.0
     commons-codec 1.11: https://mvnrepository.com/artifact/commons-codec/commons-codec/1.11, Apache 2.0
-    commons-collections4 4.3: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.3, Apache 2.0
-    commons-compress 1.21: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.21, Apache 2.0
+    commons-collections4 4.5.0: https://mvnrepository.com/artifact/org.apache.commons/commons-collections4/4.5.0, Apache 2.0
+    commons-compress 1.27.1: https://mvnrepository.com/artifact/org.apache.commons/commons-compress/1.27.1, Apache 2.0
     commons-configuration2 2.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2/2.1.1, Apache 2.0
     commons-daemon 1.0.13: https://github.com/apache/commons-daemon, Apache 2.0
-    commons-io 2.11.0: https://github.com/apache/commons-io, Apache 2.0
+    commons-io 2.19.0: https://github.com/apache/commons-io, Apache 2.0
     commons-logging 1.1.1: https://github.com/apache/commons-logging, Apache 2.0
-    commons-math3 3.1.1: https://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.1.1, Apache 2.0
+    commons-math3 3.6.1: https://mvnrepository.com/artifact/org.apache.commons/commons-math3/3.6.1, Apache 2.0
     commons-net 3.6: https://github.com/apache/commons-net, Apache 2.0
     commons-text 1.4: https://github.com/apache/commons-text, Apache 2.0
     cron-utils 9.1.6: https://mvnrepository.com/artifact/com.cronutils/cron-utils/9.1.6, Apache 2.0
-    commons-lang3 3.12.0: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.12.0, Apache 2.0
+    commons-lang3 3.17.0: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.17.0, Apache 2.0
     curator-client 5.5.0: https://mvnrepository.com/artifact/org.apache.curator/curator-client/5.5.0, Apache 2.0
     curator-framework 5.5.0: https://mvnrepository.com/artifact/org.apache.curator/curator-framework/5.5.0, Apache 2.0
     curator-recipes 5.5.0: https://mvnrepository.com/artifact/org.apache.curator/curator-recipes/5.5.0, Apache 2.0

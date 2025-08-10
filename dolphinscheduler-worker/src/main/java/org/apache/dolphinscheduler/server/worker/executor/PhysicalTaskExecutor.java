@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -122,7 +123,9 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: \n{}", taskExecutionContext.getResourceContext());
 
-        log.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
+        log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
+                JSONUtils.toPrettyJsonString(taskExecutionContext));
+
     }
 
     @Override

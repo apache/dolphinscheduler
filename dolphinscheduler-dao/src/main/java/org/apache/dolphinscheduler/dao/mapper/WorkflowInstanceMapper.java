@@ -57,16 +57,6 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
                                                 @Param("states") int[] stateArray);
 
     /**
-     * query workflow instance by host and stateArray which is not sub workflow
-     *
-     * @param host       host
-     * @param stateArray stateArray
-     * @return workflow instance list
-     */
-    List<WorkflowInstance> queryMainWorkflowByHostAndStatus(@Param("host") String host,
-                                                            @Param("states") int[] stateArray);
-
-    /**
      * query workflow instance host by stateArray
      *
      * @param stateArray
