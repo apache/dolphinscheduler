@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.task.executor.eventbus.TaskExecutorEventBus;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
@@ -125,9 +126,9 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
     protected abstract void doTriggerTaskPlugin();
 
     protected void initializeTaskContext() {
-        log.info("Begin to initialize taskContext");
         taskExecutionContext.setStartTime(System.currentTimeMillis());
-        log.info("End initialize taskContext {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
+        log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized taskContext {}",
+                JSONUtils.toPrettyJsonString(taskExecutionContext));
     }
 
     private void publishTaskRunningEvent() {

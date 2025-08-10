@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.task.executor.eventbus;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.task.executor.events.AbstractTaskExecutorLifecycleEvent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,8 @@ public class TaskExecutorEventBus extends AbstractDelayEventBus<AbstractTaskExec
 
     public void publish(final AbstractTaskExecutorLifecycleEvent event) {
         super.publish(event);
-        log.info("Publish {}: {}", event.getClass().getSimpleName(), JSONUtils.toPrettyJsonString(event));
+        log.info(TaskLogMarkers.excludeInTaskLog(), "Publish {}: {}", event.getClass().getSimpleName(),
+                JSONUtils.toPrettyJsonString(event));
     }
 
 }

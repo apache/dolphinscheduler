@@ -15,36 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
-import org.jetbrains.annotations.NotNull;
+public class TaskLogMarkers {
 
-public class PriorityAndDelayBasedTaskEntry<V extends Comparable<V>> extends DelayEntry<V> {
+    private static final Marker TASK_LOGGER_EXCLUDE_MARKER = MarkerFactory.getMarker("TASK_LOGGER_EXCLUDE");
 
-    public PriorityAndDelayBasedTaskEntry(long delayTimeMills, V data) {
-        super(delayTimeMills, data);
+    private static final Marker TASK_LOGGER_INCLUDE_MARKER = MarkerFactory.getMarker("TASK_LOGGER_INCLUDE");
+
+    /**
+     * The marker used to exclude logs from the task instance log file.
+     */
+    public static Marker excludeInTaskLog() {
+        return TASK_LOGGER_EXCLUDE_MARKER;
     }
 
-    @Override
-    public long getDelay(@NotNull TimeUnit unit) {
-        return super.getDelay(unit);
-    }
+    public static Marker includeInTaskLog() {
+        return TASK_LOGGER_INCLUDE_MARKER;
 
-    @Override
-    public int compareTo(@NotNull Delayed o) {
-        return super.compareTo(o);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

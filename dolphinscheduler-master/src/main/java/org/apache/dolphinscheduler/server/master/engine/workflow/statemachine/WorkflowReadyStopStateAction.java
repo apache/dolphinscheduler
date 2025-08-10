@@ -120,7 +120,7 @@ public class WorkflowReadyStopStateAction extends AbstractWorkflowStateAction {
         }
 
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
-        if (workflowExecutionGraph.isExistKillTaskExecutionRunnableChain()) {
+        if (workflowExecutionGraph.isExistKilledTaskExecutionRunnableChain()) {
             workflowEventBus.publish(WorkflowStoppedLifecycleEvent.of(workflowExecutionRunnable));
             return;
         }

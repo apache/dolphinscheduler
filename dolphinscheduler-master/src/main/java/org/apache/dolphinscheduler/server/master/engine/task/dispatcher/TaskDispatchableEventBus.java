@@ -15,30 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
-import java.util.concurrent.DelayQueue;
+import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 
 import lombok.SneakyThrows;
 
-public class PriorityDelayQueue<V extends DelayEntry> {
-
-    private final DelayQueue<V> queue = new DelayQueue<>();
+public class TaskDispatchableEventBus<V extends TaskDispatchableEvent<T>, T extends Comparable<T>>
+        extends
+            AbstractDelayEventBus<V> {
 
     public void add(V v) {
-        queue.put(v);
+        super.publish(v);
     }
 
     @SneakyThrows
     public V take() {
-        return queue.take();
+        return super.take();
     }
 
+    // Only use in test
     public int size() {
-        return queue.size();
+        return delayEventQueue.size();
     }
 
+    // Only use in test
     public void clear() {
-        queue.clear();
+        delayEventQueue.clear();
     }
 }
