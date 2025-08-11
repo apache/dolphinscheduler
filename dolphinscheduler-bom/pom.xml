@@ -955,6 +955,12 @@
                 <artifactId>brace-expansion</artifactId>
                 <version>${brace-expansion.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.dolphindb</groupId>
+                <artifactId>jdbc</artifactId>
+                <version>${dolphindb-jdbc.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
