@@ -162,6 +162,15 @@ export function useAliyunServerlessSpark(model: {
     },
 
     {
+      type: 'input',
+      field: 'templateId',
+      name: t('project.node.template_id'),
+      props: {
+        placeholder: t('project.node.template_id_tips')
+      }
+    },
+
+    {
       type: 'switch',
       field: 'isProduction',
       name: t('project.node.is_production'),
