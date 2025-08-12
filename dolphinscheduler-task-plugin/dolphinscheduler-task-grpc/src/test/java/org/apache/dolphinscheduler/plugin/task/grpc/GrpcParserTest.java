@@ -91,7 +91,8 @@ public class GrpcParserTest {
                         }
 
                         @Override
-                        public void testBasicMapType(BasicMapType request, StreamObserver<NoneReply> respObserver) {
+                        public void testBasicMapType(BasicMapType request,
+                                                     StreamObserver<NoneReply> respObserver) {
                             NoneReply noneReply = NoneReply.newBuilder().build();
                             respObserver.onNext(noneReply);
                             respObserver.onCompleted();
