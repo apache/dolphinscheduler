@@ -171,6 +171,44 @@ public class GrpcParserTest {
         Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
     }
 
+    @Test
+    public void testBasicMapType() throws Exception {
+        String requestMessage = "{" +
+                "\"seats\": {" +
+                "\"Tom\": 1," +
+                "\"Jerry\": 2," +
+                "\"Anisphia\": 3," +
+                "\"Euphyllia\": 4" +
+                "}" +
+                "}";
+        GrpcTask grpcTask = generateGrpcTask("ParserTester/TestBasicMapType", requestMessage,
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+        grpcTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testMapType() throws Exception {
+        String requestMessage = "{" +
+                "\"bought\": {" +
+                "\"Tom\": \"Momo\"," +
+                "\"Jerry\": \"Lingo\"" +
+                "}," +
+                "\"cash\": {" +
+                "\"Tom\": {" +
+                "\"id\": 555" +
+                "}," +
+                "\"Jerry\": {" +
+                "\"id\": 666" +
+                "}" +
+                "}" +
+                "}";
+        GrpcTask grpcTask = generateGrpcTask("ParserTester/TestMapType", requestMessage,
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+        grpcTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
+    }
+
     private GrpcTask generateGrpcTask(String methodName, String requestMessage,
                                       Map<String, String> prepareParamsMap,
                                       GrpcCheckCondition grpcCheckCondition, String condition) throws IOException {
