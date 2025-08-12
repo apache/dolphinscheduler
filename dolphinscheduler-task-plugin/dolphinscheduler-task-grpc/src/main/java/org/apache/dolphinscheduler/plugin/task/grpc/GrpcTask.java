@@ -83,7 +83,7 @@ public class GrpcTask extends AbstractTask {
             validateResponse(statusre.getStatus());
             return;
         } catch (Exception e) {
-            throw new TaskException("grpc handle exception:", e);
+            throw new TaskException("gRPC handle exception:", e);
         }
         validateResponse(Status.OK);
     }
