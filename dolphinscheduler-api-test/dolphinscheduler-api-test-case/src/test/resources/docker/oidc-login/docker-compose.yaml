@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  dolphinscheduler:
+    image: apache/dolphinscheduler-standalone-server:oidc-dev
+    platform: linux/arm64
+    pull_policy: never
+    ports:
+      - "12345:12345"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_PROFILES_ACTIVE=mysql
+      - SPRING_DATASOURCE_URL=jdbc:mysql://dolphinscheduler-mysql:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      - REGISTRY_ZOOKEEPER_CONNECT_STRING=dolphinscheduler-zookeeper:2181
+      - SECURITY_AUTHENTICATION_TYPE=OIDC
+      - SECURITY_AUTHENTICATION_OIDC_ENABLE=true
+      - API_BASE_URL=http://localhost:12345/dolphinscheduler
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_DISPLAY-NAME=Login with Keycloak
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_ISSUER-URI=http://keycloak:8080/realms/dolphinscheduler
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_CLIENT-ID=dolphinscheduler-client
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_CLIENT-SECRET=dolphinscheduler-client-secret
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_SCOPE=openid,profile,email,groups
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_USER-NAME-ATTRIBUTE=preferred_username
+      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_GROUPS-CLAIM=groups
+      - SECURITY_AUTHENTICATION_OIDC_USER_AUTO-CREATE=true
+      - SECURITY_AUTHENTICATION_OIDC_USER_DEFAULT-TENANT-CODE=default
+      - SECURITY_AUTHENTICATION_OIDC_USER_DEFAULT-QUEUE=default
+      - SECURITY_AUTHENTICATION_OIDC_USER_ADMIN-GROUP-MAPPING_0=dolphinscheduler-admins
+    depends_on:
+      dolphinscheduler-mysql:
+        condition: service_healthy
+      dolphinscheduler-zookeeper:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+
+  dolphinscheduler-mysql:
+    image: mysql:8.0
+    platform: linux/arm64
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=dolphinscheduler
+      - MYSQL_USER=dolphinscheduler
+      - MYSQL_PASSWORD=dolphinscheduler
+    volumes:
+      - ../../../../../../../dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_mysql.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+#      start_period: 120s
+
+  dolphinscheduler-zookeeper:
+    image: zookeeper:3.8.0
+    environment:
+      - ZOO_MY_ID=1
+      - ZOO_SERVERS=server.1=dolphinscheduler-zookeeper:2888:3888;2181
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+#      start_period: 120s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    platform: linux/arm64
+    command: start-dev --import-realm
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm.json
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: 'true'
+    ports:
+      - "8081:8080" # Using 8081 to avoid conflicts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 5s
+      timeout: 10s
+      retries: 40
+#      start_period: 120s
