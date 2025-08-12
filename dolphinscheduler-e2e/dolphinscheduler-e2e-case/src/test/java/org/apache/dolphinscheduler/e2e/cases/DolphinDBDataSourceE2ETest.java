@@ -76,7 +76,8 @@ public class DolphinDBDataSourceE2ETest {
     void testCreateDolphinDBDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, dolphindbPassword,
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName,
+                dolphindbPassword,
                 database, jdbcParams);
 
         WebDriverWaitFactory.createWebDriverWait(page.driver()).until(ExpectedConditions.invisibilityOfElementLocated(
