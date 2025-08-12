@@ -107,7 +107,7 @@ public class JSONDescriptorParser {
             type.fields.forEach((name, pbObject) -> {
                 if (pbObject instanceof Field) {
                     if (pbObject instanceof MapField) {
-                        descriptorProtoBuilder.addField(parseMapField(name, (MapField) pbObject));
+                        descriptorProtoBuilder.addNestedType(parseMapField(name, (MapField) pbObject));
                     } else {
                         descriptorProtoBuilder.addField(parseField(name, (Field) pbObject));
                     }
@@ -174,15 +174,33 @@ public class JSONDescriptorParser {
         return fieldDescriptorProtoBuilder;
     }
 
-    private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
-        DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
-                DescriptorProtos.FieldDescriptorProto.newBuilder();
+    private DescriptorProtos.DescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
+        DescriptorProtos.DescriptorProto.Builder mapFieldDescriptorProtoBuilder =
+                DescriptorProtos.DescriptorProto.newBuilder()
+                        .setName(selfName);
+        DescriptorProtos.FieldDescriptorProto.Builder keyDescriptorProtoBuilder =
+                DescriptorProtos.FieldDescriptorProto.newBuilder()
+                        .setName("key")
+                        .setNumber(1);
+        DescriptorProtos.FieldDescriptorProto.Builder valueDescriptorProtoBuilder =
+                DescriptorProtos.FieldDescriptorProto.newBuilder()
+                        .setName("value")
+                        .setNumber(2);
         try {
-            mapFieldDescriptorProtoBuilder
+            keyDescriptorProtoBuilder
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type
+                            .valueOf("TYPE_" + mapField.keyType.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            keyDescriptorProtoBuilder.setTypeName(mapField.keyType);
+        }
+        try {
+            valueDescriptorProtoBuilder
                     .setType(DescriptorProtos.FieldDescriptorProto.Type.valueOf("TYPE_" + mapField.type.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            mapFieldDescriptorProtoBuilder.setTypeName(mapField.type);
+            valueDescriptorProtoBuilder.setTypeName(mapField.type);
         }
+        mapFieldDescriptorProtoBuilder.addField(keyDescriptorProtoBuilder);
+        mapFieldDescriptorProtoBuilder.addField(valueDescriptorProtoBuilder);
         return mapFieldDescriptorProtoBuilder;
     }
 
