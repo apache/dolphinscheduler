@@ -105,14 +105,21 @@ public class GrpcTask extends AbstractTask {
                 }
                 break;
             case STATUS_CODE_CUSTOM:
-                Status expectedCode = Status.fromCode(Status.Code.valueOf(grpcParameters.getCondition()));
-                if (statusCode != expectedCode) {
-                    log.error(
-                            "grpc request failed, url: {}, method: {}, statusCode: {} (expect {}), checkCondition: {}",
-                            grpcParameters.getUrl(), grpcParameters.getMethodName(), statusCode.getCode(), expectedCode,
-                            GrpcCheckCondition.STATUS_CODE_DEFAULT.name());
-                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
-                    return;
+                try {
+                    Status.Code codeEnum = Status.Code.valueOf(grpcParameters.getCondition());
+                    Status expectedCode = Status.fromCode(codeEnum);
+                    if (statusCode != expectedCode) {
+                        log.error(
+                                "grpc request failed, url: {}, method: {}, statusCode: {} (expect {}), checkCondition: {}",
+                                grpcParameters.getUrl(), grpcParameters.getMethodName(), statusCode.getCode(),
+                                expectedCode,
+                                GrpcCheckCondition.STATUS_CODE_DEFAULT.name());
+                        exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                        return;
+                    }
+                } catch (IllegalArgumentException e) {
+                    throw new TaskException(
+                            String.format("grpc unrecogenized condition %s", grpcParameters.getCondition()));
                 }
                 break;
             default:
