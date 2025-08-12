@@ -34,11 +34,3 @@ message StringRequest {
 message StringReply {
   string message = 1;
 }
-
-message NoneRequest {
-
-}
-
-message NoneReply {
-
-}

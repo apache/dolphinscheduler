@@ -44,12 +44,6 @@
                                   "id": 1
                                 }
                               }
-                            },
-                            "NoneRequest": {
-                              "fields": {}
-                            },
-                            "NoneReply": {
-                              "fields": {}
                             }
                           }
                         }
