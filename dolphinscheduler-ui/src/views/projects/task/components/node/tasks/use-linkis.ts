@@ -48,12 +48,7 @@ export function useLinkis({
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
     useCustom: false,
-    paramScript: [
-      {
-        prop: '',
-        value: ''
-      }
-    ],
+    paramScript: [],
     rawScript: ''
   } as INodeData)
 

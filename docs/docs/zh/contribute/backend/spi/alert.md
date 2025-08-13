@@ -50,7 +50,7 @@ org.apache.dolphinscheduler.spi.params
 
 AbsPluginParams 该类是所有参数的基类，RadioParam 这些类都继承了该类。每个 DS 的告警插件都会在 AlertChannelFactory 的实现中返回一个 AbsPluginParams 的 list。
 
-alert_spi 具体设计可见 issue：[Alert Plugin Design](https://github.com/apache/incubator-dolphinscheduler/issues/3049)
+alert_spi 具体设计可见 issue：[Alert Plugin Design](https://github.com/apache/dolphinscheduler/issues/3049)
 
 #### Alert SPI 内置实现
 

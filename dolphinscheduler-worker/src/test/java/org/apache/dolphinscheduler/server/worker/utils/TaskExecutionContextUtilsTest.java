@@ -33,7 +33,6 @@ class TaskExecutionContextUtilsTest {
     void createTaskInstanceWorkingDirectory() throws IOException {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTenantCode("tenantCode");
-        taskExecutionContext.setProjectCode(1);
         taskExecutionContext.setWorkflowDefinitionCode(1L);
         taskExecutionContext.setWorkflowDefinitionVersion(1);
         taskExecutionContext.setWorkflowInstanceId(1);

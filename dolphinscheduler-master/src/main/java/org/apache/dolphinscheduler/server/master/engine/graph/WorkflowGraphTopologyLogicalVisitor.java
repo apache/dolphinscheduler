@@ -131,20 +131,26 @@ public class WorkflowGraphTopologyLogicalVisitor {
                 .filter(entry -> entry.getValue() == 0)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(LinkedList::new));
+        // Visited table, used to record the visited nodes
+        Set<String> visitedTaskCodes = new HashSet<>();
 
         while (!bootstrapTaskCodes.isEmpty()) {
             String taskName = bootstrapTaskCodes.removeFirst();
             if (inDegreeMap.get(taskName) > 0) {
                 continue;
             }
-            final Set<String> successors = workflowGraph.getSuccessors(taskName);
-            if (subGraphNodes.contains(taskName)) {
-                visitFunction.accept(taskName, successors);
+            // Visit only when the in-degree is 0
+            if (!visitedTaskCodes.contains(taskName)) {
+                visitedTaskCodes.add(taskName); // Record the nodes
+                final Set<String> successors = workflowGraph.getSuccessors(taskName);
+                if (subGraphNodes.contains(taskName)) {
+                    visitFunction.accept(taskName, successors);
+                }
+                for (String successor : successors) {
+                    inDegreeMap.put(successor, inDegreeMap.get(successor) - 1);
+                }
+                bootstrapTaskCodes.addAll(successors);
             }
-            for (String successor : successors) {
-                inDegreeMap.put(successor, inDegreeMap.get(successor) - 1);
-            }
-            bootstrapTaskCodes.addAll(successors);
         }
     }
 

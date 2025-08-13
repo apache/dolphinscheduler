@@ -165,9 +165,6 @@ api:
     # (0 = infinite), and socket server would never close even though no requests accept
     read-timeout: 0
 
-metrics:
-  enabled: true
-
 security:
   authentication:
     # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)

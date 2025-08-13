@@ -137,4 +137,15 @@ public class DorisDataSourceProcessorTest {
         Assertions.assertEquals("set enable_unique_key_partial_update = false", sqls.get(2));
     }
 
+    @Test
+    void testSplitAndRemoveCommentWithComments() {
+        String sql = "-- This is a comment\r\n" +
+                "select *, udfTest(p1) from table1 -- This is a comment\r\n;" +
+                "/*Annotation test*/select * from table2/*Annotation test*/";
+        List<String> result = dorisDatasourceProcessor.splitAndRemoveComment(sql);
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertEquals("select *, udfTest(p1) from table1", result.get(0));
+        Assertions.assertEquals("select * from table2", result.get(1));
+    }
+
 }

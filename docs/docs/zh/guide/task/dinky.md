@@ -3,7 +3,7 @@
 ## Overview
 
 `Dinky`任务类型，用于创建并执行`Dinky`类型任务以支撑一站式的开发、调试、运维 FlinkSQL、Flink Jar、SQL。worker 执行该任务的时候，会通过`Dinky API`触发`Dinky 的作业`。
-点击[这里](http://www.dlink.top/) 获取更多关于`Dinky`的信息。
+点击[这里](https://www.dinky.org.cn/) 获取更多关于`Dinky`的信息。
 
 ## Create Task
 

@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -137,6 +138,14 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new DorisDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        // Because doris is highly compatible with mysql syntax,
+        // a mysql-type implementation can be used for comments and statement split.
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.mysql);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.mysql);
     }
 
     private String transformOther(Map<String, String> paramMap) {

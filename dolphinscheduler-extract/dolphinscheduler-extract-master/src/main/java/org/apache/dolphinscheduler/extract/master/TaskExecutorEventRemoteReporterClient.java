@@ -33,32 +33,39 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TaskExecutorEventRemoteReporterClient implements ITaskExecutorEventRemoteReporterClient {
 
-    public void reportTaskExecutionEventToMaster(final IReportableTaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
+    @Override
+    public void reportTaskExecutionEventToMaster(final String masterAddress,
+                                                 final IReportableTaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
         try {
             taskExecutorLifecycleEvent.setLatestReportTime(System.currentTimeMillis());
             switch (taskExecutorLifecycleEvent.getType()) {
                 case DISPATCHED:
-                    reportTaskDispatchedEventToMaster(
+                    reportTaskDispatchedEventToMaster(masterAddress,
                             (TaskExecutorDispatchedLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 case RUNNING:
-                    reportTaskRunningEventToMaster((TaskExecutorStartedLifecycleEvent) taskExecutorLifecycleEvent);
+                    reportTaskRunningEventToMaster(masterAddress,
+                            (TaskExecutorStartedLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 case RUNTIME_CONTEXT_CHANGE:
-                    reportTaskRuntimeContextChangeEventToMaster(
+                    reportTaskRuntimeContextChangeEventToMaster(masterAddress,
                             (TaskExecutorRuntimeContextChangedLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 case PAUSED:
-                    reportTaskPausedEventToMaster((TaskExecutorPausedLifecycleEvent) taskExecutorLifecycleEvent);
+                    reportTaskPausedEventToMaster(masterAddress,
+                            (TaskExecutorPausedLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 case KILLED:
-                    reportTaskKilledEventToMaster((TaskExecutorKilledLifecycleEvent) taskExecutorLifecycleEvent);
+                    reportTaskKilledEventToMaster(masterAddress,
+                            (TaskExecutorKilledLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 case FAILED:
-                    reportTaskFailedEventToMaster((TaskExecutorFailedLifecycleEvent) taskExecutorLifecycleEvent);
+                    reportTaskFailedEventToMaster(masterAddress,
+                            (TaskExecutorFailedLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 case SUCCESS:
-                    reportTaskSuccessEventToMaster((TaskExecutorSuccessLifecycleEvent) taskExecutorLifecycleEvent);
+                    reportTaskSuccessEventToMaster(masterAddress,
+                            (TaskExecutorSuccessLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 default:
                     log.warn("Unsupported TaskExecutionEvent: {}", taskExecutorLifecycleEvent);
@@ -69,52 +76,59 @@ public class TaskExecutorEventRemoteReporterClient implements ITaskExecutorEvent
         }
     }
 
-    private static void reportTaskDispatchedEventToMaster(final TaskExecutorDispatchedLifecycleEvent taskExecutionDispatchedEvent) {
+    private static void reportTaskDispatchedEventToMaster(final String masterAddress,
+                                                          final TaskExecutorDispatchedLifecycleEvent taskExecutionDispatchedEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutionDispatchedEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorDispatched(taskExecutionDispatchedEvent);
     }
 
-    private static void reportTaskRunningEventToMaster(final TaskExecutorStartedLifecycleEvent taskExecutionRunningEvent) {
+    private static void reportTaskRunningEventToMaster(final String masterAddress,
+                                                       final TaskExecutorStartedLifecycleEvent taskExecutionRunningEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutionRunningEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorRunning(taskExecutionRunningEvent);
     }
 
-    private static void reportTaskRuntimeContextChangeEventToMaster(final TaskExecutorRuntimeContextChangedLifecycleEvent taskExecutorLifecycleEvent) {
+    private static void reportTaskRuntimeContextChangeEventToMaster(final String masterAddress,
+                                                                    final TaskExecutorRuntimeContextChangedLifecycleEvent taskExecutorLifecycleEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutorLifecycleEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorRuntimeContextChanged(taskExecutorLifecycleEvent);
     }
 
-    private static void reportTaskPausedEventToMaster(final TaskExecutorPausedLifecycleEvent taskExecutionPausedEvent) {
+    private static void reportTaskPausedEventToMaster(final String masterAddress,
+                                                      final TaskExecutorPausedLifecycleEvent taskExecutionPausedEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutionPausedEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorPaused(taskExecutionPausedEvent);
     }
 
-    private static void reportTaskKilledEventToMaster(final TaskExecutorKilledLifecycleEvent taskExecutionKilledEvent) {
+    private static void reportTaskKilledEventToMaster(final String masterAddress,
+                                                      final TaskExecutorKilledLifecycleEvent taskExecutionKilledEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutionKilledEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorKilled(taskExecutionKilledEvent);
     }
 
-    private static void reportTaskFailedEventToMaster(final TaskExecutorFailedLifecycleEvent taskExecutionFailedEvent) {
+    private static void reportTaskFailedEventToMaster(final String masterAddress,
+                                                      final TaskExecutorFailedLifecycleEvent taskExecutionFailedEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutionFailedEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorFailed(taskExecutionFailedEvent);
     }
 
-    private static void reportTaskSuccessEventToMaster(final TaskExecutorSuccessLifecycleEvent taskExecutionSuccessEvent) {
+    private static void reportTaskSuccessEventToMaster(final String masterAddress,
+                                                       final TaskExecutorSuccessLifecycleEvent taskExecutionSuccessEvent) {
         Clients
                 .withService(ITaskExecutorEventListener.class)
-                .withHost(taskExecutionSuccessEvent.getWorkflowInstanceHost())
+                .withHost(masterAddress)
                 .onTaskExecutorSuccess(taskExecutionSuccessEvent);
     }
 }

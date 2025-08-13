@@ -18,10 +18,39 @@
 package org.apache.dolphinscheduler.server.worker.config;
 
 import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutorContainerProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 @Slf4j
+@Component
 public class WorkerServerLoadProtection extends BaseServerLoadProtection {
 
+    @Autowired
+    private PhysicalTaskExecutorContainerProvider physicalTaskExecutorContainerDelegator;
+
+    public WorkerServerLoadProtection(WorkerConfig workerConfig) {
+        super(workerConfig.getServerLoadProtection());
+    }
+
+    @Override
+    public boolean isOverload(SystemMetrics systemMetrics) {
+        if (!baseServerLoadProtectionConfig.isEnabled()) {
+            return false;
+        }
+
+        if (super.isOverload(systemMetrics)) {
+            return true;
+        }
+
+        if (physicalTaskExecutorContainerDelegator.getExecutorContainer().slotUsage() == 1) {
+            log.info("OverLoad: the TaskExecutorContainer slot usage is 1");
+            return true;
+        }
+        return false;
+    }
 }

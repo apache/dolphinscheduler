@@ -51,11 +51,28 @@ pre-commit install
 
 现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
 
+### Helm 模板规范
+
+当您修改了Helm模板相关的文件后， 可以使用如下命令来调试 Helm 模板：
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Helm模板调试通过之后，需要使用如下命令来自动更新README.md文件（手动更新很可能格式不符合要求）：
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
 
 * 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
+
+> -Pstaging 包含插件，适合开发和测试以及无网络环境离线部署
+> -Prelease 不包含插件，适合生产环境，有能访问插件的网络可以按需下载
 
 ```shell
 cd dolphinscheduler
@@ -63,7 +80,7 @@ cd dolphinscheduler
        -Dmaven.test.skip \
        -Dspotless.skip=true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
@@ -77,7 +94,7 @@ cd dolphinscheduler
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 * 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件

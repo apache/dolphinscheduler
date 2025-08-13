@@ -119,7 +119,7 @@ public class SuccessorFlowAdjuster {
                 needSkippedBranch.add(switchResultVo.getNextNode());
             }
         }
-        needSkippedBranch.remove(switchResult.getNextNode());
+        needSkippedBranch.remove(switchParameters.getNextBranch());
         markTaskSkipped(taskExecutionRunnable, needSkippedBranch);
     }
 
@@ -136,7 +136,7 @@ public class SuccessorFlowAdjuster {
                         taskExecutionRunnable.getWorkflowInstance().getName());
                 continue;
             }
-            workflowExecutionGraph.markTaskSkipped(taskExecutionRunnable);
+            workflowExecutionGraph.markTaskSkipped(branch);
         }
     }
 

@@ -93,6 +93,21 @@ public enum WorkflowExecutionStatus {
                 || this == SERIAL_WAIT;
     }
 
+    /**
+     * status can be take over on sub-workflow
+     * @return bool
+     */
+    public boolean canTakeover() {
+        return this == RUNNING_EXECUTION
+                || this == READY_PAUSE
+                || this == PAUSE
+                || this == READY_STOP
+                || this == STOP
+                || this == FAILURE
+                || this == SUCCESS
+                || this == FAILOVER;
+    }
+
     public boolean canDirectPauseInDB() {
         return this == SERIAL_WAIT;
     }

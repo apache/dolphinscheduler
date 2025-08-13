@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,6 +60,9 @@ public class MasterSlotManager implements IMasterSlotReBalancer {
 
     @Override
     public void doReBalance(List<MasterServerMetadata> normalMasterServers) {
+
+        normalMasterServers =
+                normalMasterServers.stream().sorted(MasterServerMetadata::compareTo).collect(Collectors.toList());
 
         int tmpCurrentSlot = -1;
         for (int i = 0; i < normalMasterServers.size(); i++) {

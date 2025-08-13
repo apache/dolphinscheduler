@@ -195,6 +195,8 @@ We need to update some documentation before the Maven release. For example, to r
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` and `version` needs to be updated to x.y.z
     - `values.yaml`: `image.tag` needs to be updated to x.y.z
+  - `config`
+    - `install-plugins.sh`: `dev-SNAPSHOT` needs to be updated to x.y.z
 - Version in the docs:
   - Change the placeholder `<version>`(except `pom`) to the `x.y.z` in directory `docs`
   - Add new history version
@@ -219,13 +221,14 @@ Create release branch base on prepare branch.
 cd "${SOURCE_CODE_DIR}"
 git checkout -b "${VERSION}"-release "${VERSION}"-prepare
 git push "${GH_REMOTE}" "${VERSION}"-release
+export GPG_TTY=$(tty)
 ```
 
 > Note: If you release in remote host without source code, you should run `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git`
 > first to clone the source code. And then make sure you set `GH_REMOTE="origin"` to make all command work fine.
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
 - `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
@@ -243,7 +246,7 @@ mvn release:clean
 Then, prepare to execute the release.
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
@@ -275,7 +278,7 @@ git push "${GH_REMOTE}" --tags
 #### Maven Release Deploy
 
 ```shell
-mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=false" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 After that command is executed, the version to be released will be uploaded to Apache staging repository automatically.

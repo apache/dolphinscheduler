@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.service.ClusterService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -265,6 +266,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         clusterExist.setConfig(config);
         clusterExist.setName(name);
         clusterExist.setDescription(desc);
+        clusterExist.setUpdateTime(DateUtils.getCurrentDate());
         clusterMapper.updateById(clusterExist);
         return clusterExist;
     }

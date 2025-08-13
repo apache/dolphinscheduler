@@ -197,6 +197,13 @@ ALTER INDEX "process_task_relation_idx_pre_task_code_version" RENAME TO "workflo
 ALTER INDEX "process_task_relation_idx_project_code_process_definition_code" RENAME TO "workflow_task_relation_idx_project_code_workflow_definition_cod";
 ALTER INDEX "process_task_relation_log_idx_project_code_process_definition_c" RENAME TO "workflow_task_relation_log_idx_project_code_workflow_definition";
 
+ALTER TABLE "t_ds_relation_workflow_instance" RENAME CONSTRAINT "t_ds_relation_process_instance_pkey" TO "t_ds_relation_workflow_instance_pkey";
+ALTER TABLE "t_ds_workflow_definition" RENAME CONSTRAINT "t_ds_process_definition_pkey" TO "t_ds_workflow_definition_pkey";
+ALTER TABLE "t_ds_workflow_definition_log" RENAME CONSTRAINT "t_ds_process_definition_log_pkey" TO "t_ds_workflow_definition_log_pkey";
+ALTER TABLE "t_ds_workflow_instance" RENAME CONSTRAINT "t_ds_process_instance_pkey" TO "t_ds_workflow_instance_pkey";
+ALTER TABLE "t_ds_workflow_task_relation" RENAME CONSTRAINT "t_ds_process_task_relation_pkey" TO "t_ds_workflow_task_relation_pkey";
+ALTER TABLE "t_ds_workflow_task_relation_log" RENAME CONSTRAINT "t_ds_process_task_relation_log_pkey" TO "t_ds_workflow_task_relation_log_pkey";
+
 END;
 $$ LANGUAGE plpgsql;
 d//

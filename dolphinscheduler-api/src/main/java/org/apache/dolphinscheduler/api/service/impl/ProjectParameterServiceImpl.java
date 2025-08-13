@@ -92,24 +92,18 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         Date now = new Date();
 
-        try {
-            projectParameter = ProjectParameter
-                    .builder()
-                    .paramName(projectParameterName)
-                    .paramValue(projectParameterValue)
-                    .paramDataType(projectParameterDataType)
-                    .code(CodeGenerateUtils.genCode())
-                    .projectCode(projectCode)
-                    .userId(loginUser.getId())
-                    .operator(loginUser.getId())
-                    .createTime(now)
-                    .updateTime(now)
-                    .build();
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            log.error("Generate project parameter code error.", e);
-            putMsg(result, Status.CREATE_PROJECT_PARAMETER_ERROR);
-            return result;
-        }
+        projectParameter = ProjectParameter
+                .builder()
+                .paramName(projectParameterName)
+                .paramValue(projectParameterValue)
+                .paramDataType(projectParameterDataType)
+                .code(CodeGenerateUtils.genCode())
+                .projectCode(projectCode)
+                .userId(loginUser.getId())
+                .operator(loginUser.getId())
+                .createTime(now)
+                .updateTime(now)
+                .build();
 
         if (projectParameterMapper.insert(projectParameter) > 0) {
             log.info("Project parameter is created and id is :{}", projectParameter.getId());

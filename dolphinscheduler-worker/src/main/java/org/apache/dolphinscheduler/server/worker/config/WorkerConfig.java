@@ -43,7 +43,7 @@ public class WorkerConfig implements Validator {
     private int listenPort = 1234;
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
-    private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
+    private WorkerServerLoadProtectionConfig serverLoadProtection = new WorkerServerLoadProtectionConfig();
     private String group;
 
     /**

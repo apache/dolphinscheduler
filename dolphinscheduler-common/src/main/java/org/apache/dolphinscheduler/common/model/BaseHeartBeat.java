@@ -36,6 +36,10 @@ public class BaseHeartBeat implements HeartBeat {
     protected double jvmCpuUsage;
     protected double cpuUsage;
     protected double jvmMemoryUsage;
+    private double jvmHeapUsed;
+    private double jvmNonHeapUsed;
+    private double jvmHeapMax;
+    private double jvmNonHeapMax;
     protected double memoryUsage;
     protected double diskUsage;
     protected ServerStatus serverStatus;

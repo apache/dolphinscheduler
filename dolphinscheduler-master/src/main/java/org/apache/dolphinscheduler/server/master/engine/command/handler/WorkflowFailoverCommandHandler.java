@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -32,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecut
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -57,6 +59,9 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private MasterConfig masterConfig;
 
     /**
      * Generate the recover workflow instance.
@@ -85,7 +90,9 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
             throw new IllegalArgumentException(
                     "The WorkflowFailoverCommandParam: " + command.getCommandParam() + " is invalid");
         }
+        workflowInstance.setRestartTime(new Date());
         workflowInstance.setState(workflowFailoverCommandParam.getWorkflowExecutionStatus());
+        workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);

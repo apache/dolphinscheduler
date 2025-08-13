@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
@@ -67,6 +68,9 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
     @Autowired
     private TaskInstanceFactories taskInstanceFactories;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     /**
      * Generate the recover workflow instance.
      * <p> Will use the origin workflow instance, but will update the following fields. Need to note we cannot not
@@ -90,6 +94,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
         workflowInstance.setVarPool(null);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setCommandType(command.getCommandType());
+        workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);

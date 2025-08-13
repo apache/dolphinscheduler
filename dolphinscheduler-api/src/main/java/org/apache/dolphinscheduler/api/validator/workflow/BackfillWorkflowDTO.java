@@ -74,8 +74,6 @@ public class BackfillWorkflowDTO {
 
     private Flag dryRun;
 
-    private Flag testFlag;
-
     private Long triggerCode;
 
     private BackfillParamsDTO backfillParams;

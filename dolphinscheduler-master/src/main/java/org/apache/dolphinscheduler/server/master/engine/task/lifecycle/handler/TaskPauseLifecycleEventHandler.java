@@ -34,7 +34,7 @@ public class TaskPauseLifecycleEventHandler extends AbstractTaskLifecycleEventHa
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskPauseLifecycleEvent taskPauseEvent) {
-        taskStateAction.pauseEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskPauseEvent);
+        taskStateAction.onPauseEvent(workflowExecutionRunnable, taskExecutionRunnable, taskPauseEvent);
     }
 
     @Override

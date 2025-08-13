@@ -200,7 +200,11 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useResources(24, resourcesRequired, resourcesLimit),
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
 

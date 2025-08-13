@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.task.executor.container.TaskExecutorContainer
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +43,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.collect.Lists;
 
 /**
  * worker registry test
@@ -55,6 +56,8 @@ public class WorkerRegistryClientTest {
     private WorkerRegistryClient workerRegistryClient;
     @Mock
     private RegistryClient registryClient;
+    @Mock
+    private WorkerServerLoadProtection workerServerLoadProtection;
     @Mock
     private WorkerConfig workerConfig;
     @Mock
@@ -77,7 +80,6 @@ public class WorkerRegistryClientTest {
 
         given(workerConfig.getWorkerAddress()).willReturn(NetUtils.getAddr(1234));
         given(workerConfig.getMaxHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
-        given(workerConfig.getServerLoadProtection()).willReturn(new WorkerServerLoadProtection());
         given(metricsProvider.getSystemMetrics()).willReturn(new SystemMetrics());
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(RegistryNodeType.class)))
                 .willReturn(true);
@@ -90,8 +92,7 @@ public class WorkerRegistryClientTest {
 
     @Test
     public void testWorkerRegistryClientgetAlertServerAddress() {
-        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class)))
-                .willReturn(new ArrayList<Server>());
+        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class))).willReturn(new ArrayList<>());
         Assertions.assertEquals(workerRegistryClient.getAlertServerAddress(), Optional.empty());
         Mockito.reset(registryClient);
         String host = "test";
@@ -99,8 +100,7 @@ public class WorkerRegistryClientTest {
         Server server = new Server();
         server.setHost(host);
         server.setPort(port);
-        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class)))
-                .willReturn(new ArrayList<Server>(Arrays.asList(server)));
+        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class))).willReturn(Lists.newArrayList(server));
         Assertions.assertEquals(workerRegistryClient.getAlertServerAddress().get().getAddress(),
                 String.format("%s:%d", host, port));
     }

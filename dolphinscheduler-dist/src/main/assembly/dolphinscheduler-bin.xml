@@ -123,6 +123,11 @@
         </fileSet>
 
         <fileSet>
+            <directory>${basedir}/../.mvn/</directory>
+            <outputDirectory>.mvn</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${basedir}/release-docs</directory>
             <outputDirectory>.</outputDirectory>
         </fileSet>

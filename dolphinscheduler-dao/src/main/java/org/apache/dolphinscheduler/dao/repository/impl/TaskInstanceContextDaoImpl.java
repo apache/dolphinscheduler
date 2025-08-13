@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceContext;
@@ -89,9 +88,7 @@ public class TaskInstanceContextDaoImpl extends BaseDao<TaskInstanceContext, Tas
                                                     + o.getDateCycle()))),
                                     ArrayList::new));
             taskInstanceContext.setTaskInstanceContext(deduplicatedDependentResultTaskInstanceContextList);
-            return mybatisMapper.updateTaskInstanceContextByTaskInstanceIdAndContextType(
-                    taskInstanceContext.getTaskInstanceId(),
-                    taskInstanceContext.getContextType(), JSONUtils.toJsonString(taskInstanceContext.getContext()));
+            return mybatisMapper.updateById(taskInstanceContext);
         }
     }
 

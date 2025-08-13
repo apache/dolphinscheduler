@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus.DISPATCH;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
@@ -44,6 +46,8 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,9 +98,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void dispatchedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                      final ITaskExecutionRunnable taskExecutionRunnable,
-                                      final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
+    public void onDispatchedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                  final ITaskExecutionRunnable taskExecutionRunnable,
+                                  final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         taskInstance.setState(DISPATCH);
         taskInstance.setHost(taskDispatchedEvent.getExecutorHost());
@@ -104,9 +108,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void runtimeContextChangedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                                 final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent) {
+    public void onRuntimeContextChangedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                             final ITaskExecutionRunnable taskExecutionRunnable,
+                                             final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         if (StringUtils.isNotEmpty(taskRuntimeContextChangedEvent.getRuntimeContext())) {
             taskInstance.setAppLink(taskRuntimeContextChangedEvent.getRuntimeContext());
@@ -124,9 +128,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void pausedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskPausedLifecycleEvent taskPausedEvent) {
+    public void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskPausedLifecycleEvent taskPausedEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstancePausedEventToDB(taskExecutionRunnable, taskPausedEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainPause(taskExecutionRunnable);
@@ -141,9 +145,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void killedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskKilledLifecycleEvent taskInstanceKillEvent) {
+    public void onKilledEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskKilledLifecycleEvent taskInstanceKillEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceKilledEventToDB(taskExecutionRunnable, taskInstanceKillEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainKill(taskExecutionRunnable);
@@ -160,9 +164,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void failedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
-                                  final TaskFailedLifecycleEvent taskFailedEvent) {
+    public void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              final ITaskExecutionRunnable taskExecutionRunnable,
+                              final TaskFailedLifecycleEvent taskFailedEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceFailedEventToDB(taskExecutionRunnable, taskFailedEvent);
 
@@ -190,9 +194,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
-    public void succeedEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final ITaskExecutionRunnable taskExecutionRunnable,
-                                   final TaskSuccessLifecycleEvent taskSuccessEvent) {
+    public void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                               final ITaskExecutionRunnable taskExecutionRunnable,
+                               final TaskSuccessLifecycleEvent taskSuccessEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceSuccessEventToDB(taskExecutionRunnable, taskSuccessEvent);
         mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
@@ -203,9 +207,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
                                               final ITaskExecutionRunnable taskExecutionRunnable) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        final String finalVarPool = VarPoolUtils.mergeVarPoolJsonString(
+        final List<Property> finalVarPool = VarPoolUtils.mergeVarPoolJsonString(
                 Lists.newArrayList(workflowInstance.getVarPool(), taskInstance.getVarPool()));
-        workflowInstance.setVarPool(finalVarPool);
+        workflowInstance.setVarPool(VarPoolUtils.serializeVarPool(finalVarPool));
     }
 
     protected void persistentTaskInstanceSuccessEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -213,7 +217,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setEndTime(taskSuccessEvent.getEndTime());
-        taskInstance.setVarPool(taskSuccessEvent.getVarPool());
+        final List<Property> finalVarPool = VarPoolUtils.mergeVarPoolJsonString(taskInstance.getVarPool(),
+                JSONUtils.toJsonString(taskSuccessEvent.getVarPool()));
+        taskInstance.setVarPool(VarPoolUtils.serializeVarPool(finalVarPool));
         taskInstanceDao.updateById(taskInstance);
     }
 
@@ -229,7 +235,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void tryToDispatchTask(final ITaskExecutionRunnable taskExecutionRunnable) {
         if (isTaskNeedAcquireTaskGroupSlot(taskExecutionRunnable)) {
             acquireTaskGroupSlot(taskExecutionRunnable);
-            log.info("Task{} using taskGroup, success acquire taskGroup slot", taskExecutionRunnable.getName());
+            log.info("Task[name={}] using taskGroup, success acquire taskGroup slot", taskExecutionRunnable.getName());
             return;
         }
         taskExecutionRunnable.getWorkflowEventBus().publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));
@@ -262,7 +268,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void logWarningIfCannotDoAction(final ITaskExecutionRunnable taskExecutionRunnable,
                                               final AbstractLifecycleEvent event) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        log.warn("Task {} state is {} cannot do action on event: {}",
+        log.warn("Task[name={}] state is {} cannot do action on event: {}",
                 taskInstance.getName(),
                 taskInstance.getState(),
                 event);

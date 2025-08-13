@@ -74,6 +74,9 @@ do
   done
 done
 
+# create symbolic link for standalone-server
+cd $BIN_DIR/standalone-server && ln -s ../tools/sql/sql sql
+
 # repack bin tar
 BIN_TAR_FILE_NAME=$(basename $BIN_TAR_FILE)
 cd $DIST_DIR && tar -zcf $BIN_TAR_FILE_NAME apache-dolphinscheduler-*-bin

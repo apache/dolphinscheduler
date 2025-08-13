@@ -247,20 +247,13 @@ public class NettyRemotingClient implements AutoCloseable {
         try {
             channelsLock.lock();
             channels.values().forEach(Channel::close);
+            channels.clear();
         } finally {
             channelsLock.unlock();
         }
     }
 
-    public void closeChannel(Host host) {
-        try {
-            channelsLock.lock();
-            Channel channel = this.channels.remove(host);
-            if (channel != null) {
-                channel.close();
-            }
-        } finally {
-            channelsLock.unlock();
-        }
+    public void onChannelInactive(final Host host) {
+        channels.remove(host);
     }
 }

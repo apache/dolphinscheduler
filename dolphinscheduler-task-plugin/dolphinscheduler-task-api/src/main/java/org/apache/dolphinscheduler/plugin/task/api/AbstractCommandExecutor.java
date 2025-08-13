@@ -93,10 +93,6 @@ public abstract class AbstractCommandExecutor {
         this.logBuffer = new LinkedBlockingQueue<>();
         this.logBuffer.add(EMPTY_STRING);
 
-        if (this.taskRequest != null) {
-            // set logBufferEnable=true if the task uses logHandler and logBuffer to buffer log messages
-            this.taskRequest.setLogBufferEnable(true);
-        }
     }
 
     // todo: We need to build the IShellActuator in outer class, since different task may have specific logic to build
@@ -225,6 +221,9 @@ public abstract class AbstractCommandExecutor {
             log.error("Failed to kill process tree for task: {}, pid: {}",
                     taskRequest.getTaskAppId(), taskRequest.getProcessId());
         }
+
+        // Try to kill yarn or k8s application
+        ProcessUtils.cancelApplication(taskRequest);
     }
 
     private void collectPodLogIfNeeded() {

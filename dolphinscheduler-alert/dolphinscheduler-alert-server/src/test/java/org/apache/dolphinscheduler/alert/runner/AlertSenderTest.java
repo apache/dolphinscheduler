@@ -96,11 +96,10 @@ class AlertSenderTest {
 
         // 2.alert plugin does not exist
         int pluginDefineId = 1;
-        String pluginInstanceParams = "alert-instance-mail-params";
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId, pluginInstanceParams, pluginInstanceName);
+                pluginDefineId, PLUGIN_INSTANCE_PARAMS, pluginInstanceName);
         alertPluginInstance.setId(1);
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);

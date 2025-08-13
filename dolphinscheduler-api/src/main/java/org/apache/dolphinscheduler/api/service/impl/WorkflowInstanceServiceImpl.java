@@ -74,7 +74,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
-import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -468,9 +467,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
-                        workflowInstance.getTestFlag());
-        List<TaskInstanceDependentDetails<ITaskInstanceContext>> taskInstanceDependentDetailsList =
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId);
+        List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -482,11 +480,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return result;
     }
 
-    private List<TaskInstanceDependentDetails<ITaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
-        List<TaskInstanceDependentDetails<ITaskInstanceContext>> taskInstanceDependentDetailsList =
+    private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
+        List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 taskInstanceList.stream()
                         .map(taskInstance -> {
-                            TaskInstanceDependentDetails<ITaskInstanceContext> taskInstanceDependentDetails =
+                            TaskInstanceDependentDetails<AbstractTaskInstanceContext> taskInstanceDependentDetails =
                                     new TaskInstanceDependentDetails<>();
                             BeanUtils.copyProperties(taskInstance, taskInstanceDependentDetails);
                             return taskInstanceDependentDetails;
@@ -497,14 +495,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
                         ContextType.DEPENDENT_RESULT_CONTEXT);
         for (TaskInstanceContext taskInstanceContext : taskInstanceContextList) {
-            for (AbstractTaskInstanceContext dependentResultTaskInstanceContext : taskInstanceContext
-                    .getTaskInstanceContext()) {
-                for (TaskInstanceDependentDetails<ITaskInstanceContext> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
-                    if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
-                        taskInstanceDependentDetails
-                                .setTaskInstanceDependentResult(
-                                        dependentResultTaskInstanceContext);
-                    }
+            for (TaskInstanceDependentDetails<AbstractTaskInstanceContext> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
+                if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
+                    taskInstanceDependentDetails
+                            .setTaskInstanceDependentResults(taskInstanceContext.getTaskInstanceContext());
                 }
             }
         }
@@ -922,8 +916,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES,
-                        workflowInstance.getTestFlag());
+                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES);
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());

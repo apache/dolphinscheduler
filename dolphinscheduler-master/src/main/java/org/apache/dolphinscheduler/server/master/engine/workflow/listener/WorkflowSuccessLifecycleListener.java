@@ -97,7 +97,6 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
                 .environmentCode(workflowInstance.getEnvironmentCode())
                 .startParamList(commandParam.getCommandParams())
                 .dryRun(Flag.of(workflowInstance.getDryRun()))
-                .testFlag(Flag.of(workflowInstance.getTestFlag()))
                 .build();
         final WorkflowBackfillTriggerResponse backfillTriggerResponse =
                 workflowBackfillTrigger.triggerWorkflow(backfillTriggerRequest);

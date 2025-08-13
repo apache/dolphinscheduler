@@ -33,6 +33,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.collect.Lists;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
@@ -100,6 +103,11 @@ class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
                     if (standardRpcRequest.getArgs() == null || standardRpcRequest.getArgs().length == 0) {
                         args = null;
                     } else {
+                        if (!methodInvoker.isParameterTypeValidated(standardRpcRequest.getArgsTypes())) {
+                            throw new IllegalArgumentException(
+                                    "Parameter types: " + Lists.newArrayList(standardRpcRequest.getArgsTypes())
+                                            + " do not match the method signature.");
+                        }
                         args = new Object[standardRpcRequest.getArgs().length];
                         for (int i = 0; i < standardRpcRequest.getArgs().length; i++) {
                             args[i] = JsonSerializer.deserialize(standardRpcRequest.getArgs()[i],

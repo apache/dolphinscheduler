@@ -22,17 +22,24 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractT
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class TaskKillLifecycleEvent extends AbstractTaskLifecycleEvent {
 
     private final ITaskExecutionRunnable taskExecutionRunnable;
 
+    private TaskKillLifecycleEvent(ITaskExecutionRunnable taskExecutionRunnable, long delayTime) {
+        super(delayTime);
+        this.taskExecutionRunnable = taskExecutionRunnable;
+    }
+
     public static TaskKillLifecycleEvent of(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return new TaskKillLifecycleEvent(taskExecutionRunnable);
+        return of(taskExecutionRunnable, 0);
+    }
+
+    public static TaskKillLifecycleEvent of(final ITaskExecutionRunnable taskExecutionRunnable, long delayTime) {
+        return new TaskKillLifecycleEvent(taskExecutionRunnable, delayTime);
     }
 
     @Override
@@ -43,7 +50,8 @@ public class TaskKillLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskKillLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecutionRunnable.getName() + ", " +
+                "delayTime=" + delayTime +
                 '}';
     }
 }

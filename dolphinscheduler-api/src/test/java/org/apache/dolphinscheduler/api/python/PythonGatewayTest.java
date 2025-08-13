@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.service.ResourcesService;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -62,7 +61,7 @@ public class PythonGatewayTest {
     private ResourcesService resourcesService;
 
     @Test
-    public void testGetCodeAndVersion() throws CodeGenerateUtils.CodeGenerateException {
+    public void testGetCodeAndVersion() {
         Project project = getTestProject();
         Mockito.when(projectMapper.queryByName(project.getName())).thenReturn(project);
 

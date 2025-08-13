@@ -47,7 +47,11 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
         language: 'sql'
       }
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false }),
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    }),
     {
       type: 'multi-input',
       field: 'preStatements',

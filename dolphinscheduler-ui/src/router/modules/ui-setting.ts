@@ -30,11 +30,11 @@ export default {
   children: [
     {
       path: '',
-      name: 'ui-setting',
+      name: 'ui-setting-child',
       component: components['ui-setting'],
       meta: {
         title: '设置',
-        activeMenu: 'ui-setting',
+        activeMenu: 'ui-setting-child',
         showSide: false,
         auth: []
       }

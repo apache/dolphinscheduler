@@ -125,7 +125,6 @@ export default {
     complement_data: '补数',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
-    whether_test: '是否测试',
     continue: '继续',
     end: '结束',
     none_send: '都不发',
@@ -896,7 +895,8 @@ export default {
     template_id: 'spark template id',
     template_id_tips: 'spark template id',
     is_production: 'is production',
-    is_production_tips: 'is production'
+    is_production_tips: 'is production',
+    json_format_tips: 'JSON参数格式异常'
   },
   menu: {
     fav: '收藏组件',

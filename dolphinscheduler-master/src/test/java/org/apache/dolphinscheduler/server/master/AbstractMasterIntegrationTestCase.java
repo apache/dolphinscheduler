@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.integration.MasterContainer;
 import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
@@ -52,4 +54,10 @@ public abstract class AbstractMasterIntegrationTestCase {
 
     @Autowired
     protected MasterContainer masterContainer;
+
+    @Autowired
+    protected RegistryClient registryClient;
+
+    @Autowired
+    protected MasterConfig masterConfig;
 }

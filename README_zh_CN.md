@@ -26,20 +26,20 @@ DolphinScheduler 的主要特性如下：
 ## 快速开始
 
 - 如果想要体验
-    - [standalone 启动](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.5/guide/installation/standalone)
-    - [Docker 启动](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.5/guide/start/docker)
+    - [standalone 启动](https://dolphinscheduler.apache.org/zh-cn/docs/3.3.0-alpha/guide/installation/standalone)
+    - [Docker 启动](https://dolphinscheduler.apache.org/zh-cn/docs/3.3.0-alpha/guide/start/docker)
 - 想 Kubernetes 部署
-    - [Kubernetes 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.5/guide/installation/kubernetes)
+    - [Kubernetes 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.3.0-alpha/guide/installation/kubernetes)
 
 ## 系统部分截图
 
 * **主页**：项目和工作流概览，包括最新的工作流实例和任务实例状态统计。
 ![home](images/home.png)
 
-* **工作流定义**： 通过拖拉拽创建和管理工作流，轻松构建和维护复杂的工作流。
+* **工作流定义**： 通过拖拉拽创建和管理工作流，轻松构建和维护复杂的工作流，[内置支持多种任务类型](https://dolphinscheduler.apache.org/zh-cn/docs/3.3.0-alpha/guide/task/builtin-task)，开箱即用。
 ![workflow-definition](images/workflow-definition.png)
 
-* **工作流树状图**： 抽象的树形结构可以更清晰地理解任务之间的关系
+* **工作流树状图**： 抽象的树形结构可以更清晰地理解任务之间的关系。
 ![workflow-tree](images/workflow-tree.png)
 
 * **数据源**： 支持管理多种外部数据源，为MySQL、PostgreSQL、Hive、Trino等，并提供统一的数据访问能力。

@@ -534,7 +534,7 @@ public class DataxTask extends AbstractTask {
             int num = md.getColumnCount();
             columnNames = new String[num];
             for (int i = 1; i <= num; i++) {
-                columnNames[i - 1] = md.getColumnName(i).replace("t.", "");
+                columnNames[i - 1] = md.getColumnLabel(i).replace("t.", "");
             }
         } catch (SQLException | ExecutionException e) {
             log.error(e.getMessage(), e);

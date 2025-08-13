@@ -32,6 +32,10 @@ export function useSagemaker(model: { [field: string]: any }): IJsonItem[] {
         message: 'requestJson'
       }
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }

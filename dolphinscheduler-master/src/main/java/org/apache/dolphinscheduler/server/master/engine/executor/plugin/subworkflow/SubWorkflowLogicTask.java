@@ -148,7 +148,11 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
             return triggerNewSubWorkflow();
         }
 
-        switch (workflowExecutionRunnable.getWorkflowInstance().getCommandType()) {
+        // In some cases, workflow instance's command type has not been changed,
+        // there should better to use command.type instead
+        switch (workflowExecutionRunnable.getWorkflowExecuteContext().getCommand().getCommandType()) {
+            case RECOVER_TOLERANCE_FAULT_PROCESS:
+                return recoverFromFaultTolerantTasks();
             case RECOVER_SUSPENDED_PROCESS:
                 return recoverFromSuspendTasks();
             case START_FAILURE_TASK_PROCESS:
@@ -156,7 +160,21 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
             default:
                 return triggerNewSubWorkflow();
         }
+    }
 
+    private SubWorkflowLogicTaskRuntimeContext recoverFromFaultTolerantTasks() {
+        final WorkflowInstanceDao workflowInstanceDao = applicationContext.getBean(WorkflowInstanceDao.class);
+        final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(
+                subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
+
+        if (subWorkflowInstance != null && subWorkflowInstance.getState().canTakeover()) {
+            // Here we only need to take over the runtime context of sub-workflow,
+            // the sub-workflow will be failover by master-server when needed.
+            return subWorkflowLogicTaskRuntimeContext;
+        }
+
+        // The sub-workflow's state is bad, trigger a new sub-workflow instance
+        return triggerNewSubWorkflow();
     }
 
     private SubWorkflowLogicTaskRuntimeContext recoverFromFailedTasks() {
@@ -218,7 +236,6 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 // todo: transport varpool and local params
                 .startParamList(commandParam.getCommandParams())
                 .dryRun(Flag.of(workflowInstance.getDryRun()))
-                .testFlag(Flag.of(workflowInstance.getTestFlag()))
                 .build();
         final Integer subWorkflowInstanceId = applicationContext
                 .getBean(SubWorkflowControlClient.class)

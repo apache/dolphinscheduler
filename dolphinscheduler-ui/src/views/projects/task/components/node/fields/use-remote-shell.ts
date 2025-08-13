@@ -32,6 +32,10 @@ export function useRemoteShell(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.script_tips')
       }
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }
