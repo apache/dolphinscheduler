@@ -143,7 +143,6 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                 templateFusion = getTemplateResponse.getBody().getData().getFusion();
             }
         } catch (Exception e) {
-            log.error("Failed to get serverless spark template!", e);
             throw new AliyunServerlessSparkTaskException("Failed to get serverless spark template!");
         }
 
