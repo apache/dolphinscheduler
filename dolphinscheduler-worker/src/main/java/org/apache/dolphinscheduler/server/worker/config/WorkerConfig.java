@@ -65,7 +65,7 @@ public class WorkerConfig implements Validator {
     public void validate(Object target, Errors errors) {
         WorkerConfig workerConfig = (WorkerConfig) target;
         if (workerConfig.getMaxHeartbeatInterval().getSeconds() <= 0) {
-            errors.rejectValue("max-heartbeat-interval", null, "shoule be a valid duration");
+            errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
         }
         if (StringUtils.isEmpty(workerConfig.getWorkerAddress())) {
             workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
