@@ -47,6 +47,8 @@ public class AliyunServerlessSparkParameters extends AbstractParameters {
 
     private String sparkSubmitParameters;
 
+    private String templateId;
+
     @JsonProperty("isProduction")
     boolean isProduction;
 
