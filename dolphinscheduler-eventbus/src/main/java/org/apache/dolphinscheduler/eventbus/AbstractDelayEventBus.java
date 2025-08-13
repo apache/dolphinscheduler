@@ -43,6 +43,11 @@ public abstract class AbstractDelayEventBus<T extends AbstractDelayEvent> implem
     }
 
     @Override
+    public T take() throws InterruptedException {
+        return delayEventQueue.take();
+    }
+
+    @Override
     public Optional<T> remove() {
         return Optional.ofNullable(delayEventQueue.remove());
     }

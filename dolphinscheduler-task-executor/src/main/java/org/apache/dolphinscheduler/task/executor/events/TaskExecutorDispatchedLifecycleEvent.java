@@ -37,8 +37,6 @@ public class TaskExecutorDispatchedLifecycleEvent extends AbstractTaskExecutorLi
 
     private int workflowInstanceId;
 
-    private String workflowInstanceHost;
-
     private String taskInstanceHost;
 
     private Long latestReportTime;
@@ -49,7 +47,6 @@ public class TaskExecutorDispatchedLifecycleEvent extends AbstractTaskExecutorLi
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceHost(taskExecutionContext.getHost())
-                .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .type(TaskExecutorLifecycleEventType.DISPATCHED)
                 .build();
     }

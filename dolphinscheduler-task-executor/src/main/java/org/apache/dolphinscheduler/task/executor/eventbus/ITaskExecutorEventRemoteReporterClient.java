@@ -21,5 +21,6 @@ import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorL
 
 public interface ITaskExecutorEventRemoteReporterClient {
 
-    void reportTaskExecutionEventToMaster(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent);
+    void reportTaskExecutionEventToMaster(final String masterAddress,
+                                          final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent);
 }

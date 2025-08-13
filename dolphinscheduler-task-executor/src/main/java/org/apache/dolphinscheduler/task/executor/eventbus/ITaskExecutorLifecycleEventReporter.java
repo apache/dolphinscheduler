@@ -48,10 +48,9 @@ public interface ITaskExecutorLifecycleEventReporter extends AutoCloseable {
     void receiveTaskExecutorLifecycleEventACK(final TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
 
     /**
-     * Reassign the workflow instance host of the IReportableTaskExecutorLifecycleEvent.
-     * <p> This method is used to reassign the workflow instance host of the IReportableTaskExecutorLifecycleEvent, once the workflow's host changed.
+     * Reset the events in the channel to allow them to be reported immediately.
      */
-    boolean reassignWorkflowInstanceHost(int taskInstanceId, String workflowHost);
+    void onWorkflowInstanceHostChanged(int taskInstanceId);
 
     /**
      * Shutdown the reporter.
