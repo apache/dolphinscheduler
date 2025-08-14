@@ -219,7 +219,7 @@ public class LoginController extends BaseController {
             Map<String, String> tokenRequestHeader = new HashMap<>();
             tokenRequestHeader.put("Accept", "application/json");
             Map<String, Object> requestBody = new HashMap<>(16);
-            if (Strings.isNullOrEmpty(oAuth2ClientProperties.getClientSecret())) {
+            if (!Strings.isNullOrEmpty(oAuth2ClientProperties.getClientSecret())) {
                 // NOT REQUIRED
                 requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
             }
