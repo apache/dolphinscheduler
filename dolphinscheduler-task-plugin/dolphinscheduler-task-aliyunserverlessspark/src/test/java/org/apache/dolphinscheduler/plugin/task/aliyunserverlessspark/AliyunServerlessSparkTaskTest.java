@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import java.util.Collections;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.Assertions;
@@ -51,9 +53,12 @@ import com.aliyun.emr_serverless_spark20230808.models.CancelJobRunResponse;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunResponse;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunResponseBody;
+import com.aliyun.emr_serverless_spark20230808.models.GetTemplateResponse;
+import com.aliyun.emr_serverless_spark20230808.models.GetTemplateResponseBody;
 import com.aliyun.emr_serverless_spark20230808.models.StartJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.StartJobRunResponse;
 import com.aliyun.emr_serverless_spark20230808.models.StartJobRunResponseBody;
+import com.aliyun.emr_serverless_spark20230808.models.Template;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -90,6 +95,9 @@ public class AliyunServerlessSparkTaskTest {
     @Mock
     private CancelJobRunResponse mockCancelJobRunResponse;
 
+    @Mock
+    private GetTemplateResponse mockGetTemplateResponse;
+
     @InjectMocks
     @Spy
     private AliyunServerlessSparkTask aliyunServerlessSparkTask;
@@ -123,6 +131,8 @@ public class AliyunServerlessSparkTaskTest {
             "oss://datadev-oss-hdfs-test/spark-resource/examples/jars/spark-examples_2.12-3.3.1.jar";
 
     private static final String mockEntryPointArguments = "10";
+
+    private static final String mockTemplateId = "TPL-XXXXX";
 
     @BeforeEach
     public void before() {
@@ -167,6 +177,12 @@ public class AliyunServerlessSparkTaskTest {
                 () -> doReturn(mockGetJobRunResponse).when(mockAliyunServerlessSparkClient).getJobRun(any(), any(),
                         any()));
 
+        mockGetTemplateResponse = new GetTemplateResponse()
+                .setBody(new GetTemplateResponseBody().setData(new Template().setSparkConf(Collections.emptyList())));
+        Assertions.assertDoesNotThrow(
+                () -> doReturn(mockGetTemplateResponse).when(mockAliyunServerlessSparkClient).getTemplate(any(),
+                        any()));
+
         aliyunServerlessSparkTask.init();
         aliyunServerlessSparkTask.handle(mockTaskCallBack);
         verify(aliyunServerlessSparkTask).setAppIds(mockJobRunId);
@@ -190,6 +206,8 @@ public class AliyunServerlessSparkTaskTest {
     public void testBuildStartJobRunRequest() {
         AliyunServerlessSparkParameters mockAliyunServerlessSparkParameters =
                 mock(AliyunServerlessSparkParameters.class);
+        doReturn(mockWorkspaceId).when(mockAliyunServerlessSparkParameters).getWorkspaceId();
+        doReturn(mockTemplateId).when(mockAliyunServerlessSparkParameters).getTemplateId();
         doReturn(mockResourceQueueId).when(mockAliyunServerlessSparkParameters).getResourceQueueId();
         doReturn("JAR").when(mockAliyunServerlessSparkParameters).getCodeType();
         doReturn("ds-test").when(mockAliyunServerlessSparkParameters).getJobName();
@@ -198,12 +216,10 @@ public class AliyunServerlessSparkTaskTest {
         doReturn(mockEntryPointArguments).when(mockAliyunServerlessSparkParameters).getEntryPointArguments();
 
         aliyunServerlessSparkTask.buildStartJobRunRequest(mockAliyunServerlessSparkParameters);
-
         verify(mockAliyunServerlessSparkParameters).getResourceQueueId();
         verify(mockAliyunServerlessSparkParameters).getCodeType();
         verify(mockAliyunServerlessSparkParameters).getJobName();
         verify(mockAliyunServerlessSparkParameters).getEngineReleaseVersion();
         verify(mockAliyunServerlessSparkParameters).isProduction();
     }
-
 }
