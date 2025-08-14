@@ -22,13 +22,6 @@ import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 
-import shade.okhttp3.HttpUrl;
-import shade.okhttp3.MediaType;
-import shade.okhttp3.OkHttpClient;
-import shade.okhttp3.Request;
-import shade.okhttp3.RequestBody;
-import shade.okhttp3.Response;
-
 import org.apache.http.HttpStatus;
 
 import java.io.IOException;
@@ -38,6 +31,12 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class OkHttpUtils {
 
