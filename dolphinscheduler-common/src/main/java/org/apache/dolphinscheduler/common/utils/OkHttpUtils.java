@@ -22,6 +22,13 @@ import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 
+import shade.okhttp3.HttpUrl;
+import shade.okhttp3.MediaType;
+import shade.okhttp3.OkHttpClient;
+import shade.okhttp3.Request;
+import shade.okhttp3.RequestBody;
+import shade.okhttp3.Response;
+
 import org.apache.http.HttpStatus;
 
 import java.io.IOException;
@@ -31,12 +38,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class OkHttpUtils {
 
@@ -96,6 +97,42 @@ public class OkHttpUtils {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Post request execute failed, url: %s", url), e);
+        }
+    }
+
+    /**
+     * only contentType is application/x-www-form-urlencoded
+     * @param url
+     * @param okHttpRequestHeaders
+     * @param requestBodyMap
+     * @param connectTimeout
+     * @param writeTimeout
+     * @param readTimeout
+     * @return
+     * @throws IOException
+     */
+    public static @NonNull String postAsForm(@NonNull String url,
+                                             @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                             @Nullable Map<String, Object> requestBodyMap,
+                                             int connectTimeout,
+                                             int writeTimeout,
+                                             int readTimeout) throws IOException {
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+        StringBuffer stringBuffer = new StringBuffer();
+        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        if (requestBodyMap != null) {
+            for (String key : requestBodyMap.keySet()) {
+                stringBuffer.append(key + "=" + requestBodyMap.get(key) + "&");
+            }
+        }
+        if (requestBodyMap != null) {
+            requestBuilder =
+                    requestBuilder.post(RequestBody.create(stringBuffer.toString(),
+                            MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
+        }
+        try (Response response = client.newCall(requestBuilder.build()).execute()) {
+            return getResponseBody(response);
         }
     }
 

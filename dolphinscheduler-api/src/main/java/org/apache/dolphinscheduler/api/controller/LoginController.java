@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.apache.parquet.Strings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -218,20 +219,23 @@ public class LoginController extends BaseController {
             Map<String, String> tokenRequestHeader = new HashMap<>();
             tokenRequestHeader.put("Accept", "application/json");
             Map<String, Object> requestBody = new HashMap<>(16);
-            requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
-            HashMap<String, Object> requestParamsMap = new HashMap<>();
-            requestParamsMap.put("client_id", oAuth2ClientProperties.getClientId());
-            requestParamsMap.put("code", code);
-            requestParamsMap.put("grant_type", "authorization_code");
-            requestParamsMap.put("redirect_uri",
+            if (Strings.isNullOrEmpty(oAuth2ClientProperties.getClientSecret())) {
+                // NOT REQUIRED
+                requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
+            }
+            requestBody.put("client_id", oAuth2ClientProperties.getClientId());
+            requestBody.put("code", code);
+            requestBody.put("grant_type", "authorization_code");
+            requestBody.put("redirect_uri",
                     String.format("%s?provider=%s", oAuth2ClientProperties.getRedirectUri(), provider));
             OkHttpRequestHeaders okHttpRequestHeadersPost = new OkHttpRequestHeaders();
             okHttpRequestHeadersPost.setHeaders(tokenRequestHeader);
-            okHttpRequestHeadersPost.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_JSON);
+            okHttpRequestHeadersPost
+                    .setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED);
 
-            String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), okHttpRequestHeadersPost,
-                    requestParamsMap, requestBody, Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
-                    Constants.HTTP_CONNECT_TIMEOUT).getBody();
+            String tokenJsonStr = OkHttpUtils.postAsForm(oAuth2ClientProperties.getTokenUri(), okHttpRequestHeadersPost,
+                    requestBody, Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
+                    Constants.HTTP_CONNECT_TIMEOUT);
             String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
             Map<String, String> userInfoRequestHeaders = new HashMap<>();
             userInfoRequestHeaders.put("Accept", "application/json");
@@ -247,7 +251,7 @@ public class LoginController extends BaseController {
                     Constants.HTTP_CONNECT_TIMEOUT,
                     Constants.HTTP_CONNECT_TIMEOUT,
                     Constants.HTTP_CONNECT_TIMEOUT).getBody();
-            String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
+            String username = JSONUtils.getNodeString(userInfoJsonStr, "preferred_username");
             User user = usersService.getUserByUserName(username);
             if (user == null) {
                 user = usersService.createUser(UserType.GENERAL_USER, username, null);
