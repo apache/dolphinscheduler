@@ -40,7 +40,7 @@ export function useRelation() {
     variables.seriesData = []
     variables.links = []
 
-    variables.seriesData = obj.workFlowRelationDetailList.map((item) => {
+    variables.seriesData = obj.data.workFlowRelationDetailList.map((item) => {
       return {
         name: item.workFlowName,
         id: item.workFlowCode,
@@ -48,7 +48,7 @@ export function useRelation() {
       }
     }) as any
 
-    variables.links = obj.workFlowRelationList.map((item) => {
+    variables.links = obj.data.workFlowRelationList.map((item) => {
       return {
         source: String(item.sourceWorkFlowCode),
         target: String(item.targetWorkFlowCode)
