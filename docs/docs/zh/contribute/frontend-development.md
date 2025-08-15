@@ -36,11 +36,11 @@ Node包下载 (注意版本 v12.20.2) `https://nodejs.org/download/release/v12.2
 npm config set registry http://registry.npmmirror.com/
 ```
 
-- 修改 `dolphinscheduler-ui/.env` 文件中的 `API_BASE`，用于跟后端交互：
+- 修改 `dolphinscheduler-ui/.env.development` 文件中的 `VITE_APP_DEV_WEB_URL`，用于跟后端交互：
 
 ```
 # 代理的接口地址（自行修改）
-API_BASE = http://127.0.0.1:12345
+VITE_APP_DEV_WEB_URL = 'http://127.0.0.1:12345'
 ```
 
 ##### ！！！这里特别注意 项目如果在拉取依赖包的过程中报 " node-sass error " 错误，请在执行完后再次执行以下命令
@@ -53,7 +53,7 @@ npm install node-sass --unsafe-perm #单独安装node-sass依赖
 
 #### 开发环境运行
 
-- `npm start` 项目开发环境 (启动后访问地址 http://localhost:8888)
+- `pnpm run dev` 项目开发环境 (启动后访问地址 http://localhost:8888)
 
 #### 前端项目发布
 
