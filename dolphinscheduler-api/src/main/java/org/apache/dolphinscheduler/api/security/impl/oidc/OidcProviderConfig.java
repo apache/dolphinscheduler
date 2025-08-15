@@ -32,6 +32,11 @@ public class OidcProviderConfig {
 
     private String issuerUri;
 
+    /**
+     * URI for the provider's icon (logo) to be displayed on the login button.
+     */
+    private String iconUri;
+
     private String clientId;
 
     private String clientSecret;

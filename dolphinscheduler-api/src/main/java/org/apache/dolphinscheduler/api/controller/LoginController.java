@@ -239,6 +239,7 @@ public class LoginController extends BaseController {
                     Map<String, String> provider = new HashMap<>();
                     provider.put("id", entry.getKey());
                     provider.put("displayName", entry.getValue().getDisplayName());
+                    provider.put("iconUri", entry.getValue().getIconUri());
                     return provider;
                 })
                 .collect(Collectors.toList());
@@ -308,8 +309,6 @@ public class LoginController extends BaseController {
      *
      * @param code       authorization code
      * @param state      state parameter
-     * @param providerId OIDC provider ID
-     * @param request    HTTP request
      * @param response   HTTP response
      */
     @SneakyThrows
@@ -318,13 +317,12 @@ public class LoginController extends BaseController {
     public void handleOidcCallback(@RequestParam(name = "code", required = false) String code,
                                    @RequestParam(name = "error", required = false) String error,
                                    @RequestParam(name = "state") String state,
-                                   @PathVariable String providerId,
-                                   HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
 
         // Handle login failure from OIDC provider
         if (error != null) {
-            log.error("OIDC login failed with error: {}.", error);
+            String sanitizedError = error.replaceAll("[\n\r\t]", "_");
+            log.error("OIDC login failed with error: {}.", sanitizedError);
             response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_login_failed");
             return;
         }
@@ -370,6 +368,15 @@ public class LoginController extends BaseController {
     @GetMapping("/oauth2/authorization/{providerId}")
     public void redirectToOidc(@PathVariable String providerId, HttpServletRequest request,
                                HttpServletResponse response) throws IOException {
+
+        // Validate the providerId before using it
+        if (oidcConfigProperties == null || oidcConfigProperties.getProviders() == null
+                || !oidcConfigProperties.getProviders().containsKey(providerId)) {
+            log.error("Invalid OIDC provider ID requested: {}", providerId);
+            response.sendRedirect("/dolphinscheduler/ui/#/login?error=invalid_provider");
+            return;
+        }
+
         String state = providerId + ":" + UUID.randomUUID().toString();
         request.getSession().setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         String authorizationUrl = ((OidcAuthenticator) authenticator).getSignInUrl(state);

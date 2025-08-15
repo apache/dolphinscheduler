@@ -226,8 +226,8 @@ security:
         # registrationId used in URLs and internal mapping
         keycloak:
           display-name: "Login with Keycloak" # Text for UI Button
-          # issuer-uri: https://my-keycloak.example.com/auth/realms/myrealm
-          issuer-uri: http://localhost:8080/realms/dolphinscheduler
+          issuer-uri: http://keycloak:8080/realms/dolphinscheduler
+          icon-uri: "/images/providers-icon/keycloak.png"
           client-id: dolphinscheduler-client
           client-secret: dolphinscheduler-client-secret
           # Optional: Specify client auth method (e.g., client_secret_basic, client_secret_post). Defaults if omitted.
