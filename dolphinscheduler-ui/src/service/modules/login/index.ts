@@ -40,6 +40,13 @@ export function getOauth2Provider(): any {
   })
 }
 
+export function getOidcProviders(): any {
+  return axios({
+    url: '/oidc-providers',
+    method: 'get'
+  })
+}
+
 export function clearCookie(): any {
   return axios({
     url: '/cookies',
