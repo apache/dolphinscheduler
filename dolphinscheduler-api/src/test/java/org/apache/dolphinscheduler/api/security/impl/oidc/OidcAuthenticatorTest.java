@@ -59,6 +59,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
+import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.TokenErrorResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
@@ -67,6 +69,7 @@ import com.nimbusds.oauth2.sdk.id.Subject;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
+import com.nimbusds.openid.connect.sdk.UserInfoErrorResponse;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
@@ -126,7 +129,7 @@ public class OidcAuthenticatorTest {
             Assertions.assertEquals(username, resultUser.getUserName());
             Assertions.assertEquals(UserType.ADMIN_USER, resultUser.getUserType());
             verify(usersService).createUser(UserType.ADMIN_USER, username, email);
-        }, Collections.singletonList("admin-group"));
+        }, Collections.singletonList("admin-group"), true, true, "http://fake-issuer.com");
     }
 
     @Test
@@ -144,7 +147,7 @@ public class OidcAuthenticatorTest {
             Assertions.assertNotNull(resultUser);
             Assertions.assertEquals(username, resultUser.getUserName());
             verify(usersService, never()).createUser(any(), anyString(), anyString());
-        }, Collections.emptyList());
+        }, Collections.emptyList(), true, true, "http://fake-issuer.com");
     }
 
     @Test
@@ -160,7 +163,43 @@ public class OidcAuthenticatorTest {
 
             Assertions.assertNull(resultUser);
             verify(usersService, never()).createUser(any(), anyString(), anyString());
-        }, Collections.emptyList());
+        }, Collections.emptyList(), true, true, "http://fake-issuer.com");
+    }
+
+    @Test
+    public void testLogin_Failure_TokenExchangeFails() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+
+        executeLoginWithMocks(() -> {
+            User resultUser = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(resultUser);
+        }, Collections.emptyList(), false, true, "http://fake-issuer.com");
+    }
+
+    @Test
+    public void testLogin_Failure_UserInfoRequestFails() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+
+        executeLoginWithMocks(() -> {
+            User resultUser = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(resultUser);
+        }, Collections.emptyList(), true, false, "http://fake-issuer.com");
+    }
+
+    @Test
+    public void testLogin_Failure_InvalidIdTokenIssuer() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+
+        executeLoginWithMocks(() -> {
+            User resultUser = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(resultUser);
+        }, Collections.emptyList(), true, true, "http://invalid-issuer.com");
     }
 
     @Test
@@ -222,8 +261,6 @@ public class OidcAuthenticatorTest {
         ReflectionUtils.setField(apiBaseUrlField, oidcAuthenticator, "http://test-api-base-url");
 
         String signInUrl = oidcAuthenticator.getSignInUrl(state);
-
-        System.out.println("[DEBUG_LOG] Sign-in URL: " + signInUrl);
 
         Assertions.assertNotNull(signInUrl);
         Assertions.assertTrue(signInUrl.contains("response_type=code"), "URL should contain response_type=code");
@@ -441,7 +478,8 @@ public class OidcAuthenticatorTest {
         Assertions.assertEquals(UserType.GENERAL_USER, userType5);
     }
 
-    private void executeLoginWithMocks(Runnable assertions, List<String> groups) throws Exception {
+    private void executeLoginWithMocks(Runnable assertions, List<String> groups, boolean tokenSuccess,
+                                       boolean userInfoSuccess, String issuer) throws Exception {
         injectMockMetadataIntoCache();
 
         try (
@@ -464,7 +502,8 @@ public class OidcAuthenticatorTest {
                                     when(httpRequest.send()).thenReturn(httpResponse);
                                 })) {
 
-            mockTokenAndUserInfoFlow(tokenParserMock, userInfoResponseMock, groups);
+            mockTokenAndUserInfoFlow(tokenParserMock, userInfoResponseMock, groups, tokenSuccess, userInfoSuccess,
+                    issuer);
             assertions.run();
         }
     }
@@ -511,7 +550,20 @@ public class OidcAuthenticatorTest {
     private void mockTokenAndUserInfoFlow(
                                           MockedStatic<OIDCTokenResponseParser> tokenParserMock,
                                           MockedStatic<UserInfoResponse> userInfoResponseMock,
-                                          List<String> groups) throws Exception {
+                                          List<String> groups,
+                                          boolean tokenSuccess,
+                                          boolean userInfoSuccess,
+                                          String issuer) throws Exception {
+
+        if (!tokenSuccess) {
+            TokenErrorResponse errorResponse = mock(TokenErrorResponse.class);
+            when(errorResponse.indicatesSuccess()).thenReturn(false);
+            when(errorResponse.getErrorObject()).thenReturn(new ErrorObject("invalid_grant"));
+            tokenParserMock
+                    .when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class)))
+                    .thenReturn(errorResponse);
+            return;
+        }
 
         OIDCTokenResponse tokenResponse = mock(OIDCTokenResponse.class);
         when(tokenResponse.indicatesSuccess()).thenReturn(true);
@@ -520,7 +572,7 @@ public class OidcAuthenticatorTest {
 
         JWTClaimsSet claimsSet =
                 new JWTClaimsSet.Builder()
-                        .issuer("http://fake-issuer.com")
+                        .issuer(issuer)
                         .audience("test-client")
                         .subject(username)
                         .claim("preferred_username", username)
@@ -535,6 +587,16 @@ public class OidcAuthenticatorTest {
         tokenParserMock
                 .when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class)))
                 .thenReturn(tokenResponse);
+
+        if (!userInfoSuccess) {
+            UserInfoErrorResponse userInfoErrorResponse = mock(UserInfoErrorResponse.class);
+            when(userInfoErrorResponse.indicatesSuccess()).thenReturn(false);
+            when(userInfoErrorResponse.getErrorObject()).thenReturn(new ErrorObject("server_error"));
+            userInfoResponseMock
+                    .when(() -> UserInfoResponse.parse(any(HTTPResponse.class)))
+                    .thenReturn(userInfoErrorResponse);
+            return;
+        }
 
         UserInfoResponse userInfoResponse = mock(UserInfoResponse.class);
         when(userInfoResponse.indicatesSuccess()).thenReturn(true);

@@ -36,6 +36,9 @@ public class OidcProviderConfigTest {
         config.setIssuerUri("https://test-issuer.com");
         Assertions.assertEquals("https://test-issuer.com", config.getIssuerUri());
 
+        config.setIconUri("/icons/test.png");
+        Assertions.assertEquals("/icons/test.png", config.getIconUri());
+
         config.setClientId("test-client-id");
         Assertions.assertEquals("test-client-id", config.getClientId());
 
@@ -61,16 +64,19 @@ public class OidcProviderConfigTest {
         config1.setDisplayName("Test Provider");
         config1.setIssuerUri("https://test-issuer.com");
         config1.setClientId("test-client-id");
+        config1.setIconUri("/icon.png");
 
         OidcProviderConfig config2 = new OidcProviderConfig();
         config2.setDisplayName("Test Provider");
         config2.setIssuerUri("https://test-issuer.com");
         config2.setClientId("test-client-id");
+        config2.setIconUri("/icon.png");
 
         OidcProviderConfig config3 = new OidcProviderConfig();
         config3.setDisplayName("Different Provider");
         config3.setIssuerUri("https://different-issuer.com");
         config3.setClientId("different-client-id");
+        config3.setIconUri("/different.png");
 
         Assertions.assertEquals(config1, config2);
         Assertions.assertNotEquals(config1, config3);
@@ -85,6 +91,7 @@ public class OidcProviderConfigTest {
         config.setDisplayName("Test Provider");
         config.setIssuerUri("https://test-issuer.com");
         config.setClientId("test-client-id");
+        config.setIconUri("/icon.png");
 
         String toString = config.toString();
 
@@ -92,5 +99,6 @@ public class OidcProviderConfigTest {
         Assertions.assertTrue(toString.contains("displayName=Test Provider"));
         Assertions.assertTrue(toString.contains("issuerUri=https://test-issuer.com"));
         Assertions.assertTrue(toString.contains("clientId=test-client-id"));
+        Assertions.assertTrue(toString.contains("iconUri=/icon.png"));
     }
 }

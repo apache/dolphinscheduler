@@ -380,6 +380,13 @@ public class LoginController extends BaseController {
         String state = providerId + ":" + UUID.randomUUID().toString();
         request.getSession().setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         String authorizationUrl = ((OidcAuthenticator) authenticator).getSignInUrl(state);
+
+        if (authorizationUrl == null) {
+            log.error("OIDC authorization URL is null for providerId: {}", providerId);
+            response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_authorization_url_null");
+            return;
+        }
+
         response.sendRedirect(authorizationUrl);
     }
 }
