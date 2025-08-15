@@ -32,9 +32,10 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.type=OIDC",
         "security.authentication.oidc.enable=true",
         "security.authentication.oidc.providers.keycloak.display-name=Login with Keycloak",
-        "security.authentication.oidc.providers.keycloak.issuer-uri=http://localhost:8080/realms/dolphinscheduler",
+        "security.authentication.oidc.providers.keycloak.issuer-uri=http://keycloak:8080/realms/dolphinscheduler",
         "security.authentication.oidc.providers.keycloak.client-id=dolphinscheduler-client",
         "security.authentication.oidc.providers.keycloak.client-secret=test-secret",
+        "security.authentication.oidc.providers.keycloak.icon-uri=/icons/keycloak.png",
         "security.authentication.oidc.providers.keycloak.user-name-attribute=preferred_username",
         "security.authentication.oidc.providers.keycloak.groups-claim=groups",
         "security.authentication.oidc.user.auto-create=true",
@@ -53,9 +54,10 @@ public class OidcConfigPropertiesTest extends AbstractControllerTest {
         OidcProviderConfig keycloakConfig = oidcConfigProperties.getProviders().get("keycloak");
         Assertions.assertNotNull(keycloakConfig);
         Assertions.assertEquals("Login with Keycloak", keycloakConfig.getDisplayName());
-        Assertions.assertEquals("http://localhost:8080/realms/dolphinscheduler", keycloakConfig.getIssuerUri());
+        Assertions.assertEquals("http://keycloak:8080/realms/dolphinscheduler", keycloakConfig.getIssuerUri());
         Assertions.assertEquals("dolphinscheduler-client", keycloakConfig.getClientId());
         Assertions.assertEquals("test-secret", keycloakConfig.getClientSecret());
+        Assertions.assertEquals("/icons/keycloak.png", keycloakConfig.getIconUri());
         Assertions.assertEquals("preferred_username", keycloakConfig.getUserNameAttribute());
         Assertions.assertEquals("groups", keycloakConfig.getGroupsClaim());
 

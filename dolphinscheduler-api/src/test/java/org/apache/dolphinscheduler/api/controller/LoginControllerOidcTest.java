@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -82,6 +81,7 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
     @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(loginController, "authenticator", oidcAuthenticator);
+        ReflectionTestUtils.setField(loginController, "oidcConfigProperties", oidcConfigProperties);
     }
 
     @Test
@@ -110,6 +110,25 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testGetOidcProviders_returnsIconUri() throws Exception {
+        Map<String, OidcProviderConfig> providers = new HashMap<>();
+        OidcProviderConfig providerConfig = new OidcProviderConfig();
+        providerConfig.setDisplayName("Login with Keycloak");
+        providerConfig.setIconUri("/images/providers-icon/keycloak.png");
+        providers.put(providerId, providerConfig);
+
+        when(oidcConfigProperties.isEnable()).thenReturn(true);
+        when(oidcConfigProperties.getProviders()).thenReturn(providers);
+
+        mockMvc.perform(get("/oidc-providers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Status.SUCCESS.getCode()))
+                .andExpect(jsonPath("$.data[0].id").value(providerId))
+                .andExpect(jsonPath("$.data[0].displayName").value("Login with Keycloak"))
+                .andExpect(jsonPath("$.data[0].iconUri").value("/images/providers-icon/keycloak.png"));
+    }
+
+    @Test
     public void testGetOidcProviders_whenDisabled_returnsEmptyList() throws Exception {
         when(oidcConfigProperties.isEnable()).thenReturn(false);
 
@@ -126,6 +145,11 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
 
         when(oidcAuthenticator.getSignInUrl(anyString())).thenReturn(authUrl);
 
+        // simulate valid providerId in config
+        Map<String, OidcProviderConfig> providers = new HashMap<>();
+        providers.put(providerId, new OidcProviderConfig());
+        when(oidcConfigProperties.getProviders()).thenReturn(providers);
+
         mockMvc.perform(get("/oauth2/authorization/{providerId}", providerId))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(authUrl));
@@ -135,10 +159,25 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
     public void testRedirectToOidc_withAuthenticatorError() throws Exception {
         when(oidcAuthenticator.getSignInUrl(anyString())).thenReturn(null);
 
+        // simulate valid providerId in config
+        Map<String, OidcProviderConfig> providers = new HashMap<>();
+        providers.put(providerId, new OidcProviderConfig());
+        when(oidcConfigProperties.getProviders()).thenReturn(providers);
+
         mockMvc.perform(get("/oauth2/authorization/{providerId}", providerId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(Status.INTERNAL_SERVER_ERROR_ARGS.getCode()))
-                .andExpect(jsonPath("$.msg", containsString("Redirect URL must not be null")));
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/dolphinscheduler/ui/#/login?error=oidc_authorization_url_null"));
+    }
+
+    @Test
+    public void testRedirectToOidc_withInvalidProviderId() throws Exception {
+        String invalidProviderId = "invalid";
+        // no providers in config
+        when(oidcConfigProperties.getProviders()).thenReturn(new HashMap<>());
+
+        mockMvc.perform(get("/oauth2/authorization/{providerId}", invalidProviderId))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/dolphinscheduler/ui/#/login?error=invalid_provider"));
     }
 
     @Test
@@ -167,6 +206,17 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
     @Test
     public void testHandleOidcCallback_withLoginErrorFromProvider() throws Exception {
         String error = "access_denied";
+        String state = providerId + ":" + UUID.randomUUID();
+        String expectedRedirectUrl = "/dolphinscheduler/ui/#/login?error=oidc_login_failed";
+
+        performOidcCallback(null, error, state)
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl(expectedRedirectUrl));
+    }
+
+    @Test
+    public void testHandleOidcCallback_withErrorContainingNewlinesTabs() throws Exception {
+        String error = "access_denied\n\t";
         String state = providerId + ":" + UUID.randomUUID();
         String expectedRedirectUrl = "/dolphinscheduler/ui/#/login?error=oidc_login_failed";
 
