@@ -100,20 +100,23 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             request.getSession().removeAttribute(Constants.SSO_LOGIN_USER_STATE);
 
             if (originalState == null || !MessageDigest.isEqual(originalState.getBytes(), state.getBytes())) {
-                log.error("State validation failed. Expected: {}, Actual: {}", originalState, state);
+                String sanitizedState = state.replaceAll("[\n\r\t]", "_");
+                log.error("State validation failed. Expected: {}, Actual: {}", originalState, sanitizedState);
                 return null;
             }
 
             String[] stateParts = state.split(":", 2);
             if (stateParts.length != 2) {
-                log.error("Invalid state format: {}", state);
+                String sanitizedState = state.replaceAll("[\n\r\t]", "_");
+                log.error("Invalid state format: {}", sanitizedState);
                 return null;
             }
 
             String providerId = stateParts[0];
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
             if (providerConfig == null) {
-                log.error("Provider not found: {}", providerId);
+                String sanitizedProviderId = providerId.replaceAll("[\n\r\t]", "_");
+                log.error("Provider not found: {}", sanitizedProviderId);
                 return null;
             }
 
@@ -321,13 +324,17 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
         Object groupsFromIdToken = idTokenClaims.getClaim(groupsClaim);
         if (groupsFromIdToken instanceof List) {
-            return (List<String>) groupsFromIdToken;
+            @SuppressWarnings("unchecked")
+            List<String> groups = (List<String>) groupsFromIdToken;
+            return groups;
         }
 
         if (userInfo != null) {
             Object groupsFromUserInfo = userInfo.getClaim(groupsClaim);
             if (groupsFromUserInfo instanceof List) {
-                return (List<String>) groupsFromUserInfo;
+                @SuppressWarnings("unchecked")
+                List<String> groups = (List<String>) groupsFromUserInfo;
+                return groups;
             }
         }
 
