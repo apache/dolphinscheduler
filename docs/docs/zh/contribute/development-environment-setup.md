@@ -150,6 +150,12 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 > 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
 
+建议使用`pnpm`包管理以节约磁盘空间，在运行前端组件前，如果你还没有安装`pnpm`，可以使用以下命令安装：
+```shell
+npm install -g pnpm
+```
+
+确保`pnpm`已经安装完成后，运行以下命令：
 ```shell
 cd dolphinscheduler-ui
 pnpm install

@@ -155,6 +155,12 @@ Install frontend dependencies and run it.
 
 > Note: You can see more detail about the frontend setting in [frontend development](./frontend-development.md).
 
+We recommend using the `pnpm` package manager to save disk space. If you have not yet installed `pnpm`, you can install it using the following command before running the front-end component:
+```shell
+npm install -g pnpm
+```
+
+After ensuring that `pnpm` has been installed, run the following command:
 ```shell
 cd dolphinscheduler-ui
 pnpm install
