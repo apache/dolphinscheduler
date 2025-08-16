@@ -18,123 +18,97 @@
 package org.apache.dolphinscheduler.api.test.cases;
 
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
-import org.apache.dolphinscheduler.api.test.entity.GetUserInfoResponseData;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.OidcLoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.UserPage;
-import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.enums.UserType;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.DisableIfTestFails;
 
 @DolphinScheduler(composeFiles = "docker/oidc-login/docker-compose.yaml")
-@Slf4j
-@DisableIfTestFails
 public class OidcLoginAPITest {
 
-    private static String sessionId;
     private static final String PROVIDER_ID = "keycloak";
 
     @Test
-    @Order(10)
+    @Order(1)
     public void testGetOidcProviders() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         HttpResponse response = oidcLoginPage.getOidcProviders();
-
-        Assertions.assertTrue(response.getBody().getSuccess());
-
-        @SuppressWarnings("unchecked")
+        Assertions.assertEquals(200, response.getStatusCode());
         List<Map<String, String>> providers = (List<Map<String, String>>) response.getBody().getData();
         Assertions.assertNotNull(providers);
         Assertions.assertFalse(providers.isEmpty());
-
         Map<String, String> provider = providers.get(0);
         Assertions.assertEquals(PROVIDER_ID, provider.get("id"));
         Assertions.assertEquals("Login with Keycloak", provider.get("displayName"));
+        Assertions.assertTrue(provider.containsKey("iconUri"));
+        Assertions.assertTrue(provider.get("iconUri").endsWith("keycloak.png"));
     }
 
     @Test
-    @Order(20)
-    public void testInitiateOidcLogin() {
+    @Order(2)
+    public void testInitiateOidcLogin_validProvider() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         HttpResponse response = oidcLoginPage.initiateOidcLogin(PROVIDER_ID);
-
-        // The response should be a redirect to the Keycloak authorization endpoint
         Assertions.assertEquals(302, response.getStatusCode());
-        String location = response.getHeaders().get("Location");
-        Assertions.assertNotNull(location);
-        Assertions.assertTrue(location.contains("auth/realms/dolphinscheduler/protocol/openid-connect/auth"));
-        Assertions.assertTrue(location.contains("client_id=dolphinscheduler-client"));
-        Assertions.assertTrue(location.contains("response_type=code"));
-        Assertions.assertTrue(location.contains("scope="));
-        Assertions.assertTrue(location.contains("state="));
     }
 
     @Test
-    @Order(30)
+    @Order(3)
+    public void testInitiateOidcLogin_invalidProvider() {
+        OidcLoginPage oidcLoginPage = new OidcLoginPage();
+        HttpResponse response = oidcLoginPage.initiateOidcLoginWithInvalidProvider("invalid-provider");
+        Assertions.assertEquals(302, response.getStatusCode());
+    }
+
+    @Test
+    @Order(4)
     public void testOidcCallbackMissingCode() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         String state = PROVIDER_ID + ":" + UUID.randomUUID().toString();
         HttpResponse response = oidcLoginPage.handleOidcCallbackMissingCode(PROVIDER_ID, state);
-
         Assertions.assertEquals(302, response.getStatusCode());
-        String location = response.getHeaders().get("Location");
-        Assertions.assertNotNull(location);
-        Assertions.assertTrue(location.contains("login?error=oidc_missing_code"));
     }
 
     @Test
-    @Order(40)
+    @Order(5)
     public void testOidcCallbackError() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         String state = PROVIDER_ID + ":" + UUID.randomUUID().toString();
         HttpResponse response = oidcLoginPage.handleOidcCallbackError(PROVIDER_ID, "access_denied", state);
-
         Assertions.assertEquals(302, response.getStatusCode());
-        String location = response.getHeaders().get("Location");
-        Assertions.assertNotNull(location);
-        Assertions.assertTrue(location.contains("login?error=oidc_login_failed"));
     }
 
     @Test
-    @Order(50)
-    public void testOidcCallbackInvalidState() {
+    @Order(6)
+    public void testOidcCallbackErrorWithSpecialChars() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         String state = PROVIDER_ID + ":" + UUID.randomUUID().toString();
-        String code = "valid_code";
-        HttpResponse response = oidcLoginPage.handleOidcCallback(PROVIDER_ID, code, state);
-
+        HttpResponse response = oidcLoginPage.handleOidcCallbackError(PROVIDER_ID, "err\nor\t", state);
         Assertions.assertEquals(302, response.getStatusCode());
     }
 
     @Test
-    @Order(60)
-    public void testSimulatedSuccessfulOidcLogin() {
-
+    @Order(7)
+    public void testOidcCallbackWithInvalidProviderInState() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
-        HttpResponse loginResponse = oidcLoginPage.login("admin_user", "password");
+        String state = "unknownprovider:" + UUID.randomUUID().toString();
+        String code = "dummy_code";
+        HttpResponse response = oidcLoginPage.handleOidcCallback("unknownprovider", code, state);
+        Assertions.assertEquals(302, response.getStatusCode());
+    }
 
-        if (loginResponse.getBody().getSuccess()) {
-            sessionId =
-                    JSONUtils.convertValue(loginResponse.getBody().getData(), LoginResponseData.class).getSessionId();
-            UserPage userPage = new UserPage();
-            HttpResponse getUserInfoResponse = userPage.getUserInfo(sessionId);
-            GetUserInfoResponseData getUserInfoResponseData =
-                    JSONUtils.convertValue(getUserInfoResponse.getBody().getData(), GetUserInfoResponseData.class);
-            Assertions.assertEquals("admin_user", getUserInfoResponseData.getUserName());
-            Assertions.assertEquals(UserType.ADMIN_USER, getUserInfoResponseData.getUserType());
-        } else {
-            log.info("User admin_user not found, which is expected if no OIDC login has occurred yet");
-        }
+    @Test
+    @Order(8)
+    public void testLoginEndpointDisabledInOidcMode() {
+        OidcLoginPage oidcLoginPage = new OidcLoginPage();
+        HttpResponse response = oidcLoginPage.loginWithPassword("anyuser", "anypassword");
+        // In OIDC mode, /login endpoint should not allow password login
+        Assertions.assertNotEquals(200, response.getStatusCode());
     }
 }

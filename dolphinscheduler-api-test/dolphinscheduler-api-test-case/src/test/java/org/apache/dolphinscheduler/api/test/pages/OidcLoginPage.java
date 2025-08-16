@@ -23,38 +23,47 @@ import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class OidcLoginPage extends LoginPage {
+public final class OidcLoginPage {
+
+    private final LoginPage loginPage = new LoginPage();
 
     public HttpResponse getOidcProviders() {
-        RequestClient requestClient = new RequestClient();
-        return requestClient.get("/oidc-providers", null, null);
+        return new RequestClient().get("/oidc-providers", null, null);
     }
 
     public HttpResponse initiateOidcLogin(String providerId) {
-        RequestClient requestClient = new RequestClient();
-        return requestClient.get("/oauth2/authorization/" + providerId, null, null);
+        return new RequestClient().get("/oauth2/authorization/" + providerId, null, null);
+    }
+
+    public HttpResponse initiateOidcLoginWithInvalidProvider(String invalidProviderId) {
+        return new RequestClient().get("/oauth2/authorization/" + invalidProviderId, null, null);
     }
 
     public HttpResponse handleOidcCallback(String providerId, String code, String state) {
-        RequestClient requestClient = new RequestClient();
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
         params.put("state", state);
-        return requestClient.get("/login/oauth2/code/" + providerId, null, params);
+        return new RequestClient().get("/login/oauth2/code/" + providerId, null, params);
     }
 
     public HttpResponse handleOidcCallbackError(String providerId, String error, String state) {
-        RequestClient requestClient = new RequestClient();
         Map<String, Object> params = new HashMap<>();
         params.put("error", error);
         params.put("state", state);
-        return requestClient.get("/login/oauth2/code/" + providerId, null, params);
+        return new RequestClient().get("/login/oauth2/code/" + providerId, null, params);
     }
 
     public HttpResponse handleOidcCallbackMissingCode(String providerId, String state) {
-        RequestClient requestClient = new RequestClient();
         Map<String, Object> params = new HashMap<>();
         params.put("state", state);
-        return requestClient.get("/login/oauth2/code/" + providerId, null, params);
+        return new RequestClient().get("/login/oauth2/code/" + providerId, null, params);
+    }
+
+    /**
+     * Optional: Test /login endpoint in OIDC mode should be disabled
+     */
+    public HttpResponse loginWithPassword(String username, String password) {
+        // Only use this for negative test in OIDC mode
+        return loginPage.login(username, password);
     }
 }
