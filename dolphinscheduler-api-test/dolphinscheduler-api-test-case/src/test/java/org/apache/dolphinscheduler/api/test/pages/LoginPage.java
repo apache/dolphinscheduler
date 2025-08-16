@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginPage {
+public final class LoginPage {
 
     public HttpResponse login(String username, String password) {
         Map<String, Object> params = new HashMap<>();
