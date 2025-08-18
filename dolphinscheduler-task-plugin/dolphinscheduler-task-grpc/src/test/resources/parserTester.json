@@ -38,6 +38,10 @@
                                 "TestMapType": {
                                   "requestType": "MapType",
                                   "responseType": "NoneReply"
+                                },
+                                "TestPrimitiveMapType": {
+                                  "requestType": "PrimitiveMapType",
+                                  "responseType": "NoneReply"
                                 }
                               }
                             },
@@ -133,6 +137,29 @@
                                   "keyType": "string",
                                   "type": "Int32Only",
                                   "id": 2
+                                }
+                              }
+                            },
+                            "PrimitiveMapType": {
+                              "fields": {
+                                "bought": {
+                                  "rule": "repeated",
+                                  "type": "MapEntry_bought",
+                                  "id": 1
+                                }
+                              },
+                              "nested": {
+                                "MapEntry_bought": {
+                                  "fields": {
+                                    "key": {
+                                      "type": "string",
+                                      "id": 1
+                                    },
+                                    "value": {
+                                      "type": "string",
+                                      "id": 2
+                                    }
+                                  }
                                 }
                               }
                             },

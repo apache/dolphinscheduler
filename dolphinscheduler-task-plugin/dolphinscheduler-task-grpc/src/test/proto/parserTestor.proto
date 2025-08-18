@@ -28,6 +28,7 @@ service ParserTester {
   rpc TestEnumType (EnumType) returns (NoneReply) {}
   rpc TestBasicMapType (BasicMapType) returns (NoneReply) {}
   rpc TestMapType (MapType) returns (NoneReply) {}
+  rpc TestPrimitiveMapType (PrimitiveMapType) returns (NoneReply) {}
 }
 
 message BasicType {
@@ -61,6 +62,14 @@ message BasicMapType {
 message MapType {
   map<string, Fruits> bought = 1;
   map<string, Int32Only> cash = 2;
+}
+
+message PrimitiveMapType {
+  message MapEntry_bought {
+    string key = 1;
+    Fruits value = 2;
+  }
+  repeated MapEntry_bought bought = 1;
 }
 
 enum Fruits {

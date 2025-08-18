@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 
+import static java.util.Objects.isNull;
+
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Enum;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Field;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.MapField;
@@ -30,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors;
 
@@ -107,7 +110,7 @@ public class JSONDescriptorParser {
             type.fields.forEach((name, pbObject) -> {
                 if (pbObject instanceof Field) {
                     if (pbObject instanceof MapField) {
-                        descriptorProtoBuilder.addNestedType(parseMapField(name, (MapField) pbObject));
+                        parseMapField(descriptorProtoBuilder, name, (MapField) pbObject);
                     } else {
                         descriptorProtoBuilder.addField(parseField(name, (Field) pbObject));
                     }
@@ -165,6 +168,18 @@ public class JSONDescriptorParser {
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName(selfName)
                         .setNumber(field.id);
+        JsonNode rule = field.rule;
+        if (!isNull(rule))
+            if (rule.isTextual()) {
+                String label = rule.asText();
+                try {
+                    fieldDescriptorProtoBuilder
+                            .setLabel(DescriptorProtos.FieldDescriptorProto.Label
+                                    .valueOf("LABEL_" + label.toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("grpc exception: Unrecogenized field label: " + label, e);
+                }
+            }
         try {
             fieldDescriptorProtoBuilder
                     .setType(DescriptorProtos.FieldDescriptorProto.Type.valueOf("TYPE_" + field.type.toUpperCase()));
@@ -174,10 +189,18 @@ public class JSONDescriptorParser {
         return fieldDescriptorProtoBuilder;
     }
 
-    private DescriptorProtos.DescriptorProto.Builder parseMapField(String selfName, MapField mapField) {
-        DescriptorProtos.DescriptorProto.Builder mapFieldDescriptorProtoBuilder =
+    private DescriptorProtos.DescriptorProto.Builder parseMapField(DescriptorProtos.DescriptorProto.Builder parentMessage,
+                                                                   String selfName, MapField mapField) {
+        DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
+                DescriptorProtos.FieldDescriptorProto.newBuilder()
+                        .setName(selfName)
+                        .setNumber(mapField.id)
+                        .setTypeName("MapEntry_" + selfName)
+                        .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED);
+        DescriptorProtos.DescriptorProto.Builder mapEntryDescriptorProtoBuilder =
                 DescriptorProtos.DescriptorProto.newBuilder()
-                        .setName(selfName);
+                        .setName("MapEntry_" + selfName)
+                        .setOptions(DescriptorProtos.MessageOptions.newBuilder().setMapEntry(true).build());
         DescriptorProtos.FieldDescriptorProto.Builder keyDescriptorProtoBuilder =
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName("key")
@@ -199,9 +222,11 @@ public class JSONDescriptorParser {
         } catch (IllegalArgumentException e) {
             valueDescriptorProtoBuilder.setTypeName(mapField.type);
         }
-        mapFieldDescriptorProtoBuilder.addField(keyDescriptorProtoBuilder);
-        mapFieldDescriptorProtoBuilder.addField(valueDescriptorProtoBuilder);
-        return mapFieldDescriptorProtoBuilder;
+        mapEntryDescriptorProtoBuilder.addField(keyDescriptorProtoBuilder);
+        mapEntryDescriptorProtoBuilder.addField(valueDescriptorProtoBuilder);
+        parentMessage.addNestedType(mapEntryDescriptorProtoBuilder);
+        // parentMessage.addRepeatedField(mapFieldDescriptorProtoBuilder.build()., mapFieldDescriptorProtoBuilder);
+        return mapEntryDescriptorProtoBuilder;
     }
 
     // private DescriptorProtos.OneofDescriptorProto.Builder parseOneof(String selfName, OneOf oneof, Type parent) {

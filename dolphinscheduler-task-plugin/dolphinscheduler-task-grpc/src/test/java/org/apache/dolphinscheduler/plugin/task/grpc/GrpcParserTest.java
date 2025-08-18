@@ -30,12 +30,14 @@ import org.apache.dolphinscheduler.plugin.task.grpc.generated.MapType;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.NoneReply;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.NoneRequest;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.ParserTesterGrpc;
+import org.apache.dolphinscheduler.plugin.task.grpc.generated.PrimitiveMapType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -100,6 +102,19 @@ public class GrpcParserTest {
 
                         @Override
                         public void testMapType(MapType request, StreamObserver<NoneReply> respObserver) {
+                            Assertions.assertEquals("",
+                                    Arrays.toString(
+                                            Arrays.stream(request.getBought().entrySet().toArray()).map((val) -> {
+                                                return val.toString();
+                                            }).toArray()));
+                            NoneReply noneReply = NoneReply.newBuilder().build();
+                            respObserver.onNext(noneReply);
+                            respObserver.onCompleted();
+                        }
+
+                        @Override
+                        public void testPrimitiveMapType(PrimitiveMapType request,
+                                                         StreamObserver<NoneReply> respObserver) {
                             NoneReply noneReply = NoneReply.newBuilder().build();
                             respObserver.onNext(noneReply);
                             respObserver.onCompleted();
@@ -205,6 +220,22 @@ public class GrpcParserTest {
                 "}" +
                 "}";
         GrpcTask grpcTask = generateGrpcTask("ParserTester/TestMapType", requestMessage,
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+        grpcTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testPrimitiveMapType() throws Exception {
+        String requestMessage = "{" +
+                "\"bought\": [" +
+                "{" +
+                "\"key\": \"Jerry\"," +
+                "\"value\": \"Lingo\"" +
+                "}" +
+                "]" +
+                "}";
+        GrpcTask grpcTask = generateGrpcTask("ParserTester/TestPrimitiveMapType", requestMessage,
                 GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
         grpcTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
