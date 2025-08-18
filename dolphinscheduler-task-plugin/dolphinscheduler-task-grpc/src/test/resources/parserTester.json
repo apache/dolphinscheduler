@@ -42,6 +42,10 @@
                                 "TestPrimitiveMapType": {
                                   "requestType": "PrimitiveMapType",
                                   "responseType": "NoneReply"
+                                },
+                                "TestOneofType": {
+                                  "requestType": "OneofType",
+                                  "responseType": "NoneReply"
                                 }
                               }
                             },
@@ -101,6 +105,54 @@
                                 }
                               }
                             },
+                            "OneofType": {
+                              "oneofs": {
+                                "_bio": {
+                                  "oneof": [
+                                    "bio"
+                                  ]
+                                },
+                                "_age": {
+                                  "oneof": [
+                                    "age"
+                                  ]
+                                },
+                                "contact": {
+                                  "oneof": [
+                                    "phone",
+                                    "email"
+                                  ]
+                                }
+                              },
+                              "fields": {
+                                "name": {
+                                  "type": "string",
+                                  "id": 1
+                                },
+                                "bio": {
+                                  "type": "string",
+                                  "id": 2,
+                                  "options": {
+                                    "proto3_optional": true
+                                  }
+                                },
+                                "age": {
+                                  "type": "int32",
+                                  "id": 3,
+                                  "options": {
+                                    "proto3_optional": true
+                                  }
+                                },
+                                "phone": {
+                                  "type": "string",
+                                  "id": 4
+                                },
+                                "email": {
+                                  "type": "string",
+                                  "id": 5
+                                }
+                              }
+                            },
                             "EnumType": {
                               "fields": {
                                 "what2eat": {
@@ -156,7 +208,7 @@
                                       "id": 1
                                     },
                                     "value": {
-                                      "type": "string",
+                                      "type": "Fruits",
                                       "id": 2
                                     }
                                   }

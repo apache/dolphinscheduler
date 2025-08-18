@@ -29,6 +29,7 @@ service ParserTester {
   rpc TestBasicMapType (BasicMapType) returns (NoneReply) {}
   rpc TestMapType (MapType) returns (NoneReply) {}
   rpc TestPrimitiveMapType (PrimitiveMapType) returns (NoneReply) {}
+  rpc TestOneofType (OneofType) returns (NoneReply) {}
 }
 
 message BasicType {
@@ -45,6 +46,16 @@ message BasicType {
   sfixed32 sfixed32 = 11;
   sfixed64 sfixed64 = 12;
   bytes bytesVal = 13;
+}
+
+message OneofType{
+    string name = 1;
+    optional string bio = 2;
+    optional int32 age = 3;
+    oneof contact{
+      string phone = 4;
+      string email = 5;
+    }
 }
 
 message EnumType {
