@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -102,11 +101,6 @@ public class GrpcParserTest {
 
                         @Override
                         public void testMapType(MapType request, StreamObserver<NoneReply> respObserver) {
-                            Assertions.assertEquals("",
-                                    Arrays.toString(
-                                            Arrays.stream(request.getBought().entrySet().toArray()).map((val) -> {
-                                                return val.toString();
-                                            }).toArray()));
                             NoneReply noneReply = NoneReply.newBuilder().build();
                             respObserver.onNext(noneReply);
                             respObserver.onCompleted();

@@ -225,7 +225,8 @@ public class JSONDescriptorParser {
         mapEntryDescriptorProtoBuilder.addField(keyDescriptorProtoBuilder);
         mapEntryDescriptorProtoBuilder.addField(valueDescriptorProtoBuilder);
         parentMessage.addNestedType(mapEntryDescriptorProtoBuilder);
-        // parentMessage.addRepeatedField(mapFieldDescriptorProtoBuilder.build()., mapFieldDescriptorProtoBuilder);
+        parentMessage.addField(mapFieldDescriptorProtoBuilder.build());
+
         return mapEntryDescriptorProtoBuilder;
     }
 
