@@ -7,8 +7,8 @@
 * [Git](https://git-scm.com/downloads)
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
-* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
-* [Pnpm](https://pnpm.io/installation): v6.x
+* [Node](https://nodejs.org/en/download): v16.0+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
+* [Pnpm](https://pnpm.io/installation): v8.0+ (请确保不同版本的pnpm与Node.js之间是相互兼容的，可参考：[Compatibility](https://pnpm.io/installation#compatibility))
 
 ### 克隆代码库
 

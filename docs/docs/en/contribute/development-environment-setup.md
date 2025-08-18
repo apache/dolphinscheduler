@@ -7,8 +7,8 @@ Before setting up the DolphinScheduler development environment, please make sure
 - [Git](https://git-scm.com/downloads)
 - [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 - [Maven](http://maven.apache.org/download.cgi): v3.5+
-- [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
-- [Pnpm](https://pnpm.io/installation): v6.x
+- [Node](https://nodejs.org/en/download): v16.0+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
+- [Pnpm](https://pnpm.io/installation): v8.0+ (Make sure pnpm is compatible with Node.js, see also: [Compatibility](https://pnpm.io/installation#compatibility))
 
 ### Clone Git Repository
 
