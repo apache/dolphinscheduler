@@ -126,14 +126,9 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     @Override
     public void onWorkerGroupChange(List<WorkerGroup> workerGroups) {
         for (WorkerGroup workerGroup : workerGroups) {
-            List<String> activeWorkers = WorkerGroupUtils.getWorkerAddressListFromWorkerGroup(workerGroup)
-                    .stream()
-                    .map(workerMapping::get)
-                    .filter(Objects::nonNull)
-                    .map(WorkerServerMetadata::getAddress)
-                    .collect(Collectors.toList());
+            List<String> workerAddresses = WorkerGroupUtils.getWorkerAddressListFromWorkerGroup(workerGroup);
             synchronized (dbWorkerGroupMapping) {
-                dbWorkerGroupMapping.put(workerGroup.getName(), activeWorkers);
+                dbWorkerGroupMapping.put(workerGroup.getName(), workerAddresses);
             }
         }
     }
