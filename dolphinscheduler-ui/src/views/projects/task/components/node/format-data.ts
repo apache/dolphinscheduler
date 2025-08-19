@@ -320,6 +320,7 @@ export function formatParams(data: INodeData): {
     taskParams.codeType = data.codeType
     taskParams.jobName = data.jobName
     taskParams.engineReleaseVersion = data.engineReleaseVersion
+    taskParams.templateId = data.templateId
     taskParams.entryPoint = data.entryPoint
     taskParams.entryPointArguments = data.entryPointArguments
     taskParams.sparkSubmitParameters = data.sparkSubmitParameters

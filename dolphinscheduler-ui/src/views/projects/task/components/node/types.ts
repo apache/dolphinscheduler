@@ -362,6 +362,7 @@ interface ITaskParams {
   resourceQueueId?: string
   codeType?: string
   engineReleaseVersion?: string
+  templateId?: string
   entryPoint?: string
   entryPointArguments?: string
   sparkSubmitParameters?: string
