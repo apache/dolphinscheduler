@@ -7,7 +7,7 @@
 * [Git](https://git-scm.com/downloads)
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
-* [Node](https://nodejs.org/en/download): v16.0+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
+* [Node](https://nodejs.org/en/download): v16.0+
 * [Pnpm](https://pnpm.io/installation): v8.0+ (请确保不同版本的pnpm与Node.js之间是相互兼容的，可参考：[Compatibility](https://pnpm.io/installation#compatibility))
 
 ### 克隆代码库
@@ -150,7 +150,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 > 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
 
-建议使用`pnpm`包管理以节约磁盘空间，在运行前端组件前，如果你还没有安装`pnpm`，可以使用以下命令安装：
+在运行前端组件前，如果你还没有安装`pnpm`，可以使用以下命令安装：
 
 ```shell
 npm install -g pnpm
