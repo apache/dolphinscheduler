@@ -35,4 +35,15 @@ public final class LoginPage {
 
         return requestClient.post("/login", null, params);
     }
+
+    public HttpResponse loginByOauth(String code, String provider) {
+        Map<String, Object> params = new HashMap<>();
+
+        params.put("code", code);
+        params.put("provider", provider);
+
+        RequestClient requestClient = new RequestClient();
+
+        return requestClient.post("/rediect/login/oauth2", null, params);
+    }
 }

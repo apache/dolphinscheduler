@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.parquet.Strings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -219,7 +218,7 @@ public class LoginController extends BaseController {
             Map<String, String> tokenRequestHeader = new HashMap<>();
             tokenRequestHeader.put("Accept", "application/json");
             Map<String, Object> requestBody = new HashMap<>(16);
-            if (!Strings.isNullOrEmpty(oAuth2ClientProperties.getClientSecret())) {
+            if (!StringUtils.isEmpty(oAuth2ClientProperties.getClientSecret())) {
                 // NOT REQUIRED
                 requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
             }

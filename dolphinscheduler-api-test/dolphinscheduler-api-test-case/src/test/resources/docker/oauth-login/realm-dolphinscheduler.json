@@ -1,0 +1,32 @@
+{
+  "realm": "dolphinscheduler",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "dolphinscheduler-ui",
+      "secret": "dolphinscheduler-secret",
+      "redirectUris": [
+        "http://localhost:12345/dolphinscheduler/redirect/login/oauth2"
+      ],
+      "publicClient": false,
+      "protocol": "openid-connect"
+    }
+  ],
+  "users": [
+    {
+      "username": "test-user",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test-password",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
+
+
+
