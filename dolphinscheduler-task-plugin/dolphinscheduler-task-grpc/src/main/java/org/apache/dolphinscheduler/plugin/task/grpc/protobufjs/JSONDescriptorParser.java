@@ -31,8 +31,10 @@ import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -134,12 +136,33 @@ public class JSONDescriptorParser {
                 }
             });
         if (type.oneofs != null) {
-            type.oneofs.forEach((name, oneof) -> {
-                parseOneof(descriptorProtoBuilder, name, oneof);
-            });
+            type.oneofs.entrySet()
+                    .stream()
+                    .sorted((entry1, entry2) -> {
+                        boolean key1StartsWithUnderscore = entry1.getKey().startsWith("_");
+                        boolean key2StartsWithUnderscore = entry2.getKey().startsWith("_");
+                        if (key1StartsWithUnderscore && !key2StartsWithUnderscore) {
+                            return 1; // Move key1 after key2
+                        } else if (!key1StartsWithUnderscore && key2StartsWithUnderscore) {
+                            return -1; // Move key1 before key2
+                        } else {
+                            return 0; // Keep the original order
+                        }
+                    })
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (oldValue, newValue) -> oldValue,
+                            LinkedHashMap::new))
+                    .forEach((name, oneof) -> {
+                        parseOneof(descriptorProtoBuilder, name, oneof);
+                    });
             int oneofCount = descriptorProtoBuilder.getOneofDeclCount();
             List<DescriptorProtos.OneofDescriptorProto> oneofDescriptorProtos =
                     descriptorProtoBuilder.getOneofDeclList();
+            oneofDescriptorProtos.forEach((oneof) -> {
+
+            });
             IntStream.range(0, oneofCount)
                     .forEach(oneofIndex -> {
                         DescriptorProtos.OneofDescriptorProto oneofDescriptorProto =
