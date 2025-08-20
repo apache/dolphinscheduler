@@ -82,7 +82,9 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputPort().sendKeys(port);
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
-        createDataSourceForm().inputDataBase().sendKeys(database);
+        if (createDataSourceForm().inputDataBase().isDisplayed()) {
+            createDataSourceForm().inputDataBase().sendKeys(database);
+        }
 
         if (!"".equals(jdbcParams)) {
             createDataSourceForm().inputJdbcParams().sendKeys(jdbcParams);
