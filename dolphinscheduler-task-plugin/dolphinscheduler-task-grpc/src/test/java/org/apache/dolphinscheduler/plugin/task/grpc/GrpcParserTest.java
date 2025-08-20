@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.grpc.generated.EnumType;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.MapType;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.NoneReply;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.NoneRequest;
+import org.apache.dolphinscheduler.plugin.task.grpc.generated.OneofType;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.ParserTesterGrpc;
 import org.apache.dolphinscheduler.plugin.task.grpc.generated.PrimitiveMapType;
 
@@ -109,6 +110,13 @@ public class GrpcParserTest {
                         @Override
                         public void testPrimitiveMapType(PrimitiveMapType request,
                                                          StreamObserver<NoneReply> respObserver) {
+                            NoneReply noneReply = NoneReply.newBuilder().build();
+                            respObserver.onNext(noneReply);
+                            respObserver.onCompleted();
+                        }
+
+                        @Override
+                        public void testOneofType(OneofType request, StreamObserver<NoneReply> respObserver) {
                             NoneReply noneReply = NoneReply.newBuilder().build();
                             respObserver.onNext(noneReply);
                             respObserver.onCompleted();
@@ -230,6 +238,19 @@ public class GrpcParserTest {
                 "]" +
                 "}";
         GrpcTask grpcTask = generateGrpcTask("ParserTester/TestPrimitiveMapType", requestMessage,
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+        grpcTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testOneofType() throws Exception {
+        String requestMessage = "{" +
+                "\"name\": \"Alice\"," +
+                "\"age\": 15," +
+                "\"email\": \"alice@example.com\"" +
+                "}";
+        GrpcTask grpcTask = generateGrpcTask("ParserTester/TestOneofType", requestMessage,
                 GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
         grpcTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, grpcTask.getExitStatusCode());

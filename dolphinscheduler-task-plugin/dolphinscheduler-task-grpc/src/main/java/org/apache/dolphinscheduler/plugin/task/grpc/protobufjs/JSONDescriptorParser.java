@@ -30,7 +30,10 @@ import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Service;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.protobuf.DescriptorProtos;
@@ -106,14 +109,20 @@ public class JSONDescriptorParser {
     private DescriptorProtos.DescriptorProto.Builder parseType(String selfName, Type type) {
         DescriptorProtos.DescriptorProto.Builder descriptorProtoBuilder = DescriptorProtos.DescriptorProto.newBuilder()
                 .setName(selfName);
+
+        Map<String, DescriptorProtos.FieldDescriptorProto.Builder> fieldMap = new HashMap<>();
         if (type.fields != null)
             type.fields.forEach((name, pbObject) -> {
                 if (pbObject instanceof Field) {
                     if (pbObject instanceof MapField) {
-                        parseMapField(descriptorProtoBuilder, name, (MapField) pbObject);
+                        DescriptorProtos.FieldDescriptorProto.Builder mapField =
+                                parseMapField(descriptorProtoBuilder, name, (MapField) pbObject);
+                        fieldMap.put(name, mapField);
                     } else {
-                        descriptorProtoBuilder.addField(parseField(name, (Field) pbObject));
+                        DescriptorProtos.FieldDescriptorProto.Builder field = parseField(name, (Field) pbObject);
+                        fieldMap.put(name, field);
                     }
+
                 }
             });
         if (type.nested != null)
@@ -124,6 +133,26 @@ public class JSONDescriptorParser {
                     descriptorProtoBuilder.addNestedType(parseType(name, (Type) pbObject));
                 }
             });
+        if (type.oneofs != null) {
+            type.oneofs.forEach((name, oneof) -> {
+                parseOneof(descriptorProtoBuilder, name, oneof);
+            });
+            int oneofCount = descriptorProtoBuilder.getOneofDeclCount();
+            List<DescriptorProtos.OneofDescriptorProto> oneofDescriptorProtos =
+                    descriptorProtoBuilder.getOneofDeclList();
+            IntStream.range(0, oneofCount)
+                    .forEach(oneofIndex -> {
+                        DescriptorProtos.OneofDescriptorProto oneofDescriptorProto =
+                                oneofDescriptorProtos.get(oneofIndex);
+                        String oneofName = oneofDescriptorProto.getName();
+                        type.oneofs.get(oneofName).oneof.forEach((fieldName) -> {
+                            fieldMap.get(fieldName).setOneofIndex(oneofIndex);
+                        });
+                    });
+        }
+        fieldMap.forEach((name, field) -> {
+            descriptorProtoBuilder.addField(field);
+        });
         return descriptorProtoBuilder;
     }
 
@@ -168,6 +197,11 @@ public class JSONDescriptorParser {
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName(selfName)
                         .setNumber(field.id);
+        if (!isNull(field.options)) {
+            if (!isNull(field.options.get("proto3_optional")) && ((boolean) field.options.get("proto3_optional"))) {
+                fieldDescriptorProtoBuilder.setProto3Optional(true);
+            }
+        }
         JsonNode rule = field.rule;
         if (!isNull(rule))
             if (rule.isTextual()) {
@@ -189,8 +223,8 @@ public class JSONDescriptorParser {
         return fieldDescriptorProtoBuilder;
     }
 
-    private DescriptorProtos.DescriptorProto.Builder parseMapField(DescriptorProtos.DescriptorProto.Builder parentMessage,
-                                                                   String selfName, MapField mapField) {
+    private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(DescriptorProtos.DescriptorProto.Builder parentMessage,
+                                                                        String selfName, MapField mapField) {
         DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName(selfName)
@@ -225,16 +259,16 @@ public class JSONDescriptorParser {
         mapEntryDescriptorProtoBuilder.addField(keyDescriptorProtoBuilder);
         mapEntryDescriptorProtoBuilder.addField(valueDescriptorProtoBuilder);
         parentMessage.addNestedType(mapEntryDescriptorProtoBuilder);
-        parentMessage.addField(mapFieldDescriptorProtoBuilder.build());
 
-        return mapEntryDescriptorProtoBuilder;
+        return mapFieldDescriptorProtoBuilder;
     }
 
-    // private DescriptorProtos.OneofDescriptorProto.Builder parseOneof(String selfName, OneOf oneof, Type parent) {
-    // DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =
-    // DescriptorProtos.OneofDescriptorProto.newBuilder()
-    // .setName(selfName);
-    // throw new NotImplementedException();
-    // // return oneofDescriptorProtoBuilder;
-    // }
+    private DescriptorProtos.OneofDescriptorProto.Builder parseOneof(DescriptorProtos.DescriptorProto.Builder descriptorProtoBuilder,
+                                                                     String selfName, OneOf oneof) {
+        DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =
+                DescriptorProtos.OneofDescriptorProto.newBuilder()
+                        .setName(selfName);
+        descriptorProtoBuilder.addOneofDecl(oneofDescriptorProtoBuilder);
+        return oneofDescriptorProtoBuilder;
+    }
 }
