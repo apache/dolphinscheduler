@@ -7,8 +7,8 @@ Before setting up the DolphinScheduler development environment, please make sure
 - [Git](https://git-scm.com/downloads)
 - [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 - [Maven](http://maven.apache.org/download.cgi): v3.5+
-- [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
-- [Pnpm](https://pnpm.io/installation): v6.x
+- [Node](https://nodejs.org/en/download): v16.0+
+- [Pnpm](https://pnpm.io/installation): v8.0+ (Make sure pnpm is compatible with Node.js, see also: [Compatibility](https://pnpm.io/installation#compatibility))
 
 ### Clone Git Repository
 
@@ -154,6 +154,14 @@ Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA a
 Install frontend dependencies and run it.
 
 > Note: You can see more detail about the frontend setting in [frontend development](./frontend-development.md).
+
+If you have not yet installed `pnpm`, you can install it using the following command before running the front-end component:
+
+```shell
+npm install -g pnpm
+```
+
+After ensuring that `pnpm` has been installed, run the following command:
 
 ```shell
 cd dolphinscheduler-ui
