@@ -13,15 +13,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
--- id is AUTO_INCREMENT MODIFY id;
-ALTER TABLE t_ds_workflow_definition MODIFY id INT NOT NULL;
-ALTER TABLE t_ds_workflow_definition DROP PRIMARY KEY;
-ALTER TABLE t_ds_workflow_definition ADD PRIMARY KEY(id);
--- recover AUTO_INCREMENT
-ALTER TABLE t_ds_workflow_definition MODIFY id INT NOT NULL AUTO_INCREMENT;
-ALTER TABLE t_ds_workflow_definition ADD UNIQUE KEY uniq_workflow_definition_code (code);
-ALTER TABLE t_ds_command DROP COLUMN test_flag;
-ALTER TABLE t_ds_error_command DROP COLUMN test_flag;
-ALTER TABLE t_ds_workflow_instance DROP COLUMN test_flag;
-ALTER TABLE t_ds_task_instance DROP COLUMN test_flag;
+ */
+
+package org.apache.dolphinscheduler.plugin.datasource.dolphindb;
+
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+public class DolphinDBPooledDataSourceClient extends BasePooledDataSourceClient {
+
+    public DolphinDBPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
+    }
+}

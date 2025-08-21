@@ -514,8 +514,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     logging-interceptor 2.7.5 https://mvnrepository.com/artifact/com.squareup.okhttp/logging-interceptor/2.7.5, Apache 2.0
 
 
-
-
 jna-platform
 
 ========================================================================
