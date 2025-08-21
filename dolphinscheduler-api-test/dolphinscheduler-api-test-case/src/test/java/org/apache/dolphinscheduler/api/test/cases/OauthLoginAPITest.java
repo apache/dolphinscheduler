@@ -42,8 +42,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-
-@DolphinScheduler(composeFiles = "docker/oauth/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/oauth-login/docker-compose.yaml")
 @Slf4j
 @DisableIfTestFails
 public class OauthLoginAPITest {
@@ -58,7 +57,9 @@ public class OauthLoginAPITest {
         String username = "test-user";
         String password = "test-password";
 
-        String authUrl = "http://localhost:8080/realms/" + realm + "/protocol/openid-connect/auth?client_id=" + clientId + "&response_type=code&scope=openid&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+        String authUrl = "http://localhost:8080/realms/" + realm + "/protocol/openid-connect/auth?client_id=" + clientId
+                + "&response_type=code&scope=openid&redirect_uri="
+                + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
