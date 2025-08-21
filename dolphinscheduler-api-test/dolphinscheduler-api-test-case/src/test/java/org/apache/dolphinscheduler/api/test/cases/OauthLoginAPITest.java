@@ -17,10 +17,18 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
@@ -32,12 +40,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 
 @DolphinScheduler(composeFiles = "docker/oauth/docker-compose.yaml")
@@ -49,29 +52,20 @@ public class OauthLoginAPITest {
     @Order(10)
     public void testAdminUserLoginSuccess() {
 
-
         String realm = "dolphinscheduler";
         String clientId = "dolphinscheduler-ui";
         String redirectUri = "http://localhost:12345/dolphinscheduler/redirect/login/oauth2";
         String username = "test-user";
         String password = "test-password";
 
-
-        String authUrl = null;
-        try {
-            authUrl = "http://localhost:8080/realms/" + realm +
-                    "/protocol/openid-connect/auth?client_id=" + clientId +
-                    "&response_type=code&scope=openid&redirect_uri="
-                    + URLEncoder.encode(redirectUri, String.valueOf(StandardCharsets.UTF_8));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        String authUrl = "http://localhost:8080/realms/" + realm + "/protocol/openid-connect/auth?client_id=" + clientId + "&response_type=code&scope=openid&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
 
         ChromeOptions options = new ChromeOptions();
-        // options.addArguments("--headless");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--headless=new");
 
+        WebDriverManager.chromedriver().setup();
         WebDriver driver = new ChromeDriver(options);
         driver.get(authUrl);
 
@@ -100,8 +94,11 @@ public class OauthLoginAPITest {
         }
 
         String code = currentUrl.split("code=")[1].split("&")[0];
+
         LoginPage loginPage = new LoginPage();
         HttpResponse response = loginPage.loginByOauth(code, "keycloak");
+
         assertThat(response.getStatusCode()).isEqualTo(302);
+
     }
 }
