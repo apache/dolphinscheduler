@@ -115,13 +115,14 @@ public final class ProcessUtils {
             // Get all child processes
             String pids = getPidsStr(processId);
             String[] pidArray = PID_PATTERN.split(pids);
-            if (pidArray.length == 0) {
+            if (StringUtils.isBlank(pids) || pidArray.length == 0) {
                 log.warn("No valid PIDs found for process: {}", processId);
                 return true;
             }
 
             // Convert PID string to list of integers
-            List<Integer> pidList = Arrays.stream(pidArray).map(Integer::parseInt).collect(Collectors.toList());
+            List<Integer> pidList = Arrays.stream(pidArray).filter(StringUtils::isNotBlank).map(Integer::parseInt)
+                    .collect(Collectors.toList());
 
             // 1. Try to terminate gracefully (SIGINT)
             boolean gracefulKillSuccess = sendKillSignal("SIGINT", pidList, request.getTenantCode());
