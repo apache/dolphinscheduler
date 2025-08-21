@@ -78,6 +78,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
     public OssStorageOperator(String resourceBaseAbsolutePath) {
         super(resourceBaseAbsolutePath);
+        init();
     }
 
     private void init() {
