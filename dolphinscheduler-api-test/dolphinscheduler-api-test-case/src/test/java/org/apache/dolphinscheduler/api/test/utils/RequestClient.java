@@ -52,8 +52,7 @@ public class RequestClient {
     private OkHttpClient httpClient = null;
 
     public RequestClient() {
-        httpClient =
-                new OkHttpClient.Builder().followRedirects(false).build();
+        this.httpClient = new OkHttpClient();
     }
 
     @SneakyThrows
