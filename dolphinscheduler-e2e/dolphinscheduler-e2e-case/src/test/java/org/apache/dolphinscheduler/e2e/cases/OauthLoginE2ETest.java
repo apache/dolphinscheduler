@@ -15,12 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.cases;
+package org.apache.dolphinscheduler.e2e.cases;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.pages.LoginPage;
+import okhttp3.FormBody;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
@@ -32,18 +49,22 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-@DolphinScheduler(composeFiles = "docker/oauth/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/oauth-login/docker-compose.yaml")
 @Slf4j
 @DisableIfTestFails
 public class OauthLoginE2ETest {
 
+    public static final String DOLPHINSCHEDULER_API_URL = "http://0.0.0.0:12345/dolphinscheduler";
+
+    public static final String REQUEST_CONTENT_TYPE = "application/x-www-form-urlencoded";
+
+    public static final String QUESTION_MARK = "?";
+
+    public static final String EQUAL_MARK = "=";
+
+    public static final String AND_MARK = "&";
 
     @Test
     @Order(10)
@@ -91,17 +112,52 @@ public class OauthLoginE2ETest {
         if (!currentUrl.contains("code=")) {
             throw new RuntimeException("the URL: " + currentUrl);
         }
-
         String code = currentUrl.split("code=")[1].split("&")[0];
-        HttpResponse response = loginPage.loginByOauth(code, "keycloak");
-        assertThat(response.getStatusCode()).isEqualTo(302);
+        assertThat(loginByOauth(code)).isEqualTo(302);
     }
 
-    public HttpResponse loginByOauth(String code, String provider) {
+    public int loginByOauth(String code) {
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
-        params.put("provider", provider);
+        params.put("provider", "keycloak");
         OkHttpClient requestClient = new OkHttpClient.Builder().followRedirects(false).build();
-        return requestClient.post("/rediect/login/oauth2", null, params);
+
+        Map<String, String> headers = new HashMap<>();
+
+        String requestUrl = String.format("%s%s", DOLPHINSCHEDULER_API_URL, "/rediect/login/oauth2");
+        headers.put("Content-Type", REQUEST_CONTENT_TYPE);
+        Headers headersBuilder = Headers.of(headers);
+        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(REQUEST_CONTENT_TYPE));
+        log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        Request request = new Request.Builder()
+                .headers(headersBuilder)
+                .url(requestUrl)
+                .post(requestBody)
+                .build();
+        Response response = null;
+        try {
+            response = requestClient.newCall(request).execute();
+            return response.code();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getParams(Map<String, Object> params) {
+        StringBuilder sb = new StringBuilder(QUESTION_MARK);
+        if (!params.isEmpty()) {
+            for (Map.Entry<String, Object> item : params.entrySet()) {
+                Object value = item.getValue();
+                if (Objects.nonNull(value)) {
+                    sb.append(AND_MARK);
+                    sb.append(item.getKey());
+                    sb.append(EQUAL_MARK);
+                    sb.append(value);
+                }
+            }
+            return sb.toString();
+        } else {
+            return "";
+        }
     }
 }
