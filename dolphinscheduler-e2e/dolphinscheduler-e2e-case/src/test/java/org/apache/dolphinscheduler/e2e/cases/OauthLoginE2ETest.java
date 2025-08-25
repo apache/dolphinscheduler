@@ -1,26 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.api.test.cases;
+package org.apache.dolphinscheduler.e2e.cases;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
-import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
-import org.apache.dolphinscheduler.api.test.pages.LoginPage;
+import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
@@ -36,14 +17,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 
 @DolphinScheduler(composeFiles = "docker/oauth/docker-compose.yaml")
 @Slf4j
 @DisableIfTestFails
-public class OauthLoginAPITest {
+public class OauthLoginE2ETest {
+
 
     @Test
     @Order(10)
@@ -100,8 +83,15 @@ public class OauthLoginAPITest {
         }
 
         String code = currentUrl.split("code=")[1].split("&")[0];
-        LoginPage loginPage = new LoginPage();
         HttpResponse response = loginPage.loginByOauth(code, "keycloak");
         assertThat(response.getStatusCode()).isEqualTo(302);
+    }
+
+    public HttpResponse loginByOauth(String code, String provider) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        params.put("provider", provider);
+        OkHttpClient requestClient = new OkHttpClient.Builder().followRedirects(false).build();
+        return requestClient.post("/rediect/login/oauth2", null, params);
     }
 }
