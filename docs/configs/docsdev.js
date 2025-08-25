@@ -80,10 +80,6 @@ export default {
                                 title: 'Task Instance',
                                 link: '/en-us/docs/dev/user_doc/guide/project/task-instance.html',
                             },
-                            {
-                                title: 'Task Definition',
-                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
-                            },
                         ]
                     },
                     {
@@ -798,10 +794,6 @@ export default {
                             {
                                 title: '任务实例',
                                 link: '/zh-cn/docs/dev/user_doc/guide/project/task-instance.html',
-                            },
-                            {
-                                title: '任务定义',
-                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
                             },
                         ]
                     },
