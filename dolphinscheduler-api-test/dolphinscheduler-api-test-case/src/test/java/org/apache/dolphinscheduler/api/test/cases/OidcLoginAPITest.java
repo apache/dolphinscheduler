@@ -25,11 +25,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 @DolphinScheduler(composeFiles = "docker/oidc-login/docker-compose.yaml")
+@Slf4j
 public class OidcLoginAPITest {
 
     private static final String PROVIDER_ID = "keycloak";
@@ -109,6 +112,6 @@ public class OidcLoginAPITest {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         HttpResponse response = oidcLoginPage.loginWithPassword("anyuser", "anypassword");
         // In OIDC mode, /login endpoint should not allow password login
-        Assertions.assertNotEquals(200, response.getStatusCode());
+        Assertions.assertEquals(401, response.getStatusCode());
     }
 }
