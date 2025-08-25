@@ -46,6 +46,8 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <testcontainers.version>1.19.8</testcontainers.version>
         <junit-pioneer.version>2.2.0</junit-pioneer.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <webdrivermanager.version>5.9.2</webdrivermanager.version>
     </properties>
 
     <dependencies>
@@ -109,6 +111,19 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <artifactId>okhttp</artifactId>
+            <groupId>com.squareup.okhttp3</groupId>
+            <version>${okhttp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <dependencyManagement>
