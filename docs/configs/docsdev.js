@@ -221,10 +221,6 @@ export default {
                                 title: 'Remote Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
-                            {
-                                title: 'DolphinDB',
-                                link: '/en-us/docs/dev/user_doc/guide/datasource/dolphindb.html',
-                            },
                         ],
                     },
                     {
@@ -358,7 +354,11 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/vertica.html',
-                            }
+                            },
+                            {
+                                title: 'DolphinDB',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/dolphindb.html',
+                            },
                         ],
                     },
                     {
@@ -936,10 +936,6 @@ export default {
                                 title: 'Remote Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
-                            {
-                                title: 'DolphinDB',
-                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/dolphindb.html',
-                            },
                         ],
                     },
                     {
@@ -1057,6 +1053,10 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/vertica.html',
+                            },
+                            {
+                                title: 'DolphinDB',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/dolphindb.html',
                             },
                         ],
                     },
