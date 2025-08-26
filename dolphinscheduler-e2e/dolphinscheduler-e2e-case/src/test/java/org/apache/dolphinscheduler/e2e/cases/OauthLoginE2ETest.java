@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -30,36 +29,27 @@ import java.util.Map;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.FormBody;
-import okhttp3.Headers;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import io.github.bonigarcia.wdm.WebDriverManager;
 
 @DolphinScheduler(composeFiles = "docker/oauth-login/docker-compose.yaml")
 @Slf4j
 @DisableIfTestFails
 public class OauthLoginE2ETest {
 
-    public static final String DOLPHINSCHEDULER_API_URL = "http://0.0.0.0:12345/dolphinscheduler";
+    private static RemoteWebDriver browser;
 
-    public static final String REQUEST_CONTENT_TYPE = "application/x-www-form-urlencoded";
-
+    public static final String DOLPHINSCHEDULER_API_URL = "http://localhost:12345/dolphinscheduler";
     public static final String QUESTION_MARK = "?";
 
     public static final String EQUAL_MARK = "=";
@@ -76,20 +66,14 @@ public class OauthLoginE2ETest {
         String username = "test-user";
         String password = "test-password";
 
-        String authUrl = "http://localhost:8080/realms/" + realm + "/protocol/openid-connect/auth?client_id=" + clientId
+        String authUrl = "http://host.docker.internal:8080/realms/" + realm
+                + "/protocol/openid-connect/auth?client_id=" + clientId
                 + "&response_type=code&scope=openid&redirect_uri="
                 + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--headless=new");
+        browser.get(authUrl);
 
-        WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver(options);
-        driver.get(authUrl);
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        WebDriverWait wait = new WebDriverWait(browser, Duration.ofSeconds(30));
 
         WebElement userInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         userInput.sendKeys(username);
@@ -100,18 +84,9 @@ public class OauthLoginE2ETest {
         WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("kc-login")));
         loginButton.click();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        wait.until(d -> d.getCurrentUrl().contains("code="));
+        String currentUrl = browser.getCurrentUrl();
 
-        String currentUrl = driver.getCurrentUrl();
-        driver.quit();
-
-        if (!currentUrl.contains("code=")) {
-            throw new RuntimeException("the URL: " + currentUrl);
-        }
         String code = currentUrl.split("code=")[1].split("&")[0];
         assertThat(loginByOauth(code)).isEqualTo(302);
     }
@@ -120,25 +95,22 @@ public class OauthLoginE2ETest {
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
         params.put("provider", "keycloak");
+
         OkHttpClient requestClient = new OkHttpClient.Builder().followRedirects(false).build();
 
-        Map<String, String> headers = new HashMap<>();
+        String requestUrl = String.format("%s/redirect/login/oauth2%s",
+                DOLPHINSCHEDULER_API_URL, getParams(params));
 
-        String requestUrl = String.format("%s%s", DOLPHINSCHEDULER_API_URL, "/rediect/login/oauth2");
-        headers.put("Content-Type", REQUEST_CONTENT_TYPE);
-        Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(REQUEST_CONTENT_TYPE));
-        log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        log.info("GET request to {}", requestUrl);
+
         Request request = new Request.Builder()
-                .headers(headersBuilder)
                 .url(requestUrl)
-                .post(requestBody)
+                .get()
                 .build();
-        Response response = null;
-        try {
-            response = requestClient.newCall(request).execute();
+
+        try (Response response = requestClient.newCall(request).execute()) {
             return response.code();
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
