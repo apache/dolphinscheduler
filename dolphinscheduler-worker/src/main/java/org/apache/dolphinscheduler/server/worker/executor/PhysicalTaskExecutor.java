@@ -88,6 +88,14 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
     }
 
     @Override
+    protected void closureTaskContext() {
+        log.info("Begin to closure taskContext.");
+        taskExecutionContext.setVarPool(physicalTask.getParameters().getVarPool());
+        log.info("Set taskContext varPool {}", JSONUtils.toPrettyJsonString(taskExecutionContext.getVarPool()));
+        log.info("End closure taskContext.");
+    }
+
+    @Override
     protected TaskExecutorState doTrackTaskPluginStatus() {
         return TaskExecutorStateMappings.mapState(physicalTask.getExitStatus());
     }

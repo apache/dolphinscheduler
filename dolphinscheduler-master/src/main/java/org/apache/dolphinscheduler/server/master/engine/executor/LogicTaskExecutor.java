@@ -59,6 +59,9 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
         logicTask.start();
     }
 
+    @Override
+    protected void closureTaskContext() {}
+
     @SneakyThrows
     @Override
     public void pause() {

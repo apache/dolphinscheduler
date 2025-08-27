@@ -79,6 +79,8 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
         }
 
         doTriggerTaskPlugin();
+
+        closureTaskContext();
     }
 
     @Override
@@ -124,6 +126,8 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
     protected abstract void initializeTaskPlugin();
 
     protected abstract void doTriggerTaskPlugin();
+
+    protected abstract void closureTaskContext();
 
     protected void initializeTaskContext() {
         taskExecutionContext.setStartTime(System.currentTimeMillis());
