@@ -16,11 +16,20 @@
  */
 
 import { useRouter, useRoute } from 'vue-router'
-import { clearCookie, getOauth2Provider, getOidcProviders, login } from '@/service/modules/login'
+import {
+  clearCookie,
+  getOauth2Provider,
+  getOidcProviders,
+  login
+} from '@/service/modules/login'
 import { getUserInfo } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
-import type { LoginRes, OAuth2Provider, OidcProvider } from '@/service/modules/login/types'
+import type {
+  LoginRes,
+  OAuth2Provider,
+  OidcProvider
+} from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
