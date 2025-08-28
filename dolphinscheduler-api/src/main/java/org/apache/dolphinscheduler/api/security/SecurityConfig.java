@@ -19,10 +19,14 @@ package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.oidc.OidcAuthenticator;
+import org.apache.dolphinscheduler.api.security.impl.oidc.OidcConfigProperties;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.sso.CasdoorAuthenticator;
+import org.apache.dolphinscheduler.api.service.UsersService;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,12 +44,18 @@ public class SecurityConfig {
     @Value("${security.authentication.type:PASSWORD}")
     private String type;
 
-    private AutowireCapableBeanFactory beanFactory;
+    private final AutowireCapableBeanFactory beanFactory;
+    private final OidcConfigProperties oidcConfig;
+    private final UsersService usersService;
     private AuthenticationType authenticationType;
 
     @Autowired
-    public SecurityConfig(AutowireCapableBeanFactory beanFactory) {
+    public SecurityConfig(AutowireCapableBeanFactory beanFactory,
+                          Optional<OidcConfigProperties> oidcConfig,
+                          Optional<UsersService> usersService) {
         this.beanFactory = beanFactory;
+        this.oidcConfig = oidcConfig.orElse(null);
+        this.usersService = usersService.orElse(null);
     }
 
     private void setAuthenticationType(String type) {
@@ -74,7 +84,11 @@ public class SecurityConfig {
                 authenticator = new CasdoorAuthenticator();
                 break;
             case OIDC:
-                authenticator = new OidcAuthenticator();
+                if (oidcConfig == null || usersService == null) {
+                    throw new IllegalStateException(
+                            "OIDC authentication is configured, but required beans are not available.");
+                }
+                authenticator = new OidcAuthenticator(oidcConfig, usersService);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);
