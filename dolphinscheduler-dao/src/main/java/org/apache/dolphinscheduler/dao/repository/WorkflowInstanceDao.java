@@ -91,6 +91,15 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
                                                             int workflowDefinitionVersion,
                                                             int[] states);
 
+    /**
+     * query workflow instance by workflowDefinitionCode and stateArray
+     *
+     * @param workflowDefinitionCode workflowDefinitionCode
+     * @param states                states array
+     * @return workflow instance list
+     */
+    List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states);
+
     List<String> queryNeedFailoverMasters();
 
     /**

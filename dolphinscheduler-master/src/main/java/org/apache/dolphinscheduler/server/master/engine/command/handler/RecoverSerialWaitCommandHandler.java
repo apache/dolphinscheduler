@@ -19,86 +19,82 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
-import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
-import org.apache.dolphinscheduler.server.master.engine.workflow.strategy.WorkflowExecutionStrategyService;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * Used to handle the {@link CommandType#START_PROCESS} which will start the workflow definition.
- * <p> You can specify the start nodes at {@link RunWorkflowCommandParam}
+ * This handler used to handle {@link CommandType#RECOVER_SERIAL_WAIT}.
+ * Will recover a workflow instance from serial wait state to running state.
  */
+@Slf4j
 @Component
-public class RunWorkflowCommandHandler extends AbstractCommandHandler {
+public class RecoverSerialWaitCommandHandler extends AbstractCommandHandler {
 
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private MasterConfig masterConfig;
-
-    @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private WorkflowExecutionStrategyService workflowExecutionStrategyService;
-
     /**
-     * Will generate a new workflow instance based on the command.
+     * Generate the recover workflow instance from serial wait state.
+     * Will use the origin workflow instance, but will update the following fields:
+     * <ul>
+     *     <li>state: from SERIAL_WAIT to RUNNING_EXECUTION</li>
+     *     <li>command type</li>
+     *     <li>start time</li>
+     *     <li>restart time</li>
+     * </ul>
      */
     @Override
     protected void assembleWorkflowInstance(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
         final Command command = workflowExecuteContextBuilder.getCommand();
-        final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(command.getWorkflowInstanceId());
+        final int workflowInstanceId = command.getWorkflowInstanceId();
 
-        // Apply execution strategy before setting the state
-        boolean shouldExecute = workflowExecutionStrategyService.checkAndApplyExecutionStrategy(
-                workflowDefinition, workflowInstance);
+        log.info("Recovering workflow instance from SERIAL_WAIT state, instance id: {}", workflowInstanceId);
 
-        if (shouldExecute) {
-            workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
-                    command.getCommandType().name());
+        final WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(workflowInstanceId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
+
+        log.info("Found workflow instance: {} (id: {}), current state: {}",
+                workflowInstance.getName(), workflowInstance.getId(), workflowInstance.getState());
+
+        // Check if the workflow instance is in SERIAL_WAIT state
+        if (workflowInstance.getState() != WorkflowExecutionStatus.SERIAL_WAIT) {
+            log.warn("Workflow instance {} is not in SERIAL_WAIT state, current state: {}",
+                    workflowInstance.getName(), workflowInstance.getState());
+            throw new IllegalStateException("Workflow instance is not in SERIAL_WAIT state");
         }
 
-        workflowInstance.setHost(masterConfig.getMasterAddress());
-        workflowInstance.setCommandParam(command.getCommandParam());
-        workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
-        workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
+        workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
+        workflowInstance.setCommandType(command.getCommandType());
+        workflowInstanceDao.updateById(workflowInstance);
+
+        log.info("Successfully recovered workflow instance {} from SERIAL_WAIT to RUNNING_EXECUTION",
+                workflowInstance.getName());
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
 
     @Override
     protected void assembleWorkflowExecutionGraph(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        // For serial wait recovery, we need to create the workflow execution graph from the beginning
+        // This is similar to RunWorkflowCommandHandler
         final IWorkflowGraph workflowGraph = workflowExecuteContextBuilder.getWorkflowGraph();
         final WorkflowExecutionGraph workflowExecutionGraph = new WorkflowExecutionGraph();
         final BiConsumer<String, Set<String>> taskExecutionRunnableCreator = (task, successors) -> {
@@ -129,29 +125,8 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
         workflowExecuteContextBuilder.setWorkflowExecutionGraph(workflowExecutionGraph);
     }
 
-    /**
-     * Merge the command params with the workflow params.
-     * <p> If there are duplicate keys, the command params will override the workflow params.
-     */
-    private String mergeCommandParamsWithWorkflowParams(final Command command,
-                                                        final WorkflowDefinition workflowDefinition) {
-        final List<Property> commandParams =
-                Optional.ofNullable(JSONUtils.parseObject(command.getCommandParam(), ICommandParam.class))
-                        .map(ICommandParam::getCommandParams)
-                        .orElse(null);
-        final List<Property> globalParamsList = JSONUtils.toList(workflowDefinition.getGlobalParams(), Property.class);
-        Map<String, Property> finalParams = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(globalParamsList)) {
-            globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));
-        }
-        if (CollectionUtils.isNotEmpty(commandParams)) {
-            commandParams.forEach(commandParam -> finalParams.put(commandParam.getProp(), commandParam));
-        }
-        return JSONUtils.toJsonString(finalParams.values());
-    }
-
     @Override
     public CommandType commandType() {
-        return CommandType.START_PROCESS;
+        return CommandType.RECOVER_SERIAL_WAIT;
     }
 }

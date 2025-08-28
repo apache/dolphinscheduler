@@ -169,6 +169,11 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     }
 
     @Override
+    public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
+        return mybatisMapper.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
+    }
+
+    @Override
     public List<String> queryNeedFailoverMasters() {
         return mybatisMapper
                 .queryNeedFailoverWorkflowInstanceHost(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());

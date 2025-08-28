@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecu
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.strategy.WorkflowExecutionStrategyService;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
@@ -64,6 +65,9 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     @Autowired
     protected WorkflowAlertManager workflowAlertManager;
+
+    @Autowired
+    protected WorkflowExecutionStrategyService workflowExecutionStrategyService;
 
     /**
      * Try to trigger the tasks if the trigger condition is met.
@@ -195,6 +199,14 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
         workflowCacheRepository.remove(workflowExecutionRunnable.getId());
         workflowEventBusCoordinator.unRegisterWorkflowEventBus(workflowExecutionRunnable);
         workflowAlertManager.sendAlertWorkflowInstance(workflowExecutionRunnable.getWorkflowInstance());
+
+        // Check and wake up next serial waiting workflow instance
+        try {
+            workflowExecutionStrategyService
+                    .checkAndWakeUpNextSerialInstance(workflowExecutionRunnable.getWorkflowInstance());
+        } catch (Exception e) {
+            log.warn("Failed to check and wake up next serial waiting workflow instance", e);
+        }
 
         log.info("Successfully finalize WorkflowExecuteRunnable: {}", workflowExecutionRunnable.getName());
     }
