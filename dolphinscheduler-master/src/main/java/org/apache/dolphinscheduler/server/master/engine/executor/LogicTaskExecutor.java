@@ -60,7 +60,8 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
     }
 
     @Override
-    protected void closureTaskContext() {}
+    protected void closureTaskContext() {
+    }
 
     @SneakyThrows
     @Override
