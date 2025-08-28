@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.security.impl.oidc;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -36,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -46,6 +47,7 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenRequest;
@@ -73,11 +75,8 @@ import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 @Component("oidcAuthenticator")
 public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
-    @Autowired
-    private OidcConfigProperties oidcConfig;
-
-    @Autowired
-    private UsersService usersService;
+    private final OidcConfigProperties oidcConfig;
+    private final UsersService usersService;
 
     @Value("${api.base-url:http://localhost:12345/dolphinscheduler}")
     private String apiBaseUrl;
@@ -86,6 +85,11 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
     private static final String EMAIL_ATTRIBUTE = "email";
 
     private final Map<String, OIDCProviderMetadata> providerMetadataCache = new ConcurrentHashMap<>();
+
+    public OidcAuthenticator(OidcConfigProperties oidcConfig, UsersService usersService) {
+        this.oidcConfig = oidcConfig;
+        this.usersService = usersService;
+    }
 
     @Override
     public User login(@NonNull String state, String code) {
@@ -207,61 +211,81 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
      * Exchange authorization code for tokens
      */
     private OIDCTokens exchangeCodeForTokens(OIDCProviderMetadata providerMetadata, OidcProviderConfig providerConfig,
-                                             // String code) throws Exception {
-                                             String code, String providerId) throws Exception {
-        ClientID clientID = new ClientID(providerConfig.getClientId());
+                                             String code, String providerId) {
+        try {
+            ClientID clientID = new ClientID(providerConfig.getClientId());
 
-        Secret clientSecret = new Secret(providerConfig.getClientSecret());
-        URI redirectURI = new URI(getCallbackUrl(providerId));
+            Secret clientSecret = new Secret(providerConfig.getClientSecret());
+            URI redirectURI = new URI(getCallbackUrl(providerId));
 
-        AuthorizationCode authorizationCode = new AuthorizationCode(code);
-        AuthorizationCodeGrant codeGrant = new AuthorizationCodeGrant(authorizationCode, redirectURI);
+            AuthorizationCode authorizationCode = new AuthorizationCode(code);
+            AuthorizationCodeGrant codeGrant = new AuthorizationCodeGrant(authorizationCode, redirectURI);
 
-        ClientAuthentication clientAuth;
-        if ("client_secret_post".equalsIgnoreCase(providerConfig.getClientAuthenticationMethod())) {
-            clientAuth = new ClientSecretPost(clientID, clientSecret);
-        } else {
-            clientAuth = new ClientSecretBasic(clientID, clientSecret);
+            ClientAuthentication clientAuth;
+            if ("client_secret_post".equalsIgnoreCase(providerConfig.getClientAuthenticationMethod())) {
+                clientAuth = new ClientSecretPost(clientID, clientSecret);
+            } else {
+                clientAuth = new ClientSecretBasic(clientID, clientSecret);
+            }
+
+            TokenRequest tokenRequest = new TokenRequest(
+                    providerMetadata.getTokenEndpointURI(),
+                    clientAuth,
+                    codeGrant);
+
+            TokenResponse tokenResponse;
+            try {
+                tokenResponse = OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
+            } catch (Exception e) {
+                log.error("Failed to send token request", e);
+                throw new ServiceException(Status.OIDC_TOKEN_EXCHANGE_FAILED);
+            }
+
+            if (!tokenResponse.indicatesSuccess()) {
+                log.error("Token request failed: {}", tokenResponse.toErrorResponse().getErrorObject());
+                throw new ServiceException(Status.OIDC_TOKEN_EXCHANGE_FAILED);
+            }
+
+            return ((OIDCTokenResponse) tokenResponse).getOIDCTokens();
+        } catch (java.net.URISyntaxException e) {
+            log.error("Invalid redirect URI configured for OIDC provider: {}", providerId, e);
+            throw new ServiceException("Failed to construct OIDC redirect URI", e);
         }
-
-        TokenRequest tokenRequest = new TokenRequest(
-                providerMetadata.getTokenEndpointURI(),
-                clientAuth,
-                codeGrant);
-
-        TokenResponse tokenResponse = OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
-
-        if (!tokenResponse.indicatesSuccess()) {
-            log.error("Token request failed: {}", tokenResponse.toErrorResponse().getErrorObject());
-            throw new Exception("Token exchange failed");
-        }
-
-        return ((OIDCTokenResponse) tokenResponse).getOIDCTokens();
     }
 
     /**
      * Validate ID token and extract claims
      */
     private IDTokenClaimsSet validateIdToken(OIDCProviderMetadata providerMetadata,
-                                             OidcProviderConfig providerConfig, JWT idToken) throws Exception {
-        JWTClaimsSet claimsSet = idToken.getJWTClaimsSet();
+                                             OidcProviderConfig providerConfig, JWT idToken) {
+        JWTClaimsSet claimsSet;
+        try {
+            claimsSet = idToken.getJWTClaimsSet();
+        } catch (java.text.ParseException e) {
+            throw new ServiceException("Error parsing ID token claims", e);
+        }
 
         String issuer = claimsSet.getIssuer();
         if (issuer == null || !issuer.equals(providerMetadata.getIssuer().getValue())) {
-            throw new RuntimeException("Invalid issuer in ID token");
+            throw new ServiceException(Status.OIDC_ID_TOKEN_ISSUER_INVALID);
         }
 
         List<String> audiences = claimsSet.getAudience();
         if (audiences == null || !audiences.contains(providerConfig.getClientId())) {
-            throw new RuntimeException("Invalid audience in ID token");
+            throw new ServiceException(Status.OIDC_ID_TOKEN_AUDIENCE_INVALID);
         }
 
         Date expirationTime = claimsSet.getExpirationTime();
         if (expirationTime == null || expirationTime.before(new Date())) {
-            throw new RuntimeException("ID token has expired");
+            throw new ServiceException(Status.OIDC_ID_TOKEN_EXPIRED);
         }
 
-        return new IDTokenClaimsSet(claimsSet);
+        try {
+            return new IDTokenClaimsSet(claimsSet);
+        } catch (ParseException e) {
+            log.error("Failed to parse ID token claims, required claims may be missing.", e);
+            throw new ServiceException("ID token is missing required claims", e);
+        }
     }
 
     /**
