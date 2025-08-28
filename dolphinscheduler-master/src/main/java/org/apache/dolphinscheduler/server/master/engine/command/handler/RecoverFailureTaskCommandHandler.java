@@ -139,6 +139,7 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
                         .doVisitFunction(taskExecutionRunnableCreator)
                         .build();
         workflowGraphTopologyLogicalVisitor.visit();
+        workflowExecutionGraph.removeUnReachableEdge();
 
         workflowExecuteContextBuilder.setWorkflowExecutionGraph(workflowExecutionGraph);
     }
