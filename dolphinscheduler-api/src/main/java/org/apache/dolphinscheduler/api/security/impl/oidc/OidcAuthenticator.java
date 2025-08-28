@@ -82,6 +82,9 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
     @Value("${api.base-url:http://localhost:12345/dolphinscheduler}")
     private String apiBaseUrl;
 
+    private static final String SANITIZE_REGEX = "[\n\r\t]";
+    private static final String EMAIL_ATTRIBUTE = "email";
+
     private final Map<String, OIDCProviderMetadata> providerMetadataCache = new ConcurrentHashMap<>();
 
     @Override
@@ -100,14 +103,14 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             request.getSession().removeAttribute(Constants.SSO_LOGIN_USER_STATE);
 
             if (originalState == null || !MessageDigest.isEqual(originalState.getBytes(), state.getBytes())) {
-                String sanitizedState = state.replaceAll("[\n\r\t]", "_");
+                String sanitizedState = state.replaceAll(SANITIZE_REGEX, "_");
                 log.error("State validation failed. Expected: {}, Actual: {}", originalState, sanitizedState);
                 return null;
             }
 
             String[] stateParts = state.split(":", 2);
             if (stateParts.length != 2) {
-                String sanitizedState = state.replaceAll("[\n\r\t]", "_");
+                String sanitizedState = state.replaceAll(SANITIZE_REGEX, "_");
                 log.error("Invalid state format: {}", sanitizedState);
                 return null;
             }
@@ -115,7 +118,7 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             String providerId = stateParts[0];
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
             if (providerConfig == null) {
-                String sanitizedProviderId = providerId.replaceAll("[\n\r\t]", "_");
+                String sanitizedProviderId = providerId.replaceAll(SANITIZE_REGEX, "_");
                 log.error("Provider not found: {}", sanitizedProviderId);
                 return null;
             }
@@ -300,13 +303,13 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
     }
 
     private String extractEmail(IDTokenClaimsSet idTokenClaims, UserInfo userInfo) {
-        Object emailFromIdToken = idTokenClaims.getClaim("email");
+        Object emailFromIdToken = idTokenClaims.getClaim(EMAIL_ATTRIBUTE);
         if (emailFromIdToken != null) {
             return emailFromIdToken.toString();
         }
 
         if (userInfo != null) {
-            Object emailFromUserInfo = userInfo.getClaim("email");
+            Object emailFromUserInfo = userInfo.getClaim(EMAIL_ATTRIBUTE);
             if (emailFromUserInfo != null) {
                 return emailFromUserInfo.toString();
             }
@@ -356,7 +359,7 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
     private Scope parseScope(String scopeString) {
         if (scopeString == null || scopeString.isEmpty()) {
-            return new Scope("openid", "profile", "email");
+            return new Scope("openid", "profile", EMAIL_ATTRIBUTE);
         }
         return Scope.parse(scopeString);
     }

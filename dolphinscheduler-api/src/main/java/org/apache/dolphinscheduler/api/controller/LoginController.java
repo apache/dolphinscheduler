@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -87,23 +88,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Slf4j
 public class LoginController extends BaseController {
 
-    @Autowired
-    private SessionService sessionService;
-
-    @Autowired
-    private Authenticator authenticator;
-
-    @Autowired(required = false)
-    private OAuth2Configuration oAuth2Configuration;
-
-    @Autowired(required = false)
-    private OidcConfigProperties oidcConfigProperties;
-
-    @Autowired
-    private UsersService usersService;
+    private final SessionService sessionService;
+    private final Authenticator authenticator;
+    private final OAuth2Configuration oAuth2Configuration;
+    private final OidcConfigProperties oidcConfigProperties;
+    private final UsersService usersService;
 
     @Value("${api.ui-url:http://localhost:5173}")
     private String uiUrl;
+
+    @Autowired
+    public LoginController(SessionService sessionService,
+                           Authenticator authenticator,
+                           UsersService usersService,
+                           Optional<OAuth2Configuration> oAuth2Configuration,
+                           Optional<OidcConfigProperties> oidcConfigProperties) {
+        this.sessionService = sessionService;
+        this.authenticator = authenticator;
+        this.usersService = usersService;
+        this.oAuth2Configuration = oAuth2Configuration.orElse(null);
+        this.oidcConfigProperties = oidcConfigProperties.orElse(null);
+    }
 
     /**
      * login
@@ -227,7 +232,7 @@ public class LoginController extends BaseController {
      * @return list of OIDC providers
      */
     @Operation(summary = "getOidcProviders", description = "GET_OIDC_PROVIDERS")
-    @GetMapping("oidc-providers")
+    @GetMapping("/oidc-providers")
     public Result<List<Map<String, String>>> oidcProviders() {
         if (oidcConfigProperties == null || !oidcConfigProperties.isEnable()
                 || oidcConfigProperties.getProviders() == null) {
@@ -313,11 +318,18 @@ public class LoginController extends BaseController {
      */
     @SneakyThrows
     @Operation(summary = "handleOidcCallback", description = "HANDLE_OIDC_CALLBACK")
-    @GetMapping("login/oauth2/code/{providerId}")
-    public void handleOidcCallback(@RequestParam(name = "code", required = false) String code,
+    @GetMapping("/login/oauth2/code/{providerId}")
+    public void handleOidcCallback(@PathVariable String providerId,
+                                   @RequestParam(name = "code", required = false) String code,
                                    @RequestParam(name = "error", required = false) String error,
                                    @RequestParam(name = "state") String state,
                                    HttpServletResponse response) throws IOException {
+
+        if (!state.startsWith(providerId + ":")) {
+            log.error("OIDC login failed: State parameter does not match the provider ID.");
+            response.sendRedirect("/dolphinscheduler/ui/#/login?error=oidc_invalid_state");
+            return;
+        }
 
         // Handle login failure from OIDC provider
         if (error != null) {

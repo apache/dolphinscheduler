@@ -41,7 +41,10 @@ import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
 import cookies from 'js-cookie'
 import { ssoLoginUrl } from '@/service/modules/login'
-import type { OAuth2Provider, OidcProvider } from '@/service/modules/login/types'
+import type {
+  OAuth2Provider,
+  OidcProvider
+} from '@/service/modules/login/types'
 
 const login = defineComponent({
   name: 'login',
@@ -98,7 +101,7 @@ const login = defineComponent({
       trim,
       oauth2Providers,
       oidcProviders,
-      gotoOAuth2Page,
+      gotoOAuth2Page
     }
   },
   render() {
@@ -187,7 +190,8 @@ const login = defineComponent({
               </NButton>
             </a>
           </div>
-          {(this.oauth2Providers.length > 0 || this.oidcProviders.length > 0) && (
+          {(this.oauth2Providers.length > 0 ||
+            this.oidcProviders.length > 0) && (
             <NDivider>{this.t('login.loginWithOAuth2')}</NDivider>
           )}
 
@@ -206,14 +210,16 @@ const login = defineComponent({
             {this.oidcProviders?.map((e: OidcProvider) => {
               const authUrl = `/dolphinscheduler/oauth2/authorization/${e.id}`
               return (
-                  <a href={authUrl} class={styles['oidc-provider-link']}>
-                    <NButton block class={styles['oidc-provider-btn']}>
-                      <div class={styles['oidc-btn-content']}>
-                        {e.iconUri && <img src={e.iconUri} class={styles['oidc-btn-icon']} />}
-                        <span>{e.displayName}</span>
-                      </div>
-                    </NButton>
-                  </a>
+                <a href={authUrl} class={styles['oidc-provider-link']}>
+                  <NButton block class={styles['oidc-provider-btn']}>
+                    <div class={styles['oidc-btn-content']}>
+                      {e.iconUri && (
+                        <img src={e.iconUri} class={styles['oidc-btn-icon']} />
+                      )}
+                      <span>{e.displayName}</span>
+                    </div>
+                  </NButton>
+                </a>
               )
             })}
           </NSpace>
