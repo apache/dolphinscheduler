@@ -24,12 +24,14 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -181,6 +183,9 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     @Override
     public boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable) {
+        if (Objects.isNull(taskExecutionRunnable) || StringUtils.isBlank(taskExecutionRunnable.getName())) {
+            return false;
+        }
         if (isTaskExecutionRunnableActive(taskExecutionRunnable)
                 || isTaskExecutionRunnableInActive(taskExecutionRunnable)) {
             return false;
