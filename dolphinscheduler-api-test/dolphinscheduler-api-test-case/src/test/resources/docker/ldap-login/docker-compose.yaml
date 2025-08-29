@@ -37,7 +37,7 @@ services:
       - openldap
   openldap:
     hostname: openldap
-    image: bitnami/openldap:2.6
+    image: bitnamilegacy/openldap:2.6.10-debian-12-r4
     ports:
       - '1389:1389'
       - '1636:1636'
