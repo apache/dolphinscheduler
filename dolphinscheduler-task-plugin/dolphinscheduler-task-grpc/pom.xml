@@ -31,8 +31,8 @@
         <plugin.name>task.grpc</plugin.name>
         <grpc.version>1.71.0</grpc.version>
         <!-- CURRENT_GRPC_VERSION -->
-        <protobuf.version>3.17.2</protobuf.version>
-        <protoc.version>3.17.2</protoc.version>
+        <protobuf.version>3.17.3</protobuf.version>
+        <protoc.version>3.17.3</protoc.version>
     </properties>
 
     <dependencyManagement>
@@ -197,10 +197,12 @@
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf.version}</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>com.google.protobuf</groupId>-->
-        <!--            <artifactId>protobuf-java</artifactId>-->
-        <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.google.protobuf</groupId>-->
+<!--            <artifactId>protoc</artifactId>-->
+<!--            <version>${protoc.version}</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
     </dependencies>
 
