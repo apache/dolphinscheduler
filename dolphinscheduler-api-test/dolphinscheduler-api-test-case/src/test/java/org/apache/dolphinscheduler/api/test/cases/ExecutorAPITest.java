@@ -165,7 +165,7 @@ public class ExecutorAPITest {
             Assertions.assertTrue(data.contains("\"success\":true"));
 
             // get workflow definition code
-            HttpResponse queryAllWorkflowDefinitionByP rojectCodeResponse =
+            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
                     workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
             Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
             Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
