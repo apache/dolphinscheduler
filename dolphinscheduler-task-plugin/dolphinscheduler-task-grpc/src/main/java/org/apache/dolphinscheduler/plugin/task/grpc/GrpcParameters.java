@@ -28,15 +28,15 @@ import lombok.EqualsAndHashCode;
 @Data
 public class GrpcParameters extends AbstractParameters {
 
-    private String url; // http://domain:port
+    private String url; // grpc endpoint, http://domain:port
 
-    private String grpcServiceDefinition; // protobuf service definition
+    private String grpcServiceDefinition; // protobuf service definition, written in .proto file format
 
-    private String grpcServiceDefinitionJSON; // parsed protobuf service definition
+    private String grpcServiceDefinitionJSON; // parsed protobuf service definition, written in protobuf.js json descriptors, parsed from grpcServiceDefinition at browser side
 
     private String methodName; // e.g. com.example.service.ExampleService/ExampleMethod
 
-    private String message; // e.g. {"key1": "value1", "key2": "value2"}
+    private String message; // e.g. {"key1": "value1", "key2": "value2"}, will apply to request definition
 
     private GrpcCheckCondition grpcCheckCondition = GrpcCheckCondition.STATUS_CODE_DEFAULT;
 
