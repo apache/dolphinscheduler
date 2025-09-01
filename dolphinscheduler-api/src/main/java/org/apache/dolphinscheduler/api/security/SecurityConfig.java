@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.security;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.oidc.OidcAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.oidc.OidcConfigProperties;
@@ -48,14 +49,17 @@ public class SecurityConfig {
     private final OidcConfigProperties oidcConfig;
     private final UsersService usersService;
     private AuthenticationType authenticationType;
+    private final ApiConfig apiConfig;
 
     @Autowired
     public SecurityConfig(AutowireCapableBeanFactory beanFactory,
                           Optional<OidcConfigProperties> oidcConfig,
-                          Optional<UsersService> usersService) {
+                          Optional<UsersService> usersService,
+                          ApiConfig apiConfig) {
         this.beanFactory = beanFactory;
         this.oidcConfig = oidcConfig.orElse(null);
         this.usersService = usersService.orElse(null);
+        this.apiConfig = apiConfig;
     }
 
     private void setAuthenticationType(String type) {
@@ -88,7 +92,7 @@ public class SecurityConfig {
                     throw new IllegalStateException(
                             "OIDC authentication is configured, but required beans are not available.");
                 }
-                authenticator = new OidcAuthenticator(oidcConfig, usersService);
+                authenticator = new OidcAuthenticator(oidcConfig, usersService, apiConfig);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);

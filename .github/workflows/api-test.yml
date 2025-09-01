@@ -119,6 +119,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.WorkflowInstanceAPITest
           - name: LdapLoginAPITest
             class: org.apache.dolphinscheduler.api.test.cases.LdapLoginAPITest
+          - name: OidcLoginAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.OidcLoginAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

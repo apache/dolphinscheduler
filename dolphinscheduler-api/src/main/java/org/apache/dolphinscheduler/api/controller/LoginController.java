@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.NOT_SUPPORT_SSO;
 import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -63,7 +64,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,21 +93,21 @@ public class LoginController extends BaseController {
     private final OAuth2Configuration oAuth2Configuration;
     private final OidcConfigProperties oidcConfigProperties;
     private final UsersService usersService;
-
-    @Value("${api.ui-url:http://localhost:5173}")
-    private String uiUrl;
+    private final ApiConfig apiConfig;
 
     @Autowired
     public LoginController(SessionService sessionService,
                            Authenticator authenticator,
                            UsersService usersService,
                            Optional<OAuth2Configuration> oAuth2Configuration,
-                           Optional<OidcConfigProperties> oidcConfigProperties) {
+                           Optional<OidcConfigProperties> oidcConfigProperties,
+                           ApiConfig apiConfig) {
         this.sessionService = sessionService;
         this.authenticator = authenticator;
         this.usersService = usersService;
         this.oAuth2Configuration = oAuth2Configuration.orElse(null);
         this.oidcConfigProperties = oidcConfigProperties.orElse(null);
+        this.apiConfig = apiConfig;
     }
 
     /**
@@ -365,7 +365,7 @@ public class LoginController extends BaseController {
 
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
             response.sendRedirect(String.format("%s/login?sessionId=%s&authType=%s",
-                    uiUrl, session.getId(), "oidc"));
+                    apiConfig.getUiUrl(), session.getId(), "oidc"));
         } catch (Exception ex) {
             log.error("A critical error occurred during the OIDC callback process.", ex);
             try {

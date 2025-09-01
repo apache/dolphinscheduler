@@ -34,10 +34,4 @@ public class HttpResponse {
     private HttpResponseBody body;
 
     private Map<String, String> headers = new HashMap<>();
-
-    public HttpResponse(int statusCode, HttpResponseBody body) {
-        this.statusCode = statusCode;
-        this.body = body;
-        this.headers = new HashMap<>();
-    }
 }
