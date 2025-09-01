@@ -138,7 +138,6 @@ public class GrpcTask extends AbstractTask {
     }
 
     public void addDefaultOutput(String response) {
-        // put response in output
         Property outputProperty = new Property();
         outputProperty.setProp(String.format("%s.%s", taskExecutionContext.getTaskName(), "response"));
         outputProperty.setDirect(Direct.OUT);

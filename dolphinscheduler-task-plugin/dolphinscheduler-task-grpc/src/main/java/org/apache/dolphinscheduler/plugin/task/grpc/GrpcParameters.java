@@ -28,15 +28,15 @@ import lombok.EqualsAndHashCode;
 @Data
 public class GrpcParameters extends AbstractParameters {
 
-    private String url; // grpc endpoint, http://domain:port
+    private String url;
 
-    private String grpcServiceDefinition; // protobuf service definition, written in .proto file format
+    private String grpcServiceDefinition;
 
-    private String grpcServiceDefinitionJSON; // parsed protobuf service definition, written in protobuf.js json descriptors, parsed from grpcServiceDefinition at browser side
+    private String grpcServiceDefinitionJSON;
 
-    private String methodName; // e.g. com.example.service.ExampleService/ExampleMethod
+    private String methodName;
 
-    private String message; // e.g. {"key1": "value1", "key2": "value2"}, will apply to request definition
+    private String message;
 
     private GrpcCheckCondition grpcCheckCondition = GrpcCheckCondition.STATUS_CODE_DEFAULT;
 
@@ -46,14 +46,12 @@ public class GrpcParameters extends AbstractParameters {
      * Connect Timeout
      * Unit: ms
      */
-    private int connectTimeout = 0; // use default timeout
+    private int connectTimeout = 0;
 
     @Override
     public boolean checkParameters() {
-
         if (StringUtils.isEmpty(url) || connectTimeout <= 0)
             return false;
-        // TODO Check apply message to definition to test
         return true;
     }
 }
