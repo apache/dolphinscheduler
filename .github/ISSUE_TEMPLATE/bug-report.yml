@@ -102,6 +102,7 @@ body:
         - 3.1.x
         - 3.2.x
         - 3.3.0-alpha
+        - 3.3.1
     validations:
       required: true
 
