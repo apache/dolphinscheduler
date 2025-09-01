@@ -121,7 +121,16 @@ public final class ProcessUtils {
             }
 
             // Convert PID string to list of integers
-            List<Integer> pidList = Arrays.stream(pidArray).filter(StringUtils::isNotBlank).map(Integer::parseInt)
+            List<Integer> pidList = Arrays.stream(pidArray).filter(StringUtils::isNotBlank)
+                    .map(s -> {
+                        try {
+                            return Integer.parseInt(s.trim());
+                        } catch (NumberFormatException e) {
+                            log.warn("Invalid PID string ignored: {}", s);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
             // 1. Try to terminate gracefully (SIGINT)
