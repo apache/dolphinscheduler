@@ -62,6 +62,7 @@ dolphinscheduler-datasource-starrocks
 dolphinscheduler-datasource-trino
 dolphinscheduler-datasource-vertica
 dolphinscheduler-datasource-zeppelin
+dolphinscheduler-datasource-dolphindb
 --end--
 
 --storage-plugins--

@@ -36,11 +36,11 @@ Use the command line mode `cd`  enter the `dolphinscheduler-ui` project director
 npm config set registry http://registry.npmmirror.com/
 ```
 
-- Modify `API_BASE` in the file `dolphinscheduler-ui/.env` to interact with the backend:
+- Modify `VITE_APP_DEV_WEB_URL` in the file `dolphinscheduler-ui/.env.development` to interact with the backend:
 
 ```
 # back end interface address
-API_BASE = http://127.0.0.1:12345
+VITE_APP_DEV_WEB_URL = 'http://127.0.0.1:12345'
 ```
 
 ##### ! ! ! Special attention here. If the project reports a "node-sass error" error while pulling the dependency package, execute the following command again after execution.
@@ -53,7 +53,7 @@ npm install node-sass --unsafe-perm #Install node-sass dependency separately
 
 #### Development environment operation
 
-- `npm start` project development environment (after startup address http://localhost:8888)
+- `pnpm run dev` project development environment (after startup address http://localhost:8888)
 
 #### Front-end project release
 
