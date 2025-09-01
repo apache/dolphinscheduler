@@ -30,7 +30,6 @@
     <properties>
         <plugin.name>task.grpc</plugin.name>
         <grpc.version>1.71.0</grpc.version>
-        <!-- CURRENT_GRPC_VERSION -->
         <protobuf.version>3.17.3</protobuf.version>
         <protoc.version>3.17.3</protoc.version>
     </properties>
@@ -176,7 +175,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <!-- Use newer version than in protobuf-java-util -->
             <groupId>com.google.j2objc</groupId>
             <artifactId>j2objc-annotations</artifactId>
             <version>3.0.0</version>
@@ -197,12 +195,6 @@
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.google.protobuf</groupId>-->
-<!--            <artifactId>protoc</artifactId>-->
-<!--            <version>${protoc.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
 
     </dependencies>
 
