@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.security.impl.oidc;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
@@ -77,18 +78,24 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
     private final OidcConfigProperties oidcConfig;
     private final UsersService usersService;
+    private final ApiConfig apiConfig;
 
     @Value("${api.base-url:http://localhost:12345/dolphinscheduler}")
     private String apiBaseUrl;
 
     private static final String SANITIZE_REGEX = "[\n\r\t]";
     private static final String EMAIL_ATTRIBUTE = "email";
+    private static final String STATE_DELIMITER = ":";
+    private static final int STATE_PARTS_COUNT = 2;
+    private static final int PROVIDER_ID_INDEX = 0;
+    private static final String SANITIZE_REPLACEMENT = "_";
 
     private final Map<String, OIDCProviderMetadata> providerMetadataCache = new ConcurrentHashMap<>();
 
-    public OidcAuthenticator(OidcConfigProperties oidcConfig, UsersService usersService) {
+    public OidcAuthenticator(OidcConfigProperties oidcConfig, UsersService usersService, ApiConfig apiConfig) {
         this.oidcConfig = oidcConfig;
         this.usersService = usersService;
+        this.apiConfig = apiConfig;
     }
 
     @Override
@@ -107,23 +114,21 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             request.getSession().removeAttribute(Constants.SSO_LOGIN_USER_STATE);
 
             if (originalState == null || !MessageDigest.isEqual(originalState.getBytes(), state.getBytes())) {
-                String sanitizedState = state.replaceAll(SANITIZE_REGEX, "_");
-                log.error("State validation failed. Expected: {}, Actual: {}", originalState, sanitizedState);
+                log.error("State validation failed. Expected: {}, Actual: {}", originalState,
+                        sanitizeForLogging(state));
                 return null;
             }
 
-            String[] stateParts = state.split(":", 2);
-            if (stateParts.length != 2) {
-                String sanitizedState = state.replaceAll(SANITIZE_REGEX, "_");
-                log.error("Invalid state format: {}", sanitizedState);
+            String[] stateParts = state.split(STATE_DELIMITER, STATE_PARTS_COUNT);
+            if (stateParts.length != STATE_PARTS_COUNT) {
+                log.error("Invalid state format: {}", sanitizeForLogging(state));
                 return null;
             }
 
-            String providerId = stateParts[0];
+            String providerId = stateParts[PROVIDER_ID_INDEX];
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
             if (providerConfig == null) {
-                String sanitizedProviderId = providerId.replaceAll(SANITIZE_REGEX, "_");
-                log.error("Provider not found: {}", sanitizedProviderId);
+                log.error("Provider not found: {}", sanitizeForLogging(providerId));
                 return null;
             }
 
@@ -145,7 +150,7 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
             return user;
         } catch (Exception e) {
-            log.error("An error occurred during OIDC authentication.", e);
+            log.error("An error occurred during OIDC authentication:", e);
             return null;
         }
     }
@@ -154,8 +159,8 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
     public String getSignInUrl(String state) {
 
         try {
-            String[] stateParts = state.split(":", 2);
-            String providerId = stateParts[0];
+            String[] stateParts = state.split(STATE_DELIMITER, STATE_PARTS_COUNT);
+            String providerId = stateParts[PROVIDER_ID_INDEX];
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
 
             OIDCProviderMetadata providerMetadata = getProviderMetadata(providerId, providerConfig);
@@ -177,13 +182,13 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
             return authRequest.toURI().toString();
         } catch (Exception e) {
-            log.error("Error generating OIDC sign-in URL", e);
+            log.error("Error generating OIDC sign-in URL:", e);
             return null;
         }
     }
 
     private String getCallbackUrl(String providerId) {
-        return String.format("%s/login/oauth2/code/%s", apiBaseUrl, providerId);
+        return String.format("%s/login/oauth2/code/%s", apiConfig.getBaseUrl(), providerId);
     }
 
     /**
@@ -386,5 +391,12 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             return new Scope("openid", "profile", EMAIL_ATTRIBUTE);
         }
         return Scope.parse(scopeString);
+    }
+
+    private String sanitizeForLogging(String input) {
+        if (input == null) {
+            return null;
+        }
+        return input.replaceAll(SANITIZE_REGEX, SANITIZE_REPLACEMENT);
     }
 }

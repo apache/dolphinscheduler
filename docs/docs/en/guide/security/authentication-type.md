@@ -394,3 +394,4 @@ After restarting the DolphinScheduler API server with the new configuration, the
 Clicking the button will redirect you to your OIDC provider to authenticate. After a successful login, you will be redirected back to DolphinScheduler and automatically logged in.
 
 > **Note:** When a user clicks a provider's login button, they are first directed to a specific endpoint on the DolphinScheduler backend (e.g., `/dolphinscheduler/oauth2/authorization/keycloak`). The backend then constructs the full request and redirects the user's browser to the OIDC provider's login page.
+

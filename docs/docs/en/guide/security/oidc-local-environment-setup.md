@@ -57,8 +57,7 @@ security:
                 auto-create: true
                 default-tenant-code: "default"
                 default-queue: "default"
-                admin-group-mapping:
-                  - dolphinscheduler-admins
+                user-type: "ADMIN_USER"
 ```
 
 > **Note**:
@@ -109,3 +108,4 @@ pnpm run lint
 ```
 
 * **Security**: It's highly recommended to use a SonarQube plugin in your IDE to scan for potential security vulnerabilities early.
+
