@@ -65,7 +65,7 @@ jobs:
       - name: Check Dead Links
         run: |
           set -xe
-          lychee -c .github/workflows/lychee.toml docs/docs/*
+          lychee -c .github/workflows/lychee.toml -v docs/docs/*
   paths-filter:
     name: Helm-Doc-Path-Filter
     runs-on: ubuntu-latest
