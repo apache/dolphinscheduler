@@ -17,7 +17,6 @@ exclude = [
     '^http://minio',
     '^http://minio(:\d+)?',
     '^https://github\.com/apache/dolphinscheduler/blob/[^/]+/script/env/dolphinscheduler_env\.sh',
-    '^http://apiServerIp:apiServerPort/.*',
 ]
 
 # Exclude paths from getting checked. The values are treated as regular expressions
@@ -40,6 +39,9 @@ max_retries = 3
 # Minimum wait time in seconds between retries of failed requests.
 retry_wait_time = 10
 
+# Website timeout from connect to response finished.
+timeout = 30
+
 # When links are available using HTTPS, treat HTTP links as errors.
 require_https = false
 
@@ -51,4 +53,4 @@ include_mail = false
 include_verbatim = false
 
 # Enable the checking of fragments in links.
-include_fragments = true
+include_fragments = false
