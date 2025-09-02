@@ -120,7 +120,7 @@ The command is as follow:
 gpg --keyserver hkp://pool.sks-keyservers.net --send-key 85E11560
 ```
 
-`pool.sks-keyservers.net` is randomly chosen from [public key server](https://sks-keyservers.net/status/).
+`pool.sks-keyservers.net` is randomly chosen from [public key server](https://keyserver.ubuntu.com).
 Each server will automatically synchronize with one another, so it would be okay to choose any one, a backup keys servers
 is `gpg --keyserver hkp://keyserver.ubuntu.com --send-key <YOUR_KEY_ID>`
 

@@ -35,7 +35,7 @@
 
   ![workflow-save](../../../../img/new_ui/dev/project/workflow-save.png)
 
-  > 其他类型任务，请参考 [任务节点类型和参数设置](#TaskParamers)。 <!-- markdown-link-check-disable-line -->
+  > 其他类型任务，请参考 [任务节点类型和参数设置]
 
 - **执行策略**
 - `并行`：如果对于同一个工作流定义，同时有多个工作流实例，则并行执行工作流实例。
