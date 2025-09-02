@@ -44,6 +44,7 @@ header:
     - '**/node_modules/**'
     - '.github/actions/comment-on-issue/**'
     - '.github/actions/translate-on-issue/**'
+    - '.github/workflows/lychee.toml'
     - '**/.gitkeep'
     - 'org.mockito.plugins.MockMaker'
     - tools/dependencies/known-dependencies.txt
