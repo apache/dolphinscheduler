@@ -111,9 +111,9 @@ A: 1, **first check whether the WorkerServer service exists through jps**, or di
 
 A: Provide Docker image and Dockerfile.
 
-Docker image address: https://hub.docker.com/r/escheduler/escheduler_images
+Docker image address: https://hub.docker.com/r/apache/dolphinscheduler
 
-Dockerfile address: https://github.com/qiaozhanwei/escheduler_dockerfile/tree/master/docker_escheduler
+Dockerfile address: https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-dist/src/main/docker
 
 ---
 
@@ -533,8 +533,8 @@ A: 1, We can successfully create scheduled task and add one record into t_schedu
 
 ## Q : What is the address of swagger ui
 
-A: 1, For version 3.1.0+ is http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html,
-for version 1.2+ is http://apiServerIp:apiServerPort/dolphinscheduler/doc.html others is http://apiServerIp:apiServerPort/escheduler/doc.html.
+A: 1, For version 3.1.0+ is [http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html],
+for version 1.2+ is [http://apiServerIp:apiServerPort/dolphinscheduler/doc.html] others is [http://apiServerIp:apiServerPort/escheduler/doc.html].
 
 ---
 
@@ -583,7 +583,7 @@ A: 1, It is currently judged according to natural days, at the end of last month
 
 ## Q : DS Backend Interface Document
 
-A: 1, http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=en.
+A: 1, http://localhost:8888/dolphinscheduler/swagger-ui/index.html?language=en.
 
 ## During the operation of dolphinscheduler, the ip address is obtained incorrectly
 
@@ -616,7 +616,7 @@ dolphin.scheduler.network.interface.preferred=eth1
 
 After configuration is modified, restart the service to activation
 
-If the ip address is still wrong, please download [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) to the machine, execute the following commands and feedback the output to the community developers:
+If the ip address is still wrong, please download [dolphinscheduler-netutils.jar] to the machine, execute the following commands and feedback the output to the community developers:
 
 ```shell
 java -jar target/dolphinscheduler-netutils.jar
