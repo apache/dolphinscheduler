@@ -58,6 +58,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'editor',
+      class: 'editor-grpc-service-definition',
       field: 'grpcServiceDefinition',
       name: t('project.node.grpc_service_definition'),
       props: {
@@ -81,6 +82,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
+      class: 'input-method-name',
       field: 'methodName',
       name: t('project.node.grpc_method'),
       props: {
@@ -98,6 +100,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'editor',
+      class: 'editor-grpc-message',
       field: 'message',
       name: t('project.node.grpc_message'),
       props: {
