@@ -106,7 +106,8 @@ You can manually start the full test stack to inspect it before running the test
 
 1.  Ensure the `dolphinscheduler-api-test` module is included in your Maven projects in your IDE.
 2.  It's recommended to use **Java 11** for running the API tests.
-3.  Navigate to the `OidcLoginAPITest.java` file and run it as a JUnit test. The test framework will automatically manage the Docker containers.
+> **Notes**: Ensure that you run the required `RegistryTestCase` and `TenantAPITest` before running the OidcLoginAPITest, as they set up the necessary prerequisites.
+3. Navigate to the `OidcLoginAPITest.java` file and run it as a JUnit test. The test framework will automatically manage the Docker containers.
 > **Note**: Before running the API test using the IDE run button, ensure that port `8081` is free, as Keycloak will use this port. Also, make sure Docker Desktop is running. If you previously started the environment with `docker-compose up --build`, run `docker-compose down -v` to avoid port conflicts. The API test will automatically manage the required containers.
 
 ### Customizing the API Test Environment

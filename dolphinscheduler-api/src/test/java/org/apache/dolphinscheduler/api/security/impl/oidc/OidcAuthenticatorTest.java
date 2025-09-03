@@ -24,6 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -91,6 +92,9 @@ public class OidcAuthenticatorTest {
     private UsersService usersService;
 
     @Mock
+    private ApiConfig apiConfig;
+
+    @Mock
     private HttpServletRequest request;
     @Mock
     private HttpSession session;
@@ -107,6 +111,7 @@ public class OidcAuthenticatorTest {
         when(attributes.getRequest()).thenReturn(request);
         when(request.getSession()).thenReturn(session);
         RequestContextHolder.setRequestAttributes(attributes);
+        when(apiConfig.getBaseUrl()).thenReturn("http://localhost:12345/dolphinscheduler");
     }
 
     @Test
@@ -255,10 +260,6 @@ public class OidcAuthenticatorTest {
         Map<String, OIDCProviderMetadata> cache =
                 (Map<String, OIDCProviderMetadata>) ReflectionUtils.getField(cacheField, oidcAuthenticator);
         cache.put(providerId, metadata);
-
-        Field apiBaseUrlField = OidcAuthenticator.class.getDeclaredField("apiBaseUrl");
-        ReflectionUtils.makeAccessible(apiBaseUrlField);
-        ReflectionUtils.setField(apiBaseUrlField, oidcAuthenticator, "http://test-api-base-url");
 
         String signInUrl = oidcAuthenticator.getSignInUrl(state);
 

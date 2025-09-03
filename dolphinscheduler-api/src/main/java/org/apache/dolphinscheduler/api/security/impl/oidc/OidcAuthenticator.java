@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -79,9 +78,6 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
     private final OidcConfigProperties oidcConfig;
     private final UsersService usersService;
     private final ApiConfig apiConfig;
-
-    @Value("${api.base-url:http://localhost:12345/dolphinscheduler}")
-    private String apiBaseUrl;
 
     private static final String SANITIZE_REGEX = "[\n\r\t]";
     private static final String EMAIL_ATTRIBUTE = "email";
@@ -162,6 +158,11 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             String[] stateParts = state.split(STATE_DELIMITER, STATE_PARTS_COUNT);
             String providerId = stateParts[PROVIDER_ID_INDEX];
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
+
+            if (providerConfig == null) {
+                log.error("Provider not found: {}", sanitizeForLogging(providerId));
+                return null;
+            }
 
             OIDCProviderMetadata providerMetadata = getProviderMetadata(providerId, providerConfig);
             ClientID clientID = new ClientID(providerConfig.getClientId());
