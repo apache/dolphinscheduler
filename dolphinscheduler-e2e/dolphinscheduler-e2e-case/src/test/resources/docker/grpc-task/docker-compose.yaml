@@ -34,7 +34,7 @@ services:
       timeout: 5s
       retries: 120
   greeterServer:
-    image: ingressnginx/go-grpc-greeter-server:1.2.2
+    image: grpc/java-example-hostname:1.75.0
 #    environment:
     ports:
       - "50051:50051"
