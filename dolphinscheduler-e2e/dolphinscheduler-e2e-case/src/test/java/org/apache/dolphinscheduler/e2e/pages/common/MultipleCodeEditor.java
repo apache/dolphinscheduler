@@ -28,11 +28,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.platform.commons.util.StringUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
@@ -58,7 +58,7 @@ public final class MultipleCodeEditor {
     public MultipleCodeEditor(WebDriver driver) {
         PageFactory.initElements(driver, this);
 
-        for(WebElement element: editors){
+        for (WebElement element : editors) {
             List<WebElement> lines = element.findElements(By.className("view-line"));
             editorLines.add(lines);
         }
@@ -68,7 +68,8 @@ public final class MultipleCodeEditor {
 
     @SneakyThrows
     public MultipleCodeEditor content(int index, String content) {
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editorLines.get(index).get(0)));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(editorLines.get(index).get(0)));
 
         Actions actions = new Actions(this.driver);
 
