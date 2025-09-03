@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import org.apache.dolphinscheduler.e2e.pages.common.HttpInput;
+import org.apache.dolphinscheduler.e2e.pages.common.MultipleCodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import org.openqa.selenium.WebDriver;
@@ -40,63 +41,46 @@ public class GrpcTaskForm extends TaskNodeForm {
 
     private WebDriver driver;
 
-    private String url;
+    private HttpInput url;
+
+    private MultipleCodeEditor editors;
 
     @FindBys({
 
-            @FindBy(className = "n-tree-select"),
-            @FindBy(className = "n-base-selection"),
-    })
-    private WebElement sevicesDefinition;
-
-    @FindBys({
-
-            @FindBy(className = "n-tree-select"),
-            @FindBy(className = "n-base-selection"),
+            @FindBy(className = "input-method-name"),
+            @FindBy(tagName = "input")
     })
     private WebElement methodName;
-
-    @FindBys({
-
-            @FindBy(className = "n-tree-select"),
-            @FindBy(className = "n-base-selection"),
-    })
-    private WebElement message;
-
-    @FindBys({
-
-            @FindBy(className = "n-tree-select"),
-            @FindBy(className = "n-base-selection"),
-    })
-    private WebElement checkCondition;
 
 
     public GrpcTaskForm(WorkflowForm parent) {
         super(parent);
+
+        this.url = new HttpInput(parent.driver());
+        this.editors = new MultipleCodeEditor(parent.driver());
 
         this.driver = parent.driver();
 
         PageFactory.initElements(driver, this);
     }
 
-    public GrpcTaskForm inputUrl(String script) {
-        this.url=script;
+    public GrpcTaskForm inputUrl(String url) {
+        this.url.content(url);
         return this;
     }
 
     public GrpcTaskForm inputServiceDefinition(String serviceDefinition) {
+        this.editors.content(0, serviceDefinition);
         return this;
     }
 
     public GrpcTaskForm inputMethodName(String methodName) {
+        this.methodName.sendKeys(methodName);
         return this;
     }
 
     public GrpcTaskForm inputMessage(String message) {
-        return this;
-    }
-
-    public GrpcTaskForm inputCheckCondition(String checkCondition) {
+        this.editors.content(1, message);
         return this;
     }
 }

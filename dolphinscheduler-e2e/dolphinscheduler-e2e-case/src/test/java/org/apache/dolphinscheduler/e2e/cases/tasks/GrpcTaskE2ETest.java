@@ -37,7 +37,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
-@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/grpc-task/docker-compose.yaml")
 @DisableIfTestFails
 public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
 
@@ -86,7 +86,9 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 + "  string message = 1;\n"
                 + "}\n";
         String methodName = "Greeter/SayHello";
-        String message = "{\"name\":\"DolphinScheduler\"}";
+        String message = "{" +
+                "\"name\":\"DolphinScheduler\"" +
+                "}";
 
         workflowDefinitionPage
                 .createWorkflow()
@@ -95,10 +97,8 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .inputServiceDefinition(protobufDefinition)
                 .inputMethodName(methodName)
                 .inputMessage(message)
-                .inputCheckCondition("STATUS_CODE_DEFAULT")
                 .name(taskName)
                 .submit()
-
                 .submit()
                 .name(workflowName)
                 .submit();
