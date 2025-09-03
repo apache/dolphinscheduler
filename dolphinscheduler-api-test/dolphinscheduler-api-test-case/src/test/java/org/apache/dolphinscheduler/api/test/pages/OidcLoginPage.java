@@ -28,15 +28,15 @@ public final class OidcLoginPage {
     private final LoginPage loginPage = new LoginPage();
 
     public HttpResponse getOidcProviders() {
-        return new RequestClient().get("/oidc-providers", null, null);
+        return new RequestClient().get("/oidc-providers", null, new HashMap<>());
     }
 
     public HttpResponse initiateOidcLogin(String providerId) {
-        return new RequestClient().get("/oauth2/authorization/" + providerId, null, null);
+        return new RequestClient().get("/oauth2/authorization/" + providerId, null, new HashMap<>());
     }
 
     public HttpResponse initiateOidcLoginWithInvalidProvider(String invalidProviderId) {
-        return new RequestClient().get("/oauth2/authorization/" + invalidProviderId, null, null);
+        return new RequestClient().get("/oauth2/authorization/" + invalidProviderId, null, new HashMap<>());
     }
 
     public HttpResponse handleOidcCallback(String providerId, String code, String state) {
