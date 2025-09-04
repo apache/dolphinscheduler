@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -172,5 +173,34 @@ class SqlTaskTest {
         String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, querySql);
         Assertions.assertEquals(4, sqlParamsMap.size());
         Assertions.assertEquals(expected, formatSql);
+    }
+
+    @Test
+    void testVarPoolSetting() {
+        // 创建包含OUT参数的SqlParameters
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType("HIVE");
+        sqlParameters.setDatasource(1);
+        sqlParameters.setSql("select id, name from user where id = 1");
+
+        // 设置OUT参数
+        Property outParam = new Property("id", Direct.OUT, DataType.VARCHAR, "");
+        sqlParameters.setLocalParams(Lists.newArrayList(outParam));
+
+        // 模拟SQL执行结果
+        String sqlResult = "[{\"id\":\"1\",\"name\":\"test_user\"}]";
+
+        // 调用dealOutParam方法处理输出参数
+        sqlParameters.dealOutParam(sqlResult);
+
+        // 验证varPool是否正确设置
+        Assertions.assertNotNull(sqlParameters.getVarPool());
+        Assertions.assertEquals(1, sqlParameters.getVarPool().size());
+
+        // 验证参数值是否正确
+        Property varPoolParam = sqlParameters.getVarPool().get(0);
+        Assertions.assertEquals("id", varPoolParam.getProp());
+        Assertions.assertEquals("1", varPoolParam.getValue());
+        Assertions.assertEquals(Direct.OUT, varPoolParam.getDirect());
     }
 }
