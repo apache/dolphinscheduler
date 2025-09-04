@@ -23,6 +23,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,11 +50,11 @@ public class ProcessUtilsTest {
         }
     }
     @Test
-    public void testGetPidsStr() throws Exception {
+    public void testGetPidList() throws Exception {
         // first
         String pids = "sudo(6279)---558_1497.sh(6282)---sleep(6354)";
         int processId = 6279;
-        String exceptPidsStr = "6279 6282 6354";
+        List<Integer> exceptPidList = new ArrayList<>(Arrays.asList(6279, 6282, 6354));
         String command;
         if (SystemUtils.IS_OS_MAC) {
             pids = "-+= 6279 sudo -+- 6282 558_1497.sh --- 6354 sleep";
@@ -61,13 +65,13 @@ public class ProcessUtilsTest {
             command = String.format("%s -p %d", TaskConstants.PSTREE, processId);
         }
         mockedOSUtils.when(() -> OSUtils.exeCmd(command)).thenReturn(pids);
-        String actualPidsStr = ProcessUtils.getPidsStr(processId);
-        Assertions.assertEquals(exceptPidsStr, actualPidsStr);
+        List<Integer> actualPidList = ProcessUtils.getPidList(processId);
+        Assertions.assertEquals(exceptPidList, actualPidList);
 
         // second
         String pids2 = "apache2(2000)---222332-apache2-submit_task.py(2100)---apache2(2101)";
         int processId2 = 2000;
-        String exceptPidsStr2 = "2000 2100 2101";
+        List<Integer> exceptPidList2 = new ArrayList<>(Arrays.asList(2000, 2100, 2101));
         String command2;
         if (SystemUtils.IS_OS_MAC) {
             pids2 = "-+= 2000 apache2 -+- 2100 222332-apache2-submit_task.py --- 2101 apache2";
@@ -78,13 +82,13 @@ public class ProcessUtilsTest {
             command2 = String.format("%s -p %d", TaskConstants.PSTREE, processId2);
         }
         mockedOSUtils.when(() -> OSUtils.exeCmd(command2)).thenReturn(pids2);
-        String actualPidsStr2 = ProcessUtils.getPidsStr(processId2);
-        Assertions.assertEquals(exceptPidsStr2, actualPidsStr2);
+        List<Integer> actualPidList2 = ProcessUtils.getPidList(processId2);
+        Assertions.assertEquals(exceptPidList2, actualPidList2);
 
         // Third
         String pids3 = "sshd(5000)---sshd(6000)---bash(7000)---python(7100)";
         int processId3 = 5000;
-        String exceptPidsStr3 = "5000 6000 7000 7100";
+        List<Integer> exceptPidList3 = new ArrayList<>(Arrays.asList(5000, 6000, 7000, 7100));
         String command3;
         if (SystemUtils.IS_OS_MAC) {
             pids3 = "-+= 5000 sshd -+- 6000 sshd --= 7000 bash --- 7100 python";
@@ -95,12 +99,12 @@ public class ProcessUtilsTest {
             command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);
         }
         mockedOSUtils.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
-        String actualPidsStr3 = ProcessUtils.getPidsStr(processId3);
-        Assertions.assertEquals(exceptPidsStr3, actualPidsStr3);
+        List<Integer> actualPidList3 = ProcessUtils.getPidList(processId3);
+        Assertions.assertEquals(exceptPidList3, actualPidList3);
     }
 
     @Test
-    public void tetRemoveK8sClientCache() {
+    public void testRemoveK8sClientCache() {
         Assertions.assertDoesNotThrow(() -> {
             ProcessUtils.removeK8sClientCache("a");
         });
