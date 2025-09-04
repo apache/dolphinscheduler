@@ -26,7 +26,7 @@
 采用Azure AD账号名和密码验证。
 前置条件：设置AD账号为数据库AD管理员。
 ![admin](../../../../img/new_ui/dev/datasource/azuresql-ad2.png)
-- Azure AD用户名：Azure AD 的账号名，例如：xx@xx.onmicrosoft.com
+- Azure AD用户名：Azure AD 的账号名，例如：[xx@xx.onmicrosoft.com]
 - 密码：Azure AD 的密码
 
 ### ActiveDirectoryMSI
