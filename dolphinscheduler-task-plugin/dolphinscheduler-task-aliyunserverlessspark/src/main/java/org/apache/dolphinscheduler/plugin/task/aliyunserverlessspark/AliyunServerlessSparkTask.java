@@ -84,6 +84,8 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private String endpoint;
 
+    private RetryUtils.RetryPolicy retryPolicy = new RetryUtils.RetryPolicy(10, 1000L);
+
     protected AliyunServerlessSparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
@@ -132,7 +134,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             } catch (Exception e) {
                 throw new TaskException("Failed to get template info", e);
             }
-        });
+        }, retryPolicy);
 
         if (getTemplateResponse != null) {
             templateConf = getTemplateResponse.getBody()
@@ -154,7 +156,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             } catch (Exception e) {
                 throw new AliyunServerlessSparkTaskException("Failed to start job run!");
             }
-        });
+        }, retryPolicy);
 
         jobRunId = startJobRunResponse.getBody().getJobRunId();
         setAppIds(jobRunId);
@@ -171,7 +173,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                 } catch (Exception e) {
                     throw new AliyunServerlessSparkTaskException("Failed to get job run!", e);
                 }
-            }, new RetryUtils.RetryPolicy(10, 1000L));
+            }, retryPolicy);
 
             currentState = RunState.valueOf(getJobRunResponse.getBody().getJobRun().getState());
             log.info("job - {} state - {}", jobRunId, currentState);
@@ -224,7 +226,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                     } catch (Exception e) {
                         throw new AliyunServerlessSparkTaskException("Failed to cancel job run!");
                     }
-                });
+                }, retryPolicy);
     }
 
     @Override
