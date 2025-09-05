@@ -64,7 +64,7 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunGrpcTasks_SuccessCase() {
+    void testRunGrpcTasksSuccess() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -117,27 +117,55 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunGrpcTasks_WorkflowParamsCase() {
+    void testRunGrpcTasksFailed() {
+        WorkflowDefinitionTab workflowDefinitionPage =
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
-    }
+        String workflowName = "GrpcFailedCase";
+        String taskName = "GrpcFailedTask";
+        String endpoint = "localhost:50051";
+        String protobufDefinition = "syntax = \"proto3\";\n"
+                + "package helloworldf;\n"
+                + "service Greeter {\n"
+                + "  rpc SayHellof (HelloRequest) returns (HelloReply) {}\n"
+                + "}\n"
+                + "message HelloRequest {\n"
+                + "  string notname = 1;\n"
+                + "}\n"
+                + "message HelloReply {\n"
+                + "  string message = 1;\n"
+                + "}\n";
+        String methodName = "Greeter/SayHellof";
+        String message = "{" +
+                "\"notname\":\"DolphinScheduler\"" +
+                "}";
 
-    @Test
-    void testRunGrpcTasks_LocalParamsCase() {
+        workflowDefinitionPage
+                .createWorkflow()
+                .<GrpcTaskForm>addTask(WorkflowForm.TaskType.GRPC)
+                .inputUrl(endpoint)
+                .inputServiceDefinition(protobufDefinition)
+                .inputMethodName(methodName)
+                .inputMessage(message)
+                .name(taskName)
+                .submit()
+                .submit()
+                .name(workflowName)
+                .submit();
 
-    }
+        untilWorkflowDefinitionExist(workflowName);
 
-    @Test
-    void testRunGrpcTasks_GlobalParamsOverrideLocalParamsCase() {
+        workflowDefinitionPage.publish(workflowName);
 
-    }
+        runWorkflow(workflowName);
+        untilWorkflowInstanceExist(workflowName);
+        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceFailed(workflowName);
+        assertThat(workflowInstance.executionTime()).isEqualTo(1);
 
-    @Test
-    void testRunGrpcTasks_UsingResourceFile() {
-
-    }
-
-    @Test
-    void testRunGrpcTasks_FailedCase() {
-
+        TaskInstanceTab.Row taskInstance = untilTaskInstanceFailed(workflowName, taskName);
+        assertThat(taskInstance.retryTimes()).isEqualTo(0);
     }
 }
