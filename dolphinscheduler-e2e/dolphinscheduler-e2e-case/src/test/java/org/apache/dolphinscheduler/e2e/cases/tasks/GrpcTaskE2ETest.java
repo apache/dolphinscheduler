@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.cases.tasks;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -33,9 +34,12 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
+import org.openqa.selenium.By;
 
 @DolphinScheduler(composeFiles = "docker/grpc-task/docker-compose.yaml")
 @DisableIfTestFails
@@ -90,7 +94,7 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 "\"name\":\"DolphinScheduler\"" +
                 "}";
 
-        workflowDefinitionPage
+        WorkflowForm workflowForm = workflowDefinitionPage
                 .createWorkflow()
                 .<GrpcTaskForm>addTask(WorkflowForm.TaskType.GRPC)
                 .inputUrl(endpoint)
@@ -98,8 +102,14 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .inputMethodName(methodName)
                 .inputMessage(message)
                 .name(taskName)
-                .submit()
-                .submit()
+                .submit();
+
+        await().ignoreException(NoSuchElementException.class)
+                .untilAsserted(() -> assertThat(browser)
+                        .as("can not save workflow")
+                        .matches(it -> it.findElement(By.className("n-button")).isDisplayed()));
+
+        workflowForm.submit()
                 .name(workflowName)
                 .submit();
 

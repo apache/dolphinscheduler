@@ -213,7 +213,6 @@ public abstract class BaseWorkflowE2ETest {
                     TaskInstanceTab taskInstanceTab = projectPage
                             .goToTab(TaskInstanceTab.class);
 
-
                     List<TaskInstanceTab.Row> taskInstances = taskInstanceTab
                             .instances()
                             .stream()
