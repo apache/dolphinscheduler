@@ -1,11 +1,9 @@
-# Security
+# Security Policy
 
-The Apache Software Foundation takes a rigorous stance on eliminating security issues in its software projects. Apache DolphinScheduler is also very concerned Security issues related to its features and functionality.
+If you discover a security vulnerability in DolphinScheduler, please report it by emailing **security@dolphinscheduler.apache.org**.
 
-If you have apprehensions regarding DolphinScheduler’s security or you discover vulnerability or potential threat, don’t hesitate to get in touch with the Apache Security Team by dropping a mail at [security@apache.org]. Please specify the project name as DolphinScheduler in the email and provide a description of the relevant problem or potential threat. You are also urged to recommend the way to reproduce and replicate the issue. The apache security team and the DolphinScheduler community will get back to you after assessing and analysing the findings.
+For more details, see our [Security Page](docs/docs/en/contribute/join/security.md).
 
-Please pay attention to report the security issue on the security email before disclosing it on public domain.
+For the ASF Security process, refer to the [ASF Security Committers Guide](https://www.apache.org/security/committers.html).
 
-## Note
-
-Before you commit, check whether the issue is a security bug by following the Apache DolphinScheduler [security-model.md](https://github.com/apache/dolphinscheduler/tree/dev/docs/docs/en/contribute/join/security-model.md).
+Please do not disclose security issues publicly until they have been reviewed and addressed.
