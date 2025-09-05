@@ -203,7 +203,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             case Success:
                 return TaskConstants.EXIT_CODE_SUCCESS;
             case Failed:
-                return TaskConstants.EXIT_CODE_KILL;
+                return TaskConstants.EXIT_CODE_FAILURE;
             default:
                 return TaskConstants.EXIT_CODE_FAILURE;
         }
