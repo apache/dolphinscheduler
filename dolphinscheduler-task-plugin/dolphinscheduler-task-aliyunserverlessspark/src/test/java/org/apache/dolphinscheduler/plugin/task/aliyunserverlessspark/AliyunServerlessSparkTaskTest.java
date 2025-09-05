@@ -222,4 +222,14 @@ public class AliyunServerlessSparkTaskTest {
         verify(mockAliyunServerlessSparkParameters).getEngineReleaseVersion();
         verify(mockAliyunServerlessSparkParameters).isProduction();
     }
+
+    @Test
+    public void testMapFinalStateToExitCode() {
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS,
+                aliyunServerlessSparkTask.mapFinalStateToExitCode(RunState.Success));
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE,
+                aliyunServerlessSparkTask.mapFinalStateToExitCode(RunState.Failed));
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE,
+                aliyunServerlessSparkTask.mapFinalStateToExitCode(RunState.Cancelled));
+    }
 }
