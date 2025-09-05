@@ -34,12 +34,11 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
-import java.util.NoSuchElementException;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 
 @DolphinScheduler(composeFiles = "docker/grpc-task/docker-compose.yaml")
 @DisableIfTestFails
@@ -104,10 +103,16 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .name(taskName)
                 .submit();
 
-        await().ignoreException(NoSuchElementException.class)
-                .untilAsserted(() -> assertThat(browser)
-                        .as("can not save workflow")
-                        .matches(it -> it.findElement(By.className("n-button")).isDisplayed()));
+        await().untilAsserted(() -> assertThat(browser)
+                .as("can not save workflow")
+                .matches(it -> {
+                    try{
+                        it.findElement(By.className("n-modal-mask"));
+                    }catch (NoSuchElementException e){
+                        return true;
+                    }
+                    return false;
+                }));
 
         workflowForm.submit()
                 .name(workflowName)
@@ -153,7 +158,7 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 "\"notname\":\"DolphinScheduler\"" +
                 "}";
 
-        workflowDefinitionPage
+        WorkflowForm workflowForm = workflowDefinitionPage
                 .createWorkflow()
                 .<GrpcTaskForm>addTask(WorkflowForm.TaskType.GRPC)
                 .inputUrl(endpoint)
@@ -161,8 +166,20 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .inputMethodName(methodName)
                 .inputMessage(message)
                 .name(taskName)
-                .submit()
-                .submit()
+                .submit();
+
+        await().untilAsserted(() -> assertThat(browser)
+                        .as("can not save workflow")
+                        .matches(it -> {
+                            try{
+                                it.findElement(By.className("n-modal-mask"));
+                            }catch (NoSuchElementException e){
+                                return true;
+                            }
+                            return false;
+                        }));
+
+        workflowForm.submit()
                 .name(workflowName)
                 .submit();
 
