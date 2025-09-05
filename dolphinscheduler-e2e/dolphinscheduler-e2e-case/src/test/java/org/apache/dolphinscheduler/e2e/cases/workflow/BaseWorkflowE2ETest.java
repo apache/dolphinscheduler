@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @Slf4j
@@ -75,15 +77,25 @@ public abstract class BaseWorkflowE2ETest {
                 .goTo(projectName);
 
         return await()
+                .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
-                    return projectPage
-                            .goToTab(WorkflowInstanceTab.class)
+
+                    await().ignoreException(NoSuchElementException.class)
+                            .untilAsserted(() -> assertThat(browser)
+                                    .as("workflow instance is not found")
+                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
+
+                    WorkflowInstanceTab workflowInstanceTab = projectPage
+                            .goToTab(WorkflowInstanceTab.class);
+
+                    return workflowInstanceTab
                             .instances()
                             .stream()
                             .filter(it -> it.workflowInstanceName().startsWith(workflowName))
                             .findFirst()
                             .orElse(null);
+
                 }, Objects::nonNull);
     }
 
@@ -92,10 +104,19 @@ public abstract class BaseWorkflowE2ETest {
                 .goToNav(ProjectPage.class)
                 .goTo(projectName);
         return await()
+                .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
-                    return projectPage
-                            .goToTab(WorkflowInstanceTab.class)
+
+                    await().ignoreException(NoSuchElementException.class)
+                            .untilAsserted(() -> assertThat(browser)
+                                    .as("workflow instance is not found")
+                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
+
+                    WorkflowInstanceTab workflowInstanceTab = projectPage
+                            .goToTab(WorkflowInstanceTab.class);
+
+                    return workflowInstanceTab
                             .instances()
                             .stream()
                             .filter(it -> it.workflowInstanceName().startsWith(workflowName))

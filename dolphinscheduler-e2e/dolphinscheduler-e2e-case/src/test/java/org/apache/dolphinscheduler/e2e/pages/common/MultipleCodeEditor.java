@@ -27,7 +27,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.platform.commons.util.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -50,89 +49,76 @@ public final class MultipleCodeEditor {
 
     private List<List<WebElement>> editorLines = new ArrayList<>();
 
-    @FindBy(className = "pre-tasks-model")
-    private List<WebElement> scrollBars;
+    @FindBys({
+            @FindBy(className = "pre-tasks-model")
+    })
+    private WebElement scrollBar;
 
     private WebDriver driver;
 
     public MultipleCodeEditor(WebDriver driver) {
         PageFactory.initElements(driver, this);
 
-        for (WebElement element : editors) {
-            List<WebElement> lines = element.findElements(By.className("view-line"));
-            editorLines.add(lines);
-        }
+        relocateLines();
 
         this.driver = driver;
     }
 
+    public MultipleCodeEditor relocateLines() {
+        editorLines.clear();
+        for (WebElement element : editors) {
+            List<WebElement> lines = element.findElements(By.className("view-line"));
+            editorLines.add(lines);
+        }
+        return this;
+    }
+
     @SneakyThrows
-    public MultipleCodeEditor content(int index, String content) {
+    public MultipleCodeEditor content(int editorIndex, String content) {
+        content += Constants.LINE_SEPARATOR;
         WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(editorLines.get(index).get(0)));
+                .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
 
         Actions actions = new Actions(this.driver);
 
         List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
 
         try {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBars.get(index));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBar);
         } catch (org.openqa.selenium.NoSuchElementException ignored) {
             log.warn("scroll bar not found, skipping...");
         }
 
-        for (int i = 0; i < contentList.size(); i++) {
-            String editorLineText;
-            String inputContent = contentList.get(i);
-            if (i == 0) {
-                actions.moveToElement(editorLines.get(index).get(i))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                continue;
-            } else {
-                editorLineText = editorLines.get(index).get(i).getText();
-            }
+        actions.moveToElement(lineElement(editorIndex, 0))
+                .click()
+                .sendKeys(content)
+                .perform();
 
-            if (StringUtils.isNotBlank(inputContent)) {
-                if (editorLineText.isEmpty()) {
-                    actions.moveToElement(editorLines.get(index).get(i))
-                            .click()
-                            .sendKeys(inputContent)
-                            .sendKeys(Constants.LINE_SEPARATOR)
-                            .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-                } else {
-                    for (int p = 0; p < editorLineText.strip().length(); p++) {
-                        clearLine(actions, editorLines.get(index).get(i));
-                    }
-                    if (!editorLineText.isEmpty()) {
-                        clearLine(actions, editorLines.get(index).get(i));
-                    }
-                    actions.moveToElement(editorLines.get(index).get(i))
-                            .click()
-                            .sendKeys(inputContent)
-                            .sendKeys(Constants.LINE_SEPARATOR)
-                            .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-                }
-            } else {
-                actions.moveToElement(editorLines.get(index).get(i))
-                        .click()
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-            }
-        }
+        clearTail(actions, lineElement(editorIndex, contentList.size()), content.length());
 
         return this;
     }
 
-    private void clearLine(Actions actions, WebElement element) {
+    private void clearLine(Actions actions, WebElement element) throws InterruptedException {
         actions.moveToElement(element)
                 .click()
                 .sendKeys(Keys.BACK_SPACE)
                 .perform();
+    }
+
+    private void clearTail(Actions actions, WebElement element, int length) {
+        actions.moveToElement(element)
+                .click();
+        for (int i = 0; i < length; i++) {
+            actions.sendKeys(Keys.DELETE);
+        }
+        actions.perform();
+    }
+
+    private WebElement lineElement(int editorIndex, int lineNumber) {
+        relocateLines();
+        return editorLines
+                .get(editorIndex)
+                .get(lineNumber);
     }
 }

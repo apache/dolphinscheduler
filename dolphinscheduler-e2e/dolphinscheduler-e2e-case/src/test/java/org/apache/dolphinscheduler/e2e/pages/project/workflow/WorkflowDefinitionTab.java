@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
@@ -29,11 +30,11 @@ import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
@@ -71,6 +72,11 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
     public WorkflowForm createWorkflow() {
         buttonCreateWorkflow().click();
+
+        await().ignoreException(NoSuchElementException.class)
+                .untilAsserted(() -> assertThat(driver)
+                        .as("created workflow must be displayed")
+                        .matches(it -> it.findElement(By.className("n-collapse-item")).isDisplayed()));
 
         return new WorkflowForm(driver);
     }
@@ -126,7 +132,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowDefinitionTab delete(String workflow) {
-        Awaitility.await().untilAsserted(() -> assertThat(workflowList())
+        await().untilAsserted(() -> assertThat(workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(
                         it -> it.getText().contains(workflow)));
