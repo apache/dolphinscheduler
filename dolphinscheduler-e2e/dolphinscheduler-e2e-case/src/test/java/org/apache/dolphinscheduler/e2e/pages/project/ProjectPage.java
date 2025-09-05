@@ -140,6 +140,10 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     }
 
     public ProjectDetailPage goTo(String project) {
+        await().untilAsserted(() -> assertThat(driver)
+                .as("not in project detail page")
+                .matches(it -> it.findElement(By.className("n-layout-header")).isDisplayed()));
+
         projectList().stream()
                 .filter(it -> it.getText().contains(project))
                 .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
