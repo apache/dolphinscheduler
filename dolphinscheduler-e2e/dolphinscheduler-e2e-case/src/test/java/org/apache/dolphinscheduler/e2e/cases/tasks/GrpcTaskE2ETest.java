@@ -106,9 +106,9 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
         await().untilAsserted(() -> assertThat(browser)
                 .as("can not save workflow")
                 .matches(it -> {
-                    try{
+                    try {
                         it.findElement(By.className("n-modal-mask"));
-                    }catch (NoSuchElementException e){
+                    } catch (NoSuchElementException e) {
                         return true;
                     }
                     return false;
@@ -169,15 +169,15 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .submit();
 
         await().untilAsserted(() -> assertThat(browser)
-                        .as("can not save workflow")
-                        .matches(it -> {
-                            try{
-                                it.findElement(By.className("n-modal-mask"));
-                            }catch (NoSuchElementException e){
-                                return true;
-                            }
-                            return false;
-                        }));
+                .as("can not save workflow")
+                .matches(it -> {
+                    try {
+                        it.findElement(By.className("n-modal-mask"));
+                    } catch (NoSuchElementException e) {
+                        return true;
+                    }
+                    return false;
+                }));
 
         workflowForm.submit()
                 .name(workflowName)
