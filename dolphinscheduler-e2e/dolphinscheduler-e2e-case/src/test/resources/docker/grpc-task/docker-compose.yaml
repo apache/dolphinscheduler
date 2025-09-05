@@ -45,7 +45,7 @@ services:
         source: ./
         target: /config
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:50051/" ]
+      test: [ "CMD", "curl", "--http0.9", "http://localhost:50051/" ]
       interval: 5s
       timeout: 5s
       retries: 120
