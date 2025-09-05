@@ -70,6 +70,7 @@
         <guava.version>31.1-jre</guava.version>
         <postgresql.version>42.4.1</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
+        <hive-exec.version>2.3.9</hive-exec.version>
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.19.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
@@ -566,6 +567,11 @@
                         <artifactId>orc-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-exec</artifactId>
+                <version>${hive-exec.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kyuubi</groupId>
