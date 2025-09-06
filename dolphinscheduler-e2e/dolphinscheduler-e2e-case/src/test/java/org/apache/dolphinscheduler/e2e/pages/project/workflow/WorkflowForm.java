@@ -114,7 +114,8 @@ public final class WorkflowForm {
     }
 
     public WorkflowSaveDialog submit() {
-        buttonSave().click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(buttonSave()));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonSave());
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'Basic Information')]")));
         return new WorkflowSaveDialog(this);

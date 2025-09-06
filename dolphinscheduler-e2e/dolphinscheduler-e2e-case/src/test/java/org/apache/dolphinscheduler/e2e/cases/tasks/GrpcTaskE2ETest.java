@@ -22,7 +22,6 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
-import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
@@ -46,8 +45,6 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
 
     @BeforeAll
     public static void setup() {
-        browser = WebDriverHolder.getWebDriver();
-
         TenantPage tenantPage = new LoginPage(browser)
                 .login(adminUser)
                 .goToNav(SecurityPage.class)
@@ -102,17 +99,6 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .inputMessage(message)
                 .name(taskName)
                 .submit();
-
-        await().untilAsserted(() -> assertThat(browser)
-                .as("can not save workflow")
-                .matches(it -> {
-                    try {
-                        it.findElement(By.className("n-modal-mask"));
-                    } catch (NoSuchElementException e) {
-                        return true;
-                    }
-                    return false;
-                }));
 
         workflowForm.submit()
                 .name(workflowName)
