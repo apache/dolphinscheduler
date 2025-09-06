@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.e2e.pages;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -24,6 +27,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -70,7 +75,13 @@ public final class LoginPage extends NavBarPage {
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/home"));
+        await().ignoreException(NoSuchElementException.class)
+                .untilAsserted(() -> assertThat(driver)
+                        .as("can not go to menu")
+                        .matches(it -> it
+                                .findElement(By.xpath(
+                                        "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]"))
+                                .isDisplayed()));
 
         return new NavBarPage(driver);
     }
