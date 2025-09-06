@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import lombok.Getter;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -86,7 +87,7 @@ public final class WorkflowSaveDialog {
 
     public WorkflowForm submit() {
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(buttonSubmit));
-        buttonSubmit.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonSubmit());
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("workflow-definition"));
         return parent;
     }
