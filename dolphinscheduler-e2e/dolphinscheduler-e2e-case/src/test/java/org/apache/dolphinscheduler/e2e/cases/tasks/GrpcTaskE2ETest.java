@@ -22,6 +22,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
@@ -45,6 +46,8 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
 
     @BeforeAll
     public static void setup() {
+        browser = WebDriverHolder.getWebDriver();
+
         TenantPage tenantPage = new LoginPage(browser)
                 .login(adminUser)
                 .goToNav(SecurityPage.class)
