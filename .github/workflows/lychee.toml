@@ -17,6 +17,7 @@ exclude = [
     '^http://minio',
     '^http://minio(:\d+)?',
     '^https://github\.com/apache/dolphinscheduler/blob/[^/]+/script/env/dolphinscheduler_env\.sh',
+    '^http://who-t\.blogspot\.com/2009/12/on-commit-messages\.html',
 ]
 
 # Exclude paths from getting checked. The values are treated as regular expressions
