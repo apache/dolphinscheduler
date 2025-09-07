@@ -41,6 +41,7 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -106,8 +107,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver.manage().timeouts()
                 .implicitlyWait(Duration.ofSeconds(1))
                 .pageLoadTimeout(Duration.ofSeconds(5));
+        Dimension size = new Dimension(1920, 1080);
         driver.manage().window()
-                .fullscreen();
+                .setSize(size);
 
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
