@@ -87,7 +87,7 @@ public final class WorkflowSaveDialog {
 
     public WorkflowForm submit() {
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(buttonSubmit));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonSubmit());
+        buttonSubmit.click();
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("workflow-definition"));
         return parent;
     }
