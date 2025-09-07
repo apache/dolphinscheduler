@@ -32,11 +32,13 @@ import com.google.protobuf.util.JsonFormat;
 
 import io.grpc.CallOptions;
 import io.grpc.ChannelCredentials;
-import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
 import io.grpc.ManagedChannel;
 import io.grpc.MethodDescriptor;
+import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.protobuf.ProtoUtils;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class GrpcDynamicService {
 
@@ -151,8 +153,12 @@ public class GrpcDynamicService {
         }
 
         public static ManagedChannel createChannel(String targetAddr, ChannelCredentials channelCredentials) {
-            return Grpc.newChannelBuilder(targetAddr, channelCredentials)
+            NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+            ManagedChannel channel = NettyChannelBuilder.forTarget(targetAddr, channelCredentials)
+                    .eventLoopGroup(eventLoopGroup)
+                    .channelType(NioSocketChannel.class)
                     .build();
+            return channel;
         }
     }
 

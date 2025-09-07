@@ -76,7 +76,7 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
 
         String workflowName = "GrpcSuccessCase";
         String taskName = "GrpcSuccessTask";
-        String endpoint = "localhost:50051";
+        String endpoint = "greeterServer:50051";
         String protobufDefinition = "syntax = \"proto3\";\n"
                 + "package helloworld;\n"
                 + "service Greeter {\n"
@@ -130,7 +130,7 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
 
         String workflowName = "GrpcFailedCase";
         String taskName = "GrpcFailedTask";
-        String endpoint = "localhost:50051";
+        String endpoint = "greeterServer:50051";
         String protobufDefinition = "syntax = \"proto3\";\n"
                 + "package helloworldf;\n"
                 + "service Greeter {\n"
