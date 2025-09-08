@@ -35,7 +35,6 @@ services:
       retries: 120
   greeterServer:
     image: grpc/java-example-hostname:1.75.0
-#    environment:
     ports:
       - "50051:50051"
     networks:
