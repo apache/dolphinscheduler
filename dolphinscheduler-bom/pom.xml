@@ -126,7 +126,7 @@
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
         <brace-expansion.version>2.0.1</brace-expansion.version>
         <protoc.version>3.17.3</protoc.version>
-        <j2objc.version>3.0.0</j2objc.version>
+        <j2objc.version>1.3</j2objc.version>
     </properties>
 
     <dependencyManagement>
