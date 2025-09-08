@@ -125,7 +125,7 @@ public class GrpcDynamicService {
         }
 
         private boolean checkMethodName(String methodNameWithService) {
-            String[] path = methodNameWithService.split("/");
+            String[] path = methodNameWithService.split(GrpcConstants.SERVICE_METHOD_SEPERATOR);
             if (path.length == 0)
                 return false;
             if (path.length == 1)

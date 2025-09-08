@@ -73,7 +73,7 @@ public class JSONDescriptorParser {
                 break;
             }
         }
-        return String.join(".", packageNameNS);
+        return String.join(GrpcConstants.NAMESPACE_SEPERATOR, packageNameNS);
     }
 
     private Descriptors.FileDescriptor parseRoot(Root root) throws Descriptors.DescriptorValidationException {
