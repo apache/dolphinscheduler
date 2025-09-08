@@ -57,8 +57,7 @@ public class NavBarPage {
 
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
-            WebDriverWaitFactory.createWebDriverWait(driver)
-                    .until(ExpectedConditions.elementToBeClickable(projectTab));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(projectTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", projectTab());
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/projects/list"));
             return nav.cast(new ProjectPage(driver));
