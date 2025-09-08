@@ -77,19 +77,10 @@ public abstract class BaseWorkflowE2ETest {
                 .goTo(projectName);
 
         return await()
-                .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
-
-                    await().ignoreException(NoSuchElementException.class)
-                            .untilAsserted(() -> assertThat(browser)
-                                    .as("workflow instance is not found")
-                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
-
-                    WorkflowInstanceTab workflowInstanceTab = projectPage
-                            .goToTab(WorkflowInstanceTab.class);
-
-                    return workflowInstanceTab
+                    return projectPage
+                            .goToTab(WorkflowInstanceTab.class)
                             .instances()
                             .stream()
                             .filter(it -> it.workflowInstanceName().startsWith(workflowName))
@@ -103,19 +94,10 @@ public abstract class BaseWorkflowE2ETest {
                 .goToNav(ProjectPage.class)
                 .goTo(projectName);
         return await()
-                .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
-
-                    await().ignoreException(NoSuchElementException.class)
-                            .untilAsserted(() -> assertThat(browser)
-                                    .as("workflow instance is not found")
-                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
-
-                    WorkflowInstanceTab workflowInstanceTab = projectPage
-                            .goToTab(WorkflowInstanceTab.class);
-
-                    return workflowInstanceTab
+                    return projectPage
+                            .goToTab(WorkflowInstanceTab.class)
                             .instances()
                             .stream()
                             .filter(it -> it.workflowInstanceName().startsWith(workflowName))
@@ -130,15 +112,8 @@ public abstract class BaseWorkflowE2ETest {
                 .goToNav(ProjectPage.class)
                 .goTo(projectName);
         return await()
-                .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
-
-                    await().ignoreException(NoSuchElementException.class)
-                            .untilAsserted(() -> assertThat(browser)
-                                    .as("workflow instance is not found")
-                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
-
                     List<WorkflowInstanceTab.Row> workflowInstances = projectPage
                             .goToTab(WorkflowInstanceTab.class)
                             .instances()
@@ -166,16 +141,8 @@ public abstract class BaseWorkflowE2ETest {
         return await()
                 .until(() -> {
                     browser.navigate().refresh();
-
-                    await().ignoreException(NoSuchElementException.class)
-                            .untilAsserted(() -> assertThat(browser)
-                                    .as("task instance is not found")
-                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
-
-                    TaskInstanceTab taskInstanceTab = projectPage
-                            .goToTab(TaskInstanceTab.class);
-
-                    List<TaskInstanceTab.Row> taskInstances = taskInstanceTab
+                    List<TaskInstanceTab.Row> taskInstances = projectPage
+                            .goToTab(TaskInstanceTab.class)
                             .instances()
                             .stream()
                             .filter(it -> it.taskInstanceName().startsWith(taskName))
@@ -202,15 +169,8 @@ public abstract class BaseWorkflowE2ETest {
         return await()
                 .until(() -> {
                     browser.navigate().refresh();
-
-                    await().ignoreException(NoSuchElementException.class)
-                            .untilAsserted(() -> assertThat(browser)
-                                    .as("task instance is not found")
-                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
-                    TaskInstanceTab taskInstanceTab = projectPage
-                            .goToTab(TaskInstanceTab.class);
-
-                    List<TaskInstanceTab.Row> taskInstances = taskInstanceTab
+                    List<TaskInstanceTab.Row> taskInstances = projectPage
+                            .goToTab(TaskInstanceTab.class)
                             .instances()
                             .stream()
                             .filter(it -> it.taskInstanceName().startsWith(taskName))
