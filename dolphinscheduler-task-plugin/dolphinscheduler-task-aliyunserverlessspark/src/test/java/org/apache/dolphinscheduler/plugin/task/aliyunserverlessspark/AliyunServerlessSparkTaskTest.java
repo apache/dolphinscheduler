@@ -164,7 +164,7 @@ public class AliyunServerlessSparkTaskTest {
         doReturn(startJobRunResponseBody).when(mockStartJobRunResponse).getBody();
         Assertions.assertDoesNotThrow(
                 () -> doReturn(mockStartJobRunResponse).when(mockAliyunServerlessSparkClient)
-                        .startJobRunWithOptions(any(), any(), any(), any()));
+                        .startJobRun(any(), any()));
 
         doReturn(mockGetJobRunRequest).when(aliyunServerlessSparkTask).buildGetJobRunRequest();
         GetJobRunResponseBody getJobRunResponseBody = new GetJobRunResponseBody();
@@ -221,5 +221,15 @@ public class AliyunServerlessSparkTaskTest {
         verify(mockAliyunServerlessSparkParameters).getJobName();
         verify(mockAliyunServerlessSparkParameters).getEngineReleaseVersion();
         verify(mockAliyunServerlessSparkParameters).isProduction();
+    }
+
+    @Test
+    public void testMapFinalStateToExitCode() {
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS,
+                aliyunServerlessSparkTask.mapFinalStateToExitCode(RunState.Success));
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE,
+                aliyunServerlessSparkTask.mapFinalStateToExitCode(RunState.Failed));
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE,
+                aliyunServerlessSparkTask.mapFinalStateToExitCode(RunState.Cancelled));
     }
 }
