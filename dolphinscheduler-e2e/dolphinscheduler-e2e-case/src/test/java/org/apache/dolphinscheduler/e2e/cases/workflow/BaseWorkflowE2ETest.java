@@ -80,10 +80,12 @@ public abstract class BaseWorkflowE2ETest {
                 .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
+
                     await().ignoreException(NoSuchElementException.class)
                             .untilAsserted(() -> assertThat(browser)
                                     .as("workflow instance is not found")
                                     .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
+
                     WorkflowInstanceTab workflowInstanceTab = projectPage
                             .goToTab(WorkflowInstanceTab.class);
 
@@ -104,6 +106,7 @@ public abstract class BaseWorkflowE2ETest {
                 .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
+
                     await().ignoreException(NoSuchElementException.class)
                             .untilAsserted(() -> assertThat(browser)
                                     .as("workflow instance is not found")
@@ -130,10 +133,12 @@ public abstract class BaseWorkflowE2ETest {
                 .ignoreException(NoSuchElementException.class)
                 .until(() -> {
                     browser.navigate().refresh();
+
                     await().ignoreException(NoSuchElementException.class)
                             .untilAsserted(() -> assertThat(browser)
                                     .as("workflow instance is not found")
                                     .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
+
                     List<WorkflowInstanceTab.Row> workflowInstances = projectPage
                             .goToTab(WorkflowInstanceTab.class)
                             .instances()
@@ -161,10 +166,12 @@ public abstract class BaseWorkflowE2ETest {
         return await()
                 .until(() -> {
                     browser.navigate().refresh();
+
                     await().ignoreException(NoSuchElementException.class)
                             .untilAsserted(() -> assertThat(browser)
                                     .as("task instance is not found")
                                     .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
+
                     TaskInstanceTab taskInstanceTab = projectPage
                             .goToTab(TaskInstanceTab.class);
 
@@ -196,6 +203,10 @@ public abstract class BaseWorkflowE2ETest {
                 .until(() -> {
                     browser.navigate().refresh();
 
+                    await().ignoreException(NoSuchElementException.class)
+                            .untilAsserted(() -> assertThat(browser)
+                                    .as("task instance is not found")
+                                    .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
                     TaskInstanceTab taskInstanceTab = projectPage
                             .goToTab(TaskInstanceTab.class);
 
