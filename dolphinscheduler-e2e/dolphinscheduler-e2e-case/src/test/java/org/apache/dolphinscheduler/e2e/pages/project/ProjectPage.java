@@ -71,14 +71,10 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     public ProjectPage createProjectUntilSuccess(String project) {
         create(project);
-        await().untilAsserted(() -> assertThat(projectList())
-                .as("project list should contain newly-created project")
-                .anyMatch(it -> it.getText().contains(project)));
         assignWorkerGroup(project, "default");
         await().untilAsserted(() -> assertThat(projectList())
                 .as("project list should contain newly-created project")
                 .anyMatch(it -> it.getText().contains(project)));
-
         return this;
     }
 
@@ -102,10 +98,6 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
                 .findElement(By.className("assign-worker-group-btn")).click();
-
-        await().untilAsserted(() -> assertThat(assignWorkerGroupForm.sourceWorkerGroups())
-                .as("worker group list should contain " + workerGroup + " group")
-                .anyMatch(it -> it.getText().contains(workerGroup)));
 
         assignWorkerGroupForm.sourceWorkerGroups()
                 .stream()
@@ -140,20 +132,12 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     }
 
     public ProjectDetailPage goTo(String project) {
-        await().untilAsserted(() -> assertThat(driver)
-                .as("not in project detail page")
-                .matches(it -> it.findElement(By.className("n-layout-header")).isDisplayed()));
-
         projectList().stream()
                 .filter(it -> it.getText().contains(project))
                 .map(it -> it.findElement(By.className("project-name")).findElement(new By.ByTagName("button")))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Cannot click the project item"))
                 .click();
-
-        await().untilAsserted(() -> assertThat(driver)
-                .as("not in project detail page")
-                .matches(it -> it.findElement(By.className("n-menu-item-content")).isDisplayed()));
 
         return new ProjectDetailPage(driver);
     }

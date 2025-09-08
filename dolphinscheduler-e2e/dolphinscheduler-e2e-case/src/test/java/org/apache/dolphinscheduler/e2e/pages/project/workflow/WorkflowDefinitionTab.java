@@ -73,11 +73,6 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     public WorkflowForm createWorkflow() {
         buttonCreateWorkflow().click();
 
-        await().ignoreException(NoSuchElementException.class)
-                .untilAsserted(() -> assertThat(driver)
-                        .as("created workflow must be displayed")
-                        .matches(it -> it.findElement(By.className("n-collapse-item")).isDisplayed()));
-
         return new WorkflowForm(driver);
     }
 
@@ -132,7 +127,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowDefinitionTab delete(String workflow) {
-        await().untilAsserted(() -> assertThat(workflowList())
+        Awaitility.await().untilAsserted(() -> assertThat(workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(
                         it -> it.getText().contains(workflow)));

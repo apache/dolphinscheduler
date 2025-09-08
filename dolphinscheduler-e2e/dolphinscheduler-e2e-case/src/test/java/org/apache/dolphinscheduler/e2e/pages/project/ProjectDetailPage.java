@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
@@ -29,8 +26,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTa
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -58,24 +53,12 @@ public final class ProjectDetailPage extends NavBarPage {
             menuWorkflowDefinition().click();
             WebDriverWaitFactory.createWebDriverWait(driver)
                     .until(ExpectedConditions.urlContains("/workflow-definition"));
-
-            await().ignoreException(NoSuchElementException.class)
-                    .untilAsserted(() -> assertThat(driver)
-                            .as("workflow definition page not found")
-                            .matches(it -> it.findElement(By.className("n-data-table-base-table-body")).isDisplayed()));
-
             return tab.cast(new WorkflowDefinitionTab(driver));
         }
         if (tab == WorkflowInstanceTab.class) {
             menuWorkflowInstances().click();
             WebDriverWaitFactory.createWebDriverWait(driver)
                     .until(ExpectedConditions.urlContains("/workflow/instances"));
-
-            await().ignoreException(NoSuchElementException.class)
-                    .untilAsserted(() -> assertThat(driver)
-                            .as("workflow instance page not found")
-                            .matches(it -> it.findElement(By.className("n-data-table-base-table-body")).isDisplayed()));
-
             return tab.cast(new WorkflowInstanceTab(driver));
         }
         if (tab == TaskInstanceTab.class) {

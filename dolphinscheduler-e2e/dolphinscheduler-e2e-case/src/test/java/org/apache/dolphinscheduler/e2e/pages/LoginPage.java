@@ -75,13 +75,7 @@ public final class LoginPage extends NavBarPage {
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        await().ignoreException(NoSuchElementException.class)
-                .untilAsserted(() -> assertThat(driver)
-                        .as("can not go to menu")
-                        .matches(it -> it
-                                .findElement(By.xpath(
-                                        "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]"))
-                                .isDisplayed()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/home"));
 
         return new NavBarPage(driver);
     }

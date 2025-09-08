@@ -107,9 +107,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver.manage().timeouts()
                 .implicitlyWait(Duration.ofSeconds(1))
                 .pageLoadTimeout(Duration.ofSeconds(5));
-        Dimension size = new Dimension(1920, 1080);
         driver.manage().window()
-                .setSize(size);
+                .maximize();
 
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
