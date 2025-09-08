@@ -48,7 +48,6 @@ public class WorkflowStateEventHandler implements StateEventHandler {
             if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
                     .typeIsSerialPriority()) {
                 workflowExecuteRunnable.endProcess();
-                return true;
             }
             workflowExecuteRunnable.updateProcessInstanceState(workflowStateEvent);
             return true;
