@@ -95,7 +95,6 @@ public class GrpcTaskAPITest {
     }
 
     @Test
-    @Order(2)
     public void testGrpcWorkflowInstance() {
         try {
             // create test project
