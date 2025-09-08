@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.e2e.pages;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -27,8 +24,6 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
