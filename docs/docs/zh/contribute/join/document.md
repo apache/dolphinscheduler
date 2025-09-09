@@ -20,7 +20,7 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
 
 3. 在根目录下运行 `yarn generate` 来格式化和准备数据。
 
-4. 在根目录下运行 `yarn dev` 启动本地服务器，其将允许在 http://localhost:3000。
+4. 在根目录下运行 `yarn dev` 启动本地服务器，其将允许在 http://localhost:3000 。
 
 ```
 注意：如果您在 Windows 而非 Mac 或 Linux 中克隆代码。请阅读下面的详细信息。

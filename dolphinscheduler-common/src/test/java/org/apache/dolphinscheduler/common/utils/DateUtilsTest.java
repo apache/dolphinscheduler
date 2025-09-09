@@ -37,12 +37,12 @@ public class DateUtilsTest {
 
     @BeforeEach
     public void before() {
-        ThreadLocalContext.getTimezoneThreadLocal().remove();
+        ThreadLocalContext.removeTimezone();
     }
 
     @AfterEach
     public void after() {
-        ThreadLocalContext.getTimezoneThreadLocal().remove();
+        ThreadLocalContext.removeTimezone();
     }
 
     @Test
@@ -242,11 +242,11 @@ public class DateUtilsTest {
     public void testTimezone() {
 
         String time = "2019-01-28 00:00:00";
-        ThreadLocalContext.timezoneThreadLocal.set("UTC");
+        ThreadLocalContext.setTimezone("UTC");
         Date utcDate = DateUtils.stringToDate(time);
         Assertions.assertEquals(time, DateUtils.dateToString(utcDate));
 
-        ThreadLocalContext.timezoneThreadLocal.set("Asia/Shanghai");
+        ThreadLocalContext.setTimezone("Asia/Shanghai");
         Date shanghaiDate = DateUtils.stringToDate(time);
         Assertions.assertEquals(time, DateUtils.dateToString(shanghaiDate));
 

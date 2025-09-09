@@ -62,13 +62,13 @@ public final class DateUtils {
      * @return local datetime
      */
     private static LocalDateTime date2LocalDateTime(Date date) {
-        String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        String timezone = ThreadLocalContext.getTimezone();
         ZoneId zoneId = StringUtils.isNotEmpty(timezone) ? ZoneId.of(timezone) : ZoneId.systemDefault();
         return date2LocalDateTime(date, zoneId);
     }
 
     public static String getTimezone() {
-        String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        String timezone = ThreadLocalContext.getTimezone();
         return StringUtils.isNotEmpty(timezone) ? timezone : ZoneId.systemDefault().getId();
     }
 
@@ -90,7 +90,7 @@ public final class DateUtils {
      * @return date
      */
     private static Date localDateTime2Date(LocalDateTime localDateTime) {
-        String timezone = ThreadLocalContext.getTimezoneThreadLocal().get();
+        String timezone = ThreadLocalContext.getTimezone();
         ZoneId zoneId = StringUtils.isNotEmpty(timezone) ? ZoneId.of(timezone) : ZoneId.systemDefault();
         return localDateTime2Date(localDateTime, zoneId);
     }
