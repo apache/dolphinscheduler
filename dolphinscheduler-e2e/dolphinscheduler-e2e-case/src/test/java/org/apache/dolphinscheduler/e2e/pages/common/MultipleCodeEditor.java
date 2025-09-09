@@ -75,6 +75,7 @@ public final class MultipleCodeEditor {
 
     @SneakyThrows
     public MultipleCodeEditor content(int editorIndex, String content) {
+        relocateLines();
         content += Constants.LINE_SEPARATOR;
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
