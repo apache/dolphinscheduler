@@ -89,9 +89,9 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 + "  string message = 1;\n"
                 + "}\n";
         String methodName = "Greeter/SayHello";
-        String message = "{" +
-                "\"name\":\"DolphinScheduler\"" +
-                "}";
+        String message = "{\n" +
+                "\"name\":\"DolphinScheduler\"\n" +
+                "}\n";
 
         WorkflowForm workflowForm = workflowDefinitionPage
                 .createWorkflow()
@@ -101,9 +101,8 @@ public class GrpcTaskE2ETest extends BaseWorkflowE2ETest {
                 .inputMethodName(methodName)
                 .inputMessage(message)
                 .name(taskName)
-                .submit();
-
-        workflowForm.submit()
+                .submit()
+                .submit()
                 .name(workflowName)
                 .submit();
 

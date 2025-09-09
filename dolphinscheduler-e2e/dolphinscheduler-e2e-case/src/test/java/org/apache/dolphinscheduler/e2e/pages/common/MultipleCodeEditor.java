@@ -82,19 +82,20 @@ public final class MultipleCodeEditor {
         Actions actions = new Actions(this.driver);
 
         List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
-
         try {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBar);
         } catch (org.openqa.selenium.NoSuchElementException ignored) {
             log.warn("scroll bar not found, skipping...");
         }
-
         actions.moveToElement(lineElement(editorIndex, 0))
                 .click()
                 .sendKeys(content)
                 .perform();
 
+        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
         clearTail(actions, lineElement(editorIndex, contentList.size()), content.length());
+        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+
 
         return this;
     }
