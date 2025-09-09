@@ -44,6 +44,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,15 +114,7 @@ public final class ProcessUtils {
             }
 
             // Get all child processes
-            String pids = getPidsStr(processId);
-            String[] pidArray = PID_PATTERN.split(pids);
-            if (pidArray.length == 0) {
-                log.warn("No valid PIDs found for process: {}", processId);
-                return true;
-            }
-
-            // Convert PID string to list of integers
-            List<Integer> pidList = Arrays.stream(pidArray).map(Integer::parseInt).collect(Collectors.toList());
+            List<Integer> pidList = getPidList(processId);
 
             // 1. Try to terminate gracefully (SIGINT)
             boolean gracefulKillSuccess = sendKillSignal("SIGINT", pidList, request.getTenantCode());
@@ -251,26 +244,69 @@ public final class ProcessUtils {
     }
 
     /**
-     * get pids str.
+     * Get all descendant process IDs (including the given process) using pstree.
      *
-     * @param processId process id
-     * @return pids pid String
-     * @throws Exception exception
+     * @param processId the root process ID
+     * @return list of process IDs; returns empty list if no PIDs found (e.g., process not exists)
+     * @throws IllegalArgumentException if any PID is invalid (blank, non-numeric, or non-positive)
+     * @throws Exception if command execution fails unexpectedly (e.g., command not found)
      */
-    public static String getPidsStr(int processId) throws Exception {
-
+    public static List<Integer> getPidList(int processId) throws Exception {
         String rawPidStr;
 
-        // pstree pid get sub pids
-        if (SystemUtils.IS_OS_MAC) {
-            rawPidStr = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-        } else if (SystemUtils.IS_OS_LINUX) {
-            rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-        } else {
-            rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+        try {
+            if (SystemUtils.IS_OS_MAC) {
+                rawPidStr = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
+            } else if (SystemUtils.IS_OS_LINUX) {
+                rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+            } else {
+                log.warn("Unsupported OS for pstree: {}. Attempting generic command.", SystemUtils.OS_NAME);
+                rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+            }
+        } catch (Exception ex) {
+            log.error("Failed to execute 'pstree' command for process ID: {}", processId, ex);
+            throw ex;
         }
 
-        return parsePidStr(rawPidStr);
+        String pidsStr = parsePidStr(rawPidStr);
+        if (StringUtils.isBlank(pidsStr)) {
+            log.warn("No PIDs found for process: {}", processId);
+            return Collections.emptyList();
+        }
+
+        String[] pidArray = PID_PATTERN.split(pidsStr.trim());
+        if (pidArray.length == 0) {
+            log.warn("No PIDs parsed for process: {}", processId);
+            return Collections.emptyList();
+        }
+
+        List<Integer> pidList = new ArrayList<>();
+        for (String pidStr : pidArray) {
+            pidStr = pidStr.trim();
+
+            if (StringUtils.isBlank(pidStr)) {
+                log.error("Empty or blank PID found in output for process: {}, full PIDs string: {}", processId,
+                        pidsStr);
+                throw new IllegalArgumentException("Empty or blank PID found in output from process: " + processId);
+            }
+
+            try {
+                int pid = Integer.parseInt(pidStr);
+                if (pid <= 0) {
+                    log.error("Invalid PID value (must be positive): {} for process: {}, full PIDs string: {}",
+                            pidStr, processId, pidsStr);
+                    throw new IllegalArgumentException("Invalid PID value (must be positive): " + pid);
+                }
+                pidList.add(pid);
+            } catch (NumberFormatException e) {
+                log.error("Invalid PID format in output: {} for process: {}, full PIDs string: {}",
+                        pidStr, processId, pidsStr, e);
+                throw new IllegalArgumentException(
+                        "Invalid PID format in output: '" + pidStr + "' (from process " + processId + ")", e);
+            }
+        }
+
+        return pidList;
     }
 
     public static String parsePidStr(String rawPidStr) {
