@@ -96,7 +96,6 @@ public final class MultipleCodeEditor {
         clearTail(actions, lineElement(editorIndex, contentList.size()), content.length());
         Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
 
-
         return this;
     }
 
