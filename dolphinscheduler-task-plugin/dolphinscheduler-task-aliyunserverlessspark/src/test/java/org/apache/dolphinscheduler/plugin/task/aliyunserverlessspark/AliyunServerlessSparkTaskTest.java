@@ -164,7 +164,7 @@ public class AliyunServerlessSparkTaskTest {
         doReturn(startJobRunResponseBody).when(mockStartJobRunResponse).getBody();
         Assertions.assertDoesNotThrow(
                 () -> doReturn(mockStartJobRunResponse).when(mockAliyunServerlessSparkClient)
-                        .startJobRunWithOptions(any(), any(), any(), any()));
+                        .startJobRun(any(), any()));
 
         doReturn(mockGetJobRunRequest).when(aliyunServerlessSparkTask).buildGetJobRunRequest();
         GetJobRunResponseBody getJobRunResponseBody = new GetJobRunResponseBody();
