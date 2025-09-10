@@ -76,6 +76,13 @@ public final class MultipleCodeEditor {
     @SneakyThrows
     public MultipleCodeEditor content(int editorIndex, String content) {
         content += Constants.LINE_SEPARATOR;
+
+        try {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", editors.get(editorIndex));
+        } catch (org.openqa.selenium.NoSuchElementException ignored) {
+            log.warn("scroll bar not found, skipping...");
+        }
+
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(editors.get(editorIndex)));
 
@@ -92,18 +99,13 @@ public final class MultipleCodeEditor {
                 .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
 
         List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
-        try {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBar);
-        } catch (org.openqa.selenium.NoSuchElementException ignored) {
-            log.warn("scroll bar not found, skipping...");
-        }
+
         actions.moveToElement(lineElement(editorIndex, 0))
                 .click()
                 .sendKeys(content)
                 .perform();
+        clearTail(actions, contentList.size() + 1);
 
-        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-        clearTail(actions, lineElement(editorIndex, contentList.size()), content.length());
         Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
 
         return this;
@@ -116,9 +118,7 @@ public final class MultipleCodeEditor {
                 .perform();
     }
 
-    private void clearTail(Actions actions, WebElement element, int length) {
-        actions.moveToElement(element)
-                .click();
+    private void clearTail(Actions actions, int length) throws InterruptedException {
         for (int i = 0; i < length; i++) {
             actions.sendKeys(Keys.DELETE);
         }
