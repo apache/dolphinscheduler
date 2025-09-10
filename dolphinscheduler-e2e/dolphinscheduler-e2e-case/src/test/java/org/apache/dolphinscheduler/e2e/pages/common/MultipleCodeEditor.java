@@ -83,9 +83,6 @@ public final class MultipleCodeEditor {
             log.warn("scroll bar not found, skipping...");
         }
 
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(editors.get(editorIndex)));
-
         Actions actions = new Actions(this.driver);
         actions.moveToElement(editors.get(editorIndex))
                 .click()
