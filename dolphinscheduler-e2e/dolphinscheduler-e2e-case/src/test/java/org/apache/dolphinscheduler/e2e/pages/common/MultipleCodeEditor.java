@@ -80,7 +80,7 @@ public final class MultipleCodeEditor {
                 .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex)));
 
         Actions actions = new Actions(this.driver);
-        actions.moveToElement(editors[editorIndex])
+        actions.moveToElement(editors.get(editorIndex))
                 .click()
                 .sendKeys(Constans.LINE_SEPERATOR)
                 .perform();
