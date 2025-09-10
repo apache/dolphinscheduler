@@ -91,7 +91,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             return false;
         }
         request.setAttribute(Constants.SESSION_USER, user);
-        ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
+        ThreadLocalContext.setTimezone(user.getTimeZone());
         return true;
     }
 
@@ -100,7 +100,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
                            HttpServletResponse response,
                            Object handler,
                            ModelAndView modelAndView) {
-        ThreadLocalContext.getTimezoneThreadLocal().remove();
 
         int code = response.getStatus();
         if (code >= 200 && code < 300) {
@@ -112,5 +111,13 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         } else if (code >= 500 && code < 600) {
             ApiServerMetrics.incApiResponse5xxCount();
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request,
+                                HttpServletResponse response,
+                                Object handler,
+                                Exception ex) {
+        ThreadLocalContext.removeTimezone();
     }
 }
