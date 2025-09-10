@@ -75,12 +75,20 @@ public final class MultipleCodeEditor {
 
     @SneakyThrows
     public MultipleCodeEditor content(int editorIndex, String content) {
-        relocateLines();
         content += Constants.LINE_SEPARATOR;
         WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
+                .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex)));
 
         Actions actions = new Actions(this.driver);
+        actions.moveToElement(editors[editorIndex])
+                .click()
+                .sendKeys(Constans.LINE_SEPERATOR)
+                .perform();
+
+        relocateLines();
+
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
 
         List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
         try {
