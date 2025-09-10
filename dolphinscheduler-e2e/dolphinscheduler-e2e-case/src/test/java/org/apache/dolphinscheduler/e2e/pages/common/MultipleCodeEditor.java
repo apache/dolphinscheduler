@@ -77,14 +77,15 @@ public final class MultipleCodeEditor {
     public MultipleCodeEditor content(int editorIndex, String content) {
         content += Constants.LINE_SEPARATOR;
         WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex)));
+                .until(ExpectedConditions.elementToBeClickable(editors.get(editorIndex)));
 
         Actions actions = new Actions(this.driver);
         actions.moveToElement(editors.get(editorIndex))
                 .click()
-                .sendKeys(Constans.LINE_SEPERATOR)
+                .sendKeys(Constants.LINE_SEPARATOR)
                 .perform();
 
+        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
         relocateLines();
 
         WebDriverWaitFactory.createWebDriverWait(driver)
