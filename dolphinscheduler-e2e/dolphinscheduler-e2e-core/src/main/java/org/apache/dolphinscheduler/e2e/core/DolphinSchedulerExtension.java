@@ -99,7 +99,6 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         browser.start();
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--allow-running-insecure-content");
-        chromeOptions.addArguments("--disable-features=SidePanelPinning");
         chromeOptions.addArguments(String.format("--unsafely-treat-insecure-origin-as-secure=http://%s:%s",
                 address.getHost(), address.getPort()));
         driver = new RemoteWebDriver(browser.getSeleniumAddress(), chromeOptions);
