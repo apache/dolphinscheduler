@@ -73,14 +73,14 @@ public final class MultipleCodeEditor {
             throw new IllegalArgumentException("editorIndex out of range");
         }
 
-        content += Constants.LINE_SEPARATOR;
-
         try {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", editors.get(editorIndex));
         } catch (org.openqa.selenium.NoSuchElementException ignored) {
             log.warn("scroll bar not found, skipping...");
         }
-        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(editors.get(editorIndex)));
+
         Actions actions = new Actions(this.driver);
         actions.moveToElement(editors.get(editorIndex))
                 .click()
@@ -88,21 +88,22 @@ public final class MultipleCodeEditor {
                 .perform();
 
         Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+
         relocateLines();
 
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
 
-        List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
-
+        String[] contentList = content.split(Constants.LINE_SEPARATOR);
+        for (int i = 0; i < contentList.length; i++) {
+            contentList[i]=contentList[i].trim();
+        }
+        String rebuiltContent = String.join(Constants.LINE_SEPARATOR, contentList) + Constants.LINE_SEPARATOR;
         actions.moveToElement(lineElement(editorIndex, 0))
                 .click()
-                .sendKeys(content)
+                .sendKeys(rebuiltContent)
                 .perform();
-        clearTail(actions, contentList.size() + 1);
-
-        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-
+        clearTail(actions, content.length() + 1);
         return this;
     }
 
