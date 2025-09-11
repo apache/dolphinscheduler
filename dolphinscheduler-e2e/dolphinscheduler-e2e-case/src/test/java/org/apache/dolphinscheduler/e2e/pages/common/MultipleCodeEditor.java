@@ -49,18 +49,11 @@ public final class MultipleCodeEditor {
 
     private List<List<WebElement>> editorLines = new ArrayList<>();
 
-    @FindBys({
-            @FindBy(className = "pre-tasks-model")
-    })
-    private WebElement scrollBar;
-
     private WebDriver driver;
 
     public MultipleCodeEditor(WebDriver driver) {
         PageFactory.initElements(driver, this);
-
         relocateLines();
-
         this.driver = driver;
     }
 
@@ -75,6 +68,7 @@ public final class MultipleCodeEditor {
 
     @SneakyThrows
     public MultipleCodeEditor content(int editorIndex, String content) {
+        PageFactory.initElements(driver, this);
         if (editorIndex >= editors.size()) {
             throw new IllegalArgumentException("editorIndex out of range");
         }
