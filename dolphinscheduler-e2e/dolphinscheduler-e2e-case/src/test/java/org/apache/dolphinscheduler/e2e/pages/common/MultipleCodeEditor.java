@@ -75,14 +75,18 @@ public final class MultipleCodeEditor {
 
     @SneakyThrows
     public MultipleCodeEditor content(int editorIndex, String content) {
+        if (editorIndex >= editors.size()) {
+            throw new IllegalArgumentException("editorIndex out of range");
+        }
+
         content += Constants.LINE_SEPARATOR;
 
         try {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", editors.get(editorIndex));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", editors.get(editorIndex));
         } catch (org.openqa.selenium.NoSuchElementException ignored) {
             log.warn("scroll bar not found, skipping...");
         }
-
+        Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
         Actions actions = new Actions(this.driver);
         actions.moveToElement(editors.get(editorIndex))
                 .click()
