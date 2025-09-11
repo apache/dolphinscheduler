@@ -163,20 +163,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         log.info("Successfully submitted serverless spark job, jobRunId - {}", jobRunId);
 
         while (!RunState.isFinal(currentState)) {
-            GetJobRunRequest getJobRunRequest = buildGetJobRunRequest();
-
-            GetJobRunResponse getJobRunResponse = RetryUtils.retryFunction(() -> {
-                try {
-                    return aliyunServerlessSparkClient
-                            .getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
-                                    getJobRunRequest);
-                } catch (Exception e) {
-                    throw new AliyunServerlessSparkTaskException("Failed to get job run!", e);
-                }
-            }, retryPolicy);
-
-            currentState = RunState.valueOf(getJobRunResponse.getBody().getJobRun().getState());
-            log.info("job - {} state - {}", jobRunId, currentState);
+            currentState = RunState.valueOf(pollJobRunStatus());
 
             try {
                 Thread.sleep(10 * 1000L);
@@ -227,6 +214,34 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                         throw new AliyunServerlessSparkTaskException("Failed to cancel job run!");
                     }
                 }, retryPolicy);
+
+        RunState currentState = RunState.Cancelling;
+
+        while (!RunState.isCancelled(currentState)) {
+            currentState = RunState.valueOf(pollJobRunStatus());
+
+            try {
+                Thread.sleep(10 * 1000L);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+    }
+
+    protected String pollJobRunStatus() {
+        GetJobRunRequest getJobRunRequest = buildGetJobRunRequest();
+
+        GetJobRunResponse getJobRunResponse = RetryUtils.retryFunction(() -> {
+            try {
+                return aliyunServerlessSparkClient
+                        .getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
+                                getJobRunRequest);
+            } catch (Exception e) {
+                throw new AliyunServerlessSparkTaskException("Failed to get job run!", e);
+            }
+        }, retryPolicy);
+
+        return getJobRunResponse.getBody().getJobRun().getState();
     }
 
     @Override

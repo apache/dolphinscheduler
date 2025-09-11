@@ -192,8 +192,21 @@ public class AliyunServerlessSparkTaskTest {
     @Test
     public void testCancelApplication() throws Exception {
         doReturn(mockCancelJobRunRequest).when(aliyunServerlessSparkTask).buildCancelJobRunRequest();
+        doReturn(mockGetJobRunRequest).when(aliyunServerlessSparkTask).buildGetJobRunRequest();
+
+        GetJobRunResponseBody getJobRunResponseBody = new GetJobRunResponseBody();
+        GetJobRunResponseBody.GetJobRunResponseBodyJobRun jobRun =
+                new GetJobRunResponseBody.GetJobRunResponseBodyJobRun();
+        jobRun.setState(RunState.Cancelled.name());
+        getJobRunResponseBody.setJobRun(jobRun);
+        doReturn(getJobRunResponseBody).when(mockGetJobRunResponse).getBody();
+
         Assertions.assertDoesNotThrow(
                 () -> doReturn(mockCancelJobRunResponse).when(mockAliyunServerlessSparkClient).cancelJobRun(any(),
+                        any(), any()));
+
+        Assertions.assertDoesNotThrow(
+                () -> doReturn(mockGetJobRunResponse).when(mockAliyunServerlessSparkClient).getJobRun(any(),
                         any(), any()));
 
         aliyunServerlessSparkTask.init();
