@@ -46,7 +46,7 @@ public class GrpcParametersTest {
                 "\"connectTimeout\":\"10000\"" +
                 "}";
         GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
-        Assertions.assertEquals(10000, grpcParameters.getConnectTimeout());
+        Assertions.assertEquals(10000, grpcParameters.getConnectTimeoutMs());
         Assertions.assertEquals("127.0.0.1:50010", grpcParameters.getUrl());
         Assertions.assertEquals("TaskTester/TestOK", grpcParameters.getMethodName());
         Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());
@@ -70,7 +70,7 @@ public class GrpcParametersTest {
                 "}";
         GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
         Assertions.assertTrue(grpcParameters.checkParameters());
-        Assertions.assertEquals(10000, grpcParameters.getConnectTimeout());
+        Assertions.assertEquals(10000, grpcParameters.getConnectTimeoutMs());
         Assertions.assertEquals("127.0.0.1:50010", grpcParameters.getUrl());
         Assertions.assertEquals("TaskTester/TestOK", grpcParameters.getMethodName());
         Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());
@@ -93,7 +93,7 @@ public class GrpcParametersTest {
                 "\"connectTimeout\":\"10000\"" +
                 "}";
         GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
-        Assertions.assertEquals(10000, grpcParameters.getConnectTimeout());
+        Assertions.assertEquals(10000, grpcParameters.getConnectTimeoutMs());
         Assertions.assertEquals("127.0.0.1:50010", grpcParameters.getUrl());
         Assertions.assertEquals("TaskTester/TestOK", grpcParameters.getMethodName());
         Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());

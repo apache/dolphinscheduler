@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,15 +43,12 @@ public class GrpcParameters extends AbstractParameters {
 
     private String condition;
 
-    /**
-     * Connect Timeout
-     * Unit: ms
-     */
-    private int connectTimeout = 0;
+    @JsonProperty("connectTimeout")
+    private long connectTimeoutMs = 0L;
 
     @Override
     public boolean checkParameters() {
-        if (StringUtils.isEmpty(url) || connectTimeout <= 0)
+        if (StringUtils.isEmpty(url) || connectTimeoutMs <= 0)
             return false;
         return true;
     }

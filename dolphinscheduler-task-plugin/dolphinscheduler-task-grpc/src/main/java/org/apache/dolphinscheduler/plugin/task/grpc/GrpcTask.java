@@ -76,7 +76,7 @@ public class GrpcTask extends AbstractTask {
                     JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
             GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
             DynamicMessage message = stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage(),
-                    grpcParameters.getConnectTimeout());
+                    grpcParameters.getConnectTimeoutMs());
             Printer printer = JsonFormat.printer().omittingInsignificantWhitespace();
             addDefaultOutput(printer.print(message));
         } catch (StatusRuntimeException statusre) {

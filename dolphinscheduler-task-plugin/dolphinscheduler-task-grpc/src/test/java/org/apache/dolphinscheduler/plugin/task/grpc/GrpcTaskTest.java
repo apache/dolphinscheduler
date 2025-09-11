@@ -215,7 +215,7 @@ public class GrpcTaskTest {
         grpcParameters.setMessage(requestMessage);
         grpcParameters.setGrpcCheckCondition(grpcCheckCondition);
         grpcParameters.setCondition(condition);
-        grpcParameters.setConnectTimeout(10000);
+        grpcParameters.setConnectTimeoutMs(10000);
         return mapper.writeValueAsString(grpcParameters);
     }
 
