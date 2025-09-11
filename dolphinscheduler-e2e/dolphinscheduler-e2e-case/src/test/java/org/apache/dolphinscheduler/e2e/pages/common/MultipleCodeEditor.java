@@ -33,31 +33,30 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 @Slf4j
 public final class MultipleCodeEditor {
 
-    @FindBys({
-            @FindBy(className = "monaco-editor")
-    })
-    private List<WebElement> editors;
+    private List<WebElement> editors = new ArrayList<>();
 
     private List<List<WebElement>> editorLines = new ArrayList<>();
 
     private WebDriver driver;
 
     public MultipleCodeEditor(WebDriver driver) {
-        PageFactory.initElements(driver, this);
-        relocateLines();
         this.driver = driver;
+        locateEditors();
+        locateLines();
+    }
+    public MultipleCodeEditor locateEditors() {
+        editors.clear();
+        editors = driver.findElements(By.className("monaco-editor"));
+        return this;
     }
 
-    public MultipleCodeEditor relocateLines() {
+    public MultipleCodeEditor locateLines() {
         editorLines.clear();
         for (WebElement element : editors) {
             List<WebElement> lines = element.findElements(By.className("view-line"));
@@ -68,7 +67,7 @@ public final class MultipleCodeEditor {
 
     @SneakyThrows
     public MultipleCodeEditor content(int editorIndex, String content) {
-        PageFactory.initElements(driver, this);
+        locateEditors();
         if (editorIndex >= editors.size()) {
             throw new IllegalArgumentException("editorIndex out of range");
         }
@@ -89,7 +88,7 @@ public final class MultipleCodeEditor {
 
         Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
 
-        relocateLines();
+        locateLines();
 
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(editorLines.get(editorIndex).get(0)));
@@ -122,7 +121,7 @@ public final class MultipleCodeEditor {
     }
 
     private WebElement lineElement(int editorIndex, int lineNumber) {
-        relocateLines();
+        locateLines();
         return editorLines
                 .get(editorIndex)
                 .get(lineNumber);
