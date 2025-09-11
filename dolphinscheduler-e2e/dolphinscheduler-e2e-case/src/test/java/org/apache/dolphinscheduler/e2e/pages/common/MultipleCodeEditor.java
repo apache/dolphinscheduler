@@ -96,7 +96,7 @@ public final class MultipleCodeEditor {
 
         String[] contentList = content.split(Constants.LINE_SEPARATOR);
         for (int i = 0; i < contentList.length; i++) {
-            contentList[i]=contentList[i].trim();
+            contentList[i] = contentList[i].trim();
         }
         String rebuiltContent = String.join(Constants.LINE_SEPARATOR, contentList) + Constants.LINE_SEPARATOR;
         actions.moveToElement(lineElement(editorIndex, 0))
