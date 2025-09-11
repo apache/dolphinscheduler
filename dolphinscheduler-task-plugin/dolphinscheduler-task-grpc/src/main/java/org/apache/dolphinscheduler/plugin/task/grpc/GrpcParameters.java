@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
