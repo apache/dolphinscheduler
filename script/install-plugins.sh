@@ -55,7 +55,7 @@ while read line; do
 
   if [ "$start_char" != "-" ] && [ "$start_char" != "#" ]; then
       echo "installing plugin: " $line
-      ${DOLPHINSCHEDULER_HOME}/mvnw dependency:get -DgroupId=org.apache.dolphinscheduler -DartifactId=${line} -Dversion=${version} -Ddest=${DOLPHINSCHEDULER_HOME}/plugins/${plugin_dir}
+      ${DOLPHINSCHEDULER_HOME}/mvnw dependency:get -DgroupId=org.apache.dolphinscheduler -DartifactId=${line} -Dversion=${version} -Dclassifier=shade -Ddest=${DOLPHINSCHEDULER_HOME}/plugins/${plugin_dir}
   fi
 
 done < ${DOLPHINSCHEDULER_HOME}/conf/plugins_config
