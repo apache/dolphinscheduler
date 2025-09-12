@@ -89,17 +89,9 @@ public class JSONDescriptorParser {
                         fileDescriptorProtoBuilder.addMessageType(parseType(name, (Type) ns));
                     } else if (ns instanceof Service) {
                         fileDescriptorProtoBuilder.addService(parseService(name, (Service) ns));
-                    } else {
-
                     }
                 } else if (pbObject instanceof Enum) {
                     fileDescriptorProtoBuilder.addEnumType(parseEnum(name, (Enum) pbObject));
-                } else if (pbObject instanceof Field) {
-
-                } else if (pbObject instanceof OneOf) {
-
-                } else if (pbObject instanceof Method) {
-
                 }
             });
         Descriptors.FileDescriptor fileDescriptor =
@@ -124,7 +116,6 @@ public class JSONDescriptorParser {
                         DescriptorProtos.FieldDescriptorProto.Builder field = parseField(name, (Field) pbObject);
                         fieldMap.put(name, field);
                     }
-
                 }
             });
         if (type.nested != null)
@@ -160,9 +151,6 @@ public class JSONDescriptorParser {
             int oneofCount = descriptorProtoBuilder.getOneofDeclCount();
             List<DescriptorProtos.OneofDescriptorProto> oneofDescriptorProtos =
                     descriptorProtoBuilder.getOneofDeclList();
-            oneofDescriptorProtos.forEach((oneof) -> {
-
-            });
             IntStream.range(0, oneofCount)
                     .forEach(oneofIndex -> {
                         DescriptorProtos.OneofDescriptorProto oneofDescriptorProto =
