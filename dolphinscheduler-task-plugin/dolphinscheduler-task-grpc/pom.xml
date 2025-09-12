@@ -60,30 +60,37 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty-shaded</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.j2objc</groupId>
             <artifactId>j2objc-annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -93,6 +100,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
