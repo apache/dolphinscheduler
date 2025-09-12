@@ -56,7 +56,7 @@
       "taskParams": {
         "localParams": [],
         "resourceList": [],
-        "url": "localhost:54321",
+        "url": "greeterServer:50051",
         "grpcServiceDefinition": "syntax = \"proto3\";\n\npackage org.apache.dolphinscheduler.task.grpc.proto;\n\noption java_package = \"org.apache.dolphinscheduler.plugin.task.grpc.generated\";\noption java_multiple_files = true;\noption java_outer_classname = \"TaskTesterProto\";\n\nservice TaskTester {\n  rpc TestOK (StringRequest) returns (StringReply) {}\n  rpc TestUNIMPLEMENTED (StringRequest) returns (StringReply) {}\n}\n\nmessage StringRequest {\n  string username = 1;\n}\n\nmessage StringReply {\n  string message = 1;\n}\n",
         "grpcServiceDefinitionJSON": "{\"nested\":{\"org\":{\"nested\":{\"apache\":{\"nested\":{\"dolphinscheduler\":{\"nested\":{\"task\":{\"nested\":{\"grpc\":{\"nested\":{\"proto\":{\"options\":{\"java_package\":\"org.apache.dolphinscheduler.plugin.task.grpc.generated\",\"java_multiple_files\":true,\"java_outer_classname\":\"TaskTesterProto\"},\"nested\":{\"TaskTester\":{\"methods\":{\"TestOK\":{\"requestType\":\"StringRequest\",\"responseType\":\"StringReply\"},\"TestUNIMPLEMENTED\":{\"requestType\":\"StringRequest\",\"responseType\":\"StringReply\"}}},\"StringRequest\":{\"fields\":{\"username\":{\"type\":\"string\",\"id\":1}}},\"StringReply\":{\"fields\":{\"message\":{\"type\":\"string\",\"id\":1}}}}}}}}}}}}}}}}}",
         "methodName": "TaskTester/TestOK",

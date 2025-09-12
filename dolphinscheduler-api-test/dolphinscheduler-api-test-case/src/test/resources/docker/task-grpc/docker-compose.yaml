@@ -27,26 +27,20 @@ services:
     ports:
       - "12345:12345"
     networks:
-      - e2e
+      - api-test
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
       timeout: 5s
       retries: 120
+    depends_on:
+      sqlserver:
+        condition: service_started
   greeterServer:
     image: grpc/java-example-hostname:1.75.0
     ports:
       - "50051:50051"
     networks:
-      - e2e
-    volumes:
-      - type: bind
-        source: ./
-        target: /config
-    healthcheck:
-      test: [ "CMD", "curl", "--http0.9", "http://localhost:50051/" ]
-      interval: 5s
-      timeout: 5s
-      retries: 120
+      - api-test
 networks:
-  e2e:
+  api-test:

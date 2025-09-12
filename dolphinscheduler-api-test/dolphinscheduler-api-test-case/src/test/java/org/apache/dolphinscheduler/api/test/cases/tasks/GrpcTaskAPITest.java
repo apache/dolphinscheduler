@@ -48,7 +48,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
-@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/task-grpc/docker-compose.yaml")
 @Slf4j
 @DisableIfTestFails
 public class GrpcTaskAPITest {
