@@ -141,6 +141,16 @@
             </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>
+                <artifactId>grpc-api</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-core</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
                 <artifactId>grpc-services</artifactId>
                 <version>${io.grpc.version}</version>
             </dependency>
@@ -158,6 +168,16 @@
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-protobuf</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-api</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-core</artifactId>
                 <version>${io.grpc.version}</version>
             </dependency>
             <dependency>
