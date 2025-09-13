@@ -34,7 +34,7 @@ services:
       timeout: 5s
       retries: 120
     depends_on:
-      sqlserver:
+      greeterServer:
         condition: service_started
   greeterServer:
     image: grpc/java-example-hostname:1.75.0
