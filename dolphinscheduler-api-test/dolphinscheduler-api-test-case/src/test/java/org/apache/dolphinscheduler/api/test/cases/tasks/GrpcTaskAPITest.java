@@ -94,7 +94,7 @@ public class GrpcTaskAPITest {
     }
 
     @Test
-    public void testGrpcWorkflowInstance() {
+    public void testGrpcFailedWorkflowInstance() {
         try {
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
@@ -105,7 +105,7 @@ public class GrpcTaskAPITest {
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("workflow-json/grpc.json").getFile());
+            File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcFailedWorkflow.json").getFile());
             CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
                     .importWorkflowDefinition(loginUser, projectCode, file);
             String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
@@ -116,7 +116,56 @@ public class GrpcTaskAPITest {
                     workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
             Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
             Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
-                    .contains("hello world"));
+                    .contains("test name"));
+            workflowDefinitionCode =
+                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+
+            // release test workflow
+            HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
+                    projectCode, workflowDefinitionCode, ReleaseState.ONLINE);
+            Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
+
+            // trigger workflow instance
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date();
+            String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
+            log.info("use current time {} as scheduleTime", scheduleTime);
+            HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
+                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
+
+            workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
+        } catch (Exception e) {
+            log.error("failed", e);
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testGrpcSuccessWorkflowInstance() {
+        try {
+            // create test project
+            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
+            HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+            Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
+                    .getBody().getData()).get(0)).get("code");
+
+            // upload test workflow definition json
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcSuccessWorkflow.json").getFile());
+            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
+                    .importWorkflowDefinition(loginUser, projectCode, file);
+            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
+            Assertions.assertTrue(data.contains("\"success\":true"));
+
+            // get workflow definition code
+            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                    workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
+                    .contains("test name"));
             workflowDefinitionCode =
                     (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
                             .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
