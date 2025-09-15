@@ -39,6 +39,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
