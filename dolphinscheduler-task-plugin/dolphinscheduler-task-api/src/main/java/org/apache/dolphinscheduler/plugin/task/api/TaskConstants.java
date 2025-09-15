@@ -388,4 +388,13 @@ public class TaskConstants {
 
     public static final String STAR = "*";
     public static final String SENSITIVE_DATA_MASK = "******";
+
+    /**
+     * Kubernetes client pool configuration
+     */
+    public static final String K8S_CLIENT_POOL_MAX_SIZE = "k8s.client.pool.max.size";
+    public static final String K8S_CLIENT_POOL_MIN_IDLE = "k8s.client.pool.min.idle";
+    public static final String K8S_CLIENT_POOL_MAX_IDLE = "k8s.client.pool.max.idle";
+    public static final String K8S_CLIENT_POOL_MAX_WAIT_MS = "k8s.client.pool.max.wait.ms";
+    public static final String K8S_CLIENT_POOL_IDLE_TIMEOUT_MS = "k8s.client.pool.idle.timeout.ms";
 }
