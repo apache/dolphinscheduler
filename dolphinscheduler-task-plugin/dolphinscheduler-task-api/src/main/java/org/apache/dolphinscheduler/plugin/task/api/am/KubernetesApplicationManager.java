@@ -24,13 +24,12 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +38,7 @@ import com.google.auto.service.AutoService;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
-import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
@@ -59,29 +56,43 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     private static final int MAX_RETRY_TIMES = 10;
 
     /**
-     * cache k8s client for same task
+     * Get Kubernetes client connection pool instance
      */
-    private final Map<String, KubernetesClient> cacheClientMap = new ConcurrentHashMap<>();
+    private final KubernetesClientPool clientPool = KubernetesClientPool.getInstance();
 
     @Override
     public boolean killApplication(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) throws TaskException {
 
         boolean isKill;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
-        FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
+
+        FilterWatchListDeletable<Pod, PodList, PodResource> watchList = 
                 getListenPod(kubernetesApplicationManagerContext);
         try {
             if (getApplicationStatus(kubernetesApplicationManagerContext, watchList).isFailure()) {
                 log.error("Driver pod is in FAILED or UNKNOWN status.");
                 isKill = false;
             } else {
-                watchList.delete();
-                isKill = true;
+                String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
+                KubernetesClient client = null;
+                try {
+                    client = getClient(kubernetesApplicationManagerContext);
+                    // Retrieve watchList again, as the previous instance of tes client connection pool may have expired
+                    FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList = 
+                            client.pods()
+                                .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                                .withLabel(UNIQUE_LABEL_NAME, labelValue);
+                    newWatchList.delete();
+                    isKill = true;
+                } finally {
+                    if (client != null) {
+                        returnClient(clusterId, client);
+                    }
+                }
             }
         } catch (Exception e) {
             throw new TaskException("Failed to kill Kubernetes application with label " + labelValue, e);
         } finally {
-            // remove client cache after killing application
             removeCache(labelValue);
         }
 
@@ -96,56 +107,98 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     /**
      * get driver pod
      *
-     * @param kubernetesApplicationManagerContext
-     * @return
+     * @param kubernetesApplicationManagerContext Context
+     * @return pods
      */
     @SneakyThrows
     private FilterWatchListDeletable<Pod, PodList, PodResource> getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        KubernetesClient client = getClient(kubernetesApplicationManagerContext);
+        String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
+        KubernetesClient client = null;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
         List<Pod> podList = null;
         FilterWatchListDeletable<Pod, PodList, PodResource> watchList = null;
         int retryTimes = 0;
-        while (CollectionUtils.isEmpty(podList) && retryTimes < MAX_RETRY_TIMES) {
-            watchList = client.pods()
-                    .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                    .withLabel(UNIQUE_LABEL_NAME, labelValue);
-            podList = watchList.list().getItems();
-            if (!CollectionUtils.isEmpty(podList)) {
-                break;
+        try {
+            client = getClient(kubernetesApplicationManagerContext);
+            while (CollectionUtils.isEmpty(podList) && retryTimes < MAX_RETRY_TIMES) {
+                watchList = client.pods()
+                        .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                        .withLabel(UNIQUE_LABEL_NAME, labelValue);
+                podList = watchList.list().getItems();
+                if (!CollectionUtils.isEmpty(podList)) {
+                    break;
+                }
+                Thread.sleep(SLEEP_TIME_MILLIS);
+                retryTimes += 1;
             }
-            Thread.sleep(SLEEP_TIME_MILLIS);
-            retryTimes += 1;
+            return watchList;
+        } finally {
+            if (client != null) {
+                returnClient(clusterId, client);
+            }
         }
-
-        return watchList;
     }
 
     /**
-     * create client or get from cache map
+     * Retrieve Kubernetes clients from the connection pool
      *
-     * @param kubernetesApplicationManagerContext
-     * @return
+     * @param kubernetesApplicationManagerContext Context parameters
+     * @return Kubernetes Client
      */
     private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        K8sTaskExecutionContext k8sTaskExecutionContext =
+        K8sTaskExecutionContext k8sTaskExecutionContext = 
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
-        return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),
-                key -> new KubernetesClientBuilder()
-                        .withConfig(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())).build());
+        
+        // Using k8s configuration as cluster identifier
+        String clusterId = getClusterId(k8sTaskExecutionContext);
+        String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
+        
+        try {
+            return clientPool.getClient(clusterId, kubeConfig);
+        } catch (Exception e) {
+            log.error("Failed to get Kubernetes client from pool", e);
+            throw new RuntimeException("Failed to get Kubernetes client", e);
+        }
     }
 
-    public void removeCache(String cacheKey) {
-        try (KubernetesClient ignored = cacheClientMap.remove(cacheKey)) {
+    /**
+     * Get Cluster Identifier
+     */
+    private String getClusterId(K8sTaskExecutionContext k8sTaskExecutionContext) {
+        // The hash value of kubeconfig is used as the cluster identifier
+        String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
+        return "k8s-cluster-" + Math.abs(kubeConfig.hashCode());
+    }
+
+    /**
+     * Return the client to the connection pool
+     *
+     * @param clusterId Cluster Identifier
+     * @param client Client to be returned
+     */
+    private void returnClient(String clusterId, KubernetesClient client) {
+        try {
+            clientPool.returnClient(clusterId, client);
+        } catch (Exception e) {
+            log.error("Failed to return Kubernetes client to pool", e);
         }
+    }
+
+    /**
+     * Clean up connections
+     * Note: This method no longer removes clients from the cache,
+     *          but ensures that clients are correctly returned to the connection pool
+     */
+    public void removeCache(String cacheKey) {
+        log.debug("removeCache called with key: {}", cacheKey);
     }
 
     /**
      * get application execution status
      *
-     * @param kubernetesApplicationManagerContext
+     * @param kubernetesApplicationManagerContext Context
      * @return TaskExecutionStatus  SUCCESS / FAILURE
-     * @throws TaskException
+     * @throws TaskException throws Exception
      */
     public TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) throws TaskException {
         return getApplicationStatus(kubernetesApplicationManagerContext, null);
@@ -154,26 +207,45 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     /**
      * get application (driver pod) status
      *
-     * @param kubernetesApplicationManagerContext
-     * @param watchList
-     * @return
-     * @throws TaskException
+     * @param kubernetesApplicationManagerContext Context
+     * @param watchList watchers
+     * @return status
+     * @throws TaskException throws Exception
      */
-    private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
+    private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext, 
                                                      FilterWatchListDeletable<Pod, PodList, PodResource> watchList) throws TaskException {
         String phase;
         try {
             if (Objects.isNull(watchList)) {
                 watchList = getListenPod(kubernetesApplicationManagerContext);
             }
-            List<Pod> driverPod = watchList.list().getItems();
-            if (!driverPod.isEmpty()) {
-                // cluster mode
-                Pod driver = driverPod.get(0);
-                phase = driver.getStatus().getPhase();
-            } else {
-                // client mode
-                phase = FINISH;
+            
+            // To avoid the possibility of watchList expiration, retrieve the client again to perform the list operation
+            String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
+            KubernetesClient client = null;
+            try {
+                client = getClient(kubernetesApplicationManagerContext);
+                String labelValue = kubernetesApplicationManagerContext.getLabelValue();
+                
+                // Build the latest watchList again
+                FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList = 
+                        client.pods()
+                            .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                            .withLabel(UNIQUE_LABEL_NAME, labelValue);
+                
+                List<Pod> driverPod = newWatchList.list().getItems();
+                if (!driverPod.isEmpty()) {
+                    // cluster mode
+                    Pod driver = driverPod.get(0);
+                    phase = driver.getStatus().getPhase();
+                } else {
+                    // client mode
+                    phase = FINISH;
+                }
+            } finally {
+                if (client != null) {
+                    returnClient(clusterId, client);
+                }
             }
         } catch (Exception e) {
             throw new TaskException("Failed to get Kubernetes application status", e);
@@ -186,34 +258,40 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     /**
      * get pod's log watcher
      *
-     * @param kubernetesApplicationManagerContext
-     * @return
+     * @param kubernetesApplicationManagerContext Context
+     * @return Watcher
      */
     @SneakyThrows
     public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        KubernetesClient client = getClient(kubernetesApplicationManagerContext);
+        String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
+        KubernetesClient client = null;
         boolean podIsReady = false;
         Pod pod = null;
-        while (!podIsReady) {
-            FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
-                    getListenPod(kubernetesApplicationManagerContext);
-            List<Pod> podList = watchList == null ? null : watchList.list().getItems();
-            if (CollectionUtils.isEmpty(podList)) {
-                return null;
+        try {
+            client = getClient(kubernetesApplicationManagerContext);
+            while (!podIsReady) {
+                FilterWatchListDeletable<Pod, PodList, PodResource> watchList = 
+                        getListenPod(kubernetesApplicationManagerContext);
+                List<Pod> podList = watchList == null ? null : watchList.list().getItems();
+                if (CollectionUtils.isEmpty(podList)) {
+                    return null;
+                }
+                pod = podList.get(0);
+                String phase = pod.getStatus().getPhase();
+                if (phase.equals(PENDING) || phase.equals(UNKNOWN)) {
+                    Thread.sleep(SLEEP_TIME_MILLIS);
+                } else {
+                    podIsReady = true;
+                }
             }
-            pod = podList.get(0);
-            String phase = pod.getStatus().getPhase();
-            if (phase.equals(PENDING) || phase.equals(UNKNOWN)) {
-                Thread.sleep(SLEEP_TIME_MILLIS);
-            } else {
-                podIsReady = true;
-            }
-        }
 
-        return client.pods().inNamespace(pod.getMetadata().getNamespace())
-                .withName(pod.getMetadata().getName())
-                .inContainer(kubernetesApplicationManagerContext.getContainerName())
-                .watchLog();
+            return client.pods().inNamespace(pod.getMetadata().getNamespace())
+                    .withName(pod.getMetadata().getName())
+                    .inContainer(kubernetesApplicationManagerContext.getContainerName())
+                    .watchLog();
+        } finally {
+            log.debug("Log watch client is not returned immediately, will be managed by caller after watch completes");
+        }
     }
 
 }
