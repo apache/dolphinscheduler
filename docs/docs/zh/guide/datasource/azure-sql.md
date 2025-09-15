@@ -58,4 +58,6 @@
 
 ## 是否原生支持
 
-是，数据源不需要任务附加操作即可使用。
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+- 驱动下载链接 [mssql-jdbc-11.2.1.jre8](https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/11.2.1.jre8/mssql-jdbc-11.2.1.jre8.jar)
+

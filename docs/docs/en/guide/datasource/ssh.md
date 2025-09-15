@@ -13,3 +13,7 @@ This data source is used for RemoteShell component to execute commands remotely.
 - Password: Set the password to connect to SSH
 - Public Key: Set the public key to connect to SSH
 
+## Native Supported
+
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+

@@ -14,4 +14,6 @@
 
 ## 是否原生支持
 
-否，使用前需请参考 [数据源配置](../installation/datasource-setting.md) 中的 "数据源中心" 章节激活数据源。
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+- 驱动下载链接，[mysql-connector-j-8.0.33](https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar)
+

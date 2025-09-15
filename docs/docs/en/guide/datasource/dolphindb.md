@@ -13,7 +13,7 @@
 
 ## Native Supported
 
-- No, please refer to the "Datasource Center" section in [Datasource Configuration](../installation/datasource-setting.md) to activate the datasource before using it.
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
 - JDBC driver configuration reference [DolphinDB JDBC Connector](https://docs.dolphindb.com/en/API/JDBC.html)
 - Driver Maven dependency [com.dolphindb:jdbc:3.00.3.0](https://mvnrepository.com/artifact/com.dolphindb/jdbc/3.00.3.0)
 
