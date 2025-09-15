@@ -238,14 +238,19 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         };
-        try (Watch watch = k8sUtils.createBatchJobWatcher(job.getMetadata().getName(), watcher)) {
-            boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
-                    || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-            if (timeoutFlag) {
-                Boolean timeout = !(countDownLatch.await(taskRequest.getTaskTimeout(), TimeUnit.SECONDS));
-                waitTimeout(timeout);
-            } else {
-                countDownLatch.await();
+        try {
+            // Use k8s configuration files to differentiate between different clusters
+            K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
+            try (Watch watch = k8sUtils.createBatchJobWatcher(configYaml, job.getMetadata().getName(), watcher)) {
+                boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
+                        || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
+                if (timeoutFlag) {
+                    Boolean timeout = !(countDownLatch.await(taskRequest.getTaskTimeout(), TimeUnit.SECONDS));
+                    waitTimeout(timeout);
+                } else {
+                    countDownLatch.await();
+                }
             }
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
@@ -299,9 +304,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             if (StringUtils.isEmpty(k8sParameterStr)) {
                 return result;
             }
-            K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String configYaml = k8sTaskExecutionContext.getConfigYaml();
-            k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
             registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result);
@@ -319,8 +321,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             Thread.currentThread().interrupt();
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
-        } finally {
-            ProcessUtils.removeK8sClientCache(taskRequest.getTaskAppId());
         }
         return result;
     }
@@ -343,7 +343,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             buildK8sJob(k8STaskMainParameters);
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
-            k8sUtils.createJob(namespaceName, job);
+            K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
+            k8sUtils.createJob(configYaml, namespaceName, job);
             log.info("[K8sJobExecutor-{}-{}] submitted job successfully", taskName, taskInstanceId);
         } catch (Exception e) {
             log.error("[K8sJobExecutor-{}-{}] fail to submit job", taskName, taskInstanceId);
@@ -358,8 +360,10 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String namespaceName = k8STaskMainParameters.getNamespaceName();
         String jobName = job.getMetadata().getName();
         try {
-            if (Boolean.TRUE.equals(k8sUtils.jobExist(jobName, namespaceName))) {
-                k8sUtils.deleteJob(jobName, namespaceName);
+            K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
+            if (Boolean.TRUE.equals(k8sUtils.jobExist(configYaml, jobName, namespaceName))) {
+                k8sUtils.deleteJob(configYaml, jobName, namespaceName);
             }
         } catch (Exception e) {
             log.error("[K8sJobExecutor-{}] fail to stop job", jobName);
