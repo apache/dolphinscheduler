@@ -20,25 +20,25 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOG_LINES;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
 
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
-import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 
 @Slf4j
 public class K8sUtils {
 
-    private KubernetesClient client;
-
-    public void createJob(String namespace, Job job) {
+    public void createJob(String configYaml, String namespace, Job job) {
+        String clusterId = KubernetesClientPool.getInstance().getClusterId(configYaml);
+        KubernetesClient client = null;
         try {
+            client = KubernetesClientPool.getInstance().getClient(clusterId, configYaml);
             client.batch()
                     .v1()
                     .jobs()
@@ -46,11 +46,18 @@ public class K8sUtils {
                     .create(job);
         } catch (Exception e) {
             throw new TaskException("fail to create job", e);
+        } finally {
+            if (client != null) {
+                KubernetesClientPool.getInstance().returnClient(clusterId, client);
+            }
         }
     }
 
-    public void deleteJob(String jobName, String namespace) {
+    public void deleteJob(String configYaml, String jobName, String namespace) {
+        String clusterId = KubernetesClientPool.getInstance().getClusterId(configYaml);
+        KubernetesClient client = null;
         try {
+            client = KubernetesClientPool.getInstance().getClient(clusterId, configYaml);
             client.batch()
                     .v1()
                     .jobs()
@@ -59,20 +66,34 @@ public class K8sUtils {
                     .delete();
         } catch (Exception e) {
             throw new TaskException("fail to delete job", e);
+        } finally {
+            if (client != null) {
+                KubernetesClientPool.getInstance().returnClient(clusterId, client);
+            }
         }
     }
 
-    public Boolean jobExist(String jobName, String namespace) {
+    public Boolean jobExist(String configYaml, String jobName, String namespace) {
+        String clusterId = KubernetesClientPool.getInstance().getClusterId(configYaml);
+        KubernetesClient client = null;
         try {
+            client = KubernetesClientPool.getInstance().getClient(clusterId, configYaml);
             Job job = client.batch().v1().jobs().inNamespace(namespace).withName(jobName).get();
             return job != null;
         } catch (Exception e) {
             throw new TaskException("fail to check job: ", e);
+        } finally {
+            if (client != null) {
+                KubernetesClientPool.getInstance().returnClient(clusterId, client);
+            }
         }
     }
 
-    public Watch createBatchJobWatcher(String jobName, Watcher<Job> watcher) {
+    public Watch createBatchJobWatcher(String configYaml, String jobName, Watcher<Job> watcher) {
+        String clusterId = KubernetesClientPool.getInstance().getClusterId(configYaml);
+        KubernetesClient client = null;
         try {
+            client = KubernetesClientPool.getInstance().getClient(clusterId, configYaml);
             return client.batch()
                     .v1()
                     .jobs()
@@ -80,11 +101,18 @@ public class K8sUtils {
                     .watch(watcher);
         } catch (Exception e) {
             throw new TaskException("fail to register batch job watcher", e);
+        } finally {
+            if (client != null) {
+                log.debug("createBatchJobWatcher does not return client immediately, caller should manage client lifecycle");
+            }
         }
     }
 
-    public String getPodLog(String jobName, String namespace) {
+    public String getPodLog(String configYaml, String jobName, String namespace) {
+        String clusterId = KubernetesClientPool.getInstance().getClusterId(configYaml);
+        KubernetesClient client = null;
         try {
+            client = KubernetesClientPool.getInstance().getClient(clusterId, configYaml);
             List<Pod> podList = client.pods().inNamespace(namespace).list().getItems();
             String podName = null;
             for (Pod pod : podList) {
@@ -100,17 +128,12 @@ public class K8sUtils {
         } catch (Exception e) {
             log.error("fail to getPodLog", e);
             log.error("response bodies : {}", e.getMessage());
+        } finally {
+            if (client != null) {
+                KubernetesClientPool.getInstance().returnClient(clusterId, client);
+            }
         }
         return null;
-    }
-
-    public void buildClient(String configYaml) {
-        try {
-            Config config = Config.fromKubeconfig(configYaml);
-            client = new KubernetesClientBuilder().withConfig(config).build();
-        } catch (Exception e) {
-            throw new TaskException("fail to build k8s ApiClient", e);
-        }
     }
 
 }
