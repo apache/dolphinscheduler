@@ -13,7 +13,7 @@
 
 ## 是否原生支持
 
-- 否，使用前需请参考 [数据源配置](../installation/datasource-setting.md) 中的 "数据源中心" 章节激活数据源。
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
 - JDBC驱动配置参考文档 [DolphinDB JDBC Connector](https://docs.dolphindb.cn/zh/jdbcdoc/jdbc.html)
 - 驱动Maven依赖 [com.dolphindb:jdbc:3.00.3.0](https://mvnrepository.com/artifact/com.dolphindb/jdbc/3.00.3.0)
 

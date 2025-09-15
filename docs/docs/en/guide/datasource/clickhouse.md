@@ -18,4 +18,6 @@
 
 ## Native Supported
 
-Yes, could use this datasource by default.
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+- Driver download link [clickhouse-jdbc-0.4.6](https://repo1.maven.org/maven2/com/clickhouse/clickhouse-jdbc/0.4.6/clickhouse-jdbc-0.4.6.jar)
+
