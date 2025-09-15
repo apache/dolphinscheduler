@@ -66,7 +66,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
         boolean isKill;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
 
-        FilterWatchListDeletable<Pod, PodList, PodResource> watchList = 
+        FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
                 getListenPod(kubernetesApplicationManagerContext);
         try {
             if (getApplicationStatus(kubernetesApplicationManagerContext, watchList).isFailure()) {
@@ -78,10 +78,11 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
                 try {
                     client = getClient(kubernetesApplicationManagerContext);
                     // Retrieve watchList again, as the previous instance of tes client connection pool may have expired
-                    FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList = 
+                    FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList =
                             client.pods()
-                                .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                                .withLabel(UNIQUE_LABEL_NAME, labelValue);
+                                    .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext()
+                                            .getNamespace())
+                                    .withLabel(UNIQUE_LABEL_NAME, labelValue);
                     newWatchList.delete();
                     isKill = true;
                 } finally {
@@ -146,13 +147,13 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @return Kubernetes Client
      */
     private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        K8sTaskExecutionContext k8sTaskExecutionContext = 
+        K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
-        
+
         // Using k8s configuration as cluster identifier
         String clusterId = getClusterId(k8sTaskExecutionContext);
         String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
-        
+
         try {
             return clientPool.getClient(clusterId, kubeConfig);
         } catch (Exception e) {
@@ -212,27 +213,28 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @return status
      * @throws TaskException throws Exception
      */
-    private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext, 
+    private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
                                                      FilterWatchListDeletable<Pod, PodList, PodResource> watchList) throws TaskException {
         String phase;
         try {
             if (Objects.isNull(watchList)) {
                 watchList = getListenPod(kubernetesApplicationManagerContext);
             }
-            
+
             // To avoid the possibility of watchList expiration, retrieve the client again to perform the list operation
             String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
             KubernetesClient client = null;
             try {
                 client = getClient(kubernetesApplicationManagerContext);
                 String labelValue = kubernetesApplicationManagerContext.getLabelValue();
-                
+
                 // Build the latest watchList again
-                FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList = 
+                FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList =
                         client.pods()
-                            .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                            .withLabel(UNIQUE_LABEL_NAME, labelValue);
-                
+                                .inNamespace(
+                                        kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                                .withLabel(UNIQUE_LABEL_NAME, labelValue);
+
                 List<Pod> driverPod = newWatchList.list().getItems();
                 if (!driverPod.isEmpty()) {
                     // cluster mode
@@ -270,7 +272,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
         try {
             client = getClient(kubernetesApplicationManagerContext);
             while (!podIsReady) {
-                FilterWatchListDeletable<Pod, PodList, PodResource> watchList = 
+                FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
                         getListenPod(kubernetesApplicationManagerContext);
                 List<Pod> podList = watchList == null ? null : watchList.list().getItems();
                 if (CollectionUtils.isEmpty(podList)) {

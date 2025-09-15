@@ -65,14 +65,12 @@ public class KubernetesClientPool {
                 PropertyUtils.getInt(TaskConstants.K8S_CLIENT_POOL_MIN_IDLE, 2),
                 PropertyUtils.getInt(TaskConstants.K8S_CLIENT_POOL_MAX_IDLE, 5),
                 PropertyUtils.getInt(TaskConstants.K8S_CLIENT_POOL_MAX_WAIT_MS, 30000),
-                PropertyUtils.getInt(TaskConstants.K8S_CLIENT_POOL_IDLE_TIMEOUT_MS, 600000)
-        );
+                PropertyUtils.getInt(TaskConstants.K8S_CLIENT_POOL_IDLE_TIMEOUT_MS, 600000));
         log.info("KubernetesClientPool initialized with config: {}", poolConfig);
 
         // clean connection thread
         startCleanupThread();
     }
-
 
     public static KubernetesClientPool getInstance() {
         return INSTANCE;
@@ -106,7 +104,7 @@ public class KubernetesClientPool {
      * @throws Exception throws exception when failed
      */
     public KubernetesClient getClient(String clusterId, String kubeConfig) throws Exception {
-        ClusterClientPool pool = clusterClientPools.computeIfAbsent(clusterId, 
+        ClusterClientPool pool = clusterClientPools.computeIfAbsent(clusterId,
                 k -> new ClusterClientPool(k, kubeConfig, poolConfig));
         return pool.borrowObject();
     }
@@ -168,10 +166,11 @@ public class KubernetesClientPool {
      * Configuration Class
      */
     public static class PoolConfig {
-        private final int maxSize;        // max connection num
-        private final int minIdle;        // min free connection num
-        private final int maxIdle;        // max free connection num
-        private final long maxWaitMs;     // max waiting time
+
+        private final int maxSize; // max connection num
+        private final int minIdle; // min free connection num
+        private final int maxIdle; // max free connection num
+        private final long maxWaitMs; // max waiting time
         private final long idleTimeoutMs; // free timeout
 
         public PoolConfig(int maxSize, int minIdle, int maxIdle, long maxWaitMs, long idleTimeoutMs) {
@@ -182,11 +181,21 @@ public class KubernetesClientPool {
             this.idleTimeoutMs = idleTimeoutMs;
         }
 
-        public int getMaxSize() { return maxSize; }
-        public int getMinIdle() { return minIdle; }
-        public int getMaxIdle() { return maxIdle; }
-        public long getMaxWaitMs() { return maxWaitMs; }
-        public long getIdleTimeoutMs() { return idleTimeoutMs; }
+        public int getMaxSize() {
+            return maxSize;
+        }
+        public int getMinIdle() {
+            return minIdle;
+        }
+        public int getMaxIdle() {
+            return maxIdle;
+        }
+        public long getMaxWaitMs() {
+            return maxWaitMs;
+        }
+        public long getIdleTimeoutMs() {
+            return idleTimeoutMs;
+        }
 
         @Override
         public String toString() {
@@ -204,6 +213,7 @@ public class KubernetesClientPool {
      * Cluster Connection Pool Class
      */
     private static class ClusterClientPool {
+
         private final String clusterId;
         private final String kubeConfig;
         private final PoolConfig config;
@@ -223,7 +233,6 @@ public class KubernetesClientPool {
             initializeMinIdleConnections();
         }
 
-
         private void initializeMinIdleConnections() {
             for (int i = 0; i < config.getMinIdle(); i++) {
                 try {
@@ -234,12 +243,10 @@ public class KubernetesClientPool {
             }
         }
 
-
         private void createIdleConnection() throws Exception {
             PooledClient client = createClient();
             idleClients.offer(client);
         }
-
 
         private PooledClient createClient() throws Exception {
             if (createdCount.get() >= config.getMaxSize()) {
@@ -269,13 +276,11 @@ public class KubernetesClientPool {
                 return client.client;
             }
 
-
             if (createdCount.get() < config.getMaxSize()) {
                 client = createClient();
                 activeClients.add(client);
                 return client.client;
             }
-
 
             client = idleClients.poll(config.getMaxWaitMs(), TimeUnit.MILLISECONDS);
             if (client != null) {
@@ -286,7 +291,6 @@ public class KubernetesClientPool {
 
             throw new Exception("Timeout waiting for available Kubernetes client connection");
         }
-
 
         public synchronized void returnObject(KubernetesClient client) {
             PooledClient pooledClient = null;
@@ -300,7 +304,6 @@ public class KubernetesClientPool {
             if (pooledClient != null) {
                 activeClients.remove(pooledClient);
                 pooledClient.lastUsedTime = System.currentTimeMillis();
-                
 
                 if (idleClients.size() >= config.getMaxIdle() || !isClientValid(pooledClient.client)) {
                     closeClient(pooledClient);
@@ -310,7 +313,6 @@ public class KubernetesClientPool {
             }
         }
 
-
         public synchronized void cleanupIdle() {
             long now = System.currentTimeMillis();
             PooledClient[] clients = idleClients.toArray(new PooledClient[0]);
@@ -318,8 +320,8 @@ public class KubernetesClientPool {
             int removeCount = 0;
 
             for (PooledClient client : clients) {
-                if (idleClients.size() - removeCount > keepIdle && 
-                    now - client.lastUsedTime > config.getIdleTimeoutMs()) {
+                if (idleClients.size() - removeCount > keepIdle &&
+                        now - client.lastUsedTime > config.getIdleTimeoutMs()) {
                     if (idleClients.remove(client)) {
                         closeClient(client);
                         removeCount++;
@@ -327,7 +329,6 @@ public class KubernetesClientPool {
                 }
             }
         }
-
 
         private boolean isClientValid(KubernetesClient client) {
             try {
@@ -338,7 +339,6 @@ public class KubernetesClientPool {
             }
         }
 
-
         private void closeClient(PooledClient client) {
             try {
                 client.client.close();
@@ -348,7 +348,6 @@ public class KubernetesClientPool {
                 log.error("Error closing Kubernetes client for cluster {}", clusterId, e);
             }
         }
-
 
         public synchronized void close() {
             PooledClient client;
@@ -362,8 +361,8 @@ public class KubernetesClientPool {
             activeClients.clear();
         }
 
-
         private static class PooledClient {
+
             private final KubernetesClient client;
             private long lastUsedTime;
 
