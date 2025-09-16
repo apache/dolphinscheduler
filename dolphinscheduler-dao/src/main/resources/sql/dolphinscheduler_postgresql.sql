@@ -767,9 +767,9 @@ CREATE TABLE t_ds_schedules (
   environment_code bigint DEFAULT '-1',
   create_time timestamp NOT NULL ,
   update_time timestamp NOT NULL ,
-  PRIMARY KEY (id),
-  CONSTRAINT workflow_definition_code_unique UNIQUE (workflow_definition_code)
+  PRIMARY KEY (id)
 );
+CREATE UNIQUE INDEX uniq_workflow_definition_code ON t_ds_schedules (process_definition_code);
 
 --
 -- Table structure for table t_ds_session
