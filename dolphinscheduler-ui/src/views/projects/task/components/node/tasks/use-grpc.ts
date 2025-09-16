@@ -43,6 +43,7 @@ export function useGrpc({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
+    grpcCredentialType: 'INSECURE',
     grpcCheckCondition: 'STATUS_CODE_DEFAULT',
     grpcServiceDefinitionJSON: '',
     url: '',

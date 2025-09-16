@@ -286,6 +286,7 @@ interface ITaskParams {
   executorCores?: number
   mainArgs?: string
   others?: string
+  grpcCredentialType?: string
   grpcServiceDefinition?: string
   grpcServiceDefinitionJSON?: string
   methodName?: string

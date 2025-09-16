@@ -40,6 +40,7 @@ import com.google.protobuf.util.JsonFormat.Printer;
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.TlsChannelCredentials;
 
 @Slf4j
 public class GrpcTask extends AbstractTask {
@@ -70,8 +71,13 @@ public class GrpcTask extends AbstractTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            ManagedChannel channel =
-                    GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
+            ManagedChannel channel;
+            if (grpcParameters.getChannelCredentialType() == GrpcCredentialType.TLS_DEFAULT) {
+                TlsChannelCredentials creds = (TlsChannelCredentials) TlsChannelCredentials.create();
+                channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl(), creds);
+            } else {
+                channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
+            }
             Descriptors.FileDescriptor fileDesc =
                     JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
             GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);

@@ -32,6 +32,8 @@ public class GrpcParameters extends AbstractParameters {
 
     private String url;
 
+    private GrpcCredentialType channelCredentialType = GrpcCredentialType.INSECURE;
+
     private String grpcServiceDefinition;
 
     private String grpcServiceDefinitionJSON;

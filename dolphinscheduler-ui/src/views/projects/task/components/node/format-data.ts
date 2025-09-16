@@ -92,6 +92,7 @@ export function formatParams(data: INodeData): {
   }
   if (data.taskType === 'GRPC') {
     taskParams.url = data.url
+    taskParams.grpcCredentialType = data.grpcCredentialType
     taskParams.grpcServiceDefinition = data.grpcServiceDefinition
     const root = proto.parse(data.grpcServiceDefinition || '').root
     const grpcServiceDefinitionJSON = JSON.stringify(root.toJSON()) || '{}'

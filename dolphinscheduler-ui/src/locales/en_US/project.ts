@@ -509,6 +509,9 @@ export default {
     grpc_url_tips: 'Please Enter gRPC Url',
     grpc_url_format_tips:
       'Request address format is incorrect, gRPC only allows host:port format',
+    grpc_credential_type: 'gRPC Credential Type',
+    grpc_credential_type_insecure: 'Insecure',
+    grpc_credential_type_tls_default: 'Default client SSL/TLS',
     grpc_method: 'gRPC Method',
     grpc_method_tips:
       'Please Enter gRPC Method (required, Service/Method), eg: Greeter/SayHello',

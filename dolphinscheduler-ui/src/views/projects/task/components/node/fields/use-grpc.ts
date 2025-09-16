@@ -34,6 +34,17 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     }
   ]
 
+  const GRPC_CREDENTIAL_TYPES = [
+    {
+      label: t('project.node.grpc_credential_type_insecure'),
+      value: 'INSECURE'
+    },
+    {
+      label: t('project.node.grpc_credential_type_tls_default'),
+      value: 'TLS_DEFAULT'
+    }
+  ]
+
   return [
     {
       type: 'input',
@@ -55,6 +66,12 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
           }
         }
       }
+    },
+    {
+      type: 'select',
+      field: 'grpcCredentialType',
+      name: t('project.node.grpc_credential_type'),
+      options: GRPC_CREDENTIAL_TYPES
     },
     {
       type: 'editor',
