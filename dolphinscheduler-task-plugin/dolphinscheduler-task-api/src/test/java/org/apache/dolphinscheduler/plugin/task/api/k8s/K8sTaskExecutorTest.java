@@ -169,11 +169,9 @@ public class K8sTaskExecutorTest {
         mockPool.returnClient(clusterId, client1);
         Mockito.verify(mockPool).returnClient(clusterId, client1);
 
-        // 再次获取连接
         KubernetesClient client2 = mockPool.getClient(clusterId, mockKubeConfig);
         Assertions.assertNotNull(client2);
 
-        // 关闭连接池
         mockPool.closePool(clusterId);
         Mockito.verify(mockPool).closePool(clusterId);
     }
@@ -228,7 +226,7 @@ public class K8sTaskExecutorTest {
                     2, // minIdle
                     5, // maxIdle
                     10000, // maxWaitMs
-                    600000 // idleTimeoutMs (使用默认值)
+                    600000 // idleTimeoutMs
             );
 
             KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
