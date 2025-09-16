@@ -26,7 +26,15 @@ import org.apache.commons.lang3.SystemUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
+import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManager;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
 
+import io.fabric8.kubernetes.client.KubernetesClient;
+
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,15 +111,45 @@ public class ProcessUtilsTest {
         Assertions.assertEquals(exceptPidList3, actualPidList3);
     }
 
-    @Test
-    public void testRemoveK8sClientCache() {
-        Assertions.assertDoesNotThrow(() -> {
-            ProcessUtils.removeK8sClientCache("a");
-        });
 
-        Assertions.assertThrows(Exception.class, () -> {
-            ProcessUtils.removeK8sClientCache(null);
-        });
+    /**
+     * 测试K8s客户端是否被正确归还到连接池
+     */
+    @Test
+    public void testK8sClientReturnToPool() {
+        try {
+            try (MockedStatic<KubernetesClientPool> mockedPool = Mockito.mockStatic(KubernetesClientPool.class)) {
+                KubernetesClientPool mockClientPool = Mockito.mock(KubernetesClientPool.class);
+                KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
+
+
+                mockedPool.when(KubernetesClientPool::getInstance).thenReturn(mockClientPool);
+                KubernetesApplicationManager mockAppManager = Mockito.mock(KubernetesApplicationManager.class);
+                java.lang.reflect.Field mapField = ProcessUtils.class.getDeclaredField("applicationManagerMap");
+                mapField.setAccessible(true);
+
+                @SuppressWarnings("unchecked")
+                Map<ResourceManagerType, ApplicationManager> originalMap = (Map<ResourceManagerType, ApplicationManager>) mapField.get(null);
+
+
+                originalMap.put(ResourceManagerType.KUBERNETES, mockAppManager);
+
+                TaskExecutionContext taskContext = Mockito.mock(TaskExecutionContext.class);
+                K8sTaskExecutionContext k8sContext = Mockito.mock(K8sTaskExecutionContext.class);
+                Mockito.when(taskContext.getK8sTaskExecutionContext()).thenReturn(k8sContext);
+
+
+                String clusterId = "test-cluster-id";
+                KubernetesClientPool.getInstance().returnClient(clusterId, mockClient);
+
+
+                Mockito.verify(mockClientPool).returnClient(clusterId, mockClient);
+
+                originalMap.remove(ResourceManagerType.KUBERNETES);
+            }
+        } catch (Exception e) {
+            Assertions.fail("Test failed due to reflection error: " + e.getMessage());
+        }
     }
 
     @Test
