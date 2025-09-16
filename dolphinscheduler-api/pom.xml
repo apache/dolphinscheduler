@@ -120,7 +120,6 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-storage-all</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
