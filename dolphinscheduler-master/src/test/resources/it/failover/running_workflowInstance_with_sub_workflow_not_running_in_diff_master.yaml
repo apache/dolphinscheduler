@@ -101,7 +101,7 @@ workflowInstances:
     workflowDefinitionCode: 2
     workflowDefinitionVersion: 1
     projectCode: 1
-    state: SUBMITTED_SUCCESS
+    state: RUNNING_EXECUTION
     recovery: NO
     startTime: 2025-04-24 18:00:00
     endTime: null

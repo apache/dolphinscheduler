@@ -19,3 +19,7 @@
 | Datawarehouse name         | Enter the datawarehouse name of the SNOWFLAKE connection.    |
 | Jdbc connection parameters | Parameter settings for SNOWFLAKE connection, in JSON format. |
 
+## Native Supported
+
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+

@@ -16,7 +16,7 @@ If you want to deploy DolphinScheduler in production, we recommend you follow [c
 
 ## Download Plugin Dependencies
 
-Please refer to the [Download Plugin Dependencies](../installation/pseudo-cluster.md) in pseudo-cluster deployment.
+Please refer to the [Download Plugin Dependencies](../installation/pseudo-cluster.md) in pseudo-cluster deployment. Note that standalone minimal operation requires downloading plugin dependencies `dolphinscheduler-task-shell` and `dolphinscheduler-storage-hdfs`.
 
 ### Configure User Exemption and Permissions
 

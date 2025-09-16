@@ -18,5 +18,6 @@
 
 ## Native Supported
 
-No, you need to import Mysql jdbc driver first, read section example in [datasource-setting](../installation/datasource-setting.md) `DataSource Center` section to import Mysql JDBC Driver.
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+- Driver download link [mysql-connector-j-8.0.33](https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar)
 

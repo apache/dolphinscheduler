@@ -240,7 +240,7 @@ public class WorkflowAlertManager {
         WarningType warningType = workflowInstance.getWarningType();
         switch (warningType) {
             case ALL:
-                if (workflowInstance.getState().isFinished()) {
+                if (workflowInstance.getState().isFinalState()) {
                     sendWarning = true;
                 }
                 break;
