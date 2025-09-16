@@ -135,7 +135,7 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         workerGroup.setName("测试");
         Mockito.when(workerGroupDao.queryById(12)).thenReturn(workerGroup);
         Mockito.when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus("测试",
-                WorkflowExecutionStatus.getNotTerminalStatus()))
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                 .thenReturn(null);
         Mockito.when(workerGroupDao.deleteById(12)).thenReturn(true);
         Mockito.when(workflowInstanceMapper.updateWorkflowInstanceByWorkerGroupName("测试", "")).thenReturn(1);

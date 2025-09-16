@@ -192,7 +192,7 @@ public class TenantServiceTest {
                 baseServiceLogger)).thenReturn(true);
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
         when(workflowInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
-                WorkflowExecutionStatus.getNotTerminalStatus()))
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(getInstanceList());
         when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
         when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
