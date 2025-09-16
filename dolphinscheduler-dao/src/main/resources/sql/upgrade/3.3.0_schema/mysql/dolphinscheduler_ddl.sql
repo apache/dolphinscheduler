@@ -225,7 +225,6 @@ DROP PROCEDURE drop_data_quality_tables;
 
 ALTER TABLE `t_ds_workflow_definition` ADD KEY `idx_project_code` (`project_code`) USING BTREE;
 ALTER TABLE `t_ds_workflow_definition_log` ADD KEY `idx_project_code` (`project_code`) USING BTREE;
-ALTER TABLE `t_ds_schedules` ADD UNIQUE KEY `idx_code` (`process_definition_code`) USING BTREE;
 
 -- drop_column_t_ds_worker_group other_params_json
 DROP PROCEDURE if EXISTS drop_column_t_ds_worker_group_other_params_json;

@@ -235,7 +235,6 @@ DROP FUNCTION IF EXISTS drop_data_quality_tables();
 
 create index workflow_definition_index_project_code on t_ds_workflow_definition (project_code);
 create index workflow_definition_log_index_project_code on t_ds_workflow_definition_log (project_code);
-create unique index idx_code on t_ds_schedules (process_definition_code);
 
 -- drop_column_t_ds_worker_group other_params_json
 delimiter d//
