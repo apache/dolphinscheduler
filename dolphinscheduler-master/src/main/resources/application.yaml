@@ -67,6 +67,13 @@ mybatis-plus:
       id-type: auto
     banner: false
 
+scheduler-plugin:
+  quartz:
+    # By default, will not use a separate datasource for quartz
+    # If you want to use a separate datasource, set it to true and configure the datasource below
+    # If set true, and you do not configure hikari below, it will use the same configuration as spring.datasource.hikari
+    using-separate-datasource: false
+    # hikari:
 
 registry:
   type: zookeeper
