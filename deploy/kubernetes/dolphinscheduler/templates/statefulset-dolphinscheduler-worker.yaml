@@ -83,6 +83,16 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
+            {{- if .Values.worker.envFromSecret }}
+            - secretRef:
+                name: {{ .Values.worker.envFromSecret }}
+            {{- end }}
+            {{- if .Values.worker.envFromSecrets }}
+            {{- range .Values.worker.envFromSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
           {{- if .Values.worker.resources }}
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
