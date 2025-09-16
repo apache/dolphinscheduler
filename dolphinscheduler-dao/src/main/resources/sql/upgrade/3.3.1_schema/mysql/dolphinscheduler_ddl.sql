@@ -18,6 +18,7 @@
 ALTER TABLE t_ds_workflow_definition MODIFY id INT NOT NULL;
 ALTER TABLE t_ds_workflow_definition DROP PRIMARY KEY;
 ALTER TABLE t_ds_workflow_definition ADD PRIMARY KEY(id);
+ALTER TABLE t_ds_schedules ADD UNIQUE KEY idx_code (process_definition_code);
 -- recover AUTO_INCREMENT
 ALTER TABLE t_ds_workflow_definition MODIFY id INT NOT NULL AUTO_INCREMENT;
 ALTER TABLE t_ds_workflow_definition ADD UNIQUE KEY uniq_workflow_definition_code (code);
