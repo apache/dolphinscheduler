@@ -74,4 +74,6 @@ Use application (client) ID and secret to apply for temporary token, and use tok
 
 ## Support Native
 
-Yes, can use this datasource directly in SQL task.
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+- Driver download link [mssql-jdbc-11.2.1.jre8](https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/11.2.1.jre8/mssql-jdbc-11.2.1.jre8.jar)
+

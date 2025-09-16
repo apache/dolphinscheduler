@@ -237,7 +237,7 @@ public class WorkerGroupServiceTest {
         List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
         workflowInstances.add(workflowInstance);
         when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
-                WorkflowExecutionStatus.getNotTerminalStatus()))
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(workflowInstances);
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
@@ -255,7 +255,7 @@ public class WorkerGroupServiceTest {
         WorkerGroup workerGroup = getWorkerGroup(1);
         when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
         when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
-                WorkflowExecutionStatus.getNotTerminalStatus())).thenReturn(null);
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES)).thenReturn(null);
 
         when(workerGroupDao.deleteById(1)).thenReturn(true);
 

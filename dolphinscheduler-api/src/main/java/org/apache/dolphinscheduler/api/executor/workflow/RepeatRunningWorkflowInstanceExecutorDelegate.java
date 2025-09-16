@@ -42,7 +42,7 @@ public class RepeatRunningWorkflowInstanceExecutorDelegate
     @Override
     public Void execute(RepeatRunningWorkflowInstanceOperation workflowInstanceControlRequest) {
         final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
-        if (workflowInstance.getState() == null || !workflowInstance.getState().isFinished()) {
+        if (workflowInstance.getState() == null || !workflowInstance.getState().isFinalState()) {
             throw new ServiceException(
                     String.format("The workflow instance: %s status is %s, cannot repeat running",
                             workflowInstance.getName(), workflowInstance.getState()));

@@ -346,7 +346,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByWorkerGroupNameAndStatus(
                 workerGroup.getName(),
-                WorkflowExecutionStatus.getNotTerminalStatus());
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             List<Integer> workflowInstanceIds =
                     workflowInstances.stream().map(WorkflowInstance::getId).collect(Collectors.toList());
