@@ -245,7 +245,8 @@ public class KubernetesClientPool {
 
         private void createIdleConnection() throws Exception {
             PooledClient client = createClient();
-            idleClients.offer(client);
+            boolean offer = idleClients.offer(client);
+            log.debug("{} to initialize idle connection for cluster {}", offer,clusterId);
         }
 
         private PooledClient createClient() throws Exception {
@@ -308,7 +309,8 @@ public class KubernetesClientPool {
                 if (idleClients.size() >= config.getMaxIdle() || !isClientValid(pooledClient.client)) {
                     closeClient(pooledClient);
                 } else {
-                    idleClients.offer(pooledClient);
+                    boolean offer = idleClients.offer(pooledClient);
+                    log.debug("{} to return Object", offer);
                 }
             }
         }
@@ -332,7 +334,7 @@ public class KubernetesClientPool {
 
         private boolean isClientValid(KubernetesClient client) {
             try {
-                client.getVersion();
+                client.namespaces().list();
                 return true;
             } catch (Exception e) {
                 return false;
