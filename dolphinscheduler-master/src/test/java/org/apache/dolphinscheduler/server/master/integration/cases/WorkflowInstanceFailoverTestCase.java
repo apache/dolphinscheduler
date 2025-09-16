@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
-import org.apache.dolphinscheduler.server.master.failover.FailoverCoordinator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +53,6 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
 
     @Autowired
     private SystemEventBus systemEventBus;
-
-    @Autowired
-    FailoverCoordinator failoverCoordinator;
 
     @Test
     public void testGlobalFailover_runningWorkflow_withSubmittedTasks() {
@@ -895,69 +892,62 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
         assertThat(mainWorkflowInstance).isNotNull();
         assertThat(submittedSubWorkflowInstance).isNotNull();
 
-        MasterServerMetadata masterServerMain = MasterServerMetadata.builder()
-                .cpuUsage(0.2)
-                .memoryUsage(0.4)
-                .serverStatus(ServerStatus.NORMAL)
-                .address(mainWorkflowInstance.getHost())
-                .build();
-        MasterServerMetadata masterServerSub = MasterServerMetadata.builder()
-                .cpuUsage(0.2)
-                .memoryUsage(0.4)
-                .serverStatus(ServerStatus.NORMAL)
-                .address(submittedSubWorkflowInstance.getHost())
-                .build();
-
-        // first start workflow to simulate the normal parent workflow
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain, new Date(), 0));
-
-        final String mainMasterFailoverNodePath = RegistryUtils.getFailoveredNodePath(
-                masterServerMain.getAddress(),
-                masterServerMain.getServerStartupTime(),
-                masterServerMain.getProcessId());
-        // wait failover main-workflow
+        // Failover the main and sub workflow master
+        systemEventBus.publish(GlobalMasterFailoverEvent.of(new Date()));
+        // wait failover finished
         await()
                 .atMost(Duration.ofMinutes(1))
                 .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
-                    assertThat(registryClient.exists(mainMasterFailoverNodePath)).isTrue();
+                    assertThat(registryClient
+                            .exists(RegistryUtils.getGlobalMasterFailoverNodePath(mainWorkflowInstance.getHost())))
+                                    .isTrue();
+                    assertThat(registryClient.exists(
+                            RegistryUtils.getGlobalMasterFailoverNodePath(submittedSubWorkflowInstance.getHost())))
+                                    .isTrue();
                 });
 
-        await()
-                .atMost(Duration.ofMinutes(1))
-                .pollInterval(Duration.ofMillis(500))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryWorkflowInstance(1).getState())
-                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                });
+        // Two workflow instance is success
         await()
                 .atMost(Duration.ofMinutes(1))
                 .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
                     assertThat(repository.queryAllWorkflowInstance())
-                            .hasSize(3)
-                            .filteredOn(workflowInstance -> workflowInstance.getId() == 3)
-                            .allSatisfy(workflowInstance -> {
-                                assertThat(workflowInstance.getState())
-                                        .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                            .hasSize(2)
+                            .satisfies(workflowInstances -> {
+                                // Main workflow instance should be success
+                                // And the sub-workflow task instance should be success too.
+                                assertThat(workflowInstances)
+                                        .filteredOn(workflowInstance -> Objects.equals(workflowInstance.getId(),
+                                                mainWorkflowInstance.getId()))
+                                        .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                                .isEqualTo(WorkflowExecutionStatus.SUCCESS))
+                                        .satisfiesExactly(workflowInstance -> {
+                                            assertThat(repository.queryTaskInstance(mainWorkflowInstance.getId()))
+                                                    .hasSize(2)
+                                                    .anySatisfy(taskInstance -> assertThat(taskInstance.getState())
+                                                            .isEqualTo(TaskExecutionStatus.NEED_FAULT_TOLERANCE))
+                                                    .anySatisfy(taskInstance -> assertThat(taskInstance.getState())
+                                                            .isEqualTo(TaskExecutionStatus.SUCCESS));
+                                        });
+                                // Sub-workflow instance should be success.
+                                // The task instance in sub-workflow should be failover.
+                                assertThat(workflowInstances)
+                                        .filteredOn(workflowInstance -> Objects.equals(workflowInstance.getId(),
+                                                submittedSubWorkflowInstance.getId()))
+                                        .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                                .isEqualTo(WorkflowExecutionStatus.SUCCESS))
+                                        .satisfiesExactly(workflowInstance -> {
+                                            assertThat(
+                                                    repository.queryTaskInstance(submittedSubWorkflowInstance.getId()))
+                                                            .hasSize(1)
+                                                            .satisfiesExactly(
+                                                                    taskInstance -> assertThat(taskInstance.getState())
+                                                                            .isEqualTo(TaskExecutionStatus.SUCCESS));
+                                        });
                             });
                 });
-
-        await()
-                .atMost(Duration.ofMinutes(1))
-                .pollInterval(Duration.ofMillis(500))
-                .untilAsserted(() -> {
-                    assertThat(repository.queryAllTaskInstance())
-                            .hasSize(3)
-                            .filteredOn(taskInstance -> taskInstance.getId() > 1)
-                            .allSatisfy(taskInstance -> {
-                                assertThat(taskInstance.getState())
-                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
-                            });
-                });
-
         masterContainer.assertAllResourceReleased();
-
     }
 
     @Test
