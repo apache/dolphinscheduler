@@ -15,4 +15,4 @@
  * limitations under the License.
 */
 
-ALTER TABLE `t_ds_schedules` ADD UNIQUE KEY `uniq_workflow_definition_code` (`process_definition_code`) USING BTREE;
+ALTER TABLE `t_ds_schedules` ADD UNIQUE KEY `uniq_workflow_definition_code` (`workflow_definition_code`) USING BTREE;
