@@ -265,7 +265,6 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      */
     @SneakyThrows
     public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
         KubernetesClient client = null;
         boolean podIsReady = false;
         Pod pod = null;
