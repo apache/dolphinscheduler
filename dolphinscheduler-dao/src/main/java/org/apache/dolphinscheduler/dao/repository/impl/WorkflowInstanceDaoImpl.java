@@ -171,12 +171,12 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     @Override
     public List<String> queryNeedFailoverMasters() {
         return mybatisMapper
-                .queryNeedFailoverWorkflowInstanceHost(WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+                .queryNeedFailoverWorkflowInstanceHost(WorkflowExecutionStatus.NEED_FAILOVER_STATES);
     }
 
     @Override
     public List<WorkflowInstance> queryNeedFailoverWorkflowInstances(String masterAddress) {
         return mybatisMapper.queryByHostAndStatus(masterAddress,
-                WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+                WorkflowExecutionStatus.NEED_FAILOVER_STATES);
     }
 }

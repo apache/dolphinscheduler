@@ -329,7 +329,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             log.error("Can not execute task for workflow instance which is not finished, workflowInstanceId:{}.",
                     workflowInstanceId);
             putMsg(response, Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED);

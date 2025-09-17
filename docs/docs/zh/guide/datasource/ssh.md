@@ -13,3 +13,7 @@
 - 密码：设置连接 SSH 的密码
 - 公钥：设置连接 SSH 的公钥
 
+## 是否原生支持
+
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+

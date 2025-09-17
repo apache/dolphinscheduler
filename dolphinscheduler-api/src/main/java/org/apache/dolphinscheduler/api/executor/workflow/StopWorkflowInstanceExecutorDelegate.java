@@ -46,7 +46,7 @@ public class StopWorkflowInstanceExecutorDelegate
         final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
         exceptionIfWorkflowInstanceCannotStop(workflowInstance);
 
-        if (ifWorkflowInstanceCanDirectStopInDB(workflowInstance)) {
+        if (workflowInstance.getState().isCanDirectStopInDB()) {
             directStopInDB(workflowInstance);
         } else {
             stopInMaster(workflowInstance);
@@ -56,16 +56,12 @@ public class StopWorkflowInstanceExecutorDelegate
 
     void exceptionIfWorkflowInstanceCannotStop(WorkflowInstance workflowInstance) {
         final WorkflowExecutionStatus workflowInstanceState = workflowInstance.getState();
-        if (workflowInstanceState.canStop()) {
+        if (workflowInstanceState.isCanStop()) {
             return;
         }
         throw new ServiceException(
                 "The workflow instance: " + workflowInstance.getName() + " status is " + workflowInstanceState
                         + ", can not stop");
-    }
-
-    boolean ifWorkflowInstanceCanDirectStopInDB(WorkflowInstance workflowInstance) {
-        return workflowInstance.getState().canDirectStopInDB();
     }
 
     void directStopInDB(WorkflowInstance workflowInstance) {

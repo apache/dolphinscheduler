@@ -15,3 +15,7 @@
 - 数据仓库： 输入数据 SNOWFLAKE 的数据仓库名称
 - Jdbc 连接参数：用于 SNOWFLAKE 数据源 连接的参数设置，以 JSON 形式填写
 
+## 是否原生支持
+
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+

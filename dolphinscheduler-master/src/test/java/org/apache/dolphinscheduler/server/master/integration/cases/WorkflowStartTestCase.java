@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -1031,6 +1032,38 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("dep_task_with_timeout_killed");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with task depend type TASK_ONLY")
+    public void testStartWorkflow_withTaskOnlyStrategy() {
+        final String yaml = "/it/start/workflow_with_task_only_strategy.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam().withStartNodes(Lists.newArrayList(1L)))
+                .taskDependType(TaskDependType.TASK_ONLY)
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();

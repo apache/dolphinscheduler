@@ -42,7 +42,7 @@ public class RecoverSuspendedWorkflowInstanceExecutorDelegate
     @Override
     public Void execute(RecoverSuspendedWorkflowInstanceOperation workflowInstanceControlRequest) {
         final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
-        if (!workflowInstance.getState().isPause() && !workflowInstance.getState().isStop()) {
+        if (!workflowInstance.getState().isPaused() && !workflowInstance.getState().isStopped()) {
             throw new ServiceException(
                     String.format("The workflow instance: %s state is %s, cannot recovery", workflowInstance.getName(),
                             workflowInstance.getState()));

@@ -655,9 +655,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         // check workflow instance status
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not update workflow instance, workflowInstanceId:{}.",
-                    workflowInstance.getState().getDesc(), workflowInstanceId);
+                    workflowInstance.getState().name(), workflowInstanceId);
             putMsg(result, WORKFLOW_INSTANCE_STATE_OPERATION_ERROR,
                     workflowInstance.getName(), workflowInstance.getState().toString(), "update");
             return result;
@@ -835,9 +835,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         projectService.checkProjectAndAuthThrowException(loginUser, project,
                 ApiFuncIdentificationConstant.INSTANCE_DELETE);
         // check workflow instance status
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not delete workflow instance, workflowInstanceId:{}.",
-                    workflowInstance.getState().getDesc(), workflowInstanceId);
+                    workflowInstance.getState().name(), workflowInstanceId);
             throw new ServiceException(WORKFLOW_INSTANCE_STATE_OPERATION_ERROR, workflowInstance.getName(),
                     workflowInstance.getState(), "delete");
         }
@@ -1076,7 +1076,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             }
             log.info("Begin to delete workflow instance, workflow definition code: {}", workflowDefinitionCode);
             for (WorkflowInstance workflowInstance : workflowInstances) {
-                if (!workflowInstance.getState().isFinished()) {
+                if (!workflowInstance.getState().isFinalState()) {
                     log.warn("Workflow instance is not finished cannot delete, workflow instance id:{}",
                             workflowInstance.getId());
                     throw new ServiceException(WORKFLOW_INSTANCE_STATE_OPERATION_ERROR, workflowInstance.getName(),
