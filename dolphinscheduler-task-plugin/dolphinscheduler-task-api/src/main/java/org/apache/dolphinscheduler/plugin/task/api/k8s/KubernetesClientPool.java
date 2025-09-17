@@ -249,7 +249,7 @@ public class KubernetesClientPool {
         private void createIdleConnection() throws Exception {
             PooledClient client = createClient();
             boolean offer = idleClients.offer(client);
-            log.debug("{} to initialize idle connection for cluster {}", offer,clusterId);
+            log.debug("{} to initialize idle connection for cluster {}", offer, clusterId);
         }
 
         private PooledClient createClient() throws Exception {
