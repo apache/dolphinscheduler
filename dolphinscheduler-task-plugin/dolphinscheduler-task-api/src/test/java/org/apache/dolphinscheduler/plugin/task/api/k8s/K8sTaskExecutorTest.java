@@ -39,8 +39,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
@@ -48,8 +46,6 @@ import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
 
 public class K8sTaskExecutorTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(K8sTaskExecutorTest.class);
 
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;

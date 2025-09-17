@@ -77,7 +77,6 @@ public class K8sUtilsTest {
         KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
         mockClient = Mockito.mock(KubernetesClient.class);
 
-        // 设置静态方法mock
         Mockito.when(KubernetesClientPool.getInstance()).thenReturn(mockPool);
         Mockito.when(mockPool.getClusterId(mockKubeConfig)).thenReturn(mockClusterId);
         Mockito.when(mockPool.getClient(mockClusterId, mockKubeConfig)).thenReturn(mockClient);
@@ -102,12 +101,10 @@ public class K8sUtilsTest {
         ObjectMeta mockMetadata = Mockito.mock(ObjectMeta.class);
         PrettyLoggable prettyLoggable = Mockito.mock(PrettyLoggable.class);
 
-        // 2. 配置完整的链式调用返回值，确保每个方法调用都返回正确的mock对象
         Mockito.when(mockClient.batch()).thenReturn(mockBatch);
         Mockito.when(mockBatch.v1()).thenReturn(mockV1);
         Mockito.when(mockV1.jobs()).thenReturn(mockJobs);
 
-        // 使用宽松参数匹配器允许任意符合类型的参数
         Mockito.when(mockJobs.inNamespace(mockNamespace)).thenReturn(mockInNamespace);
         Mockito.when(mockJobs.withName(mockJobName)).thenReturn(mockWithName);
 
@@ -143,7 +140,6 @@ public class K8sUtilsTest {
 
     @Test
     public void testCreateJobSuccess() {
-        // 3. 执行被测试方法
         k8sUtils.createJob(mockKubeConfig, mockNamespace, mockJob);
         Mockito.verify(mockClient).batch();
         Mockito.verify(mockBatch).v1();
@@ -155,7 +151,6 @@ public class K8sUtilsTest {
 
     @Test
     public void testDeleteJobSuccess() {
-        // 执行被测试方法
         k8sUtils.deleteJob(mockKubeConfig, mockJobName, mockNamespace);
         Mockito.verify(mockClient).batch();
         Mockito.verify(mockBatch).v1();
@@ -167,19 +162,15 @@ public class K8sUtilsTest {
 
     @Test
     public void testJobExistSuccess() {
-        // 执行
         Boolean result = k8sUtils.jobExist(mockKubeConfig, mockJobName, mockNamespace);
-        // 验证
         Assertions.assertTrue(result);
     }
 
     @Test
     public void testJobExistFailure() {
-        // 准备
         RuntimeException expectedException = new RuntimeException("Check job failed");
         Mockito.doThrow(expectedException).when(mockClient).batch();
 
-        // 执行和验证
         TaskException exception = Assertions.assertThrows(TaskException.class,
                 () -> k8sUtils.jobExist(mockKubeConfig, mockJobName, mockNamespace));
 
@@ -195,11 +186,9 @@ public class K8sUtilsTest {
 
     @Test
     public void testCreateBatchJobWatcherFailure() {
-        // 准备
         RuntimeException expectedException = new RuntimeException("Create watcher failed");
         Mockito.doThrow(expectedException).when(mockClient).batch();
 
-        // 执行和验证
         TaskException exception = Assertions.assertThrows(TaskException.class,
                 () -> k8sUtils.createBatchJobWatcher(mockKubeConfig, mockJobName, mockWatcher));
 
