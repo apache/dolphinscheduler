@@ -18,6 +18,8 @@ exclude = [
     '^http://minio(:\d+)?',
     '^https://github\.com/apache/dolphinscheduler/blob/[^/]+/script/env/dolphinscheduler_env\.sh',
     '^http://who-t\.blogspot\.com/2009/12/on-commit-messages\.html',
+    '^https://openmldb\.ai',
+    '^https://archive\.apache\.org/dist',
 ]
 
 # Exclude paths from getting checked. The values are treated as regular expressions
@@ -41,7 +43,7 @@ max_retries = 3
 retry_wait_time = 10
 
 # Website timeout from connect to response finished.
-timeout = 30
+timeout = 60
 
 # When links are available using HTTPS, treat HTTP links as errors.
 require_https = false
@@ -55,3 +57,6 @@ include_verbatim = false
 
 # Enable the checking of fragments in links.
 include_fragments = false
+
+# User agent to send with each request.
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"

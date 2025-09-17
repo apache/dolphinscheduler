@@ -96,21 +96,13 @@ class StopWorkflowInstanceExecuteFunctionTest {
     @EnumSource(value = WorkflowExecutionStatus.class, names = {
             "SERIAL_WAIT"})
     void ifWorkflowInstanceCanDirectStopInDB_canDirectStopInDB(WorkflowExecutionStatus workflowExecutionStatus) {
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setName("Workflow-1");
-        workflowInstance.setState(workflowExecutionStatus);
-        Assertions
-                .assertTrue(stopWorkflowInstanceExecutorDelegate.ifWorkflowInstanceCanDirectStopInDB(workflowInstance));
+        Assertions.assertTrue(workflowExecutionStatus.isCanDirectStopInDB());
     }
 
     @ParameterizedTest
     @EnumSource(value = WorkflowExecutionStatus.class, names = {
             "SERIAL_WAIT"}, mode = EnumSource.Mode.EXCLUDE)
     void ifWorkflowInstanceCanDirectStopInDB_canNotDirectStopInDB(WorkflowExecutionStatus workflowExecutionStatus) {
-        WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setName("Workflow-1");
-        workflowInstance.setState(workflowExecutionStatus);
-        Assertions.assertFalse(
-                stopWorkflowInstanceExecutorDelegate.ifWorkflowInstanceCanDirectStopInDB(workflowInstance));
+        Assertions.assertFalse(workflowExecutionStatus.isCanDirectStopInDB());
     }
 }

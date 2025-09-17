@@ -258,7 +258,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private List<WorkflowInstance> getWorkflowInstancesByTenant(Tenant tenant) {
         return workflowInstanceMapper.queryByTenantCodeAndStatus(
                 tenant.getTenantCode(),
-                WorkflowExecutionStatus.getNotTerminalStatus());
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES);
     }
 
     /**
