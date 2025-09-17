@@ -91,7 +91,6 @@ public class KubernetesClientPool {
             return base64Hash.replace("=", "");
         } catch (Exception e) {
             log.error("Failed to generate cluster ID", e);
-            // if fail, use plan b
             return Integer.toString(kubeConfig.hashCode());
         }
     }
@@ -101,12 +100,16 @@ public class KubernetesClientPool {
      * @param clusterId Cluster Identifier
      * @param kubeConfig kubeconfig Configuration
      * @return Kubernetes Client
-     * @throws Exception throws exception when failed
      */
-    public KubernetesClient getClient(String clusterId, String kubeConfig) throws Exception {
+    public KubernetesClient getClient(String clusterId, String kubeConfig) {
         ClusterClientPool pool = clusterClientPools.computeIfAbsent(clusterId,
                 k -> new ClusterClientPool(k, kubeConfig, poolConfig));
-        return pool.borrowObject();
+        try {
+            return pool.borrowObject();
+        } catch (Exception e) {
+            log.error("Failed to get Kubernetes client", e);
+            return null;
+        }
     }
 
     /**
