@@ -43,7 +43,8 @@ public class K8sUtils {
                     .v1()
                     .jobs()
                     .inNamespace(namespace)
-                    .create(job);
+                    .resource(job)
+                    .create();
         } catch (Exception e) {
             throw new TaskException("fail to create job", e);
         } finally {
@@ -81,7 +82,7 @@ public class K8sUtils {
             Job job = client.batch().v1().jobs().inNamespace(namespace).withName(jobName).get();
             return job != null;
         } catch (Exception e) {
-            throw new TaskException("fail to check job: ", e);
+            throw new TaskException("fail to check job", e);
         } finally {
             if (client != null) {
                 KubernetesClientPool.getInstance().returnClient(clusterId, client);
@@ -114,7 +115,10 @@ public class K8sUtils {
         KubernetesClient client = null;
         try {
             client = KubernetesClientPool.getInstance().getClient(clusterId, configYaml);
-            List<Pod> podList = client.pods().inNamespace(namespace).list().getItems();
+            List<Pod> podList = client.pods()
+                    .inNamespace(namespace)
+                    .list()
+                    .getItems();
             String podName = null;
             for (Pod pod : podList) {
                 podName = pod.getMetadata().getName();
@@ -136,5 +140,4 @@ public class K8sUtils {
         }
         return null;
     }
-
 }
