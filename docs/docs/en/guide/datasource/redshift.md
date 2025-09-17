@@ -32,6 +32,6 @@ Use cluster ID, AWS Region, port(optional) and IAM to login.
 
 ## Native Supported
 
-Yes, could use this datasource by default.
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+- Read more about Redshift IAM JDBC driver configuration reference document [redshift-connect-IAM-jdbc](https://docs.aws.amazon.com/redshift/latest/mgmt/generating-iam-credentials-configure-jdbc-odbc.html)
 
-Read more about Redshift IAM JDBC driver configuration reference document [redshift-connect-IAM-jdbc](https://docs.aws.amazon.com/redshift/latest/mgmt/generating-iam-credentials-configure-jdbc-odbc.html)

@@ -922,6 +922,8 @@ export default {
     entry_point_arguments_tips: 'entry point arguments',
     spark_submit_parameters: 'spark submit parameters',
     spark_submit_parameters_tips: 'spark submit parameters',
+    template_id: 'spark template id',
+    template_id_tips: 'spark template id',
     is_production: 'is production',
     is_production_tips: 'is production',
     json_format_tips: 'Json parameters format is abnormal'

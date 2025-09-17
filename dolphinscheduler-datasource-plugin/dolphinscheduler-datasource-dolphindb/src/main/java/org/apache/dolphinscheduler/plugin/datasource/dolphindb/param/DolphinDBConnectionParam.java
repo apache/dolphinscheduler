@@ -15,30 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.plugin.datasource.dolphindb.param;
 
-import java.util.concurrent.DelayQueue;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-import lombok.SneakyThrows;
+public class DolphinDBConnectionParam extends BaseConnectionParam {
 
-public class PriorityDelayQueue<V extends DelayEntry> {
-
-    private final DelayQueue<V> queue = new DelayQueue<>();
-
-    public void add(V v) {
-        queue.put(v);
-    }
-
-    @SneakyThrows
-    public V take() {
-        return queue.take();
-    }
-
-    public int size() {
-        return queue.size();
-    }
-
-    public void clear() {
-        queue.clear();
+    @Override
+    public String toString() {
+        return "DolphinDBConnectionParam{"
+                + "user='" + user + '\''
+                + ", password='" + password + '\''
+                + ", address='" + address + '\''
+                + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
 }

@@ -15,36 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.plugin.datasource.dolphindb.param;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.jetbrains.annotations.NotNull;
+public class DolphinDBDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-public class PriorityAndDelayBasedTaskEntry<V extends Comparable<V>> extends DelayEntry<V> {
-
-    public PriorityAndDelayBasedTaskEntry(long delayTimeMills, V data) {
-        super(delayTimeMills, data);
+    @Override
+    public String toString() {
+        return "DolphinDBDataSourceParamDTO{"
+                + "name='" + name + '\''
+                + ", note='" + note + '\''
+                + ", host='" + host + '\''
+                + ", port=" + port
+                + ", userName='" + userName + '\''
+                + ", password='" + password + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
 
     @Override
-    public long getDelay(@NotNull TimeUnit unit) {
-        return super.getDelay(unit);
-    }
-
-    @Override
-    public int compareTo(@NotNull Delayed o) {
-        return super.compareTo(o);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    public DbType getType() {
+        return DbType.DOLPHINDB;
     }
 }

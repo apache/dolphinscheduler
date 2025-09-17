@@ -28,13 +28,16 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
+    // Store all the task execution runnable in the execution graph.
     private final Map<String, ITaskExecutionRunnable> totalTaskExecuteRunnableMap;
 
     private final Set<String> failureTaskChains;
@@ -76,6 +79,26 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     public void addEdge(String fromTaskName, Set<String> toTaskNames) {
         successors.computeIfAbsent(fromTaskName, k -> new HashSet<>()).addAll(toTaskNames);
         toTaskNames.forEach(toTask -> predecessors.computeIfAbsent(toTask, k -> new HashSet<>()).add(fromTaskName));
+    }
+
+    @Override
+    public void removeUnReachableEdge() {
+        // If the node in successors or predecessors is not in taskExecuteRunnableMap
+        // It means that the node is not executable, so we need to filter it out
+        Consumer<Map<String, Set<String>>> removeUnReachableEdge = edgeMap -> {
+            final Iterator<Map.Entry<String, Set<String>>> iterator = edgeMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Set<String>> entry = iterator.next();
+                if (!totalTaskExecuteRunnableMap.containsKey(entry.getKey())) {
+                    iterator.remove();
+                    continue;
+                }
+                Set<String> toTasks = entry.getValue();
+                toTasks.removeIf(toTask -> !totalTaskExecuteRunnableMap.containsKey(toTask));
+            }
+        };
+        removeUnReachableEdge.accept(successors);
+        removeUnReachableEdge.accept(predecessors);
     }
 
     @Override

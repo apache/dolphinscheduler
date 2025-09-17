@@ -15,21 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.queue;
+package org.apache.dolphinscheduler.plugin.datasource.dolphindb;
 
-import static com.google.common.truth.Truth.assertThat;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import java.util.concurrent.TimeUnit;
+public class DolphinDBPooledDataSourceClient extends BasePooledDataSourceClient {
 
-import org.junit.jupiter.api.Test;
-
-class DelayEntryTest {
-
-    @Test
-    void getDelay() {
-        DelayEntry<String> delayEntry = new DelayEntry<>(5_000L, "Item");
-        assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
-                .isWithin(TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS))
-                .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
+    public DolphinDBPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
 }

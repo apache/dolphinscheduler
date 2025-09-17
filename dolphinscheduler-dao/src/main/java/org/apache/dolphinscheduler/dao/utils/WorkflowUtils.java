@@ -35,7 +35,7 @@ public class WorkflowUtils {
      * @return workflow duration
      */
     public static String getWorkflowInstanceDuration(WorkflowInstance workflowInstance) {
-        return workflowInstance.getState() != null && workflowInstance.getState().isFinished()
+        return workflowInstance.getState() != null && workflowInstance.getState().isFinalState()
                 ? DateUtils.format2Duration(workflowInstance.getStartTime(), workflowInstance.getEndTime())
                 : DateUtils.format2Duration(workflowInstance.getStartTime(), new Date());
     }
