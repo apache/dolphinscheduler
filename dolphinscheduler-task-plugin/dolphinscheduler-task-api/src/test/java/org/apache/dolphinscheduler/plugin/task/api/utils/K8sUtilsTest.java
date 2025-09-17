@@ -17,30 +17,34 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodList;
-import io.fabric8.kubernetes.api.model.StatusDetails;
-import io.fabric8.kubernetes.api.model.batch.v1.JobList;
-import io.fabric8.kubernetes.client.dsl.*;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
-
 
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
-
+import io.fabric8.kubernetes.client.dsl.BatchAPIGroupDSL;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.PodResource;
+import io.fabric8.kubernetes.client.dsl.PrettyLoggable;
+import io.fabric8.kubernetes.client.dsl.ScalableResource;
+import io.fabric8.kubernetes.client.dsl.V1BatchAPIGroupDSL;
 
 public class K8sUtilsTest {
 
@@ -48,14 +52,15 @@ public class K8sUtilsTest {
     private MockedStatic<KubernetesClientPool> mockedKubernetesClientPool;
     private KubernetesClient mockClient;
     private final String mockClusterId = "mock-cluster-id";
-    private final String mockKubeConfig = "apiVersion: v1\nclusters:\n- cluster:\n    server: https://kubernetes.default.svc\n  name: mock-cluster\ncontexts:\n- context:\n    cluster: mock-cluster\n    namespace: default\n    user: mock-user\n  name: mock-context\ncurrent-context: mock-context\nkind: Config\npreferences: {}\nusers:\n- name: mock-user\n  user: {}\n";
+    private final String mockKubeConfig =
+            "apiVersion: v1\nclusters:\n- cluster:\n    server: https://kubernetes.default.svc\n  name: mock-cluster\ncontexts:\n- context:\n    cluster: mock-cluster\n    namespace: default\n    user: mock-user\n  name: mock-context\ncurrent-context: mock-context\nkind: Config\npreferences: {}\nusers:\n- name: mock-user\n  user: {}\n";
     private final String mockNamespace = "default";
     private final String mockJobName = "test-job-123";
 
     private BatchAPIGroupDSL mockBatch;
     private V1BatchAPIGroupDSL mockV1;
-    private MixedOperation<Job,JobList,ScalableResource<Job>> mockJobs;
-    private MixedOperation<Job,JobList,ScalableResource<Job>> mockInNamespace;
+    private MixedOperation<Job, JobList, ScalableResource<Job>> mockJobs;
+    private MixedOperation<Job, JobList, ScalableResource<Job>> mockInNamespace;
     private ScalableResource<Job> mockWithName;
     private ScalableResource<Job> mockResource;
     private Job mockJob;
@@ -64,9 +69,8 @@ public class K8sUtilsTest {
 
     private final String expectedLog = "Pod log content";
 
-    @Test
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setUp() {
         k8sUtils = new K8sUtils();
         mockedKubernetesClientPool = Mockito.mockStatic(KubernetesClientPool.class); // 拦截所有使用静态方法的请求
@@ -103,7 +107,6 @@ public class K8sUtilsTest {
         Mockito.when(mockBatch.v1()).thenReturn(mockV1);
         Mockito.when(mockV1.jobs()).thenReturn(mockJobs);
 
-
         // 使用宽松参数匹配器允许任意符合类型的参数
         Mockito.when(mockJobs.inNamespace(mockNamespace)).thenReturn(mockInNamespace);
         Mockito.when(mockJobs.withName(mockJobName)).thenReturn(mockWithName);
@@ -131,9 +134,11 @@ public class K8sUtilsTest {
         Mockito.when(prettyLoggable.getLog(Mockito.anyBoolean())).thenReturn(expectedLog);
     }
 
-    @After
-    public void tearDown() {
-        mockedKubernetesClientPool.close();
+    @AfterEach
+    void tearDown() {
+        if (mockedKubernetesClientPool != null) {
+            mockedKubernetesClientPool.close();
+        }
     }
 
     @Test
@@ -148,7 +153,6 @@ public class K8sUtilsTest {
         Mockito.verify(mockResource).create();
     }
 
-
     @Test
     public void testDeleteJobSuccess() {
         // 执行被测试方法
@@ -161,13 +165,12 @@ public class K8sUtilsTest {
         Mockito.verify(mockWithName).delete();
     }
 
-
     @Test
     public void testJobExistSuccess() {
         // 执行
         Boolean result = k8sUtils.jobExist(mockKubeConfig, mockJobName, mockNamespace);
         // 验证
-        Assert.assertTrue(result);
+        Assertions.assertTrue(result);
     }
 
     @Test
@@ -177,17 +180,17 @@ public class K8sUtilsTest {
         Mockito.doThrow(expectedException).when(mockClient).batch();
 
         // 执行和验证
-        TaskException exception = Assert.assertThrows(TaskException.class, () ->
-            k8sUtils.jobExist(mockKubeConfig, mockJobName, mockNamespace));
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> k8sUtils.jobExist(mockKubeConfig, mockJobName, mockNamespace));
 
-        Assert.assertEquals("fail to check job", exception.getMessage());
-        Assert.assertEquals(expectedException, exception.getCause());
+        Assertions.assertEquals("fail to check job", exception.getMessage());
+        Assertions.assertEquals(expectedException, exception.getCause());
     }
 
     @Test
     public void testCreateBatchJobWatcherSuccess() {
         Watch result = k8sUtils.createBatchJobWatcher(mockKubeConfig, mockJobName, mockWatcher);
-        Assert.assertEquals(mockWatch, result);
+        Assertions.assertEquals(mockWatch, result);
     }
 
     @Test
@@ -197,17 +200,17 @@ public class K8sUtilsTest {
         Mockito.doThrow(expectedException).when(mockClient).batch();
 
         // 执行和验证
-        TaskException exception = Assert.assertThrows(TaskException.class,
+        TaskException exception = Assertions.assertThrows(TaskException.class,
                 () -> k8sUtils.createBatchJobWatcher(mockKubeConfig, mockJobName, mockWatcher));
 
-        Assert.assertEquals("fail to register batch job watcher", exception.getMessage());
-        Assert.assertEquals(expectedException, exception.getCause());
+        Assertions.assertEquals("fail to register batch job watcher", exception.getMessage());
+        Assertions.assertEquals(expectedException, exception.getCause());
     }
 
     @Test
     public void testGetPodLogSuccess() {
         String result = k8sUtils.getPodLog(mockKubeConfig, mockJobName, mockNamespace);
-        Assert.assertEquals(expectedLog, result);
+        Assertions.assertEquals(expectedLog, result);
     }
 
     @Test
@@ -218,7 +221,7 @@ public class K8sUtilsTest {
         Mockito.when(podList.getItems()).thenReturn(emptyPodList);
 
         String result = k8sUtils.getPodLog(mockKubeConfig, mockJobName, mockNamespace);
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
     }
 
     @Test
@@ -227,6 +230,6 @@ public class K8sUtilsTest {
         Mockito.doThrow(expectedException).when(mockClient).pods();
 
         String result = k8sUtils.getPodLog(mockKubeConfig, mockJobName, mockNamespace);
-        Assert.assertNull(result);
+        Assertions.assertNull(result);
     }
 }
