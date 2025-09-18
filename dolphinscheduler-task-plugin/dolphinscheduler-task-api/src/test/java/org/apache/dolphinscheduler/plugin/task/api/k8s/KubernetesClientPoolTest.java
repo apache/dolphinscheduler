@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
 
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -404,7 +406,7 @@ public class KubernetesClientPoolTest {
                             Assertions.assertNotNull(client, "Client should not be null");
 
                             // Simulate some work with the client
-                            Thread.sleep(10);
+                            Awaitility.await().atMost(Duration.ofMillis(10));
 
                             // Return the client to the pool
                             realPool.returnClient(clusterId, client);

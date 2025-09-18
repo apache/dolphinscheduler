@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,6 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -249,7 +251,7 @@ public class K8sTaskExecutorTest {
         });
 
         watcherThread.start();
-        Thread.sleep(100);
+        Awaitility.await().atMost(Duration.ofMillis(100));
         if (capturedWatcher[0] != null) {
             capturedWatcher[0].eventReceived(Watcher.Action.MODIFIED, mockJob);
         }
