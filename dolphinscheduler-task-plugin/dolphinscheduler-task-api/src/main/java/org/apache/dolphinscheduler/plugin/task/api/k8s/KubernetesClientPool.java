@@ -215,7 +215,7 @@ public class KubernetesClientPool {
     /**
      * Cluster Connection Pool Class
      */
-    private static class ClusterClientPool {
+    public static class ClusterClientPool {
 
         private final String clusterId;
         private final String kubeConfig;
