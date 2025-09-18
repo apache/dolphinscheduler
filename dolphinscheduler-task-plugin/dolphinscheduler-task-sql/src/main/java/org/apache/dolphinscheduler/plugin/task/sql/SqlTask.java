@@ -198,6 +198,9 @@ public class SqlTask extends AbstractTask {
 
             // post execute
             executeUpdate(connection, postStatementsBinds, "post");
+
+            // set varPool
+            taskExecutionContext.setVarPool(sqlParameters.getVarPool());
         } catch (Exception e) {
             log.error("execute sql error: {}", e.getMessage());
             throw e;
