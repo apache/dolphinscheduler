@@ -32,6 +32,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESTART_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_INSTANCE_ID;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
@@ -84,6 +86,8 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 @Slf4j
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
+    @Setter
+    @Getter
     private Job job;
     protected boolean podLogOutputIsFinished = false;
     protected Future<?> podLogOutputFuture;
@@ -259,6 +263,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         } catch (Exception e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+            log.error(e.getMessage());
         }
     }
 
@@ -297,7 +302,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     }
 
     @Override
-    public TaskResponse run(String k8sParameterStr) throws Exception {
+    public TaskResponse run(String k8sParameterStr) {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         try {
@@ -317,10 +322,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 }
             }
         } catch (Exception e) {
+            // if Exception happen
             cancelApplication(k8sParameterStr);
             Thread.currentThread().interrupt();
             result.setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            log.error(e.getMessage());
         }
         return result;
     }
@@ -392,13 +398,5 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
             }
         }
-    }
-
-    public Job getJob() {
-        return job;
-    }
-
-    public void setJob(Job job) {
-        this.job = job;
     }
 }
