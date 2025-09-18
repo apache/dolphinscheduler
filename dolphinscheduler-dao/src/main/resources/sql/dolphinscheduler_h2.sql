@@ -848,7 +848,7 @@ CREATE TABLE t_ds_schedules
     create_time               datetime     NOT NULL,
     update_time               datetime     NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY `uniq_workflow_definition_code` (`workflow_definition_code`)
+    UNIQUE KEY `uniq_schedules_workflow_definition_code` (`workflow_definition_code`)
 );
 
 -- ----------------------------

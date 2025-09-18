@@ -15,4 +15,4 @@
  * limitations under the License.
 */
 
-create unique index uniq_workflow_definition_code on t_ds_schedules (workflow_definition_code);
+create unique index uniq_schedules_workflow_definition_code on t_ds_schedules (workflow_definition_code);
