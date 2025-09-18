@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -36,13 +33,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import io.fabric8.kubernetes.client.KubernetesClient;
 
+import io.fabric8.kubernetes.client.KubernetesClient;
 
 public class KubernetesClientPoolTest {
 
     private KubernetesClientPool mockPool;
-    private final String mockKubeConfig = "apiVersion: v1\nclusters:\n- cluster:\n    server: https://kubernetes.default.svc\n  name: mock-cluster\ncontexts:\n- context:\n    cluster: mock-cluster\n    namespace: default\n    user: mock-user\n  name: mock-context\ncurrent-context: mock-context\nkind: Config\npreferences: {}\nusers:\n- name: mock-user\n  user: {}";
+    private final String mockKubeConfig =
+            "apiVersion: v1\nclusters:\n- cluster:\n    server: https://kubernetes.default.svc\n  name: mock-cluster\ncontexts:\n- context:\n    cluster: mock-cluster\n    namespace: default\n    user: mock-user\n  name: mock-context\ncurrent-context: mock-context\nkind: Config\npreferences: {}\nusers:\n- name: mock-user\n  user: {}";
     private final String clusterId = "mock-cluster-id";
     private MockedStatic<KubernetesClientPool> mockedKubernetesClientPool;
 
@@ -52,7 +50,6 @@ public class KubernetesClientPoolTest {
 
         mockPool = Mockito.mock(KubernetesClientPool.class);
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
-
 
         Mockito.when(KubernetesClientPool.getInstance()).thenReturn(mockPool);
         Mockito.when(mockPool.getClient(Mockito.anyString(), Mockito.anyString())).thenReturn(mockClient);
@@ -65,7 +62,6 @@ public class KubernetesClientPoolTest {
             mockedKubernetesClientPool.close();
         }
     }
-
 
     /**
      * test: getClusterId,getClient,closePool,returnClient
@@ -177,7 +173,6 @@ public class KubernetesClientPoolTest {
         Assertions.assertSame(instance1, instance2, "KubernetesClientPool should be a singleton");
     }
 
-
     /**
      * Test getClusterId method with valid kubeConfig
      */
@@ -190,7 +185,6 @@ public class KubernetesClientPoolTest {
         Assertions.assertEquals(clusterId, sameClusterId, "Same kubeConfig should return same cluster ID");
     }
 
-
     /**
      * Test getClusterId method with different kubeConfigs
      */
@@ -201,7 +195,6 @@ public class KubernetesClientPoolTest {
         String clusterId2 = mockPool.getClusterId(differentKubeConfig);
         Assertions.assertNotEquals(clusterId1, clusterId2, "Different kubeConfigs should return different cluster IDs");
     }
-
 
     /**
      * Test getClient method with valid parameters
@@ -215,12 +208,15 @@ public class KubernetesClientPoolTest {
         KubernetesClientPool realPool = Mockito.spy(KubernetesClientPool.class);
 
         // Mock the clusterClientPools field to return a mock ClusterClientPool
-        java.lang.reflect.Field clusterClientPoolsField = KubernetesClientPool.class.getDeclaredField("clusterClientPools");
+        java.lang.reflect.Field clusterClientPoolsField =
+                KubernetesClientPool.class.getDeclaredField("clusterClientPools");
         clusterClientPoolsField.setAccessible(true);
-        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools =
+                new ConcurrentHashMap<>();
 
         // Create a mock ClusterClientPool
-        KubernetesClientPool.ClusterClientPool mockClusterClientPool = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+        KubernetesClientPool.ClusterClientPool mockClusterClientPool =
+                Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
         mockClusterClientPools.put(clusterId, mockClusterClientPool);
 
         // Mock the borrowObject method
@@ -240,7 +236,6 @@ public class KubernetesClientPoolTest {
         Assertions.assertEquals(mockClient, client, "Returned client should match the mock client");
     }
 
-
     /**
      * Test returnClient method
      */
@@ -253,12 +248,15 @@ public class KubernetesClientPoolTest {
         KubernetesClientPool realPool = Mockito.spy(KubernetesClientPool.class);
 
         // Mock the clusterClientPools field to return a mock ClusterClientPool
-        java.lang.reflect.Field clusterClientPoolsField = KubernetesClientPool.class.getDeclaredField("clusterClientPools");
+        java.lang.reflect.Field clusterClientPoolsField =
+                KubernetesClientPool.class.getDeclaredField("clusterClientPools");
         clusterClientPoolsField.setAccessible(true);
-        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools =
+                new ConcurrentHashMap<>();
 
         // Create a mock ClusterClientPool
-        KubernetesClientPool.ClusterClientPool mockClusterClientPool = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+        KubernetesClientPool.ClusterClientPool mockClusterClientPool =
+                Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
         mockClusterClientPools.put(clusterId, mockClusterClientPool);
 
         // Mock the borrowObject method to return our mock client
@@ -294,12 +292,15 @@ public class KubernetesClientPoolTest {
         KubernetesClientPool realPool = Mockito.spy(KubernetesClientPool.class);
 
         // Mock the clusterClientPools field to return a mock ClusterClientPool
-        java.lang.reflect.Field clusterClientPoolsField = KubernetesClientPool.class.getDeclaredField("clusterClientPools");
+        java.lang.reflect.Field clusterClientPoolsField =
+                KubernetesClientPool.class.getDeclaredField("clusterClientPools");
         clusterClientPoolsField.setAccessible(true);
-        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools =
+                new ConcurrentHashMap<>();
 
         // Create a mock ClusterClientPool
-        KubernetesClientPool.ClusterClientPool mockClusterClientPool = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+        KubernetesClientPool.ClusterClientPool mockClusterClientPool =
+                Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
         mockClusterClientPools.put(clusterId, mockClusterClientPool);
 
         // Set the mock clusterClientPools into the realPool
@@ -319,7 +320,6 @@ public class KubernetesClientPoolTest {
                 "Cluster client pool should be removed after close");
     }
 
-
     /**
      * Test close method (closes all pools)
      */
@@ -329,16 +329,20 @@ public class KubernetesClientPoolTest {
         KubernetesClientPool realPool = Mockito.spy(KubernetesClientPool.class);
 
         // Mock the clusterClientPools field
-        java.lang.reflect.Field clusterClientPoolsField = KubernetesClientPool.class.getDeclaredField("clusterClientPools");
+        java.lang.reflect.Field clusterClientPoolsField =
+                KubernetesClientPool.class.getDeclaredField("clusterClientPools");
         clusterClientPoolsField.setAccessible(true);
-        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools =
+                new ConcurrentHashMap<>();
 
         // Create multiple mock ClusterClientPools for different clusters
         String clusterId1 = clusterId;
         String clusterId2 = clusterId + "_2";
 
-        KubernetesClientPool.ClusterClientPool mockClusterClientPool1 = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
-        KubernetesClientPool.ClusterClientPool mockClusterClientPool2 = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+        KubernetesClientPool.ClusterClientPool mockClusterClientPool1 =
+                Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+        KubernetesClientPool.ClusterClientPool mockClusterClientPool2 =
+                Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
 
         mockClusterClientPools.put(clusterId1, mockClusterClientPool1);
         mockClusterClientPools.put(clusterId2, mockClusterClientPool2);
@@ -362,7 +366,6 @@ public class KubernetesClientPoolTest {
                 "All cluster client pools should be removed after close");
     }
 
-
     @Test
     public void testConcurrentAccess() throws Exception {
         final int threadCount = 10;
@@ -375,12 +378,15 @@ public class KubernetesClientPoolTest {
         KubernetesClientPool realPool = Mockito.spy(KubernetesClientPool.class);
 
         // Mock the clusterClientPools field
-        java.lang.reflect.Field clusterClientPoolsField = KubernetesClientPool.class.getDeclaredField("clusterClientPools");
+        java.lang.reflect.Field clusterClientPoolsField =
+                KubernetesClientPool.class.getDeclaredField("clusterClientPools");
         clusterClientPoolsField.setAccessible(true);
-        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools =
+                new ConcurrentHashMap<>();
 
         // Create a mock ClusterClientPool
-        KubernetesClientPool.ClusterClientPool mockClusterClientPool = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+        KubernetesClientPool.ClusterClientPool mockClusterClientPool =
+                Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
         mockClusterClientPools.put(clusterId, mockClusterClientPool);
 
         // Create a mock KubernetesClient
@@ -435,7 +441,6 @@ public class KubernetesClientPoolTest {
         }
     }
 
-
     /**
      * Test handling of closed client
      */
@@ -446,12 +451,15 @@ public class KubernetesClientPoolTest {
 
         // Mock the clusterClientPools field to return a mock ClusterClientPool
         try {
-            java.lang.reflect.Field clusterClientPoolsField = KubernetesClientPool.class.getDeclaredField("clusterClientPools");
+            java.lang.reflect.Field clusterClientPoolsField =
+                    KubernetesClientPool.class.getDeclaredField("clusterClientPools");
             clusterClientPoolsField.setAccessible(true);
-            ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools = new ConcurrentHashMap<>();
+            ConcurrentHashMap<String, KubernetesClientPool.ClusterClientPool> mockClusterClientPools =
+                    new ConcurrentHashMap<>();
 
             // Create a mock ClusterClientPool
-            KubernetesClientPool.ClusterClientPool mockClusterClientPool = Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
+            KubernetesClientPool.ClusterClientPool mockClusterClientPool =
+                    Mockito.mock(KubernetesClientPool.ClusterClientPool.class);
             mockClusterClientPools.put(clusterId, mockClusterClientPool);
 
             // Mock the borrowObject method to throw an exception, simulating a closed client scenario
