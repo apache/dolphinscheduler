@@ -231,10 +231,13 @@ public class K8sTaskExecutorTest {
         });
 
         watcherThread.start();
-        Awaitility.await().atMost(Duration.ofMillis(100));
-        if (capturedWatcher[0] != null) {
-            capturedWatcher[0].eventReceived(Watcher.Action.MODIFIED, mockJob);
-        }
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(2))
+                .pollInterval(Duration.ofMillis(100))
+                .until(() -> capturedWatcher[0] != null);
+
+        // ensure Watcher is not Null
+        capturedWatcher[0].eventReceived(Watcher.Action.MODIFIED, mockJob);
 
         testLatch.await(2, TimeUnit.SECONDS);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
