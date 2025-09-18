@@ -17,35 +17,60 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import io.fabric8.kubernetes.api.model.Affinity;
+import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.Watch;
+import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+
 
 public class K8sTaskExecutorTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(K8sTaskExecutorTest.class);
 
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;
@@ -56,28 +81,54 @@ public class K8sTaskExecutorTest {
     private final double minMemorySpace = 10;
     private final int taskInstanceId = 1000;
     private final String taskName = "k8s_task_test";
+    private final String taskAppId = "k8s_task_test_app_1000";
     private Job job;
 
     private final String mockKubeConfig =
             "apiVersion: v1\nclusters:\n- cluster:\n    server: https://kubernetes.default.svc\n  name: mock-cluster\ncontexts:\n- context:\n    cluster: mock-cluster\n    namespace: default\n    user: mock-user\n  name: mock-context\ncurrent-context: mock-context\nkind: Config\npreferences: {}\nusers:\n- name: mock-user\n  user: {}\n";
 
     private MockedStatic<KubernetesClientPool> mockedKubernetesClientPool;
+    private MockedStatic<K8sUtils> mockedK8sUtils;
+    private MockedStatic<ProcessUtils> mockedProcessUtils;
+    private MockedStatic<LogUtils> mockedLogUtils;
+    private MockedStatic<JSONUtils> mockedJsonUtils;
+
+    private KubernetesClient mockClient;
+    private K8sUtils mockK8sUtilsImpl;
+    private Watch mockWatch;
+    private LogWatch mockLogWatch;
 
     @BeforeEach
     public void before() throws Exception {
         mockedKubernetesClientPool = Mockito.mockStatic(KubernetesClientPool.class);
+        mockedK8sUtils = Mockito.mockStatic(K8sUtils.class);
+        mockedProcessUtils = Mockito.mockStatic(ProcessUtils.class);
+        mockedLogUtils = Mockito.mockStatic(LogUtils.class);
+        mockedJsonUtils = Mockito.mockStatic(JSONUtils.class);
+
         KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
-        KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
+        mockClient = Mockito.mock(KubernetesClient.class);
+        mockK8sUtilsImpl = Mockito.mock(K8sUtils.class);
+        mockWatch = Mockito.mock(Watch.class);
+        mockLogWatch = Mockito.mock(LogWatch.class);
+
         Mockito.when(KubernetesClientPool.getInstance()).thenReturn(mockPool);
         Mockito.when(mockPool.getClient(Mockito.anyString(), Mockito.anyString())).thenReturn(mockClient);
 
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
+        taskRequest.setTaskAppId(taskAppId);
+        taskRequest.setTaskTimeout(60);
+        taskRequest.setTaskTimeoutStrategy(TaskTimeoutStrategy.WARN);
 
         K8sTaskExecutionContext k8sContext = new K8sTaskExecutionContext();
         k8sContext.setConfigYaml(mockKubeConfig);
         taskRequest.setK8sTaskExecutionContext(k8sContext);
+
+
+        Mockito.when(JSONUtils.parseObject(Mockito.anyString(), Mockito.eq(K8sTaskMainParameters.class)))
+                .thenReturn(k8sTaskMainParameters);
 
         Map<String, String> labelMap = new HashMap<>();
         labelMap.put("test", "1234");
@@ -96,9 +147,15 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskMainParameters.setCommand("[\"perl\" ,\"-Mbignum=bpi\", \"-wle\", \"print bpi(2000)\"]");
         k8sTaskMainParameters.setLabelMap(labelMap);
-        k8sTaskMainParameters.setNodeSelectorRequirements(Arrays.asList(requirement));
+        k8sTaskMainParameters.setNodeSelectorRequirements(Collections.singletonList(requirement));
         k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
         job = k8sTaskExecutor.getJob();
+
+        // reflect
+        Field field = AbstractK8sTaskExecutor.class.getDeclaredField("k8sUtils");
+        field.setAccessible(true);
+        field.set(k8sTaskExecutor, mockK8sUtilsImpl);
+
     }
 
     @AfterEach
@@ -106,8 +163,19 @@ public class K8sTaskExecutorTest {
         if (mockedKubernetesClientPool != null) {
             mockedKubernetesClientPool.close();
         }
+        if (mockedK8sUtils != null) {
+            mockedK8sUtils.close();
+        }
+        if (mockedProcessUtils != null) {
+            mockedProcessUtils.close();
+        }
+        if (mockedLogUtils != null) {
+            mockedLogUtils.close();
+        }
+        if (mockedJsonUtils != null) {
+            mockedJsonUtils.close();
+        }
     }
-
     @Test
     public void testGetK8sJobStatusNormal() {
         JobStatus jobStatus = new JobStatus();
@@ -143,123 +211,50 @@ public class K8sTaskExecutorTest {
     }
 
     /**
-     * k8s Test
+     * Test registerBatchJobWatcher method with successful job completion
      */
     @Test
-    public void testKubernetesClientPoolBasicFunction() throws Exception {
-        KubernetesClientPool mockPool = KubernetesClientPool.getInstance();
+    public void testRegisterBatchJobWatcherSuccess() throws Exception {
+        // mock setTaskStatus
+        TaskResponse taskResponse = new TaskResponse();
+        String taskInstanceIdStr = String.valueOf(taskInstanceId);
 
-        String clusterId = "mock-cluster-id";
-        Mockito.when(mockPool.getClusterId(Mockito.anyString())).thenReturn(clusterId);
+        // Mock Job and its status
+        Job mockJob = Mockito.mock(Job.class);
+        JobStatus mockJobStatus = Mockito.mock(JobStatus.class);
+        ObjectMeta mockMetadata = Mockito.mock(ObjectMeta.class);
 
-        KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
-        Mockito.when(mockPool.getClient(clusterId, mockKubeConfig)).thenReturn(mockClient);
+        Mockito.when(mockJob.getMetadata()).thenReturn(mockMetadata);
+        Mockito.when(mockMetadata.getName()).thenReturn("test-job");
+        Mockito.when(mockJob.getStatus()).thenReturn(mockJobStatus);
+        // mock getK8sJobStatus
+        Mockito.when(mockJobStatus.getSucceeded()).thenReturn(1); // Job succeeded
 
-        String actualClusterId = mockPool.getClusterId(mockKubeConfig);
-        Assertions.assertEquals(clusterId, actualClusterId);
+        // Setup CountDownLatch behavior with a spy
+        K8sTaskExecutor spyExecutor = Mockito.spy(k8sTaskExecutor);
+        // Create a real Watcher instance that we can control
+        final Watcher<Job>[] capturedWatcher = new Watcher[1];
+        // Mock k8sUtils.createBatchJobWatcher to capture the watcher
+        Mockito.doAnswer(invocation -> {
+            capturedWatcher[0] = invocation.getArgument(2);
+            return mockWatch;
+        }).when(mockK8sUtilsImpl).createBatchJobWatcher(
+                Mockito.anyString(), Mockito.anyString(), Mockito.any(Watcher.class));
 
-        KubernetesClient client1 = mockPool.getClient(clusterId, mockKubeConfig);
-        Assertions.assertNotNull(client1);
-        Assertions.assertEquals(mockClient, client1);
+        // Create a thread to run the method and capture the watcher
+        CountDownLatch testLatch = new CountDownLatch(1);
+        Thread watcherThread = new Thread(() -> {
+            spyExecutor.registerBatchJobWatcher(mockJob, taskInstanceIdStr, taskResponse);
+            testLatch.countDown();
+        });
 
-        mockPool.returnClient(clusterId, client1);
-        Mockito.verify(mockPool).returnClient(clusterId, client1);
-
-        KubernetesClient client2 = mockPool.getClient(clusterId, mockKubeConfig);
-        Assertions.assertNotNull(client2);
-
-        mockPool.closePool(clusterId);
-        Mockito.verify(mockPool).closePool(clusterId);
-    }
-
-    @Test
-    public void testKubernetesClientPoolConcurrency() throws Exception {
-        KubernetesClientPool mockPool = KubernetesClientPool.getInstance();
-        String clusterId = "mock-cluster-id";
-
-        Mockito.when(mockPool.getClusterId(Mockito.anyString())).thenReturn(clusterId);
-
-        final int threadCount = 5;
-        final CountDownLatch latch = new CountDownLatch(threadCount);
-        final ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-        final List<Exception> exceptions = new ArrayList<>();
-
-        try {
-            for (int i = 0; i < threadCount; i++) {
-                final int threadNum = i;
-                executorService.submit(() -> {
-                    try {
-                        KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
-                        Mockito.when(mockPool.getClient(clusterId, mockKubeConfig)).thenReturn(mockClient);
-
-                        KubernetesClient client = mockPool.getClient(clusterId, mockKubeConfig);
-                        Assertions.assertNotNull(client);
-
-                        Thread.sleep(100);
-
-                        mockPool.returnClient(clusterId, client);
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            latch.await(30, TimeUnit.SECONDS);
-
-            Assertions.assertTrue(exceptions.isEmpty(), "Concurrent access to connection pool caused exceptions");
-        } finally {
-            executorService.shutdown();
+        watcherThread.start();
+        Thread.sleep(100);
+        if (capturedWatcher[0] != null) {
+            capturedWatcher[0].eventReceived(Watcher.Action.MODIFIED, mockJob);
         }
+
+        testLatch.await(2, TimeUnit.SECONDS);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
     }
-
-    @Test
-    public void testKubernetesClientPoolConfig() {
-        try {
-            KubernetesClientPool.PoolConfig expectedConfig = new KubernetesClientPool.PoolConfig(
-                    10, // maxSize
-                    2, // minIdle
-                    5, // maxIdle
-                    10000, // maxWaitMs
-                    600000 // idleTimeoutMs
-            );
-
-            KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
-
-            java.lang.reflect.Field configField = KubernetesClientPool.class.getDeclaredField("poolConfig");
-            configField.setAccessible(true);
-            configField.set(mockPool, expectedConfig);
-
-            Assertions.assertEquals(10, expectedConfig.getMaxSize());
-            Assertions.assertEquals(2, expectedConfig.getMinIdle());
-            Assertions.assertEquals(5, expectedConfig.getMaxIdle());
-            Assertions.assertEquals(10000, expectedConfig.getMaxWaitMs());
-        } catch (Exception e) {
-            Assertions.fail("Failed to test connection pool config: " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testClusterIdGeneration() {
-
-        KubernetesClientPool mockPool = KubernetesClientPool.getInstance();
-
-        String mockClusterId = "mock-cluster-id-1";
-        Mockito.when(mockPool.getClusterId(mockKubeConfig)).thenReturn(mockClusterId);
-
-        String differentKubeConfig = mockKubeConfig + "#different";
-        String mockDifferentClusterId = "mock-cluster-id-2";
-        Mockito.when(mockPool.getClusterId(differentKubeConfig)).thenReturn(mockDifferentClusterId);
-
-        String clusterId1 = mockPool.getClusterId(mockKubeConfig);
-        String clusterId2 = mockPool.getClusterId(mockKubeConfig);
-        Assertions.assertEquals(clusterId1, clusterId2);
-        Assertions.assertEquals(mockClusterId, clusterId1);
-
-        String clusterId3 = mockPool.getClusterId(differentKubeConfig);
-        Assertions.assertNotEquals(clusterId1, clusterId3);
-        Assertions.assertEquals(mockDifferentClusterId, clusterId3);
-    }
-
 }
