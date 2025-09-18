@@ -19,8 +19,11 @@ package org.apache.dolphinscheduler.task.executor.container;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
@@ -98,6 +101,7 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
         }
         log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         pushTaskExecutorLogToRemote(taskExecutor);
+        deleteExecPathIfProduction(taskExecutor);
     }
 
     @Override
@@ -142,6 +146,28 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
             }
         } catch (Exception ex) {
             log.error("Send task log {} to remote storage failed", taskExecutionContext.getLogPath(), ex);
+        }
+    }
+
+    /**
+     * Delete task exec Directory if set development.state=false in common.properties explicit
+     * otherwise keep it for debug reason.
+     */
+    private void deleteExecPathIfProduction(ITaskExecutor taskExecutor) {
+        boolean isDev = PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
+        if (!isDev) {
+            try {
+                final TaskExecutionContext ctx = taskExecutor.getTaskExecutionContext();
+                final String execPath = (ctx != null ? ctx.getExecutePath() : "");
+                if (!"".equals(execPath)) {
+                    FileUtils.deleteFile(execPath);
+                    log.info("Deleted task exec directory: {}", execPath);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to delete task exec directory in prod mode.", e);
+            }
+        } else {
+            log.debug("Development mode is on, skip deleting executePath for debug reason");
         }
     }
 
