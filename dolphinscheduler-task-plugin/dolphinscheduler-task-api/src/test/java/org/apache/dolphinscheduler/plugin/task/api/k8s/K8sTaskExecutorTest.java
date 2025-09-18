@@ -47,8 +47,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -57,11 +55,8 @@ import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
-import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 public class K8sTaskExecutorTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(K8sTaskExecutorTest.class);
 
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;
@@ -84,10 +79,8 @@ public class K8sTaskExecutorTest {
     private MockedStatic<LogUtils> mockedLogUtils;
     private MockedStatic<JSONUtils> mockedJsonUtils;
 
-    private KubernetesClient mockClient;
     private K8sUtils mockK8sUtilsImpl;
     private Watch mockWatch;
-    private LogWatch mockLogWatch;
 
     @BeforeEach
     public void before() throws Exception {
@@ -98,10 +91,9 @@ public class K8sTaskExecutorTest {
         mockedJsonUtils = Mockito.mockStatic(JSONUtils.class);
 
         KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
-        mockClient = Mockito.mock(KubernetesClient.class);
+        KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
         mockK8sUtilsImpl = Mockito.mock(K8sUtils.class);
         mockWatch = Mockito.mock(Watch.class);
-        mockLogWatch = Mockito.mock(LogWatch.class);
 
         Mockito.when(KubernetesClientPool.getInstance()).thenReturn(mockPool);
         Mockito.when(mockPool.getClient(Mockito.anyString(), Mockito.anyString())).thenReturn(mockClient);
