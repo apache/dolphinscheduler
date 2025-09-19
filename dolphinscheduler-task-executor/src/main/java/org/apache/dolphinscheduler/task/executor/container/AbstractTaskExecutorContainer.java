@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.task.executor.container;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -158,8 +159,8 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
         if (!isDev) {
             try {
                 final TaskExecutionContext ctx = taskExecutor.getTaskExecutionContext();
-                final String execPath = (ctx != null ? ctx.getExecutePath() : "");
-                if (!"".equals(execPath)) {
+                final String execPath = ctx.getExecutePath();
+                if (StringUtils.isNotEmpty(execPath)) {
                     FileUtils.deleteFile(execPath);
                     log.info("Deleted task exec directory: {}", execPath);
                 }
