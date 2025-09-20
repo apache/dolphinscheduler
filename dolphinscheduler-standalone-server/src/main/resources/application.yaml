@@ -32,6 +32,9 @@ spring:
       url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
       username: sa
       password: ""
+      hikari:
+        connection-test-query: select 1
+        pool-name: DolphinSchedulerDataSource
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -66,6 +69,11 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
   cloud.discovery.client.composite-indicator.enabled: false
+
+scheduler-plugin:
+  quartz:
+    using-separate-datasource: false
+    # hikari:
 
 mybatis-plus:
   mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml

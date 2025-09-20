@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -61,6 +62,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         hiveDataSourceParamDTO.setLoginUserKeytabUsername(hiveConnectionParam.getLoginUserKeytabUsername());
         hiveDataSourceParamDTO.setLoginUserKeytabPath(hiveConnectionParam.getLoginUserKeytabPath());
         hiveDataSourceParamDTO.setJavaSecurityKrb5Conf(hiveConnectionParam.getJavaSecurityKrb5Conf());
+        hiveDataSourceParamDTO.setPrincipal(hiveConnectionParam.getPrincipal());
 
         String[] tmpArray = hiveConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
         StringBuilder hosts = new StringBuilder();
@@ -123,11 +125,16 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
-        String jdbcUrl = hiveConnectionParam.getJdbcUrl();
-        if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
-            return jdbcUrl + ";" + transformOther(hiveConnectionParam.getOther());
+
+        StringBuilder jdbcUrlBuilder = new StringBuilder(hiveConnectionParam.getJdbcUrl());
+        if (StringUtils.isNotBlank(hiveConnectionParam.getPrincipal())) {
+            jdbcUrlBuilder.append(";principal=").append(hiveConnectionParam.getPrincipal());
         }
-        return jdbcUrl;
+        if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
+            jdbcUrlBuilder.append(";").append(transformOther(hiveConnectionParam.getOther()));
+        }
+
+        return jdbcUrlBuilder.toString();
     }
 
     @Override
