@@ -39,6 +39,11 @@ public class ZookeeperTreeCacheListenerAdapter implements TreeCacheListener {
 
     @Override
     public void childEvent(final CuratorFramework curatorFramework, final TreeCacheEvent event) {
+        // When the event type is INITIALIZED or CONNECTION_SUSPENDED or CONNECTION_LOST or CONNECTION_RECONNECTED, the
+        // data in the event is null by default
+        if (event.getData() == null) {
+            return;
+        }
         final String eventPath = event.getData().getPath();
         switch (listener.getSubscribeScope()) {
             case PATH_ONLY:
