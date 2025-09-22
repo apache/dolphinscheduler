@@ -505,7 +505,7 @@ public enum Status {
     DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS(120034, "this cluster has been used in namespace,so you can't delete it.",
             "该集群已经被命名空间使用，所以不能删除该集群信息"),
 
-    TASK_GROUP_NAME_EXSIT(130001, "this task group name is repeated in a project", "该任务组名称在一个项目中已经使用"),
+    TASK_GROUP_NAME_EXIST(130001, "this task group name is repeated in a project", "该任务组名称在一个项目中已经使用"),
     TASK_GROUP_SIZE_ERROR(130002, "task group size error", "任务组大小应该为大于1的整数"),
     TASK_GROUP_STATUS_ERROR(130003, "task group status error", "任务组已经被关闭"),
     TASK_GROUP_FULL(130004, "task group is full", "任务组已经满了"),

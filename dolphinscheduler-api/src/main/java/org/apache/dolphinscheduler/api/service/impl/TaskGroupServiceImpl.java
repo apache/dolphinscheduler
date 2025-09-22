@@ -112,7 +112,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
         if (taskGroup1 != null) {
             log.warn("Task group with the same name already exists, taskGroupName:{}.", taskGroup1.getName());
-            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
+            putMsg(result, Status.TASK_GROUP_NAME_EXIST);
             return result;
         }
         Date now = new Date();
@@ -178,7 +178,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
         if (exists > 0) {
             log.error("Task group with the same name already exists.");
-            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
+            putMsg(result, Status.TASK_GROUP_NAME_EXIST);
             return result;
         }
         if (taskGroup.getStatus() != Flag.YES) {
