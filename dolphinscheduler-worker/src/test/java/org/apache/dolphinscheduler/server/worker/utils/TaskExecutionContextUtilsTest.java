@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
@@ -54,5 +55,22 @@ class TaskExecutionContextUtilsTest {
         } finally {
             FileUtils.deleteFile(taskWorkingDirectory);
         }
+    }
+
+    @Test
+    void clearTaskInstanceWorkingDirectory() throws IOException {
+        System.getProperties().setProperty(Constants.DEVELOPMENT_STATE, "false");
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(1);
+
+        TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
+        String taskWorkingDirectory =
+                FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
+        Files.createFile(Paths.get(taskWorkingDirectory, "1.sh"));
+        
+        // Test if set development.state=false, will delete the working directory
+        TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
+        Assertions.assertFalse(Files.exists(Paths.get(taskWorkingDirectory)));
     }
 }
