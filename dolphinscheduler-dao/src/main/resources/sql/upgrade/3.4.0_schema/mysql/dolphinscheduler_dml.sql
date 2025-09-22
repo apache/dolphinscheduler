@@ -15,7 +15,4 @@
  * limitations under the License.
 */
 
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_task_id` (`task_id`);
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_group_id` (`group_id`);
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_status` (`status`);
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_workflow_instance_id` (`workflow_instance_id`);
+UPDATE t_ds_datasource SET connection_params = REPLACE(connection_params, '"publicKey"', '"privateKey"') WHERE type = 17 AND connection_params LIKE '%"publicKey"%';

@@ -90,6 +90,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         flag = true;
         internalThread = new BaseDaemonThread(this::doStart) {
         };
+        internalThread.setName("TaskGroupCoordinator-Thread");
         internalThread.start();
         log.info("TaskGroupCoordinator started...");
     }

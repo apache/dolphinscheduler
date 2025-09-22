@@ -13,6 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-UPDATE t_ds_datasource SET connection_params = REPLACE(connection_params, '"publicKey"', '"privateKey"') WHERE type = 17 AND connection_params LIKE '%"publicKey"%';
+package org.apache.dolphinscheduler.dao.repository;
+
+public interface IWorkflowSerialQueueDao extends IDao<WorkflowSerialQueue> {
+}

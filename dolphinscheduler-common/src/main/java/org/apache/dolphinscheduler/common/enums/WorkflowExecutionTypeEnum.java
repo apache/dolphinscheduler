@@ -56,4 +56,8 @@ public enum WorkflowExecutionTypeEnum {
         throw new IllegalArgumentException("invalid status : " + executionType);
     }
 
+    public boolean isSerial() {
+        return this != PARALLEL;
+    }
+
 }

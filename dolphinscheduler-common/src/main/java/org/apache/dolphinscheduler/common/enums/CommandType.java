@@ -89,7 +89,6 @@ public enum CommandType {
     STOP(9, "stop a workflow"),
     /**
      * Recover from the serial-wait state.
-     * todo: We may need to remove these command, and use the workflow instance origin command type when notify from serial wait.
      */
     RECOVER_SERIAL_WAIT(11, "recover serial wait"),
     /**
