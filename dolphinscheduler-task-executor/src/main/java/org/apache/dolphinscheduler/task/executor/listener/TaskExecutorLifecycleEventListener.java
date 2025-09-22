@@ -17,27 +17,23 @@
 
 package org.apache.dolphinscheduler.task.executor.listener;
 
+import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
-import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.ITaskExecutorLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPausedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorSuccessLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.*;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
+import org.apache.dolphinscheduler.task.executor.utils.CommonUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 
 @Slf4j
 public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycleEventListener {
@@ -106,8 +102,9 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
     @Override
     public void onTaskExecutorFinalizeLifecycleEvent(final TaskExecutorFinalizeLifecycleEvent event) {
         TaskInstanceLogHeader.printFinalizeTaskHeader();
-        final ITaskExecutor taskExecutor = getTaskExecutor(event);
 
+        final ITaskExecutor taskExecutor = getTaskExecutor(event);
+        clearTaskExecPathIfNeeded(taskExecutor.getTaskExecutionContext());
         taskExecutorRepository.remove(taskExecutor.getId());
 
         final ITaskExecutorContainer executorContainer = taskExecutorContainerDelegator.getExecutorContainer();
@@ -121,6 +118,61 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
     private ITaskExecutor getTaskExecutor(final ITaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
         return taskExecutorRepository.get(taskExecutorLifecycleEvent.getTaskInstanceId()).orElseThrow(
                 () -> new TaskExecutorNotFoundException(taskExecutorLifecycleEvent.getTaskInstanceId()));
+    }
+
+    /**
+     * Clears the local execution path directory for a task if needed.
+     * Skips in develop mode, validates path safety, and handles deletion errors gracefully.
+     *
+     * @param taskExecutionContext context containing task execution details, nullable
+     */
+    private void clearTaskExecPathIfNeeded(TaskExecutionContext taskExecutionContext) {
+        if (taskExecutionContext == null) {
+            log.warn("TaskExecutionContext is null, cannot clear execution path");
+            return;
+        }
+
+        String execLocalPath = taskExecutionContext.getExecutePath();
+
+        // Skip cleanup in development mode to preserve files for debugging
+        if (CommonUtils.isDevelopMode()) {
+            log.info("Running in develop mode, skip clearing path: {}", execLocalPath);
+            return;
+        }
+
+        log.info("Clearing task execution path: {}", execLocalPath);
+
+        if (Strings.isNullOrEmpty(execLocalPath)) {
+            log.warn("Execution path is null or empty for task: {}", taskExecutionContext.getTaskName());
+            return;
+        }
+
+        File execFile = new File(execLocalPath);
+        Path path;
+
+        try {
+            // Resolve the canonical path (follow symlinks, remove ../)
+            path = execFile.toPath().toRealPath();
+            // Prevent deletion of root directories (e.g., "/", "C:\") to avoid system damage
+            if (path.getRoot().equals(path)) {
+                log.warn("Refusing to delete root directory: {}", path);
+                return;
+            }
+
+            // Only attempt deletion if the path is an existing directory
+            if (path.toFile().isDirectory()) {
+                org.apache.commons.io.FileUtils.deleteDirectory(execFile);
+                log.info("Successfully cleared task execution path: {}", execLocalPath);
+            } else {
+                log.debug("Path is not a directory or does not exist: {}", execLocalPath);
+            }
+        } catch (NoSuchFileException ex) {
+            log.warn("Path does not exist or already deleted: {}", execLocalPath, ex);
+        } catch (IOException ex) {
+            log.error("Failed to delete task execution path: {}", execLocalPath, ex);
+        } catch (SecurityException ex) {
+            log.error("Permission denied when accessing or deleting path: {}", execLocalPath, ex);
+        }
     }
 
 }
