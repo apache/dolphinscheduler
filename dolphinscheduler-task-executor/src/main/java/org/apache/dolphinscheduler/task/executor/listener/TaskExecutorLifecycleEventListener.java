@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.task.executor.listener;
 
-import com.google.common.base.Strings;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
@@ -26,7 +24,6 @@ import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
-import org.apache.dolphinscheduler.task.executor.events.*;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.utils.CommonUtils;
 
@@ -34,6 +31,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.base.Strings;
 
 @Slf4j
 public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycleEventListener {

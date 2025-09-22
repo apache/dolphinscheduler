@@ -17,17 +17,26 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.HADOOP_SECURITY_AUTHENTICATION;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.JAVA_SECURITY_KRB5_CONF_PATH;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.KERBEROS;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.LOGIN_USER_KEY_TAB_PATH;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.LOGIN_USER_KEY_TAB_USERNAME;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.RESOURCE_UPLOAD_PATH;
+
 import org.apache.dolphinscheduler.common.enums.StorageType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import java.io.IOException;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * common utils
@@ -106,4 +115,26 @@ public class CommonUtils {
         return false;
     }
 
+    /**
+     * @param tenantCode tenant code
+     * @return file directory of tenants on hdfs
+     */
+    public static String getHdfsTenantDir(String tenantCode) {
+        return String.format("%s/%s", getHdfsDataBasePath(), tenantCode);
+    }
+
+    /**
+     * get data hdfs path
+     *
+     * @return data hdfs path
+     */
+    public static String getHdfsDataBasePath() {
+        String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+        if ("/".equals(resourceUploadPath)) {
+            // if basepath is configured to /, the generated url may be //default/resources (with extra leading /)
+            return "";
+        } else {
+            return resourceUploadPath;
+        }
+    }
 }
