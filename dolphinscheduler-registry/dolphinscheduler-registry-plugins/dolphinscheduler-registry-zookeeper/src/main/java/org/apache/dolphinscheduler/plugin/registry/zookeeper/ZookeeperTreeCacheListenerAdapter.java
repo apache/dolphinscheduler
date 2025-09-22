@@ -34,7 +34,7 @@ public class ZookeeperTreeCacheListenerAdapter implements TreeCacheListener {
 
     private final SubscribeListener listener;
 
-    private final EnumSet<TreeCacheEvent.Type> NODE_CHANGE_EVENTS =
+    private static final EnumSet<TreeCacheEvent.Type> NODE_CHANGE_EVENTS =
             EnumSet.of(TreeCacheEvent.Type.NODE_REMOVED,
                     TreeCacheEvent.Type.NODE_UPDATED,
                     TreeCacheEvent.Type.NODE_ADDED);
