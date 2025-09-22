@@ -24,6 +24,18 @@ import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.ITaskExecutorLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPausedLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.utils.CommonUtils;
 
