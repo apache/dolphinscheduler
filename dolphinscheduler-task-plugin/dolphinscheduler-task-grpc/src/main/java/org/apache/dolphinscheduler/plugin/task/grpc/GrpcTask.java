@@ -64,7 +64,7 @@ public class GrpcTask extends AbstractTask {
         log.info("Initialize gRPC task params: {}", JSONUtils.toPrettyJsonString(grpcParameters));
 
         if (grpcParameters == null || !grpcParameters.checkParameters()) {
-            throw new RuntimeException("gRPC task params is not valid");
+            throw new RuntimeException("gRPC task params is not valid, method definition may not corresponds to message or method name is invalid");
         }
     }
 

@@ -83,6 +83,32 @@ public class GrpcDynamicService {
         return responseBuilder.build();
     }
 
+    public static DynamicMessage mergeJSON(Descriptors.FileDescriptor fileDesc, String methodNameWithService, String messageJSON) {
+        MethodName methodNameData = new MethodName(methodNameWithService);
+        Descriptors.ServiceDescriptor pServiceDescriptor =
+                fileDesc.findServiceByName(methodNameData.getServiceName());
+        if (isNull(pServiceDescriptor))
+            throw new RuntimeException(
+                    "cannot find service <" + methodNameData.getServiceName() + "> from service definition");
+        Descriptors.MethodDescriptor pMethodDescriptor =
+                pServiceDescriptor.findMethodByName(methodNameData.getMethodName());
+        if (isNull(pMethodDescriptor))
+            throw new RuntimeException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
+                    + methodNameData.getServiceName() + "> with method list: " + Arrays.toString(pServiceDescriptor
+                            .getMethods().stream().map(Descriptors.MethodDescriptor::getName).toArray()));
+        Descriptors.Descriptor requestMessageType = pMethodDescriptor.getInputType();
+        DynamicMessage.Builder requestBuilder = DynamicMessage.newBuilder(requestMessageType);
+        try {
+            JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
+        } catch (InvalidProtocolBufferException ipbe) {
+            throw new RuntimeException(
+                    "cannot merge json message to protobuf definition type <" + requestMessageType.getName() + ">",
+                    ipbe);
+        }
+        return requestBuilder.build();
+    }
+
+
     static MethodDescriptor methodFromProtobuf(
                                                Descriptors.ServiceDescriptor serviceDesc,
                                                Descriptors.MethodDescriptor methodDesc) {

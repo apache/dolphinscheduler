@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.protobuf.Descriptors;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,7 +27,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.protobuf.Descriptors;
+
+import io.protostuff.compiler.ParserModule;
+import io.protostuff.compiler.parser.Importer;
+import io.protostuff.compiler.parser.ParserException;
+import io.protostuff.compiler.parser.ProtoContext;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -54,13 +62,23 @@ public class GrpcParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
+        // validate JSON formatted proto definition
         try {
             Descriptors.FileDescriptor fileDesc =
                     JSONDescriptorHelper.FileDescFromJSON(grpcServiceDefinitionJSON);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        } catch (Descriptors.DescriptorValidationException e) {
-            throw new RuntimeException(e);
+            GrpcDynamicService.mergeJSON(fileDesc, methodName, message);
+        } catch (JsonProcessingException | Descriptors.DescriptorValidationException | RuntimeException e) {
+            return false;
+        }
+        // validate source proto format
+        try {
+            StringReader protoReader = new StringReader(grpcServiceDefinition);
+            Injector injector = Guice.createInjector(new ParserModule());
+            Importer importer = injector.getInstance(Importer.class);
+            ProtoContext protoContext = importer.importFile(protoReader, protoReader.GetDefaultName());
+            protoContext.getProto();
+        } catch (ParserException e) {
+            return false;
         }
         if (StringUtils.isEmpty(url) || connectTimeoutMs <= 0)
             return false;
