@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.protobuf.Descriptors;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +27,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -51,6 +54,14 @@ public class GrpcParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
+        try {
+            Descriptors.FileDescriptor fileDesc =
+                    JSONDescriptorHelper.FileDescFromJSON(grpcServiceDefinitionJSON);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (Descriptors.DescriptorValidationException e) {
+            throw new RuntimeException(e);
+        }
         if (StringUtils.isEmpty(url) || connectTimeoutMs <= 0)
             return false;
         return true;
