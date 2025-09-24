@@ -143,7 +143,11 @@ public class WorkflowGraphTopologyLogicalVisitor {
             if (!visitedTaskCodes.contains(taskName)) {
                 visitedTaskCodes.add(taskName); // Record the nodes
                 final Set<String> successors = workflowGraph.getSuccessors(taskName);
-                if (subGraphNodes.contains(taskName)) {
+                // In TASK_ONLY mode, pass empty successors since there are no subsequent nodes
+                if (taskDependType == TaskDependType.TASK_ONLY) {
+                    final Set<String> emptySuccessors = new HashSet<>();
+                    visitFunction.accept(taskName, emptySuccessors);
+                } else {
                     visitFunction.accept(taskName, successors);
                 }
                 for (String successor : successors) {
