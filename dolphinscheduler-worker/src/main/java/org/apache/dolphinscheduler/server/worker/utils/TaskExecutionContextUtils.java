@@ -111,7 +111,7 @@ public class TaskExecutionContextUtils {
         return resourceContext;
     }
 
-    public static void clearTaskInstanceWorkingDirectory (TaskExecutionContext taskExecutionContext) {
+    public static void clearTaskInstanceWorkingDirectory(TaskExecutionContext taskExecutionContext) {
         boolean isDevelopment = PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
         if (!isDevelopment) {
             try {

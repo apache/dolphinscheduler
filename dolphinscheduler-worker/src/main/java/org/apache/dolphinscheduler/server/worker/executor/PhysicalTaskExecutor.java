@@ -109,7 +109,6 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
         TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
     }
 
-
     @Override
     protected void initializeTaskContext() {
         super.initializeTaskContext();

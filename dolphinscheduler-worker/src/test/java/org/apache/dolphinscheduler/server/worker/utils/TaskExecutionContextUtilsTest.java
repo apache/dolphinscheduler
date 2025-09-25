@@ -68,7 +68,7 @@ class TaskExecutionContextUtilsTest {
         String taskWorkingDirectory =
                 FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
         Files.createFile(Paths.get(taskWorkingDirectory, "1.sh"));
-        
+
         // Test if set development.state=false, will delete the working directory
         TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
         Assertions.assertFalse(Files.exists(Paths.get(taskWorkingDirectory)));
