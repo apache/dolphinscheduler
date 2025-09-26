@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.graph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-
-import org.apache.commons.collections4.CollectionUtils;
+import static com.google.common.base.Preconditions.*;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,6 +26,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import com.google.common.collect.Sets;
 
@@ -143,11 +142,7 @@ public class WorkflowGraphTopologyLogicalVisitor {
             if (!visitedTaskCodes.contains(taskName)) {
                 visitedTaskCodes.add(taskName); // Record the nodes
                 final Set<String> successors = workflowGraph.getSuccessors(taskName);
-                // In TASK_ONLY mode, pass empty successors since there are no subsequent nodes
-                if (taskDependType == TaskDependType.TASK_ONLY) {
-                    final Set<String> emptySuccessors = new HashSet<>();
-                    visitFunction.accept(taskName, emptySuccessors);
-                } else {
+                if (subGraphNodes.contains(taskName)) {
                     visitFunction.accept(taskName, successors);
                 }
                 for (String successor : successors) {
