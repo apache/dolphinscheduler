@@ -28,14 +28,7 @@ import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.protobuf.Descriptors;
-
-import io.protostuff.compiler.ParserModule;
-import io.protostuff.compiler.parser.Importer;
-import io.protostuff.compiler.parser.ParserException;
-import io.protostuff.compiler.parser.ProtoContext;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -68,16 +61,6 @@ public class GrpcParameters extends AbstractParameters {
                     JSONDescriptorHelper.FileDescFromJSON(grpcServiceDefinitionJSON);
             GrpcDynamicService.mergeJSON(fileDesc, methodName, message);
         } catch (JsonProcessingException | Descriptors.DescriptorValidationException | RuntimeException e) {
-            return false;
-        }
-        // validate source proto format
-        try {
-            StringReader protoReader = new StringReader(grpcServiceDefinition);
-            Injector injector = Guice.createInjector(new ParserModule());
-            Importer importer = injector.getInstance(Importer.class);
-            ProtoContext protoContext = importer.importFile(protoReader, protoReader.GetDefaultName());
-            protoContext.getProto();
-        } catch (ParserException e) {
             return false;
         }
         if (StringUtils.isEmpty(url) || connectTimeoutMs <= 0)

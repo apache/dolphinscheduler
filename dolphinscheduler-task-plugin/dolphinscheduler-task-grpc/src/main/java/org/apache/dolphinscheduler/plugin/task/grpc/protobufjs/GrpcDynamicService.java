@@ -83,7 +83,8 @@ public class GrpcDynamicService {
         return responseBuilder.build();
     }
 
-    public static DynamicMessage mergeJSON(Descriptors.FileDescriptor fileDesc, String methodNameWithService, String messageJSON) {
+    public static DynamicMessage mergeJSON(Descriptors.FileDescriptor fileDesc, String methodNameWithService,
+                                           String messageJSON) {
         MethodName methodNameData = new MethodName(methodNameWithService);
         Descriptors.ServiceDescriptor pServiceDescriptor =
                 fileDesc.findServiceByName(methodNameData.getServiceName());
@@ -107,7 +108,6 @@ public class GrpcDynamicService {
         }
         return requestBuilder.build();
     }
-
 
     static MethodDescriptor methodFromProtobuf(
                                                Descriptors.ServiceDescriptor serviceDesc,
