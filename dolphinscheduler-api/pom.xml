@@ -238,11 +238,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hbase.thirdparty</groupId>
-            <artifactId>hbase-noop-htrace</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.casbin</groupId>
             <artifactId>casdoor-spring-boot-starter</artifactId>
         </dependency>
