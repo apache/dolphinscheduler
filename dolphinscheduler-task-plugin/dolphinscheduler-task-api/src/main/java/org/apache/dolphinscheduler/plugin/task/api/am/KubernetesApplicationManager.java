@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api.am;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
@@ -58,7 +59,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     /**
      * Get Kubernetes client connection pool instance
      */
-    private final KubernetesClientPool clientPool = KubernetesClientPool.getInstance();
+    public final KubernetesClientPool clientPool = KubernetesClientPool.getInstance();
 
     @Override
     public boolean killApplication(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) throws TaskException {
@@ -93,8 +94,6 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
             }
         } catch (Exception e) {
             throw new TaskException("Failed to kill Kubernetes application with label " + labelValue, e);
-        } finally {
-            removeCache(labelValue);
         }
 
         return isKill;
@@ -112,7 +111,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @return pods
      */
     @SneakyThrows
-    private FilterWatchListDeletable<Pod, PodList, PodResource> getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+    public FilterWatchListDeletable<Pod, PodList, PodResource> getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
         KubernetesClient client = null;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
@@ -146,7 +145,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @param kubernetesApplicationManagerContext Context parameters
      * @return Kubernetes Client
      */
-    private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+    public KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
 
@@ -165,7 +164,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     /**
      * Get Cluster Identifier
      */
-    private String getClusterId(K8sTaskExecutionContext k8sTaskExecutionContext) {
+    public String getClusterId(K8sTaskExecutionContext k8sTaskExecutionContext) {
         // The hash value of kubeconfig is used as the cluster identifier
         String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
         return "k8s-cluster-" + Math.abs(kubeConfig.hashCode());
@@ -177,21 +176,12 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @param clusterId Cluster Identifier
      * @param client Client to be returned
      */
-    private void returnClient(String clusterId, KubernetesClient client) {
+    public void returnClient(String clusterId, KubernetesClient client) {
         try {
             clientPool.returnClient(clusterId, client);
         } catch (Exception e) {
             log.error("Failed to return Kubernetes client to pool", e);
         }
-    }
-
-    /**
-     * Clean up connections
-     * Note: This method no longer removes clients from the cache,
-     *          but ensures that clients are correctly returned to the connection pool
-     */
-    public void removeCache(String cacheKey) {
-        log.debug("removeCache called with key: {}", cacheKey);
     }
 
     /**
@@ -213,7 +203,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @return status
      * @throws TaskException throws Exception
      */
-    private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
+    public TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
                                                      FilterWatchListDeletable<Pod, PodList, PodResource> watchList) throws TaskException {
         String phase;
         try {
