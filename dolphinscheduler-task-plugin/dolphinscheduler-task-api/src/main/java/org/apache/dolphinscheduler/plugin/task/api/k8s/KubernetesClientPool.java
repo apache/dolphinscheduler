@@ -292,7 +292,6 @@ public class KubernetesClientPool {
                 client.lastUsedTime = System.currentTimeMillis();
                 return client.client;
             }
-
             throw new Exception("Timeout waiting for available Kubernetes client connection");
         }
 
@@ -308,7 +307,6 @@ public class KubernetesClientPool {
             if (pooledClient != null) {
                 activeClients.remove(pooledClient);
                 pooledClient.lastUsedTime = System.currentTimeMillis();
-
                 if (idleClients.size() >= config.getMaxIdle() || !isClientValid(pooledClient.client)) {
                     closeClient(pooledClient);
                 } else {
@@ -322,14 +320,11 @@ public class KubernetesClientPool {
             long now = System.currentTimeMillis();
             PooledClient[] clients = idleClients.toArray(new PooledClient[0]);
             int keepIdle = Math.max(config.getMinIdle(), 0);
-            int removeCount = 0;
-
             for (PooledClient client : clients) {
-                if (idleClients.size() - removeCount > keepIdle &&
+                if (idleClients.size() > keepIdle &&
                         now - client.lastUsedTime > config.getIdleTimeoutMs()) {
                     if (idleClients.remove(client)) {
                         closeClient(client);
-                        removeCount++;
                     }
                 }
             }
@@ -366,7 +361,7 @@ public class KubernetesClientPool {
             activeClients.clear();
         }
 
-        private static class PooledClient {
+        public static class PooledClient {
 
             private final KubernetesClient client;
             private long lastUsedTime;
