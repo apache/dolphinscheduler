@@ -113,8 +113,7 @@
 
     <select id="filterSchedules"
             parameterType="org.apache.dolphinscheduler.dao.entity.Schedule"
-            resultType="org.apache.dolphinscheduler.dao.entity.Schedule"
-    >
+            resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         SELECT pd.name as workflow_definition_name, p.name as project_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
