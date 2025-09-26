@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.api.am;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
-import io.fabric8.kubernetes.api.model.ObjectMeta;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
@@ -204,7 +203,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * @throws TaskException throws Exception
      */
     public TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
-                                                     FilterWatchListDeletable<Pod, PodList, PodResource> watchList) throws TaskException {
+                                                    FilterWatchListDeletable<Pod, PodList, PodResource> watchList) throws TaskException {
         String phase;
         try {
             if (Objects.isNull(watchList)) {

@@ -17,24 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
-
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.PodStatus;
-import io.fabric8.kubernetes.client.dsl.ContainerResource;
-import io.fabric8.kubernetes.client.dsl.LogWatch;
-import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
 
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -47,22 +43,23 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.ContainerResource;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.PodResource;
-
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
-
 
 @ExtendWith(MockitoExtension.class)
 public class KubernetesApplicationManagerTest {
 
     @Spy
-    private KubernetesApplicationManager kubernetesApplicationManager = new  KubernetesApplicationManager();
+    private KubernetesApplicationManager kubernetesApplicationManager = new KubernetesApplicationManager();
 
     @Mock
     private KubernetesClientPool kubernetesClientPoolInstance;
@@ -93,15 +90,15 @@ public class KubernetesApplicationManagerTest {
         mockedKubernetesClientPool.close();
     }
     @Test
-    public void testGetClusterId(){
+    public void testGetClusterId() {
         mockK8sTaskExecutionContext = mock(K8sTaskExecutionContext.class);
         when(mockK8sTaskExecutionContext.getConfigYaml()).thenReturn(mockKubeConfig);
         String clusterId = new KubernetesApplicationManager().getClusterId(mockK8sTaskExecutionContext);
-        Assertions.assertEquals("k8s-cluster-" + Math.abs(mockKubeConfig.hashCode()),clusterId);
+        Assertions.assertEquals("k8s-cluster-" + Math.abs(mockKubeConfig.hashCode()), clusterId);
     }
 
     @Test
-    public void testGetResourceManagerType(){
+    public void testGetResourceManagerType() {
         KubernetesApplicationManager manager = new KubernetesApplicationManager();
         ResourceManagerType resourceManagerType = manager.getResourceManagerType();
         Assertions.assertEquals(ResourceManagerType.KUBERNETES, resourceManagerType);
@@ -114,21 +111,21 @@ public class KubernetesApplicationManagerTest {
 
         Field field = KubernetesApplicationManager.class.getDeclaredField("clientPool");
         field.setAccessible(true);
-        field.set(kubernetesApplicationManager,kubernetesClientPool);
+        field.set(kubernetesApplicationManager, kubernetesClientPool);
 
-        kubernetesApplicationManager.returnClient(mockClusterId,mockClient);
+        kubernetesApplicationManager.returnClient(mockClusterId, mockClient);
         verify(kubernetesClientPool).returnClient(mockClusterId, mockClient); // just verify use it
     }
 
-
     @Test
-    public void testKillApplicationSuccess(){
+    public void testKillApplicationSuccess() {
         when(mockContext.getLabelValue()).thenReturn(mockLabelValue);
         when(mockContext.getK8sTaskExecutionContext()).thenReturn(mockK8sTaskExecutionContext);
         when(mockK8sTaskExecutionContext.getNamespace()).thenReturn(mockNamespace);
 
         doReturn(mockWatchList).when(kubernetesApplicationManager).getListenPod(mockContext);
-        doReturn(TaskExecutionStatus.SUCCESS).when(kubernetesApplicationManager).getApplicationStatus(mockContext,mockWatchList);
+        doReturn(TaskExecutionStatus.SUCCESS).when(kubernetesApplicationManager).getApplicationStatus(mockContext,
+                mockWatchList);
         doReturn(mockClusterId).when(kubernetesApplicationManager).getClusterId(mockK8sTaskExecutionContext);
         doReturn(mockClient).when(kubernetesApplicationManager).getClient(mockContext);
 
@@ -136,30 +133,30 @@ public class KubernetesApplicationManagerTest {
         NonNamespaceOperation<Pod, PodList, PodResource> mockNamespaceOperation = mock(NonNamespaceOperation.class);
         FilterWatchListDeletable<Pod, PodList, PodResource> mockResult = mock(FilterWatchListDeletable.class);
 
-
         when(mockClient.pods()).thenReturn(mockPodsOperation);
         when(mockPodsOperation.inNamespace(mockNamespace)).thenReturn(mockNamespaceOperation);
-        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME,mockLabelValue)).thenReturn(mockResult);
+        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME, mockLabelValue)).thenReturn(mockResult);
 
         boolean flag = kubernetesApplicationManager.killApplication(mockContext);
 
         verify(mockResult).delete();
-        verify(kubernetesApplicationManager).returnClient(mockClusterId,mockClient);
+        verify(kubernetesApplicationManager).returnClient(mockClusterId, mockClient);
         Assertions.assertTrue(flag);
     }
 
     @Test
-    public void testKillApplicationFail(){
+    public void testKillApplicationFail() {
         when(mockContext.getLabelValue()).thenReturn(mockLabelValue);
         doReturn(mockWatchList).when(kubernetesApplicationManager).getListenPod(mockContext);
-        doReturn(TaskExecutionStatus.FAILURE).when(kubernetesApplicationManager).getApplicationStatus(mockContext,mockWatchList);
+        doReturn(TaskExecutionStatus.FAILURE).when(kubernetesApplicationManager).getApplicationStatus(mockContext,
+                mockWatchList);
 
         boolean flag = kubernetesApplicationManager.killApplication(mockContext);
         Assertions.assertFalse(flag);
     }
 
     @Test
-    public void testGetListenPod(){
+    public void testGetListenPod() {
         when(mockContext.getK8sTaskExecutionContext()).thenReturn(mockK8sTaskExecutionContext);
         when(mockK8sTaskExecutionContext.getNamespace()).thenReturn(mockNamespace);
         when(mockContext.getLabelValue()).thenReturn(mockLabelValue);
@@ -173,17 +170,17 @@ public class KubernetesApplicationManagerTest {
 
         when(mockClient.pods()).thenReturn(mockPodsOperation);
         when(mockPodsOperation.inNamespace(mockNamespace)).thenReturn(mockNamespaceOperation);
-        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME,mockLabelValue)).thenReturn(mockResult);
+        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME, mockLabelValue)).thenReturn(mockResult);
         PodList pods = mock(PodList.class);
         Pod mockPod = Mockito.mock(Pod.class);
         List<Pod> podList = Collections.singletonList(mockPod);
         when(mockResult.list()).thenReturn(pods);
         when(pods.getItems()).thenReturn(podList);
 
-
-        FilterWatchListDeletable<Pod, PodList, PodResource> result = kubernetesApplicationManager.getListenPod(mockContext);
+        FilterWatchListDeletable<Pod, PodList, PodResource> result =
+                kubernetesApplicationManager.getListenPod(mockContext);
         Assertions.assertEquals(mockResult, result);
-        verify(kubernetesApplicationManager).returnClient(mockClusterId,mockClient);
+        verify(kubernetesApplicationManager).returnClient(mockClusterId, mockClient);
     }
 
     @Test
@@ -195,14 +192,14 @@ public class KubernetesApplicationManagerTest {
 
         Field field = KubernetesApplicationManager.class.getDeclaredField("clientPool");
         field.setAccessible(true);
-        field.set(kubernetesApplicationManager,mockKubernetesClientPool);
+        field.set(kubernetesApplicationManager, mockKubernetesClientPool);
 
         kubernetesApplicationManager.getClient(mockContext);
-        verify(mockKubernetesClientPool).getClient(mockClusterId,mockKubeConfig);
+        verify(mockKubernetesClientPool).getClient(mockClusterId, mockKubeConfig);
     }
 
     @Test
-    public void testGetApplicationStatusSuccess(){
+    public void testGetApplicationStatusSuccess() {
         doReturn(mockWatchList).when(kubernetesApplicationManager).getListenPod(mockContext);
         when(mockContext.getK8sTaskExecutionContext()).thenReturn(mockK8sTaskExecutionContext);
         doReturn(mockClusterId).when(kubernetesApplicationManager).getClusterId(mockK8sTaskExecutionContext);
@@ -216,7 +213,7 @@ public class KubernetesApplicationManagerTest {
 
         when(mockClient.pods()).thenReturn(mockPodsOperation);
         when(mockPodsOperation.inNamespace(mockNamespace)).thenReturn(mockNamespaceOperation);
-        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME,mockLabelValue)).thenReturn(mockResult);
+        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME, mockLabelValue)).thenReturn(mockResult);
         PodStatus mockPodStatus = mock(PodStatus.class);
         PodList pods = mock(PodList.class);
         Pod mockPod = Mockito.mock(Pod.class);
@@ -227,35 +224,35 @@ public class KubernetesApplicationManagerTest {
         when(mockPodStatus.getPhase()).thenReturn("Succeeded");
 
         TaskExecutionStatus applicationStatus = kubernetesApplicationManager.getApplicationStatus(mockContext);
-        Assertions.assertEquals(TaskExecutionStatus.SUCCESS,applicationStatus);
+        Assertions.assertEquals(TaskExecutionStatus.SUCCESS, applicationStatus);
 
-//        try {
-//
-//
-//
-//                if (!driverPod.isEmpty()) {
-//                    // cluster mode
-//                    Pod driver = driverPod.get(0);
-//                    phase = driver.getStatus().getPhase();
-//                } else {
-//                    // client mode
-//                    phase = FINISH;
-//                }
-//            } finally {
-//                if (client != null) {
-//                    returnClient(clusterId, client);
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new TaskException("Failed to get Kubernetes application status", e);
-//        }
-//
-//        return phase.equals(FAILED) || phase.equals(UNKNOWN) ? TaskExecutionStatus.FAILURE
-//                : TaskExecutionStatus.SUCCESS;
+        // try {
+        //
+        //
+        //
+        // if (!driverPod.isEmpty()) {
+        // // cluster mode
+        // Pod driver = driverPod.get(0);
+        // phase = driver.getStatus().getPhase();
+        // } else {
+        // // client mode
+        // phase = FINISH;
+        // }
+        // } finally {
+        // if (client != null) {
+        // returnClient(clusterId, client);
+        // }
+        // }
+        // } catch (Exception e) {
+        // throw new TaskException("Failed to get Kubernetes application status", e);
+        // }
+        //
+        // return phase.equals(FAILED) || phase.equals(UNKNOWN) ? TaskExecutionStatus.FAILURE
+        // : TaskExecutionStatus.SUCCESS;
     }
 
     @Test
-    public void testGetApplicationStatusFailed(){
+    public void testGetApplicationStatusFailed() {
         doReturn(mockWatchList).when(kubernetesApplicationManager).getListenPod(mockContext);
         when(mockContext.getK8sTaskExecutionContext()).thenReturn(mockK8sTaskExecutionContext);
         doReturn(mockClusterId).when(kubernetesApplicationManager).getClusterId(mockK8sTaskExecutionContext);
@@ -269,7 +266,7 @@ public class KubernetesApplicationManagerTest {
 
         when(mockClient.pods()).thenReturn(mockPodsOperation);
         when(mockPodsOperation.inNamespace(mockNamespace)).thenReturn(mockNamespaceOperation);
-        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME,mockLabelValue)).thenReturn(mockResult);
+        when(mockNamespaceOperation.withLabel(UNIQUE_LABEL_NAME, mockLabelValue)).thenReturn(mockResult);
         PodStatus mockPodStatus = mock(PodStatus.class);
         PodList pods = mock(PodList.class);
         Pod mockPod = Mockito.mock(Pod.class);
@@ -280,19 +277,19 @@ public class KubernetesApplicationManagerTest {
         when(mockPodStatus.getPhase()).thenReturn("Failed");
 
         TaskExecutionStatus applicationStatus = kubernetesApplicationManager.getApplicationStatus(mockContext);
-        Assertions.assertEquals(TaskExecutionStatus.FAILURE,applicationStatus);
+        Assertions.assertEquals(TaskExecutionStatus.FAILURE, applicationStatus);
     }
     @Test
-    public void testGetPodLogWatcher(){
+    public void testGetPodLogWatcher() {
         doReturn(mockClient).when(kubernetesApplicationManager).getClient(mockContext);
         doReturn(mockWatchList).when(kubernetesApplicationManager).getListenPod(mockContext);
 
         MixedOperation<Pod, PodList, PodResource> mockPodsOperation = mock(MixedOperation.class);
         NonNamespaceOperation<Pod, PodList, PodResource> mockNamespaceOperation = mock(NonNamespaceOperation.class);
         Pod mockPod = Mockito.mock(Pod.class);
-        List<Pod> podList = Collections.singletonList(mockPod); //  must have one pod
+        List<Pod> podList = Collections.singletonList(mockPod); // must have one pod
         PodList pods = mock(PodList.class);
-        ObjectMeta mockMeta =  Mockito.mock(ObjectMeta.class);
+        ObjectMeta mockMeta = Mockito.mock(ObjectMeta.class);
         PodStatus mockStatus = Mockito.mock(PodStatus.class);
         PodResource mockPodResource = Mockito.mock(PodResource.class);
         ContainerResource mockContainerResource = Mockito.mock(ContainerResource.class);
@@ -303,12 +300,10 @@ public class KubernetesApplicationManagerTest {
         when(mockPod.getStatus()).thenReturn(mockStatus);
         when(mockStatus.getPhase()).thenReturn("Running");
 
-
         when(mockPod.getMetadata()).thenReturn(mockMeta);
         when(mockMeta.getNamespace()).thenReturn(mockNamespace);
         when(mockMeta.getName()).thenReturn("mockName");
         when(mockContext.getContainerName()).thenReturn("container-1");
-
 
         when(mockClient.pods()).thenReturn(mockPodsOperation);
         when(mockPodsOperation.inNamespace(mockNamespace)).thenReturn(mockNamespaceOperation);
@@ -317,7 +312,7 @@ public class KubernetesApplicationManagerTest {
         when(mockContainerResource.watchLog()).thenReturn(mockLogWatch);
 
         LogWatch podLogWatcher = kubernetesApplicationManager.getPodLogWatcher(mockContext);
-        Assertions.assertEquals(mockLogWatch,podLogWatcher);
+        Assertions.assertEquals(mockLogWatch, podLogWatcher);
 
     }
 }

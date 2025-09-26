@@ -33,12 +33,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.fabric8.kubernetes.api.model.Namespace;
-import io.fabric8.kubernetes.api.model.NamespaceList;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
-import io.fabric8.kubernetes.client.dsl.Resource;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -48,7 +42,13 @@ import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import io.fabric8.kubernetes.api.model.Namespace;
+import io.fabric8.kubernetes.api.model.NamespaceList;
+import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 
 public class KubernetesClientPoolTest {
 
@@ -499,7 +499,6 @@ public class KubernetesClientPoolTest {
         }
     }
 
-
     /**
      * Test that PooledClient constructor correctly initializes the client and lastUsedTime.
      */
@@ -530,7 +529,8 @@ public class KubernetesClientPoolTest {
         long lastUsedTimeValue = lastUsedTimeField.getLong(pooledClient);
 
         // Allow for a small time difference (up to 1 second) between test execution and constructor call
-        Assertions.assertEquals(currentTime, lastUsedTimeValue, 1000, "lastUsedTime should be initialized to current time");
+        Assertions.assertEquals(currentTime, lastUsedTimeValue, 1000,
+                "lastUsedTime should be initialized to current time");
 
         // Test that we can modify the lastUsedTime field.
         long newTime = System.currentTimeMillis() + 10000; // 10 seconds in the future
@@ -545,7 +545,8 @@ public class KubernetesClientPoolTest {
      */
     private Class<?> getPooledClientClass() throws ClassNotFoundException {
         // Get the outer class
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
 
         // Get the inner PooledClient class
         Class<?>[] nestedClasses = clusterClientPoolClass.getDeclaredClasses();
@@ -569,8 +570,10 @@ public class KubernetesClientPoolTest {
                 600000); // idleTimeoutMs
 
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
 
         // Create mock clients
@@ -581,23 +584,25 @@ public class KubernetesClientPoolTest {
         AtomicInteger builderCounter = new AtomicInteger(0);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    // Configure the mock behavior
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    // Use the class-level counter to determine which mock client to return
-                    Mockito.when(mock.build()).thenAnswer(invocation -> {
-                        int count = builderCounter.getAndIncrement();
-                        if (count == 0) {
-                            return mockClient1;
-                        } else if (count == 1) {
-                            return mockClient2;
-                        } else {
-                            // For any additional calls, just return mockClient2
-                            return mockClient2;
-                        }
-                    });
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    // Configure the mock behavior
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    // Use the class-level counter to determine which mock client to return
+                                    Mockito.when(mock.build()).thenAnswer(invocation -> {
+                                        int count = builderCounter.getAndIncrement();
+                                        if (count == 0) {
+                                            return mockClient1;
+                                        } else if (count == 1) {
+                                            return mockClient2;
+                                        } else {
+                                            // For any additional calls, just return mockClient2
+                                            return mockClient2;
+                                        }
+                                    });
+                                })) {
 
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
 
@@ -630,12 +635,13 @@ public class KubernetesClientPoolTest {
         }
     }
 
-
     @Test
     public void testClusterClientPoolReturnObjectAndClientField() throws Exception {
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
         KubernetesClientPool.PoolConfig poolConfig = new KubernetesClientPool.PoolConfig(
                 2, // maxSize
@@ -644,30 +650,34 @@ public class KubernetesClientPoolTest {
                 30000, // maxWaitMs
                 600); // idleTimeoutMs
 
-
         // Create a mock client
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
         NamespaceList namespaceList = Mockito.mock(NamespaceList.class);
-        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces = Mockito.mock(NonNamespaceOperation.class);
+        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces =
+                Mockito.mock(NonNamespaceOperation.class);
         Mockito.when(mockClient.namespaces()).thenReturn(namespaces);
         Mockito.when(namespaces.list()).thenReturn(namespaceList);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    // Configure the mock behavior
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    Mockito.when(mock.build()).thenReturn(mockClient);
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    // Configure the mock behavior
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    Mockito.when(mock.build()).thenReturn(mockClient);
+                                })) {
 
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
 
             // Get the borrowObject and returnObject methods
             Method borrowObjectMethod = clusterClientPoolClass.getDeclaredMethod("borrowObject");
             borrowObjectMethod.setAccessible(true);
-            Method returnObjectMethod = clusterClientPoolClass.getDeclaredMethod("returnObject", KubernetesClient.class);
+            Method returnObjectMethod =
+                    clusterClientPoolClass.getDeclaredMethod("returnObject", KubernetesClient.class);
             returnObjectMethod.setAccessible(true);
-            Method isClientValidMethod = clusterClientPoolClass.getDeclaredMethod("isClientValid", KubernetesClient.class);
+            Method isClientValidMethod =
+                    clusterClientPoolClass.getDeclaredMethod("isClientValid", KubernetesClient.class);
             isClientValidMethod.setAccessible(true);
             Method cleanupIdleMethod = clusterClientPoolClass.getDeclaredMethod("cleanupIdle");
             cleanupIdleMethod.setAccessible(true);
@@ -683,14 +693,13 @@ public class KubernetesClientPoolTest {
             activeClientsField.setAccessible(true);
             Set<?> activeClients = (Set<?>) activeClientsField.get(clusterClientPool);
 
-
             // Borrow a client
             KubernetesClient client = (KubernetesClient) borrowObjectMethod.invoke(clusterClientPool);
             // Verify client is active
             Assertions.assertEquals(1, activeClients.size(), "Active clients count should be 1 after borrowing");
 
             // Test with valid client
-            Boolean isValid  = (Boolean) isClientValidMethod.invoke(clusterClientPool, client);
+            Boolean isValid = (Boolean) isClientValidMethod.invoke(clusterClientPool, client);
             Assertions.assertTrue(isValid, "Client is valid");
             // Test with invalid client
             KubernetesClient invalidClient = Mockito.mock(KubernetesClient.class); // null client
@@ -699,7 +708,6 @@ public class KubernetesClientPoolTest {
 
             // Return the client
             returnObjectMethod.invoke(clusterClientPool, client);
-
 
             // Verify client is returned to idle pool
             Assertions.assertEquals(0, activeClients.size(), "Active clients count should be 0 after returning");
@@ -720,7 +728,8 @@ public class KubernetesClientPoolTest {
 
             // Verify that idle clients were cleaned up
             Assertions.assertEquals(0, idleClients.size(), "Idle clients should be cleaned up after timeout");
-            Assertions.assertEquals(0, ((java.util.concurrent.atomic.AtomicInteger) createdCountField.get(clusterClientPool)).get(),
+            Assertions.assertEquals(0,
+                    ((java.util.concurrent.atomic.AtomicInteger) createdCountField.get(clusterClientPool)).get(),
                     "Created count should be 0 after cleanup");
 
         }
@@ -732,8 +741,10 @@ public class KubernetesClientPoolTest {
     @Test
     public void testCreatClient() throws Exception {
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
 
         KubernetesClientPool.PoolConfig poolConfig = new KubernetesClientPool.PoolConfig(
@@ -746,17 +757,20 @@ public class KubernetesClientPoolTest {
         // Create a mock client
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
         NamespaceList namespaceList = Mockito.mock(NamespaceList.class);
-        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces = Mockito.mock(NonNamespaceOperation.class);
+        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces =
+                Mockito.mock(NonNamespaceOperation.class);
         Mockito.when(mockClient.namespaces()).thenReturn(namespaces);
         Mockito.when(namespaces.list()).thenReturn(namespaceList);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    // Configure the mock behavior
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    Mockito.when(mock.build()).thenReturn(mockClient);
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    // Configure the mock behavior
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    Mockito.when(mock.build()).thenReturn(mockClient);
+                                })) {
 
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
             Method createClientMethod = clusterClientPoolClass.getDeclaredMethod("createClient");
@@ -788,8 +802,10 @@ public class KubernetesClientPoolTest {
     @Test
     public void testClusterClientPoolCreateIdleConnection() throws Exception {
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
 
         KubernetesClientPool.PoolConfig poolConfig = new KubernetesClientPool.PoolConfig(
@@ -803,11 +819,13 @@ public class KubernetesClientPoolTest {
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    Mockito.when(mock.build()).thenReturn(mockClient);
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    Mockito.when(mock.build()).thenReturn(mockClient);
+                                })) {
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
 
             // Get the createIdleConnection method
@@ -825,14 +843,16 @@ public class KubernetesClientPoolTest {
 
             // Initial state verification
             Assertions.assertEquals(0, idleClients.size(), "Idle clients should be 0 initially");
-            Assertions.assertEquals(0, ((AtomicInteger) createdCountField.get(clusterClientPool)).get(), "Created count should be 0 initially");
+            Assertions.assertEquals(0, ((AtomicInteger) createdCountField.get(clusterClientPool)).get(),
+                    "Created count should be 0 initially");
 
             // Call createIdleConnection
             createIdleConnectionMethod.invoke(clusterClientPool);
 
             // Verify client was created and added to idle pool
             Assertions.assertEquals(1, idleClients.size(), "Idle clients should be 1 after createIdleConnection");
-            Assertions.assertEquals(1, ((AtomicInteger) createdCountField.get(clusterClientPool)).get(), "Created count should be 1 after createIdleConnection");
+            Assertions.assertEquals(1, ((AtomicInteger) createdCountField.get(clusterClientPool)).get(),
+                    "Created count should be 1 after createIdleConnection");
         }
     }
 
@@ -842,8 +862,10 @@ public class KubernetesClientPoolTest {
     @Test
     public void testClusterClientPoolInitializeMinIdleConnections() throws Exception {
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
 
         // Create a pool config with minIdle=3
@@ -858,11 +880,13 @@ public class KubernetesClientPoolTest {
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    Mockito.when(mock.build()).thenReturn(mockClient);
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    Mockito.when(mock.build()).thenReturn(mockClient);
+                                })) {
             // This will automatically call initializeMinIdleConnections during construction
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
 
@@ -877,7 +901,8 @@ public class KubernetesClientPoolTest {
 
             // Verify minIdle connections were created and added to idle pool
             Assertions.assertEquals(3, idleClients.size(), "Idle clients should be 3 after initialization");
-            Assertions.assertEquals(3, ((AtomicInteger) createdCountField.get(clusterClientPool)).get(), "Created count should be 3 after initialization");
+            Assertions.assertEquals(3, ((AtomicInteger) createdCountField.get(clusterClientPool)).get(),
+                    "Created count should be 3 after initialization");
         }
     }
 
@@ -905,19 +930,24 @@ public class KubernetesClientPoolTest {
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
 
         // Test constructor with different configurations
-        for (KubernetesClientPool.PoolConfig poolConfig : new KubernetesClientPool.PoolConfig[] {poolConfig1, poolConfig2}) {
-            try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                    (mock, context) -> {
-                        Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                        Mockito.when(mock.build()).thenReturn(mockClient);
-                    })) {
+        for (KubernetesClientPool.PoolConfig poolConfig : new KubernetesClientPool.PoolConfig[]{poolConfig1,
+                poolConfig2}) {
+            try (
+                    MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                            Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                    (mock, context) -> {
+                                        Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                        Mockito.when(mock.build()).thenReturn(mockClient);
+                                    })) {
                 // Create ClusterClientPool instance
-                Object clusterClientPool = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool")
+                Object clusterClientPool = Class.forName(
+                        "org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool")
                         .getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class)
                         .newInstance(clusterId, mockKubeConfig, poolConfig);
 
                 // Get fields to verify initialization
-                Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+                Class<?> clusterClientPoolClass = Class.forName(
+                        "org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
                 Field clusterIdField = clusterClientPoolClass.getDeclaredField("clusterId");
                 Field kubeConfigField = clusterClientPoolClass.getDeclaredField("kubeConfig");
                 Field configField = clusterClientPoolClass.getDeclaredField("config");
@@ -934,18 +964,25 @@ public class KubernetesClientPoolTest {
                 createdCountField.setAccessible(true);
 
                 // Verify field initialization
-                Assertions.assertEquals(clusterId, clusterIdField.get(clusterClientPool), "Cluster ID should be correctly initialized");
-                Assertions.assertEquals(mockKubeConfig, kubeConfigField.get(clusterClientPool), "KubeConfig should be correctly initialized");
-                Assertions.assertEquals(poolConfig, configField.get(clusterClientPool), "PoolConfig should be correctly initialized");
-                Assertions.assertNotNull(idleClientsField.get(clusterClientPool), "Idle clients queue should be initialized");
-                Assertions.assertNotNull(activeClientsField.get(clusterClientPool), "Active clients set should be initialized");
-                Assertions.assertNotNull(createdCountField.get(clusterClientPool), "Created count should be initialized");
+                Assertions.assertEquals(clusterId, clusterIdField.get(clusterClientPool),
+                        "Cluster ID should be correctly initialized");
+                Assertions.assertEquals(mockKubeConfig, kubeConfigField.get(clusterClientPool),
+                        "KubeConfig should be correctly initialized");
+                Assertions.assertEquals(poolConfig, configField.get(clusterClientPool),
+                        "PoolConfig should be correctly initialized");
+                Assertions.assertNotNull(idleClientsField.get(clusterClientPool),
+                        "Idle clients queue should be initialized");
+                Assertions.assertNotNull(activeClientsField.get(clusterClientPool),
+                        "Active clients set should be initialized");
+                Assertions.assertNotNull(createdCountField.get(clusterClientPool),
+                        "Created count should be initialized");
 
                 // Verify minIdle connections were created
                 BlockingQueue<?> idleClients = (BlockingQueue<?>) idleClientsField.get(clusterClientPool);
                 Assertions.assertEquals(poolConfig.getMinIdle(), idleClients.size(),
                         "Idle clients should match minIdle configuration");
-                Assertions.assertEquals(poolConfig.getMinIdle(), ((AtomicInteger) createdCountField.get(clusterClientPool)).get(),
+                Assertions.assertEquals(poolConfig.getMinIdle(),
+                        ((AtomicInteger) createdCountField.get(clusterClientPool)).get(),
                         "Created count should match minIdle configuration");
             }
         }
@@ -1035,8 +1072,10 @@ public class KubernetesClientPoolTest {
     @Test
     public void testClusterClientPoolCleanupIdle() throws Exception {
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
 
         // Use a very small idle timeout for testing
@@ -1051,26 +1090,31 @@ public class KubernetesClientPoolTest {
         // Create a mock client
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
         NamespaceList namespaceList = Mockito.mock(NamespaceList.class);
-        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces = Mockito.mock(NonNamespaceOperation.class);
+        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces =
+                Mockito.mock(NonNamespaceOperation.class);
         Mockito.when(mockClient.namespaces()).thenReturn(namespaces);
         Mockito.when(namespaces.list()).thenReturn(namespaceList);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    Mockito.when(mock.build()).thenReturn(mockClient);
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    Mockito.when(mock.build()).thenReturn(mockClient);
+                                })) {
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
 
             // Get the necessary methods and fields
             Method borrowObjectMethod = clusterClientPoolClass.getDeclaredMethod("borrowObject");
             borrowObjectMethod.setAccessible(true);
-            Method returnObjectMethod = clusterClientPoolClass.getDeclaredMethod("returnObject", KubernetesClient.class);
+            Method returnObjectMethod =
+                    clusterClientPoolClass.getDeclaredMethod("returnObject", KubernetesClient.class);
             returnObjectMethod.setAccessible(true);
             Method cleanupIdleMethod = clusterClientPoolClass.getDeclaredMethod("cleanupIdle");
             cleanupIdleMethod.setAccessible(true);
-            Method isClientValidMethod = clusterClientPoolClass.getDeclaredMethod("isClientValid", KubernetesClient.class);
+            Method isClientValidMethod =
+                    clusterClientPoolClass.getDeclaredMethod("isClientValid", KubernetesClient.class);
             isClientValidMethod.setAccessible(true);
 
             Field createdCountField = clusterClientPoolClass.getDeclaredField("createdCount");
@@ -1084,22 +1128,19 @@ public class KubernetesClientPoolTest {
             activeClientsField.setAccessible(true);
             Set<?> activeClients = (Set<?>) activeClientsField.get(clusterClientPool);
 
-
-
             // Borrow and return 3 clients to create idle connections
             KubernetesClient client1 = (KubernetesClient) borrowObjectMethod.invoke(clusterClientPool);
             KubernetesClient client2 = (KubernetesClient) borrowObjectMethod.invoke(clusterClientPool);
             KubernetesClient client3 = (KubernetesClient) borrowObjectMethod.invoke(clusterClientPool);
             Assertions.assertEquals(3, activeClients.size(), "Active clients count should be 3 after borrowing");
 
-            isClientValidMethod.invoke(clusterClientPool,client1);
-            isClientValidMethod.invoke(clusterClientPool,client2);
-            isClientValidMethod.invoke(clusterClientPool,client3);
+            isClientValidMethod.invoke(clusterClientPool, client1);
+            isClientValidMethod.invoke(clusterClientPool, client2);
+            isClientValidMethod.invoke(clusterClientPool, client3);
 
             returnObjectMethod.invoke(clusterClientPool, client1);
             returnObjectMethod.invoke(clusterClientPool, client2);
             returnObjectMethod.invoke(clusterClientPool, client3);
-
 
             // Verify all clients are idle
             Assertions.assertEquals(3, idleClients.size(), "Idle clients count should be 3 after returning");
@@ -1134,8 +1175,10 @@ public class KubernetesClientPoolTest {
     @Test
     public void testClusterClientPoolCleanupIdlePartialTimeout() throws Exception {
         // Create a real ClusterClientPool instance using reflection
-        Class<?> clusterClientPoolClass = Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class, KubernetesClientPool.PoolConfig.class);
+        Class<?> clusterClientPoolClass =
+                Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
+        Constructor<?> constructor = clusterClientPoolClass.getDeclaredConstructor(String.class, String.class,
+                KubernetesClientPool.PoolConfig.class);
         constructor.setAccessible(true);
 
         // Use a very small idle timeout for testing
@@ -1150,22 +1193,26 @@ public class KubernetesClientPoolTest {
         // Create a mock client
         KubernetesClient mockClient = Mockito.mock(KubernetesClient.class);
         NamespaceList namespaceList = Mockito.mock(NamespaceList.class);
-        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces = Mockito.mock(NonNamespaceOperation.class);
+        NonNamespaceOperation<Namespace, NamespaceList, Resource<Namespace>> namespaces =
+                Mockito.mock(NonNamespaceOperation.class);
         Mockito.when(mockClient.namespaces()).thenReturn(namespaces);
         Mockito.when(namespaces.list()).thenReturn(namespaceList);
 
         // Mock KubernetesClientBuilder to control client creation
-        try (MockedConstruction<KubernetesClientBuilder> mockedConstruction = Mockito.mockConstruction(KubernetesClientBuilder.class,
-                (mock, context) -> {
-                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
-                    Mockito.when(mock.build()).thenReturn(mockClient);
-                })) {
+        try (
+                MockedConstruction<KubernetesClientBuilder> mockedConstruction =
+                        Mockito.mockConstruction(KubernetesClientBuilder.class,
+                                (mock, context) -> {
+                                    Mockito.when(mock.withConfig((Config) Mockito.any())).thenReturn(mock);
+                                    Mockito.when(mock.build()).thenReturn(mockClient);
+                                })) {
             Object clusterClientPool = constructor.newInstance(clusterId, mockKubeConfig, poolConfig);
 
             // Get the necessary methods and fields
             Method borrowObjectMethod = clusterClientPoolClass.getDeclaredMethod("borrowObject");
             borrowObjectMethod.setAccessible(true);
-            Method returnObjectMethod = clusterClientPoolClass.getDeclaredMethod("returnObject", KubernetesClient.class);
+            Method returnObjectMethod =
+                    clusterClientPoolClass.getDeclaredMethod("returnObject", KubernetesClient.class);
             returnObjectMethod.setAccessible(true);
             Method cleanupIdleMethod = clusterClientPoolClass.getDeclaredMethod("cleanupIdle");
             cleanupIdleMethod.setAccessible(true);
