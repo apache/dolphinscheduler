@@ -847,7 +847,8 @@ CREATE TABLE t_ds_schedules
     environment_code          bigint(20) DEFAULT '-1',
     create_time               datetime     NOT NULL,
     update_time               datetime     NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE KEY `uniq_schedules_workflow_definition_code` (`workflow_definition_code`)
 );
 
 -- ----------------------------
