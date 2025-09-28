@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.executor;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -106,7 +108,14 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     public void finalizeTask() {
-        TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
+        clearTaskInstanceWorkingDirectoryIfNeeded();
+    }
+
+    private void clearTaskInstanceWorkingDirectoryIfNeeded() {
+        boolean isDevelopment = PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
+        if (!isDevelopment) {
+            TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
+        }
     }
 
     @Override
