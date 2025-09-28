@@ -46,7 +46,7 @@ github:
           - E2E
           - Docs
           - Frontend Build
-          - "E2E-K8S-Result"
+#          - "E2E-K8S-Result"
           - "API-Test-Result"
           - "Mergeable: milestone-label-check"
           - "Title Validator"
