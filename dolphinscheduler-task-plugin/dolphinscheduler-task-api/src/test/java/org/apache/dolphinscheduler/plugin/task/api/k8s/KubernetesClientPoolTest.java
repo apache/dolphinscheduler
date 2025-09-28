@@ -551,7 +551,7 @@ public class KubernetesClientPoolTest {
         // Get the inner PooledClient class
         Class<?>[] nestedClasses = clusterClientPoolClass.getDeclaredClasses();
         for (Class<?> nestedClass : nestedClasses) {
-            if (nestedClass.getSimpleName().equals("PooledClient")) {
+            if ("PooledClient".equals(nestedClass.getSimpleName())) {
                 return nestedClass;
             }
         }
