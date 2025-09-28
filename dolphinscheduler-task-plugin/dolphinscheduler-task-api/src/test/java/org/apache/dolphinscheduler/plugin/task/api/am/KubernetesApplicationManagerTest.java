@@ -94,7 +94,7 @@ public class KubernetesApplicationManagerTest {
         mockK8sTaskExecutionContext = mock(K8sTaskExecutionContext.class);
         when(mockK8sTaskExecutionContext.getConfigYaml()).thenReturn(mockKubeConfig);
         String clusterId = new KubernetesApplicationManager().getClusterId(mockK8sTaskExecutionContext);
-        Assertions.assertEquals("k8s-cluster-" + Math.abs(mockKubeConfig.hashCode()), clusterId);
+        Assertions.assertEquals("k8s-cluster-" + Math.abs((long) mockKubeConfig.hashCode()), clusterId);
     }
 
     @Test
