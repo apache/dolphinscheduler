@@ -544,14 +544,13 @@ public class KubernetesClientPoolTest {
      * Helper method to get the PooledClient class using reflection.
      */
     private Class<?> getPooledClientClass() throws ClassNotFoundException {
-        // Get the outer class
         Class<?> clusterClientPoolClass =
                 Class.forName("org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool$ClusterClientPool");
-
-        // Get the inner PooledClient class
         Class<?>[] nestedClasses = clusterClientPoolClass.getDeclaredClasses();
+        Class<?> targetClass = KubernetesClientPool.ClusterClientPool.PooledClient.class;
+
         for (Class<?> nestedClass : nestedClasses) {
-            if ("PooledClient".equals(nestedClass.getSimpleName())) {
+            if (nestedClass == targetClass) {
                 return nestedClass;
             }
         }
