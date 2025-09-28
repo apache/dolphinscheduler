@@ -64,8 +64,6 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
     @SneakyThrows
     @Override
     public void createStorageDir(String directoryAbsolutePath) {
-        exceptionIfPathEmpty(directoryAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(directoryAbsolutePath);
         final Path path = Paths.get(directoryAbsolutePath);
         if (exists(directoryAbsolutePath)) {
             throw new FileAlreadyExistsException("Directory already exists: " + directoryAbsolutePath);
@@ -75,16 +73,12 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
 
     @Override
     public boolean exists(String resourceAbsolutePath) {
-        exceptionIfPathEmpty(resourceAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(resourceAbsolutePath);
         return Files.exists(Paths.get(resourceAbsolutePath));
     }
 
     @SneakyThrows
     @Override
     public void delete(String resourceAbsolutePath, boolean recursive) {
-        exceptionIfPathEmpty(resourceAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(resourceAbsolutePath);
         if (recursive) {
             FileUtils.deleteQuietly(new File(resourceAbsolutePath));
         } else {
@@ -95,10 +89,6 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
     @SneakyThrows
     @Override
     public void copy(String srcAbsolutePath, String dstAbsolutePath, boolean deleteSource, boolean overwrite) {
-        exceptionIfPathEmpty(srcAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(srcAbsolutePath);
-        exceptionIfPathEmpty(dstAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(dstAbsolutePath);
         if (srcAbsolutePath.equals(dstAbsolutePath)) {
             throw new IllegalArgumentException(
                     "Source path and destination path cannot be the same: " + srcAbsolutePath);
@@ -108,8 +98,11 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
             throw new FileNotFoundException("Source path does not exist: " + srcAbsolutePath);
         }
 
-        if (exists(dstAbsolutePath) && !overwrite) {
-            throw new FileAlreadyExistsException("Destination path already exists: " + dstAbsolutePath);
+        if (exists(dstAbsolutePath)) {
+            if (!overwrite) {
+                throw new FileAlreadyExistsException("Destination path already exists: " + dstAbsolutePath);
+            }
+            delete(dstAbsolutePath, true);
         }
 
         final File srcFile = new File(srcAbsolutePath);
@@ -119,7 +112,7 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
         } else {
             FileUtils.copyFile(srcFile, dstFile);
         }
-        if (overwrite) {
+        if (deleteSource) {
             delete(srcAbsolutePath, true);
         }
     }
@@ -127,23 +120,17 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
     @Override
     public void upload(String srcLocalFileAbsolutePath, String dstAbsolutePath, boolean deleteSource,
                        boolean overwrite) {
-        exceptionIfPathNotUnderStorageBaseDir(srcLocalFileAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(dstAbsolutePath);
         copy(srcLocalFileAbsolutePath, dstAbsolutePath, deleteSource, overwrite);
     }
 
     @Override
     public void download(String srcFileAbsolutePath, String dstAbsolutePath, boolean overwrite) {
-        exceptionIfPathNotUnderStorageBaseDir(srcFileAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(dstAbsolutePath);
         copy(srcFileAbsolutePath, dstAbsolutePath, false, overwrite);
     }
 
     @SneakyThrows
     @Override
     public List<String> fetchFileContent(String fileAbsolutePath, int skipLineNums, int limit) {
-        exceptionIfPathEmpty(fileAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(fileAbsolutePath);
         try (Stream<String> stream = Files.lines(Paths.get(fileAbsolutePath)).skip(skipLineNums).limit(limit)) {
             return stream.collect(Collectors.toList());
         }
@@ -152,8 +139,6 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
     @SneakyThrows
     @Override
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
-        exceptionIfPathEmpty(resourceAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(resourceAbsolutePath);
         Path path = Paths.get(resourceAbsolutePath);
         if (!Files.exists(path)) {
             return Collections.emptyList();
@@ -169,8 +154,6 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
     @SneakyThrows
     @Override
     public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
-        exceptionIfPathEmpty(resourceAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(resourceAbsolutePath);
         List<StorageEntity> result = new ArrayList<>();
 
         LinkedList<Path> foldersToFetch = new LinkedList<>();
@@ -195,8 +178,6 @@ public class LocalStorageOperator extends AbstractStorageOperator implements Clo
 
     @Override
     public StorageEntity getStorageEntity(String resourceAbsolutePath) {
-        exceptionIfPathEmpty(resourceAbsolutePath);
-        exceptionIfPathNotUnderStorageBaseDir(resourceAbsolutePath);
         return transformFileStatusToResourceMetadata(Paths.get(resourceAbsolutePath));
     }
 

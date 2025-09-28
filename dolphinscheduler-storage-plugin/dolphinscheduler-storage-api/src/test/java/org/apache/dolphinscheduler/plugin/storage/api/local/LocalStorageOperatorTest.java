@@ -50,7 +50,7 @@ class LocalStorageOperatorTest {
 
     @SneakyThrows
     @BeforeEach
-    public void setup() {
+    void setup() {
         // /localStorage/default/resources/sqlDirectory/demo.sql
         // /emptyDirectory
         Files.createDirectories(Paths.get(STORAGE_BASE_DIR));
@@ -68,7 +68,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testGetResourceMetaData_directory() {
+    void testGetResourceMetaData_directory() {
         ResourceMetadata resourceMetaData = storageOperator.getResourceMetaData(TENANT_BASE_DIR);
         assertThat(resourceMetaData.getResourceAbsolutePath()).isEqualTo(TENANT_BASE_DIR);
         assertThat(resourceMetaData.getResourceBaseDirectory()).isEqualTo(STORAGE_BASE_DIR);
@@ -78,7 +78,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testGetResourceMetaData_file() {
+    void testGetResourceMetaData_file() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sql").toString();
 
         ResourceMetadata resourceMetaData = storageOperator.getResourceMetaData(resourceFileAbsolutePath);
@@ -90,7 +90,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testGetResourceMetaData_invalidatedPath() {
+    void testGetResourceMetaData_invalidatedPath() {
         String resourceFileAbsolutePath = Paths.get("/", "sqlDirectory", "demo.sql").toString();
 
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
@@ -100,46 +100,46 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testGetStorageBaseDirectory() {
+    void testGetStorageBaseDirectory() {
         String storageBaseDirectory = storageOperator.getStorageBaseDirectory();
         assertThat(storageBaseDirectory).isEqualTo(STORAGE_BASE_DIR);
     }
 
     @Test
-    public void testGetStorageBaseDirectory_withTenant() {
+    void testGetStorageBaseDirectory_withTenant() {
         String storageBaseDirectory = storageOperator.getStorageBaseDirectory("default");
         assertThat(storageBaseDirectory).isEqualTo(Paths.get(STORAGE_BASE_DIR, TENANT_CODE).toString());
     }
 
     @Test
-    public void testGetStorageBaseDirectory_withTenant_withResourceTypeFile() {
+    void testGetStorageBaseDirectory_withTenant_withResourceTypeFile() {
         String storageBaseDirectory = storageOperator.getStorageBaseDirectory("default", ResourceType.FILE);
         assertThat(storageBaseDirectory)
                 .isEqualTo(Paths.get(STORAGE_BASE_DIR, TENANT_CODE, StorageOperator.FILE_FOLDER_NAME).toString());
     }
 
     @Test
-    public void testGetStorageBaseDirectory_withTenant_withResourceTypeAll() {
+    void testGetStorageBaseDirectory_withTenant_withResourceTypeAll() {
         String storageBaseDirectory = storageOperator.getStorageBaseDirectory("default", ResourceType.ALL);
         assertThat(storageBaseDirectory).isEqualTo(Paths.get(STORAGE_BASE_DIR, TENANT_CODE).toString());
     }
 
     @Test
-    public void testGetStorageBaseDirectory_withEmptyTenant_withResourceType() {
+    void testGetStorageBaseDirectory_withEmptyTenant_withResourceType() {
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
                 () -> storageOperator.getStorageBaseDirectory("", ResourceType.ALL));
         assertThat(illegalArgumentException.getMessage()).isEqualTo("Tenant code should not be empty");
     }
 
     @Test
-    public void testGetStorageBaseDirectory_withTenant_withEmptyResourceType() {
+    void testGetStorageBaseDirectory_withTenant_withEmptyResourceType() {
         IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
                 () -> storageOperator.getStorageBaseDirectory("default", null));
         assertThat(illegalArgumentException.getMessage()).isEqualTo("Resource type should not be null");
     }
 
     @Test
-    public void testGetStorageFileAbsolutePath() {
+    void testGetStorageFileAbsolutePath() {
         String fileAbsolutePath = storageOperator.getStorageFileAbsolutePath("default", "test.sh");
         assertThat(fileAbsolutePath).isEqualTo(
                 Paths.get(STORAGE_BASE_DIR, TENANT_CODE, StorageOperator.FILE_FOLDER_NAME, "test.sh").toString());
@@ -147,7 +147,7 @@ class LocalStorageOperatorTest {
 
     @SneakyThrows
     @Test
-    public void testCreateStorageDir_notExists() {
+    void testCreateStorageDir_notExists() {
         String testDirFileAbsolutePath =
                 Paths.get(STORAGE_BASE_DIR, "root", StorageOperator.FILE_FOLDER_NAME, "testDir").toString();
         try {
@@ -166,38 +166,38 @@ class LocalStorageOperatorTest {
 
     @SneakyThrows
     @Test
-    public void testCreateStorageDir_exists() {
+    void testCreateStorageDir_exists() {
         String testDirFileAbsolutePath =
                 Paths.get(STORAGE_BASE_DIR, "default", StorageOperator.FILE_FOLDER_NAME, "sqlDirectory").toString();
         assertThrows(FileAlreadyExistsException.class, () -> storageOperator.createStorageDir(testDirFileAbsolutePath));
     }
 
     @Test
-    public void testExists_fileExist() {
+    void testExists_fileExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sql").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isTrue();
     }
 
     @Test
-    public void testExists_fileNotExist() {
+    void testExists_fileNotExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sh").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isFalse();
     }
 
     @Test
-    public void testExists_directoryExist() {
+    void testExists_directoryExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isTrue();
     }
 
     @Test
-    public void testExists_directoryNotExist() {
+    void testExists_directoryNotExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "shellDirectory").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isFalse();
     }
 
     @Test
-    public void testDelete_directoryExist() {
+    void testDelete_directoryExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isTrue();
 
@@ -206,7 +206,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testDelete_directoryNotExist() {
+    void testDelete_directoryNotExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "shellDirectory").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isFalse();
 
@@ -215,7 +215,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testDelete_fileExist() {
+    void testDelete_fileExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sql").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isTrue();
 
@@ -224,7 +224,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testDelete_fileNotExist() {
+    void testDelete_fileNotExist() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sh").toString();
         assertThat(storageOperator.exists(resourceFileAbsolutePath)).isFalse();
 
@@ -233,7 +233,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testFetchFileContent() {
+    void testFetchFileContent() {
         // todo: add large file test case
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sql").toString();
         List<String> content = storageOperator.fetchFileContent(resourceFileAbsolutePath, 0, 10);
@@ -242,7 +242,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testListStorageEntity_directoryNotEmpty() {
+    void testListStorageEntity_directoryNotEmpty() {
         List<StorageEntity> storageEntities = storageOperator.listStorageEntity(TENANT_BASE_DIR);
         assertThat(storageEntities.size()).isEqualTo(2);
 
@@ -262,20 +262,20 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testListStorageEntity_directoryEmpty() {
+    void testListStorageEntity_directoryEmpty() {
         String resourceFileAbsolutePath = TENANT_BASE_DIR + "/emptyDirectory";
         List<StorageEntity> storageEntities = storageOperator.listStorageEntity(resourceFileAbsolutePath);
         assertThat(storageEntities.size()).isEqualTo(0);
     }
 
     @Test
-    public void testListStorageEntity_directoryNotExist() {
+    void testListStorageEntity_directoryNotExist() {
         String resourceFileAbsolutePath = TENANT_BASE_DIR + "/notExistDirectory";
         assertThat(storageOperator.listStorageEntity(resourceFileAbsolutePath)).isEmpty();
     }
 
     @Test
-    public void testListStorageEntity_file() {
+    void testListStorageEntity_file() {
         String resourceFileAbsolutePath = Paths.get(TENANT_BASE_DIR, "sqlDirectory", "demo.sql").toString();
         List<StorageEntity> storageEntities = storageOperator.listStorageEntity(resourceFileAbsolutePath);
         assertThat(storageEntities.size()).isEqualTo(1);
@@ -291,7 +291,7 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testListStorageEntityRecursively_directory() {
+    void testListStorageEntityRecursively_directory() {
         List<StorageEntity> storageEntities = storageOperator.listFileStorageEntityRecursively(TENANT_BASE_DIR);
         assertThat(storageEntities.size()).isEqualTo(3);
 
@@ -309,7 +309,7 @@ class LocalStorageOperatorTest {
 
     @SneakyThrows
     @AfterEach
-    public void after() {
+    void after() {
         FileUtils.deleteFile(STORAGE_BASE_DIR);
     }
 
