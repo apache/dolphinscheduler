@@ -166,7 +166,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     public String getClusterId(K8sTaskExecutionContext k8sTaskExecutionContext) {
         // The hash value of kubeconfig is used as the cluster identifier
         String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
-        return "k8s-cluster-" + Math.abs(kubeConfig.hashCode());
+        return "k8s-cluster-" + Math.abs((long) kubeConfig.hashCode());
     }
 
     /**
