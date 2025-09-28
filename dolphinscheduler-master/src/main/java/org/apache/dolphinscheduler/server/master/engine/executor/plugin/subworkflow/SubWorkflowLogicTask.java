@@ -167,9 +167,9 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(
                 subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
 
-        if (subWorkflowInstance != null && subWorkflowInstance.getState().canTakeover()) {
-            // Here we only need to take over the runtime context of sub-workflow,
-            // the sub-workflow will be failover by master-server when needed.
+        if (subWorkflowInstance != null) {
+            // If the sub workflow instance is existed, means we already trigger the sub workflow instance.
+            // So we don't need to trigger again.
             return subWorkflowLogicTaskRuntimeContext;
         }
 

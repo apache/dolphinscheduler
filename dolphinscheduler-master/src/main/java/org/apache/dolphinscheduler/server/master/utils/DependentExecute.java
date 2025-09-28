@@ -180,7 +180,7 @@ public class DependentExecute {
      * @return
      */
     private DependResult dependResultByWorkflowInstance(WorkflowInstance workflowInstance) {
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             return DependResult.WAITING;
         }
         if (workflowInstance.getState().isSuccess()) {
@@ -199,7 +199,7 @@ public class DependentExecute {
      * @return
      */
     private DependResult dependResultByAllTaskOfWorkflowInstance(WorkflowInstance workflowInstance) {
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             log.info(
                     "Wait for the dependent workflow to complete, workflowDefinitionCode: {}, pworkflowInstanceId: {}.",
                     workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getId());
@@ -272,7 +272,7 @@ public class DependentExecute {
                 return DependResult.SUCCESS;
             }
 
-            if (!workflowInstance.getState().isFinished()) {
+            if (!workflowInstance.getState().isFinalState()) {
                 log.info(
                         "Wait for the dependent workflow to complete, workflowDefinitionCode: {}, workflowInstanceId: {}.",
                         workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getId());
@@ -362,7 +362,7 @@ public class DependentExecute {
         } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
-            if (workflowInstance.getState().isRunning()
+            if (!workflowInstance.getState().isFinalState()
                     && taskInstance.getRetryTimes() < taskInstance.getMaxRetryTimes()) {
                 log.info("taskDefinitionCode: {}, taskDefinitionName: {}, retryTimes: {}, maxRetryTimes: {}",
                         taskInstance.getTaskCode(), taskInstance.getName(), taskInstance.getRetryTimes(),

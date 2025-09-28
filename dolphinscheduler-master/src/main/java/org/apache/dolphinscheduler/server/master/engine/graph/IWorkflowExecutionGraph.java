@@ -41,6 +41,11 @@ public interface IWorkflowExecutionGraph {
     void addEdge(final String fromTaskName, final Set<String> toTaskName);
 
     /**
+     * Remove the unreachable edge in the graph.
+     */
+    void removeUnReachableEdge();
+
+    /**
      * Return the start tasks, the start tasks in the workflow execution graph is the tasks which predecessors is empty.
      */
     List<ITaskExecutionRunnable> getStartNodes();

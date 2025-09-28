@@ -33,6 +33,8 @@ dolphinscheduler-task-shell
 --end--
 ```
 
+> **_Note:_** The plugin dependency package is usually not included in the binary package. If you encounter a `ClassNotFoundException` error when starting the service, please refer to the documentation of the relevant plugin type to check if the plugin dependency package is missing. For example, `dolphinscheduler-datasource-mysql` does not include `mysql-connector-java.jar`.
+
 ## DolphinScheduler Startup Environment
 
 > **_Note:_** DolphinScheduler itself does not depend on Hadoop, Hive, Spark, but if you need to run tasks that depend on them, you need to have the corresponding environment support.

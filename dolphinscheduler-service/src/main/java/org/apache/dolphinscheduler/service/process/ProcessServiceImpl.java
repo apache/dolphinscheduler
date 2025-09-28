@@ -754,7 +754,7 @@ public class ProcessServiceImpl implements ProcessService {
     public void forceWorkflowInstanceSuccessByTaskInstanceId(TaskInstance task) {
         WorkflowInstance workflowInstance = findWorkflowInstanceDetailById(task.getWorkflowInstanceId()).orElse(null);
         if (workflowInstance != null
-                && (workflowInstance.getState().isFailure() || workflowInstance.getState().isStop())) {
+                && (workflowInstance.getState().isFailure() || workflowInstance.getState().isStopped())) {
             List<TaskInstance> validTaskList =
                     taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId());
             List<Long> instanceTaskCodeList =
