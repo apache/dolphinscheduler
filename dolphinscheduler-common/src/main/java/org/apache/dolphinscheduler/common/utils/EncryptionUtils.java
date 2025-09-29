@@ -22,8 +22,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
+import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,8 @@ public class EncryptionUtils {
     private static final byte[] defaultKey =
             {0x72, 0x38, 0x61, 0x73, 0x49, 0x73, 0x41, 0x52, 0x22, 0x11, 0x72, 0x65, 0x74,
                     0x6c, 0x61, 0x49};
+    private static final int AES_KEY_LEN = 16; // 128 bit
+    private static final int ITERATIONS = 130_000;
 
     public static final String ENC_PREFIX = "ENC('";
     public static final String ENC_SUBFIX = "')";
@@ -109,14 +114,35 @@ public class EncryptionUtils {
             return null;
         }
     }
-
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            System.exit(1);
+    public static String normalizeKey(String password) {
+        try {
+            byte[] salt = new byte[8];
+            new SecureRandom().nextBytes(salt);
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, AES_KEY_LEN * 8);
+            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            byte[] keyBytes = skf.generateSecret(spec).getEncoded();
+            return Base64.encodeBase64String(keyBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Key derivation failed", e);
         }
-        String password = args[0];
-        String key = args[1];
-        System.out.println(EncryptionUtils.encrypt(password, Base64.decodeBase64(key)));
     }
-
+    private static String colorize(String text) {
+        return "\u001B[31m" + text + "\u001B[0m";
+    }
+    public static void main(String[] args) {
+        String out = "Encrypted Password is [%s], Encrypted Key is [%s]";
+        if (args.length == 1) {
+            String password = args[0];
+            System.out.printf((out) + "%n", colorize(encrypt(password, Base64.decodeBase64(getDefaultKey()))),
+                    colorize(Base64.encodeBase64String(defaultKey)));
+        } else if (args.length == 2) {
+            String password = args[0];
+            String key = args[1];
+            String normalizedKey = normalizeKey(key);
+            System.out.printf((out) + "%n", colorize(encrypt(password, Base64.decodeBase64(normalizedKey))),
+                    colorize(normalizedKey));
+        } else {
+            System.out.println("Usage: sh encrypt-password.sh [plain-password] [plain-key]");
+        }
+    }
 }
