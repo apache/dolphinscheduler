@@ -35,7 +35,8 @@ public class DecryptEnvironmentPostProcessor implements EnvironmentPostProcessor
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         String datasourcePassword = environment.getProperty("spring.datasource.password");
         if (EncryptionUtils.isEncrypted(datasourcePassword)) {
-            String decryptedPassword = EncryptionUtils.getDecryptedValue(datasourcePassword);
+            String passwordEncryptKey = environment.getProperty("spring.datasource.encryption.key");
+            String decryptedPassword = EncryptionUtils.decryptPassword(datasourcePassword, passwordEncryptKey);
             Properties props = new Properties();
             props.put("spring.datasource.password", decryptedPassword);
             environment.getPropertySources().addFirst(new PropertiesPropertySource("decryptedProps", props));

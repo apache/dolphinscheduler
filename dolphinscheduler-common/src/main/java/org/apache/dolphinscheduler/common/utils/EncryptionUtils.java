@@ -58,19 +58,6 @@ public class EncryptionUtils {
         return DigestUtils.md5Hex(null == rawStr ? StringUtils.EMPTY : rawStr);
     }
 
-    private static byte[] getKeyFromConfig() {
-        try {
-            String keyStr = System.getProperty("datasource.encryption.key");
-            if (StringUtils.isEmpty(keyStr)) {
-                throw new RuntimeException("No encryption key found in config");
-            }
-            return Base64.decodeBase64(keyStr);
-        } catch (Exception e) {
-            log.warn("Failed to load encryption key from config, using default key");
-            throw e;
-        }
-    }
-
     public static boolean isEncrypted(String value) {
         return StringUtils.isNotEmpty(value) && value.startsWith(ENC_PREFIX) && value.endsWith(ENC_SUBFIX);
     }
@@ -86,10 +73,13 @@ public class EncryptionUtils {
         }
     }
 
-    private static String decrypt(String strToDecrypt) {
+    private static String decrypt(String strToDecrypt, String passwordEncryptKey) {
+        if (StringUtils.isEmpty(passwordEncryptKey)) {
+            throw new RuntimeException("No encryption key found in config");
+        }
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            final SecretKeySpec secretKey = new SecretKeySpec(getKeyFromConfig(), "AES");
+            final SecretKeySpec secretKey = new SecretKeySpec(Base64.decodeBase64(passwordEncryptKey), "AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.decodeBase64(strToDecrypt)), Charset.defaultCharset());
         } catch (Exception e) {
@@ -97,22 +87,11 @@ public class EncryptionUtils {
         }
     }
 
-    public static String decryptPass(String value) {
-        return decrypt(value.substring(ENC_PREFIX.length(), value.length() - ENC_SUBFIX.length()));
+    public static String decryptPassword(String value, String passwordEncryptKey) {
+        return decrypt(value.substring(ENC_PREFIX.length(), value.length() - ENC_SUBFIX.length()), passwordEncryptKey);
     }
 
-    public static String getDecryptedValue(String value) {
-        try {
-            if (isEncrypted(value)) {
-                return decryptPass(value);
-            }
-            return value;
-        } catch (Exception e) {
-            log.error("Get decrypted value failed, {}", value, e);
-            return null;
-        }
-    }
-    public static String normalizeKey(String password) {
+    private static String normalizeKey(String password) {
         try {
             byte[] salt = new byte[8];
             new SecureRandom().nextBytes(salt);
