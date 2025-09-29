@@ -62,17 +62,15 @@ public class EncryptionUtils {
         try {
             String keyStr = System.getProperty("datasource.encryption.key");
             if (StringUtils.isEmpty(keyStr)) {
-                return getDefaultKey();
+                throw new RuntimeException("No encryption key found in config");
             }
             return Base64.decodeBase64(keyStr);
         } catch (Exception e) {
             log.warn("Failed to load encryption key from config, using default key");
-            return getDefaultKey();
+            throw e;
         }
     }
-    private static byte[] getDefaultKey() {
-        return defaultKey;
-    }
+
     public static boolean isEncrypted(String value) {
         return StringUtils.isNotEmpty(value) && value.startsWith(ENC_PREFIX) && value.endsWith(ENC_SUBFIX);
     }
@@ -131,18 +129,14 @@ public class EncryptionUtils {
     }
     public static void main(String[] args) {
         String out = "Encrypted Password is [%s], Encrypted Key is [%s]";
-        if (args.length == 1) {
-            String password = args[0];
-            System.out.printf((out) + "%n", colorize(encrypt(password, Base64.decodeBase64(getDefaultKey()))),
-                    colorize(Base64.encodeBase64String(defaultKey)));
-        } else if (args.length == 2) {
+        if (args.length != 2) {
+            System.out.println("Usage: sh encrypt-password.sh [plain-password] [plain-key]");
+        } else {
             String password = args[0];
             String key = args[1];
             String normalizedKey = normalizeKey(key);
             System.out.printf((out) + "%n", colorize(encrypt(password, Base64.decodeBase64(normalizedKey))),
                     colorize(normalizedKey));
-        } else {
-            System.out.println("Usage: sh encrypt-password.sh [plain-password] [plain-key]");
         }
     }
 }
