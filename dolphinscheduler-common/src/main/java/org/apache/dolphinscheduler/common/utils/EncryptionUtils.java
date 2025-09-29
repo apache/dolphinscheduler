@@ -34,8 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EncryptionUtils {
 
-    private static final byte[] key = {0x72, 0x38, 0x61, 0x73, 0x49, 0x73, 0x41, 0x52, 0x22, 0x11, 0x72, 0x65, 0x74,
-            0x6c, 0x61, 0x49};
+    private static final byte[] defaultKey =
+            {0x72, 0x38, 0x61, 0x73, 0x49, 0x73, 0x41, 0x52, 0x22, 0x11, 0x72, 0x65, 0x74,
+                    0x6c, 0x61, 0x49};
 
     public static final String ENC_PREFIX = "ENC('";
     public static final String ENC_SUBFIX = "')";
@@ -51,11 +52,27 @@ public class EncryptionUtils {
     public static String getMd5(String rawStr) {
         return DigestUtils.md5Hex(null == rawStr ? StringUtils.EMPTY : rawStr);
     }
+
+    private static byte[] getKeyFromConfig() {
+        try {
+            String keyStr = System.getProperty("datasource.encryption.key");
+            if (StringUtils.isEmpty(keyStr)) {
+                return getDefaultKey();
+            }
+            return Base64.decodeBase64(keyStr);
+        } catch (Exception e) {
+            log.warn("Failed to load encryption key from config, using default key");
+            return getDefaultKey();
+        }
+    }
+    private static byte[] getDefaultKey() {
+        return defaultKey;
+    }
     public static boolean isEncrypted(String value) {
         return StringUtils.isNotEmpty(value) && value.startsWith(ENC_PREFIX) && value.endsWith(ENC_SUBFIX);
     }
 
-    public static String encrypt(String strToEncrypt) {
+    private static String encrypt(String strToEncrypt, byte[] key) {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             final SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
@@ -66,10 +83,10 @@ public class EncryptionUtils {
         }
     }
 
-    public static String decrypt(String strToDecrypt) {
+    private static String decrypt(String strToDecrypt) {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            final SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+            final SecretKeySpec secretKey = new SecretKeySpec(getKeyFromConfig(), "AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.decodeBase64(strToDecrypt)), Charset.defaultCharset());
         } catch (Exception e) {
@@ -94,11 +111,12 @@ public class EncryptionUtils {
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) {
+        if (args.length != 2) {
             System.exit(1);
         }
-        String passwordTxt = args[0];
-        System.out.println(EncryptionUtils.encrypt(passwordTxt));
+        String password = args[0];
+        String key = args[1];
+        System.out.println(EncryptionUtils.encrypt(password, Base64.decodeBase64(key)));
     }
 
 }
