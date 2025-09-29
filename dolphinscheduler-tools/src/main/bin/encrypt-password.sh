@@ -16,12 +16,13 @@
 # limitations under the License.
 #
 
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <password_to_encrypt>"
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <password_to_encrypt> <key_to_encrypt_password>"
     exit 1
 fi
 
 PASSWORD="$1"
+KEY="$2"
 
 BIN_DIR=$(dirname $0)
 DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd ${BIN_DIR}/../..;pwd)}
@@ -35,4 +36,4 @@ JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
   -cp "$TOOLS_HOME/conf":"$TOOLS_HOME/libs/*" \
-  org.apache.dolphinscheduler.common.utils.EncryptionUtils "$PASSWORD"
+  org.apache.dolphinscheduler.common.utils.EncryptionUtils "$PASSWORD" "$KEY"
