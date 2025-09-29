@@ -37,9 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EncryptionUtils {
 
-    private static final byte[] defaultKey =
-            {0x72, 0x38, 0x61, 0x73, 0x49, 0x73, 0x41, 0x52, 0x22, 0x11, 0x72, 0x65, 0x74,
-                    0x6c, 0x61, 0x49};
     private static final int AES_KEY_LEN = 16; // 128 bit
     private static final int ITERATIONS = 130_000;
 
