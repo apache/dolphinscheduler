@@ -72,6 +72,7 @@
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.19.0</commons-io.version>
+        <commons-cli.version>1.2</commons-cli.version>
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.4.6</clickhouse-jdbc.version>
         <databend-jdbc.version>0.3.9</databend-jdbc.version>
@@ -576,6 +577,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${commons-cli.version}</version>
             </dependency>
 
             <dependency>
