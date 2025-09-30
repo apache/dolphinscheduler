@@ -70,6 +70,11 @@ public interface ITaskExecutor extends ITaskExecutorStateTracker {
     void kill();
 
     /**
+     * finalize the task executor.
+     */
+    void finalizeTask();
+
+    /**
      * Get the EventBus belongs to the task executor.
      */
     TaskExecutorEventBus getTaskExecutorEventBus();

@@ -250,6 +250,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | minio.auth.rootUser | string | `"minioadmin"` | minio username |
 | minio.defaultBuckets | string | `"dolphinscheduler"` | minio default buckets |
 | minio.enabled | bool | `true` | Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production. |
+| minio.image.registry | string | `"docker.io"` |  |
+| minio.image.repository | string | `"bitnamilegacy/minio"` |  |
+| minio.image.tag | string | `"2022.10.29-debian-11-r0"` |  |
 | minio.persistence.enabled | bool | `false` | Set minio.persistence.enabled to true to mount a new volume for internal minio |
 | mysql.auth.database | string | `"dolphinscheduler"` | mysql database |
 | mysql.auth.params | string | `"characterEncoding=utf8"` | mysql params |
@@ -257,11 +260,17 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | mysql.auth.username | string | `"ds"` | mysql username |
 | mysql.driverClassName | string | `"com.mysql.cj.jdbc.Driver"` | mysql driverClassName |
 | mysql.enabled | bool | `false` | If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL |
+| mysql.image.registry | string | `"docker.io"` |  |
+| mysql.image.repository | string | `"bitnamilegacy/mysql"` |  |
+| mysql.image.tag | string | `"8.0.31-debian-11-r0"` |  |
 | mysql.primary.persistence.enabled | bool | `false` | Set mysql.primary.persistence.enabled to true to mount a new volume for internal MySQL |
 | mysql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | mysql.primary.persistence.storageClass | string | `"-"` | MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
 | postgresql.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName for internal PostgreSQL |
 | postgresql.enabled | bool | `true` | If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL |
+| postgresql.image.registry | string | `"docker.io"` |  |
+| postgresql.image.repository | string | `"bitnamilegacy/postgresql"` |  |
+| postgresql.image.tag | string | `"11.11.0"` |  |
 | postgresql.params | string | `"characterEncoding=utf8"` | The params for internal PostgreSQL |
 | postgresql.persistence.enabled | bool | `false` | Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL |
 | postgresql.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
@@ -361,6 +370,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.updateStrategy | object | `{"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
+| zookeeper.image.registry | string | `"docker.io"` |  |
+| zookeeper.image.repository | string | `"bitnamilegacy/zookeeper"` |  |
+| zookeeper.image.tag | string | `"3.8.4"` |  |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
