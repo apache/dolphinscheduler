@@ -26,11 +26,18 @@ import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 
+import java.util.EnumSet;
+
 public class ZookeeperTreeCacheListenerAdapter implements TreeCacheListener {
 
     private final String watchedPath;
 
     private final SubscribeListener listener;
+
+    private static final EnumSet<TreeCacheEvent.Type> NODE_CHANGE_EVENTS =
+            EnumSet.of(TreeCacheEvent.Type.NODE_REMOVED,
+                    TreeCacheEvent.Type.NODE_UPDATED,
+                    TreeCacheEvent.Type.NODE_ADDED);
 
     public ZookeeperTreeCacheListenerAdapter(final String watchedPath, final SubscribeListener listener) {
         this.listener = listener;
@@ -39,6 +46,11 @@ public class ZookeeperTreeCacheListenerAdapter implements TreeCacheListener {
 
     @Override
     public void childEvent(final CuratorFramework curatorFramework, final TreeCacheEvent event) {
+        // When the event type is INITIALIZED or CONNECTION_SUSPENDED or CONNECTION_LOST or CONNECTION_RECONNECTED, the
+        // data in the event is null by default
+        if (!isNodeChangeEvent(event)) {
+            return;
+        }
         final String eventPath = event.getData().getPath();
         switch (listener.getSubscribeScope()) {
             case PATH_ONLY:
@@ -57,6 +69,10 @@ public class ZookeeperTreeCacheListenerAdapter implements TreeCacheListener {
             default:
                 throw new RegistryException("Unknown event scope: " + listener.getSubscribeScope());
         }
+    }
+
+    private boolean isNodeChangeEvent(TreeCacheEvent event) {
+        return NODE_CHANGE_EVENTS.contains(event.getType());
     }
 
     private Event convertToEvent(TreeCacheEvent event, String watchedPath) {

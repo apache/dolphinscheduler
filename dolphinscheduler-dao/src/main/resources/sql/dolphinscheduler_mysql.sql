@@ -848,7 +848,8 @@ CREATE TABLE `t_ds_schedules` (
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_workflow_definition_code` (`workflow_definition_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

@@ -33,13 +33,19 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
