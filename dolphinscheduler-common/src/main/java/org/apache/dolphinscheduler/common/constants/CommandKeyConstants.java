@@ -37,7 +37,7 @@ public class CommandKeyConstants {
 
     public static final String CMD_PARAM_SUB_WORKFLOW_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE = "processDefinitionCode";
+    public static final String CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE = "workflowDefinitionCode";
 
     public static final String CMD_PARAM_START_NODES = "StartNodeList";
 
