@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -79,12 +80,10 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
     private final UsersService usersService;
     private final ApiConfig apiConfig;
 
-    private static final String SANITIZE_REGEX = "[\n\r\t]";
     private static final String EMAIL_ATTRIBUTE = "email";
     private static final String STATE_DELIMITER = ":";
     private static final int STATE_PARTS_COUNT = 2;
     private static final int PROVIDER_ID_INDEX = 0;
-    private static final String SANITIZE_REPLACEMENT = "_";
 
     private final Map<String, OIDCProviderMetadata> providerMetadataCache = new ConcurrentHashMap<>();
 
@@ -111,20 +110,20 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
 
             if (originalState == null || !MessageDigest.isEqual(originalState.getBytes(), state.getBytes())) {
                 log.error("State validation failed. Expected: {}, Actual: {}", originalState,
-                        sanitizeForLogging(state));
+                        RegexUtils.escapeNRT(state));
                 return null;
             }
 
             String[] stateParts = state.split(STATE_DELIMITER, STATE_PARTS_COUNT);
             if (stateParts.length != STATE_PARTS_COUNT) {
-                log.error("Invalid state format: {}", sanitizeForLogging(state));
+                log.error("Invalid state format: {}", RegexUtils.escapeNRT(state));
                 return null;
             }
 
             String providerId = stateParts[PROVIDER_ID_INDEX];
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
             if (providerConfig == null) {
-                log.error("Provider not found: {}", sanitizeForLogging(providerId));
+                log.error("Provider not found: {}", RegexUtils.escapeNRT(providerId));
                 return null;
             }
 
@@ -138,10 +137,19 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             List<String> groups = extractGroups(providerConfig, idTokenClaims, userInfo);
 
             User user = usersService.getUserByUserName(username);
+            UserType userType = determineUserType(groups);
 
-            if (user == null && oidcConfig.getUser().isAutoCreate()) {
-                UserType userType = determineUserType(groups);
-                user = usersService.createUser(userType, username, email);
+            if (user == null) {
+                if (oidcConfig.getUser().isAutoCreate()) {
+                    user = usersService.createUser(userType, username, email);
+                }
+            } else {
+                // If user exists, check if the role needs to be updated
+                if (user.getUserType() != userType) {
+                    user.setUserType(userType);
+                    // Use the new, simpler updateUser method
+                    usersService.updateUser(user);
+                }
             }
 
             return user;
@@ -160,7 +168,7 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             OidcProviderConfig providerConfig = oidcConfig.getProviders().get(providerId);
 
             if (providerConfig == null) {
-                log.error("Provider not found: {}", sanitizeForLogging(providerId));
+                log.error("Provider not found: {}", RegexUtils.escapeNRT(providerId));
                 return null;
             }
 
@@ -392,12 +400,5 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
             return new Scope("openid", "profile", EMAIL_ATTRIBUTE);
         }
         return Scope.parse(scopeString);
-    }
-
-    private String sanitizeForLogging(String input) {
-        if (input == null) {
-            return null;
-        }
-        return input.replaceAll(SANITIZE_REGEX, SANITIZE_REPLACEMENT);
     }
 }

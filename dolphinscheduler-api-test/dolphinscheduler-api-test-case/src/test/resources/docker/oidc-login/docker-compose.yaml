@@ -20,52 +20,52 @@ version: "3.8"
 services:
   dolphinscheduler:
     image: apache/dolphinscheduler-standalone-server:ci
-    platform: linux/arm64
+    environment:
+      WORKER_TENANT_AUTO_CREATE: "true"
     ports:
       - "12345:12345"
-    environment:
-      - SECURITY_AUTHENTICATION_TYPE=OIDC
-      - SECURITY_AUTHENTICATION_OIDC_ENABLE=true
-      - API_BASE_URL=http://localhost:12345/dolphinscheduler
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_DISPLAY-NAME=Login with Keycloak
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_ISSUER-URI=http://keycloak:8080/realms/dolphinscheduler
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_CLIENT-ID=dolphinscheduler-client
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_CLIENT-SECRET=dolphinscheduler-client-secret
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_SCOPE=openid,profile,email,groups
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_USER-NAME-ATTRIBUTE=preferred_username
-      - SECURITY_AUTHENTICATION_OIDC_PROVIDERS_KEYCLOAK_GROUPS-CLAIM=groups
-      - SECURITY_AUTHENTICATION_OIDC_USER_AUTO-CREATE=true
-      - SECURITY_AUTHENTICATION_OIDC_USER_DEFAULT-TENANT-CODE=default
-      - SECURITY_AUTHENTICATION_OIDC_USER_DEFAULT-QUEUE=default
-      - SECURITY_AUTHENTICATION_OIDC_USER_ADMIN-GROUP-MAPPING_0=dolphinscheduler-admins
-    depends_on:
-      keycloak:
-        condition: service_healthy
+    volumes:
+      - ./application.yaml:/opt/dolphinscheduler/standalone-server/conf/application.yaml
+      # Mount the wait script into the container and make it read-only
+      - ./wait-and-start-ds.sh:/wait-and-start-ds.sh
+    # Override the default entrypoint to run our script
+    entrypoint:
+      - /bin/bash
+      - -c
+      - "chmod +x /wait-and-start-ds.sh && /wait-and-start-ds.sh"
+    networks:
+      - api-test
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:12345/dolphinscheduler/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 180s
+      test: ["CMD","bash","-c","{ printf 'GET /dolphinscheduler/actuator/health HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&0; grep -q 'HTTP/1.1 200'; } 0<>/dev/tcp/localhost/12345" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+    depends_on:
+      - keycloak   # No health dependency; we gate startup with the wait script
 
   keycloak:
+    hostname: keycloak
     image: quay.io/keycloak/keycloak:22.0.1
-    platform: linux/arm64
-    command: start-dev --import-realm
-    volumes:
-      - ./realm-export.json:/opt/keycloak/data/import/realm.json
+    ports:
+      - "8080:8080"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HTTP_ENABLED: 'true'
-      KC_HOSTNAME_STRICT: 'false'
-      KC_HOSTNAME_STRICT_HTTPS: 'false'
-      KC_HOSTNAME_URL: http://localhost:8081
-    ports:
-      - "8081:8080" # Using 8081 to avoid conflicts
+      KC_PROXY: edge
+    command: ["start-dev", "--import-realm"]
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    networks:
+      - api-test
+    tty: true
+    stdin_open: true
+    restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      # Wait until the dolphinscheduler realm OIDC metadata is served (implies import done)
+      test: ["CMD","bash","-c","{ printf 'GET /realms/dolphinscheduler/.well-known/openid-configuration HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&0; grep -q 'HTTP/1.1 200'; } 0<>/dev/tcp/localhost/8080"]
       interval: 5s
-      timeout: 10s
-      retries: 40
-      start_period: 180s
+      timeout: 60s
+      retries: 120
+
+networks:
+  api-test:

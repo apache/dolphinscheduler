@@ -17,15 +17,36 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
+import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
+import org.apache.dolphinscheduler.api.test.entity.GetUserInfoResponseData;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.pages.OidcLoginPage;
+import org.apache.dolphinscheduler.api.test.pages.security.UserPage;
+import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.Dns;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
@@ -36,6 +57,41 @@ import org.junit.jupiter.api.Test;
 public class OidcLoginAPITest {
 
     private static final String PROVIDER_ID = "keycloak";
+
+    private enum HtmlEntity {
+
+        AMP("&amp;", "&"),
+        LT("&lt;", "<"),
+        GT("&gt;", ">"),
+        QUOT("&quot;", "\""),
+        APOS("&#39;", "'");
+
+        private final String encoded;
+        private final String decoded;
+
+        HtmlEntity(String encoded, String decoded) {
+            this.encoded = encoded;
+            this.decoded = decoded;
+        }
+    }
+
+    private enum Delimiter {
+
+        QUERY_START("?"),
+        PARAM_SEP("&"),
+        KEY_VALUE_SEP("=");
+
+        private final String value;
+
+        Delimiter(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
 
     @Test
     @Order(1)
@@ -111,7 +167,201 @@ public class OidcLoginAPITest {
     public void testLoginEndpointDisabledInOidcMode() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         HttpResponse response = oidcLoginPage.loginWithPassword("anyuser", "anypassword");
-        // In OIDC mode, /login endpoint should not allow password login
-        Assertions.assertEquals(401, response.getStatusCode());
+        // In OIDC mode, the /login endpoint is handled by the OidcAuthenticator,
+        // which returns a username/password error with a 200 status.
+        Assertions.assertEquals(200, response.getStatusCode());
+        Assertions.assertEquals(10013, response.getBody().getCode(), "Expected 'user name or password error'");
+    }
+
+    @Test
+    @Order(20)
+    public void testGeneralUserLoginSuccess() throws Exception {
+        String sessionId = doOidcLogin("general_user", "password");
+        Assertions.assertNotNull(sessionId);
+
+        // Verify user info and user type = GENERAL_USER
+        UserPage userPage = new UserPage();
+        HttpResponse getUserInfoHttpResponse = userPage.getUserInfo(sessionId);
+        GetUserInfoResponseData userInfo =
+                JSONUtils.convertValue(getUserInfoHttpResponse.getBody().getData(), GetUserInfoResponseData.class);
+        Assertions.assertEquals("general_user", userInfo.getUserName());
+        Assertions.assertEquals("GENERAL_USER", userInfo.getUserType().name());
+    }
+
+    @Test
+    @Order(30)
+    public void testLoginFailedWrongPassword() throws Exception {
+        // Expect the callback not to yield a session id when wrong password
+        String sessionId = doOidcLoginExpectingFailure("general_user", "wrong");
+        Assertions.assertNull(sessionId);
+    }
+
+    @SneakyThrows
+    private String doOidcLogin(String username, String password) {
+        OkHttpClient http = buildClientWithCookieJar();
+
+        // 1) Kick off OIDC login to get Keycloak Auth URL and capture DS session cookie (JSESSIONID)
+        String authorizeUrl = getAuthorizationRedirect(http);
+
+        // 2) Fetch Keycloak login page and extract form action
+        String loginAction = fetchLoginFormAction(http, authorizeUrl);
+
+        // 3) Submit credentials to Keycloak
+        String callbackUrl = submitCredentialsAndGetCallback(http, loginAction, username, password);
+
+        // 4) Call DS callback with the same JSESSIONID cookie and capture redirect with sessionId
+        return callDsCallbackAndExtractSessionId(http, callbackUrl);
+    }
+
+    @SneakyThrows
+    private String doOidcLoginExpectingFailure(String username, String password) {
+        OkHttpClient http = buildClientWithCookieJar();
+        String authorizeUrl = getAuthorizationRedirect(http);
+        String loginAction = fetchLoginFormAction(http, authorizeUrl);
+        String callbackUrl = submitCredentialsAndGetCallback(http, loginAction, username, password);
+        if (callbackUrl == null) {
+            return null;
+        }
+        String sessionId = callDsCallbackAndExtractSessionId(http, callbackUrl);
+        return sessionId;
+    }
+
+    private OkHttpClient buildClientWithCookieJar() {
+        return new OkHttpClient.Builder()
+                .followRedirects(false)
+                // Map docker-compose service hostname 'keycloak' to localhost since the test runs on host network
+                .dns(hostname -> {
+                    if ("keycloak".equalsIgnoreCase(hostname)) {
+                        try {
+                            return Collections.singletonList(InetAddress.getByName("127.0.0.1"));
+                        } catch (UnknownHostException e) {
+                            return Dns.SYSTEM.lookup(hostname);
+                        }
+                    }
+                    return Dns.SYSTEM.lookup(hostname);
+                })
+                .cookieJar(new CookieJar() {
+
+                    private final List<Cookie> cookieStore = new ArrayList<>();
+
+                    @Override
+                    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+                        cookieStore.addAll(cookies);
+                    }
+
+                    @Override
+                    public List<Cookie> loadForRequest(HttpUrl url) {
+                        return cookieStore;
+                    }
+                })
+                .build();
+    }
+
+    @SneakyThrows
+    private String getAuthorizationRedirect(OkHttpClient http) {
+        String kickOffUrl = Constants.DOLPHINSCHEDULER_API_URL + "/oauth2/authorization/" + PROVIDER_ID;
+        Request req = new Request.Builder().url(kickOffUrl).get().build();
+        try (Response resp = http.newCall(req).execute()) {
+            Assertions.assertEquals(302, resp.code(), "DS should redirect to OIDC provider");
+            String location = resp.header("Location");
+            log.info("Authorization redirect location: {}", location);
+            return location;
+        }
+    }
+
+    @SneakyThrows
+    private String fetchLoginFormAction(OkHttpClient http, String authorizationUrl) {
+        Request req = new Request.Builder().url(authorizationUrl).get().build();
+        try (Response resp = http.newCall(req).execute()) {
+            Assertions.assertEquals(200, resp.code(), "Should load Keycloak login page");
+            String html = resp.body() != null ? resp.body().string() : "";
+            String action = extractBetween(html, "action=\"", "\"");
+            // Keycloak template encodes '&' as '&amp;' in action attribute; we need to unescape it
+            if (action != null) {
+                action = htmlUnescape(action);
+            }
+            log.info("Keycloak login form action (decoded): {}", action);
+            Assertions.assertNotNull(action, "Cannot find Keycloak login form action");
+            return action.startsWith("http") ? action : "http://" + HttpUrl.parse(authorizationUrl).host() + action;
+        }
+    }
+
+    private String htmlUnescape(String input) {
+        if (input == null) {
+            return null;
+        }
+        String result = input;
+        for (HtmlEntity entity : HtmlEntity.values()) {
+            result = result.replace(entity.encoded, entity.decoded);
+        }
+        return result;
+    }
+
+    @SneakyThrows
+    private String submitCredentialsAndGetCallback(OkHttpClient http, String loginAction, String username,
+                                                   String password) {
+        RequestBody form = new FormBody.Builder()
+                .add("username", username)
+                .add("password", password)
+                .add("credentialId", "")
+                .build();
+        Request req = new Request.Builder().url(loginAction).post(form).build();
+        try (Response resp = http.newCall(req).execute()) {
+            if (resp.code() != 302) {
+                // wrong password usually returns 200 with error page
+                log.warn("Login did not redirect, likely wrong password. Code={}", resp.code());
+                return null;
+            }
+            String loc = resp.header("Location");
+            log.info("Post-login redirect location: {}", loc);
+            return loc;
+        }
+    }
+
+    private String callDsCallbackAndExtractSessionId(OkHttpClient http, String callbackUrl) throws IOException {
+        if (callbackUrl == null) {
+            return null;
+        }
+        Request req = new Request.Builder().url(callbackUrl).get().build();
+        try (Response resp = http.newCall(req).execute()) {
+            // DS will 302 to UI with sessionId
+            if (resp.code() != 302) {
+                log.warn("DS callback did not redirect to UI. Code={}", resp.code());
+                return null;
+            }
+            String finalLocation = resp.header("Location");
+            log.info("Final redirect location: {}", finalLocation);
+            return parseQueryParam(finalLocation, "sessionId");
+        }
+    }
+
+    private String extractBetween(String text, String start, String end) {
+        int s = text.indexOf(start);
+        if (s < 0)
+            return null;
+        s += start.length();
+        int e = text.indexOf(end, s);
+        if (e < 0)
+            return null;
+        return text.substring(s, e);
+    }
+
+    private String parseQueryParam(String url, String name) {
+        final int KEY_VALUE_PAIR_LENGTH = 2;
+        final int KEY_INDEX = 0;
+        final int VALUE_INDEX = 1;
+
+        int qIndex = url.indexOf(Delimiter.QUERY_START.toString());
+        if (qIndex < 0) {
+            return null;
+        }
+        String query = url.substring(qIndex + 1);
+        for (String p : query.split(Delimiter.PARAM_SEP.toString())) {
+            String[] kv = p.split(Delimiter.KEY_VALUE_SEP.toString(), KEY_VALUE_PAIR_LENGTH);
+            if (kv.length == KEY_VALUE_PAIR_LENGTH && kv[KEY_INDEX].equals(name)) {
+                return URLDecoder.decode(kv[VALUE_INDEX], StandardCharsets.UTF_8);
+            }
+        }
+        return null;
     }
 }

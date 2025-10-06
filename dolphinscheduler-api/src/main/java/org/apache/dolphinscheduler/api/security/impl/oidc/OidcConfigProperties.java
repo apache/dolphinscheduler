@@ -22,6 +22,7 @@ import java.util.Map;
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,5 +35,7 @@ public class OidcConfigProperties {
 
     private boolean enable = false;
     private Map<String, OidcProviderConfig> providers;
+
+    @NestedConfigurationProperty
     private OidcUserConfig user = new OidcUserConfig();
 }
