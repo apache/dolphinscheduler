@@ -26,7 +26,7 @@ services:
       - "12345:12345"
     volumes:
       - ./application.yaml:/opt/dolphinscheduler/standalone-server/conf/application.yaml
-      # Mount the wait script into the container and make it read-only
+      # Mount the wait script into the container
       - ./wait-and-start-ds.sh:/wait-and-start-ds.sh
     # Override the default entrypoint to run our script
     entrypoint:

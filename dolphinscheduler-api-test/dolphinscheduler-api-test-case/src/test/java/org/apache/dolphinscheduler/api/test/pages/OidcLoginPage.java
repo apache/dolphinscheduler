@@ -34,7 +34,6 @@ import okhttp3.Response;
 
 public final class OidcLoginPage {
 
-    // This client is configured to NOT follow redirects, which is required for these tests.
     private final OkHttpClient client = new OkHttpClient.Builder()
             .followRedirects(false)
             .build();
@@ -55,7 +54,6 @@ public final class OidcLoginPage {
 
             HttpResponseBody responseData = null;
             if (response.body() != null) {
-                // Only try to parse JSON if the content type is JSON
                 String contentType = response.header("Content-Type");
                 if (contentType != null && contentType.contains("application/json")) {
                     responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);

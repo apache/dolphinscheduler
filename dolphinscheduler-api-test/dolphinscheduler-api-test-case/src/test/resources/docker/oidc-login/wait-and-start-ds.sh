@@ -19,12 +19,12 @@ set -euo pipefail
 
 echo "Container started. Waiting for 40 seconds to allow Keycloak to initialize..."
 
-# Wait for 40 seconds
+# Wait for 60 seconds
 sleep 60
 
 echo "Wait finished. Preparing to start DolphinScheduler standalone server..."
 
-# Ensure the start script is executable (fixes: Permission denied)
+# Ensure the start script is executable
 if [ ! -x /opt/dolphinscheduler/standalone-server/bin/start.sh ]; then
   echo "start.sh not executable. Applying chmod +x ..."
   chmod +x /opt/dolphinscheduler/standalone-server/bin/start.sh || {
@@ -34,18 +34,13 @@ if [ ! -x /opt/dolphinscheduler/standalone-server/bin/start.sh ]; then
   }
 fi
 
-# Show final permissions for debugging
 ls -l /opt/dolphinscheduler/standalone-server/bin/start.sh || true
 
 echo "Starting DolphinScheduler..."
 /opt/dolphinscheduler/standalone-server/bin/start.sh
 
-# Keep container alive if the start script backgrounds the process
-# so that Docker healthcheck can poll the API endpoint.
-# If the process runs in foreground this loop will exit immediately when it ends.
 while true; do
   sleep 5
-  # Optionally check if main java process exists (best-effort)
   if ! pgrep -f 'org.apache.dolphinscheduler' >/dev/null 2>&1; then
     echo "Warning: DolphinScheduler process not detected yet (or already exited)." >&2
   fi

@@ -167,10 +167,22 @@ public class OidcLoginAPITest {
     public void testLoginEndpointDisabledInOidcMode() {
         OidcLoginPage oidcLoginPage = new OidcLoginPage();
         HttpResponse response = oidcLoginPage.loginWithPassword("anyuser", "anypassword");
-        // In OIDC mode, the /login endpoint is handled by the OidcAuthenticator,
-        // which returns a username/password error with a 200 status.
         Assertions.assertEquals(200, response.getStatusCode());
         Assertions.assertEquals(10013, response.getBody().getCode(), "Expected 'user name or password error'");
+    }
+
+    @Test
+    @Order(10)
+    public void testAdminUserLoginSuccess() throws Exception {
+        String sessionId = doOidcLogin("admin_user", "password");
+        Assertions.assertNotNull(sessionId);
+
+        UserPage userPage = new UserPage();
+        HttpResponse getUserInfoHttpResponse = userPage.getUserInfo(sessionId);
+        GetUserInfoResponseData userInfo =
+                JSONUtils.convertValue(getUserInfoHttpResponse.getBody().getData(), GetUserInfoResponseData.class);
+        Assertions.assertEquals("admin_user", userInfo.getUserName());
+        Assertions.assertEquals("ADMIN_USER", userInfo.getUserType().name());
     }
 
     @Test
@@ -179,7 +191,6 @@ public class OidcLoginAPITest {
         String sessionId = doOidcLogin("general_user", "password");
         Assertions.assertNotNull(sessionId);
 
-        // Verify user info and user type = GENERAL_USER
         UserPage userPage = new UserPage();
         HttpResponse getUserInfoHttpResponse = userPage.getUserInfo(sessionId);
         GetUserInfoResponseData userInfo =
@@ -191,7 +202,6 @@ public class OidcLoginAPITest {
     @Test
     @Order(30)
     public void testLoginFailedWrongPassword() throws Exception {
-        // Expect the callback not to yield a session id when wrong password
         String sessionId = doOidcLoginExpectingFailure("general_user", "wrong");
         Assertions.assertNull(sessionId);
     }
@@ -200,16 +210,12 @@ public class OidcLoginAPITest {
     private String doOidcLogin(String username, String password) {
         OkHttpClient http = buildClientWithCookieJar();
 
-        // 1) Kick off OIDC login to get Keycloak Auth URL and capture DS session cookie (JSESSIONID)
         String authorizeUrl = getAuthorizationRedirect(http);
 
-        // 2) Fetch Keycloak login page and extract form action
         String loginAction = fetchLoginFormAction(http, authorizeUrl);
 
-        // 3) Submit credentials to Keycloak
         String callbackUrl = submitCredentialsAndGetCallback(http, loginAction, username, password);
 
-        // 4) Call DS callback with the same JSESSIONID cookie and capture redirect with sessionId
         return callDsCallbackAndExtractSessionId(http, callbackUrl);
     }
 
@@ -229,7 +235,6 @@ public class OidcLoginAPITest {
     private OkHttpClient buildClientWithCookieJar() {
         return new OkHttpClient.Builder()
                 .followRedirects(false)
-                // Map docker-compose service hostname 'keycloak' to localhost since the test runs on host network
                 .dns(hostname -> {
                     if ("keycloak".equalsIgnoreCase(hostname)) {
                         try {
@@ -276,7 +281,6 @@ public class OidcLoginAPITest {
             Assertions.assertEquals(200, resp.code(), "Should load Keycloak login page");
             String html = resp.body() != null ? resp.body().string() : "";
             String action = extractBetween(html, "action=\"", "\"");
-            // Keycloak template encodes '&' as '&amp;' in action attribute; we need to unescape it
             if (action != null) {
                 action = htmlUnescape(action);
             }
@@ -308,7 +312,6 @@ public class OidcLoginAPITest {
         Request req = new Request.Builder().url(loginAction).post(form).build();
         try (Response resp = http.newCall(req).execute()) {
             if (resp.code() != 302) {
-                // wrong password usually returns 200 with error page
                 log.warn("Login did not redirect, likely wrong password. Code={}", resp.code());
                 return null;
             }
@@ -324,7 +327,6 @@ public class OidcLoginAPITest {
         }
         Request req = new Request.Builder().url(callbackUrl).get().build();
         try (Response resp = http.newCall(req).execute()) {
-            // DS will 302 to UI with sessionId
             if (resp.code() != 302) {
                 log.warn("DS callback did not redirect to UI. Code={}", resp.code());
                 return null;

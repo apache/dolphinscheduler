@@ -144,11 +144,9 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
                     user = usersService.createUser(userType, username, email);
                 }
             } else {
-                // If user exists, check if the role needs to be updated
                 if (user.getUserType() != userType) {
                     user.setUserType(userType);
-                    // Use the new, simpler updateUser method
-                    usersService.updateUser(user);
+                    user = usersService.updateUser(user);
                 }
             }
 
