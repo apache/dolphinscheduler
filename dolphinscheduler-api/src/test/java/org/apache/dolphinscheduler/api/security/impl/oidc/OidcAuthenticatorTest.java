@@ -24,7 +24,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.nimbusds.jwt.JWT;
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -62,9 +61,11 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenErrorResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPRequest;
@@ -82,7 +83,6 @@ import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
-import com.nimbusds.oauth2.sdk.Scope;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension.class)
@@ -865,18 +865,21 @@ public class OidcAuthenticatorTest {
                 "\"id_token_signing_alg_values_supported\":[\"RS256\"]" +
                 "}";
 
-        try (MockedConstruction<HTTPRequest> requestConstruction = Mockito.mockConstruction(HTTPRequest.class,
-                (mock, context) -> {
-                    HTTPResponse httpResponse = new HTTPResponse(200);
-                    httpResponse.setContent(metadataJson);
-                    when(mock.send()).thenReturn(httpResponse);
-                })) {
+        try (
+                MockedConstruction<HTTPRequest> requestConstruction = Mockito.mockConstruction(HTTPRequest.class,
+                        (mock, context) -> {
+                            HTTPResponse httpResponse = new HTTPResponse(200);
+                            httpResponse.setContent(metadataJson);
+                            when(mock.send()).thenReturn(httpResponse);
+                        })) {
             String url1 = oidcAuthenticator.getSignInUrl(state);
             Assertions.assertNotNull(url1, "First call should fetch metadata and produce URL");
-            Assertions.assertEquals(1, requestConstruction.constructed().size(), "Should have constructed exactly one HTTPRequest");
+            Assertions.assertEquals(1, requestConstruction.constructed().size(),
+                    "Should have constructed exactly one HTTPRequest");
             String url2 = oidcAuthenticator.getSignInUrl(state);
             Assertions.assertNotNull(url2, "Second call should use cached metadata");
-            Assertions.assertEquals(1, requestConstruction.constructed().size(), "Cache should prevent new HTTPRequest construction");
+            Assertions.assertEquals(1, requestConstruction.constructed().size(),
+                    "Cache should prevent new HTTPRequest construction");
         }
     }
 
@@ -887,21 +890,24 @@ public class OidcAuthenticatorTest {
         mockOidcConfiguration(providerId, true, Collections.emptyList());
         injectMockMetadataIntoCache();
 
-        try (MockedStatic<OIDCTokenResponseParser> tokenParserMock = Mockito.mockStatic(OIDCTokenResponseParser.class);
-             MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
-                     (mock, context) -> {
-                         HTTPRequest httpRequest = mock(HTTPRequest.class);
-                         HTTPResponse httpResponse = mock(HTTPResponse.class);
-                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
-                         when(httpRequest.send()).thenReturn(httpResponse);
-                     });
-             MockedConstruction<UserInfoRequest> userInfoRequestConstruction = Mockito.mockConstruction(UserInfoRequest.class,
-                     (mock, context) -> {
-                         HTTPRequest httpRequest = mock(HTTPRequest.class);
-                         HTTPResponse httpResponse = mock(HTTPResponse.class);
-                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
-                         when(httpRequest.send()).thenReturn(httpResponse);
-                     })) {
+        try (
+                MockedStatic<OIDCTokenResponseParser> tokenParserMock =
+                        Mockito.mockStatic(OIDCTokenResponseParser.class);
+                MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
+                        (mock, context) -> {
+                            HTTPRequest httpRequest = mock(HTTPRequest.class);
+                            HTTPResponse httpResponse = mock(HTTPResponse.class);
+                            when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                            when(httpRequest.send()).thenReturn(httpResponse);
+                        });
+                MockedConstruction<UserInfoRequest> userInfoRequestConstruction =
+                        Mockito.mockConstruction(UserInfoRequest.class,
+                                (mock, context) -> {
+                                    HTTPRequest httpRequest = mock(HTTPRequest.class);
+                                    HTTPResponse httpResponse = mock(HTTPResponse.class);
+                                    when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                                    when(httpRequest.send()).thenReturn(httpResponse);
+                                })) {
 
             OIDCTokenResponse tokenResponse = mock(OIDCTokenResponse.class);
             when(tokenResponse.indicatesSuccess()).thenReturn(true);
@@ -910,7 +916,8 @@ public class OidcAuthenticatorTest {
             when(badJwt.getJWTClaimsSet()).thenThrow(new ParseException("bad token", 0));
             when(oidcTokens.getIDToken()).thenReturn(badJwt);
             when(tokenResponse.getOIDCTokens()).thenReturn(oidcTokens);
-            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class))).thenReturn(tokenResponse);
+            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class)))
+                    .thenReturn(tokenResponse);
 
             User result = oidcAuthenticator.login(state, code);
             Assertions.assertNull(result, "Login should fail on ID token parse error");
@@ -924,21 +931,24 @@ public class OidcAuthenticatorTest {
         mockOidcConfiguration(providerId, true, Collections.emptyList());
         injectMockMetadataIntoCache();
 
-        try (MockedStatic<OIDCTokenResponseParser> tokenParserMock = Mockito.mockStatic(OIDCTokenResponseParser.class);
-             MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
-                     (mock, context) -> {
-                         HTTPRequest httpRequest = mock(HTTPRequest.class);
-                         HTTPResponse httpResponse = mock(HTTPResponse.class);
-                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
-                         when(httpRequest.send()).thenReturn(httpResponse);
-                     });
-             MockedConstruction<UserInfoRequest> userInfoRequestConstruction = Mockito.mockConstruction(UserInfoRequest.class,
-                     (mock, context) -> {
-                         HTTPRequest httpRequest = mock(HTTPRequest.class);
-                         HTTPResponse httpResponse = mock(HTTPResponse.class);
-                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
-                         when(httpRequest.send()).thenReturn(httpResponse);
-                     })) {
+        try (
+                MockedStatic<OIDCTokenResponseParser> tokenParserMock =
+                        Mockito.mockStatic(OIDCTokenResponseParser.class);
+                MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
+                        (mock, context) -> {
+                            HTTPRequest httpRequest = mock(HTTPRequest.class);
+                            HTTPResponse httpResponse = mock(HTTPResponse.class);
+                            when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                            when(httpRequest.send()).thenReturn(httpResponse);
+                        });
+                MockedConstruction<UserInfoRequest> userInfoRequestConstruction =
+                        Mockito.mockConstruction(UserInfoRequest.class,
+                                (mock, context) -> {
+                                    HTTPRequest httpRequest = mock(HTTPRequest.class);
+                                    HTTPResponse httpResponse = mock(HTTPResponse.class);
+                                    when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                                    when(httpRequest.send()).thenReturn(httpResponse);
+                                })) {
 
             OIDCTokenResponse tokenResponse = mock(OIDCTokenResponse.class);
             when(tokenResponse.indicatesSuccess()).thenReturn(true);
@@ -955,7 +965,8 @@ public class OidcAuthenticatorTest {
             PlainJWT idToken = new PlainJWT(claimsSet);
             when(oidcTokens.getIDToken()).thenReturn(idToken);
             when(tokenResponse.getOIDCTokens()).thenReturn(oidcTokens);
-            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class))).thenReturn(tokenResponse);
+            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class)))
+                    .thenReturn(tokenResponse);
 
             User result = oidcAuthenticator.login(state, code);
             Assertions.assertNull(result, "Login should fail due to missing expiration claim");
@@ -988,7 +999,8 @@ public class OidcAuthenticatorTest {
         IDTokenClaimsSet idTokenClaims = mock(IDTokenClaimsSet.class);
         UserInfo userInfo = null;
         @SuppressWarnings("unchecked")
-        List<String> groups = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims, userInfo);
+        List<String> groups =
+                (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims, userInfo);
         Assertions.assertTrue(groups.isEmpty(), "Groups should be empty when groupsClaim is blank");
     }
 
@@ -1004,7 +1016,8 @@ public class OidcAuthenticatorTest {
         UserInfo userInfo = new UserInfo(new Subject("sub"));
         userInfo.setClaim("groups", "still-not-a-list");
         @SuppressWarnings("unchecked")
-        List<String> groups = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims, userInfo);
+        List<String> groups =
+                (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims, userInfo);
         Assertions.assertTrue(groups.isEmpty(), "Groups should be empty when claims are not list types");
     }
 

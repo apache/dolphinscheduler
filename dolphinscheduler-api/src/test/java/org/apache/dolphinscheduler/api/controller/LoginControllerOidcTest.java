@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,6 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
 
         when(oidcAuthenticator.getSignInUrl(anyString())).thenReturn(authUrl);
 
-        // simulate valid providerId in config
         Map<String, OidcProviderConfig> providers = new HashMap<>();
         providers.put(providerId, new OidcProviderConfig());
         when(oidcConfigProperties.getProviders()).thenReturn(providers);
@@ -159,7 +159,6 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
     public void testRedirectToOidc_withAuthenticatorError() throws Exception {
         when(oidcAuthenticator.getSignInUrl(anyString())).thenReturn(null);
 
-        // simulate valid providerId in config
         Map<String, OidcProviderConfig> providers = new HashMap<>();
         providers.put(providerId, new OidcProviderConfig());
         when(oidcConfigProperties.getProviders()).thenReturn(providers);
@@ -172,7 +171,6 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
     @Test
     public void testRedirectToOidc_withInvalidProviderId() throws Exception {
         String invalidProviderId = "invalid";
-        // no providers in config
         when(oidcConfigProperties.getProviders()).thenReturn(new HashMap<>());
 
         mockMvc.perform(get("/oauth2/authorization/{providerId}", invalidProviderId))
@@ -275,6 +273,38 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
                 .andExpect(redirectedUrl(expectedRedirectUrl));
 
         ReflectionTestUtils.setField(loginController, "authenticator", oidcAuthenticator);
+    }
+
+    @Test
+    public void testHandleOidcCallback_withInvalidState() throws Exception {
+        String code = "testCode";
+        String state = "otherProvider:" + UUID.randomUUID();
+        mockMvc.perform(get("/login/oauth2/code/{providerId}", providerId)
+                .param("code", code)
+                .param("state", state))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/dolphinscheduler/ui/#/login?error=oidc_invalid_state"));
+    }
+
+    @Test
+    public void testRedirectToOidc_StateStoredInSession() throws Exception {
+        String authUrl = "http://oidc-provider.com/auth?state=fakestate";
+        when(oidcAuthenticator.getSignInUrl(anyString())).thenReturn(authUrl);
+        Map<String, OidcProviderConfig> providers = new HashMap<>();
+        providers.put(providerId, new OidcProviderConfig());
+        when(oidcConfigProperties.getProviders()).thenReturn(providers);
+
+        mockMvc.perform(get("/oauth2/authorization/{providerId}", providerId))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl(authUrl))
+                .andExpect(result -> {
+                    javax.servlet.http.HttpSession session = result.getRequest().getSession(false);
+                    Assertions.assertNotNull(session, "Session should exist");
+                    Object storedState = session.getAttribute(Constants.SSO_LOGIN_USER_STATE);
+                    Assertions.assertNotNull(storedState, "State should be stored in session");
+                    Assertions.assertTrue(storedState.toString().startsWith(providerId + ":"),
+                            "Stored state should start with providerId prefix");
+                });
     }
 
     private ResultActions performOidcCallback(String code, String error, String state) throws Exception {

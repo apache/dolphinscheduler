@@ -57,6 +57,7 @@ import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
 import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
@@ -208,8 +209,8 @@ public class OidcAuthenticator extends AbstractSsoAuthenticator {
         }
 
         URI wellKnownURI = new URI(providerConfig.getIssuerUri() + "/.well-known/openid-configuration");
-        com.nimbusds.oauth2.sdk.http.HTTPRequest httpRequest =
-                new com.nimbusds.oauth2.sdk.http.HTTPRequest(com.nimbusds.oauth2.sdk.http.HTTPRequest.Method.GET,
+        HTTPRequest httpRequest =
+                new HTTPRequest(HTTPRequest.Method.GET,
                         wellKnownURI.toURL());
 
         HTTPResponse httpResponse = httpRequest.send();
