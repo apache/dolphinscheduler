@@ -24,6 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nimbusds.jwt.JWT;
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -31,6 +32,9 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -74,9 +78,11 @@ import com.nimbusds.openid.connect.sdk.UserInfoErrorResponse;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
+import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
+import com.nimbusds.oauth2.sdk.Scope;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension.class)
@@ -142,6 +148,7 @@ public class OidcAuthenticatorTest {
         String state = providerId + ":" + UUID.randomUUID();
         User existingUser = new User();
         existingUser.setUserName(username);
+        existingUser.setUserType(UserType.GENERAL_USER);
 
         when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
         when(usersService.getUserByUserName(username)).thenReturn(existingUser);
@@ -249,10 +256,10 @@ public class OidcAuthenticatorTest {
         when(oidcConfigProperties.getProviders()).thenReturn(providers);
 
         OIDCProviderMetadata metadata = mock(OIDCProviderMetadata.class);
-        when(metadata.getTokenEndpointURI()).thenReturn(new java.net.URI("http://fake/token"));
-        when(metadata.getUserInfoEndpointURI()).thenReturn(new java.net.URI("http://fake/userinfo"));
+        when(metadata.getTokenEndpointURI()).thenReturn(new URI("http://fake/token"));
+        when(metadata.getUserInfoEndpointURI()).thenReturn(new URI("http://fake/userinfo"));
         when(metadata.getIssuer()).thenReturn(new Issuer("http://fake-issuer.com"));
-        when(metadata.getAuthorizationEndpointURI()).thenReturn(new java.net.URI("http://fake/authorize"));
+        when(metadata.getAuthorizationEndpointURI()).thenReturn(new URI("http://fake/authorize"));
 
         Field cacheField = OidcAuthenticator.class.getDeclaredField("providerMetadataCache");
         ReflectionUtils.makeAccessible(cacheField);
@@ -283,24 +290,24 @@ public class OidcAuthenticatorTest {
 
     @Test
     public void testParseScope() throws Exception {
-        java.lang.reflect.Method parseScopeMethod =
+        Method parseScopeMethod =
                 OidcAuthenticator.class.getDeclaredMethod("parseScope", String.class);
         ReflectionUtils.makeAccessible(parseScopeMethod);
 
-        com.nimbusds.oauth2.sdk.Scope scope1 =
-                (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, (String) null);
+        Scope scope1 =
+                (Scope) parseScopeMethod.invoke(oidcAuthenticator, (String) null);
         Assertions.assertTrue(scope1.contains("openid"));
         Assertions.assertTrue(scope1.contains("profile"));
         Assertions.assertTrue(scope1.contains("email"));
 
-        com.nimbusds.oauth2.sdk.Scope scope2 =
-                (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, "");
+        Scope scope2 =
+                (Scope) parseScopeMethod.invoke(oidcAuthenticator, "");
         Assertions.assertTrue(scope2.contains("openid"));
         Assertions.assertTrue(scope2.contains("profile"));
         Assertions.assertTrue(scope2.contains("email"));
 
-        com.nimbusds.oauth2.sdk.Scope scope3 =
-                (com.nimbusds.oauth2.sdk.Scope) parseScopeMethod.invoke(oidcAuthenticator, "openid,custom");
+        Scope scope3 =
+                (Scope) parseScopeMethod.invoke(oidcAuthenticator, "openid,custom");
         Assertions.assertTrue(scope3.contains("openid"));
         Assertions.assertTrue(scope3.contains("custom"));
         Assertions.assertFalse(scope3.contains("profile"));
@@ -308,41 +315,32 @@ public class OidcAuthenticatorTest {
 
     @Test
     public void testExtractUsername() throws Exception {
-        java.lang.reflect.Method extractUsernameMethod = OidcAuthenticator.class.getDeclaredMethod(
+        Method extractUsernameMethod = OidcAuthenticator.class.getDeclaredMethod(
                 "extractUsername", OidcProviderConfig.class,
-                com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class,
-                com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
+                IDTokenClaimsSet.class,
+                UserInfo.class);
         ReflectionUtils.makeAccessible(extractUsernameMethod);
 
         OidcProviderConfig providerConfig = new OidcProviderConfig();
         providerConfig.setUserNameAttribute("preferred_username");
 
-        com.nimbusds.oauth2.sdk.id.Subject subject = new com.nimbusds.oauth2.sdk.id.Subject("subject-id");
+        Subject subject = new Subject("subject-id");
 
-        com.nimbusds.jwt.JWTClaimsSet claimsSet1 = new com.nimbusds.jwt.JWTClaimsSet.Builder()
-                .subject(subject.getValue())
-                .issuer("https://issuer.example.com")
-                .audience("client-id")
-                .expirationTime(new Date(System.currentTimeMillis() + 60000))
-                .issueTime(new Date())
-                .claim("preferred_username", "test-username")
-                .build();
-
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 =
-                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        IDTokenClaimsSet idTokenClaims1 =
+                mock(IDTokenClaimsSet.class);
         when(idTokenClaims1.getSubject()).thenReturn(subject);
         when(idTokenClaims1.getClaim("preferred_username")).thenReturn("test-username");
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 =
-                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        UserInfo userInfo1 =
+                new UserInfo(subject);
         userInfo1.setClaim("preferred_username", "user-info-username");
 
         String username1 =
                 (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims1, userInfo1);
         Assertions.assertEquals("test-username", username1);
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 =
-                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        IDTokenClaimsSet idTokenClaims2 =
+                mock(IDTokenClaimsSet.class);
         when(idTokenClaims2.getSubject()).thenReturn(subject);
         when(idTokenClaims2.getClaim("preferred_username")).thenReturn(null);
 
@@ -350,8 +348,8 @@ public class OidcAuthenticatorTest {
                 (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo1);
         Assertions.assertEquals("user-info-username", username2);
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 =
-                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        UserInfo userInfo2 =
+                new UserInfo(subject);
 
         String username3 =
                 (String) extractUsernameMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2, userInfo2);
@@ -360,33 +358,33 @@ public class OidcAuthenticatorTest {
 
     @Test
     public void testExtractEmail() throws Exception {
-        java.lang.reflect.Method extractEmailMethod = OidcAuthenticator.class.getDeclaredMethod(
-                "extractEmail", com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class,
-                com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
+        Method extractEmailMethod = OidcAuthenticator.class.getDeclaredMethod(
+                "extractEmail", IDTokenClaimsSet.class,
+                UserInfo.class);
         ReflectionUtils.makeAccessible(extractEmailMethod);
 
-        com.nimbusds.oauth2.sdk.id.Subject subject = new com.nimbusds.oauth2.sdk.id.Subject("subject-id");
+        Subject subject = new Subject("subject-id");
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 =
-                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        IDTokenClaimsSet idTokenClaims1 =
+                mock(IDTokenClaimsSet.class);
         when(idTokenClaims1.getClaim("email")).thenReturn("test@example.com");
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 =
-                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        UserInfo userInfo1 =
+                new UserInfo(subject);
         userInfo1.setClaim("email", "userinfo@example.com");
 
         String email1 = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims1, userInfo1);
         Assertions.assertEquals("test@example.com", email1);
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 =
-                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        IDTokenClaimsSet idTokenClaims2 =
+                mock(IDTokenClaimsSet.class);
         when(idTokenClaims2.getClaim("email")).thenReturn(null);
 
         String email2 = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims2, userInfo1);
         Assertions.assertEquals("userinfo@example.com", email2);
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 =
-                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        UserInfo userInfo2 =
+                new UserInfo(subject);
 
         String email3 = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims2, userInfo2);
         Assertions.assertNull(email3);
@@ -394,25 +392,25 @@ public class OidcAuthenticatorTest {
 
     @Test
     public void testExtractGroups() throws Exception {
-        java.lang.reflect.Method extractGroupsMethod = OidcAuthenticator.class.getDeclaredMethod(
+        Method extractGroupsMethod = OidcAuthenticator.class.getDeclaredMethod(
                 "extractGroups", OidcProviderConfig.class,
-                com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class,
-                com.nimbusds.openid.connect.sdk.claims.UserInfo.class);
+                IDTokenClaimsSet.class,
+                UserInfo.class);
         ReflectionUtils.makeAccessible(extractGroupsMethod);
 
         OidcProviderConfig providerConfig = new OidcProviderConfig();
         providerConfig.setGroupsClaim("groups");
 
-        com.nimbusds.oauth2.sdk.id.Subject subject = new com.nimbusds.oauth2.sdk.id.Subject("subject-id");
+        Subject subject = new Subject("subject-id");
 
         List<String> idTokenGroups = Arrays.asList("group1", "group2");
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims1 =
-                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        IDTokenClaimsSet idTokenClaims1 =
+                mock(IDTokenClaimsSet.class);
         when(idTokenClaims1.getClaim("groups")).thenReturn(idTokenGroups);
 
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo1 =
-                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        UserInfo userInfo1 =
+                new UserInfo(subject);
         userInfo1.setClaim("groups", Arrays.asList("group3", "group4"));
 
         @SuppressWarnings("unchecked")
@@ -420,13 +418,13 @@ public class OidcAuthenticatorTest {
                 (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims1, userInfo1);
         Assertions.assertEquals(idTokenGroups, groups1);
 
-        com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet idTokenClaims2 =
-                mock(com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet.class);
+        IDTokenClaimsSet idTokenClaims2 =
+                mock(IDTokenClaimsSet.class);
         when(idTokenClaims2.getClaim("groups")).thenReturn(null);
 
         List<String> userInfoGroups = Arrays.asList("group3", "group4");
-        com.nimbusds.openid.connect.sdk.claims.UserInfo userInfo2 =
-                new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject);
+        UserInfo userInfo2 =
+                new UserInfo(subject);
         userInfo2.setClaim("groups", userInfoGroups);
 
         @SuppressWarnings("unchecked")
@@ -445,13 +443,13 @@ public class OidcAuthenticatorTest {
         @SuppressWarnings("unchecked")
         List<String> groups4 =
                 (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims2,
-                        new com.nimbusds.openid.connect.sdk.claims.UserInfo(subject));
+                        new UserInfo(subject));
         Assertions.assertTrue(groups4.isEmpty());
     }
 
     @Test
     public void testDetermineUserType() throws Exception {
-        java.lang.reflect.Method determineUserTypeMethod = OidcAuthenticator.class.getDeclaredMethod(
+        Method determineUserTypeMethod = OidcAuthenticator.class.getDeclaredMethod(
                 "determineUserType", List.class);
         ReflectionUtils.makeAccessible(determineUserTypeMethod);
 
@@ -511,8 +509,8 @@ public class OidcAuthenticatorTest {
 
     private void injectMockMetadataIntoCache() throws Exception {
         OIDCProviderMetadata metadata = mock(OIDCProviderMetadata.class);
-        when(metadata.getTokenEndpointURI()).thenReturn(new java.net.URI("http://fake/token"));
-        when(metadata.getUserInfoEndpointURI()).thenReturn(new java.net.URI("http://fake/userinfo"));
+        when(metadata.getTokenEndpointURI()).thenReturn(new URI("http://fake/token"));
+        when(metadata.getUserInfoEndpointURI()).thenReturn(new URI("http://fake/userinfo"));
         when(metadata.getIssuer()).thenReturn(new Issuer("http://fake-issuer.com"));
 
         Field cacheField = OidcAuthenticator.class.getDeclaredField("providerMetadataCache");
@@ -613,5 +611,411 @@ public class OidcAuthenticatorTest {
         userInfoResponseMock
                 .when(() -> UserInfoResponse.parse(any(HTTPResponse.class)))
                 .thenReturn(userInfoResponse);
+    }
+
+    @Test
+    public void testLogin_Failure_NullServletRequestAttributes() {
+        RequestContextHolder.resetRequestAttributes();
+        String state = providerId + ":" + UUID.randomUUID();
+        User result = oidcAuthenticator.login(state, code);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void testLogin_Failure_InvalidStateFormat_NoDelimiter() {
+        String state = providerId + UUID.randomUUID(); // missing ':'
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        RequestContextHolder.setRequestAttributes(attributes);
+        User result = oidcAuthenticator.login(state, code);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void testLogin_ExistingUserRoleUpdated() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.singletonList("admin-group"));
+
+        // Existing user currently GENERAL but should become ADMIN due to group mapping
+        User existingUser = new User();
+        existingUser.setUserName(username);
+        existingUser.setUserType(UserType.GENERAL_USER);
+        when(usersService.getUserByUserName(username)).thenReturn(existingUser);
+        when(usersService.updateUser(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        executeLoginWithCustomClaims(() -> {
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(UserType.ADMIN_USER, result.getUserType());
+            verify(usersService).updateUser(any(User.class));
+        }, Collections.singletonList("admin-group"), true, true, builder -> builder.issuer("http://fake-issuer.com"));
+    }
+
+    @Test
+    public void testLogin_Failure_InvalidAudience() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+
+        executeLoginWithCustomClaims(() -> {
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(result);
+        }, Collections.emptyList(), true, true, builder -> builder.audience("wrong-client"));
+    }
+
+    @Test
+    public void testLogin_Failure_ExpiredToken() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+
+        executeLoginWithCustomClaims(() -> {
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(result);
+        }, Collections.emptyList(), true, true,
+                builder -> builder.expirationTime(new Date(System.currentTimeMillis() - 60000))); // already expired
+    }
+
+    @Test
+    public void testLogin_Failure_TokenRequestSendException() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+        injectMockMetadataIntoCache();
+
+        try (
+                MockedStatic<OIDCTokenResponseParser> tokenParserMock =
+                        Mockito.mockStatic(OIDCTokenResponseParser.class);
+                MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
+                        (mock, context) -> {
+                            HTTPRequest httpRequest = mock(HTTPRequest.class);
+                            when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                            when(httpRequest.send()).thenThrow(new RuntimeException("network failure"));
+                        })) {
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(result);
+        }
+    }
+
+    @Test
+    public void testLogin_Failure_InvalidRedirectUri() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+        when(apiConfig.getBaseUrl()).thenReturn("http://localhost:12345/dolphinscheduler invalid");
+
+        executeLoginWithMocks(() -> {
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(result);
+        }, Collections.emptyList(), true, true, "http://fake-issuer.com");
+    }
+
+    @Test
+    public void testLogin_Success_ClientSecretPost() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        OidcProviderConfig providerConfig = new OidcProviderConfig();
+        providerConfig.setIssuerUri("http://fake-issuer.com");
+        providerConfig.setClientId("test-client");
+        providerConfig.setClientSecret("test-secret");
+        providerConfig.setClientAuthenticationMethod("client_secret_post");
+        providerConfig.setUserNameAttribute("preferred_username");
+        providerConfig.setGroupsClaim("groups");
+
+        OidcUserConfig userConfig = new OidcUserConfig();
+        userConfig.setAutoCreate(true);
+        userConfig.setAdminGroupMapping(Collections.emptyList());
+
+        Map<String, OidcProviderConfig> providers = new HashMap<>();
+        providers.put(providerId, providerConfig);
+        when(oidcConfigProperties.getProviders()).thenReturn(providers);
+        when(oidcConfigProperties.getUser()).thenReturn(userConfig);
+
+        when(usersService.getUserByUserName(username)).thenReturn(null);
+        User newUser = new User();
+        newUser.setUserName(username);
+        newUser.setUserType(UserType.GENERAL_USER);
+        when(usersService.createUser(UserType.GENERAL_USER, username, email)).thenReturn(newUser);
+
+        executeLoginWithMocks(() -> {
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(username, result.getUserName());
+        }, Collections.emptyList(), true, true, "http://fake-issuer.com");
+    }
+
+    private interface ClaimsCustomizer {
+
+        JWTClaimsSet.Builder customize(JWTClaimsSet.Builder builder);
+    }
+
+    private void executeLoginWithCustomClaims(Runnable assertions,
+                                              List<String> groups,
+                                              boolean tokenSuccess,
+                                              boolean userInfoSuccess,
+                                              ClaimsCustomizer claimsCustomizer) throws Exception {
+        injectMockMetadataIntoCache();
+        try (
+                MockedStatic<OIDCTokenResponseParser> tokenParserMock =
+                        Mockito.mockStatic(OIDCTokenResponseParser.class);
+                MockedStatic<UserInfoResponse> userInfoResponseMock = Mockito.mockStatic(UserInfoResponse.class);
+                MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
+                        (mock, context) -> {
+                            HTTPRequest httpRequest = mock(HTTPRequest.class);
+                            HTTPResponse httpResponse = mock(HTTPResponse.class);
+                            when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                            when(httpRequest.send()).thenReturn(httpResponse);
+                        });
+                MockedConstruction<UserInfoRequest> userInfoRequestConstruction =
+                        Mockito.mockConstruction(UserInfoRequest.class,
+                                (mock, context) -> {
+                                    HTTPRequest httpRequest = mock(HTTPRequest.class);
+                                    HTTPResponse httpResponse = mock(HTTPResponse.class);
+                                    when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                                    when(httpRequest.send()).thenReturn(httpResponse);
+                                })) {
+
+            if (!tokenSuccess) {
+                TokenErrorResponse errorResponse = mock(TokenErrorResponse.class);
+                when(errorResponse.indicatesSuccess()).thenReturn(false);
+                when(errorResponse.getErrorObject()).thenReturn(new ErrorObject("invalid_grant"));
+                tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class)))
+                        .thenReturn(errorResponse);
+                assertions.run();
+                return;
+            }
+
+            OIDCTokenResponse tokenResponse = mock(OIDCTokenResponse.class);
+            when(tokenResponse.indicatesSuccess()).thenReturn(true);
+            OIDCTokens oidcTokens = mock(OIDCTokens.class);
+            when(oidcTokens.getAccessToken()).thenReturn(new BearerAccessToken());
+
+            JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
+                    .issuer("http://fake-issuer.com")
+                    .audience("test-client")
+                    .subject(username)
+                    .claim("preferred_username", username)
+                    .claim("email", email)
+                    .claim("groups", groups)
+                    .expirationTime(new Date(System.currentTimeMillis() + 60000))
+                    .issueTime(new Date());
+            builder = claimsCustomizer.customize(builder);
+            JWTClaimsSet claimsSet = builder.build();
+            PlainJWT idToken = new PlainJWT(claimsSet);
+            when(oidcTokens.getIDToken()).thenReturn(idToken);
+            when(tokenResponse.getOIDCTokens()).thenReturn(oidcTokens);
+            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class)))
+                    .thenReturn(tokenResponse);
+
+            if (!userInfoSuccess) {
+                UserInfoErrorResponse userInfoErrorResponse = mock(UserInfoErrorResponse.class);
+                when(userInfoErrorResponse.indicatesSuccess()).thenReturn(false);
+                when(userInfoErrorResponse.getErrorObject()).thenReturn(new ErrorObject("server_error"));
+                userInfoResponseMock.when(() -> UserInfoResponse.parse(any(HTTPResponse.class)))
+                        .thenReturn(userInfoErrorResponse);
+                assertions.run();
+                return;
+            }
+
+            UserInfoResponse userInfoResponse = mock(UserInfoResponse.class);
+            when(userInfoResponse.indicatesSuccess()).thenReturn(true);
+            UserInfoSuccessResponse successResponse = mock(UserInfoSuccessResponse.class);
+            when(userInfoResponse.toSuccessResponse()).thenReturn(successResponse);
+            UserInfo nimbusUserInfo = new UserInfo(new Subject(username));
+            nimbusUserInfo.setClaim("preferred_username", username);
+            nimbusUserInfo.setClaim("email", email);
+            nimbusUserInfo.setClaim("groups", groups);
+            when(successResponse.getUserInfo()).thenReturn(nimbusUserInfo);
+            userInfoResponseMock.when(() -> UserInfoResponse.parse(any(HTTPResponse.class)))
+                    .thenReturn(userInfoResponse);
+
+            assertions.run();
+        }
+    }
+
+    @Test
+    public void testGetProviderMetadata_CacheBehavior() throws Exception {
+        Field cacheField = OidcAuthenticator.class.getDeclaredField("providerMetadataCache");
+        ReflectionUtils.makeAccessible(cacheField);
+        @SuppressWarnings("unchecked")
+        Map<String, OIDCProviderMetadata> cache =
+                (Map<String, OIDCProviderMetadata>) ReflectionUtils.getField(cacheField, oidcAuthenticator);
+        cache.clear();
+
+        OidcProviderConfig providerConfig = new OidcProviderConfig();
+        providerConfig.setIssuerUri("http://fake-issuer.com");
+        providerConfig.setClientId("test-client");
+        providerConfig.setClientSecret("test-secret");
+        providerConfig.setUserNameAttribute("preferred_username");
+        providerConfig.setGroupsClaim("groups");
+        Map<String, OidcProviderConfig> providers = new HashMap<>();
+        providers.put(providerId, providerConfig);
+        when(oidcConfigProperties.getProviders()).thenReturn(providers);
+
+        String state = providerId + ":" + UUID.randomUUID();
+        when(apiConfig.getBaseUrl()).thenReturn("http://localhost:12345/dolphinscheduler");
+        String metadataJson = "{" +
+                "\"issuer\":\"http://fake-issuer.com\"," +
+                "\"authorization_endpoint\":\"http://fake/authorize\"," +
+                "\"token_endpoint\":\"http://fake/token\"," +
+                "\"userinfo_endpoint\":\"http://fake/userinfo\"," +
+                "\"jwks_uri\":\"http://fake/jwks\"," +
+                "\"response_types_supported\":[\"code\"]," +
+                "\"subject_types_supported\":[\"public\"]," +
+                "\"id_token_signing_alg_values_supported\":[\"RS256\"]" +
+                "}";
+
+        try (MockedConstruction<HTTPRequest> requestConstruction = Mockito.mockConstruction(HTTPRequest.class,
+                (mock, context) -> {
+                    HTTPResponse httpResponse = new HTTPResponse(200);
+                    httpResponse.setContent(metadataJson);
+                    when(mock.send()).thenReturn(httpResponse);
+                })) {
+            String url1 = oidcAuthenticator.getSignInUrl(state);
+            Assertions.assertNotNull(url1, "First call should fetch metadata and produce URL");
+            Assertions.assertEquals(1, requestConstruction.constructed().size(), "Should have constructed exactly one HTTPRequest");
+            String url2 = oidcAuthenticator.getSignInUrl(state);
+            Assertions.assertNotNull(url2, "Second call should use cached metadata");
+            Assertions.assertEquals(1, requestConstruction.constructed().size(), "Cache should prevent new HTTPRequest construction");
+        }
+    }
+
+    @Test
+    public void testLogin_Failure_IdTokenParseError() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+        injectMockMetadataIntoCache();
+
+        try (MockedStatic<OIDCTokenResponseParser> tokenParserMock = Mockito.mockStatic(OIDCTokenResponseParser.class);
+             MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
+                     (mock, context) -> {
+                         HTTPRequest httpRequest = mock(HTTPRequest.class);
+                         HTTPResponse httpResponse = mock(HTTPResponse.class);
+                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                         when(httpRequest.send()).thenReturn(httpResponse);
+                     });
+             MockedConstruction<UserInfoRequest> userInfoRequestConstruction = Mockito.mockConstruction(UserInfoRequest.class,
+                     (mock, context) -> {
+                         HTTPRequest httpRequest = mock(HTTPRequest.class);
+                         HTTPResponse httpResponse = mock(HTTPResponse.class);
+                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                         when(httpRequest.send()).thenReturn(httpResponse);
+                     })) {
+
+            OIDCTokenResponse tokenResponse = mock(OIDCTokenResponse.class);
+            when(tokenResponse.indicatesSuccess()).thenReturn(true);
+            OIDCTokens oidcTokens = mock(OIDCTokens.class);
+            JWT badJwt = mock(JWT.class);
+            when(badJwt.getJWTClaimsSet()).thenThrow(new ParseException("bad token", 0));
+            when(oidcTokens.getIDToken()).thenReturn(badJwt);
+            when(tokenResponse.getOIDCTokens()).thenReturn(oidcTokens);
+            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class))).thenReturn(tokenResponse);
+
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(result, "Login should fail on ID token parse error");
+        }
+    }
+
+    @Test
+    public void testLogin_Failure_MissingExpirationClaim() throws Exception {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(state);
+        mockOidcConfiguration(providerId, true, Collections.emptyList());
+        injectMockMetadataIntoCache();
+
+        try (MockedStatic<OIDCTokenResponseParser> tokenParserMock = Mockito.mockStatic(OIDCTokenResponseParser.class);
+             MockedConstruction<TokenRequest> tokenRequestConstruction = Mockito.mockConstruction(TokenRequest.class,
+                     (mock, context) -> {
+                         HTTPRequest httpRequest = mock(HTTPRequest.class);
+                         HTTPResponse httpResponse = mock(HTTPResponse.class);
+                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                         when(httpRequest.send()).thenReturn(httpResponse);
+                     });
+             MockedConstruction<UserInfoRequest> userInfoRequestConstruction = Mockito.mockConstruction(UserInfoRequest.class,
+                     (mock, context) -> {
+                         HTTPRequest httpRequest = mock(HTTPRequest.class);
+                         HTTPResponse httpResponse = mock(HTTPResponse.class);
+                         when(mock.toHTTPRequest()).thenReturn(httpRequest);
+                         when(httpRequest.send()).thenReturn(httpResponse);
+                     })) {
+
+            OIDCTokenResponse tokenResponse = mock(OIDCTokenResponse.class);
+            when(tokenResponse.indicatesSuccess()).thenReturn(true);
+            OIDCTokens oidcTokens = mock(OIDCTokens.class);
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                    .issuer("http://fake-issuer.com")
+                    .audience("test-client")
+                    .subject(username)
+                    .claim("preferred_username", username)
+                    .claim("email", email)
+                    // deliberately omit expirationTime
+                    .issueTime(new Date())
+                    .build();
+            PlainJWT idToken = new PlainJWT(claimsSet);
+            when(oidcTokens.getIDToken()).thenReturn(idToken);
+            when(tokenResponse.getOIDCTokens()).thenReturn(oidcTokens);
+            tokenParserMock.when(() -> OIDCTokenResponseParser.parse(any(HTTPResponse.class))).thenReturn(tokenResponse);
+
+            User result = oidcAuthenticator.login(state, code);
+            Assertions.assertNull(result, "Login should fail due to missing expiration claim");
+        }
+    }
+
+    @Test
+    public void testLogin_Failure_MissingSessionState() {
+        String state = providerId + ":" + UUID.randomUUID();
+        when(session.getAttribute(Constants.SSO_LOGIN_USER_STATE)).thenReturn(null); // simulate missing attribute
+        User result = oidcAuthenticator.login(state, code);
+        Assertions.assertNull(result, "Login should fail if session state attribute is missing");
+    }
+
+    @Test
+    public void testGetSignInUrl_Failure_ProviderNotFound() {
+        String state = "unknown:" + UUID.randomUUID();
+        when(oidcConfigProperties.getProviders()).thenReturn(Collections.emptyMap());
+        String url = oidcAuthenticator.getSignInUrl(state);
+        Assertions.assertNull(url, "Sign-in URL should be null for unknown provider");
+    }
+
+    @Test
+    public void testExtractGroups_EmptyClaimConfigured() throws Exception {
+        Method extractGroupsMethod = OidcAuthenticator.class.getDeclaredMethod(
+                "extractGroups", OidcProviderConfig.class, IDTokenClaimsSet.class, UserInfo.class);
+        ReflectionUtils.makeAccessible(extractGroupsMethod);
+        OidcProviderConfig providerConfig = new OidcProviderConfig();
+        providerConfig.setGroupsClaim("");
+        IDTokenClaimsSet idTokenClaims = mock(IDTokenClaimsSet.class);
+        UserInfo userInfo = null;
+        @SuppressWarnings("unchecked")
+        List<String> groups = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims, userInfo);
+        Assertions.assertTrue(groups.isEmpty(), "Groups should be empty when groupsClaim is blank");
+    }
+
+    @Test
+    public void testExtractGroups_InvalidTypes() throws Exception {
+        Method extractGroupsMethod = OidcAuthenticator.class.getDeclaredMethod(
+                "extractGroups", OidcProviderConfig.class, IDTokenClaimsSet.class, UserInfo.class);
+        ReflectionUtils.makeAccessible(extractGroupsMethod);
+        OidcProviderConfig providerConfig = new OidcProviderConfig();
+        providerConfig.setGroupsClaim("groups");
+        IDTokenClaimsSet idTokenClaims = mock(IDTokenClaimsSet.class);
+        when(idTokenClaims.getClaim("groups")).thenReturn("not-a-list");
+        UserInfo userInfo = new UserInfo(new Subject("sub"));
+        userInfo.setClaim("groups", "still-not-a-list");
+        @SuppressWarnings("unchecked")
+        List<String> groups = (List<String>) extractGroupsMethod.invoke(oidcAuthenticator, providerConfig, idTokenClaims, userInfo);
+        Assertions.assertTrue(groups.isEmpty(), "Groups should be empty when claims are not list types");
+    }
+
+    @Test
+    public void testExtractEmail_UserInfoNull() throws Exception {
+        Method extractEmailMethod = OidcAuthenticator.class.getDeclaredMethod(
+                "extractEmail", IDTokenClaimsSet.class, UserInfo.class);
+        ReflectionUtils.makeAccessible(extractEmailMethod);
+        IDTokenClaimsSet idTokenClaims = mock(IDTokenClaimsSet.class);
+        when(idTokenClaims.getClaim("email")).thenReturn(null);
+        String emailValue = (String) extractEmailMethod.invoke(oidcAuthenticator, idTokenClaims, null);
+        Assertions.assertNull(emailValue, "Email should be null when not present in ID token or user info");
     }
 }
