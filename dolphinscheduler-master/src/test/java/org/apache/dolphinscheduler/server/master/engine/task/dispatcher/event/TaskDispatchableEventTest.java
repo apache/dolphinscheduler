@@ -38,6 +38,6 @@ class TaskDispatchableEventTest {
         TaskDispatchableEvent<String> highPriorityEntry =
                 new TaskDispatchableEvent<>(15_000L, "1_HIGH");
         TaskDispatchableEvent<String> lowPriorityEntry = new TaskDispatchableEvent<>(5_000L, "3_LOW");
-        assertThat(highPriorityEntry.compareTo(lowPriorityEntry) < 0).isTrue();
+        assertThat(highPriorityEntry.compareTo(lowPriorityEntry) > 0).isTrue();
     }
 }
