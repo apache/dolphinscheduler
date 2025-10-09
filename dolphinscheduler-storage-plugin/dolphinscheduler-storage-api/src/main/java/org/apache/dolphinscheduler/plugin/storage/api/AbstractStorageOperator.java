@@ -18,23 +18,17 @@
 package org.apache.dolphinscheduler.plugin.storage.api;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 
 public abstract class AbstractStorageOperator implements StorageOperator {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractStorageOperator.class);
     protected final String resourceBaseAbsolutePath;
 
     public AbstractStorageOperator(String resourceBaseAbsolutePath) {
@@ -64,7 +58,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        return PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler");
+        return resourceBaseAbsolutePath;
     }
 
     @Override
@@ -105,6 +99,15 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     protected void exceptionIfPathEmpty(String resourceAbsolutePath) {
         if (StringUtils.isEmpty(resourceAbsolutePath)) {
             throw new IllegalArgumentException("Resource path should not be empty");
+        }
+    }
+
+    protected void exceptionIfPathNotUnderStorageBaseDir(String resourceAbsolutePath) {
+        String storageBaseDirectory = getStorageBaseDirectory();
+        if (!resourceAbsolutePath.startsWith(storageBaseDirectory)) {
+            throw new IllegalArgumentException(
+                    "Resource path: " + resourceAbsolutePath + " is not under storage base directory: "
+                            + storageBaseDirectory);
         }
     }
 
