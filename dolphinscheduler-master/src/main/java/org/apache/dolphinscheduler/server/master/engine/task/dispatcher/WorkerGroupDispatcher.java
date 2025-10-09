@@ -115,7 +115,8 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      */
     public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable, final long delayTimeMills) {
         waitingDispatchTaskIds.add(taskExecutionRunnable.getId());
-        workerGroupEventBus.add(new TaskDispatchableEvent<>(delayTimeMills, taskExecutionRunnable));
+        workerGroupEventBus.add(new TaskDispatchableEvent<>(delayTimeMills, taskExecutionRunnable,
+                taskExecutionRunnable.getTaskExecutionContext().getDispatchFailTimes()));
     }
 
     public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
