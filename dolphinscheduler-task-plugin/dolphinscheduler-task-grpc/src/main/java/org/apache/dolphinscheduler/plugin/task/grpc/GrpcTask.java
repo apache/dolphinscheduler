@@ -97,6 +97,7 @@ public class GrpcTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
+        // Do nothing when task to be canceled
     }
 
     private void validateResponse(Status statusCode) {
