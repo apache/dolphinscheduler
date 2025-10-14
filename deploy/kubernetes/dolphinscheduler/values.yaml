@@ -407,6 +407,12 @@ common:
     FLINK_HOME: "/opt/soft/flink"
     # -- Set `DATAX_LAUNCHER` for DolphinScheduler's task environment
     DATAX_LAUNCHER: "/opt/soft/datax/bin/datax.py"
+    # -- Whether to enable management endpoints security: false, true
+    MANAGEMENT_SECURITY_ENABLE: false
+    # -- management endpoints security username
+    MANAGEMENT_SECURITY_USERNAME: "xxx"
+    # -- management endpoints security password
+    MANAGEMENT_SECURITY_PASSWORD: "xxx"
   ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     # -- Set `common.sharedStoragePersistence.enabled` to `true` to mount a shared storage volume for Hadoop, Spark binary and etc

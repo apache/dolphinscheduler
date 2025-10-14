@@ -109,6 +109,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | common.configmap.HADOOP_HOME | string | `"/opt/soft/hadoop"` | Set `HADOOP_HOME` for DolphinScheduler's task environment |
 | common.configmap.HIVE_HOME | string | `"/opt/soft/hive"` | Set `HIVE_HOME` for DolphinScheduler's task environment |
 | common.configmap.JAVA_HOME | string | `"/opt/java/openjdk"` | Set `JAVA_HOME` for DolphinScheduler's task environment |
+| common.configmap.MANAGEMENT_SECURITY_ENABLE | bool | `false` | Whether to enable management endpoints security: false, true |
+| common.configmap.MANAGEMENT_SECURITY_PASSWORD | string | `"xxx"` | management endpoints security password |
+| common.configmap.MANAGEMENT_SECURITY_USERNAME | string | `"xxx"` | management endpoints security username |
 | common.configmap.PYTHON_LAUNCHER | string | `"/usr/bin/python/bin/python3"` | Set `PYTHON_LAUNCHER` for DolphinScheduler's task environment |
 | common.configmap.RESOURCE_UPLOAD_PATH | string | `"/dolphinscheduler"` | Resource store on HDFS/S3 path, please make sure the directory exists on hdfs and have read write permissions |
 | common.configmap.SPARK_HOME | string | `"/opt/soft/spark"` | Set `SPARK_HOME` for DolphinScheduler's task environment |

@@ -90,7 +90,21 @@ spec:
           {{- if .Values.master.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:5679/actuator/health/liveness"]
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLE | default false }}
+                  {{- $cmd := "curl -s http://localhost:5679/actuator/health/liveness" }}
+                  {{- if $enableSecurity }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
             initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
@@ -100,7 +114,21 @@ spec:
           {{- if .Values.master.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:5679/actuator/health/readiness"]
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLE | default false }}
+                  {{- $cmd := "curl -s http://localhost:5679/actuator/health/readiness" }}
+                  {{- if $enableSecurity }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
             initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}
