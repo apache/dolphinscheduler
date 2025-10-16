@@ -1036,15 +1036,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>confluent-io</id>
-            <name>Confluent Cloud</name>
-            <url>https://packages.confluent.io/maven/</url>
-
-        </repository>
-    </repositories>
-
     <profiles>
         <profile>
             <id>zk-3.8</id>
