@@ -67,9 +67,13 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
+import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -796,6 +800,26 @@ public class WorkflowInstanceServiceTest {
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
         Map<String, Object> processNotExist = workflowInstanceService.viewVariables(1L, 1);
         Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testViewVariablesWithStartingParam() {
+        final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
+                .commandParams(Lists.newArrayList(Property.builder()
+                        .prop("name")
+                        .direct(Direct.IN)
+                        .type(DataType.VARCHAR)
+                        .value("commandParam")
+                        .build()))
+                .build();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setCommandType(CommandType.SCHEDULER);
+        workflowInstance.setScheduleTime(new Date());
+        workflowInstance.setGlobalParams("");
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
+        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+        Map<String, Object> successRes = workflowInstanceService.viewVariables(1L, 1);
+        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     /**
