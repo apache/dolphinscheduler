@@ -459,12 +459,22 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private List<TaskDefinitionLog> generateTaskDefinitionList(String taskDefinitionJson) {
         try {
             List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
             if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
                 log.error("Generate task definition list failed, the given taskDefinitionJson is invalided: {}",
                         taskDefinitionJson);
                 throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             }
+
+            Set<String> taskNameSet = new HashSet<>();
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                if (!taskNameSet.add(taskDefinitionLog.getName())) {
+                    log.error(
+                            "Generate task definition list failed, the given task definition name is duplicate, taskName: {}, taskDefinition: {}",
+                            taskDefinitionLog.getName(), taskDefinitionLog);
+                    throw new ServiceException(Status.TASK_NAME_DUPLICATE_ERROR, taskDefinitionLog.getName());
+                }
+
                 if (!checkTaskParameters(taskDefinitionLog.getTaskType(), taskDefinitionLog.getTaskParams())) {
                     log.error(
                             "Generate task definition list failed, the given task definition parameter is invalided, taskName: {}, taskDefinition: {}",

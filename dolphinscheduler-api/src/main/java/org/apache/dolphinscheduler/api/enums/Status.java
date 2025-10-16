@@ -248,6 +248,7 @@ public enum Status {
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
     TASK_SAVEPOINT_ERROR(10196, "task savepoint error", "任务实例savepoint错误"),
     TASK_STOP_ERROR(10197, "task stop error", "任务实例停止错误"),
+    TASK_NAME_DUPLICATE_ERROR(10198, "task name {0} duplicate error", "同一个工作流中任务名称 {0} 重复"),
     LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
     DELETE_TASK_TYPE_ERROR(10200, "delete task type error", "删除任务类型错误"),
     ADD_TASK_TYPE_ERROR(10200, "add task type error", "添加任务类型错误"),
