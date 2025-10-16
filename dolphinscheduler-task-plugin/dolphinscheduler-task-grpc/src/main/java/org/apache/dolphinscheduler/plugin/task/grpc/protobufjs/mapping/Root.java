@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
-
-import java.util.Map;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
 
 import lombok.Data;
 
-@Data
-public class Type extends Namespace {
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-    public Map<String, Field> fields;
-    public Map<String, OneOf> oneofs;
+@Data
+@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, defaultImpl = Root.class)
+public class Root extends Namespace {
 }

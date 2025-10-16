@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
 
 import java.util.Map;
 
 import lombok.Data;
 
 @Data
-public class Service extends Namespace {
+public class Enum extends ReflectionObject {
 
-    public Map<String, Method> methods;
+    public Map<String, Integer> values;
 }

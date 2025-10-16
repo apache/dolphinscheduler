@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
 
 import lombok.Data;
 import lombok.Getter;

@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
+
+import java.util.ArrayList;
 
 import lombok.Data;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 @Data
-@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, defaultImpl = Root.class)
-public class Root extends Namespace {
+public class OneOf extends ReflectionObject {
+
+    public ArrayList<String> oneof;
 }

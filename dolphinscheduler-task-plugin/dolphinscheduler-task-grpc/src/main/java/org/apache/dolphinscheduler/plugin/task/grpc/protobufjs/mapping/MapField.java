@@ -15,16 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
 
 import lombok.Data;
 
 @Data
-public class Method extends ReflectionObject {
+public class MapField extends Field {
 
-    public String type;
-    public String requestType;
-    public String responseType;
-    public String requestStream;
-    public String responseStream;
+    public String keyType;
 }

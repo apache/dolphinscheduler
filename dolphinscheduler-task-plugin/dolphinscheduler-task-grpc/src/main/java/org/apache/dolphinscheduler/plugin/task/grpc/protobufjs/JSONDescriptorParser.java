@@ -19,15 +19,17 @@ package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 
 import static java.util.Objects.isNull;
 
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Enum;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Field;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.MapField;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Method;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Namespace;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.OneOf;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Root;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Service;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Type;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Enum;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Field;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.MapField;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Method;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Namespace;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.OneOf;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Root;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Service;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Type;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.FieldLabel;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.FieldPrimitiveType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,12 +102,15 @@ public class JSONDescriptorParser {
         return fileDescriptor;
     }
 
+    private boolean isHiddenMapEntryKey(String fieldName) {
+        return fieldName.startsWith("_");
+    }
     private int mapEntrySorter(Map.Entry<String, OneOf> entry1, Map.Entry<String, OneOf> entry2) {
-        boolean key1StartsWithUnderscore = entry1.getKey().startsWith("_");
-        boolean key2StartsWithUnderscore = entry2.getKey().startsWith("_");
-        if (key1StartsWithUnderscore && !key2StartsWithUnderscore) {
+        boolean isKey1Hidden = isHiddenMapEntryKey(entry1.getKey());
+        boolean isKey2Hidden = isHiddenMapEntryKey(entry2.getKey());
+        if (isKey1Hidden && !isKey2Hidden) {
             return 1; // Move key1 after key2
-        } else if (!key1StartsWithUnderscore && key2StartsWithUnderscore) {
+        } else if (!isKey1Hidden && isKey2Hidden) {
             return -1; // Move key1 before key2
         } else {
             return 0; // Keep the original order
@@ -221,15 +226,14 @@ public class JSONDescriptorParser {
                 String label = rule.asText();
                 try {
                     fieldDescriptorProtoBuilder
-                            .setLabel(DescriptorProtos.FieldDescriptorProto.Label
-                                    .valueOf("LABEL_" + label.toUpperCase()));
+                            .setLabel(FieldLabel.parseFieldLabel(label));
                 } catch (IllegalArgumentException e) {
-                    throw new RuntimeException("grpc exception: Unrecogenized field label: " + label, e);
+                    throw new RuntimeException("grpc exception: Unrecognized field label: " + label, e);
                 }
             }
         try {
             fieldDescriptorProtoBuilder
-                    .setType(DescriptorProtos.FieldDescriptorProto.Type.valueOf("TYPE_" + field.type.toUpperCase()));
+                    .setType(FieldPrimitiveType.parseFieldType(field.type));
         } catch (IllegalArgumentException e) {
             fieldDescriptorProtoBuilder.setTypeName(field.type);
         }
@@ -238,15 +242,16 @@ public class JSONDescriptorParser {
 
     private DescriptorProtos.FieldDescriptorProto.Builder parseMapField(DescriptorProtos.DescriptorProto.Builder parentMessage,
                                                                         String selfName, MapField mapField) {
+        String mapEntryTypeName = "MapEntry_" + selfName;
         DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName(selfName)
                         .setNumber(mapField.id)
-                        .setTypeName("MapEntry_" + selfName)
+                        .setTypeName(mapEntryTypeName)
                         .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED);
         DescriptorProtos.DescriptorProto.Builder mapEntryDescriptorProtoBuilder =
                 DescriptorProtos.DescriptorProto.newBuilder()
-                        .setName("MapEntry_" + selfName)
+                        .setName(mapEntryTypeName)
                         .setOptions(DescriptorProtos.MessageOptions.newBuilder().setMapEntry(true).build());
         DescriptorProtos.FieldDescriptorProto.Builder keyDescriptorProtoBuilder =
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
@@ -258,14 +263,13 @@ public class JSONDescriptorParser {
                         .setNumber(2);
         try {
             keyDescriptorProtoBuilder
-                    .setType(DescriptorProtos.FieldDescriptorProto.Type
-                            .valueOf("TYPE_" + mapField.keyType.toUpperCase()));
+                    .setType(FieldPrimitiveType.parseFieldType(mapField.keyType));
         } catch (IllegalArgumentException e) {
             keyDescriptorProtoBuilder.setTypeName(mapField.keyType);
         }
         try {
             valueDescriptorProtoBuilder
-                    .setType(DescriptorProtos.FieldDescriptorProto.Type.valueOf("TYPE_" + mapField.type.toUpperCase()));
+                    .setType(FieldPrimitiveType.parseFieldType(mapField.type));
         } catch (IllegalArgumentException e) {
             valueDescriptorProtoBuilder.setTypeName(mapField.type);
         }

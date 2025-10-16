@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types.Root;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Root;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.protobuf.Descriptors;

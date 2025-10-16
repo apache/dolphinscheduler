@@ -15,22 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
 
 import java.util.Map;
 
 import lombok.Data;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 @Data
-@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, defaultImpl = Namespace.class)
-@JsonSubTypes({
-        @JsonSubTypes.Type(Type.class),
-        @JsonSubTypes.Type(Service.class)
-})
-public class Namespace extends ReflectionObject {
+public class Type extends Namespace {
 
-    public Map<String, ? extends ReflectionObject> nested;
+    public Map<String, Field> fields;
+    public Map<String, OneOf> oneofs;
 }
