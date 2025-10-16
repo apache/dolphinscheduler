@@ -211,8 +211,8 @@ public class GrpcParserTest {
     public void testMapType() throws Exception {
         String requestMessage = "{" +
                 "\"bought\": {" +
-                "\"Tom\": \"Momo\"," +
-                "\"Jerry\": \"Lingo\"" +
+                "\"Tom\": \"MOMO\"," +
+                "\"Jerry\": \"LINGO\"" +
                 "}," +
                 "\"cash\": {" +
                 "\"Tom\": {" +
@@ -235,7 +235,7 @@ public class GrpcParserTest {
                 "\"bought\": [" +
                 "{" +
                 "\"key\": \"Jerry\"," +
-                "\"value\": \"Lingo\"" +
+                "\"value\": \"LINGO\"" +
                 "}" +
                 "]" +
                 "}";

@@ -217,9 +217,9 @@
                             },
                             "Fruits": {
                               "values": {
-                                "Lingo": 0,
-                                "Ichigo": 1,
-                                "Momo": 2
+                                "LINGO": 0,
+                                "ICHIGO": 1,
+                                "MOMO": 2
                               }
                             },
                             "NoneRequest": {
