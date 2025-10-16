@@ -96,7 +96,6 @@ public class GrpcTaskTest {
             .build();
     private int serverPort = 0;
 
-
     @BeforeEach
     public void setUp() throws Exception {
         executor = Executors.newFixedThreadPool(2);
