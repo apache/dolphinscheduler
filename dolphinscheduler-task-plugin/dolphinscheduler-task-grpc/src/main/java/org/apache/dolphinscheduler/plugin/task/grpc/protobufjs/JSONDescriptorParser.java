@@ -100,6 +100,18 @@ public class JSONDescriptorParser {
         return fileDescriptor;
     }
 
+    private int mapEntrySorter(Map.Entry<String, OneOf> entry1, Map.Entry<String, OneOf> entry2) {
+        boolean key1StartsWithUnderscore = entry1.getKey().startsWith("_");
+        boolean key2StartsWithUnderscore = entry2.getKey().startsWith("_");
+        if (key1StartsWithUnderscore && !key2StartsWithUnderscore) {
+            return 1; // Move key1 after key2
+        } else if (!key1StartsWithUnderscore && key2StartsWithUnderscore) {
+            return -1; // Move key1 before key2
+        } else {
+            return 0; // Keep the original order
+        }
+    }
+
     private DescriptorProtos.DescriptorProto.Builder parseType(String selfName, Type type) {
         DescriptorProtos.DescriptorProto.Builder descriptorProtoBuilder = DescriptorProtos.DescriptorProto.newBuilder()
                 .setName(selfName);
@@ -129,17 +141,7 @@ public class JSONDescriptorParser {
         if (type.oneofs != null) {
             type.oneofs.entrySet()
                     .stream()
-                    .sorted((entry1, entry2) -> {
-                        boolean key1StartsWithUnderscore = entry1.getKey().startsWith("_");
-                        boolean key2StartsWithUnderscore = entry2.getKey().startsWith("_");
-                        if (key1StartsWithUnderscore && !key2StartsWithUnderscore) {
-                            return 1; // Move key1 after key2
-                        } else if (!key1StartsWithUnderscore && key2StartsWithUnderscore) {
-                            return -1; // Move key1 before key2
-                        } else {
-                            return 0; // Keep the original order
-                        }
-                    })
+                    .sorted(this::mapEntrySorter)
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,

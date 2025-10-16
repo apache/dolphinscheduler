@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,6 +36,7 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 class WorkerGroupDispatcherTest {
 
@@ -52,6 +54,7 @@ class WorkerGroupDispatcherTest {
         ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
         dispatcher.start();
 
         dispatcher.dispatchTask(taskExecutionRunnable, 0);
@@ -65,6 +68,7 @@ class WorkerGroupDispatcherTest {
         ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
         dispatcher.start();
 
         dispatcher.dispatchTask(taskExecutionRunnable, 2000);
@@ -74,10 +78,38 @@ class WorkerGroupDispatcherTest {
     }
 
     @Test
+    void dispatchTask_withOneDelayTaskAnotherIsDispatchRetryTask() throws TaskDispatchException {
+        final ITaskExecutionRunnable delayTaskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        final TaskInstance delayTaskInstance = mock(TaskInstance.class);
+        when(delayTaskExecutionRunnable.getTaskInstance()).thenReturn(delayTaskInstance);
+        when(delayTaskExecutionRunnable.getTaskExecutionContext()).thenReturn(TaskExecutionContext.builder().build());
+        when(delayTaskExecutionRunnable.getId()).thenReturn(1);
+
+        final ITaskExecutionRunnable dispatchRetryTaskExecutionRunnable = mock(ITaskExecutionRunnable.class);
+        final TaskInstance dispatchRetryTaskInstance = mock(TaskInstance.class);
+        when(dispatchRetryTaskExecutionRunnable.getTaskInstance()).thenReturn(dispatchRetryTaskInstance);
+        when(dispatchRetryTaskExecutionRunnable.getTaskExecutionContext())
+                .thenReturn(TaskExecutionContext.builder().dispatchFailTimes(1).build());
+        when(dispatchRetryTaskExecutionRunnable.getId()).thenReturn(2);
+        dispatcher.start();
+
+        dispatcher.dispatchTask(delayTaskExecutionRunnable, 2000);
+        dispatcher.dispatchTask(dispatchRetryTaskExecutionRunnable, 100);
+        await()
+                .atLeast(Duration.ofMillis(1500))
+                .untilAsserted(() -> verify(taskExecutorClient, times(2)).dispatch(any()));
+
+        InOrder inOrder = inOrder(taskExecutorClient);
+        inOrder.verify(taskExecutorClient).dispatch(dispatchRetryTaskExecutionRunnable);
+        inOrder.verify(taskExecutorClient).dispatch(delayTaskExecutionRunnable);
+    }
+
+    @Test
     void dispatchTask_HasBeenRemoved() {
         ITaskExecutionRunnable taskExecutionRunnable = mock(ITaskExecutionRunnable.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
 
         dispatcher.dispatchTask(taskExecutionRunnable, 0);
         dispatcher.removeTask(taskExecutionRunnable);

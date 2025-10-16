@@ -15,15 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.storage.hdfs;
+package org.apache.dolphinscheduler.plugin.task.grpc.generated;
 
-import lombok.extern.slf4j.Slf4j;
+public interface EnumTypeOrBuilder
+        extends
+            // @@protoc_insertion_point(interface_extends:org.apache.dolphinscheduler.task.grpc.proto.EnumType)
+            com.google.protobuf.MessageOrBuilder {
 
-@Slf4j
-public class LocalStorageOperator extends HdfsStorageOperator {
-
-    public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
-        super(hdfsStorageProperties);
-    }
-
+    /**
+     * <code>.org.apache.dolphinscheduler.task.grpc.proto.Fruits what2eat = 1;</code>
+     * @return The enum numeric value on the wire for what2eat.
+     */
+    int getWhat2EatValue();
+    /**
+     * <code>.org.apache.dolphinscheduler.task.grpc.proto.Fruits what2eat = 1;</code>
+     * @return The what2eat.
+     */
+    org.apache.dolphinscheduler.plugin.task.grpc.generated.Fruits getWhat2Eat();
 }
