@@ -132,9 +132,6 @@ public class GrpcParserTest {
             .build();
     private int serverPort = 0;
 
-    public GrpcParserTest() throws IOException {
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         executor = Executors.newFixedThreadPool(2);

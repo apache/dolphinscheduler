@@ -96,8 +96,6 @@ public class GrpcTaskTest {
             .build();
     private int serverPort = 0;
 
-    public GrpcTaskTest() throws IOException {
-    }
 
     @BeforeEach
     public void setUp() throws Exception {
