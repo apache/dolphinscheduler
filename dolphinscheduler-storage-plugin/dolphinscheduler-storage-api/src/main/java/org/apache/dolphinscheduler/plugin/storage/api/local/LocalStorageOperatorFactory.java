@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.storage.hdfs;
+package org.apache.dolphinscheduler.plugin.storage.api.local;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
@@ -23,24 +23,18 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
+import lombok.SneakyThrows;
+
 import com.google.auto.service.AutoService;
 
 @AutoService(StorageOperatorFactory.class)
 public class LocalStorageOperatorFactory implements StorageOperatorFactory {
 
-    public static final String LOCAL_DEFAULT_FS = "file:/";
-
+    @SneakyThrows
     @Override
     public StorageOperator createStorageOperate() {
-        final HdfsStorageProperties hdfsStorageProperties = getHdfsStorageProperties();
-        return new LocalStorageOperator(hdfsStorageProperties);
-    }
-
-    private HdfsStorageProperties getHdfsStorageProperties() {
-        return HdfsStorageProperties.builder()
-                .defaultFS(LOCAL_DEFAULT_FS)
-                .resourceUploadPath(PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
-                .build();
+        return new LocalStorageOperator(
+                PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler"));
     }
 
     @Override

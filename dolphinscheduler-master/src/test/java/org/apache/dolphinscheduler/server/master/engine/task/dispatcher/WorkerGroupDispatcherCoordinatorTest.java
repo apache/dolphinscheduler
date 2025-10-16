@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
@@ -49,9 +50,12 @@ class WorkerGroupDispatcherCoordinatorTest {
 
         ITaskExecutionRunnable taskExecutionRunnable = Mockito.mock(ITaskExecutionRunnable.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
+        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
 
         when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
         when(taskInstance.getWorkerGroup()).thenReturn(workerGroup);
+        when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(taskExecutionContext);
+        when(taskExecutionContext.getDispatchFailTimes()).thenReturn(1);
 
         assertFalse(workerGroupDispatcherCoordinator.existWorkerGroup(workerGroup));
 

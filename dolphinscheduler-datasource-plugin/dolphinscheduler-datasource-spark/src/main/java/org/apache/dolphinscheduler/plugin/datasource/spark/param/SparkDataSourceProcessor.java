@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -61,6 +62,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         sparkDatasourceParamDTO.setJavaSecurityKrb5Conf(connectionParams.getJavaSecurityKrb5Conf());
         sparkDatasourceParamDTO.setLoginUserKeytabPath(connectionParams.getLoginUserKeytabPath());
         sparkDatasourceParamDTO.setLoginUserKeytabUsername(connectionParams.getLoginUserKeytabUsername());
+        sparkDatasourceParamDTO.setPrincipal(connectionParams.getPrincipal());
 
         StringBuilder hosts = new StringBuilder();
         String[] tmpArray = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
@@ -125,11 +127,16 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
-        if (MapUtils.isNotEmpty(sparkConnectionParam.getOther())) {
-            return String.format("%s;%s", sparkConnectionParam.getJdbcUrl(),
-                    transformOther(sparkConnectionParam.getOther()));
+
+        StringBuilder jdbcUrlBuilder = new StringBuilder(sparkConnectionParam.getJdbcUrl());
+        if (StringUtils.isNotBlank(sparkConnectionParam.getPrincipal())) {
+            jdbcUrlBuilder.append(";principal=").append(sparkConnectionParam.getPrincipal());
         }
-        return sparkConnectionParam.getJdbcUrl();
+        if (MapUtils.isNotEmpty(sparkConnectionParam.getOther())) {
+            jdbcUrlBuilder.append(";").append(transformOther(sparkConnectionParam.getOther()));
+        }
+
+        return jdbcUrlBuilder.toString();
     }
 
     @Override

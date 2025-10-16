@@ -13,17 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.plugin.storage.hdfs;
-
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
-public class LocalStorageOperator extends HdfsStorageOperator {
-
-    public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
-        super(hdfsStorageProperties);
-    }
-
-}
+*/
