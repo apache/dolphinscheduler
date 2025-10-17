@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Root;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.protobuf.Descriptors;
 
 public class JSONDescriptorHelper {
@@ -32,7 +31,7 @@ public class JSONDescriptorHelper {
         return JSONUtils.parseObject(json, Root.class);
     }
 
-    public static Descriptors.FileDescriptor fileDescFromJSON(String json) throws JsonProcessingException, Descriptors.DescriptorValidationException {
+    public static Descriptors.FileDescriptor fileDescFromJSON(String json) throws Descriptors.DescriptorValidationException {
         JSONDescriptorParser parser = new JSONDescriptorParser();
         return parser.buildDescriptor(protobufFromJSON(json));
     }

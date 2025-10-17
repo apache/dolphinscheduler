@@ -27,11 +27,9 @@ public class MethodType {
     }
 
     public static DescriptorProtos.MethodDescriptorProto.Builder parseMethod(String selfName, Method method) {
-        DescriptorProtos.MethodDescriptorProto.Builder methodDescriptorProtoBuilder =
-                DescriptorProtos.MethodDescriptorProto.newBuilder()
-                        .setName(selfName)
-                        .setInputType(method.getRequestType())
-                        .setOutputType(method.getResponseType());
-        return methodDescriptorProtoBuilder;
+        return DescriptorProtos.MethodDescriptorProto.newBuilder()
+                .setName(selfName)
+                .setInputType(method.getRequestType())
+                .setOutputType(method.getResponseType());
     }
 }

@@ -27,7 +27,6 @@ import lombok.Getter;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 
 import io.grpc.CallOptions;
@@ -80,7 +79,7 @@ public class GrpcDynamicService {
         CallOptions callOptions = timeout > 0 ? CallOptions.DEFAULT.withDeadlineAfter(timeout, TimeUnit.MILLISECONDS)
                 : CallOptions.DEFAULT;
         responseBuilder.mergeFrom(
-                (Message) io.grpc.stub.ClientCalls.blockingUnaryCall(channel, methodDescriptor, callOptions, request));
+                io.grpc.stub.ClientCalls.blockingUnaryCall(channel, methodDescriptor, callOptions, request));
         return responseBuilder.build();
     }
 
@@ -166,10 +165,7 @@ public class GrpcDynamicService {
             if (serviceName == null || serviceName.isEmpty()) {
                 return false;
             }
-            if (rpcName == null || rpcName.isEmpty()) {
-                return false;
-            }
-            return true;
+            return rpcName != null && !rpcName.isEmpty();
         }
     }
 
@@ -184,11 +180,10 @@ public class GrpcDynamicService {
 
         public static ManagedChannel createChannel(String targetAddr, ChannelCredentials channelCredentials) {
             NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
-            ManagedChannel channel = NettyChannelBuilder.forTarget(targetAddr, channelCredentials)
+            return NettyChannelBuilder.forTarget(targetAddr, channelCredentials)
                     .eventLoopGroup(eventLoopGroup)
                     .channelType(NioSocketChannel.class)
                     .build();
-            return channel;
         }
     }
 

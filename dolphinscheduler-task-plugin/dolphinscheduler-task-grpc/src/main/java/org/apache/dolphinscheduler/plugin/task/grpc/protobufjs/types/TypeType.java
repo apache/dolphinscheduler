@@ -93,9 +93,7 @@ public class TypeType {
                             Map.Entry::getValue,
                             (oldValue, newValue) -> oldValue,
                             LinkedHashMap::new))
-                    .forEach((name, oneof) -> {
-                        OneofType.parseOneof(descriptorProtoBuilder, name);
-                    });
+                    .forEach((name, oneof) -> OneofType.parseOneof(descriptorProtoBuilder, name));
             int oneofCount = descriptorProtoBuilder.getOneofDeclCount();
             List<DescriptorProtos.OneofDescriptorProto> oneofDescriptorProtos =
                     descriptorProtoBuilder.getOneofDeclList();
@@ -104,14 +102,11 @@ public class TypeType {
                         DescriptorProtos.OneofDescriptorProto oneofDescriptorProto =
                                 oneofDescriptorProtos.get(oneofIndex);
                         String oneofName = oneofDescriptorProto.getName();
-                        oneofs.get(oneofName).getOneofList().forEach((fieldName) -> {
-                            fieldMap.get(fieldName).setOneofIndex(oneofIndex);
-                        });
+                        oneofs.get(oneofName).getOneofList()
+                                .forEach(fieldName -> fieldMap.get(fieldName).setOneofIndex(oneofIndex));
                     });
         }
-        fieldMap.forEach((name, field) -> {
-            descriptorProtoBuilder.addField(field);
-        });
+        fieldMap.forEach((name, field) -> descriptorProtoBuilder.addField(field));
     }
 
     private static boolean isHiddenMapEntryKey(String fieldName) {

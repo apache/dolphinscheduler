@@ -27,7 +27,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.protobuf.Descriptors;
 
 @EqualsAndHashCode(callSuper = true)
@@ -60,7 +59,7 @@ public class GrpcParameters extends AbstractParameters {
             Descriptors.FileDescriptor fileDesc =
                     JSONDescriptorHelper.fileDescFromJSON(grpcServiceDefinitionJSON);
             GrpcDynamicService.mergeJSON(fileDesc, methodName, message);
-        } catch (JsonProcessingException | Descriptors.DescriptorValidationException | RuntimeException e) {
+        } catch (Descriptors.DescriptorValidationException | RuntimeException e) {
             return false;
         }
         return !(StringUtils.isEmpty(url) || connectTimeoutMs <= 0);
