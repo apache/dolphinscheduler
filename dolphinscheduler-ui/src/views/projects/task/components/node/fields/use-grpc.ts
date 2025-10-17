@@ -171,7 +171,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['input', 'blur'],
         validator(validate: any, value: string) {
-          if (!Number.isInteger(parseInt(value))) {
+          if (!Number.isInteger(Number.parseInt(value))) {
             return new Error(
               t('project.node.connect_timeout') +
                 t('project.node.positive_integer_tips')
