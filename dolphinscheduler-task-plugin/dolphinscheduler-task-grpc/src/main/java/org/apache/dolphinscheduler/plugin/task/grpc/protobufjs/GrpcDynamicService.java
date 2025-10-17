@@ -55,12 +55,12 @@ public class GrpcDynamicService {
         Descriptors.ServiceDescriptor pServiceDescriptor =
                 fileDescriptor.findServiceByName(methodNameData.getServiceName());
         if (isNull(pServiceDescriptor))
-            throw new RuntimeException(
+            throw new GrpcParserException(
                     "cannot find service <" + methodNameData.getServiceName() + "> from service definition");
         Descriptors.MethodDescriptor pMethodDescriptor =
                 pServiceDescriptor.findMethodByName(methodNameData.getMethodName());
         if (isNull(pMethodDescriptor))
-            throw new RuntimeException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
+            throw new GrpcParserException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
                     + methodNameData.getServiceName() + "> with method list: " + Arrays.toString(pServiceDescriptor
                             .getMethods().stream().map(Descriptors.MethodDescriptor::getName).toArray()));
         MethodDescriptor methodDescriptor = methodFromProtobuf(pServiceDescriptor, pMethodDescriptor);
@@ -71,7 +71,7 @@ public class GrpcDynamicService {
         try {
             JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
         } catch (InvalidProtocolBufferException ipbe) {
-            throw new RuntimeException(
+            throw new GrpcParserException(
                     "cannot merge json message to protobuf definition type <" + requestMessageType.getName() + ">",
                     ipbe);
         }
@@ -89,12 +89,12 @@ public class GrpcDynamicService {
         Descriptors.ServiceDescriptor pServiceDescriptor =
                 fileDesc.findServiceByName(methodNameData.getServiceName());
         if (isNull(pServiceDescriptor))
-            throw new RuntimeException(
+            throw new GrpcParserException(
                     "cannot find service <" + methodNameData.getServiceName() + "> from service definition");
         Descriptors.MethodDescriptor pMethodDescriptor =
                 pServiceDescriptor.findMethodByName(methodNameData.getMethodName());
         if (isNull(pMethodDescriptor))
-            throw new RuntimeException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
+            throw new GrpcParserException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
                     + methodNameData.getServiceName() + "> with method list: " + Arrays.toString(pServiceDescriptor
                             .getMethods().stream().map(Descriptors.MethodDescriptor::getName).toArray()));
         Descriptors.Descriptor requestMessageType = pMethodDescriptor.getInputType();
@@ -102,7 +102,7 @@ public class GrpcDynamicService {
         try {
             JsonFormat.parser().ignoringUnknownFields().merge(messageJSON, requestBuilder);
         } catch (InvalidProtocolBufferException ipbe) {
-            throw new RuntimeException(
+            throw new GrpcParserException(
                     "cannot merge json message to protobuf definition type <" + requestMessageType.getName() + ">",
                     ipbe);
         }

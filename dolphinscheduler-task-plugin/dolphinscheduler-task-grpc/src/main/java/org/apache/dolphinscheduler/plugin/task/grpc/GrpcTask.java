@@ -64,7 +64,7 @@ public class GrpcTask extends AbstractTask {
         log.info("Initialize gRPC task params: {}", JSONUtils.toPrettyJsonString(grpcParameters));
 
         if (grpcParameters == null || !grpcParameters.checkParameters()) {
-            throw new RuntimeException(
+            throw new GrpcTaskException(
                     "gRPC task params is not valid, method definition may not corresponds to message or method name is invalid");
         }
     }
@@ -90,7 +90,7 @@ public class GrpcTask extends AbstractTask {
             validateResponse(statusre.getStatus());
             return;
         } catch (Exception e) {
-            throw new TaskException("gRPC handle exception:", e);
+            throw new GrpcTaskException("gRPC handle exception:", e);
         }
         validateResponse(Status.OK);
     }
@@ -126,12 +126,12 @@ public class GrpcTask extends AbstractTask {
                         return;
                     }
                 } catch (IllegalArgumentException e) {
-                    throw new TaskException(
+                    throw new GrpcTaskException(
                             String.format("grpc unrecogenized condition %s", grpcParameters.getCondition()));
                 }
                 break;
             default:
-                throw new TaskException(String.format("grpc check condition %s not supported",
+                throw new GrpcTaskException(String.format("grpc check condition %s not supported",
                         grpcParameters.getGrpcCheckCondition()));
         }
         // default success log
