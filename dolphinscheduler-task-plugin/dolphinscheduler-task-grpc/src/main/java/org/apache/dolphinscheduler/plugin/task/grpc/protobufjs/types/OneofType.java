@@ -21,6 +21,9 @@ import com.google.protobuf.DescriptorProtos;
 
 public class OneofType {
 
+    private OneofType() {
+    }
+
     public static DescriptorProtos.OneofDescriptorProto.Builder parseOneof(DescriptorProtos.DescriptorProto.Builder descriptorProtoBuilder,
                                                                            String selfName) {
         DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =

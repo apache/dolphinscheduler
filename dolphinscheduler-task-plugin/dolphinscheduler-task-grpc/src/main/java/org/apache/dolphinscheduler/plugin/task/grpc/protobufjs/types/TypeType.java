@@ -35,6 +35,9 @@ import com.google.protobuf.DescriptorProtos;
 
 public class TypeType {
 
+    private TypeType() {
+    }
+
     public static DescriptorProtos.DescriptorProto.Builder parseType(String selfName, Type type) {
         DescriptorProtos.DescriptorProto.Builder descriptorProtoBuilder = DescriptorProtos.DescriptorProto.newBuilder()
                 .setName(selfName);

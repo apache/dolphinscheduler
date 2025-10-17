@@ -29,6 +29,9 @@ import com.google.protobuf.DescriptorProtos;
 
 public class FieldType {
 
+    private FieldType() {
+    }
+
     private static final HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> labelMap = initLabelMap();
     private static HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> initLabelMap() {
         HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> map = new HashMap<>();

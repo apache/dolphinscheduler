@@ -21,8 +21,10 @@ import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.MapField;
 
 import com.google.protobuf.DescriptorProtos;
 
-public class MapFieldType extends FieldType {
+public class MapFieldType {
 
+    private MapFieldType() {
+    }
     public static DescriptorProtos.FieldDescriptorProto.Builder parseMapField(DescriptorProtos.DescriptorProto.Builder parentMessage,
                                                                               String selfName, MapField mapField) {
         String mapEntryTypeName = "MapEntry_" + selfName;

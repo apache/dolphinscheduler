@@ -23,6 +23,9 @@ import com.google.protobuf.DescriptorProtos;
 
 public class EnumType {
 
+    private EnumType() {
+    }
+
     public static DescriptorProtos.EnumDescriptorProto.Builder parseEnum(String selfName, Enum enumObj) {
         DescriptorProtos.EnumDescriptorProto.Builder enumDescriptorProtoBuilder =
                 DescriptorProtos.EnumDescriptorProto.newBuilder()

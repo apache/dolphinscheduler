@@ -24,6 +24,9 @@ import com.google.protobuf.DescriptorProtos;
 
 public class ServiceType {
 
+    private ServiceType() {
+    }
+
     public static DescriptorProtos.ServiceDescriptorProto.Builder parseService(String selfName, Service service) {
         DescriptorProtos.ServiceDescriptorProto.Builder serviceDescriptorProtoBuilder =
                 DescriptorProtos.ServiceDescriptorProto.newBuilder()

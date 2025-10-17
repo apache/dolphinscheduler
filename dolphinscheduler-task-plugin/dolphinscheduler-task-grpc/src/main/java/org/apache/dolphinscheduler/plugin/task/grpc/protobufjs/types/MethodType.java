@@ -23,6 +23,9 @@ import com.google.protobuf.DescriptorProtos;
 
 public class MethodType {
 
+    private MethodType() {
+    }
+
     public static DescriptorProtos.MethodDescriptorProto.Builder parseMethod(String selfName, Method method) {
         DescriptorProtos.MethodDescriptorProto.Builder methodDescriptorProtoBuilder =
                 DescriptorProtos.MethodDescriptorProto.newBuilder()
