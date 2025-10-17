@@ -647,6 +647,21 @@ public class WorkflowInstanceServiceTest {
                             taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
             Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
 
+            final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
+                    .commandParams(Lists.newArrayList(Property.builder()
+                            .prop("name")
+                            .direct(Direct.IN)
+                            .type(DataType.VARCHAR)
+                            .value("commandParam")
+                            .build()))
+                    .timeZone("Asia/Shanghai")
+                    .build();
+            workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
+            Map<String, Object> processInstanceFinishRes2 =
+                    workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                            taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
+            Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes2.get(Constants.STATUS));
+
             // success
             when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(workflowDefinition);
             putMsg(result, Status.SUCCESS, projectCode);
@@ -811,15 +826,31 @@ public class WorkflowInstanceServiceTest {
                         .type(DataType.VARCHAR)
                         .value("commandParam")
                         .build()))
+                .timeZone("Asia/Shanghai")
                 .build();
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setCommandType(CommandType.SCHEDULER);
         workflowInstance.setScheduleTime(new Date());
-        workflowInstance.setGlobalParams("");
         workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
+
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
         Map<String, Object> successRes = workflowInstanceService.viewVariables(1L, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        final RunWorkflowCommandParam commandParamWithEmptyTimeZone = RunWorkflowCommandParam.builder()
+                .commandParams(Lists.newArrayList(Property.builder()
+                        .prop("name")
+                        .direct(Direct.IN)
+                        .type(DataType.VARCHAR)
+                        .value("commandParam")
+                        .build()))
+                .build();
+        workflowInstance.setCommandType(CommandType.SCHEDULER);
+        workflowInstance.setScheduleTime(new Date());
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(commandParamWithEmptyTimeZone));
+        Map<String, Object> successRes2 = workflowInstanceService.viewVariables(1L, 1);
+        Assertions.assertEquals(Status.SUCCESS, successRes2.get(Constants.STATUS));
+
     }
 
     /**

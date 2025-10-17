@@ -667,7 +667,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         String timezoneId;
         final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
-        if (commandParam == null || StringUtils.isBlank(commandParam.getTimeZone())) {
+        if (commandParam == null || StringUtils.isEmpty(commandParam.getTimeZone())) {
             timezoneId = loginUser.getTimeZone();
         } else {
             timezoneId = commandParam.getTimeZone();
@@ -876,7 +876,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         String timezone = null;
         final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
-        if (commandParam != null && StringUtils.isBlank(commandParam.getTimeZone())) {
+        if (commandParam != null && StringUtils.isNotEmpty(commandParam.getTimeZone())) {
             timezone = commandParam.getTimeZone();
         }
 
