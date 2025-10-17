@@ -30,8 +30,8 @@ public class MethodType {
         DescriptorProtos.MethodDescriptorProto.Builder methodDescriptorProtoBuilder =
                 DescriptorProtos.MethodDescriptorProto.newBuilder()
                         .setName(selfName)
-                        .setInputType(method.requestType)
-                        .setOutputType(method.responseType);
+                        .setInputType(method.getRequestType())
+                        .setOutputType(method.getResponseType());
         return methodDescriptorProtoBuilder;
     }
 }

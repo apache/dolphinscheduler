@@ -24,6 +24,6 @@ import lombok.Data;
 @Data
 public class Type extends Namespace {
 
-    public Map<String, Field> fields;
-    public Map<String, OneOf> oneofs;
+    private Map<String, Field> fields;
+    private Map<String, OneOf> oneofs;
 }

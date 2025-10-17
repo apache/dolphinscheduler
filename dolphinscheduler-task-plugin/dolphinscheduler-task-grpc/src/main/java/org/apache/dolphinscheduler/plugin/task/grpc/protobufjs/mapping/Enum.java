@@ -24,5 +24,5 @@ import lombok.Data;
 @Data
 public class Enum extends ReflectionObject {
 
-    public Map<String, Integer> values;
+    private Map<String, Integer> values;
 }

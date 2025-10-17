@@ -30,7 +30,7 @@ public class EnumType {
         DescriptorProtos.EnumDescriptorProto.Builder enumDescriptorProtoBuilder =
                 DescriptorProtos.EnumDescriptorProto.newBuilder()
                         .setName(selfName);
-        enumObj.values.forEach((name, id) -> {
+        enumObj.getValues().forEach((name, id) -> {
             DescriptorProtos.EnumValueDescriptorProto.Builder enumValueDescriptorProtoBuilder =
                     DescriptorProtos.EnumValueDescriptorProto.newBuilder()
                             .setName(name)

@@ -35,5 +35,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class ReflectionObject {
 
-    public Map<String, Object> options;
+    private Map<String, Object> options;
 }

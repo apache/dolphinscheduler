@@ -31,8 +31,8 @@ public class ServiceType {
         DescriptorProtos.ServiceDescriptorProto.Builder serviceDescriptorProtoBuilder =
                 DescriptorProtos.ServiceDescriptorProto.newBuilder()
                         .setName(selfName);
-        if (service.methods != null)
-            service.methods.forEach((name, pbObject) -> {
+        if (service.getMethods() != null)
+            service.getMethods().forEach((name, pbObject) -> {
                 if (pbObject instanceof Method) {
                     serviceDescriptorProtoBuilder.addMethod(MethodType.parseMethod(name, (Method) pbObject));
                 }

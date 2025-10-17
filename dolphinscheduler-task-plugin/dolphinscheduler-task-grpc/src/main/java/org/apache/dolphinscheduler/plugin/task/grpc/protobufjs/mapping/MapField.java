@@ -22,5 +22,5 @@ import lombok.Data;
 @Data
 public class MapField extends Field {
 
-    public String keyType;
+    private String keyType;
 }

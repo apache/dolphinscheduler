@@ -40,10 +40,10 @@ public class JSONDescriptorParser {
 
     private Namespace findInnerNamespace(Namespace ns) {
         while (true) {
-            if (ns.nested != null && ns.nested.size() == 1
-                    && ns.nested.values().toArray()[0] instanceof Namespace && !(ns.nested instanceof Type)
-                    && !(ns.nested instanceof Service)) {
-                ns = (Namespace) ns.nested.values().toArray()[0];
+            if (ns.getNested() != null && ns.getNested().size() == 1
+                    && ns.getNested().values().toArray()[0] instanceof Namespace && !(ns.getNested() instanceof Type)
+                    && !(ns.getNested() instanceof Service)) {
+                ns = (Namespace) ns.getNested().values().toArray()[0];
             } else {
                 break;
             }
@@ -55,11 +55,11 @@ public class JSONDescriptorParser {
         List<String> packageNameNS = new ArrayList<>();
         Namespace ns = root;
         while (true) {
-            if (ns.nested != null && ns.nested.size() == 1
-                    && ns.nested.values().toArray()[0] instanceof Namespace && !(ns.nested instanceof Type)
-                    && !(ns.nested instanceof Service)) {
-                packageNameNS.add((String) ns.nested.keySet().toArray()[0]);
-                ns = (Namespace) ns.nested.values().toArray()[0];
+            if (ns.getNested() != null && ns.getNested().size() == 1
+                    && ns.getNested().values().toArray()[0] instanceof Namespace && !(ns.getNested() instanceof Type)
+                    && !(ns.getNested() instanceof Service)) {
+                packageNameNS.add((String) ns.getNested().keySet().toArray()[0]);
+                ns = (Namespace) ns.getNested().values().toArray()[0];
             } else {
                 break;
             }
@@ -72,8 +72,8 @@ public class JSONDescriptorParser {
                 DescriptorProtos.FileDescriptorProto.newBuilder()
                         .setPackage(readPackageName(root));
         Namespace innerNS = findInnerNamespace(root);
-        if (innerNS.nested != null)
-            innerNS.nested.forEach((name, pbObject) -> {
+        if (innerNS.getNested() != null)
+            innerNS.getNested().forEach((name, pbObject) -> {
                 if (pbObject instanceof Namespace) {
                     Namespace ns = (Namespace) pbObject;
                     if (ns instanceof Type) {

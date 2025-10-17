@@ -34,8 +34,8 @@ public class Field extends ReflectionObject {
 
     @Getter
     @Setter
-    public JsonNode rule;
+    private JsonNode rule;
 
-    public String type;
-    public int id;
+    private String type;
+    private int id;
 }

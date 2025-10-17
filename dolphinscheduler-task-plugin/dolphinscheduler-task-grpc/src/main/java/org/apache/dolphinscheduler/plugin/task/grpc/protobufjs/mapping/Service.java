@@ -24,5 +24,5 @@ import lombok.Data;
 @Data
 public class Service extends Namespace {
 
-    public Map<String, Method> methods;
+    private Map<String, Method> methods;
 }

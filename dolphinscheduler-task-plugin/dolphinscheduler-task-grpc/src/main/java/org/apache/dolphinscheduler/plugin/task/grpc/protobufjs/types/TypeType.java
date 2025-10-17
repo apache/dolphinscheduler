@@ -44,9 +44,9 @@ public class TypeType {
 
         Map<String, DescriptorProtos.FieldDescriptorProto.Builder> fieldMap = new HashMap<>();
 
-        enumFields(descriptorProtoBuilder, fieldMap, type.fields);
-        enumNested(descriptorProtoBuilder, type.nested);
-        enumOneofs(descriptorProtoBuilder, fieldMap, type.oneofs);
+        enumFields(descriptorProtoBuilder, fieldMap, type.getFields());
+        enumNested(descriptorProtoBuilder, type.getNested());
+        enumOneofs(descriptorProtoBuilder, fieldMap, type.getOneofs());
         return descriptorProtoBuilder;
     }
 
@@ -104,7 +104,7 @@ public class TypeType {
                         DescriptorProtos.OneofDescriptorProto oneofDescriptorProto =
                                 oneofDescriptorProtos.get(oneofIndex);
                         String oneofName = oneofDescriptorProto.getName();
-                        oneofs.get(oneofName).oneofList.forEach((fieldName) -> {
+                        oneofs.get(oneofName).getOneofList().forEach((fieldName) -> {
                             fieldMap.get(fieldName).setOneofIndex(oneofIndex);
                         });
                     });

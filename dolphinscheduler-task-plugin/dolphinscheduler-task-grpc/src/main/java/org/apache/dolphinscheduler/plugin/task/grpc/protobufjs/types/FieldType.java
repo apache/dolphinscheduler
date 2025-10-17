@@ -84,11 +84,11 @@ public class FieldType {
         DescriptorProtos.FieldDescriptorProto.Builder fieldDescriptorProtoBuilder =
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName(selfName)
-                        .setNumber(field.id);
+                        .setNumber(field.getId());
 
-        enumOptions(fieldDescriptorProtoBuilder, field.options);
+        enumOptions(fieldDescriptorProtoBuilder, field.getOptions());
 
-        JsonNode rule = field.rule;
+        JsonNode rule = field.getRule();
         if (!isNull(rule) && rule.isTextual()) {
             String label = rule.asText();
             try {
@@ -100,9 +100,9 @@ public class FieldType {
         }
         try {
             fieldDescriptorProtoBuilder
-                    .setType(FieldType.parseFieldType(field.type));
+                    .setType(FieldType.parseFieldType(field.getType()));
         } catch (IllegalArgumentException e) {
-            fieldDescriptorProtoBuilder.setTypeName(field.type);
+            fieldDescriptorProtoBuilder.setTypeName(field.getType());
         }
         return fieldDescriptorProtoBuilder;
     }

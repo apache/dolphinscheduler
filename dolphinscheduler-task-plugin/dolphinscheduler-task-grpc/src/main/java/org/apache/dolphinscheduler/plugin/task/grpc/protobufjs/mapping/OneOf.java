@@ -27,5 +27,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class OneOf extends ReflectionObject {
 
     @JsonProperty("oneof")
-    public ArrayList<String> oneofList;
+    private ArrayList<String> oneofList;
 }

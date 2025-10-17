@@ -31,7 +31,7 @@ public class MapFieldType {
         DescriptorProtos.FieldDescriptorProto.Builder mapFieldDescriptorProtoBuilder =
                 DescriptorProtos.FieldDescriptorProto.newBuilder()
                         .setName(selfName)
-                        .setNumber(mapField.id)
+                        .setNumber(mapField.getId())
                         .setTypeName(mapEntryTypeName)
                         .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED);
         DescriptorProtos.DescriptorProto.Builder mapEntryDescriptorProtoBuilder =
@@ -48,15 +48,15 @@ public class MapFieldType {
                         .setNumber(2);
         try {
             keyDescriptorProtoBuilder
-                    .setType(FieldType.parseFieldType(mapField.keyType));
+                    .setType(FieldType.parseFieldType(mapField.getKeyType()));
         } catch (IllegalArgumentException e) {
-            keyDescriptorProtoBuilder.setTypeName(mapField.keyType);
+            keyDescriptorProtoBuilder.setTypeName(mapField.getKeyType());
         }
         try {
             valueDescriptorProtoBuilder
-                    .setType(FieldType.parseFieldType(mapField.type));
+                    .setType(FieldType.parseFieldType(mapField.getType()));
         } catch (IllegalArgumentException e) {
-            valueDescriptorProtoBuilder.setTypeName(mapField.type);
+            valueDescriptorProtoBuilder.setTypeName(mapField.getType());
         }
         mapEntryDescriptorProtoBuilder.addField(keyDescriptorProtoBuilder);
         mapEntryDescriptorProtoBuilder.addField(valueDescriptorProtoBuilder);

@@ -32,5 +32,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public class Namespace extends ReflectionObject {
 
-    public Map<String, ? extends ReflectionObject> nested;
+    private Map<String, ? extends ReflectionObject> nested;
 }
