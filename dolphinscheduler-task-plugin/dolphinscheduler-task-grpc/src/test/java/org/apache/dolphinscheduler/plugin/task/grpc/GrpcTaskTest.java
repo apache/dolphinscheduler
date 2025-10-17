@@ -97,7 +97,7 @@ public class GrpcTaskTest {
     private int serverPort = 0;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         executor = Executors.newFixedThreadPool(2);
         server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
                 .executor(executor)
@@ -120,7 +120,7 @@ public class GrpcTaskTest {
     }
 
     @AfterEach
-    public void after() {
+    void after() {
         if (server != null && !server.isShutdown()) {
             server.shutdownNow();
         }
@@ -130,7 +130,7 @@ public class GrpcTaskTest {
     }
 
     @Test
-    public void testHandleStatusCodeDefaultOK() throws Exception {
+    void testHandleStatusCodeDefaultOK() throws Exception {
         GrpcTask grpcTaskOK = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
                 GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
         GrpcTask grpcTaskMismatchedStatus = generateGrpcTask("TaskTester/TestUNIMPLEMENTED",
@@ -142,7 +142,7 @@ public class GrpcTaskTest {
     }
 
     @Test
-    public void testHandleStatusCodeCustom() throws Exception {
+    void testHandleStatusCodeCustom() throws Exception {
         GrpcTask grpcTaskUnimplemented = generateGrpcTask("TaskTester/TestUNIMPLEMENTED",
                 "{\"username\":\"test username\"}", GrpcCheckCondition.STATUS_CODE_CUSTOM, "UNIMPLEMENTED");
         grpcTaskUnimplemented.handle(null);
@@ -150,7 +150,7 @@ public class GrpcTaskTest {
     }
 
     @Test
-    public void testAddDefaultOutput() throws Exception {
+    void testAddDefaultOutput() throws Exception {
         GrpcTask grpcTask = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
                 GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
         String response = "{\"message\":\"test reply: test username\"}";

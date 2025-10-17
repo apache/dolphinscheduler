@@ -133,7 +133,7 @@ public class GrpcParserTest {
     private int serverPort = 0;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         executor = Executors.newFixedThreadPool(2);
         server = Grpc.newServerBuilderForPort(0, InsecureServerCredentials.create())
                 .executor(executor)
@@ -156,7 +156,7 @@ public class GrpcParserTest {
     }
 
     @AfterEach
-    public void after() {
+    void after() {
         if (server != null && !server.isShutdown()) {
             server.shutdownNow();
         }
@@ -166,7 +166,7 @@ public class GrpcParserTest {
     }
 
     @Test
-    public void testBasicType() throws Exception {
+    void testBasicType() throws Exception {
         String requestMessage = "{" +
                 "\"stringVal\": \"test string\"," +
                 "\"boolVal\": true," +
@@ -189,7 +189,7 @@ public class GrpcParserTest {
     }
 
     @Test
-    public void testBasicMapType() throws Exception {
+    void testBasicMapType() throws Exception {
         String requestMessage = "{" +
                 "\"seats\": {" +
                 "\"Tom\": 1," +
@@ -205,7 +205,7 @@ public class GrpcParserTest {
     }
 
     @Test
-    public void testMapType() throws Exception {
+    void testMapType() throws Exception {
         String requestMessage = "{" +
                 "\"bought\": {" +
                 "\"Tom\": \"MOMO\"," +
@@ -227,7 +227,7 @@ public class GrpcParserTest {
     }
 
     @Test
-    public void testPrimitiveMapType() throws Exception {
+    void testPrimitiveMapType() throws Exception {
         String requestMessage = "{" +
                 "\"bought\": [" +
                 "{" +
@@ -243,7 +243,7 @@ public class GrpcParserTest {
     }
 
     @Test
-    public void testOneofType() throws Exception {
+    void testOneofType() throws Exception {
         String requestMessage = "{" +
                 "\"name\": \"Alice\"," +
                 "\"age\": 15," +

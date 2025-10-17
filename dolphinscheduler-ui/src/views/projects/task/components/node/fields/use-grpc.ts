@@ -20,7 +20,6 @@ import type { IJsonItem } from '../types'
 import * as proto from 'protobufjs'
 
 export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
-  //TODO: Implement gRPC specific logic
   const { t } = useI18n()
 
   const GRPC_CHECK_CONDITIONS = [

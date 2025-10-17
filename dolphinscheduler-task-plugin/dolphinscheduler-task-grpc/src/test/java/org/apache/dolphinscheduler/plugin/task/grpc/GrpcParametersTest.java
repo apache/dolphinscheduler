@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 public class GrpcParametersTest {
 
     @Test
-    public void testGenerator() throws IOException {
+    void testGenerator() throws IOException {
         String paramData = "{" +
                 "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
@@ -55,7 +55,7 @@ public class GrpcParametersTest {
     }
 
     @Test
-    public void testCheckParameters() throws IOException {
+    void testCheckParameters() throws IOException {
         String paramData = "{" +
                 "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
@@ -79,7 +79,7 @@ public class GrpcParametersTest {
     }
 
     @Test
-    public void testCheckValues() throws IOException {
+    void testCheckValues() throws IOException {
         String paramData = "{" +
                 "\"localParams\":[]," +
                 "\"url\":\"127.0.0.1:50010\"," +
