@@ -58,12 +58,13 @@ public class GrpcDynamicService {
             throw new GrpcParserException(
                     "cannot find service <" + methodNameData.getServiceName() + "> from service definition");
         Descriptors.MethodDescriptor pMethodDescriptor =
-                pServiceDescriptor.findMethodByName(methodNameData.getMethodName());
+                pServiceDescriptor.findMethodByName(methodNameData.getRpcName());
         if (isNull(pMethodDescriptor))
-            throw new GrpcParserException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
+            throw new GrpcParserException("cannot find method <" + methodNameData.getRpcName() + "> from service <"
                     + methodNameData.getServiceName() + "> with method list: " + Arrays.toString(pServiceDescriptor
                             .getMethods().stream().map(Descriptors.MethodDescriptor::getName).toArray()));
-        MethodDescriptor methodDescriptor = methodFromProtobuf(pServiceDescriptor, pMethodDescriptor);
+        MethodDescriptor<DynamicMessage, DynamicMessage> methodDescriptor =
+                methodFromProtobuf(pServiceDescriptor, pMethodDescriptor);
         Descriptors.Descriptor requestMessageType = pMethodDescriptor.getInputType();
         Descriptors.Descriptor responseMessageType = pMethodDescriptor.getOutputType();
         DynamicMessage.Builder requestBuilder = DynamicMessage.newBuilder(requestMessageType);
@@ -92,9 +93,9 @@ public class GrpcDynamicService {
             throw new GrpcParserException(
                     "cannot find service <" + methodNameData.getServiceName() + "> from service definition");
         Descriptors.MethodDescriptor pMethodDescriptor =
-                pServiceDescriptor.findMethodByName(methodNameData.getMethodName());
+                pServiceDescriptor.findMethodByName(methodNameData.getRpcName());
         if (isNull(pMethodDescriptor))
-            throw new GrpcParserException("cannot find method <" + methodNameData.getMethodName() + "> from service <"
+            throw new GrpcParserException("cannot find method <" + methodNameData.getRpcName() + "> from service <"
                     + methodNameData.getServiceName() + "> with method list: " + Arrays.toString(pServiceDescriptor
                             .getMethods().stream().map(Descriptors.MethodDescriptor::getName).toArray()));
         Descriptors.Descriptor requestMessageType = pMethodDescriptor.getInputType();
@@ -109,9 +110,9 @@ public class GrpcDynamicService {
         return requestBuilder.build();
     }
 
-    static MethodDescriptor methodFromProtobuf(
-                                               Descriptors.ServiceDescriptor serviceDesc,
-                                               Descriptors.MethodDescriptor methodDesc) {
+    static MethodDescriptor<DynamicMessage, DynamicMessage> methodFromProtobuf(
+                                                                               Descriptors.ServiceDescriptor serviceDesc,
+                                                                               Descriptors.MethodDescriptor methodDesc) {
         return MethodDescriptor.<DynamicMessage, DynamicMessage>newBuilder()
                 .setType(getMethodTypeFromDesc(methodDesc))
                 .setFullMethodName(MethodDescriptor.generateFullMethodName(
@@ -143,7 +144,7 @@ public class GrpcDynamicService {
         @Getter
         String serviceName = null;
         @Getter
-        String methodName = null;
+        String rpcName = null;
 
         public MethodName(String methodNameWithService) {
             if (!checkMethodName(methodNameWithService))
@@ -155,17 +156,17 @@ public class GrpcDynamicService {
             if (path.length == 0)
                 return false;
             if (path.length == 1)
-                methodName = path[0];
+                rpcName = path[0];
             if (path.length == 2) {
                 serviceName = path[0];
-                methodName = path[1];
+                rpcName = path[1];
             } else {
                 return false;
             }
             if (serviceName == null || serviceName.isEmpty()) {
                 return false;
             }
-            if (methodName == null || methodName.isEmpty()) {
+            if (rpcName == null || rpcName.isEmpty()) {
                 return false;
             }
             return true;
@@ -173,6 +174,9 @@ public class GrpcDynamicService {
     }
 
     public static class ChannelFactory {
+
+        private ChannelFactory() {
+        }
 
         public static ManagedChannel createChannel(String targetAddr) {
             return createChannel(targetAddr, InsecureChannelCredentials.create());

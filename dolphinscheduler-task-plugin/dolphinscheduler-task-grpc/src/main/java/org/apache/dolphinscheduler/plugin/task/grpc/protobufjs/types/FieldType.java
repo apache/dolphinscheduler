@@ -86,16 +86,15 @@ public class FieldType {
         enumOptions(fieldDescriptorProtoBuilder, field.options);
 
         JsonNode rule = field.rule;
-        if (!isNull(rule))
-            if (rule.isTextual()) {
-                String label = rule.asText();
-                try {
-                    fieldDescriptorProtoBuilder
-                            .setLabel(FieldType.parseFieldLabel(label));
-                } catch (IllegalArgumentException e) {
-                    throw new GrpcParserException("grpc exception: Unrecognized field label: " + label, e);
-                }
+        if (!isNull(rule) && rule.isTextual()) {
+            String label = rule.asText();
+            try {
+                fieldDescriptorProtoBuilder
+                        .setLabel(FieldType.parseFieldLabel(label));
+            } catch (IllegalArgumentException e) {
+                throw new GrpcParserException("grpc exception: Unrecognized field label: " + label, e);
             }
+        }
         try {
             fieldDescriptorProtoBuilder
                     .setType(FieldType.parseFieldType(field.type));
@@ -107,10 +106,8 @@ public class FieldType {
 
     private static void enumOptions(DescriptorProtos.FieldDescriptorProto.Builder fieldDescriptorProtoBuilder,
                                     Map<String, Object> options) {
-        if (!isNull(options)) {
-            if (!isNull(options.get("proto3_optional")) && ((boolean) options.get("proto3_optional"))) {
-                fieldDescriptorProtoBuilder.setProto3Optional(true);
-            }
+        if (!isNull(options) && !isNull(options.get("proto3_optional")) && ((boolean) options.get("proto3_optional"))) {
+            fieldDescriptorProtoBuilder.setProto3Optional(true);
         }
     }
 }

@@ -101,7 +101,7 @@ public class TypeType {
                         DescriptorProtos.OneofDescriptorProto oneofDescriptorProto =
                                 oneofDescriptorProtos.get(oneofIndex);
                         String oneofName = oneofDescriptorProto.getName();
-                        oneofs.get(oneofName).oneof.forEach((fieldName) -> {
+                        oneofs.get(oneofName).oneofList.forEach((fieldName) -> {
                             fieldMap.get(fieldName).setOneofIndex(oneofIndex);
                         });
                     });

@@ -21,8 +21,11 @@ import java.util.ArrayList;
 
 import lombok.Data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 public class OneOf extends ReflectionObject {
 
-    public ArrayList<String> oneof;
+    @JsonProperty("oneof")
+    public ArrayList<String> oneofList;
 }
