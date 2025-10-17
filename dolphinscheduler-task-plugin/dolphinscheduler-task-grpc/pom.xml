@@ -252,7 +252,7 @@
                     <pluginId>grpc-java</pluginId>
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
                     <protoSourceRoot>${project.basedir}/src/test/proto</protoSourceRoot>
-                    <outputDirectory>${project.basedir}/src/test/java/</outputDirectory>
+                    <outputDirectory>${project.basedir}/target/generated-test-sources/protobuf/java/</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
