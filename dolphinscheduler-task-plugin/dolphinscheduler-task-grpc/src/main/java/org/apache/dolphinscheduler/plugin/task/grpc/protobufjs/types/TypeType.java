@@ -126,5 +126,4 @@ public class TypeType {
             return 0; // Keep the original order
         }
     }
-
 }

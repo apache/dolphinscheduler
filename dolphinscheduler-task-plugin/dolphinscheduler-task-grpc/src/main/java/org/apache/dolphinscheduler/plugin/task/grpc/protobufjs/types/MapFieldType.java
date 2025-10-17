@@ -62,5 +62,4 @@ public class MapFieldType extends FieldType {
 
         return mapFieldDescriptorProtoBuilder;
     }
-
 }
