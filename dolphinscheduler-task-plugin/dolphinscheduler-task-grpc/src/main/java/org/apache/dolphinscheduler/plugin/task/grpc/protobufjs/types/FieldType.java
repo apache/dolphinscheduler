@@ -27,39 +27,38 @@ import com.google.protobuf.DescriptorProtos;
 
 public class FieldType {
 
-    private static final HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> labelMap =
-            new HashMap<String, DescriptorProtos.FieldDescriptorProto.Label>() {
-
-                {
-                    put("optional", DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL);
-                    put("required", DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED);
-                    put("repeated", DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED);
-                }
-            };
+    private static final HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> labelMap = initLabelMap();
+    private static HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> initLabelMap() {
+        HashMap<String, DescriptorProtos.FieldDescriptorProto.Label> map = new HashMap<>();
+        map.put("optional", DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL);
+        map.put("required", DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED);
+        map.put("repeated", DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED);
+        return map;
+    }
 
     private static final HashMap<String, DescriptorProtos.FieldDescriptorProto.Type> primitiveTypeMap =
-            new HashMap<String, DescriptorProtos.FieldDescriptorProto.Type>() {
-
-                {
-                    put("double", DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE);
-                    put("float", DescriptorProtos.FieldDescriptorProto.Type.TYPE_FLOAT);
-                    put("int64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64);
-                    put("uint64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT64);
-                    put("int32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32);
-                    put("fixed64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED64);
-                    put("fixed32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED32);
-                    put("bool", DescriptorProtos.FieldDescriptorProto.Type.TYPE_BOOL);
-                    put("string", DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING);
-                    put("group", DescriptorProtos.FieldDescriptorProto.Type.TYPE_GROUP);
-                    put("bytes", DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES);
-                    put("uint32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT32);
-                    put("enum", DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM);
-                    put("sfixed32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED32);
-                    put("sfixed64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED64);
-                    put("sint32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT32);
-                    put("sint64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT64);
-                };
-            };
+            initPrimitiveTypeMap();
+    private static HashMap<String, DescriptorProtos.FieldDescriptorProto.Type> initPrimitiveTypeMap() {
+        HashMap<String, DescriptorProtos.FieldDescriptorProto.Type> map = new HashMap<>();
+        map.put("double", DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE);
+        map.put("float", DescriptorProtos.FieldDescriptorProto.Type.TYPE_FLOAT);
+        map.put("int64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64);
+        map.put("uint64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT64);
+        map.put("int32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32);
+        map.put("fixed64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED64);
+        map.put("fixed32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED32);
+        map.put("bool", DescriptorProtos.FieldDescriptorProto.Type.TYPE_BOOL);
+        map.put("string", DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING);
+        map.put("group", DescriptorProtos.FieldDescriptorProto.Type.TYPE_GROUP);
+        map.put("bytes", DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES);
+        map.put("uint32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT32);
+        map.put("enum", DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM);
+        map.put("sfixed32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED32);
+        map.put("sfixed64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED64);
+        map.put("sint32", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT32);
+        map.put("sint64", DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT64);
+        return map;
+    }
 
     public static DescriptorProtos.FieldDescriptorProto.Label parseFieldLabel(String labelName) {
         if (!labelMap.containsKey(labelName)) {

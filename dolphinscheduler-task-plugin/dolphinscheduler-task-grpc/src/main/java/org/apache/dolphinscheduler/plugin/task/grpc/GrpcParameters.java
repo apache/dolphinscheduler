@@ -58,13 +58,11 @@ public class GrpcParameters extends AbstractParameters {
         // validate JSON formatted proto definition
         try {
             Descriptors.FileDescriptor fileDesc =
-                    JSONDescriptorHelper.FileDescFromJSON(grpcServiceDefinitionJSON);
+                    JSONDescriptorHelper.fileDescFromJSON(grpcServiceDefinitionJSON);
             GrpcDynamicService.mergeJSON(fileDesc, methodName, message);
         } catch (JsonProcessingException | Descriptors.DescriptorValidationException | RuntimeException e) {
             return false;
         }
-        if (StringUtils.isEmpty(url) || connectTimeoutMs <= 0)
-            return false;
-        return true;
+        return !(StringUtils.isEmpty(url) || connectTimeoutMs <= 0);
     }
 }

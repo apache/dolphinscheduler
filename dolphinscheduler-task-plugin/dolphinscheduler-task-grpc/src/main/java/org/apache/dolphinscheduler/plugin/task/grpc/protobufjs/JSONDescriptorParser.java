@@ -40,7 +40,7 @@ public class JSONDescriptorParser {
 
     private Namespace findInnerNamespace(Namespace ns) {
         while (true) {
-            if (ns.nested != null && ns.nested.values().size() == 1
+            if (ns.nested != null && ns.nested.size() == 1
                     && ns.nested.values().toArray()[0] instanceof Namespace && !(ns.nested instanceof Type)
                     && !(ns.nested instanceof Service)) {
                 ns = (Namespace) ns.nested.values().toArray()[0];
@@ -55,7 +55,7 @@ public class JSONDescriptorParser {
         List<String> packageNameNS = new ArrayList<>();
         Namespace ns = root;
         while (true) {
-            if (ns.nested != null && ns.nested.values().size() == 1
+            if (ns.nested != null && ns.nested.size() == 1
                     && ns.nested.values().toArray()[0] instanceof Namespace && !(ns.nested instanceof Type)
                     && !(ns.nested instanceof Service)) {
                 packageNameNS.add((String) ns.nested.keySet().toArray()[0]);
@@ -85,10 +85,8 @@ public class JSONDescriptorParser {
                     fileDescriptorProtoBuilder.addEnumType(EnumType.parseEnum(name, (Enum) pbObject));
                 }
             });
-        Descriptors.FileDescriptor fileDescriptor =
-                Descriptors.FileDescriptor.buildFrom(fileDescriptorProtoBuilder.build(),
-                        new Descriptors.FileDescriptor[0]);
-        return fileDescriptor;
+        return Descriptors.FileDescriptor.buildFrom(fileDescriptorProtoBuilder.build(),
+                new Descriptors.FileDescriptor[0]);
     }
 
 }

@@ -23,6 +23,7 @@ public final class ParserTesterProto {
     }
     public static void registerAllExtensions(
                                              com.google.protobuf.ExtensionRegistryLite registry) {
+        // No extensions to register
     }
 
     public static void registerAllExtensions(

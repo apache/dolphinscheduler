@@ -25,12 +25,15 @@ import com.google.protobuf.Descriptors;
 
 public class JSONDescriptorHelper {
 
-    public static Root ProtobufFromJSON(String json) throws JsonProcessingException {
+    private JSONDescriptorHelper() {
+    }
+
+    public static Root protobufFromJSON(String json) {
         return JSONUtils.parseObject(json, Root.class);
     }
 
-    public static Descriptors.FileDescriptor FileDescFromJSON(String json) throws JsonProcessingException, Descriptors.DescriptorValidationException {
+    public static Descriptors.FileDescriptor fileDescFromJSON(String json) throws JsonProcessingException, Descriptors.DescriptorValidationException {
         JSONDescriptorParser parser = new JSONDescriptorParser();
-        return parser.buildDescriptor(ProtobufFromJSON(json));
+        return parser.buildDescriptor(protobufFromJSON(json));
     }
 }

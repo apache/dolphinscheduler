@@ -80,7 +80,7 @@ public class GrpcTask extends AbstractTask {
                 channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
             }
             Descriptors.FileDescriptor fileDesc =
-                    JSONDescriptorHelper.FileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
+                    JSONDescriptorHelper.fileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
             GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
             DynamicMessage message = stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage(),
                     grpcParameters.getConnectTimeoutMs());
