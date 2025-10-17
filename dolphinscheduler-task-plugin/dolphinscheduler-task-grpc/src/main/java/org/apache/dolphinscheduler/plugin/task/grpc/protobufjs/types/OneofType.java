@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
 
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.OneOf;
-
 import com.google.protobuf.DescriptorProtos;
 
 public class OneofType {
 
     public static DescriptorProtos.OneofDescriptorProto.Builder parseOneof(DescriptorProtos.DescriptorProto.Builder descriptorProtoBuilder,
-                                                                           String selfName, OneOf oneof) {
+                                                                           String selfName) {
         DescriptorProtos.OneofDescriptorProto.Builder oneofDescriptorProtoBuilder =
                 DescriptorProtos.OneofDescriptorProto.newBuilder()
                         .setName(selfName);

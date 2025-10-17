@@ -91,7 +91,7 @@ public class TypeType {
                             (oldValue, newValue) -> oldValue,
                             LinkedHashMap::new))
                     .forEach((name, oneof) -> {
-                        OneofType.parseOneof(descriptorProtoBuilder, name, oneof);
+                        OneofType.parseOneof(descriptorProtoBuilder, name);
                     });
             int oneofCount = descriptorProtoBuilder.getOneofDeclCount();
             List<DescriptorProtos.OneofDescriptorProto> oneofDescriptorProtos =
