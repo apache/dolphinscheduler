@@ -152,5 +152,6 @@ public class GrpcTask extends AbstractTask {
         outputProperty.setType(DataType.VARCHAR);
         outputProperty.setValue(response);
         grpcParameters.addPropertyToValPool(outputProperty);
+        log.info("grpc task output added to val pool: {}", outputProperty.getProp());
     }
 }

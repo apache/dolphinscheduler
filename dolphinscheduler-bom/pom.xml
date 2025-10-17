@@ -39,7 +39,7 @@
         <!-- todo: Should upgrade the jetcd.test, 0.7.1 doesn't support arm -->
         <jetcd.test.version>0.7.1</jetcd.test.version>
         <io.grpc.version>1.41.0</io.grpc.version>
-        <commons-text.version>1.13.1</commons-text.version>
+        <commons-text.version>1.4</commons-text.version>
         <commons-codec.version>1.11</commons-codec.version>
         <commons-logging.version>1.1.1</commons-logging.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
