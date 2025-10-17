@@ -256,15 +256,6 @@ public class GrpcParserTest {
     }
 
     private GrpcTask generateGrpcTask(String methodName, String requestMessage,
-                                      Map<String, String> prepareParamsMap,
-                                      GrpcCheckCondition grpcCheckCondition, String condition) throws IOException {
-        String paramData =
-                generateGrpcParameters("127.0.0.1:" + serverPort, methodName, requestMessage, grpcCheckCondition,
-                        condition);
-        return generateGrpcTaskFromParamData(paramData, prepareParamsMap);
-    }
-
-    private GrpcTask generateGrpcTask(String methodName, String requestMessage,
                                       GrpcCheckCondition grpcCheckCondition, String condition) throws IOException {
         String paramData =
                 generateGrpcParameters("127.0.0.1:" + serverPort, methodName, requestMessage, grpcCheckCondition,

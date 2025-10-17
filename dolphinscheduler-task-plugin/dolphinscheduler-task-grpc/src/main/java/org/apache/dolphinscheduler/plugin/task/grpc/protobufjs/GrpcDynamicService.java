@@ -147,7 +147,7 @@ public class GrpcDynamicService {
 
         public MethodName(String methodNameWithService) {
             if (!checkMethodName(methodNameWithService))
-                throw new RuntimeException("grpc task method name is invalid");
+                throw new GrpcParserException("grpc task method name is invalid");
         }
 
         private boolean checkMethodName(String methodNameWithService) {

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
 
 import static java.util.Objects.isNull;
 
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcParserException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,7 +93,7 @@ public class FieldType {
                     fieldDescriptorProtoBuilder
                             .setLabel(FieldType.parseFieldLabel(label));
                 } catch (IllegalArgumentException e) {
-                    throw new RuntimeException("grpc exception: Unrecognized field label: " + label, e);
+                    throw new GrpcParserException("grpc exception: Unrecognized field label: " + label, e);
                 }
             }
         try {
