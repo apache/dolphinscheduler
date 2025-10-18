@@ -85,13 +85,17 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
+          let msg = ''
           if (!value) {
-            return new Error(t('project.node.grpc_service_definition_tips'))
+            msg = t('project.node.grpc_service_definition_tips')
           }
           try {
             proto.parse(value || '')
-          } catch (e) {
-            return new Error(t('project.node.grpc_service_definition_invalid'))
+          } catch {
+            msg = t('project.node.grpc_service_definition_invalid')
+          }
+          if (msg) {
+            return new Error(msg)
           }
         }
       }
@@ -127,14 +131,18 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'blur'],
         required: true,
         validator(validate: any, value: string) {
+          let msg = ''
           if (!value) {
-            return new Error(t('project.node.grpc_message_tips'))
+            msg = t('project.node.grpc_message_tips')
           }
           //check value is a valid json format
           try {
             JSON.parse(value)
-          } catch (e) {
-            return new Error(t('project.node.grpc_message_tips_invalid_json'))
+          } catch {
+            msg = t('project.node.grpc_message_tips_invalid_json')
+          }
+          if (msg) {
+            return new Error(msg)
           }
         }
       }
