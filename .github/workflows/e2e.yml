@@ -192,7 +192,6 @@ jobs:
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
-            -DtrimStackTrace=false \
             -DfailIfNoTests=false \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v4
