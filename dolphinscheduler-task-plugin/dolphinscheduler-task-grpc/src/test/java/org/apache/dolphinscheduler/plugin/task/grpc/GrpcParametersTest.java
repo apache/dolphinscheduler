@@ -43,7 +43,7 @@ public class GrpcParametersTest {
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
                 "\"condition\":\"\"," +
-                "\"connectTimeout\":\"10000\"" +
+                "\"grpcCconnectTimeoutMs\":\"10000\"" +
                 "}";
         GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
         Assertions.assertEquals(10000, grpcParameters.getConnectTimeoutMs());
@@ -66,7 +66,7 @@ public class GrpcParametersTest {
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
                 "\"condition\":\"\"," +
-                "\"connectTimeout\":\"10000\"" +
+                "\"grpcConnectTimeoutMs\":\"10000\"" +
                 "}";
         GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
         Assertions.assertTrue(grpcParameters.checkParameters());
@@ -90,7 +90,7 @@ public class GrpcParametersTest {
                 "\"message\":\"{ \\\"username\\\":\\\"test username\\\" }\"," +
                 "\"grpcCheckCondition\":\"STATUS_CODE_DEFAULT\"," +
                 "\"condition\":\"\"," +
-                "\"connectTimeout\":\"10000\"" +
+                "\"grpcConnectTimeoutMs\":\"10000\"" +
                 "}";
         GrpcParameters grpcParameters = JSONUtils.parseObject(paramData, GrpcParameters.class);
         Assertions.assertEquals(10000, grpcParameters.getConnectTimeoutMs());

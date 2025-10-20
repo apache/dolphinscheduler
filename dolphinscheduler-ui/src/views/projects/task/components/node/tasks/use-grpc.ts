@@ -48,7 +48,7 @@ export function useGrpc({
     grpcServiceDefinitionJSON: '',
     url: '',
     condition: '',
-    connectTimeout: 60000,
+    grpcConnectTimeoutMs: 60000,
     socketTimeout: 60000,
     timeoutNotifyStrategy: ['WARN']
   } as INodeData)

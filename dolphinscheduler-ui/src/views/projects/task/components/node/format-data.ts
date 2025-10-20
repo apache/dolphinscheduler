@@ -101,7 +101,7 @@ export function formatParams(data: INodeData): {
     taskParams.message = data.message
     taskParams.grpcCheckCondition = data.grpcCheckCondition
     taskParams.condition = data.condition
-    taskParams.connectTimeout = data.connectTimeout
+    taskParams.grpcConnectTimeoutMs = data.grpcConnectTimeoutMs
     taskParams.socketTimeout = data.socketTimeout
   }
 

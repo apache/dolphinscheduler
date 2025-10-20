@@ -292,6 +292,7 @@ interface ITaskParams {
   methodName?: string
   message?: string
   grpcCheckCondition?: string
+  grpcConnectTimeoutMs?: number
   httpMethod?: string
   httpBody?: string
   httpCheckCondition?: string

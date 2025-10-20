@@ -166,7 +166,7 @@ export function useGrpc(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input-number',
-      field: 'connectTimeout',
+      field: 'grpcConnectTimeoutMs',
       name: t('project.node.connect_timeout'),
       span: 12,
       props: {

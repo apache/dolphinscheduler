@@ -63,7 +63,7 @@
         "message": "{\n    \"name\": \"test name\"\n}",
         "grpcCheckCondition": "STATUS_CODE_DEFAULT",
         "condition": "",
-        "connectTimeout": 60000,
+        "grpcConnectTimeoutMs": 60000,
         "socketTimeout": 60000
       },
       "taskParamList": [],

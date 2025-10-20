@@ -49,7 +49,7 @@ public class GrpcParameters extends AbstractParameters {
 
     private String condition;
 
-    @JsonProperty("connectTimeout")
+    @JsonProperty("grpcConnectTimeoutMs")
     private long connectTimeoutMs = 0L;
 
     @Override
