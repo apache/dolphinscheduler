@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARA
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
@@ -79,6 +80,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
@@ -663,13 +665,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
 
-        //
-        Map<String, String> commandParamMap = JSONUtils.toMap(workflowInstance.getCommandParam());
-        String timezoneId = null;
-        if (commandParamMap == null || StringUtils.isBlank(commandParamMap.get(Constants.SCHEDULE_TIMEZONE))) {
+        String timezoneId;
+        final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
+        if (commandParam == null || StringUtils.isEmpty(commandParam.getTimeZone())) {
             timezoneId = loginUser.getTimeZone();
         } else {
-            timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
+            timezoneId = commandParam.getTimeZone();
         }
 
         setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
@@ -873,11 +874,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
 
-        Map<String, String> commandParam = JSONUtils.toMap(workflowInstance.getCommandParam());
         String timezone = null;
-        if (commandParam != null) {
-            timezone = commandParam.get(Constants.SCHEDULE_TIMEZONE);
+        final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
+        if (commandParam != null && StringUtils.isNotEmpty(commandParam.getTimeZone())) {
+            timezone = commandParam.getTimeZone();
         }
+
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(workflowInstance.getCmdTypeIfComplement(),
                         workflowInstance.getScheduleTime(), timezone);
