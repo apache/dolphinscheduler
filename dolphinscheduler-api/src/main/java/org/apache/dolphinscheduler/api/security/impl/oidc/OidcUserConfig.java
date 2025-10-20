@@ -15,41 +15,35 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { LoginReq } from './types'
+package org.apache.dolphinscheduler.api.security.impl.oidc;
 
-export function login(data: LoginReq): any {
-  return axios({
-    url: '/login',
-    method: 'post',
-    data
-  })
-}
+import java.util.List;
 
-export function ssoLoginUrl(): any {
-  return axios({
-    url: '/login/sso',
-    method: 'get'
-  })
-}
+import lombok.Data;
 
-export function getOauth2Provider(): any {
-  return axios({
-    url: '/oauth2-provider',
-    method: 'get'
-  })
-}
+/**
+ * OIDC user configuration
+ */
+@Data
+public class OidcUserConfig {
 
-export function getOidcProviders(): any {
-  return axios({
-    url: '/oidc-providers',
-    method: 'get'
-  })
-}
+    /**
+     * Whether to auto-create users if they don't exist
+     */
+    private boolean autoCreate = false;
 
-export function clearCookie(): any {
-  return axios({
-    url: '/cookies',
-    method: 'delete'
-  })
+    /**
+     * Default tenant code for auto-created users
+     */
+    private String defaultTenantCode = "default";
+
+    /**
+     * Default queue for auto-created users
+     */
+    private String defaultQueue = "default";
+
+    /**
+     * Groups that map to an administrator role
+     */
+    private List<String> adminGroupMapping;
 }

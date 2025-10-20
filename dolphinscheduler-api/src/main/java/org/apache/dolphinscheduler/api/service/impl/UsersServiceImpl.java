@@ -341,6 +341,22 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Override
     @Transactional
+    public User updateUser(User user) {
+        if (user == null || user.getId() == null) {
+            throw new ServiceException(Status.USER_NOT_EXIST);
+        }
+        // Ensure the update time is set
+        user.setUpdateTime(new Date());
+        int updatedRows = userMapper.updateById(user);
+
+        if (updatedRows == 0) {
+            throw new ServiceException(Status.UPDATE_USER_ERROR);
+        }
+        return user;
+    }
+
+    @Override
+    @Transactional
     public User updateUser(User loginUser,
                            Integer userId,
                            String userName,

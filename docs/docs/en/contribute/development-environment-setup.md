@@ -27,7 +27,7 @@ Supporting system:
 - MacOS
 - Liunx
 
-Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+Run `./mvnw clean install -Prelease -Dmaven.test.skip=true`
 
 ### Code Style
 
