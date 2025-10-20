@@ -1,0 +1,71 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: "3.8"
+
+services:
+  dolphinscheduler:
+    image: apache/dolphinscheduler-standalone-server:ci
+    environment:
+      WORKER_TENANT_AUTO_CREATE: "true"
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./application.yaml:/opt/dolphinscheduler/standalone-server/conf/application.yaml
+      # Mount the wait script into the container
+      - ./wait-and-start-ds.sh:/wait-and-start-ds.sh
+    # Override the default entrypoint to run our script
+    entrypoint:
+      - /bin/bash
+      - -c
+      - "chmod +x /wait-and-start-ds.sh && /wait-and-start-ds.sh"
+    networks:
+      - api-test
+    healthcheck:
+      test: ["CMD","bash","-c","{ printf 'GET /dolphinscheduler/actuator/health HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&0; grep -q 'HTTP/1.1 200'; } 0<>/dev/tcp/localhost/12345" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+    depends_on:
+      - keycloak   # No health dependency; we gate startup with the wait script
+
+  keycloak:
+    hostname: keycloak
+    image: quay.io/keycloak/keycloak:22.0.1
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_PROXY: edge
+    command: ["start-dev", "--import-realm"]
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    networks:
+      - api-test
+    tty: true
+    stdin_open: true
+    restart: always
+    healthcheck:
+      # Wait until the dolphinscheduler realm OIDC metadata is served (implies import done)
+      test: ["CMD","bash","-c","{ printf 'GET /realms/dolphinscheduler/.well-known/openid-configuration HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&0; grep -q 'HTTP/1.1 200'; } 0<>/dev/tcp/localhost/8080"]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+
+networks:
+  api-test:

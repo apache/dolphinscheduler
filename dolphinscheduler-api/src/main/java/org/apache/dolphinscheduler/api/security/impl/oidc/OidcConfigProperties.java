@@ -15,41 +15,27 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { LoginReq } from './types'
+package org.apache.dolphinscheduler.api.security.impl.oidc;
 
-export function login(data: LoginReq): any {
-  return axios({
-    url: '/login',
-    method: 'post',
-    data
-  })
-}
+import java.util.Map;
 
-export function ssoLoginUrl(): any {
-  return axios({
-    url: '/login/sso',
-    method: 'get'
-  })
-}
+import lombok.Data;
 
-export function getOauth2Provider(): any {
-  return axios({
-    url: '/oauth2-provider',
-    method: 'get'
-  })
-}
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.stereotype.Component;
 
-export function getOidcProviders(): any {
-  return axios({
-    url: '/oidc-providers',
-    method: 'get'
-  })
-}
+/**
+ * OIDC configuration properties
+ */
+@Data
+@Component
+@ConfigurationProperties(prefix = "security.authentication.oidc")
+public class OidcConfigProperties {
 
-export function clearCookie(): any {
-  return axios({
-    url: '/cookies',
-    method: 'delete'
-  })
+    private boolean enable = false;
+    private Map<String, OidcProviderConfig> providers;
+
+    @NestedConfigurationProperty
+    private OidcUserConfig user = new OidcUserConfig();
 }
