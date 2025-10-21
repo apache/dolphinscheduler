@@ -24,6 +24,7 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.0.22",
     "pinia-plugin-persistedstate": "^2.2.0",
+    "protobufjs": "^7.5.4",
     "qs": "^6.11.0",
     "screenfull": "^6.0.2",
     "vfonts": "^0.0.3",

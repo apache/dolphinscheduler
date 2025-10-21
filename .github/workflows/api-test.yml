@@ -119,6 +119,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.WorkflowInstanceAPITest
           - name: LdapLoginAPITest
             class: org.apache.dolphinscheduler.api.test.cases.LdapLoginAPITest
+          - name: GrpcTaskAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.GrpcTaskAPITest
           - name: OidcLoginAPITest
             class: org.apache.dolphinscheduler.api.test.cases.OidcLoginAPITest
     env:
