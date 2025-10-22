@@ -94,7 +94,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLE | default false }}
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
                   {{- $cmd := "curl -s http://localhost:5679/actuator/health/liveness" }}
                   {{- if $enableSecurity }}
                       {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
@@ -118,7 +118,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLE | default false }}
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
                   {{- $cmd := "curl -s http://localhost:5679/actuator/health/readiness" }}
                   {{- if $enableSecurity }}
                       {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}

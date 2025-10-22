@@ -124,7 +124,6 @@
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
         <brace-expansion.version>2.0.1</brace-expansion.version>
-        <commons-net.version>3.9.0</commons-net.version>
         <jakarta-servlet-api.version>4.0.4</jakarta-servlet-api.version>
     </properties>
 
@@ -962,12 +961,6 @@
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${jakarta-servlet-api.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>${commons-net.version}</version>
             </dependency>
 
         </dependencies>

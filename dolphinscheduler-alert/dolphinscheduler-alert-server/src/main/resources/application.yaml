@@ -50,6 +50,10 @@ server:
   port: 50053
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
   endpoints:
     web:
       exposure:

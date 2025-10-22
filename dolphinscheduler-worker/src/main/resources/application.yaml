@@ -73,6 +73,10 @@ server:
   port: 1235
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
   endpoints:
     web:
       exposure:

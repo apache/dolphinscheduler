@@ -97,6 +97,10 @@ mybatis-plus:
     banner: false
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
   endpoints:
     web:
       exposure:

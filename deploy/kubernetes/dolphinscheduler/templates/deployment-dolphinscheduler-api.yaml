@@ -97,7 +97,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLE | default false }}
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
                   {{- $cmd := "curl -s http://localhost:12345/dolphinscheduler/actuator/health/liveness" }}
                   {{- if $enableSecurity }}
                       {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
@@ -121,7 +121,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLE | default false }}
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
                   {{- $cmd := "curl -s http://localhost:12345/dolphinscheduler/actuator/health/readiness" }}
                   {{- if $enableSecurity }}
                       {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
