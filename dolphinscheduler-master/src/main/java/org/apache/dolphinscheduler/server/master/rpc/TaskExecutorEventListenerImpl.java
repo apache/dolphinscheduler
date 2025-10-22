@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.extract.master.ITaskExecutorEventListener;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
@@ -60,7 +61,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                 .executorHost(taskExecutorDispatchedLifecycleEvent.getTaskInstanceHost())
                 .build();
 
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskDispatchedLifecycleEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorDispatchedLifecycleEvent, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskDispatchedLifecycleEvent));
     }
 
     @Override
@@ -73,7 +75,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                 .logPath(taskExecutorStartedLifecycleEvent.getLogPath())
                 .build();
 
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskRunningEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorStartedLifecycleEvent, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskRunningEvent));
     }
 
     @Override
@@ -86,7 +89,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                 .runtimeContext(taskExecutorRuntimeContextChangedLifecycleEventr.getAppIds())
                 .build();
 
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskRuntimeContextChangedEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorRuntimeContextChangedLifecycleEventr, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskRuntimeContextChangedEvent));
     }
 
     @Override
@@ -98,7 +102,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                 .endTime(new Date(taskExecutorSuccessLifecycleEvent.getEndTime()))
                 .varPool(taskExecutorSuccessLifecycleEvent.getVarPool())
                 .build();
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskSuccessEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorSuccessLifecycleEvent, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskSuccessEvent));
     }
 
     @Override
@@ -108,7 +113,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                 .taskExecutionRunnable(taskExecutionRunnable)
                 .endTime(new Date(taskExecutorFailedLifecycleEvent.getEndTime()))
                 .build();
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorFailedLifecycleEvent, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent));
     }
 
     @Override
@@ -118,14 +124,16 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                 .taskExecutionRunnable(taskExecutionRunnable)
                 .endTime(new Date(taskExecutorKilledLifecycleEvent.getEndTime()))
                 .build();
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskKilledEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorKilledLifecycleEvent, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskKilledEvent));
     }
 
     @Override
     public void onTaskExecutorPaused(final TaskExecutorPausedLifecycleEvent taskExecutorPausedLifecycleEvent) {
         final ITaskExecutionRunnable taskExecutionRunnable = getTaskExecutionRunnable(taskExecutorPausedLifecycleEvent);
         final TaskPausedLifecycleEvent taskPausedEvent = TaskPausedLifecycleEvent.of(taskExecutionRunnable);
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskPausedEvent);
+        publishWithMDC(taskExecutionRunnable, taskExecutorPausedLifecycleEvent, 
+        () -> taskExecutionRunnable.getWorkflowEventBus().publish(taskPausedEvent));
     }
 
     private ITaskExecutionRunnable getTaskExecutionRunnable(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
@@ -143,6 +151,17 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             throw new IllegalArgumentException("Cannot find the TaskExecuteRunnable: " + taskInstanceId);
         }
         return taskExecutionRunnable;
+    }
+
+    private void publishWithMDC(final ITaskExecutionRunnable taskExecutionRunnable, 
+                           final IReportableTaskExecutorLifecycleEvent event, 
+                           final Runnable publishAction) {
+        LogUtils.setWorkflowInstanceIdMDC(event.getWorkflowInstanceId());
+        try {
+            publishAction.run();
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
+        }
     }
 
 }
