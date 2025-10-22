@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
@@ -149,42 +150,65 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     }
 
     private CompletableFuture<IWorkflowExecutionRunnable> bootstrapCommand(Command command) {
-        return supplyAsync(
-                () -> workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command), commandHandleThreadPool);
+        return supplyAsync(() -> {
+            LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
+            log.info("Start bootstrap command: {}", command.getId());
+            try {
+                IWorkflowExecutionRunnable result = workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
+                log.info("Success bootstrap command");
+                return result;
+            } finally {
+                LogUtils.removeWorkflowInstanceIdMDC();
+            }
+        }, commandHandleThreadPool);
     }
 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowInstance workflowInstance =
-                workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
-        if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
-            log.info("The workflow {} state is: {} will not be trigger now",
-                    workflowInstance.getName(),
-                    workflowInstance.getState());
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
+        
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstance.getId());
+        try {
+            if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
+                log.info("The workflow {} state is: {} will not be trigger now",
+                        workflowInstance.getName(),
+                        workflowInstance.getState());
+                return CompletableFuture.completedFuture(null);
+            }
+    
+            workflowRepository.put(workflowExecutionRunnable);
+            workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecutionRunnable);
+            workflowExecutionRunnable.getWorkflowEventBus()
+                    .publish(WorkflowStartLifecycleEvent.of(workflowExecutionRunnable));
             return CompletableFuture.completedFuture(null);
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
         }
-
-        workflowRepository.put(workflowExecutionRunnable);
-        workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecutionRunnable);
-        workflowExecutionRunnable.getWorkflowEventBus()
-                .publish(WorkflowStartLifecycleEvent.of(workflowExecutionRunnable));
-        return CompletableFuture.completedFuture(null);
     }
 
     private CompletableFuture<Void> bootstrapSuccess(Command command) {
-        log.info("Success bootstrap command {}", JSONUtils.toPrettyJsonString(command));
-        MasterServerMetrics.incMasterConsumeCommand(1);
-        return CompletableFuture.completedFuture(null);
+        LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
+        try {
+            log.info("Success bootstrap command {}", JSONUtils.toPrettyJsonString(command));
+            MasterServerMetrics.incMasterConsumeCommand(1);
+            return CompletableFuture.completedFuture(null);
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
+        }
     }
 
     private Void bootstrapError(Command command, Throwable throwable) {
-        if (throwable instanceof CommandDuplicateHandleException) {
-            log.warn("Handle command failed, the command: {} has been handled by other master",
-                    command,
-                    throwable);
-            return null;
+        LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
+        try {
+            if (throwable instanceof CommandDuplicateHandleException) {
+                log.warn("Handle command failed, the command: {} has been handled by other master",
+                        command, throwable);
+            } else {
+                log.error("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
+                commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
+            }
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
         }
-        log.error("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
-        commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
         return null;
     }
 
