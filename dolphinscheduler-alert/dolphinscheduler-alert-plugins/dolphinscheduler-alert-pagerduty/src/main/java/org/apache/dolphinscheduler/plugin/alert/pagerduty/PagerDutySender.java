@@ -65,7 +65,8 @@ public final class PagerDutySender {
         return alertResult;
     }
 
-    private AlertResult sendPagerDutyAlterV2(AlertResult alertResult, String title, String content, String duplicateKey) throws IOException {
+    private AlertResult sendPagerDutyAlterV2(AlertResult alertResult, String title, String content,
+                                             String duplicateKey) throws IOException {
         String requestBody = textToJsonStringV2(title, content, duplicateKey);
         return send(alertResult, PagerDutyParamsConstants.PAGER_DUTY_EVENT_API, requestBody);
     }

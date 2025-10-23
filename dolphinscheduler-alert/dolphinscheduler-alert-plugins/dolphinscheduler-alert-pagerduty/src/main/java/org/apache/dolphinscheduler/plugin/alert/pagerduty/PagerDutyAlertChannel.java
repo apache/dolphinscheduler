@@ -34,6 +34,7 @@ public final class PagerDutyAlertChannel implements AlertChannel {
             return new AlertResult(false, "PagerDuty alert params is empty");
         }
 
-        return new PagerDutySender(alertParams).sendPagerDutyAlter(alertData.getTitle(), alertData.getContent(), alertData.getProjectCode() + "-" + alertData.getWorkflowDefinitionCode());
+        return new PagerDutySender(alertParams).sendPagerDutyAlter(alertData.getTitle(), alertData.getContent(),
+                alertData.getProjectCode() + "-" + alertData.getWorkflowDefinitionCode());
     }
 }
