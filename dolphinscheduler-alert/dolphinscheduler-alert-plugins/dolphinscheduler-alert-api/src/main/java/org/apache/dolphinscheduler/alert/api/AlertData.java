@@ -56,4 +56,13 @@ public class AlertData {
      */
     private int alertType;
 
+    /**
+     * Project_code
+     */
+    private Long projectCode;
+
+    /**
+     * Workflow_Definition_Code
+     */
+    private Long workflowDefinitionCode;
 }

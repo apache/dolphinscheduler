@@ -51,13 +51,13 @@ public final class PagerDutySender {
         Preconditions.checkArgument(!Objects.isNull(integrationKey), "PagerDuty integration key can not be null");
     }
 
-    public AlertResult sendPagerDutyAlter(String title, String content) {
+    public AlertResult sendPagerDutyAlter(String title, String content, String duplicateKey) {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
         alertResult.setMessage("send pager duty alert fail.");
 
         try {
-            sendPagerDutyAlterV2(alertResult, title, content);
+            sendPagerDutyAlterV2(alertResult, title, content, duplicateKey);
         } catch (Exception e) {
             log.info("send pager duty alert exception : {}", e.getMessage());
         }
@@ -65,8 +65,8 @@ public final class PagerDutySender {
         return alertResult;
     }
 
-    private AlertResult sendPagerDutyAlterV2(AlertResult alertResult, String title, String content) throws IOException {
-        String requestBody = textToJsonStringV2(title, content);
+    private AlertResult sendPagerDutyAlterV2(AlertResult alertResult, String title, String content, String duplicateKey) throws IOException {
+        String requestBody = textToJsonStringV2(title, content, duplicateKey);
         return send(alertResult, PagerDutyParamsConstants.PAGER_DUTY_EVENT_API, requestBody);
     }
 
@@ -103,9 +103,12 @@ public final class PagerDutySender {
         return alertResult;
     }
 
-    private String textToJsonStringV2(String title, String content) {
+    private String textToJsonStringV2(String title, String content, String duplicateKey) {
         Map<String, Object> items = new HashMap<>();
         items.put("routing_key", integrationKey);
+        if (duplicateKey != null && !duplicateKey.equals("null-null")) {
+            items.put("dedup_key", duplicateKey);
+        }
         items.put("event_action", PagerDutyParamsConstants.PAGER_DUTY_EVENT_ACTION_TRIGGER);
         Map<String, Object> payload = new HashMap<>();
         payload.put("summary", title);

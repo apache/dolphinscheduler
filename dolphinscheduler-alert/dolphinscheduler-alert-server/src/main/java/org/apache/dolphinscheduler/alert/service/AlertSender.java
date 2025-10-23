@@ -106,6 +106,8 @@ public class AlertSender extends AbstractEventSender<Alert> {
                 .log(event.getLog())
                 .title(event.getTitle())
                 .alertType(event.getAlertType().getCode())
+                .projectCode(event.getProjectCode())
+                .workflowDefinitionCode(event.getWorkflowDefinitionCode())
                 .build();
     }
 
