@@ -15,157 +15,155 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.command;
+ package org.apache.dolphinscheduler.server.master.engine.command;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-
+ import static java.util.concurrent.CompletableFuture.supplyAsync;
+ 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
-import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBusCoordinator;
-import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
-import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnableFactory;
-import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
-import org.apache.dolphinscheduler.service.command.CommandService;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-/**
- * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
- */
-@Service
-@Slf4j
-public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
-
-    @Autowired
-    private ICommandFetcher commandFetcher;
-
-    @Autowired
-    private CommandService commandService;
-
-    @Autowired
-    private MasterConfig masterConfig;
-
-    @Autowired
-    private MasterServerLoadProtection masterServerLoadProtection;
-
-    @Autowired
-    private IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private WorkflowExecutionRunnableFactory workflowExecutionRunnableFactory;
-
-    @Autowired
-    private MetricsProvider metricsProvider;
-
-    @Autowired
-    private WorkflowEventBusCoordinator workflowEventBusCoordinator;
-
-    private ExecutorService commandHandleThreadPool;
-
-    private boolean flag = false;
-
-    protected CommandEngine() {
-        super("MasterCommandLoopThread");
-    }
-
-    @Override
-    public synchronized void start() {
-        log.info("MasterSchedulerBootstrap starting..");
-        this.commandHandleThreadPool = ThreadUtils.newDaemonFixedThreadExecutor("MasterCommandHandleThreadPool",
-                Runtime.getRuntime().availableProcessors());
-        flag = true;
-        super.start();
-        log.info("MasterSchedulerBootstrap started...");
-    }
-
-    @Override
-    public void close() throws Exception {
-        log.info("MasterSchedulerBootstrap stopping...");
-        flag = false;
-        log.info("MasterSchedulerBootstrap stopped...");
-    }
-
-    @Override
-    public void run() {
-        while (flag) {
-            try {
-                // todo: if the workflow event queue is much, we need to handle the back pressure
-                SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-                if (masterServerLoadProtection.isOverload(systemMetrics)) {
-                    log.warn("The current server is overload, cannot consumes commands.");
-                    MasterServerMetrics.incMasterOverload();
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    continue;
-                }
-                List<Command> commands = commandFetcher.fetchCommands();
-                if (CollectionUtils.isEmpty(commands)) {
-                    // indicate that no command ,sleep for 1s
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    continue;
-                }
-
-                List<CompletableFuture<Void>> allCompleteFutures = new ArrayList<>();
-                for (Command command : commands) {
-                    CompletableFuture<Void> completableFuture = bootstrapCommand(command)
-                            .thenAccept(this::bootstrapWorkflowExecutionRunnable)
-                            .thenAccept((unused) -> bootstrapSuccess(command))
-                            .exceptionally(throwable -> bootstrapError(command, throwable));
-                    allCompleteFutures.add(completableFuture);
-                }
-                CompletableFuture.allOf(allCompleteFutures.toArray(new CompletableFuture[0])).join();
-            } catch (InterruptedException interruptedException) {
-                log.warn("Master schedule bootstrap interrupted, close the loop", interruptedException);
-                Thread.currentThread().interrupt();
-                break;
-            } catch (Exception e) {
-                log.error("Master schedule workflow error", e);
-                // sleep for 1s here to avoid the database down cause the exception boom
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            }
-        }
-    }
-
+ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+ import org.apache.dolphinscheduler.common.utils.JSONUtils;
+ import org.apache.dolphinscheduler.dao.entity.Command;
+ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+ import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+ import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+ import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
+ import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+ import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBusCoordinator;
+ import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
+ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
+ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnableFactory;
+ import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
+ import org.apache.dolphinscheduler.service.command.CommandService;
+ 
+ import org.apache.commons.collections4.CollectionUtils;
+ import org.apache.commons.lang3.exception.ExceptionUtils;
+ 
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.ExecutorService;
+ 
+ import lombok.extern.slf4j.Slf4j;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Service;
+ 
+ /**
+  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
+  */
+ @Service
+ @Slf4j
+ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
+ 
+     @Autowired
+     private ICommandFetcher commandFetcher;
+ 
+     @Autowired
+     private CommandService commandService;
+ 
+     @Autowired
+     private MasterConfig masterConfig;
+ 
+     @Autowired
+     private MasterServerLoadProtection masterServerLoadProtection;
+ 
+     @Autowired
+     private IWorkflowRepository workflowRepository;
+ 
+     @Autowired
+     private WorkflowExecutionRunnableFactory workflowExecutionRunnableFactory;
+ 
+     @Autowired
+     private MetricsProvider metricsProvider;
+ 
+     @Autowired
+     private WorkflowEventBusCoordinator workflowEventBusCoordinator;
+ 
+     private ExecutorService commandHandleThreadPool;
+ 
+     private boolean flag = false;
+ 
+     protected CommandEngine() {
+         super("MasterCommandLoopThread");
+     }
+ 
+     @Override
+     public synchronized void start() {
+         log.info("MasterSchedulerBootstrap starting..");
+         this.commandHandleThreadPool = ThreadUtils.newDaemonFixedThreadExecutor("MasterCommandHandleThreadPool",
+                 Runtime.getRuntime().availableProcessors());
+         flag = true;
+         super.start();
+         log.info("MasterSchedulerBootstrap started...");
+     }
+ 
+     @Override
+     public void close() throws Exception {
+         log.info("MasterSchedulerBootstrap stopping...");
+         flag = false;
+         log.info("MasterSchedulerBootstrap stopped...");
+     }
+ 
+     @Override
+     public void run() {
+         while (flag) {
+             try {
+                 // todo: if the workflow event queue is much, we need to handle the back pressure
+                 SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+                 if (masterServerLoadProtection.isOverload(systemMetrics)) {
+                     log.warn("The current server is overload, cannot consumes commands.");
+                     MasterServerMetrics.incMasterOverload();
+                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                     continue;
+                 }
+                 List<Command> commands = commandFetcher.fetchCommands();
+                 if (CollectionUtils.isEmpty(commands)) {
+                     // indicate that no command ,sleep for 1s
+                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                     continue;
+                 }
+ 
+                 List<CompletableFuture<Void>> allCompleteFutures = new ArrayList<>();
+                 for (Command command : commands) {
+                     CompletableFuture<Void> completableFuture = bootstrapCommand(command)
+                             .thenAccept(this::bootstrapWorkflowExecutionRunnable)
+                             .thenAccept((unused) -> bootstrapSuccess(command))
+                             .exceptionally(throwable -> bootstrapError(command, throwable));
+                     allCompleteFutures.add(completableFuture);
+                 }
+                 CompletableFuture.allOf(allCompleteFutures.toArray(new CompletableFuture[0])).join();
+             } catch (InterruptedException interruptedException) {
+                 log.warn("Master schedule bootstrap interrupted, close the loop", interruptedException);
+                 Thread.currentThread().interrupt();
+                 break;
+             } catch (Exception e) {
+                 log.error("Master schedule workflow error", e);
+                 // sleep for 1s here to avoid the database down cause the exception boom
+                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+             }
+         }
+     }
+ 
     private CompletableFuture<IWorkflowExecutionRunnable> bootstrapCommand(Command command) {
-        return supplyAsync(() -> {
-            LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
-            log.info("Start bootstrap command: {}", command.getId());
-            try {
-                IWorkflowExecutionRunnable result = workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
-                log.info("Success bootstrap command");
-                return result;
-            } finally {
-                LogUtils.removeWorkflowInstanceIdMDC();
-            }
-        }, commandHandleThreadPool);
+        return supplyAsync(
+                () -> {
+                    LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
+                    try {
+                        return workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
+                    } finally {
+                        LogUtils.removeWorkflowInstanceIdMDC();
+                    }
+                }, commandHandleThreadPool);
     }
-
+ 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
-        
+        final WorkflowInstance workflowInstance =
+                workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         LogUtils.setWorkflowInstanceIdMDC(workflowInstance.getId());
         try {
             if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
@@ -174,7 +172,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
                         workflowInstance.getState());
                 return CompletableFuture.completedFuture(null);
             }
-    
+
             workflowRepository.put(workflowExecutionRunnable);
             workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecutionRunnable);
             workflowExecutionRunnable.getWorkflowEventBus()
@@ -184,7 +182,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
             LogUtils.removeWorkflowInstanceIdMDC();
         }
     }
-
+ 
     private CompletableFuture<Void> bootstrapSuccess(Command command) {
         LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
         try {
@@ -195,21 +193,22 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
             LogUtils.removeWorkflowInstanceIdMDC();
         }
     }
-
+ 
     private Void bootstrapError(Command command, Throwable throwable) {
         LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
         try {
             if (throwable instanceof CommandDuplicateHandleException) {
                 log.warn("Handle command failed, the command: {} has been handled by other master",
-                        command, throwable);
-            } else {
-                log.error("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
-                commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
+                        command,
+                        throwable);
+                return null;
             }
+            log.error("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
+            commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
+            return null;
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
         }
-        return null;
     }
-
-}
+ 
+ }
