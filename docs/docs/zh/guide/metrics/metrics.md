@@ -39,6 +39,7 @@ Spring Boot Actuator 提供了一系列用于监控和管理应用的 HTTP 端�
 因此，强烈建议您在生产环境中开启端点安全认证，目前提供HTTP Basic Authentication的认证方式，选择如下两种配置方式之一都可以。
 
 - 您可以通过各个服务的 application.yaml 文件进行单独配置:
+
 ```yaml
 management:
   security:
@@ -48,6 +49,7 @@ management:
 ```
 
 - 您也可以通过 dolphinscheduler_env.sh 文件进行统一配置：
+
 ```sh
 export MANAGEMENT_SECURITY_ENABLED=true
 export MANAGEMENT_SECURITY_USER=username
@@ -55,6 +57,7 @@ export MANAGEMENT_SECURITY_PASSWORD=password
 ```
 
 - 添加安全认证之后，您可通过链接如下访问`prometheus格式`指标。
+
 ```sh
 curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
 curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 

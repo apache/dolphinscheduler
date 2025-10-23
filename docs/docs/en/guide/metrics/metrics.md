@@ -40,6 +40,7 @@ Spring Boot Actuator provides a series of HTTP endpoints for monitoring and mana
 Therefore, we strongly recommend enabling endpoint security authentication in production environments. Currently, HTTP Basic Authentication is supported, and you can choose either of the following two configuration methods.
 
 - You can configure it individually in the application.yaml file of each service:
+
 ```yaml
 management:
   security:
@@ -49,6 +50,7 @@ management:
 ```
 
 - Alternatively, you can configure it globally via the dolphinscheduler_env.sh file:
+
 ```sh
 export MANAGEMENT_SECURITY_ENABLED=true
 export MANAGEMENT_SECURITY_USER=username
@@ -56,6 +58,7 @@ export MANAGEMENT_SECURITY_PASSWORD=password
 ```
 
 - After enabling security authentication, you could access `prometheus-format` metrics using the following commands:
+
 ```sh
 curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
 curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 
