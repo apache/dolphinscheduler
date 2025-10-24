@@ -338,6 +338,31 @@ public class UsersServiceTest {
     }
 
     @Test
+    public void testUpdateUserSimple() {
+        // null user -> USER_NOT_EXIST
+        assertThrowsServiceException(Status.USER_NOT_EXIST, () -> usersService.updateUser(null));
+
+        // user with null id -> USER_NOT_EXIST
+        User noIdUser = new User();
+        assertThrowsServiceException(Status.USER_NOT_EXIST, () -> usersService.updateUser(noIdUser));
+
+        // update failure (0 rows affected) -> UPDATE_USER_ERROR
+        User failingUser = new User();
+        failingUser.setId(1);
+        Mockito.when(userMapper.updateById(Mockito.any())).thenReturn(0);
+        assertThrowsServiceException(Status.UPDATE_USER_ERROR, () -> usersService.updateUser(failingUser));
+
+        // success path (1 row affected)
+        User successUser = new User();
+        successUser.setId(2);
+        Mockito.when(userMapper.updateById(Mockito.any())).thenReturn(1);
+        User updated = usersService.updateUser(successUser);
+        Assertions.assertNotNull(updated);
+        Assertions.assertEquals(2, updated.getId());
+        Assertions.assertNotNull(updated.getUpdateTime(), "updateTime should be set");
+    }
+
+    @Test
     public void testDeleteUserById() {
         User loginUser = new User();
         try {

@@ -75,12 +75,19 @@ public class RequestClient {
 
         HttpResponseBody responseData = null;
         int responseCode = response.code();
+        Map<String, String> responseHeaders = new HashMap<>();
+
+        Headers responseHeadersObj = response.headers();
+        for (String name : responseHeadersObj.names()) {
+            responseHeaders.put(name, responseHeadersObj.get(name));
+        }
+
         if (response.body() != null) {
             responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
         }
         response.close();
 
-        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData, responseHeaders);
 
         log.info("GET response: {}", httpResponse);
 
@@ -124,12 +131,19 @@ public class RequestClient {
         Response response = this.httpClient.newCall(request).execute();
         int responseCode = response.code();
         HttpResponseBody responseData = null;
+        Map<String, String> responseHeaders = new HashMap<>();
+
+        Headers responseHeadersObj = response.headers();
+        for (String name : responseHeadersObj.names()) {
+            responseHeaders.put(name, responseHeadersObj.get(name));
+        }
+
         if (response.body() != null) {
             responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
         }
         response.close();
 
-        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData, responseHeaders);
 
         log.info("POST response: {}", httpResponse);
 
@@ -155,12 +169,19 @@ public class RequestClient {
         Response response = this.httpClient.newCall(request).execute();
         int responseCode = response.code();
         HttpResponseBody responseData = null;
+        Map<String, String> responseHeaders = new HashMap<>();
+
+        Headers responseHeadersObj = response.headers();
+        for (String name : responseHeadersObj.names()) {
+            responseHeaders.put(name, responseHeadersObj.get(name));
+        }
+
         if (response.body() != null) {
             responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
         }
         response.close();
 
-        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData, responseHeaders);
 
         log.info("PUT response: {}", httpResponse);
 
@@ -217,12 +238,19 @@ public class RequestClient {
 
         int responseCode = response.code();
         HttpResponseBody responseData = null;
+        Map<String, String> responseHeaders = new HashMap<>();
+
+        Headers responseHeadersObj = response.headers();
+        for (String name : responseHeadersObj.names()) {
+            responseHeaders.put(name, responseHeadersObj.get(name));
+        }
+
         if (response.body() != null) {
             responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
         }
         response.close();
 
-        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData, responseHeaders);
 
         log.info("DELETE response: {}", httpResponse);
 

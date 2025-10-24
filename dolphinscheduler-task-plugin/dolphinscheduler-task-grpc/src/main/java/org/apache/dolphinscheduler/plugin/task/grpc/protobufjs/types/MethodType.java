@@ -15,15 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.storage.hdfs;
+package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.types;
 
-import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping.Method;
 
-@Slf4j
-public class LocalStorageOperator extends HdfsStorageOperator {
+import com.google.protobuf.DescriptorProtos;
 
-    public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
-        super(hdfsStorageProperties);
+public class MethodType {
+
+    private MethodType() {
     }
 
+    public static DescriptorProtos.MethodDescriptorProto.Builder parseMethod(String selfName, Method method) {
+        return DescriptorProtos.MethodDescriptorProto.newBuilder()
+                .setName(selfName)
+                .setInputType(method.getRequestType())
+                .setOutputType(method.getResponseType());
+    }
 }

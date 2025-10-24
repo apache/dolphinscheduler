@@ -88,6 +88,7 @@ dolphinscheduler-task-flink
 dolphinscheduler-task-flink-stream
 dolphinscheduler-task-hivecli
 dolphinscheduler-task-http
+dolphinscheduler-task-grpc
 dolphinscheduler-task-java
 dolphinscheduler-task-jupyter
 dolphinscheduler-task-k8s
