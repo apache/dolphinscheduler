@@ -75,9 +75,9 @@ pg_ctl reload
 然后设置以下环境变量，将username和password改成你在上一步中设置的用户名{user}和密码{password}
 
 > **⚠️ 时区配置提醒**
-> 
+>
 > 避免使用 `CST` 等模糊时区标识符，可能造成调度时间错误。
-> 
+>
 > 推荐使用明确的时区，如：`serverTimezone=Asia/Shanghai`
 
 对于 MySQL：

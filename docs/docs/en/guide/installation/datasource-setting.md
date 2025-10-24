@@ -76,9 +76,9 @@ pg_ctl reload
 Then, set the database configurations by exporting the following environment variables, change {user} and {password} to what you set in the previous step.
 
 > **⚠️ Timezone Configuration Notice**
-> 
+>
 > Avoid using ambiguous timezone identifiers like `CST`, which may cause scheduling time errors.
-> 
+>
 > Use explicit timezone like: `serverTimezone=Asia/Shanghai`
 
 For MySQL:
