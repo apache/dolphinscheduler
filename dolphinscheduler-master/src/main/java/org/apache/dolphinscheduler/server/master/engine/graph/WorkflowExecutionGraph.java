@@ -208,12 +208,15 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
                 || isTaskExecutionRunnableInActive(taskExecutionRunnable)) {
             return false;
         }
+        boolean isConditionTask = TaskTypeUtils.isConditionTask(
+                taskExecutionRunnable.getTaskDefinition().getTaskType());
+
         return getPredecessors(taskExecutionRunnable.getName())
                 .stream()
                 .allMatch(predecessor -> isTaskExecutionRunnableInActive(predecessor)
                         && !isTaskExecutionRunnableFailed(predecessor)
                         && !isTaskExecutionRunnablePaused(predecessor)
-                        && !isTaskExecutionRunnableKilled(predecessor));
+                        && (isConditionTask || !isTaskExecutionRunnableKilled(predecessor)));
     }
 
     @Override
@@ -287,6 +290,10 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     @Override
     public boolean isEndOfTaskChain(final ITaskExecutionRunnable taskExecutionRunnable) {
+        boolean isAllSuccessorsAreConditionTask = isAllSuccessorsAreConditionTask(taskExecutionRunnable);
+        if (isAllSuccessorsAreConditionTask) {
+            return false;
+        }
         return successors.get(taskExecutionRunnable.getName()).isEmpty()
                 || isTaskExecutionRunnableKilled(taskExecutionRunnable)
                 || isTaskExecutionRunnablePaused(taskExecutionRunnable)
@@ -335,7 +342,7 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
         }
         return successors.stream().allMatch(
                 successor -> isTaskExecutionRunnableSkipped(successor)
-                        || TaskTypeUtils.isConditionTask(taskExecutionRunnable.getTaskInstance().getTaskType()));
+                        || TaskTypeUtils.isConditionTask(successor.getTaskDefinition().getTaskType()));
     }
 
     private void assertTaskExecutionRunnableState(final ITaskExecutionRunnable taskExecutionRunnable,
