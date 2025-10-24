@@ -244,7 +244,6 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void publishWorkflowInstanceTopologyLogicalTransitionEvent(final ITaskExecutionRunnable taskExecutionRunnable) {
         final Integer workflowInstanceId = taskExecutionRunnable.getWorkflowInstance().getId();
         final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
-        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableInActive(taskExecutionRunnable);
         taskExecutionRunnable
                 .getWorkflowEventBus()
                 .publish(
