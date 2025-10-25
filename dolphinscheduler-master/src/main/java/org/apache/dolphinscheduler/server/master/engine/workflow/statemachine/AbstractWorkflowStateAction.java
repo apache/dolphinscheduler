@@ -79,7 +79,6 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
                 .sorted(Comparator.comparing(ITaskExecutionRunnable::getName))
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(readyToTriggerTasks)) {
-            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
             return;
         }
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
@@ -129,7 +128,14 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
         }
 
         successorFlowAdjuster.adjustSuccessorFlow(taskExecutionRunnable);
-        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
+        final List<ITaskExecutionRunnable> successors = workflowExecutionGraph.getSuccessors(taskExecutionRunnable);
+        if (successors.isEmpty()) {
+            log.debug("The task: {} has no successor, try to emit workflow finished event",
+                    taskExecutionRunnable.getName());
+            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+            return;
+        }
+        triggerTasks(workflowExecutionRunnable, successors);
     }
 
     protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,

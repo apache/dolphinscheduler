@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
@@ -46,7 +48,13 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         final IWorkflowExecutionGraph workflowExecutionGraph =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
-        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getStartNodes());
+        final List<ITaskExecutionRunnable> startNodes = workflowExecutionGraph.getStartNodes();
+        if (startNodes.isEmpty()) {
+            log.info("Workflow start node is empty, try to emit workflow finished event");
+            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+            return;
+        }
+        triggerTasks(workflowExecutionRunnable, startNodes);
     }
 
     @Override
