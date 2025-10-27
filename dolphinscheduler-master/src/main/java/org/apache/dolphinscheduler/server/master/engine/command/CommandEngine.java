@@ -152,10 +152,8 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     private CompletableFuture<IWorkflowExecutionRunnable> bootstrapCommand(Command command) {
         return supplyAsync(() -> {
             LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
-            log.info("Start bootstrap command: {}", command.getId());
             try {
                 IWorkflowExecutionRunnable result = workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
-                log.info("Success bootstrap command");
                 return result;
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();
