@@ -28,9 +28,10 @@ public class TaskExecutorMDCUtils {
     private static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
 
     public static MDCAutoClosable logWithMDC(final ITaskExecutor taskExecutor) {
-        return logWithMDC(taskExecutor.getId(), 
-            taskExecutor.getTaskExecutionContext().getLogPath(), 
-            taskExecutor.getTaskExecutionContext() == null ? 0 : taskExecutor.getTaskExecutionContext().getWorkflowInstanceId());
+        return logWithMDC(taskExecutor.getId(),
+                taskExecutor.getTaskExecutionContext().getLogPath(),
+                taskExecutor.getTaskExecutionContext() == null ? 0
+                        : taskExecutor.getTaskExecutionContext().getWorkflowInstanceId());
     }
 
     public static MDCAutoClosable logWithMDC(final int taskInstanceId) {
@@ -41,7 +42,8 @@ public class TaskExecutorMDCUtils {
         return logWithMDC(taskInstanceId, null, workflowInstanceId);
     }
 
-    public static MDCAutoClosable logWithMDC(final int taskInstanceId, final String logPath, final int workflowInstanceId) {
+    public static MDCAutoClosable logWithMDC(final int taskInstanceId, final String logPath,
+                                             final int workflowInstanceId) {
 
         if (logPath != null) {
             MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, logPath);

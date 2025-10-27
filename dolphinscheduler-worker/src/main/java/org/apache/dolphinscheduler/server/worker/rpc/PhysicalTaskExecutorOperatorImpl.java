@@ -50,16 +50,17 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
         final TaskExecutionContext taskExecutionContext = taskExecutorDispatchRequest.getTaskExecutionContext();
         final int taskInstanceId = taskExecutionContext.getTaskInstanceId();
         final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
-        
-        try (TaskExecutorMDCUtils.MDCAutoClosable _ignore1 = 
-                TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
-            
+
+        try (
+                TaskExecutorMDCUtils.MDCAutoClosable _ignore1 =
+                        TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
+
             log.info("Receive TaskExecutorDispatchResponse: {}", taskExecutorDispatchRequest);
             physicalTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
-            
+
             // Reset MDC, because dispatchLogicTask will clear MDC internally
             TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId);
-            
+
             log.info("Handle TaskExecutorDispatchResponse: {} success", taskExecutorDispatchRequest);
             return TaskExecutorDispatchResponse.success();
         } catch (Throwable throwable) {
@@ -72,7 +73,9 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public TaskExecutorKillResponse killTask(final TaskExecutorKillRequest taskExecutorKillRequest) {
         final int taskInstanceId = taskExecutorKillRequest.getTaskInstanceId();
         final int workflowInstanceId = physicalTaskEngineDelegator.getWorkflowInstanceId(taskInstanceId);
-        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
+        try (
+                TaskExecutorMDCUtils.MDCAutoClosable ignore =
+                        TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
             log.info("Receive TaskExecutorKillRequest: {}", taskExecutorKillRequest);
             physicalTaskEngineDelegator.killLogicTask(taskInstanceId);
             log.info("Handle TaskExecutorKillRequest: {} success", taskExecutorKillRequest);
@@ -87,7 +90,9 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public TaskExecutorPauseResponse pauseTask(final TaskExecutorPauseRequest taskPauseRequest) {
         final int taskInstanceId = taskPauseRequest.getTaskInstanceId();
         final int workflowInstanceId = physicalTaskEngineDelegator.getWorkflowInstanceId(taskInstanceId);
-        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
+        try (
+                TaskExecutorMDCUtils.MDCAutoClosable ignore =
+                        TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
             log.info("Receive TaskExecutorPauseRequest: {}", taskPauseRequest);
             physicalTaskEngineDelegator.pauseLogicTask(taskInstanceId);
             log.info("Handle TaskExecutorPauseRequest: {} success", taskPauseRequest);
@@ -115,7 +120,9 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public void ackPhysicalTaskExecutorLifecycleEvent(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
         final int taskExecutorId = taskExecutorLifecycleEventAck.getTaskExecutorId();
         final int workflowInstanceId = physicalTaskEngineDelegator.getWorkflowInstanceId(taskExecutorId);
-        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskExecutorId, workflowInstanceId)) {
+        try (
+                TaskExecutorMDCUtils.MDCAutoClosable ignore =
+                        TaskExecutorMDCUtils.logWithMDC(taskExecutorId, workflowInstanceId)) {
             log.info("Receive TaskExecutorLifecycleEventAck: {}", taskExecutorLifecycleEventAck);
             physicalTaskEngineDelegator.ackPhysicalTaskExecutorLifecycleEventACK(taskExecutorLifecycleEventAck);
         }
