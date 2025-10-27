@@ -153,7 +153,8 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         return supplyAsync(() -> {
             LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
             try {
-                IWorkflowExecutionRunnable result = workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
+                IWorkflowExecutionRunnable result =
+                        workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
                 return result;
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();
@@ -162,9 +163,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     }
 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowInstance workflowInstance = 
+        final WorkflowInstance workflowInstance =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
-        
+
         LogUtils.setWorkflowInstanceIdMDC(workflowInstance.getId());
         try {
             if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
@@ -173,7 +174,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
                         workflowInstance.getState());
                 return CompletableFuture.completedFuture(null);
             }
-    
+
             workflowRepository.put(workflowExecutionRunnable);
             workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecutionRunnable);
             workflowExecutionRunnable.getWorkflowEventBus()
