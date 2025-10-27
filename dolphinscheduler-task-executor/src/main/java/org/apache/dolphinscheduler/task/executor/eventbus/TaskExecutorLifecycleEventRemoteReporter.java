@@ -197,7 +197,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
             final IReportableTaskExecutorLifecycleEvent headEvent = reportableTaskExecutorLifecycleEventChannel.peek();
             try (
                     final TaskExecutorMDCUtils.MDCAutoClosable ignore =
-                            TaskExecutorMDCUtils.logWithMDC(headEvent.getTaskInstanceId())) {
+                            TaskExecutorMDCUtils.logWithMDC(headEvent.getTaskInstanceId(), headEvent.getWorkflowInstanceId())) {
                 try {
                     if (isTaskExecutorEventNeverSent(headEvent) || isRetryIntervalExceeded(headEvent)) {
                         final Optional<ITaskExecutor> taskExecutorOptional =

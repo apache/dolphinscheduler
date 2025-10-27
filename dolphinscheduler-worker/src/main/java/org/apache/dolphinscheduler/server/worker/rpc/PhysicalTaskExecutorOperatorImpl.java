@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.extract.worker.IPhysicalTaskExecutorOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskEngineDelegator;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchResponse;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
@@ -46,10 +47,19 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
 
     @Override
     public TaskExecutorDispatchResponse dispatchTask(final TaskExecutorDispatchRequest taskExecutorDispatchRequest) {
-        log.info("Receive TaskExecutorDispatchResponse: {}", taskExecutorDispatchRequest);
         final TaskExecutionContext taskExecutionContext = taskExecutorDispatchRequest.getTaskExecutionContext();
-        try {
+        final int taskInstanceId = taskExecutionContext.getTaskInstanceId();
+        final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
+        
+        try (TaskExecutorMDCUtils.MDCAutoClosable _ignore1 = 
+                TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
+            
+            log.info("Receive TaskExecutorDispatchResponse: {}", taskExecutorDispatchRequest);
             physicalTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
+            
+            // Reset MDC, because dispatchLogicTask will clear MDC internally
+            TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId);
+            
             log.info("Handle TaskExecutorDispatchResponse: {} success", taskExecutorDispatchRequest);
             return TaskExecutorDispatchResponse.success();
         } catch (Throwable throwable) {
@@ -60,9 +70,10 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
 
     @Override
     public TaskExecutorKillResponse killTask(final TaskExecutorKillRequest taskExecutorKillRequest) {
-        log.info("Receive TaskExecutorKillRequest: {}", taskExecutorKillRequest);
         final int taskInstanceId = taskExecutorKillRequest.getTaskInstanceId();
-        try {
+        final int workflowInstanceId = physicalTaskEngineDelegator.getWorkflowInstanceId(taskInstanceId);
+        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
+            log.info("Receive TaskExecutorKillRequest: {}", taskExecutorKillRequest);
             physicalTaskEngineDelegator.killLogicTask(taskInstanceId);
             log.info("Handle TaskExecutorKillRequest: {} success", taskExecutorKillRequest);
             return TaskExecutorKillResponse.success();
@@ -74,9 +85,10 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
 
     @Override
     public TaskExecutorPauseResponse pauseTask(final TaskExecutorPauseRequest taskPauseRequest) {
-        log.info("Receive TaskExecutorPauseRequest: {}", taskPauseRequest);
         final int taskInstanceId = taskPauseRequest.getTaskInstanceId();
-        try {
+        final int workflowInstanceId = physicalTaskEngineDelegator.getWorkflowInstanceId(taskInstanceId);
+        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskInstanceId, workflowInstanceId)) {
+            log.info("Receive TaskExecutorPauseRequest: {}", taskPauseRequest);
             physicalTaskEngineDelegator.pauseLogicTask(taskInstanceId);
             log.info("Handle TaskExecutorPauseRequest: {} success", taskPauseRequest);
             return TaskExecutorPauseResponse.success();
@@ -88,17 +100,24 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
 
     @Override
     public TaskExecutorReassignMasterResponse reassignWorkflowInstanceHost(final TaskExecutorReassignMasterRequest taskExecutorReassignMasterRequest) {
-        boolean success =
-                physicalTaskEngineDelegator.reassignWorkflowInstanceHost(taskExecutorReassignMasterRequest);
-        if (success) {
-            return TaskExecutorReassignMasterResponse.success();
+        final int taskInstanceId = taskExecutorReassignMasterRequest.getTaskInstanceId();
+        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskInstanceId)) {
+            boolean success =
+                    physicalTaskEngineDelegator.reassignWorkflowInstanceHost(taskExecutorReassignMasterRequest);
+            if (success) {
+                return TaskExecutorReassignMasterResponse.success();
+            }
+            return TaskExecutorReassignMasterResponse.failed("Reassign master host failed");
         }
-        return TaskExecutorReassignMasterResponse.failed("Reassign master host failed");
     }
 
     @Override
     public void ackPhysicalTaskExecutorLifecycleEvent(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
-        log.info("Receive TaskExecutorLifecycleEventAck: {}", taskExecutorLifecycleEventAck);
-        physicalTaskEngineDelegator.ackPhysicalTaskExecutorLifecycleEventACK(taskExecutorLifecycleEventAck);
+        final int taskExecutorId = taskExecutorLifecycleEventAck.getTaskExecutorId();
+        final int workflowInstanceId = physicalTaskEngineDelegator.getWorkflowInstanceId(taskExecutorId);
+        try (TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskExecutorId, workflowInstanceId)) {
+            log.info("Receive TaskExecutorLifecycleEventAck: {}", taskExecutorLifecycleEventAck);
+            physicalTaskEngineDelegator.ackPhysicalTaskExecutorLifecycleEventACK(taskExecutorLifecycleEventAck);
+        }
     }
 }

@@ -292,6 +292,7 @@ public abstract class AbstractCommandExecutor {
                 .newSingleDaemonScheduledExecutorService("TaskInstanceLogOutput-thread-" + taskRequest.getTaskName());
         taskOutputFuture = parseProcessOutputExecutorService.submit(() -> {
             try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(), taskRequest.getTaskInstanceId());
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 while (logBuffer.size() > 1 || !processLogOutputIsSuccess || !podLogOutputIsFinished) {
                     if (logBuffer.size() > 1) {
@@ -306,6 +307,7 @@ public abstract class AbstractCommandExecutor {
                 log.error("Output task log error", e);
             } finally {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         });
         parseProcessOutputExecutorService.shutdown();
