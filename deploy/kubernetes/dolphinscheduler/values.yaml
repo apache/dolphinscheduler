@@ -597,7 +597,7 @@ worker:
   
   # -- Init Container for Advanced Processing
   # Use when you need to transform, validate, or prepare configuration files
-  initContainers:
+  initContainers: {}
     - name: config-processor
       image: busybox:latest
       command:
