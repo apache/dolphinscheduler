@@ -26,10 +26,8 @@ public class TaskExecutorMDCUtils {
     private static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
     private static final String TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY = "taskInstanceLogFullPath";
 
-
     public static MDCAutoClosable logWithMDC(final ITaskExecutor taskExecutor) {
         return logWithMDC(taskExecutor.getId(), taskExecutor.getTaskExecutionContext().getLogPath());
-
     }
 
     public static MDCAutoClosable logWithMDC(final int taskInstanceId) {
