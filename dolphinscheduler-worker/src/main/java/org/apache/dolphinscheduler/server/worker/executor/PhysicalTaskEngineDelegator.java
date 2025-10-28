@@ -42,9 +42,13 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
     private final PhysicalTaskExecutorRepository physicalTaskExecutorRepository;
 
     public PhysicalTaskEngineDelegator(final PhysicalTaskEngineFactory physicalTaskEngineFactory,
+
                                        final PhysicalTaskExecutorFactory physicalTaskExecutorFactory,
+
                                        final PhysicalTaskExecutorRepository physicalTaskExecutorRepository,
+
                                        final PhysicalTaskExecutorLifecycleEventReporter physicalTaskExecutorEventReporter) {
+
         this.physicalTaskExecutorFactory = physicalTaskExecutorFactory;
         this.taskEngine = physicalTaskEngineFactory.createTaskEngine();
         this.physicalTaskExecutorRepository = physicalTaskExecutorRepository;
@@ -59,6 +63,7 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
 
     public void dispatchLogicTask(final TaskExecutionContext taskExecutionContext) {
         final ITaskExecutor taskExecutor = physicalTaskExecutorFactory.createTaskExecutor(taskExecutionContext);
+
         taskEngine.submitTask(taskExecutor);
     }
 
@@ -71,27 +76,20 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
     }
 
     public void ackPhysicalTaskExecutorLifecycleEventACK(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
-        physicalTaskExecutorEventReporter.receiveTaskExecutorLifecycleEventACK(taskExecutorLifecycleEventAck);
-    }
 
-    public int getWorkflowInstanceId(final int taskInstanceId) {
-        final Optional<ITaskExecutor> taskExecutorOptional = physicalTaskExecutorRepository.get(taskInstanceId);
-        if (!taskExecutorOptional.isPresent()) {
-            return 0;
-        }
-        final TaskExecutionContext taskExecutionContext = taskExecutorOptional.get().getTaskExecutionContext();
-        if (taskExecutionContext == null) {
-            return 0;
-        }
-        return taskExecutionContext.getWorkflowInstanceId();
+        physicalTaskExecutorEventReporter.receiveTaskExecutorLifecycleEventACK(taskExecutorLifecycleEventAck);
+
     }
 
     public boolean reassignWorkflowInstanceHost(final TaskExecutorReassignMasterRequest taskExecutorReassignMasterRequest) {
+
         final int taskInstanceId = taskExecutorReassignMasterRequest.getTaskInstanceId();
         final String workflowHost = taskExecutorReassignMasterRequest.getWorkflowHost();
         final Optional<ITaskExecutor> taskExecutorOptional = physicalTaskExecutorRepository.get(taskInstanceId);
+
         if (taskExecutorOptional.isPresent()) {
             taskExecutorOptional.get().getTaskExecutionContext().setWorkflowInstanceHost(workflowHost);
+
             physicalTaskExecutorEventReporter.onWorkflowInstanceHostChanged(taskInstanceId);
             return true;
         }

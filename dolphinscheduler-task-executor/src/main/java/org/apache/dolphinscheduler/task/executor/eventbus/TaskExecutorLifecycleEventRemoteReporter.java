@@ -50,9 +50,11 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     private static final Long DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL = TimeUnit.MINUTES.toMillis(3);
 
+
     private final String reporterName;
 
     private final Map<Integer, ReportableTaskExecutorLifecycleEventChannel> eventChannels = new ConcurrentHashMap<>();
+
 
     private final ITaskExecutorEventRemoteReporterClient taskExecutorEventRemoteReporterClient;
 
@@ -62,11 +64,14 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     private final Condition taskExecutionEventEmptyCondition = eventChannelsLock.newCondition();
 
+
     private final ITaskExecutorRepository taskExecutorRepository;
 
     public TaskExecutorLifecycleEventRemoteReporter(final String reporterName,
                                                     final ITaskExecutorEventRemoteReporterClient taskExecutorEventRemoteReporterClient,
+
                                                     final ITaskExecutorRepository taskExecutorRepository) {
+
         super(reporterName);
         this.reporterName = reporterName;
         this.taskExecutorEventRemoteReporterClient = taskExecutorEventRemoteReporterClient;
@@ -86,6 +91,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         while (runningFlag) {
             try {
                 for (final ReportableTaskExecutorLifecycleEventChannel eventChannel : eventChannels.values()) {
+
                     if (eventChannel.isEmpty()) {
                         continue;
                     }
@@ -106,6 +112,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     @Override
     public void reportTaskExecutorLifecycleEvent(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
+
         eventChannelsLock.lock();
         try {
             log.info(TaskLogMarkers.excludeInTaskLog(), "Report : {}",
@@ -124,10 +131,12 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     @Override
     public void receiveTaskExecutorLifecycleEventACK(final TaskExecutorLifecycleEventAck eventAck) {
+
         final int taskExecutorId = eventAck.getTaskExecutorId();
         eventChannelsLock.lock();
         try {
             final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskExecutorId);
+
             if (eventChannel == null) {
                 return;
             }
@@ -137,15 +146,19 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
                 log.info("Success removed {} by ack: {}", removed, eventAck);
             } else {
                 log.info("Failed removed ReportableTaskExecutorLifecycleEvent by ack: {}", eventAck);
+
             }
             if (eventChannel.isEmpty()) {
                 // Extend the lifecycle of the TaskExecutor to span the entire processing cycle of the task.
+
                 // so we can finalize the TaskExecutor after the associated channel has been removed.
+
                 if (removed != null && removed.getType().isFinished()) {
                     finalizeTaskExecutor(removed.getTaskInstanceId());
                 }
                 eventChannels.remove(taskExecutorId);
                 log.debug("Removed ReportableTaskExecutorLifecycleEventChannel: {}", taskExecutorId);
+
             }
             taskExecutionEventEmptyCondition.signalAll();
         } finally {
@@ -158,8 +171,10 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         eventChannelsLock.lock();
         try {
             final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskInstanceId);
+
             if (eventChannel != null) {
                 eventChannel.taskExecutionEventsQueue.forEach(event -> event.setLatestReportTime(null));
+
                 taskExecutionEventEmptyCondition.signalAll();
             }
         } finally {
@@ -181,47 +196,56 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     private void finalizeTaskExecutor(final Integer taskExecutorId) {
         final Optional<ITaskExecutor> taskExecutorOptional = taskExecutorRepository.get(taskExecutorId);
+
         if (taskExecutorOptional.isPresent()) {
             taskExecutorOptional.get().getTaskExecutorEventBus()
                     .publish(TaskExecutorFinalizeLifecycleEvent.of(taskExecutorOptional.get()));
+
         } else {
             log.warn("TaskExecutor is not exists: {}", taskExecutorId);
         }
     }
 
     private void handleTaskExecutionEventChannel(final ReportableTaskExecutorLifecycleEventChannel reportableTaskExecutorLifecycleEventChannel) {
+
         if (reportableTaskExecutorLifecycleEventChannel.isEmpty()) {
             return;
         }
         while (!reportableTaskExecutorLifecycleEventChannel.isEmpty()) {
             final IReportableTaskExecutorLifecycleEvent headEvent = reportableTaskExecutorLifecycleEventChannel.peek();
+
             try (
                     final TaskExecutorMDCUtils.MDCAutoClosable ignore =
-                            TaskExecutorMDCUtils.logWithMDC(headEvent.getTaskInstanceId(),
-                                    headEvent.getWorkflowInstanceId())) {
+                            TaskExecutorMDCUtils.logWithMDC(headEvent.getTaskInstanceId())) {
                 try {
                     if (isTaskExecutorEventNeverSent(headEvent) || isRetryIntervalExceeded(headEvent)) {
+
                         final Optional<ITaskExecutor> taskExecutorOptional =
                                 taskExecutorRepository.get(headEvent.getTaskInstanceId());
                         if (!taskExecutorOptional.isPresent()) {
                             throw new BaseException(String.format("The TaskExecutor id %d is not exist.",
+
                                     headEvent.getTaskInstanceId()));
                         }
                         final String masterAddress =
                                 taskExecutorOptional.get().getTaskExecutionContext().getWorkflowInstanceHost();
+
                         taskExecutorEventRemoteReporterClient.reportTaskExecutionEventToMaster(masterAddress,
+
                                 headEvent);
                         continue;
                     }
                     if (log.isDebugEnabled()) {
                         log.debug(
                                 "The ReportableTaskExecutorLifecycleEvent: {} latest send time: {} doesn't exceeded retry interval",
+
                                 headEvent,
                                 headEvent.getLatestReportTime());
                     }
                     break;
                 } catch (Exception ex) {
-                    log.error("Send TaskExecutionEvent: {} to master error will retry after {} mills",
+                    log.error("Send TaskExecutionEvent: {} to master error will retry after {}mills",
+
                             headEvent,
                             DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL,
                             ex);
@@ -251,10 +275,12 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     }
 
     private boolean isTaskExecutorEventNeverSent(final IReportableTaskExecutorLifecycleEvent headEvent) {
+
         return headEvent.getLatestReportTime() == null;
     }
 
     private boolean isRetryIntervalExceeded(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
+
         if (isTaskExecutorEventNeverSent(reportableTaskExecutorLifecycleEvent)) {
             return true;
         }
@@ -272,10 +298,12 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     }
 
     private void waitIfAnyTaskExecutionEventChannelRetryIntervalPassed() throws InterruptedException {
+
         eventChannelsLock.lock();
         try {
             final long waitInterval =
                     (getOldestReportTime() + DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL) - System.currentTimeMillis();
+
             if (waitInterval <= 0) {
                 return;
             }
@@ -292,13 +320,16 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
         private final LinkedBlockingQueue<IReportableTaskExecutorLifecycleEvent> taskExecutionEventsQueue;
 
+
         // todo: remove the master address from the channel, we need to get the master address from the TaskExecutor
+
         public ReportableTaskExecutorLifecycleEventChannel(int taskExecutorId) {
             this.taskExecutorId = taskExecutorId;
             this.taskExecutionEventsQueue = new LinkedBlockingQueue<>();
         }
 
         public void addTaskExecutionEvent(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
+
             taskExecutionEventsQueue.add(reportableTaskExecutorLifecycleEvent);
         }
 
@@ -307,7 +338,9 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         }
 
         public IReportableTaskExecutorLifecycleEvent remove(TaskExecutorLifecycleEventType type) {
+
             final AtomicReference<IReportableTaskExecutorLifecycleEvent> removed = new AtomicReference<>();
+
             taskExecutionEventsQueue.removeIf(event -> {
                 if (event.getType() == type) {
                     removed.set(event);
