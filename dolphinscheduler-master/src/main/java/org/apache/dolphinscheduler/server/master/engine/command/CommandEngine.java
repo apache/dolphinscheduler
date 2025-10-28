@@ -130,13 +130,17 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
 
                List<CompletableFuture<Void>> allCompleteFutures = new ArrayList<>();
                for (Command command : commands) {
-                   CompletableFuture<Void> completableFuture = bootstrapCommand(command)
-                           .thenAccept(this::bootstrapWorkflowExecutionRunnable)
-                           .thenAccept((unused) -> bootstrapSuccess(command))
-                           .exceptionally(throwable -> bootstrapError(command, throwable))
-                           .whenComplete((result, throwable) -> LogUtils.removeWorkflowInstanceIdMDC());
-                   allCompleteFutures.add(completableFuture);
-               }
+                    CompletableFuture<Void> completableFuture = supplyAsync(() -> {
+                        LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
+                        return command;
+                    }, commandHandleThreadPool)
+                            .thenApply(this::bootstrapCommand)
+                            .thenAccept(this::bootstrapWorkflowExecutionRunnable)
+                            .thenAccept((unused) -> bootstrapSuccess(command))
+                            .exceptionally(throwable -> bootstrapError(command, throwable))
+                            .whenComplete((result, throwable) -> LogUtils.removeWorkflowInstanceIdMDC());
+                    allCompleteFutures.add(completableFuture);
+                }
                CompletableFuture.allOf(allCompleteFutures.toArray(new CompletableFuture[0])).join();
             } catch (InterruptedException interruptedException) {
                 log.warn("Master schedule bootstrap interrupted, close the loop", interruptedException);
@@ -150,13 +154,8 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         }
     }
 
-    private CompletableFuture<IWorkflowExecutionRunnable> bootstrapCommand(Command command) {
-        return supplyAsync(() -> {
-            LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
-            IWorkflowExecutionRunnable result =
-                    workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
-            return result;
-        }, commandHandleThreadPool);
+    private IWorkflowExecutionRunnable bootstrapCommand(Command command) {
+        return workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
     }
 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
