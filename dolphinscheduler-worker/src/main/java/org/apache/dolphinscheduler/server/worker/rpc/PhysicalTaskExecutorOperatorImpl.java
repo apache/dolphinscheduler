@@ -48,15 +48,12 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public TaskExecutorDispatchResponse dispatchTask(final TaskExecutorDispatchRequest taskExecutorDispatchRequest) {
         log.info("Receive TaskExecutorDispatchResponse: {}", taskExecutorDispatchRequest);
         final TaskExecutionContext taskExecutionContext = taskExecutorDispatchRequest.getTaskExecutionContext();
-        
         try {
             physicalTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
             log.info("Handle TaskExecutorDispatchResponse: {} success", taskExecutorDispatchRequest);
-            
             return TaskExecutorDispatchResponse.success();
         } catch (Throwable throwable) {
             log.error("Handle TaskExecutorDispatchResponse: {} failed", taskExecutorDispatchRequest, throwable);
-            
             return TaskExecutorDispatchResponse.failed(ExceptionUtils.getMessage(throwable));
         }
     }
@@ -71,7 +68,6 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
             return TaskExecutorKillResponse.success();
         } catch (Throwable throwable) {
             log.error("Handle TaskExecutorKillRequest: {} failed", taskExecutorKillRequest, throwable);
-            
             return TaskExecutorKillResponse.fail(ExceptionUtils.getMessage(throwable));
         }
     }
@@ -86,7 +82,6 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
             return TaskExecutorPauseResponse.success();
         } catch (Throwable throwable) {
             log.error("Handle TaskExecutorPauseRequest: {} failed", taskPauseRequest, throwable);
-            
             return TaskExecutorPauseResponse.fail(ExceptionUtils.getMessage(throwable));
         }
     }
@@ -95,7 +90,6 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public TaskExecutorReassignMasterResponse reassignWorkflowInstanceHost(final TaskExecutorReassignMasterRequest taskExecutorReassignMasterRequest) {
         boolean success =
                 physicalTaskEngineDelegator.reassignWorkflowInstanceHost(taskExecutorReassignMasterRequest);
-        
         if (success) {
             return TaskExecutorReassignMasterResponse.success();
         }
@@ -106,6 +100,5 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public void ackPhysicalTaskExecutorLifecycleEvent(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
         log.info("Receive TaskExecutorLifecycleEventAck: {}", taskExecutorLifecycleEventAck);
         physicalTaskEngineDelegator.ackPhysicalTaskExecutorLifecycleEventACK(taskExecutorLifecycleEventAck);
-        
     }
 }
