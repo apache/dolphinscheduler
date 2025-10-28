@@ -586,7 +586,7 @@ worker:
   # -- Direct Secret Mounting
   # Mount secrets directly as environment variables
   # Single secret
-  envFromSecret: "git-sync-secret"
+  envFromSecret: ""
   
   # Multiple secrets (advanced use cases)
   # Use when you have variables distributed across different secrets
