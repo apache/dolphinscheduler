@@ -177,9 +177,10 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         return CompletableFuture.completedFuture(null);
     }
 
-    private void bootstrapSuccess(Command command) {
+    private CompletableFuture<Void> bootstrapSuccess(Command command) {
         log.info("Success bootstrap command {}", JSONUtils.toPrettyJsonString(command));
         MasterServerMetrics.incMasterConsumeCommand(1);
+        return CompletableFuture.completedFuture(null);
     }
 
     private Void bootstrapError(Command command, Throwable throwable) {
