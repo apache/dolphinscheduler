@@ -20,16 +20,22 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
+import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
@@ -39,6 +45,7 @@ class ProjectE2ETest {
     private static final String project = "test-project-" + UUID.randomUUID();
 
     private static final String workerGroup = "default";
+    private static final String workerGroupTest = "test-wg-" + UUID.randomUUID();
 
     private static RemoteWebDriver browser;
 
@@ -69,6 +76,23 @@ class ProjectE2ETest {
         final ProjectPage page = new ProjectPage(browser);
         page.assignWorkerGroup(project, workerGroup);
         page.verifyAssignedWorkerGroup(project, workerGroup);
+
+        WorkerGroupPage workerGroupPage =
+                new WorkerGroupPage(browser).goToNav(SecurityPage.class).goToTab(WorkerGroupPage.class);
+        WebDriverWaitFactory.createWebDriverWait(workerGroupPage.driver())
+                .until(ExpectedConditions.urlContains("/security/worker-group-manage"));
+        workerGroupPage.create(workerGroupTest);
+        Awaitility.await().atMost(Duration.ofMinutes(1)).untilAsserted(() -> {
+            browser.navigate().refresh();
+            assertThat(workerGroupPage.workerGroupList())
+                    .as("workerGroup list should contain newly-created workerGroup")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(workerGroupTest));
+        });
+
+        ProjectPage backToProjectPage = new ProjectPage(browser).goToNav(ProjectPage.class);
+        backToProjectPage.assignWorkerGroup(project, workerGroupTest);
+        backToProjectPage.verifyAssignedWorkerGroup(project, workerGroupTest);
     }
 
     @Test
