@@ -248,6 +248,7 @@ public enum Status {
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
     TASK_SAVEPOINT_ERROR(10196, "task savepoint error", "任务实例savepoint错误"),
     TASK_STOP_ERROR(10197, "task stop error", "任务实例停止错误"),
+    TASK_NAME_DUPLICATE_ERROR(10198, "task name {0} duplicate error", "同一个工作流中任务名称 {0} 重复"),
     LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
     DELETE_TASK_TYPE_ERROR(10200, "delete task type error", "删除任务类型错误"),
     ADD_TASK_TYPE_ERROR(10200, "add task type error", "添加任务类型错误"),
@@ -293,6 +294,12 @@ public enum Status {
     QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
     UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
     VERSION_INFO_STATE_ERROR(10304, "Failed to obtain project version and address", "获取版本信息错误"),
+
+    OIDC_TOKEN_EXCHANGE_FAILED(15000, "OIDC token exchange failed", "OIDC令牌交换失败"),
+    OIDC_ID_TOKEN_ISSUER_INVALID(15001, "Invalid issuer in OIDC ID token", "OIDC ID令牌的颁发者无效"),
+    OIDC_ID_TOKEN_AUDIENCE_INVALID(15002, "Invalid audience in OIDC ID token", "OIDC ID令牌的受众无效"),
+    OIDC_ID_TOKEN_EXPIRED(15003, "OIDC ID token has expired", "OIDC ID令牌已过期"),
+
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
     RESOURCE_EXIST(20005, "resource already exists", "资源已存在"),
     RESOURCE_SUFFIX_NOT_SUPPORT_VIEW(20006, "resource suffix do not support online viewing", "资源文件后缀不支持查看"),

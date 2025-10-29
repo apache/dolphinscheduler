@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.test.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,4 +32,6 @@ public class HttpResponse {
     private int statusCode;
 
     private HttpResponseBody body;
+
+    private Map<String, String> headers = new HashMap<>();
 }

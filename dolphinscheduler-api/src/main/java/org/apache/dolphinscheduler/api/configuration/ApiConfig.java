@@ -38,6 +38,8 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(value = "api")
 public class ApiConfig implements Validator {
 
+    private String baseUrl;
+    private String uiUrl;
     private boolean auditEnable = false;
 
     private TrafficConfiguration trafficControl = new TrafficConfiguration();
@@ -55,6 +57,8 @@ public class ApiConfig implements Validator {
     }
 
     private void printConfig() {
+        log.info("API config: baseUrl -> {} ", baseUrl);
+        log.info("API config: uiUrl -> {} ", uiUrl);
         log.info("API config: auditEnable -> {} ", auditEnable);
         log.info("API config: trafficControl -> {} ", trafficControl);
         log.info("API config: pythonGateway -> {} ", pythonGateway);
