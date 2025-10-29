@@ -303,7 +303,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 位置：`worker-server/conf/application.yaml`
 
-|                                     参数                                      |    默认值    |                                           描述                                            |
+| 参数                                                                          | 默认值       | 描述                                                                                      |
 |-----------------------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------|
 | worker.listen-port                                                          | 1234      | worker监听端口                                                                              |
 | worker.max-heartbeat-interval                                               | 10s       | worker最大心跳间隔                                                                            |
@@ -319,6 +319,11 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | worker.physical-task-config.task-executor-thread-size                       | 100       | Worker中任务最大并发度                                                                          |
 | worker.tenant-config.auto-create-tenant-enabled                             | true      | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
 | worker.tenant-config.default-tenant-enabled                                 | false     | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                             |
+| k8s.client.pool.max.size                                                    | 10        | 每个 Kubernetes 集群的客户端连接总数上限                                                              |
+| k8s.client.pool.min.idle                                                    | 2         | 每个集群维持的最小空闲连接数                                                                          |
+| k8s.client.pool.max.idle                                                    | 5         | 每个集群允许的最大空闲连接数                                                                          |
+| k8s.client.pool.max.wait.ms                                                 | 30000     | 在连接池耗尽时，借用客户端的最大等待时间（毫秒）                                                                |
+| k8s.client.pool.idle.timeout.ms                                             | 600000    | 空闲连接的超时时间（毫秒），超时连接会被定期清理                                                                |
 
 ## Alert Server相关配置
 
