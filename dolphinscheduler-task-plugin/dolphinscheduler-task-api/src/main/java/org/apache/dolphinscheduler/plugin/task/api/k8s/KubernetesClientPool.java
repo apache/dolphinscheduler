@@ -32,6 +32,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -43,6 +45,10 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
  */
 @Slf4j
 public class KubernetesClientPool {
+
+    private static final String BASE64_PADDING_CHARACTER = "=";
+    private static final String EMPTY_STRING = "";
+    private final static int CLEANUP_THREAD_REGULAR = 30000;
 
     /**
      * Connection pool instance
@@ -83,12 +89,10 @@ public class KubernetesClientPool {
      */
     public String getClusterId(String kubeConfig) {
         try {
-
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(kubeConfig.getBytes(StandardCharsets.UTF_8));
-
             String base64Hash = Base64.getUrlEncoder().encodeToString(hashBytes);
-            return base64Hash.replace("=", "");
+            return base64Hash.replace(BASE64_PADDING_CHARACTER, EMPTY_STRING);
         } catch (Exception e) {
             log.error("Failed to generate cluster ID", e);
             return Integer.toString(kubeConfig.hashCode());
@@ -142,8 +146,7 @@ public class KubernetesClientPool {
         Thread cleanupThread = new Thread(() -> {
             while (true) {
                 try {
-                    // every 30s
-                    Thread.sleep(30000);
+                    Thread.sleep(CLEANUP_THREAD_REGULAR);
                     cleanupIdleClients();
                 } catch (InterruptedException e) {
                     log.warn("Cleanup thread interrupted", e);
@@ -168,6 +171,8 @@ public class KubernetesClientPool {
     /**
      * Configuration Class
      */
+    @ToString
+    @Getter
     public static class PoolConfig {
 
         private final int maxSize; // max connection num
@@ -182,33 +187,6 @@ public class KubernetesClientPool {
             this.maxIdle = maxIdle;
             this.maxWaitMs = maxWaitMs;
             this.idleTimeoutMs = idleTimeoutMs;
-        }
-
-        public int getMaxSize() {
-            return maxSize;
-        }
-        public int getMinIdle() {
-            return minIdle;
-        }
-        public int getMaxIdle() {
-            return maxIdle;
-        }
-        public long getMaxWaitMs() {
-            return maxWaitMs;
-        }
-        public long getIdleTimeoutMs() {
-            return idleTimeoutMs;
-        }
-
-        @Override
-        public String toString() {
-            return "PoolConfig{" +
-                    "maxSize=" + maxSize +
-                    ", minIdle=" + minIdle +
-                    ", maxIdle=" + maxIdle +
-                    ", maxWaitMs=" + maxWaitMs +
-                    ", idleTimeoutMs=" + idleTimeoutMs +
-                    '}';
         }
     }
 
@@ -233,16 +211,16 @@ public class KubernetesClientPool {
             this.activeClients = new HashSet<>();
 
             // initial
-            initializeMinIdleConnections();
+            try {
+                initializeMinIdleConnections();
+            } catch (Exception e) {
+                log.error("Failed to initialize idle connection for cluster {}", clusterId);
+            }
         }
 
-        private void initializeMinIdleConnections() {
+        private void initializeMinIdleConnections() throws Exception {
             for (int i = 0; i < config.getMinIdle(); i++) {
-                try {
-                    createIdleConnection();
-                } catch (Exception e) {
-                    log.error("Failed to initialize idle connection for cluster {}", clusterId, e);
-                }
+                createIdleConnection();
             }
         }
 

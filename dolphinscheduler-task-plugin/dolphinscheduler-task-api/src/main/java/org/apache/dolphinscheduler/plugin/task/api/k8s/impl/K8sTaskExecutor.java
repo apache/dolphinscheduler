@@ -263,7 +263,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         } catch (Exception e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
-            log.error(e.getMessage());
         }
     }
 
@@ -322,11 +321,10 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 }
             }
         } catch (Exception e) {
-            // if Exception happen
             cancelApplication(k8sParameterStr);
             Thread.currentThread().interrupt();
             result.setExitStatusCode(EXIT_CODE_FAILURE);
-            log.error(e.getMessage());
+            log.error("k8s task executor running error: ", e);
         }
         return result;
     }

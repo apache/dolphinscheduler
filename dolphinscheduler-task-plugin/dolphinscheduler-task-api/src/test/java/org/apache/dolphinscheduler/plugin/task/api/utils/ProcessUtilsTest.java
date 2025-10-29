@@ -112,7 +112,7 @@ public class ProcessUtilsTest {
     }
 
     /**
-     * 测试K8s客户端是否被正确归还到连接池
+     * Testing whether the K8s client is correctly returned to the connection pool
      */
     @Test
     public void testK8sClientReturnToPool() {

@@ -53,6 +53,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
     private static final String FAILED = "Failed";
     private static final String UNKNOWN = "Unknown";
 
+    private static final String K8S_CLUSTER_PREFIX = "k8s-cluster-";
     private static final int MAX_RETRY_TIMES = 10;
 
     /**
@@ -167,7 +168,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
         String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
         int hashCode = kubeConfig.hashCode();
         int nonNegativeHash = hashCode & 0x7FFFFFFF;
-        return "k8s-cluster-" + nonNegativeHash;
+        return K8S_CLUSTER_PREFIX + nonNegativeHash;
     }
 
     /**
