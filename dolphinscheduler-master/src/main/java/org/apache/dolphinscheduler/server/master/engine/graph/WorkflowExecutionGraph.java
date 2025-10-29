@@ -336,7 +336,8 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
         }
         return successors.stream().allMatch(
                 successor -> isTaskExecutionRunnableSkipped(successor)
-                        || TaskTypeUtils.isConditionTask(successor.getTaskDefinition().getTaskType()));
+                        || (TaskTypeUtils.isConditionTask(successor.getTaskDefinition().getTaskType())
+                                && !isTaskExecutionRunnableForbidden(successor)));
     }
 
     private void assertTaskExecutionRunnableState(final ITaskExecutionRunnable taskExecutionRunnable,
