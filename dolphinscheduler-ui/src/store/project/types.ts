@@ -30,6 +30,7 @@ type TaskType =
   | 'MR'
   | 'PYTHON'
   | 'DEPENDENT'
+  | 'GRPC'
   | 'HTTP'
   | 'DATAX'
   | 'SQOOP'

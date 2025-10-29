@@ -1,0 +1,61 @@
+{
+  "nested": {
+    "org": {
+      "nested": {
+        "apache": {
+          "nested": {
+            "dolphinscheduler": {
+              "nested": {
+                "task": {
+                  "nested": {
+                    "grpc": {
+                      "nested": {
+                        "proto": {
+                          "options": {
+                            "java_package": "org.apache.dolphinscheduler.plugin.task.grpc.generated",
+                            "java_multiple_files": true,
+                            "java_outer_classname": "TaskTesterProto"
+                          },
+                          "nested": {
+                            "TaskTester": {
+                              "methods": {
+                                "TestOK": {
+                                  "requestType": "StringRequest",
+                                  "responseType": "StringReply"
+                                },
+                                "TestUNIMPLEMENTED": {
+                                  "requestType": "StringRequest",
+                                  "responseType": "StringReply"
+                                }
+                              }
+                            },
+                            "StringRequest": {
+                              "fields": {
+                                "username": {
+                                  "type": "string",
+                                  "id": 1
+                                }
+                              }
+                            },
+                            "StringReply": {
+                              "fields": {
+                                "message": {
+                                  "type": "string",
+                                  "id": 1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

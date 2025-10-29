@@ -114,7 +114,7 @@ spec:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-api
             - name: config-volume
-              mountPath: /opt/dolphinscheduler/conf/common.properties
+              mountPath: /opt/dolphinscheduler/api-server/conf/common.properties
               subPath: common.properties
             {{- if .Values.api.taskTypeFilter.enabled }}
             - name: config-volume

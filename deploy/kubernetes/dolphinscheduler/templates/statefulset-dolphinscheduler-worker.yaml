@@ -118,7 +118,7 @@ spec:
               subPath: application.yaml
             {{- end }}
             - name: config-volume
-              mountPath: /opt/dolphinscheduler/conf/common.properties
+              mountPath: /opt/dolphinscheduler/worker-server/conf/common.properties
               subPath: common.properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}

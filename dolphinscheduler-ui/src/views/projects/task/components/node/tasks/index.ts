@@ -22,6 +22,7 @@ import { useSubWorkflow } from './use-sub-workflow'
 import { usePython } from './use-python'
 import { useSpark } from './use-spark'
 import { useMr } from './use-mr'
+import { useGrpc } from './use-grpc'
 import { useHttp } from './use-http'
 import { useSql } from './use-sql'
 import { useProcedure } from './use-procedure'
@@ -59,6 +60,7 @@ export default {
   SPARK: useSpark,
   MR: useMr,
   FLINK: useFlink,
+  GRPC: useGrpc,
   HTTP: useHttp,
   SQL: useSql,
   PROCEDURE: useProcedure,

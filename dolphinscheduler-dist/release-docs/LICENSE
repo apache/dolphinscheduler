@@ -458,7 +458,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     sdk-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core/2.17.282, Apache 2.0
     third-party-jackson-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/third-party-jackson-core/2.17.282, Apache 2.0
     utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/utils/2.17.282, Apache 2.0
-    zt-zip 1.15: https://github.com/zeroturnaround/zt-zip/blob/master/LICENSE, Apache 2.0
     content-type 2.2: https://mvnrepository.com/artifact/com.nimbusds/content-type/2.2, Apache 2.0
     jackson-dataformat-xml 2.13.3: https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml/2.13.3, Apache 2.0
     lang-tag 1.6: https://mvnrepository.com/artifact/com.nimbusds/lang-tag/1.6, Apache 2.0

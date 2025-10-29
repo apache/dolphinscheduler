@@ -217,11 +217,6 @@
             <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.zeroturnaround</groupId>
-            <artifactId>zt-zip</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>

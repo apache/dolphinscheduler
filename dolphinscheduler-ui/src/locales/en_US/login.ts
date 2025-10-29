@@ -22,6 +22,6 @@ export default {
   userPassword: 'Password',
   userPassword_tips: 'Please enter your password',
   login: 'Login',
-  loginWithOAuth2: 'login with OAuth2',
+  loginWithOAuth2: 'Login with OAuth2',
   ssoLogin: 'SSO Login'
 }

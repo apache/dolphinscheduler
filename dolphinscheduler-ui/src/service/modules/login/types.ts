@@ -33,4 +33,10 @@ interface OAuth2Provider {
   iconUri: string
 }
 
-export { LoginReq, LoginRes, OAuth2Provider }
+interface OidcProvider {
+  id: string
+  displayName: string
+  iconUri?: string
+}
+
+export { LoginReq, LoginRes, OAuth2Provider, OidcProvider }

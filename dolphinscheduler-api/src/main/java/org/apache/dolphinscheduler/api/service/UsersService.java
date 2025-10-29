@@ -108,11 +108,19 @@ public interface UsersService {
      *
      * @param loginUser login user
      * @param pageNo page number
-     * @param searchVal search avlue
+     * @param searchVal search value
      * @param pageSize page size
      * @return user list page
      */
     Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+
+    /**
+     * Update an existing user entity.
+     *
+     * @param user The user object to update.
+     * @return The updated user object.
+     */
+    User updateUser(User user);
 
     User updateUser(User loginUser,
                     Integer userId,
