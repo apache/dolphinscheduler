@@ -141,7 +141,6 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
                             .whenComplete((result, throwable) -> LogUtils.removeWorkflowInstanceIdMDC());
                     allCompleteFutures.add(completableFuture);
                 }
-
                 CompletableFuture.allOf(allCompleteFutures.toArray(new CompletableFuture[0])).join();
             } catch (InterruptedException interruptedException) {
                 log.warn("Master schedule bootstrap interrupted, close the loop", interruptedException);
