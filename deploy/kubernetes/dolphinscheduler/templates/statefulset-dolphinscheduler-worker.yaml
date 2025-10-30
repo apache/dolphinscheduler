@@ -95,8 +95,11 @@ spec:
                 - -c
                 - |
                   {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                  {{- $permitAllEndpointsStr := .Values.common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | default "health,info" }}
+                  {{- $permitAllEndpoints := splitList "," $permitAllEndpointsStr | trimAll " " }}
+                  {{- $shouldPermitAll := has "health" $permitAllEndpoints }}
                   {{- $cmd := "curl -s http://localhost:1235/actuator/health/liveness" }}
-                  {{- if $enableSecurity }}
+                  {{- if (and (eq $enableSecurity "true") (not $shouldPermitAll)) }}
                       {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
                       {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
                       {{- $authString := printf "%s:%s" $username $password }}
@@ -119,8 +122,11 @@ spec:
                 - -c
                 - |
                   {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                  {{- $permitAllEndpointsStr := .Values.common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | default "health,info" }}
+                  {{- $permitAllEndpoints := splitList "," $permitAllEndpointsStr | trimAll " " }}
+                  {{- $shouldPermitAll := has "health" $permitAllEndpoints }}
                   {{- $cmd := "curl -s http://localhost:1235/actuator/health/readiness" }}
-                  {{- if $enableSecurity }}
+                  {{- if (and (eq $enableSecurity "true") (not $shouldPermitAll)) }}
                       {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
                       {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
                       {{- $authString := printf "%s:%s" $username $password }}

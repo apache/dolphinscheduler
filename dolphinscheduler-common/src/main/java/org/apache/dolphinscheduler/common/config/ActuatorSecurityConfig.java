@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.common.config;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -34,6 +37,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Security configuration for Actuator endpoints.
@@ -61,19 +65,35 @@ public class ActuatorSecurityConfig {
                                                            HttpSecurity http,
                                                            ActuatorSecurityProperties properties) throws Exception {
 
+        // Restrict this security configuration to requests starting with actuator paths
         http.requestMatcher(request -> request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_1) ||
                 request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_2));
 
         if (properties.isEnabled()) {
-            http.authorizeHttpRequests(authz -> authz
-                    .anyRequest().hasRole(ROLE_ACTUATOR))
-                    .httpBasic();
+            http.authorizeHttpRequests(authz -> {
+                // Grant public access to endpoints listed in permitAllEndpoints
+                for (String endpoint : properties.getPermitAllEndpoints()) {
+                    if (StringUtils.isNotBlank(endpoint)) {
+                        String cleanEndpoint = endpoint.trim();
+                        // Match both standard and prefixed actuator paths
+                        authz.requestMatchers(
+                                new AntPathRequestMatcher(ACTUATOR_PATH_PATTERN_2 + cleanEndpoint)).permitAll();
+                        authz.requestMatchers(
+                                new AntPathRequestMatcher(ACTUATOR_PATH_PATTERN_1 + cleanEndpoint)).permitAll();
+                    }
+                }
+                // All other actuator requests require the ACTUATOR role
+                authz.anyRequest().hasRole(ROLE_ACTUATOR);
+            })
+                    .httpBasic(); // Use HTTP Basic authentication for secured endpoints
         } else {
-            http.authorizeHttpRequests(authz -> authz
-                    .anyRequest().permitAll());
+            // If security is disabled, allow all requests to actuator endpoints
+            http.authorizeHttpRequests(authz -> authz.anyRequest().permitAll());
         }
 
+        // Disable CSRF for actuator endpoints as they are typically accessed by scripts or monitoring tools
         http.csrf().disable();
+
         return http.build();
     }
 
@@ -126,5 +146,13 @@ public class ActuatorSecurityConfig {
          * Password for authentication.
          */
         private String password;
+
+        /**
+         * List of actuator endpoint IDs (e.g., 'health', 'info') that should be accessible
+         * without authentication, even when 'enabled' is true.
+         * These are matched against paths like /actuator/{id}.
+         * Example: ['health', 'info', 'prometheus']
+         */
+        private List<String> permitAllEndpoints = new ArrayList<>();
     }
 }
