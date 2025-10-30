@@ -135,7 +135,7 @@ management:
     enabled: false
     username: username
     password: password
-    permit-all-endpoints: [health,metrics]
+    exclude: [health,metrics]
   endpoints:
     web:
       exposure:

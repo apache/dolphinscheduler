@@ -71,8 +71,8 @@ public class ActuatorSecurityConfig {
 
         if (properties.isEnabled()) {
             http.authorizeHttpRequests(authz -> {
-                // Grant public access to endpoints listed in permitAllEndpoints
-                for (String endpoint : properties.getPermitAllEndpoints()) {
+                // Grant public access to endpoints listed in exclude
+                for (String endpoint : properties.getExclude()) {
                     if (StringUtils.isNotBlank(endpoint)) {
                         String cleanEndpoint = endpoint.trim();
                         // Match both standard and prefixed actuator paths
@@ -153,6 +153,6 @@ public class ActuatorSecurityConfig {
          * These are matched against paths like /actuator/{id}.
          * Example: ['health', 'info', 'prometheus']
          */
-        private List<String> permitAllEndpoints = new ArrayList<>();
+        private List<String> exclude = new ArrayList<>();
     }
 }
