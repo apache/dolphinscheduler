@@ -20,6 +20,7 @@ exclude = [
     '^http://who-t\.blogspot\.com/2009/12/on-commit-messages\.html',
     '^https://openmldb\.ai',
     '^https://archive\.apache\.org/dist',
+    '^https://www\.bilibili\.com/video/BV1d64y1s7eZ'
 ]
 
 # Exclude paths from getting checked. The values are treated as regular expressions
