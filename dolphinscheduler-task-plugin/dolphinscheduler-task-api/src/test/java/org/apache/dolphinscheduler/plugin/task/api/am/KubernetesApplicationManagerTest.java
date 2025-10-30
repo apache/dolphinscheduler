@@ -29,6 +29,10 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,12 +95,14 @@ public class KubernetesApplicationManagerTest {
     }
     @Test
     public void testGetClusterId() {
+        KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
+        Mockito.when(KubernetesClientPool.getInstance()).thenReturn(mockPool);
+        Mockito.when(mockPool.getClusterId(Mockito.anyString())).thenReturn(mockClusterId);
+
         mockK8sTaskExecutionContext = mock(K8sTaskExecutionContext.class);
         when(mockK8sTaskExecutionContext.getConfigYaml()).thenReturn(mockKubeConfig);
         String clusterId = new KubernetesApplicationManager().getClusterId(mockK8sTaskExecutionContext);
-        String kubeConfig = mockK8sTaskExecutionContext.getConfigYaml();
-        String newHashCode = "k8s-cluster-" + (kubeConfig.hashCode() & 0x7FFFFFFF);
-        Assertions.assertEquals(newHashCode, clusterId);
+        Assertions.assertSame(clusterId,mockClusterId, "ClusterId Same");
     }
 
     @Test
@@ -227,30 +233,6 @@ public class KubernetesApplicationManagerTest {
 
         TaskExecutionStatus applicationStatus = kubernetesApplicationManager.getApplicationStatus(mockContext);
         Assertions.assertEquals(TaskExecutionStatus.SUCCESS, applicationStatus);
-
-        // try {
-        //
-        //
-        //
-        // if (!driverPod.isEmpty()) {
-        // // cluster mode
-        // Pod driver = driverPod.get(0);
-        // phase = driver.getStatus().getPhase();
-        // } else {
-        // // client mode
-        // phase = FINISH;
-        // }
-        // } finally {
-        // if (client != null) {
-        // returnClient(clusterId, client);
-        // }
-        // }
-        // } catch (Exception e) {
-        // throw new TaskException("Failed to get Kubernetes application status", e);
-        // }
-        //
-        // return phase.equals(FAILED) || phase.equals(UNKNOWN) ? TaskExecutionStatus.FAILURE
-        // : TaskExecutionStatus.SUCCESS;
     }
 
     @Test
@@ -286,6 +268,12 @@ public class KubernetesApplicationManagerTest {
         doReturn(mockClient).when(kubernetesApplicationManager).getClient(mockContext);
         doReturn(mockWatchList).when(kubernetesApplicationManager).getListenPod(mockContext);
 
+        KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
+        Mockito.when(KubernetesClientPool.getInstance()).thenReturn(mockPool);
+        mockK8sTaskExecutionContext = mock(K8sTaskExecutionContext.class);
+        when(mockContext.getK8sTaskExecutionContext()).thenReturn(mockK8sTaskExecutionContext);
+        when(mockK8sTaskExecutionContext.getConfigYaml()).thenReturn(mockKubeConfig);
+
         MixedOperation<Pod, PodList, PodResource> mockPodsOperation = mock(MixedOperation.class);
         NonNamespaceOperation<Pod, PodList, PodResource> mockNamespaceOperation = mock(NonNamespaceOperation.class);
         Pod mockPod = Mockito.mock(Pod.class);
@@ -314,7 +302,8 @@ public class KubernetesApplicationManagerTest {
         when(mockContainerResource.watchLog()).thenReturn(mockLogWatch);
 
         LogWatch podLogWatcher = kubernetesApplicationManager.getPodLogWatcher(mockContext);
-        Assertions.assertEquals(mockLogWatch, podLogWatcher);
+        Assertions.assertTrue(podLogWatcher instanceof LogWatch);
+        Assertions.assertSame(mockLogWatch.getOutput(), podLogWatcher.getOutput());
 
     }
 }

@@ -610,8 +610,8 @@ public class KubernetesClientPoolTest {
             borrowObjectMethod.setAccessible(true);
 
             // Get all available clients (maxSize = 2)
-            KubernetesClient client1 = (KubernetesClient) borrowObjectMethod.invoke(clusterClientPool);
-            KubernetesClient client2 = (KubernetesClient) borrowObjectMethod.invoke(clusterClientPool);
+            borrowObjectMethod.invoke(clusterClientPool);
+            borrowObjectMethod.invoke(clusterClientPool);
 
             // Try to borrow another client - should timeout after 500ms
             long startTime = System.currentTimeMillis();
