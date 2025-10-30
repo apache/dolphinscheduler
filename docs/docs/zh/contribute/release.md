@@ -497,7 +497,7 @@ svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/do
 
 ### 更新文档
 
-官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
+官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，请先合并 主仓库的 dev 分支后再合并 website 的 master 分支，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
   - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
