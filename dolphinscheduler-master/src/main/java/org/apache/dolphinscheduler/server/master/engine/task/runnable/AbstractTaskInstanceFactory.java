@@ -79,6 +79,7 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setTaskType(taskDefinition.getTaskType());
         taskInstance.setTaskCode(taskDefinition.getCode());
         taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
+        taskInstance.setTaskGroupPriority(taskDefinition.getTaskGroupPriority());
         taskInstance.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskInstance.setRetryInterval(taskDefinition.getFailRetryInterval());
         taskInstance.setTaskInstancePriority(taskDefinition.getTaskPriority());
