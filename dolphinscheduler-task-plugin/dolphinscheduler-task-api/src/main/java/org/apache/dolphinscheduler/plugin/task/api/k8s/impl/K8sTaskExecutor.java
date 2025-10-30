@@ -301,7 +301,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     }
 
     @Override
-    public TaskResponse run(String k8sParameterStr) throws Exception{
+    public TaskResponse run(String k8sParameterStr) throws Exception {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         try {

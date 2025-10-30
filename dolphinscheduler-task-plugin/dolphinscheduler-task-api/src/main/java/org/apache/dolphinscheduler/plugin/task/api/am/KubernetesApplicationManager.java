@@ -292,6 +292,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      * Wrapper for LogWatch that returns the client to the pool when closed.
      */
     private static class ClientReturningLogWatch implements LogWatch {
+
         private final LogWatch delegate;
         private final KubernetesClient client;
         private final String clusterId;

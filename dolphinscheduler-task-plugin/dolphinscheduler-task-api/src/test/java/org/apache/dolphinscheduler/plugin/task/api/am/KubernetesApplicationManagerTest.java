@@ -29,10 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.KubernetesClientPool;
 
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -102,7 +98,7 @@ public class KubernetesApplicationManagerTest {
         mockK8sTaskExecutionContext = mock(K8sTaskExecutionContext.class);
         when(mockK8sTaskExecutionContext.getConfigYaml()).thenReturn(mockKubeConfig);
         String clusterId = new KubernetesApplicationManager().getClusterId(mockK8sTaskExecutionContext);
-        Assertions.assertSame(clusterId,mockClusterId, "ClusterId Same");
+        Assertions.assertSame(clusterId, mockClusterId, "ClusterId Same");
     }
 
     @Test

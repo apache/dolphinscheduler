@@ -73,7 +73,8 @@ public class K8sUtilsTest {
     @BeforeEach
     public void setUp() {
         k8sUtils = new K8sUtils();
-        mockedKubernetesClientPool = Mockito.mockStatic(KubernetesClientPool.class); // Intercept all requests using static methods
+        mockedKubernetesClientPool = Mockito.mockStatic(KubernetesClientPool.class); // Intercept all requests using
+                                                                                     // static methods
         KubernetesClientPool mockPool = Mockito.mock(KubernetesClientPool.class);
         mockClient = Mockito.mock(KubernetesClient.class);
 
