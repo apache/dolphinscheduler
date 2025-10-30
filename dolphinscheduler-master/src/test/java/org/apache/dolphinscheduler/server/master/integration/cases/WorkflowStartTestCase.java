@@ -23,9 +23,7 @@ import static org.awaitility.Awaitility.await;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -41,6 +39,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.Objects;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -140,6 +139,18 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .untilAsserted(() -> {
+                    TaskDefinition taskDefinition = context.getTasks().get(0);
+
+                    Assertions
+                            .assertThat(repository.queryTaskGroupQueue(workflow))
+                            .allMatch(taskGroupQueue ->
+                                    Objects.equals(taskGroupQueue.getGroupId(), taskDefinition.getTaskGroupId())
+                                    && Objects.equals(taskGroupQueue.getPriority(), taskDefinition.getTaskGroupPriority()));
+                });
+
 
         await()
                 .atMost(Duration.ofMinutes(2))

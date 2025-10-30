@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.integration;
 
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
@@ -38,6 +40,9 @@ public class Repository {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private TaskGroupQueueDao taskGroupQueueDao;
 
     /**
      * Return the list of process instances for a given workflow definition in ascending order of their IDs.
@@ -87,4 +92,19 @@ public class Repository {
         return taskInstanceDao.queryAll();
     }
 
+    /**
+     * Return the list of {@link TaskGroupQueue} records for a given workflow definition
+     * in descending order of their IDs.
+     *
+     * @param workflowDefinition the workflow definition
+     * @return the list of {@link TaskGroupQueue} records ordered by priority descending
+     */
+    public List<TaskGroupQueue> queryTaskGroupQueue(WorkflowDefinition workflowDefinition) {
+        return queryWorkflowInstance(workflowDefinition)
+                .stream()
+                .flatMap(workflowInstance -> taskGroupQueueDao.queryByWorkflowInstanceId(workflowInstance.getId())
+                        .stream())
+                .sorted(Comparator.comparingInt(TaskGroupQueue::getId))
+                .collect(Collectors.toList());
+    }
 }

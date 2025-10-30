@@ -206,7 +206,7 @@ public class TaskDefinition {
      */
     private int taskGroupId;
     /**
-     * task group id
+     * task group priority
      */
     private int taskGroupPriority;
 

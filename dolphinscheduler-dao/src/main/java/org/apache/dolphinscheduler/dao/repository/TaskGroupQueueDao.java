@@ -92,4 +92,14 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
      * @return TaskGroupQueue ordered by priority desc
      */
     List<TaskGroupQueue> queryWaitNotifyForceStartTaskGroupQueue(int minTaskGroupQueueId, int limit);
+
+    /**
+     * Query all {@link TaskGroupQueue} belonging to the specified workflow instance.
+     *
+     * @param workflowInstanceId workflowInstanceId
+     * @return TaskGroupQueue
+     */
+    List<TaskGroupQueue> queryByWorkflowInstanceId(Integer workflowInstanceId);
+
+
 }
