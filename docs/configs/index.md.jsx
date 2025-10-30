@@ -66,6 +66,7 @@ import docs321Config from '../../../site_config/docs3-2-1';
 import docs322Config from '../../../site_config/docs3-2-2';
 import docs330Config from '../../../site_config/docs3-3-0-alpha';
 import docs331Config from '../../../site_config/docs3-3-1';
+import docs332Config from '../../../site_config/docs3-3-2';
 import docsDevConfig from '../../../site_config/docsdev';
 
 const docsSource = {
@@ -108,6 +109,7 @@ const docsSource = {
   '3.2.2': docs322Config,
   '3.3.0-alpha': docs330Config,
   '3.3.1': docs331Config,
+  '3.3.2': docs332Config,
   dev: docsDevConfig,
 };
 
