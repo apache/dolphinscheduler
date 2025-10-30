@@ -111,7 +111,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | common.configmap.JAVA_HOME | string | `"/opt/java/openjdk"` | Set `JAVA_HOME` for DolphinScheduler's task environment |
 | common.configmap.MANAGEMENT_SECURITY_ENABLED | bool | `false` | Whether to enable management endpoints security: false, true |
 | common.configmap.MANAGEMENT_SECURITY_PASSWORD | string | `""` | management endpoints security password |
-| common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | string | `"health,info"` | A list of Actuator endpoint IDs that should be accessible without authentication, even when security is enabled. Common values: health, info, prometheus, metrics. |
+| common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | string | `"health,metrics"` | A list of Actuator endpoint IDs that should be accessible without authentication, even when security is enabled. Common values: health, info, prometheus, metrics. |
 | common.configmap.MANAGEMENT_SECURITY_USERNAME | string | `""` | management endpoints security username |
 | common.configmap.PYTHON_LAUNCHER | string | `"/usr/bin/python/bin/python3"` | Set `PYTHON_LAUNCHER` for DolphinScheduler's task environment |
 | common.configmap.RESOURCE_UPLOAD_PATH | string | `"/dolphinscheduler"` | Resource store on HDFS/S3 path, please make sure the directory exists on hdfs and have read write permissions |

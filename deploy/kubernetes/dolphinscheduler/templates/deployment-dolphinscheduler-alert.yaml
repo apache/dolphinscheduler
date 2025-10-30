@@ -97,7 +97,7 @@ spec:
                 - -c
                 - |
                   {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
-                  {{- $permitAllEndpointsStr := .Values.common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | default "health,info" }}
+                  {{- $permitAllEndpointsStr := .Values.common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | default "health,metrics" }}
                   {{- $rawList := split "," $permitAllEndpointsStr }}
                   {{- $cleanList := list }}
                   {{- range $item := $rawList }}
@@ -131,7 +131,7 @@ spec:
                 - -c
                 - |
                   {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
-                  {{- $permitAllEndpointsStr := .Values.common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | default "health,info" }}
+                  {{- $permitAllEndpointsStr := .Values.common.configmap.MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS | default "health,metrics" }}
                   {{- $rawList := split "," $permitAllEndpointsStr }}
                   {{- $cleanList := list }}
                   {{- range $item := $rawList }}

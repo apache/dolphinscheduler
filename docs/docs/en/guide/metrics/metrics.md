@@ -47,6 +47,7 @@ management:
     enabled: true
     username: username
     password: password
+    permit-all-endpoints: [health,metrics]
 ```
 
 - Alternatively, you can configure it globally via the dolphinscheduler_env.sh file:
@@ -55,6 +56,7 @@ management:
 export MANAGEMENT_SECURITY_ENABLED=true
 export MANAGEMENT_SECURITY_USER=username
 export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS="health,metrics"
 ```
 
 - After enabling security authentication, you could access `prometheus-format` metrics using the following commands:

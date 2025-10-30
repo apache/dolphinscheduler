@@ -46,6 +46,7 @@ management:
     enabled: true
     username: username
     password: password
+    permit-all-endpoints: [health,metrics]
 ```
 
 - 您也可以通过 dolphinscheduler_env.sh 文件进行统一配置：
@@ -54,6 +55,7 @@ management:
 export MANAGEMENT_SECURITY_ENABLED=true
 export MANAGEMENT_SECURITY_USER=username
 export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_PERMIT_ALL_ENDPOINTS="health,metrics"
 ```
 
 - 添加安全认证之后，您可通过链接如下访问`prometheus格式`指标。
