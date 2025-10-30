@@ -104,8 +104,7 @@ public class K8sUtils {
             throw new TaskException("fail to register batch job watcher", e);
         } finally {
             if (client != null) {
-                log.debug(
-                        "createBatchJobWatcher does not return client immediately, caller should manage client lifecycle");
+                KubernetesClientPool.getInstance().returnClient(clusterId, client);
             }
         }
     }

@@ -95,7 +95,7 @@ public class KubernetesClientPool {
             return base64Hash.replace(BASE64_PADDING_CHARACTER, EMPTY_STRING);
         } catch (Exception e) {
             log.error("Failed to generate cluster ID", e);
-            return Integer.toString(kubeConfig.hashCode());
+            return Integer.toString(kubeConfig.hashCode() & 0x7FFFFFFF);
         }
     }
 

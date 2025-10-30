@@ -78,7 +78,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
                 KubernetesClient client = null;
                 try {
                     client = getClient(kubernetesApplicationManagerContext);
-                    // Retrieve watchList again, as the previous instance of tes client connection pool may have expired
+                    // Retrieve watchList again, as the previous instance of the client connection pool may have expired
                     FilterWatchListDeletable<Pod, PodList, PodResource> newWatchList =
                             client.pods()
                                     .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext()
@@ -166,9 +166,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
      */
     public String getClusterId(K8sTaskExecutionContext k8sTaskExecutionContext) {
         String kubeConfig = k8sTaskExecutionContext.getConfigYaml();
-        int hashCode = kubeConfig.hashCode();
-        int nonNegativeHash = hashCode & 0x7FFFFFFF;
-        return K8S_CLUSTER_PREFIX + nonNegativeHash;
+        return clientPool.getClusterId(kubeConfig);
     }
 
     /**
@@ -259,6 +257,7 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
         KubernetesClient client = null;
         boolean podIsReady = false;
         Pod pod = null;
+        String clusterId = getClusterId(kubernetesApplicationManagerContext.getK8sTaskExecutionContext());
         try {
             client = getClient(kubernetesApplicationManagerContext);
             while (!podIsReady) {
@@ -277,13 +276,45 @@ public class KubernetesApplicationManager implements ApplicationManager<Kubernet
                 }
             }
 
-            return client.pods().inNamespace(pod.getMetadata().getNamespace())
+            LogWatch logWatch = client.pods().inNamespace(pod.getMetadata().getNamespace())
                     .withName(pod.getMetadata().getName())
                     .inContainer(kubernetesApplicationManagerContext.getContainerName())
                     .watchLog();
-        } finally {
-            log.debug("Log watch client is not returned immediately, will be managed by caller after watch completes");
+            return new ClientReturningLogWatch(logWatch, client, clusterId);
+        } catch (Exception e) {
+            if (client != null) {
+                clientPool.returnClient(clusterId, client);
+            }
+            throw e;
         }
     }
-
+    /**
+     * Wrapper for LogWatch that returns the client to the pool when closed.
+     */
+    private static class ClientReturningLogWatch implements LogWatch {
+        private final LogWatch delegate;
+        private final KubernetesClient client;
+        private final String clusterId;
+        private boolean closed = false;
+        public ClientReturningLogWatch(LogWatch delegate, KubernetesClient client, String clusterId) {
+            this.delegate = delegate;
+            this.client = client;
+            this.clusterId = clusterId;
+        }
+        @Override
+        public void close() {
+            if (!closed) {
+                try {
+                    delegate.close();
+                } finally {
+                    KubernetesClientPool.getInstance().returnClient(clusterId, client);
+                    closed = true;
+                }
+            }
+        }
+        @Override
+        public java.io.InputStream getOutput() {
+            return delegate.getOutput();
+        }
+    }
 }
