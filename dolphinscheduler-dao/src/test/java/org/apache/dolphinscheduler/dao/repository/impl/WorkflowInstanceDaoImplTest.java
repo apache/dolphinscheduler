@@ -41,17 +41,16 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
     void queryByWorkflowCodeVersionStatus_EMPTY_INSTANCE() {
         long workflowDefinitionCode = 1L;
         int workflowDefinitionVersion = 1;
-        int[] status = WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState();
 
         assertTrue(isEmpty(workflowInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
-                workflowDefinitionVersion, status)));
+                workflowDefinitionVersion, WorkflowExecutionStatus.NEED_FAILOVER_STATES)));
     }
 
     @Test
     void queryByWorkflowCodeVersionStatus_EXIST_NOT_FINISH_INSTANCE() {
         long workflowDefinitionCode = 1L;
         int workflowDefinitionVersion = 1;
-        int[] status = WorkflowExecutionStatus.getNotTerminalStatus();
+        int[] status = WorkflowExecutionStatus.NOT_TERMINAL_STATES;
 
         assertTrue(isEmpty(workflowInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode,
                 workflowDefinitionVersion, status)));
@@ -101,7 +100,7 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
     void queryByWorkflowCodeVersionStatus_EXIST_FINISH_INSTANCE() {
         long workflowDefinitionCode = 1L;
         int workflowDefinitionVersion = 1;
-        int[] status = WorkflowExecutionStatus.getNotTerminalStatus();
+        int[] status = WorkflowExecutionStatus.NOT_TERMINAL_STATES;
 
         workflowInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.PAUSE));

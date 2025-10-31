@@ -30,4 +30,5 @@ serverPrincipal: Kerberos principal configured by kyuubi.kinit.principal at the 
 
 ## Native Supported
 
-Yes, could use this datasource by default.
+- No, read section example in [pseudo-cluster](../installation/pseudo-cluster.md) `Download Plugins Dependencies` section to activate this datasource.
+

@@ -23,6 +23,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import org.apache.dolphinscheduler.authentication.aws.AmazonElasticMapReduceClientFactory;
+import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Map;
-import java.util.TimeZone;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,7 +62,7 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .setTimeZone(TimeZone.getDefault())
+            .setTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
             .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     /**

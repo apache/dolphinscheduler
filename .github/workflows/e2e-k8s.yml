@@ -38,7 +38,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3.0.2
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
           filters: |
@@ -72,7 +72,9 @@ jobs:
           ./mvnw -B clean package \
           -Dmaven.test.skip=true \
           -Dspotless.skip=true \
-          -Pdocker,staging -Ddocker.tag=ci
+          -Pdocker,staging \
+          -Ddocker.tag=ci \
+          -Danalyze.skip=true
       - name: Create k8s Kind Cluster
         run: |
           # install kubectl

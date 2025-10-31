@@ -30,15 +30,16 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.utils.RetryUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,12 +47,13 @@ import com.aliyun.emr_serverless_spark20230808.Client;
 import com.aliyun.emr_serverless_spark20230808.models.CancelJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunResponse;
+import com.aliyun.emr_serverless_spark20230808.models.GetTemplateRequest;
+import com.aliyun.emr_serverless_spark20230808.models.GetTemplateResponse;
 import com.aliyun.emr_serverless_spark20230808.models.JobDriver;
 import com.aliyun.emr_serverless_spark20230808.models.StartJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.StartJobRunResponse;
 import com.aliyun.emr_serverless_spark20230808.models.Tag;
 import com.aliyun.teaopenapi.models.Config;
-import com.aliyun.teautil.models.RuntimeOptions;
 
 @Slf4j
 public class AliyunServerlessSparkTask extends AbstractRemoteTask {
@@ -64,6 +66,12 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam;
 
+    private String templateConf;
+
+    private String templateDisplayReleaseVersion;
+
+    private Boolean templateFusion;
+
     private String jobRunId;
 
     private RunState currentState;
@@ -75,6 +83,8 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     private String regionId;
 
     private String endpoint;
+
+    private RetryUtils.RetryPolicy retryPolicy = new RetryUtils.RetryPolicy(10, 1000L);
 
     protected AliyunServerlessSparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -116,31 +126,66 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
-        try {
-            StartJobRunRequest startJobRunRequest = buildStartJobRunRequest(aliyunServerlessSparkParameters);
-            RuntimeOptions runtime = new RuntimeOptions();
-            Map<String, String> headers = new HashMap<>();
-            StartJobRunResponse startJobRunResponse = aliyunServerlessSparkClient.startJobRunWithOptions(
-                    aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest, headers, runtime);
-            jobRunId = startJobRunResponse.getBody().getJobRunId();
-            setAppIds(jobRunId);
-            log.info("Successfully submitted serverless spark job, jobRunId - {}", jobRunId);
-
-            while (!RunState.isFinal(currentState)) {
-                GetJobRunRequest getJobRunRequest = buildGetJobRunRequest();
-                GetJobRunResponse getJobRunResponse = aliyunServerlessSparkClient
-                        .getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId, getJobRunRequest);
-                currentState = RunState.valueOf(getJobRunResponse.getBody().getJobRun().getState());
-                log.info("job - {} state - {}", jobRunId, currentState);
-                Thread.sleep(10 * 1000L);
+        GetTemplateResponse getTemplateResponse = RetryUtils.retryFunction(() -> {
+            try {
+                return aliyunServerlessSparkClient.getTemplate(
+                        aliyunServerlessSparkParameters.getWorkspaceId(),
+                        buildGetTemplateRequest());
+            } catch (Exception e) {
+                throw new TaskException("Failed to get template info", e);
             }
+        }, retryPolicy);
 
-            setExitStatusCode(mapFinalStateToExitCode(currentState));
+        if (getTemplateResponse != null) {
+            templateConf = getTemplateResponse.getBody()
+                    .getData()
+                    .getSparkConf()
+                    .stream()
+                    .map(item -> "--conf " + item.getKey() + "=" + item.getValue())
+                    .collect(Collectors.joining(" "));
 
-        } catch (Exception e) {
-            log.error("Serverless spark job failed!", e);
-            throw new AliyunServerlessSparkTaskException("Serverless spark job failed!");
+            templateDisplayReleaseVersion = getTemplateResponse.getBody().getData().getDisplaySparkVersion();
+            templateFusion = getTemplateResponse.getBody().getData().getFusion();
         }
+
+        StartJobRunRequest startJobRunRequest = buildStartJobRunRequest(aliyunServerlessSparkParameters);
+        StartJobRunResponse startJobRunResponse = RetryUtils.retryFunction(() -> {
+            try {
+                return aliyunServerlessSparkClient.startJobRun(
+                        aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest);
+            } catch (Exception e) {
+                throw new AliyunServerlessSparkTaskException("Failed to start job run!");
+            }
+        }, retryPolicy);
+
+        jobRunId = startJobRunResponse.getBody().getJobRunId();
+        setAppIds(jobRunId);
+        log.info("Successfully submitted serverless spark job, jobRunId - {}", jobRunId);
+
+        while (!RunState.isFinal(currentState)) {
+            GetJobRunRequest getJobRunRequest = buildGetJobRunRequest();
+
+            GetJobRunResponse getJobRunResponse = RetryUtils.retryFunction(() -> {
+                try {
+                    return aliyunServerlessSparkClient
+                            .getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
+                                    getJobRunRequest);
+                } catch (Exception e) {
+                    throw new AliyunServerlessSparkTaskException("Failed to get job run!", e);
+                }
+            }, retryPolicy);
+
+            currentState = RunState.valueOf(getJobRunResponse.getBody().getJobRun().getState());
+            log.info("job - {} state - {}", jobRunId, currentState);
+
+            try {
+                Thread.sleep(10 * 1000L);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
+        setExitStatusCode(mapFinalStateToExitCode(currentState));
     }
 
     @Override
@@ -158,7 +203,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             case Success:
                 return TaskConstants.EXIT_CODE_SUCCESS;
             case Failed:
-                return TaskConstants.EXIT_CODE_KILL;
+                return TaskConstants.EXIT_CODE_FAILURE;
             default:
                 return TaskConstants.EXIT_CODE_FAILURE;
         }
@@ -172,12 +217,16 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     @Override
     public void cancelApplication() throws TaskException {
         CancelJobRunRequest cancelJobRunRequest = buildCancelJobRunRequest();
-        try {
-            aliyunServerlessSparkClient.cancelJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
-                    cancelJobRunRequest);
-        } catch (Exception e) {
-            log.error("Failed to cancel serverless spark job run", e);
-        }
+        RetryUtils.retryFunction(
+                () -> {
+                    try {
+                        return aliyunServerlessSparkClient.cancelJobRun(
+                                aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
+                                cancelJobRunRequest);
+                    } catch (Exception e) {
+                        throw new AliyunServerlessSparkTaskException("Failed to cancel job run!");
+                    }
+                }, retryPolicy);
     }
 
     @Override
@@ -199,16 +248,27 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     }
 
     protected StartJobRunRequest buildStartJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+        if (templateConf != null) {
+            aliyunServerlessSparkParameters.setSparkSubmitParameters(
+                    templateConf + " " + aliyunServerlessSparkParameters.getSparkSubmitParameters());
+        }
+
         StartJobRunRequest startJobRunRequest = new StartJobRunRequest();
+        startJobRunRequest.setClientToken(genereteClientToken());
         startJobRunRequest.setRegionId(regionId);
         startJobRunRequest.setResourceQueueId(aliyunServerlessSparkParameters.getResourceQueueId());
         startJobRunRequest.setCodeType(aliyunServerlessSparkParameters.getCodeType());
         startJobRunRequest.setName(aliyunServerlessSparkParameters.getJobName());
+
         String engineReleaseVersion = aliyunServerlessSparkParameters.getEngineReleaseVersion();
-        engineReleaseVersion =
-                StringUtils.isEmpty(engineReleaseVersion) ? AliyunServerlessSparkConstants.DEFAULT_ENGINE
-                        : engineReleaseVersion;
-        startJobRunRequest.setReleaseVersion(engineReleaseVersion);
+
+        if (engineReleaseVersion != null && !engineReleaseVersion.isEmpty()) {
+            startJobRunRequest.setReleaseVersion(engineReleaseVersion);
+        } else if (templateDisplayReleaseVersion != null && templateFusion != null) {
+            startJobRunRequest.setDisplayReleaseVersion(templateDisplayReleaseVersion);
+            startJobRunRequest.setFusion(templateFusion);
+        }
+
         Tag envTag = new Tag();
         envTag.setKey(AliyunServerlessSparkConstants.ENV_KEY);
         String envType = aliyunServerlessSparkParameters.isProduction() ? AliyunServerlessSparkConstants.ENV_PROD
@@ -242,5 +302,20 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         CancelJobRunRequest cancelJobRunRequest = new CancelJobRunRequest();
         cancelJobRunRequest.setRegionId(regionId);
         return cancelJobRunRequest;
+    }
+
+    protected GetTemplateRequest buildGetTemplateRequest() {
+        GetTemplateRequest getTemplateRequest = new GetTemplateRequest();
+
+        if (aliyunServerlessSparkParameters.getTemplateId() != null
+                && !aliyunServerlessSparkParameters.getTemplateId().isEmpty()) {
+            getTemplateRequest.setTemplateBizId(aliyunServerlessSparkParameters.getTemplateId());
+        }
+
+        return getTemplateRequest;
+    }
+
+    protected String genereteClientToken() {
+        return taskExecutionContext.getTaskInstanceId() + "-" + UUID.randomUUID();
     }
 }

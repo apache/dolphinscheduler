@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TaskExecutionContextCreateRequest {
 
+    private IWorkflowExecutionGraph workflowExecutionGraph;
     private WorkflowDefinition workflowDefinition;
     private WorkflowInstance workflowInstance;
     private TaskDefinition taskDefinition;

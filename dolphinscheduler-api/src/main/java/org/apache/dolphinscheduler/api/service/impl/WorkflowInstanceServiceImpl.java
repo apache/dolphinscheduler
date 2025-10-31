@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARA
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
@@ -74,12 +75,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
-import org.apache.dolphinscheduler.dao.model.ITaskInstanceContext;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
@@ -468,9 +469,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId,
-                        workflowInstance.getTestFlag());
-        List<TaskInstanceDependentDetails<ITaskInstanceContext>> taskInstanceDependentDetailsList =
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId);
+        List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -482,11 +482,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return result;
     }
 
-    private List<TaskInstanceDependentDetails<ITaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
-        List<TaskInstanceDependentDetails<ITaskInstanceContext>> taskInstanceDependentDetailsList =
+    private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
+        List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 taskInstanceList.stream()
                         .map(taskInstance -> {
-                            TaskInstanceDependentDetails<ITaskInstanceContext> taskInstanceDependentDetails =
+                            TaskInstanceDependentDetails<AbstractTaskInstanceContext> taskInstanceDependentDetails =
                                     new TaskInstanceDependentDetails<>();
                             BeanUtils.copyProperties(taskInstance, taskInstanceDependentDetails);
                             return taskInstanceDependentDetails;
@@ -497,14 +497,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
                         ContextType.DEPENDENT_RESULT_CONTEXT);
         for (TaskInstanceContext taskInstanceContext : taskInstanceContextList) {
-            for (AbstractTaskInstanceContext dependentResultTaskInstanceContext : taskInstanceContext
-                    .getTaskInstanceContext()) {
-                for (TaskInstanceDependentDetails<ITaskInstanceContext> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
-                    if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
-                        taskInstanceDependentDetails
-                                .setTaskInstanceDependentResult(
-                                        dependentResultTaskInstanceContext);
-                    }
+            for (TaskInstanceDependentDetails<AbstractTaskInstanceContext> taskInstanceDependentDetails : taskInstanceDependentDetailsList) {
+                if (taskInstanceDependentDetails.getId().equals(taskInstanceContext.getTaskInstanceId())) {
+                    taskInstanceDependentDetails
+                            .setTaskInstanceDependentResults(taskInstanceContext.getTaskInstanceContext());
                 }
             }
         }
@@ -661,21 +657,20 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
         // check workflow instance status
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not update workflow instance, workflowInstanceId:{}.",
-                    workflowInstance.getState().getDesc(), workflowInstanceId);
+                    workflowInstance.getState().name(), workflowInstanceId);
             putMsg(result, WORKFLOW_INSTANCE_STATE_OPERATION_ERROR,
                     workflowInstance.getName(), workflowInstance.getState().toString(), "update");
             return result;
         }
 
-        //
-        Map<String, String> commandParamMap = JSONUtils.toMap(workflowInstance.getCommandParam());
-        String timezoneId = null;
-        if (commandParamMap == null || StringUtils.isBlank(commandParamMap.get(Constants.SCHEDULE_TIMEZONE))) {
+        String timezoneId;
+        final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
+        if (commandParam == null || StringUtils.isEmpty(commandParam.getTimeZone())) {
             timezoneId = loginUser.getTimeZone();
         } else {
-            timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
+            timezoneId = commandParam.getTimeZone();
         }
 
         setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
@@ -841,9 +836,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         projectService.checkProjectAndAuthThrowException(loginUser, project,
                 ApiFuncIdentificationConstant.INSTANCE_DELETE);
         // check workflow instance status
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not delete workflow instance, workflowInstanceId:{}.",
-                    workflowInstance.getState().getDesc(), workflowInstanceId);
+                    workflowInstance.getState().name(), workflowInstanceId);
             throw new ServiceException(WORKFLOW_INSTANCE_STATE_OPERATION_ERROR, workflowInstance.getName(),
                     workflowInstance.getState(), "delete");
         }
@@ -879,11 +874,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             return result;
         }
 
-        Map<String, String> commandParam = JSONUtils.toMap(workflowInstance.getCommandParam());
         String timezone = null;
-        if (commandParam != null) {
-            timezone = commandParam.get(Constants.SCHEDULE_TIMEZONE);
+        final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
+        if (commandParam != null && StringUtils.isNotEmpty(commandParam.getTimeZone())) {
+            timezone = commandParam.getTimeZone();
         }
+
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(workflowInstance.getCmdTypeIfComplement(),
                         workflowInstance.getScheduleTime(), timezone);
@@ -922,8 +918,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                             Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES,
-                        workflowInstance.getTestFlag());
+                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES);
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
@@ -1083,7 +1078,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             }
             log.info("Begin to delete workflow instance, workflow definition code: {}", workflowDefinitionCode);
             for (WorkflowInstance workflowInstance : workflowInstances) {
-                if (!workflowInstance.getState().isFinished()) {
+                if (!workflowInstance.getState().isFinalState()) {
                     log.warn("Workflow instance is not finished cannot delete, workflow instance id:{}",
                             workflowInstance.getId());
                     throw new ServiceException(WORKFLOW_INSTANCE_STATE_OPERATION_ERROR, workflowInstance.getName(),

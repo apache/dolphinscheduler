@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -63,7 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -337,6 +337,22 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         putMsg(result, Status.SUCCESS);
 
         return result;
+    }
+
+    @Override
+    @Transactional
+    public User updateUser(User user) {
+        if (user == null || user.getId() == null) {
+            throw new ServiceException(Status.USER_NOT_EXIST);
+        }
+        // Ensure the update time is set
+        user.setUpdateTime(new Date());
+        int updatedRows = userMapper.updateById(user);
+
+        if (updatedRows == 0) {
+            throw new ServiceException(Status.UPDATE_USER_ERROR);
+        }
+        return user;
     }
 
     @Override
@@ -891,7 +907,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // add system default timezone if not user timezone
         if (StringUtils.isEmpty(user.getTimeZone())) {
-            user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
+            user.setTimeZone(SystemConstants.DEFAULT_TIME_ZONE.toZoneId().getId());
         }
 
         // remove password

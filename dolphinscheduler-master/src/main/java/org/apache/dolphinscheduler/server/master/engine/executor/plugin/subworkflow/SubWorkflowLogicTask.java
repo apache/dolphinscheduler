@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.Abstract
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.failover.WorkflowFailover;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
@@ -168,9 +167,9 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(
                 subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
 
-        if (subWorkflowInstance != null && subWorkflowInstance.getState().canFailover()) {
-            // Only handle sub-workflow's fail-over in SubWorkflowLogicTask's fail-over
-            applicationContext.getBean(WorkflowFailover.class).failoverWorkflow(subWorkflowInstance);
+        if (subWorkflowInstance != null) {
+            // If the sub workflow instance is existed, means we already trigger the sub workflow instance.
+            // So we don't need to trigger again.
             return subWorkflowLogicTaskRuntimeContext;
         }
 
@@ -237,7 +236,6 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 // todo: transport varpool and local params
                 .startParamList(commandParam.getCommandParams())
                 .dryRun(Flag.of(workflowInstance.getDryRun()))
-                .testFlag(Flag.of(workflowInstance.getTestFlag()))
                 .build();
         final Integer subWorkflowInstanceId = applicationContext
                 .getBean(SubWorkflowControlClient.class)

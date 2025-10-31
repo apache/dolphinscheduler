@@ -29,7 +29,7 @@ public class RegistryUtils {
         return RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath() + "/" + masterAddress;
     }
 
-    public static String getFailoveredNodePathWhichStartupTimeIsUnknown(final String serverAddress) {
+    public static String getGlobalMasterFailoverNodePath(final String serverAddress) {
         return RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + "/" + serverAddress + "-" + "unknown" + "-"
                 + "unknown";
     }

@@ -26,6 +26,7 @@ import type {
   IDependentParameters
 } from './types'
 import { ref } from 'vue'
+import * as proto from 'protobufjs'
 
 export function formatParams(data: INodeData): {
   workflowDefinitionCode: string
@@ -89,6 +90,21 @@ export function formatParams(data: INodeData): {
     taskParams.taskManager = data.taskManager
     taskParams.parallelism = data.parallelism
   }
+  if (data.taskType === 'GRPC') {
+    taskParams.url = data.url
+    taskParams.grpcCredentialType = data.grpcCredentialType
+    taskParams.grpcServiceDefinition = data.grpcServiceDefinition
+    const root = proto.parse(data.grpcServiceDefinition || '').root
+    const grpcServiceDefinitionJSON = JSON.stringify(root.toJSON()) || '{}'
+    taskParams.grpcServiceDefinitionJSON = grpcServiceDefinitionJSON
+    taskParams.methodName = data.methodName
+    taskParams.message = data.message
+    taskParams.grpcCheckCondition = data.grpcCheckCondition
+    taskParams.condition = data.condition
+    taskParams.grpcConnectTimeoutMs = data.grpcConnectTimeoutMs
+    taskParams.socketTimeout = data.socketTimeout
+  }
+
   if (data.taskType === 'HTTP') {
     taskParams.httpMethod = data.httpMethod
     taskParams.httpBody = data.httpBody
@@ -305,6 +321,7 @@ export function formatParams(data: INodeData): {
     taskParams.codeType = data.codeType
     taskParams.jobName = data.jobName
     taskParams.engineReleaseVersion = data.engineReleaseVersion
+    taskParams.templateId = data.templateId
     taskParams.entryPoint = data.entryPoint
     taskParams.entryPointArguments = data.entryPointArguments
     taskParams.sparkSubmitParameters = data.sparkSubmitParameters

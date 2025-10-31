@@ -13,8 +13,8 @@
 
 在继续之前，您必须先安装并启动 dolphinscheduler。 对于初学者，我们建议设置 dolphionscheduler 与官方 Docker image 或 standalone server。
 
-* [standalone server](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/installation/standalone)
-* [docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/start/docker)
+* [standalone server](../installation/standalone.md)
+* [docker](./docker.md)
 
 ### 构建您的第一个工作流程
 

@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
@@ -120,22 +119,16 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Date now = new Date();
 
-        try {
-            project = Project
-                    .builder()
-                    .name(name)
-                    .code(CodeGenerateUtils.genCode())
-                    .description(desc)
-                    .userId(loginUser.getId())
-                    .userName(loginUser.getUserName())
-                    .createTime(now)
-                    .updateTime(now)
-                    .build();
-        } catch (CodeGenerateException e) {
-            log.error("Generate workflow definition code error.", e);
-            putMsg(result, Status.CREATE_PROJECT_ERROR);
-            return result;
-        }
+        project = Project
+                .builder()
+                .name(name)
+                .code(CodeGenerateUtils.genCode())
+                .description(desc)
+                .userId(loginUser.getId())
+                .userName(loginUser.getUserName())
+                .createTime(now)
+                .updateTime(now)
+                .build();
 
         if (projectMapper.insert(project) > 0) {
             log.info("Project is created and id is :{}", project.getId());

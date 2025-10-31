@@ -218,7 +218,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         WorkflowInstance workflowInstance = workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId())
                 .orElseThrow(
                         () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, task.getWorkflowInstanceId()));
-        if (!workflowInstance.getState().isFinished()) {
+        if (!workflowInstance.getState().isFinalState()) {
             throw new ServiceException("The workflow instance is not finished: " + workflowInstance.getState()
                     + " cannot force start task instance");
         }

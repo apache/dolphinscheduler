@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceRecoverSuspendTasksResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -81,10 +82,11 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
                             });
                 });
 
-        assertThat(workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId).isSuccess());
+        assertThat(workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId))
+                .matches(WorkflowInstanceRecoverSuspendTasksResponse::isSuccess);
 
         await()
-                .pollInterval(Duration.ofMillis(100))
+                .pollInterval(Duration.ofSeconds(1))
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
 
@@ -158,6 +160,7 @@ public class WorkflowInstanceRecoverStopTestCase extends AbstractMasterIntegrati
 
         await()
                 .atMost(Duration.ofMinutes(1))
+                .pollInterval(Duration.ofSeconds(1))
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(workflow))
                             .hasSize(1)

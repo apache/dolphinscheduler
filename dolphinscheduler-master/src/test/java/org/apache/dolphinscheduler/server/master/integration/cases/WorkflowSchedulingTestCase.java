@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.integration.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -37,7 +38,6 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.TimeZone;
 
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +63,7 @@ public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCas
                 .workflowDefinitionCode(workflow.getCode())
                 .startTime(new Date())
                 .endTime(DateUtils.addDays(new Date(), 1))
-                .timezoneId(TimeZone.getDefault().getID())
+                .timezoneId(SystemConstants.DEFAULT_TIME_ZONE.getID())
                 .crontab("0/5 * * * * ?")
                 .failureStrategy(FailureStrategy.CONTINUE)
                 .warningType(WarningType.NONE)

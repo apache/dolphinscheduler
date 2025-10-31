@@ -78,6 +78,11 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
     }
 
     @Override
+    public void finalizeTask() {
+        // do nothing for now
+    }
+
+    @Override
     public String toString() {
         return "LogicTaskExecutor{" +
                 "id=" + taskExecutionContext.getTaskInstanceId() +

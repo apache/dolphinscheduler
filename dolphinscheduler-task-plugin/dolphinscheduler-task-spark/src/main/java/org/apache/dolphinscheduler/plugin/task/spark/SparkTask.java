@@ -112,11 +112,6 @@ public class SparkTask extends AbstractYarnTask {
         return args.stream().collect(Collectors.joining(" "));
     }
 
-    @Override
-    protected Map<String, String> getProperties() {
-        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
-    }
-
     /**
      * build spark options
      *

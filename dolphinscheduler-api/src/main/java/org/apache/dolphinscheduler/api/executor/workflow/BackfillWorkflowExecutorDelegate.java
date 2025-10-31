@@ -130,7 +130,6 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
                 .startParamList(backfillWorkflowDTO.getStartParamList())
                 .dryRun(backfillWorkflowDTO.getDryRun())
-                .testFlag(backfillWorkflowDTO.getTestFlag())
                 .build();
 
         final WorkflowBackfillTriggerResponse backfillTriggerResponse = Clients

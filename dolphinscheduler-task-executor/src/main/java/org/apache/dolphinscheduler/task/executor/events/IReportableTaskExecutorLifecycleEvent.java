@@ -30,16 +30,6 @@ public interface IReportableTaskExecutorLifecycleEvent extends ITaskExecutorLife
     int getWorkflowInstanceId();
 
     /**
-     * The host of the workflow instance which the event should report to.
-     */
-    String getWorkflowInstanceHost();
-
-    /**
-     * Set the host of the workflow instance which the event should report to.
-     */
-    void setWorkflowInstanceHost(String workflowInstanceHost);
-
-    /**
      * Get the latest report time of the event, if the event is never reported, return null.
      */
     Long getLatestReportTime();

@@ -504,7 +504,7 @@ A：1，我们可以成功创建调度任务，并且表 t_scheduler_schedules �
 
 ## Q：请问 swagger ui 的地址是什么
 
-A：1， 3.1.0+ 版本地址是 http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html, 1.2+ 版本地址是：http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=cn，其它版本是 http://apiServerIp:apiServerPort/escheduler/swagger-ui/index.html?language=zh_CN&lang=cn。
+A：1， 3.1.0+ 版本地址是 [http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html], 1.2+ 版本地址是：[http://apiServerIp:apiServerPort/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=cn]，其它版本是 [http://apiServerIp:apiServerPort/escheduler/swagger-ui/index.html?language=zh_CN&lang=cn]。
 
 ---
 
@@ -551,7 +551,7 @@ A：1，目前是按照自然天来判断，上月末：判断时间是工作流
 
 ## Q：DS 后端接口文档
 
-A：1，http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=zh。
+A：1，http://localhost:8888/dolphinscheduler/swagger-ui/index.html?language=zh_CN&lang=zh。
 
 ## dolphinscheduler 在运行过程中，ip 地址获取错误的问题
 
@@ -584,7 +584,7 @@ dolphin.scheduler.network.interface.preferred=eth1
 
 以上配置修改后重启服务生效
 
-如果 ip 地址获取依然错误，请下载 [dolphinscheduler-netutils.jar](/asset/dolphinscheduler-netutils.jar) 到相应机器，执行以下命令以进一步排障，并反馈给社区开发人员：
+如果 ip 地址获取依然错误，请下载 [dolphinscheduler-netutils.jar] 到相应机器，执行以下命令以进一步排障，并反馈给社区开发人员：
 
 ```shell
 java -jar target/dolphinscheduler-netutils.jar
@@ -735,5 +735,14 @@ A: 对于标识为`缓存执行`的任务, 当任务启动时会生成一个缓�
 - 若无，则任务照常运行，并在任务完成时将任务实例的数据存入缓存
 
 若不需要缓存时，可以在工作流实例中右键运行清除缓存，则会清除该版本下当前输入的参数的缓存数据。
+
+--- 
+
+## Q：为什么导入一个在线的工作流定义，导入后的工作流定义的定时状态是下线的？
+
+A：因为我们不希望用户直接导入一个`在线`的定时工作流，所以在导出时，系统会将它的状态改为`下线`。
+为了遵循这个原则，即使用户自行将要导入的工作流定义中的定时状态改为`在线`，系统也会将状态覆盖为`下线`。
+
+---
 
 我们会持续收集更多的 FAQ。

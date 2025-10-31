@@ -82,8 +82,7 @@ export function useTable() {
       {
         title: '#',
         key: 'id',
-        ...COLUMN_WIDTH_CONFIG['index'],
-        render: (rowData: any, rowIndex: number) => rowIndex + 1
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('project.workflow.workflow_instance_name'),

@@ -45,7 +45,7 @@ public class PauseWorkflowInstanceExecutorDelegate
     public Void execute(PauseWorkflowInstanceOperation workflowInstanceControlRequest) {
         final WorkflowInstance workflowInstance = workflowInstanceControlRequest.workflowInstance;
         exceptionIfWorkflowInstanceCannotPause(workflowInstance);
-        if (ifWorkflowInstanceCanDirectPauseInDB(workflowInstance)) {
+        if (workflowInstance.getState().isCanDirectPauseInDB()) {
             directPauseInDB(workflowInstance);
         } else {
             pauseInMaster(workflowInstance);
@@ -55,16 +55,12 @@ public class PauseWorkflowInstanceExecutorDelegate
 
     private void exceptionIfWorkflowInstanceCannotPause(WorkflowInstance workflowInstance) {
         WorkflowExecutionStatus workflowInstanceState = workflowInstance.getState();
-        if (workflowInstanceState.canPause()) {
+        if (workflowInstanceState.isCanPause()) {
             return;
         }
         throw new ServiceException(
                 "The workflow instance: " + workflowInstance.getName() + " status is " + workflowInstanceState
                         + ", can not pause");
-    }
-
-    private boolean ifWorkflowInstanceCanDirectPauseInDB(WorkflowInstance workflowInstance) {
-        return workflowInstance.getState().canDirectPauseInDB();
     }
 
     private void directPauseInDB(WorkflowInstance workflowInstance) {

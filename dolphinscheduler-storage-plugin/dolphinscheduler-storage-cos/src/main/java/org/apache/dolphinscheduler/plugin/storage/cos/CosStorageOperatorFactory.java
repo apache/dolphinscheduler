@@ -52,7 +52,7 @@ public class CosStorageOperatorFactory implements StorageOperatorFactory {
                 .accessKeySecret(cosPropertiesMap.get(CosStorageConstants.TENCENT_CLOUD_ACCESS_KEY_SECRET))
                 .bucketName(cosPropertiesMap.get(CosStorageConstants.TENCENT_CLOUD_COS_BUCKET_NAME))
                 .resourceUploadPath(
-                        cosPropertiesMap.getOrDefault(StorageConstants.RESOURCE_UPLOAD_PATH,
+                        PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH,
                                 CosStorageConstants.DEFAULT_COS_RESOURCE_UPLOAD_PATH))
                 .build();
     }

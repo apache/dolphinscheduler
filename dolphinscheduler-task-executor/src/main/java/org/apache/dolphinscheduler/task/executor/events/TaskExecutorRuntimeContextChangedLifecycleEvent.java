@@ -37,8 +37,6 @@ public class TaskExecutorRuntimeContextChangedLifecycleEvent extends AbstractTas
 
     private int workflowInstanceId;
 
-    private String workflowInstanceHost;
-
     private String taskInstanceHost;
 
     @Deprecated
@@ -53,7 +51,6 @@ public class TaskExecutorRuntimeContextChangedLifecycleEvent extends AbstractTas
         return TaskExecutorRuntimeContextChangedLifecycleEvent.builder()
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())
                 .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
-                .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .taskInstanceHost(taskExecutionContext.getHost())
                 .processId(taskExecutionContext.getProcessId())
                 .appIds(taskExecutionContext.getAppIds())

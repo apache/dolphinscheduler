@@ -100,7 +100,6 @@ public class ExecutorController extends BaseController {
      * @param workflowInstancePriority   workflow instance priority
      * @param workerGroup               worker group
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
-     * @param testFlag                  testFlag
      * @param executionOrder            complement data in some kind of order
      * @return start workflow result code
      */
@@ -122,7 +121,6 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
             @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class)),
             @Parameter(name = "allLevelDependent", description = "ALL_LEVEL_DEPENDENT", schema = @Schema(implementation = boolean.class, example = "false")),
             @Parameter(name = "executionOrder", description = "EXECUTION_ORDER", schema = @Schema(implementation = ExecutionOrder.class))
@@ -148,7 +146,6 @@ public class ExecutorController extends BaseController {
                                                            @RequestParam(value = "startParams", required = false) String startParams,
                                                            @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                                            @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
-                                                           @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                                            @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
                                                            @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
                                                            @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
@@ -169,7 +166,6 @@ public class ExecutorController extends BaseController {
                         .environmentCode(environmentCode)
                         .startParamList(startParams)
                         .dryRun(Flag.of(dryRun))
-                        .testFlag(Flag.of(testFlag))
                         .build();
                 return Result
                         .success(Lists.newArrayList(execService.triggerWorkflowDefinition(workflowTriggerRequest)));
@@ -190,7 +186,6 @@ public class ExecutorController extends BaseController {
                         .environmentCode(environmentCode)
                         .startParamList(startParams)
                         .dryRun(Flag.of(dryRun))
-                        .testFlag(Flag.of(testFlag))
                         .backfillTime(WorkflowUtils.parseBackfillTime(scheduleTime))
                         .expectedParallelismNumber(expectedParallelismNumber)
                         .backfillDependentMode(complementDependentMode)
@@ -222,7 +217,6 @@ public class ExecutorController extends BaseController {
      * @param workerGroup               worker group
      * @param tenantCode                tenant code
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
-     * @param testFlag                  testFlag
      * @param executionOrder            complement data in some kind of order
      * @return start workflow result code
      */
@@ -243,7 +237,6 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
             @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
             @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class)),
             @Parameter(name = "allLevelDependent", description = "ALL_LEVEL_DEPENDENT", schema = @Schema(implementation = boolean.class, example = "false")),
             @Parameter(name = "executionOrder", description = "EXECUTION_ORDER", schema = @Schema(implementation = ExecutionOrder.class))
@@ -269,7 +262,6 @@ public class ExecutorController extends BaseController {
                                                                  @RequestParam(value = "startParams", required = false) String startParams,
                                                                  @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                                                  @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
-                                                                 @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                                                  @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
                                                                  @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
                                                                  @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
@@ -296,7 +288,6 @@ public class ExecutorController extends BaseController {
                     startParams,
                     expectedParallelismNumber,
                     dryRun,
-                    testFlag,
                     complementDependentMode,
                     allLevelDependent,
                     executionOrder);

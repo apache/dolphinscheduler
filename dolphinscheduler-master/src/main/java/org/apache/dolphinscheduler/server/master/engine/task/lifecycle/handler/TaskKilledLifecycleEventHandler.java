@@ -43,7 +43,7 @@ public class TaskKilledLifecycleEventHandler extends AbstractTaskLifecycleEventH
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final ITaskExecutionRunnable taskExecutionRunnable,
                        final TaskKilledLifecycleEvent taskKilledEvent) {
-        taskStateAction.killedEventAction(workflowExecutionRunnable, taskExecutionRunnable, taskKilledEvent);
+        taskStateAction.onKilledEvent(workflowExecutionRunnable, taskExecutionRunnable, taskKilledEvent);
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecutionRunnable,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(

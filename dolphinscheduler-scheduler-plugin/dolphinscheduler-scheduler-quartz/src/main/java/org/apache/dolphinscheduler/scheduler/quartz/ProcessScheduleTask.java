@@ -118,7 +118,6 @@ public class ProcessScheduleTask extends QuartzJobBean {
                 .tenantCode(schedule.getTenantCode())
                 .environmentCode(schedule.getEnvironmentCode())
                 .dryRun(Flag.NO)
-                .testFlag(Flag.NO)
                 .build();
         workflowInstanceController.scheduleTriggerWorkflow(scheduleTriggerRequest);
     }

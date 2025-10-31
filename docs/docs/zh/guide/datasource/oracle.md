@@ -13,3 +13,7 @@
 - Jdbc 连接参数：用于 ORACLE 连接的参数设置，以 JSON 形式填写
   - 比如 `{"schema": "abc"}` 指定使用 `username` 用户下的 `abc` 数据库
 
+## 是否原生支持
+
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+

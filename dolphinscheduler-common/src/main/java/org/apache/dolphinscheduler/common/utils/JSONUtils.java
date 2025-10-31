@@ -25,6 +25,8 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
+import org.apache.dolphinscheduler.common.constants.SystemConstants;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -69,10 +71,6 @@ import com.google.common.base.Strings;
 @Slf4j
 public final class JSONUtils {
 
-    static {
-        log.info("init timezone: {}", TimeZone.getDefault());
-    }
-
     private static final ObjectMapper objectMapper = JsonMapper.builder()
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
@@ -83,7 +81,7 @@ public final class JSONUtils {
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
-            .defaultTimeZone(TimeZone.getDefault())
+            .defaultTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();
 
@@ -110,7 +108,7 @@ public final class JSONUtils {
     /**
      * json representation of object
      *
-     * @param object object
+     * @param object  object
      * @param feature feature
      * @return object to json string
      */
@@ -133,13 +131,17 @@ public final class JSONUtils {
      * the fields of the specified object are generics, just the object itself should not be a
      * generic type.
      *
-     * @param json the string from which the object is to be deserialized
+     * @param json  the string from which the object is to be deserialized
      * @param clazz the class of T
-     * @param <T> T
+     * @param <T>   T
      * @return an object of type T from the string
      * classOfT
      */
     public static @Nullable <T> T parseObject(String json, Class<T> clazz) {
+        if (clazz == null) {
+            throw new IllegalArgumentException("Class type cannot be null");
+        }
+
         if (Strings.isNullOrEmpty(json)) {
             return null;
         }
@@ -147,17 +149,16 @@ public final class JSONUtils {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
-            log.error("Parse object exception, jsonStr: {}, class: {}", json, clazz, e);
+            throw new IllegalArgumentException("Parse json: " + json + " to class: " + clazz.getName() + " failed", e);
         }
-        return null;
     }
 
     /**
-     *  deserialize
+     * deserialize
      *
-     * @param src byte array
+     * @param src   byte array
      * @param clazz class
-     * @param <T> deserialize type
+     * @param <T>   deserialize type
      * @return deserialize type
      */
     public static <T> T parseObject(byte[] src, Class<T> clazz) {
@@ -171,12 +172,16 @@ public final class JSONUtils {
     /**
      * json to list
      *
-     * @param json json string
+     * @param json  json string
      * @param clazz class
-     * @param <T> T
+     * @param <T>   T
      * @return list
      */
     public static <T> List<T> toList(String json, Class<T> clazz) {
+        if (clazz == null) {
+            throw new IllegalArgumentException("Class type cannot be null");
+        }
+
         if (Strings.isNullOrEmpty(json)) {
             return Collections.emptyList();
         }
@@ -185,10 +190,10 @@ public final class JSONUtils {
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {
-            log.error("parse list exception!", e);
+            throw new IllegalArgumentException(
+                    "Parse json: " + json + " to list of class: " + clazz.getName() + " failed", e);
         }
 
-        return Collections.emptyList();
     }
 
     /**
@@ -222,7 +227,7 @@ public final class JSONUtils {
      * node or its child nodes, and returning value it has.
      * If no matching field is found in this node or its descendants, returns null.
      *
-     * @param jsonNode json node
+     * @param jsonNode  json node
      * @param fieldName Name of field to look for
      * @return Value of first matching node found, if any; null if none
      */
@@ -238,7 +243,6 @@ public final class JSONUtils {
 
     /**
      * json to map
-     * {@link #toMap(String, Class, Class)}
      *
      * @param json json
      * @return json to map
@@ -249,33 +253,9 @@ public final class JSONUtils {
     }
 
     /**
-     * json to map
-     *
-     * @param json json
-     * @param classK classK
-     * @param classV classV
-     * @param <K> K
-     * @param <V> V
-     * @return to map
-     */
-    public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
-        if (Strings.isNullOrEmpty(json)) {
-            return Collections.emptyMap();
-        }
-
-        try {
-            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
-            });
-        } catch (Exception e) {
-            log.error("json to map exception!", e);
-        }
-
-        return Collections.emptyMap();
-    }
-
-    /**
      * from the key-value generated json  to get the str value no matter the real type of value
-     * @param json the json str
+     *
+     * @param json     the json str
      * @param nodeName key
      * @return the str value of key
      */
@@ -305,13 +285,15 @@ public final class JSONUtils {
             return null;
         }
 
+        if (type == null) {
+            throw new IllegalArgumentException("Type reference cannot be null");
+        }
+
         try {
             return objectMapper.readValue(json, type);
         } catch (Exception e) {
-            log.error("json to map exception!", e);
+            throw new IllegalArgumentException("Parse json: " + json + " to type: " + type.getType() + " failed", e);
         }
-
-        return null;
     }
 
     /**
@@ -347,14 +329,12 @@ public final class JSONUtils {
         if (obj == null) {
             return null;
         }
-        String json = "";
         try {
-            json = toJsonString(obj);
+            return toJsonString(obj).getBytes(UTF_8);
         } catch (Exception e) {
-            log.error("json serialize exception.", e);
+            throw new IllegalArgumentException("Object: " + obj + " to json serialization exception.", e);
         }
 
-        return json.getBytes(UTF_8);
     }
 
     public static ObjectNode parseObject(String text) {

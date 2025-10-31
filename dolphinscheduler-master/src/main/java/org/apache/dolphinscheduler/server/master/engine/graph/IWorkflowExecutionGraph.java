@@ -41,6 +41,11 @@ public interface IWorkflowExecutionGraph {
     void addEdge(final String fromTaskName, final Set<String> toTaskName);
 
     /**
+     * Remove the unreachable edge in the graph.
+     */
+    void removeUnReachableEdge();
+
+    /**
      * Return the start tasks, the start tasks in the workflow execution graph is the tasks which predecessors is empty.
      */
     List<ITaskExecutionRunnable> getStartNodes();
@@ -182,12 +187,12 @@ public interface IWorkflowExecutionGraph {
     /**
      * Whether there exist the TaskExecutionRunnable chain in the graph is finish with paused.
      */
-    boolean isExistPauseTaskExecutionRunnableChain();
+    boolean isExistPausedTaskExecutionRunnableChain();
 
     /**
      * Whether there exist the TaskExecutionRunnable chain in the graph is finish with kill.
      */
-    boolean isExistKillTaskExecutionRunnableChain();
+    boolean isExistKilledTaskExecutionRunnableChain();
 
     /**
      * Check whether the given task is the end of the task chain.

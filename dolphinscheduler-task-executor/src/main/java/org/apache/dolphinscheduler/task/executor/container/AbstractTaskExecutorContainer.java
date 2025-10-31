@@ -98,6 +98,8 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
         }
         log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         pushTaskExecutorLogToRemote(taskExecutor);
+        // [Fix-17520]
+        taskExecutor.finalizeTask();
     }
 
     @Override

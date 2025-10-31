@@ -25,4 +25,5 @@ interface ServerMethodInvoker {
 
     Object invoke(final Object... arg) throws Throwable;
 
+    boolean isParameterTypeValidated(Class<?>[] argsTypes);
 }

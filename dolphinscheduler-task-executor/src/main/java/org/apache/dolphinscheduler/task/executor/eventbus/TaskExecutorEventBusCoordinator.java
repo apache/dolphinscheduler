@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.events.AbstractTaskExecutorLifecycleEvent;
@@ -187,9 +188,9 @@ public class TaskExecutorEventBusCoordinator implements ITaskExecutorEventBusCoo
                                     "Unsupported TaskExecutorLifecycleEvent: " + taskExecutorLifecycleEvent);
                     }
                 }
-                log.info("Success fire {}: {} ",
+                log.info(TaskLogMarkers.excludeInTaskLog(), "Success fire {}: {} ",
                         taskExecutorLifecycleEvent.getClass().getSimpleName(),
-                        JSONUtils.toPrettyJsonString(taskExecutorLifecycleEvent));
+                        JSONUtils.toJsonString(taskExecutorLifecycleEvent));
             } catch (Exception e) {
                 log.error("Fire TaskExecutorLifecycleEvent: {} error", taskExecutorLifecycleEvent, e);
             }

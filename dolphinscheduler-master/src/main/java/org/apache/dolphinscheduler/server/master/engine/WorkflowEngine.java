@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine;
 
 import org.apache.dolphinscheduler.server.master.engine.command.CommandEngine;
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskEngineDelegator;
-import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueueLooper;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +37,7 @@ public class WorkflowEngine implements AutoCloseable {
     private CommandEngine commandEngine;
 
     @Autowired
-    private GlobalTaskDispatchWaitingQueueLooper globalTaskDispatchWaitingQueueLooper;
+    private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
 
     @Autowired
     private LogicTaskEngineDelegator logicTaskEngineDelegator;
@@ -48,7 +48,7 @@ public class WorkflowEngine implements AutoCloseable {
 
         commandEngine.start();
 
-        globalTaskDispatchWaitingQueueLooper.start();
+        workerGroupDispatcherCoordinator.start();
 
         logicTaskEngineDelegator.start();
 
@@ -60,7 +60,7 @@ public class WorkflowEngine implements AutoCloseable {
         try (
                 final CommandEngine ignore1 = commandEngine;
                 final WorkflowEventBusCoordinator ignore2 = workflowEventBusCoordinator;
-                final GlobalTaskDispatchWaitingQueueLooper ignore3 = globalTaskDispatchWaitingQueueLooper;
+                final WorkerGroupDispatcherCoordinator ignore3 = workerGroupDispatcherCoordinator;
                 final LogicTaskEngineDelegator ignore5 = logicTaskEngineDelegator) {
             // closed the resource
         }

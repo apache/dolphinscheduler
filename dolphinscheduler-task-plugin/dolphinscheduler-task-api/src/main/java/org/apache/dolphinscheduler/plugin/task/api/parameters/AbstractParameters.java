@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -101,27 +100,8 @@ public abstract class AbstractParameters implements IParameters {
         return localParametersMaps;
     }
 
-    /**
-     * get varPool map
-     *
-     * @return parameters map
-     */
-    public Map<String, Property> getVarPoolMap() {
-        Map<String, Property> varPoolMap = new LinkedHashMap<>();
-        if (varPool != null) {
-            for (Property property : varPool) {
-                varPoolMap.put(property.getProp(), property);
-            }
-        }
-        return varPoolMap;
-    }
-
-    public void setVarPool(String varPool) {
-        if (StringUtils.isEmpty(varPool)) {
-            this.varPool = new ArrayList<>();
-        } else {
-            this.varPool = JSONUtils.toList(varPool, Property.class);
-        }
+    public void setVarPool(List<Property> varPool) {
+        this.varPool = varPool;
     }
 
     public void dealOutParam(Map<String, String> taskOutputParams) {

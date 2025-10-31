@@ -33,7 +33,6 @@ class TaskExecutionContextUtilsTest {
     void createTaskInstanceWorkingDirectory() throws IOException {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTenantCode("tenantCode");
-        taskExecutionContext.setProjectCode(1);
         taskExecutionContext.setWorkflowDefinitionCode(1L);
         taskExecutionContext.setWorkflowDefinitionVersion(1);
         taskExecutionContext.setWorkflowInstanceId(1);
@@ -55,5 +54,24 @@ class TaskExecutionContextUtilsTest {
         } finally {
             FileUtils.deleteFile(taskWorkingDirectory);
         }
+    }
+
+    @Test
+    void clearTaskInstanceWorkingDirectory() throws IOException {
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(1);
+
+        TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
+        String taskWorkingDirectory =
+                FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
+        Files.createFile(Paths.get(taskWorkingDirectory, "1.sh"));
+
+        // Test delete the working directory
+        TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
+        Assertions.assertFalse(Files.exists(Paths.get(taskWorkingDirectory)));
+
+        // Test do nothing if working directory is empty
+        TaskExecutionContext emptyExecPathContext = new TaskExecutionContext();
+        TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(emptyExecPathContext);
     }
 }

@@ -72,7 +72,7 @@ master:
       memory-usage-weight: 40
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 30
-  worker-group-refresh-interval: 10s
+  worker-group-refresh-interval: 5m
   command-fetch-strategy:
     type: ID_SLOT_BASED
     config:

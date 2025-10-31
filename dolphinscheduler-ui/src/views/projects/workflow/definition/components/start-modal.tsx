@@ -517,21 +517,23 @@ export default defineComponent({
                     />
                   </NFormItem>
                 )}
-                <NFormItem
-                  label={t('project.workflow.order_of_execution')}
-                  path='executionOrder'
-                >
-                  <NRadioGroup v-model:value={this.startForm.executionOrder}>
-                    <NSpace>
-                      <NRadio value={'DESC_ORDER'}>
-                        {t('project.workflow.descending_order')}
-                      </NRadio>
-                      <NRadio value={'ASC_ORDER'}>
-                        {t('project.workflow.ascending_order')}
-                      </NRadio>
-                    </NSpace>
-                  </NRadioGroup>
-                </NFormItem>
+                {this.startForm.runMode === 'RUN_MODE_SERIAL' && (
+                  <NFormItem
+                    label={t('project.workflow.order_of_execution')}
+                    path='executionOrder'
+                  >
+                    <NRadioGroup v-model:value={this.startForm.executionOrder}>
+                      <NSpace>
+                        <NRadio value={'DESC_ORDER'}>
+                          {t('project.workflow.descending_order')}
+                        </NRadio>
+                        <NRadio value={'ASC_ORDER'}>
+                          {t('project.workflow.ascending_order')}
+                        </NRadio>
+                      </NSpace>
+                    </NRadioGroup>
+                  </NFormItem>
+                )}
                 <NFormItem
                   label={t('project.workflow.schedule_date')}
                   path={
@@ -652,13 +654,6 @@ export default defineComponent({
               checkedValue={1}
               uncheckedValue={0}
               v-model:value={this.startForm.dryRun}
-            />
-          </NFormItem>
-          <NFormItem label={t('project.workflow.whether_test')} path='testFlag'>
-            <NSwitch
-              checkedValue={1}
-              uncheckedValue={0}
-              v-model:value={this.startForm.testFlag}
             />
           </NFormItem>
         </NForm>

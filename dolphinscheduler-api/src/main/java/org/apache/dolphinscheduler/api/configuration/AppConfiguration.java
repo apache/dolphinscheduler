@@ -106,7 +106,8 @@ public class AppConfiguration implements WebMvcConfigurer {
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
                         "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
                         "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error", "/oauth2-provider",
-                        "/redirect/login/oauth2", "/cookies");
+                        "/redirect/login/oauth2", "/cookies", "/oidc-providers", "/oauth2/authorization/**",
+                        "/login/oauth2/code/**");
     }
 
     @Override

@@ -37,7 +37,7 @@ public class WorkflowFailedLifecycleEventHandler
     public void handle(final IWorkflowStateAction workflowStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowFailedLifecycleEvent workflowFailedEvent) {
-        workflowStateAction.failedEventAction(workflowExecutionRunnable, workflowFailedEvent);
+        workflowStateAction.onFailedEvent(workflowExecutionRunnable, workflowFailedEvent);
     }
 
     @Override
