@@ -1153,7 +1153,11 @@ CREATE TABLE `t_ds_task_group_queue` (
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   KEY `idx_t_ds_task_group_queue_in_queue` (`in_queue`),
-  PRIMARY KEY( `id` )
+  KEY `idx_task_id` (`task_id`),
+  KEY `idx_group_id` (`group_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_workflow_instance_id` (`workflow_instance_id`),
+  PRIMARY KEY( `id` ),
 )ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
