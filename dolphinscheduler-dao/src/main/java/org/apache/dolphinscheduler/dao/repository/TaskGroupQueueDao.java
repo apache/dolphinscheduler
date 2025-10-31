@@ -101,5 +101,4 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
      */
     List<TaskGroupQueue> queryByWorkflowInstanceId(Integer workflowInstanceId);
 
-
 }
