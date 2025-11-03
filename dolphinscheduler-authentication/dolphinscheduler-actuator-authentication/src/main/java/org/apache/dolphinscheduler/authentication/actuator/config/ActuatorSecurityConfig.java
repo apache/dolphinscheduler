@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.config;
+package org.apache.dolphinscheduler.authentication.actuator.config;
 
 import org.apache.commons.lang3.StringUtils;
 

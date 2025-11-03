@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.alert.service.AlertHAServer;
+import org.apache.dolphinscheduler.authentication.actuator.ActuatorConfiguration;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -45,7 +46,8 @@ import org.springframework.context.annotation.Import;
 @Slf4j
 @Import({CommonConfiguration.class,
         DaoConfiguration.class,
-        RegistryConfiguration.class})
+        RegistryConfiguration.class,
+        ActuatorConfiguration.class})
 @SpringBootApplication
 public class AlertServer {
 
