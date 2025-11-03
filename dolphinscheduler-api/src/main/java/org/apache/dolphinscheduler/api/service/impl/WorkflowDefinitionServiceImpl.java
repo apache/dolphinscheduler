@@ -2428,8 +2428,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         log.info("Delete version: {} of workflow: {}, projectCode: {}", version, code, projectCode);
 
         // delete workflow lineage
+        // It's safe to return 0 if no lineage exists (idempotent operation)
         int deleteWorkflowLineageResult = workflowLineageService.deleteWorkflowLineage(Collections.singletonList(code));
-        if (deleteWorkflowLineageResult <= 0) {
+        if (deleteWorkflowLineageResult < 0) {
             log.error("Delete workflow lineage by workflow definition code error, workflowDefinitionCode: {}", code);
             throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
         }
