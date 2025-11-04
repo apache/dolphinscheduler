@@ -195,8 +195,9 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
                 // Note: These orphaned records should be cleaned up by a background cleanup task,
                 // not here to avoid side effects in a read-only query method.
                 if (taskDefinition == null) {
-                    log.warn("Orphaned lineage record detected: taskDefinitionCode {} not found, workflowTaskLineageId: {}. "
-                            + "This dirty data should be cleaned up by a background task.",
+                    log.warn(
+                            "Orphaned lineage record detected: taskDefinitionCode {} not found, workflowTaskLineageId: {}. "
+                                    + "This dirty data should be cleaned up by a background task.",
                             workflowTaskLineage.getTaskDefinitionCode(), workflowTaskLineage.getId());
                     continue;
                 }
@@ -205,7 +206,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
             taskDepStrList.add(String.format(Constants.FORMAT_S_S_COLON, workflowDefinition.getName(), taskName));
         }
         // If no valid task dependencies found, return empty Optional to indicate no dependencies.
-        if(taskDepStrList.isEmpty()) {
+        if (taskDepStrList.isEmpty()) {
             return Optional.empty();
         }
 
