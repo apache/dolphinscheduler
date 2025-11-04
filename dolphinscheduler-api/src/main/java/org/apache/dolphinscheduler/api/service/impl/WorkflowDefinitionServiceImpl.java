@@ -1128,8 +1128,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // It's safe to return 0 if no lineage exists (idempotent)
         int deleteWorkflowLineageResult = workflowLineageService
                 .deleteWorkflowLineage(Collections.singletonList(workflowDefinition.getCode()));
-        if (deleteWorkflowLineageResult < 0) {
-            throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
+        if (deleteWorkflowLineageResult <= 0) {
+            if(deleteWorkflowLineageResult < 0) {
+                throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
+            }else{
+                log.warn("No workflow lineage to delete, workflowDefinitionCode: {}", code);
+            }
         }
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
