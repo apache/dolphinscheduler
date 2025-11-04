@@ -53,8 +53,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  */
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties(ActuatorSecurityConfig.ActuatorSecurityProperties.class)
-public class ActuatorSecurityConfig {
+@EnableConfigurationProperties(ActuatorAuthenticationConfiguration.ActuatorSecurityProperties.class)
+public class ActuatorAuthenticationConfiguration {
 
     private static final String ACTUATOR_PATH_PATTERN_1 = "/dolphinscheduler/actuator/";
     private static final String ACTUATOR_PATH_PATTERN_2 = "/actuator/";
