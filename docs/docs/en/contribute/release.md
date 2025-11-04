@@ -204,6 +204,7 @@ We need to update some documentation before the Maven release. For example, to r
   - `docs/configs/docsdev.js`: change `/dev/` to `/x.y.z/`, **DO NOT** change this filename, is will be auto change by website tools.
 
 > Note: `VERSION` is a place hold string, is same as the version we set in `VERSION=<THE-VERSION-YOU-RELEASE>`.
+> Please merge the dev branch of the main warehouse before merging the master branch of the website. When the modified pull requests are merged, it will take effect.
 
 ### Modify Correct year in NOTICE file
 
