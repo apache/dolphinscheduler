@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -40,8 +41,9 @@ import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseCon
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.Assertions;
@@ -143,27 +145,32 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        await()
-                .untilAsserted(() -> {
-                    TaskDefinition taskDefinition = context.getTasks().get(0);
-
-                    Assertions
-                            .assertThat(repository.queryTaskGroupQueue(workflow))
-                            .allMatch(taskGroupQueue -> Objects.equals(taskGroupQueue.getGroupId(),
-                                    taskDefinition.getTaskGroupId())
-                                    && Objects.equals(taskGroupQueue.getPriority(),
-                                            taskDefinition.getTaskGroupPriority()));
-                });
+        final TaskDefinition taskDefinition = context.getTasks().get(0);
+        final Map<Integer, TaskGroupQueue> taskGroupQueueMap = new HashMap<>();
 
         await()
                 .atMost(Duration.ofMinutes(2))
                 .atLeast(Duration.ofSeconds(20))
                 .untilAsserted(() -> {
+
+                    // Capture TaskGroupQueue records during execution since they are deleted after task completion.
+                    repository.queryTaskGroupQueue(workflow).forEach(taskGroupQueue -> {
+                        taskGroupQueueMap.put(taskGroupQueue.getId(), taskGroupQueue);
+                    });
+
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(4)
                             .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState())
                                     && taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+
+                    Assertions
+                            .assertThat(taskGroupQueueMap)
+                            .hasSize(4)
+                            .allSatisfy((id, taskGroupQueue) -> {
+                                assertThat(taskGroupQueue.getGroupId()).isEqualTo(taskDefinition.getTaskGroupId());
+                                assertThat(taskGroupQueue.getPriority()).isEqualTo(1);
+                            });
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -733,6 +740,75 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     assertThat(latestTaskInstance.getSubmitTime())
                             .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
                 });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one fake task(A) failed with retry using task group")
+    public void testStartWorkflow_with_oneFailedTaskWithRetryUsingTaskGroup() {
+        final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry_using_task_group.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        final TaskDefinition taskDefinition = context.getTasks().get(0);
+        final Map<Integer, TaskGroupQueue> taskGroupQueueMap = new HashMap<>();
+
+        await()
+                .atMost(Duration.ofMinutes(3))
+                .untilAsserted(() -> {
+                    // Capture TaskGroupQueue records during execution since they are deleted after task completion.
+                    repository.queryTaskGroupQueue(workflow).forEach(taskGroupQueue -> {
+                        taskGroupQueueMap.put(taskGroupQueue.getId(), taskGroupQueue);
+                    });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+
+                    final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
+                    Assertions
+                            .assertThat(taskInstances)
+                            .allSatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            })
+                            .hasSize(2);
+
+                    final TaskInstance taskInstance = taskInstances.get(0);
+                    Assertions
+                            .assertThat(taskInstance)
+                            .matches(task -> task.getRetryTimes() == 0)
+                            .matches(task -> task.getFlag() == Flag.NO)
+                            .isNotNull();
+
+                    final TaskInstance latestTaskInstance = taskInstances.get(1);
+                    Assertions
+                            .assertThat(latestTaskInstance)
+                            .matches(task -> task.getRetryTimes() == 1)
+                            .matches(task -> task.getFlag() == Flag.YES)
+                            .isNotNull();
+                    assertThat(latestTaskInstance.getFirstSubmitTime()).isEqualTo(taskInstance.getFirstSubmitTime());
+                    assertThat(latestTaskInstance.getSubmitTime())
+                            .isAtLeast(DateUtils.addSeconds(taskInstance.getSubmitTime(), -65));
+                    assertThat(latestTaskInstance.getSubmitTime())
+                            .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
+
+                    Assertions
+                            .assertThat(taskGroupQueueMap)
+                            .hasSize(2)
+                            .allSatisfy((id, taskGroupQueue) -> {
+                                assertThat(taskGroupQueue.getGroupId()).isEqualTo(taskDefinition.getTaskGroupId());
+                                assertThat(taskGroupQueue.getPriority()).isEqualTo(1);
+                            });
+                });
+
         masterContainer.assertAllResourceReleased();
     }
 
