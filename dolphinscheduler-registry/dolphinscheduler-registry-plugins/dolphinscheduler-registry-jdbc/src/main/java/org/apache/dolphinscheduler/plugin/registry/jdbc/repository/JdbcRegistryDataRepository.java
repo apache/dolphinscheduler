@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 @Repository
 public class JdbcRegistryDataRepository {
 
@@ -69,5 +71,15 @@ public class JdbcRegistryDataRepository {
 
     public void updateById(JdbcRegistryDataDTO jdbcRegistryDataDTO) {
         jdbcRegistryDataMapper.updateById(JdbcRegistryDataDTO.toJdbcRegistryData(jdbcRegistryDataDTO));
+    }
+
+    public List<JdbcRegistryDataDTO> selectEphemeralDataByClientIds(List<Long> clientIds) {
+        return jdbcRegistryDataMapper.selectList(new QueryWrapper<JdbcRegistryData>()
+                .lambda()
+                .in(JdbcRegistryData::getClientId, clientIds)
+                .eq(JdbcRegistryData::getDataType, DataType.EPHEMERAL.name()))
+                .stream()
+                .map(JdbcRegistryDataDTO::fromJdbcRegistryData)
+                .collect(Collectors.toList());
     }
 }

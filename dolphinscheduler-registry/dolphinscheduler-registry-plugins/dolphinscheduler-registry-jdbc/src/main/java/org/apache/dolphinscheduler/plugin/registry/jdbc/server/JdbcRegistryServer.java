@@ -303,10 +303,16 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
             return;
         }
         log.info("Begin to delete dead jdbcRegistryClient: {}", jdbcRegistryClientIds);
-        jdbcRegistryDataRepository.deleteEphemeralDateByClientIds(jdbcRegistryClientIds);
+        deleteEphemeralDataByClientIds(jdbcRegistryClientIds);
         jdbcRegistryLockRepository.deleteByClientIds(jdbcRegistryClientIds);
         jdbcRegistryClientRepository.deleteByIds(jdbcRegistryClientIds);
         log.info("Success delete dead jdbcRegistryClient: {}", jdbcRegistryClientIds);
+    }
+
+    private void deleteEphemeralDataByClientIds(List<Long> clientIds) {
+        List<JdbcRegistryDataDTO> ephemeralDataList =
+                jdbcRegistryDataRepository.selectEphemeralDataByClientIds(clientIds);
+        ephemeralDataList.forEach(data -> jdbcRegistryDataManager.deleteJdbcRegistryDataByKey(data.getDataKey()));
     }
 
     private void refreshClientsHeartbeat() {
