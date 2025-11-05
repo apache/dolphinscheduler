@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.authentication.actuator.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(ActuatorAuthenticationConfiguration.ActuatorSecurityProperties.class)
+@Slf4j
 public class ActuatorAuthenticationConfiguration {
 
     private static final String ACTUATOR_PATH_PATTERN_1 = "/dolphinscheduler/actuator/";
@@ -64,7 +66,7 @@ public class ActuatorAuthenticationConfiguration {
     public SecurityFilterChain actuatorSecurityFilterChain(
                                                            HttpSecurity http,
                                                            ActuatorSecurityProperties properties) throws Exception {
-
+        log.info("Initialize ActuatorSecurityConfiguration, management.security.enabled: {}, management.security.exclude: {}",properties.isEnabled(),properties.getExclude());
         // Restrict this security configuration to requests starting with actuator paths
         http.requestMatcher(request -> request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_1) ||
                 request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_2));
