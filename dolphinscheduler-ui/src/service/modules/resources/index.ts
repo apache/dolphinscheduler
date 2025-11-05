@@ -38,7 +38,8 @@ export function queryResourceListPaging(
   return axios({
     url: '/resources',
     method: 'get',
-    params
+    params,
+    timeout: 0
   })
 }
 
@@ -46,7 +47,8 @@ export function queryBaseDir(params: ResourceTypeReq): any {
   return axios({
     url: '/resources/base-dir',
     method: 'get',
-    params
+    params,
+    timeout: 0
   })
 }
 
@@ -67,7 +69,8 @@ export function createDirectory(
   return axios({
     url: '/resources/directory',
     method: 'post',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -75,7 +78,8 @@ export function queryResourceList(params: ResourceTypeReq & FullNameReq): any {
   return axios({
     url: '/resources/list',
     method: 'get',
-    params
+    params,
+    timeout: 0
   })
 }
 
@@ -85,7 +89,8 @@ export function onlineCreateResource(
   return axios({
     url: '/resources/online-create',
     method: 'post',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -95,7 +100,8 @@ export function queryResourceByProgramType(
   return axios({
     url: '/resources/query-by-type',
     method: 'get',
-    params
+    params,
+    timeout: 0
   })
 }
 
@@ -105,7 +111,8 @@ export function updateResource(
   return axios({
     url: '/resources',
     method: 'put',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -113,7 +120,8 @@ export function deleteResource(params: FullNameReq & TenantCodeReq): any {
   return axios({
     url: '/resources',
     method: 'delete',
-    params
+    params,
+    timeout: 0
   })
 }
 
@@ -127,7 +135,8 @@ export function updateResourceContent(
   return axios({
     url: '/resources/update-content',
     method: 'put',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -137,6 +146,7 @@ export function viewResource(
   return axios({
     url: '/resources/view',
     method: 'get',
-    params
+    params,
+    timeout: 0
   })
 }
