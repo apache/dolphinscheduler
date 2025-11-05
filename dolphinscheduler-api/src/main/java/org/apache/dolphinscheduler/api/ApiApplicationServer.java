@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api;
 
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
-import org.apache.dolphinscheduler.authentication.actuator.config.ActuatorAuthenticationConfiguration;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
@@ -45,8 +44,7 @@ import org.springframework.context.event.EventListener;
         CommonConfiguration.class,
         ServiceConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class,
-        ActuatorAuthenticationConfiguration.class})
+        RegistryConfiguration.class})
 @ServletComponentScan
 @SpringBootApplication
 public class ApiApplicationServer {

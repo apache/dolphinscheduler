@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.dolphinscheduler.authentication.actuator.config.ActuatorAuthenticationConfiguration;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -64,8 +63,7 @@ import org.springframework.context.annotation.Import;
         ServiceConfiguration.class,
         CommonConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class,
-        ActuatorAuthenticationConfiguration.class})
+        RegistryConfiguration.class})
 @SpringBootApplication
 public class MasterServer implements IStoppable {
 

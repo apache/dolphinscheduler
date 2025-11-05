@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
-import org.apache.dolphinscheduler.authentication.actuator.config.ActuatorAuthenticationConfiguration;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -47,8 +46,7 @@ import org.springframework.context.annotation.Import;
 @Slf4j
 @Import({CommonConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class,
-        ActuatorAuthenticationConfiguration.class})
+        RegistryConfiguration.class})
 @SpringBootApplication
 public class WorkerServer implements IStoppable {
 

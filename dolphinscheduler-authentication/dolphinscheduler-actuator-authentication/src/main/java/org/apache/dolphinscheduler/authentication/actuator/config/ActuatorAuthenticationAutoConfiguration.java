@@ -27,10 +27,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -52,11 +52,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * When enabled, HTTP Basic authentication is required with a configured username and password.
  * </p>
  */
-@Configuration
+@AutoConfiguration
 @EnableWebSecurity
-@EnableConfigurationProperties(ActuatorAuthenticationConfiguration.ActuatorSecurityProperties.class)
+@EnableConfigurationProperties(ActuatorAuthenticationAutoConfiguration.ActuatorSecurityProperties.class)
 @Slf4j
-public class ActuatorAuthenticationConfiguration {
+public class ActuatorAuthenticationAutoConfiguration {
 
     private static final String ACTUATOR_PATH_PATTERN_1 = "/dolphinscheduler/actuator/";
     private static final String ACTUATOR_PATH_PATTERN_2 = "/actuator/";
