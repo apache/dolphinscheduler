@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.authentication.actuator.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -66,7 +66,9 @@ public class ActuatorAuthenticationAutoConfiguration {
     public SecurityFilterChain actuatorSecurityFilterChain(
                                                            HttpSecurity http,
                                                            ActuatorSecurityProperties properties) throws Exception {
-        log.info("Initialize ActuatorSecurityConfiguration, management.security.enabled: {}, management.security.exclude: {}",properties.isEnabled(),properties.getExclude());
+        log.info(
+                "Initialize ActuatorSecurityConfiguration, management.security.enabled: {}, management.security.exclude: {}",
+                properties.isEnabled(), properties.getExclude());
         // Restrict this security configuration to requests starting with actuator paths
         http.requestMatcher(request -> request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_1) ||
                 request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_2));
