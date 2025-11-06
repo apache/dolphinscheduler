@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryData;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryDataChanceEvent;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryDataChangeEvent;
 
 import java.util.Date;
 
@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JdbcRegistryDataChanceEventDTO {
+public class JdbcRegistryDataChangeEventDTO {
 
     private Long id;
 
@@ -49,27 +49,27 @@ public class JdbcRegistryDataChanceEventDTO {
 
     }
 
-    public static JdbcRegistryDataChanceEventDTO fromJdbcRegistryDataChanceEvent(JdbcRegistryDataChanceEvent jdbcRegistryDataChanceEvent) {
+    public static JdbcRegistryDataChangeEventDTO fromJdbcRegistryDataChangeEvent(JdbcRegistryDataChangeEvent jdbcRegistryDataChangeEvent) {
         JdbcRegistryData jdbcRegistryData =
-                JSONUtils.parseObject(jdbcRegistryDataChanceEvent.getJdbcRegistryData(), JdbcRegistryData.class);
+                JSONUtils.parseObject(jdbcRegistryDataChangeEvent.getJdbcRegistryData(), JdbcRegistryData.class);
         if (jdbcRegistryData == null) {
             throw new IllegalArgumentException(
-                    "jdbcRegistryData: " + jdbcRegistryDataChanceEvent.getJdbcRegistryData() + " is invalidated");
+                    "jdbcRegistryData: " + jdbcRegistryDataChangeEvent.getJdbcRegistryData() + " is invalidated");
         }
-        return JdbcRegistryDataChanceEventDTO.builder()
-                .id(jdbcRegistryDataChanceEvent.getId())
+        return JdbcRegistryDataChangeEventDTO.builder()
+                .id(jdbcRegistryDataChangeEvent.getId())
                 .jdbcRegistryData(JdbcRegistryDataDTO.fromJdbcRegistryData(jdbcRegistryData))
-                .eventType(EventType.valueOf(jdbcRegistryDataChanceEvent.getEventType()))
-                .createTime(jdbcRegistryDataChanceEvent.getCreateTime())
+                .eventType(EventType.valueOf(jdbcRegistryDataChangeEvent.getEventType()))
+                .createTime(jdbcRegistryDataChangeEvent.getCreateTime())
                 .build();
     }
 
-    public static JdbcRegistryDataChanceEvent toJdbcRegistryDataChanceEvent(JdbcRegistryDataChanceEventDTO jdbcRegistryDataChanceEvent) {
-        return JdbcRegistryDataChanceEvent.builder()
-                .id(jdbcRegistryDataChanceEvent.getId())
-                .jdbcRegistryData(JSONUtils.toJsonString(jdbcRegistryDataChanceEvent.getJdbcRegistryData()))
-                .eventType(jdbcRegistryDataChanceEvent.getEventType().name())
-                .createTime(jdbcRegistryDataChanceEvent.getCreateTime())
+    public static JdbcRegistryDataChangeEvent toJdbcRegistryDataChangeEvent(JdbcRegistryDataChangeEventDTO jdbcRegistryDataChangeEvent) {
+        return JdbcRegistryDataChangeEvent.builder()
+                .id(jdbcRegistryDataChangeEvent.getId())
+                .jdbcRegistryData(JSONUtils.toJsonString(jdbcRegistryDataChangeEvent.getJdbcRegistryData()))
+                .eventType(jdbcRegistryDataChangeEvent.getEventType().name())
+                .createTime(jdbcRegistryDataChangeEvent.getCreateTime())
                 .build();
     }
 
