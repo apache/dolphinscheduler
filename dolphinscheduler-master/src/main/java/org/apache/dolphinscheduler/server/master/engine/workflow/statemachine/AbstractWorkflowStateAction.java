@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,28 +71,27 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      * <p> If all the given tasks trigger condition is not met then will try to emit workflow finish event.
      */
     protected void triggerTasks(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final List<ITaskExecutionRunnable> taskExecutionRunnables) {
+                                final List<ITaskExecutionRunnable> triggerCandidateTasks) {
         final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
-        final List<ITaskExecutionRunnable> readyTaskExecutionRunnableList = taskExecutionRunnables
+        final List<ITaskExecutionRunnable> readyToTriggerTasks = triggerCandidateTasks
                 .stream()
                 .filter(workflowExecutionGraph::isTriggerConditionMet)
+                .sorted(Comparator.comparing(ITaskExecutionRunnable::getName))
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(readyTaskExecutionRunnableList)) {
-            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+        if (CollectionUtils.isEmpty(readyToTriggerTasks)) {
             return;
         }
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
-        for (ITaskExecutionRunnable readyTaskExecutionRunnable : readyTaskExecutionRunnableList) {
-            workflowExecutionGraph.markTaskExecutionRunnableActive(readyTaskExecutionRunnable);
-            if (workflowExecutionGraph.isTaskExecutionRunnableSkipped(readyTaskExecutionRunnable)
-                    || workflowExecutionGraph.isTaskExecutionRunnableForbidden(readyTaskExecutionRunnable)) {
-                workflowExecutionGraph.markTaskExecutionRunnableInActive(readyTaskExecutionRunnable);
+        for (ITaskExecutionRunnable readyToTriggerTask : readyToTriggerTasks) {
+            workflowExecutionGraph.markTaskExecutionRunnableActive(readyToTriggerTask);
+            if (workflowExecutionGraph.isTaskExecutionRunnableSkipped(readyToTriggerTask)
+                    || workflowExecutionGraph.isTaskExecutionRunnableForbidden(readyToTriggerTask)) {
                 workflowEventBus.publish(
                         WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent.of(
-                                workflowExecutionRunnable, readyTaskExecutionRunnable));
+                                workflowExecutionRunnable, readyToTriggerTask));
                 continue;
             }
-            workflowEventBus.publish(TaskStartLifecycleEvent.of(readyTaskExecutionRunnable));
+            workflowEventBus.publish(TaskStartLifecycleEvent.of(readyToTriggerTask));
         }
     }
 
@@ -128,7 +128,14 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
         }
 
         successorFlowAdjuster.adjustSuccessorFlow(taskExecutionRunnable);
-        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
+        final List<ITaskExecutionRunnable> successors = workflowExecutionGraph.getSuccessors(taskExecutionRunnable);
+        if (successors.isEmpty()) {
+            log.debug("The task: {} has no successor, try to emit workflow finished event",
+                    taskExecutionRunnable.getName());
+            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+            return;
+        }
+        triggerTasks(workflowExecutionRunnable, successors);
     }
 
     protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
@@ -164,6 +171,10 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      * <p> The workflow finish state is determined by the state of the task in the workflow.
      */
     protected abstract void emitWorkflowFinishedEventIfApplicable(final IWorkflowExecutionRunnable workflowExecutionRunnable);
+
+    protected boolean isWorkflowFinishable(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
+        return workflowExecutionRunnable.getWorkflowExecutionGraph().isAllTaskExecutionRunnableChainFinish();
+    }
 
     /**
      * Assert that the state of the task is the expected state.

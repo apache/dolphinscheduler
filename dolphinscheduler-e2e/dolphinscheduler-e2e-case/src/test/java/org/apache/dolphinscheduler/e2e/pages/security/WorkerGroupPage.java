@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 
 import lombok.Getter;
@@ -98,6 +102,12 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
+    }
+    public void verifyWorkerGroupCreated(String workerGroupName) {
+        await().atMost(Duration.ofMinutes(1)).untilAsserted(() -> assertThat(workerGroupList())
+                .as("workerGroup list should contain newly-created workerGroup")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(workerGroupName)));
     }
 
     @Getter

@@ -74,13 +74,19 @@ pg_ctl reload
 
 然后设置以下环境变量，将username和password改成你在上一步中设置的用户名{user}和密码{password}
 
+> **⚠️ 时区配置提醒**
+>
+> 避免使用 `CST` 等模糊时区标识符，可能造成调度时间错误。
+>
+> 推荐使用明确的时区，如：`serverTimezone=Asia/Shanghai`
+
 对于 MySQL：
 
 ```shell
 # for mysql
 export DATABASE=${DATABASE:-mysql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
+export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone={your_timezone}"
 export SPRING_DATASOURCE_USERNAME={user}
 export SPRING_DATASOURCE_PASSWORD={password}
 ```

@@ -178,6 +178,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         // And the DAG will continue to execute.
         final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
         if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
+            mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
             publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
             return;
         }
@@ -244,7 +245,6 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void publishWorkflowInstanceTopologyLogicalTransitionEvent(final ITaskExecutionRunnable taskExecutionRunnable) {
         final Integer workflowInstanceId = taskExecutionRunnable.getWorkflowInstance().getId();
         final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
-        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableInActive(taskExecutionRunnable);
         taskExecutionRunnable
                 .getWorkflowEventBus()
                 .publish(

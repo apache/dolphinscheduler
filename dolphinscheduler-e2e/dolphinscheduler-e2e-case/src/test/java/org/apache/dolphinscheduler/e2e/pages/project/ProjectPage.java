@@ -130,7 +130,49 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
         return this;
     }
+    public ProjectPage removeWorkerGroup(String project, String workerGroup) {
+        projectList()
+                .stream()
+                .filter(it -> it.getText().contains(project))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
+                .findElement(By.className("assign-worker-group-btn")).click();
 
+        WebElement workerGroupItem = assignWorkerGroupForm.sourceWorkerGroupItems()
+                .stream()
+                .filter(it -> it.findElement(By.className("n-transfer-list-item__label"))
+                        .getText().contains(workerGroup))
+                .filter(it -> {
+                    WebElement checkbox = it.findElement(By.className("n-checkbox"));
+                    return "true".equals(checkbox.getAttribute("aria-checked"));
+                })
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can not find selected source worker group: " + workerGroup));
+
+        workerGroupItem.click();
+        assignWorkerGroupForm.buttonSubmit().click();
+        return this;
+    }
+    public ProjectPage verifyRemovedWorkerGroup(String project, String workerGroup) {
+        projectList()
+                .stream()
+                .filter(it -> it.getText().contains(project))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
+                .findElement(By.className("assign-worker-group-btn")).click();
+
+        assignWorkerGroupForm.targetWorkerGroups()
+                .stream()
+                .filter(it -> it.getText().contains(workerGroup))
+                .findFirst()
+                .ifPresent(it -> {
+                    throw new RuntimeException(
+                            "Worker group should have been deleted but still exists: " + workerGroup);
+                });
+        assignWorkerGroupForm.buttonCancel().click();
+
+        return this;
+    }
     public ProjectDetailPage goTo(String project) {
         projectList().stream()
                 .filter(it -> it.getText().contains(project))
@@ -179,6 +221,13 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
                 @FindBy(className = "n-transfer-list-item__label")
         })
         private List<WebElement> targetWorkerGroups;
+
+        @FindBys({
+                @FindBy(className = "assign-worker-group-modal"),
+                @FindBy(className = "n-transfer-list--source"),
+                @FindBy(className = "n-transfer-list-item--source")
+        })
+        private List<WebElement> sourceWorkerGroupItems;
 
         @FindBys({
                 @FindBy(className = "assign-worker-group-modal"),

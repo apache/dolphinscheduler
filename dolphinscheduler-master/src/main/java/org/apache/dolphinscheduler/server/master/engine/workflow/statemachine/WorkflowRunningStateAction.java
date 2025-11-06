@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.statemachine;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
@@ -30,6 +31,8 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowSucceedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +48,13 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
         final IWorkflowExecutionGraph workflowExecutionGraph =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
-        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getStartNodes());
+        final List<ITaskExecutionRunnable> startNodes = workflowExecutionGraph.getStartNodes();
+        if (startNodes.isEmpty()) {
+            log.info("Workflow start node is empty, try to emit workflow finished event");
+            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+            return;
+        }
+        triggerTasks(workflowExecutionRunnable, startNodes);
     }
 
     @Override
@@ -53,8 +62,10 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
                                                  final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                                  final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        super.tryToTriggerSuccessorsAfterTaskFinish(workflowExecutionRunnable,
-                workflowTopologyLogicalTransitionWithTaskFinishEvent.getTaskExecutionRunnable());
+        final ITaskExecutionRunnable taskExecutionRunnable =
+                workflowTopologyLogicalTransitionWithTaskFinishEvent.getTaskExecutionRunnable();
+        workflowExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableInActive(taskExecutionRunnable);
+        super.tryToTriggerSuccessorsAfterTaskFinish(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     @Override
@@ -135,13 +146,11 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
      */
     @Override
     protected void emitWorkflowFinishedEventIfApplicable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final IWorkflowExecutionGraph workflowExecutionGraph =
-                workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
-        if (!workflowExecutionGraph.isAllTaskExecutionRunnableChainFinish()) {
+        if (!isWorkflowFinishable(workflowExecutionRunnable)) {
             log.debug("There exist task which is not finish, don't need to emit workflow finished event");
             return;
         }
-
+        final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
         if (workflowExecutionGraph.isExistFailureTaskExecutionRunnableChain()) {
             workflowEventBus.publish(WorkflowFailedLifecycleEvent.of(workflowExecutionRunnable));
