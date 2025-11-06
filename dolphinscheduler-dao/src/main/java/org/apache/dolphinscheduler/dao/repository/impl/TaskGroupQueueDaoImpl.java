@@ -92,5 +92,4 @@ public class TaskGroupQueueDaoImpl extends BaseDao<TaskGroupQueue, TaskGroupQueu
                 minTaskGroupQueueId,
                 limit);
     }
-
 }

@@ -92,5 +92,4 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
      * @return TaskGroupQueue ordered by priority desc
      */
     List<TaskGroupQueue> queryWaitNotifyForceStartTaskGroupQueue(int minTaskGroupQueueId, int limit);
-
 }
