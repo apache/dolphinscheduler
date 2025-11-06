@@ -93,8 +93,4 @@ public class TaskGroupQueueDaoImpl extends BaseDao<TaskGroupQueue, TaskGroupQueu
                 limit);
     }
 
-    @Override
-    public List<TaskGroupQueue> queryByWorkflowInstanceId(Integer workflowInstanceId) {
-        return mybatisMapper.queryByWorkflowInstanceId(workflowInstanceId);
-    }
 }

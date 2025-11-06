@@ -137,5 +137,4 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
                                                                  @Param("minTaskGroupQueueId") int minTaskGroupQueueId,
                                                                  @Param("limit") int limit);
 
-    List<TaskGroupQueue> queryByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
 }

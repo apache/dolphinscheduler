@@ -260,10 +260,4 @@
         limit #{limit}
     </select>
 
-    <select id="queryByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
-        select
-        <include refid="baseSql" />
-        from t_ds_task_group_queue
-        where workflow_instance_id = #{workflowInstanceId}
-    </select>
 </mapper>
