@@ -92,19 +92,7 @@ public class Repository {
         return taskInstanceDao.queryAll();
     }
 
-    /**
-     * Return the list of {@link TaskGroupQueue} records for a given workflow definition
-     * in descending order of their IDs.
-     *
-     * @param workflowDefinition the workflow definition
-     * @return the list of {@link TaskGroupQueue} records ordered by priority descending
-     */
-    public List<TaskGroupQueue> queryTaskGroupQueue(WorkflowDefinition workflowDefinition) {
-        return queryWorkflowInstance(workflowDefinition)
-                .stream()
-                .flatMap(workflowInstance -> taskGroupQueueDao.queryByWorkflowInstanceId(workflowInstance.getId())
-                        .stream())
-                .sorted(Comparator.comparingInt(TaskGroupQueue::getId))
-                .collect(Collectors.toList());
+    public List<TaskGroupQueue> queryAllInQueueTaskGroupQueue() {
+        return taskGroupQueueDao.queryAllInQueueTaskGroupQueue();
     }
 }

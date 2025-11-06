@@ -24,10 +24,10 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -41,9 +41,9 @@ import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseCon
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.Assertions;
@@ -154,7 +154,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
 
                     // Capture TaskGroupQueue records during execution since they are deleted after task completion.
-                    repository.queryTaskGroupQueue(workflow).forEach(taskGroupQueue -> {
+                    repository.queryAllInQueueTaskGroupQueue().forEach(taskGroupQueue -> {
                         taskGroupQueueMap.put(taskGroupQueue.getId(), taskGroupQueue);
                     });
 
@@ -763,7 +763,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(3))
                 .untilAsserted(() -> {
                     // Capture TaskGroupQueue records during execution since they are deleted after task completion.
-                    repository.queryTaskGroupQueue(workflow).forEach(taskGroupQueue -> {
+                    repository.queryAllInQueueTaskGroupQueue().forEach(taskGroupQueue -> {
                         taskGroupQueueMap.put(taskGroupQueue.getId(), taskGroupQueue);
                     });
 
