@@ -1161,6 +1161,10 @@ CREATE TABLE t_ds_task_group_queue (
 );
 
 create index idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue(in_queue);
+create index idx_t_ds_task_group_queue_task_id on t_ds_task_group_queue(task_id);
+create index idx_t_ds_task_group_queue_group_id on t_ds_task_group_queue(group_id);
+create index idx_t_ds_task_group_queue_status on t_ds_task_group_queue(status);
+create index idx_t_ds_task_group_queue_workflow_instance_id on t_ds_task_group_queue(workflow_instance_id);
 
 --
 -- Table structure for table t_ds_task_group

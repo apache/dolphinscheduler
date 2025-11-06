@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
+import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import java.util.UUID;
 
@@ -39,6 +41,7 @@ class ProjectE2ETest {
     private static final String project = "test-project-" + UUID.randomUUID();
 
     private static final String workerGroup = "default";
+    private static final String workerGroupTest = "test-wg-" + UUID.randomUUID();
 
     private static RemoteWebDriver browser;
 
@@ -69,6 +72,26 @@ class ProjectE2ETest {
         final ProjectPage page = new ProjectPage(browser);
         page.assignWorkerGroup(project, workerGroup);
         page.verifyAssignedWorkerGroup(project, workerGroup);
+    }
+
+    @Test
+    @Order(6)
+    void testAssignNewWorkerGroup() {
+        WorkerGroupPage workerGroupPage =
+                new WorkerGroupPage(browser).goToNav(SecurityPage.class).goToTab(WorkerGroupPage.class);
+        workerGroupPage.create(workerGroupTest);
+        workerGroupPage.verifyWorkerGroupCreated(workerGroupTest);
+        ProjectPage projectPage = new ProjectPage(browser).goToNav(ProjectPage.class);
+        projectPage.assignWorkerGroup(project, workerGroupTest);
+        projectPage.verifyAssignedWorkerGroup(project, workerGroupTest);
+    }
+
+    @Test
+    @Order(7)
+    void testRemoveWorkerGroup() {
+        final ProjectPage page = new ProjectPage(browser);
+        page.removeWorkerGroup(project, workerGroup);
+        page.verifyRemovedWorkerGroup(project, workerGroup);
     }
 
     @Test
