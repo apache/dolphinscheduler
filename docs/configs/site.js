@@ -29,7 +29,7 @@ export default {
   defaultLanguage: 'en-us',
   'en-us': {
     banner: {
-      text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
+      text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to discuss them ',
       link: 'https://s.apache.org/dolphinscheduler-slack'
     },
     pageMenu: [
