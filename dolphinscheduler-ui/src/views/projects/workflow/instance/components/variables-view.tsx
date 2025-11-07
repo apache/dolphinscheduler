@@ -67,7 +67,7 @@ export default defineComponent({
     }
 
     /**
-     * Copyed text processing
+     * Copied text processing
      */
     const rtClipboard = (el: any, taskType: string) => {
       const arr: Array<string> = []
