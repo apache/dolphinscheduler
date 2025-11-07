@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryDataChanceEvent;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryDataChangeEvent;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
@@ -28,13 +28,13 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface JdbcRegistryDataChanceEventMapper extends BaseMapper<JdbcRegistryDataChanceEvent> {
+public interface JdbcRegistryDataChangeEventMapper extends BaseMapper<JdbcRegistryDataChangeEvent> {
 
     @Select("select max(id) from t_ds_jdbc_registry_data_change_event")
     Long getMaxId();
 
     @Select("select * from t_ds_jdbc_registry_data_change_event where id > #{id} order by id asc limit 1000")
-    List<JdbcRegistryDataChanceEvent> selectJdbcRegistryDataChangeEventWhereIdAfter(@Param("id") long id);
+    List<JdbcRegistryDataChangeEvent> selectJdbcRegistryDataChangeEventWhereIdAfter(@Param("id") long id);
 
     @Delete("delete from t_ds_jdbc_registry_data_change_event where create_time > #{createTime}")
     void deleteJdbcRegistryDataChangeEventBeforeCreateTime(@Param("createTime") Date createTime);

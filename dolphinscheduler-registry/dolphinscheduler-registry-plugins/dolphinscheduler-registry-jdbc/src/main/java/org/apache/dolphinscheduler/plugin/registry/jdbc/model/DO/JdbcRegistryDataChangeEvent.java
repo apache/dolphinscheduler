@@ -33,7 +33,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JdbcRegistryDataChanceEvent {
+public class JdbcRegistryDataChangeEvent {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
