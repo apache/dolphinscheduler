@@ -125,26 +125,32 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         // check if assign worker group exists in the project
         Set<String> projectWorkerGroupNames =
                 projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
-        difference = SetUtils.difference(unauthorizedWorkerGroupNames, projectWorkerGroupNames);
+        Set<String> needDeletedWorkerGroups =
+                SetUtils.difference(projectWorkerGroupNames, unauthorizedWorkerGroupNames);
         Date now = new Date();
-        if (CollectionUtils.isNotEmpty(difference)) {
+
+        if (CollectionUtils.isNotEmpty(needDeletedWorkerGroups)) {
             Set<String> usedWorkerGroups = getAllUsedWorkerGroups(project);
-
-            if (CollectionUtils.isNotEmpty(usedWorkerGroups) && usedWorkerGroups.containsAll(difference)) {
+            if (CollectionUtils.isNotEmpty(usedWorkerGroups) && usedWorkerGroups.containsAll(needDeletedWorkerGroups)) {
                 throw new ServiceException(Status.USED_WORKER_GROUP_EXISTS,
-                        SetUtils.intersection(usedWorkerGroups, difference).toSet());
+                        SetUtils.intersection(usedWorkerGroups, needDeletedWorkerGroups).toSet());
             }
-
             boolean deleted =
-                    projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(projectCode, new ArrayList<>(difference));
+                    projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(projectCode,
+                            new ArrayList<>(needDeletedWorkerGroups));
             if (deleted) {
-                log.info("Success to delete worker groups [{}] for the project [{}] .", difference, project.getName());
+                log.info("Success to delete worker groups [{}] for the project [{}] .", needDeletedWorkerGroups,
+                        project.getName());
             } else {
-                log.error("Failed to delete worker groups [{}] for the project [{}].", difference, project.getName());
+                log.error("Failed to delete worker groups [{}] for the project [{}].", needDeletedWorkerGroups,
+                        project.getName());
                 throw new ServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR);
             }
-
-            difference.forEach(workerGroupName -> {
+        }
+        Set<String> needAssignedWorkerGroups =
+                SetUtils.difference(unauthorizedWorkerGroupNames, projectWorkerGroupNames);
+        if (CollectionUtils.isNotEmpty(needAssignedWorkerGroups)) {
+            needAssignedWorkerGroups.forEach(workerGroupName -> {
                 ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
                 projectWorkerGroup.setProjectCode(projectCode);
                 projectWorkerGroup.setWorkerGroup(workerGroupName);

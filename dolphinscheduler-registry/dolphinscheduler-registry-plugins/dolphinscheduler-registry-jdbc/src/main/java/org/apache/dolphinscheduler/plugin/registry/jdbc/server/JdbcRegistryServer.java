@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryClientHeartbeatDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryClientRepository;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChanceEventRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChangeEventRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -82,14 +82,14 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     public JdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
                               JdbcRegistryLockRepository jdbcRegistryLockRepository,
                               JdbcRegistryClientRepository jdbcRegistryClientRepository,
-                              JdbcRegistryDataChanceEventRepository jdbcRegistryDataChanceEventRepository,
+                              JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
                               JdbcRegistryProperties jdbcRegistryProperties) {
         this.jdbcRegistryDataRepository = checkNotNull(jdbcRegistryDataRepository);
         this.jdbcRegistryLockRepository = checkNotNull(jdbcRegistryLockRepository);
         this.jdbcRegistryClientRepository = checkNotNull(jdbcRegistryClientRepository);
         this.jdbcRegistryProperties = checkNotNull(jdbcRegistryProperties);
         this.jdbcRegistryDataManager = new JdbcRegistryDataManager(
-                jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChanceEventRepository);
+                jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChangeEventRepository);
         this.jdbcRegistryLockManager = new JdbcRegistryLockManager(
                 jdbcRegistryProperties, jdbcRegistryLockRepository);
         this.jdbcRegistryServerState = JdbcRegistryServerState.INIT;

@@ -85,7 +85,8 @@ export function onlineCreateResource(
   return axios({
     url: '/resources/online-create',
     method: 'post',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -105,7 +106,8 @@ export function updateResource(
   return axios({
     url: '/resources',
     method: 'put',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -127,7 +129,8 @@ export function updateResourceContent(
   return axios({
     url: '/resources/update-content',
     method: 'put',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -137,6 +140,7 @@ export function viewResource(
   return axios({
     url: '/resources/view',
     method: 'get',
-    params
+    params,
+    timeout: 0
   })
 }
