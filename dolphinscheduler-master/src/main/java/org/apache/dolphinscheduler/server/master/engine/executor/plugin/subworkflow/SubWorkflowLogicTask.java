@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.subworkflow;
 
-import static java.util.Arrays.asList;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.deserializeVarPool;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -46,8 +46,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,11 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.context.ApplicationContext;
-
-import com.fasterxml.jackson.core.type.TypeReference;
+import static java.util.Arrays.asList;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.deserializeVarPool;
 
 @Slf4j
 public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameters> {
@@ -235,9 +231,9 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
 
         final List<Property> paramList = mergeParams(asList(
+                new ArrayList<>(deserializeVarPool(workflowInstance.getGlobalParams())),
                 commandParam.getCommandParams(),
-                new ArrayList<>(deserializeVarPool(workflowInstance.getVarPool())),
-                new ArrayList<>(deserializeVarPool(workflowInstance.getGlobalParams()))));
+                new ArrayList<>(deserializeVarPool(workflowInstance.getVarPool()))));
 
         final WorkflowManualTriggerRequest workflowManualTriggerRequest = WorkflowManualTriggerRequest.builder()
                 .userId(taskExecutionContext.getExecutorId())
