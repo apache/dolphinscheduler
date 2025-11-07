@@ -53,7 +53,7 @@ management:
 
 ```sh
 export MANAGEMENT_SECURITY_ENABLED=true
-export MANAGEMENT_SECURITY_USER=username
+export MANAGEMENT_SECURITY_USERNAME=username
 export MANAGEMENT_SECURITY_PASSWORD=password
 export MANAGEMENT_SECURITY_EXCLUDE="health,metrics"
 ```
