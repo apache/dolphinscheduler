@@ -49,7 +49,7 @@ public class ResourceTreeVisitor implements Visitor {
 
     /**
      * visit
-     * @return resoruce component
+     * @return resource component
      */
     @Override
     public ResourceComponent visit(String rootPath) {
