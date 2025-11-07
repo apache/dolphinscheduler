@@ -1038,7 +1038,6 @@
                 <artifactId>jdbc</artifactId>
                 <version>${dolphindb-jdbc.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
