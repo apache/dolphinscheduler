@@ -27,8 +27,7 @@ CREATE TABLE `t_ds_jdbc_registry_data`
     `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'last update time',
     PRIMARY KEY (`id`),
-    unique Key `uk_t_ds_jdbc_registry_dataKey` (`data_key`),
-    KEY `k_t_ds_jdbc_registry_client_id` (`client_id`)
+    unique Key `uk_t_ds_jdbc_registry_dataKey` (`data_key`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
