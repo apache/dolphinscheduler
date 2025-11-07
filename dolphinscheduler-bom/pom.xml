@@ -130,7 +130,6 @@
         <guice.version>7.0.0</guice.version>
         <jsr305.version>3.0.0</jsr305.version>
         <error.prone.annotations.version>2.11.0</error.prone.annotations.version>
-        <jakarta-servlet-api.version>4.0.4</jakarta-servlet-api.version>
     </properties>
 
     <dependencyManagement>
@@ -1038,12 +1037,6 @@
                 <groupId>com.dolphindb</groupId>
                 <artifactId>jdbc</artifactId>
                 <version>${dolphindb-jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>${jakarta-servlet-api.version}</version>
             </dependency>
 
         </dependencies>
