@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.subworkflow;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
+import static java.util.Arrays.asList;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.deserializeVarPool;
+
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -46,7 +46,8 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
-import org.springframework.context.ApplicationContext;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,8 +55,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.deserializeVarPool;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.ApplicationContext;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
 public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameters> {
