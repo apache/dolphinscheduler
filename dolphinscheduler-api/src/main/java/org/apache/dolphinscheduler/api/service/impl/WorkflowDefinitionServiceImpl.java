@@ -485,9 +485,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return taskDefinitionLogs;
         } catch (ServiceException ex) {
             throw ex;
+        } catch (IllegalArgumentException ex) {
+            log.error("Generate task definition list failed, meet an illegal exception", ex);
+            throw new ServiceException(Status.WORKFLOW_DEFINE_ILLEGAL_ARG, ex.getMessage());
         } catch (Exception e) {
             log.error("Generate task definition list failed, meet an unknown exception", e);
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, taskDefinitionJson);
         }
     }
 
