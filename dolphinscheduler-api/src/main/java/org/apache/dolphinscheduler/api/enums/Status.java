@@ -261,6 +261,8 @@ public enum Status {
     QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
     EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
+    TASK_DEFINITION_INVALID(10207, "Task definition validation failed, please check the configuration",
+            "任务定义校验失败，请检查配置"),
 
     DELETE_QUEUE_BY_ID_ERROR(10307, "delete queue by id error", "删除队列错误"),
     DELETE_QUEUE_BY_ID_FAIL_USERS(10308, "delete queue by id fail, for there are {0} users using it",
