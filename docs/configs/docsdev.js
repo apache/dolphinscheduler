@@ -521,7 +521,7 @@ export default {
                         ],
                     },
                     {
-                        title: 'register-plugins',
+                        title: 'registry-plugins',
                         children: [
                             {
                                 title: 'ETCD',
