@@ -243,12 +243,13 @@ public class RegistryClient {
         }
         for (final String failoverFinishedNode : failoverFinishedNodes) {
             try {
-                final String failoverFinishTime = registry.get(failoverFinishedNode);
+                final String failoverFinishedNodePath = RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + Constants.SINGLE_SLASH + failoverFinishedNode;
+                final String failoverFinishTime = registry.get(failoverFinishedNodePath);
                 if (System.currentTimeMillis() - Long.parseLong(failoverFinishTime) > TimeUnit.DAYS.toMillis(7)) {
-                    registry.delete(failoverFinishedNode);
+                    registry.delete(failoverFinishedNodePath);
                     log.info(
                             "Clear the failover finished node: {} which failover time is before the current time minus 1 week",
-                            failoverFinishedNode);
+                            failoverFinishedNodePath);
                 }
             } catch (Exception ex) {
                 log.error("Failed to clean the failoverFinishedNode: {}", failoverFinishedNode, ex);
