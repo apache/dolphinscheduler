@@ -242,7 +242,8 @@ public class RegistryClient {
             return;
         }
         for (final String failoverFinishedNode : failoverFinishedNodes) {
-            final String failoverFinishedNodePath = RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath() + Constants.SINGLE_SLASH + failoverFinishedNode;
+            final String failoverFinishedNodePath = RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath()
+                    + Constants.SINGLE_SLASH + failoverFinishedNode;
             try {
                 final String failoverFinishTime = registry.get(failoverFinishedNodePath);
                 if (System.currentTimeMillis() - Long.parseLong(failoverFinishTime) > TimeUnit.DAYS.toMillis(7)) {
