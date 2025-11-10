@@ -1,10 +1,10 @@
 # 介绍
 
-这个插件将使用etcd作为注册中心。
+这个插件将使用 ETCD 作为注册中心。
 
 # 如何使用
 
-如果要将注册中心设置为 etcd，需要在 master/worker/api 的 application.yml 中设置属性
+如果要将注册中心设置为 ETCD，需要在 master/worker/api 的 application.yml 中设置属性
 
 ```yaml
 registry:
@@ -28,7 +28,7 @@ registry:
   load-balancer-policy: ""
 ```
 
-如果你的etcd服务器配置了ssl，关于认证文件你可以看【这里】(https://github.com/etcd-io/jetcd/blob/main/docs/SslConfig.md)了解如何转换。
+如果你的 ETCD 服务器配置了 SSL，关于认证文件你可以看[这里](https://github.com/etcd-io/jetcd/blob/main/docs/SslConfig.md)了解如何转换。
 
 > 如果您需要ssl认证，您需要确保您的 JDK 版本比 Java 8u 252(2020年4月) 更新，JDK11 也可以很好地工作.
 >
@@ -38,4 +38,4 @@ registry:
 >
 > https://github.com/grpc/grpc-java/issues/5369#issuecomment-751885384
 
-完成这个配置后，你可以启动你的 DolphinScheduler 集群，你的集群将使用 etcd 作为注册中心存储服务器元数据。
+完成这个配置后，你可以启动你的 DolphinScheduler 集群，你的集群将使用 ETCD 作为注册中心存储服务器元数据。
