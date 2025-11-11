@@ -21,18 +21,23 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.WorkflowLineageServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -56,6 +61,12 @@ public class WorkflowTaskLineageServiceTest {
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     /**
      * get mock Project
@@ -126,6 +137,123 @@ public class WorkflowTaskLineageServiceTest {
         workFlowRelationDetail.setWorkFlowName("testdag");
         workFlowLineages.add(workFlowRelationDetail);
         return workFlowLineages;
+    }
+
+    @Test
+    public void testTaskDependentMsgWithOrphanedLineageRecord() {
+        // Test case: Handle dirty data scenario where taskDefinition is null
+        long projectCode = 1L;
+        long workflowDefinitionCode = 100L;
+        long taskCode = 200L;
+
+        // Create orphaned lineage record (taskDefinitionCode exists but taskDefinition is null)
+        List<WorkflowTaskLineage> dependentWorkflowList = new ArrayList<>();
+        WorkflowTaskLineage orphanedLineage = new WorkflowTaskLineage();
+        orphanedLineage.setId(1);
+        orphanedLineage.setDeptWorkflowDefinitionCode(50L);
+        orphanedLineage.setTaskDefinitionCode(999L); // This task definition doesn't exist
+        dependentWorkflowList.add(orphanedLineage);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(50L);
+        workflowDefinition.setName("TestWorkflow");
+
+        when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
+                .thenReturn(dependentWorkflowList);
+        when(workflowDefinitionMapper.queryByCode(50L)).thenReturn(workflowDefinition);
+        when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Task definition not found (dirty data)
+
+        // Should return Optional.empty() because all records are orphaned
+        Optional<String> result =
+                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void testTaskDependentMsgWithMixedValidAndOrphanedRecords() {
+        // Test case: Some records are valid, some are orphaned
+        long projectCode = 1L;
+        long workflowDefinitionCode = 100L;
+        long taskCode = 200L;
+
+        List<WorkflowTaskLineage> dependentWorkflowList = new ArrayList<>();
+
+        // Valid lineage record
+        WorkflowTaskLineage validLineage = new WorkflowTaskLineage();
+        validLineage.setId(1);
+        validLineage.setDeptWorkflowDefinitionCode(50L);
+        validLineage.setTaskDefinitionCode(300L);
+        dependentWorkflowList.add(validLineage);
+
+        // Orphaned lineage record (dirty data)
+        WorkflowTaskLineage orphanedLineage = new WorkflowTaskLineage();
+        orphanedLineage.setId(2);
+        orphanedLineage.setDeptWorkflowDefinitionCode(60L);
+        orphanedLineage.setTaskDefinitionCode(999L); // This task definition doesn't exist
+        dependentWorkflowList.add(orphanedLineage);
+
+        WorkflowDefinition workflowDefinition1 = new WorkflowDefinition();
+        workflowDefinition1.setCode(50L);
+        workflowDefinition1.setName("ValidWorkflow");
+
+        WorkflowDefinition workflowDefinition2 = new WorkflowDefinition();
+        workflowDefinition2.setCode(60L);
+        workflowDefinition2.setName("OrphanedWorkflow");
+
+        TaskDefinition validTaskDefinition = new TaskDefinition();
+        validTaskDefinition.setCode(300L);
+        validTaskDefinition.setName("ValidTask");
+
+        when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
+                .thenReturn(dependentWorkflowList);
+        when(workflowDefinitionMapper.queryByCode(50L)).thenReturn(workflowDefinition1);
+        when(workflowDefinitionMapper.queryByCode(60L)).thenReturn(workflowDefinition2);
+        when(taskDefinitionMapper.queryByCode(300L)).thenReturn(validTaskDefinition);
+        when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Orphaned record
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setCode(taskCode);
+        taskDefinition.setName("TestTask");
+        when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(taskDefinition);
+
+        // Should return a message with only the valid record, skipping the orphaned one
+        Optional<String> result =
+                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+        Assertions.assertTrue(result.isPresent());
+        String message = result.get();
+        Assertions.assertTrue(message.contains("ValidWorkflow"));
+        Assertions.assertTrue(message.contains("ValidTask"));
+        // Orphaned record should be skipped, so it shouldn't appear in the message
+        Assertions.assertFalse(message.contains("OrphanedWorkflow"));
+    }
+
+    @Test
+    public void testTaskDependentMsgWithEmptyListAfterFilteringOrphanedRecords() {
+        // Test case: All records are orphaned, resulting in empty list
+        long projectCode = 1L;
+        long workflowDefinitionCode = 100L;
+        long taskCode = 0L; // No specific task code
+
+        List<WorkflowTaskLineage> dependentWorkflowList = new ArrayList<>();
+        WorkflowTaskLineage orphanedLineage = new WorkflowTaskLineage();
+        orphanedLineage.setId(1);
+        orphanedLineage.setDeptWorkflowDefinitionCode(50L);
+        orphanedLineage.setTaskDefinitionCode(999L); // This task definition doesn't exist
+        dependentWorkflowList.add(orphanedLineage);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(50L);
+        workflowDefinition.setName("TestWorkflow");
+
+        when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, 0L))
+                .thenReturn(dependentWorkflowList);
+        when(workflowDefinitionMapper.queryByCode(50L)).thenReturn(workflowDefinition);
+        when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Task definition not found
+
+        // Should return Optional.empty() because all records are orphaned
+        Optional<String> result =
+                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+        Assertions.assertFalse(result.isPresent());
     }
 
 }
