@@ -598,23 +598,23 @@ worker:
   # -- Init Container for Advanced Processing
   # Use when you need to transform, validate, or prepare configuration files
   initContainers: {}
-    - name: config-processor
-      image: busybox:latest
-      command:
-        - /bin/sh
-        - -c
-        - |
-          echo "⚙️ Init startup settings..."
-          # Create specific starup script for an specific environment settings in worker pods.
-          # You can use unix variables from secrets
-      envFrom:
-        # -- Example secret name for initContainer
-        - secretRef:
-            name: git-sync-secret
-        # -- Example volumeMounts for initContiner
-      volumeMounts:
-        - name: shared-config
-          mountPath: /shared-config
+    # - name: config-processor
+    #  image: busybox:latest
+    #  command:
+    #    - /bin/sh
+    #    - -c
+    #    - |
+    #      echo "⚙️ Init startup settings..."
+    #      # Create specific starup script for an specific environment settings in worker pods.
+    #      # You can use unix variables from secrets
+    #  envFrom:
+    #    # -- Example secret name for initContainer
+    #    - secretRef:
+    #        name: git-sync-secret
+    #    # -- Example volumeMounts for initContiner
+    #  volumeMounts:
+    #    - name: shared-config
+    #      mountPath: /shared-config
   updateStrategy:
     type: RollingUpdate
   # -- Replicas is the desired number of replicas of the given Template.
