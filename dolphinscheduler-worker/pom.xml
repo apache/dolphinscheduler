@@ -217,6 +217,11 @@
             <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-actuator-authentication</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

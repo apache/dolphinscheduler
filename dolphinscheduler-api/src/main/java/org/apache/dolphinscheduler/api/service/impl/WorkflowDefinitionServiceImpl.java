@@ -1123,6 +1123,18 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // If delete error, we can call this interface again.
         workflowDefinitionDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
+
+        // delete workflow lineage (lineage data only keeps one record per workflow code)
+        // It's safe to return 0 if no lineage exists (idempotent)
+        int deleteWorkflowLineageResult = workflowLineageService
+                .deleteWorkflowLineage(Collections.singletonList(workflowDefinition.getCode()));
+        if (deleteWorkflowLineageResult <= 0) {
+            if (deleteWorkflowLineageResult < 0) {
+                throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
+            } else {
+                log.warn("No workflow lineage to delete, workflowDefinitionCode: {}", code);
+            }
+        }
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
 
@@ -2427,12 +2439,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         log.info("Delete version: {} of workflow: {}, projectCode: {}", version, code, projectCode);
 
-        // delete workflow lineage
-        int deleteWorkflowLineageResult = workflowLineageService.deleteWorkflowLineage(Collections.singletonList(code));
-        if (deleteWorkflowLineageResult <= 0) {
-            log.error("Delete workflow lineage by workflow definition code error, workflowDefinitionCode: {}", code);
-            throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
-        }
     }
 
     private void updateWorkflowValid(User user, WorkflowDefinition oldWorkflowDefinition,
