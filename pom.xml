@@ -317,6 +317,12 @@
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-actuator-authentication</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-eventbus</artifactId>
                 <version>${project.version}</version>
             </dependency>
