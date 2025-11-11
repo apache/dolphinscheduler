@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.integration;
 
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
@@ -40,9 +38,6 @@ public class Repository {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private TaskGroupQueueDao taskGroupQueueDao;
 
     /**
      * Return the list of process instances for a given workflow definition in ascending order of their IDs.
@@ -92,7 +87,4 @@ public class Repository {
         return taskInstanceDao.queryAll();
     }
 
-    public List<TaskGroupQueue> queryAllInQueueTaskGroupQueue() {
-        return taskGroupQueueDao.queryAllInQueueTaskGroupQueue();
-    }
 }

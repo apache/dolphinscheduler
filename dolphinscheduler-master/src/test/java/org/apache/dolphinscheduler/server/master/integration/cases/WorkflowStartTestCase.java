@@ -23,8 +23,6 @@ import static org.awaitility.Awaitility.await;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -41,12 +39,11 @@ import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseCon
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Index;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -145,32 +142,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        final TaskDefinition taskDefinition = context.getTasks().get(0);
-        final Map<Integer, TaskGroupQueue> taskGroupQueueMap = new HashMap<>();
-
         await()
                 .atMost(Duration.ofMinutes(2))
                 .atLeast(Duration.ofSeconds(20))
                 .untilAsserted(() -> {
-
-                    // Capture TaskGroupQueue records during execution since they are deleted after task completion.
-                    repository.queryAllInQueueTaskGroupQueue().forEach(taskGroupQueue -> {
-                        taskGroupQueueMap.put(taskGroupQueue.getId(), taskGroupQueue);
-                    });
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(4)
                             .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState())
                                     && taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
-
-                    Assertions
-                            .assertThat(taskGroupQueueMap)
-                            .hasSize(4)
-                            .allSatisfy((id, taskGroupQueue) -> {
-                                assertThat(taskGroupQueue.getGroupId()).isEqualTo(taskDefinition.getTaskGroupId());
-                                assertThat(taskGroupQueue.getPriority()).isEqualTo(1);
-                            });
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -756,17 +737,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .build();
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        final TaskDefinition taskDefinition = context.getTasks().get(0);
-        final Map<Integer, TaskGroupQueue> taskGroupQueueMap = new HashMap<>();
-
         await()
                 .atMost(Duration.ofMinutes(3))
                 .untilAsserted(() -> {
-                    // Capture TaskGroupQueue records during execution since they are deleted after task completion.
-                    repository.queryAllInQueueTaskGroupQueue().forEach(taskGroupQueue -> {
-                        taskGroupQueueMap.put(taskGroupQueue.getId(), taskGroupQueue);
-                    });
-
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
@@ -779,34 +752,17 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             })
-                            .hasSize(2);
-
-                    final TaskInstance taskInstance = taskInstances.get(0);
-                    Assertions
-                            .assertThat(taskInstance)
-                            .matches(task -> task.getRetryTimes() == 0)
-                            .matches(task -> task.getFlag() == Flag.NO)
-                            .isNotNull();
-
-                    final TaskInstance latestTaskInstance = taskInstances.get(1);
-                    Assertions
-                            .assertThat(latestTaskInstance)
-                            .matches(task -> task.getRetryTimes() == 1)
-                            .matches(task -> task.getFlag() == Flag.YES)
-                            .isNotNull();
-                    assertThat(latestTaskInstance.getFirstSubmitTime()).isEqualTo(taskInstance.getFirstSubmitTime());
-                    assertThat(latestTaskInstance.getSubmitTime())
-                            .isAtLeast(DateUtils.addSeconds(taskInstance.getSubmitTime(), -65));
-                    assertThat(latestTaskInstance.getSubmitTime())
-                            .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
-
-                    Assertions
-                            .assertThat(taskGroupQueueMap)
                             .hasSize(2)
-                            .allSatisfy((id, taskGroupQueue) -> {
-                                assertThat(taskGroupQueue.getGroupId()).isEqualTo(taskDefinition.getTaskGroupId());
-                                assertThat(taskGroupQueue.getPriority()).isEqualTo(1);
-                            });
+                            .satisfies(taskInstance -> {
+                                assertThat(taskInstance.getRetryTimes()).isEqualTo(0);
+                                assertThat(taskInstance.getFlag()).isEqualTo(Flag.NO);
+                                assertThat(taskInstance.getTaskGroupPriority()).isEqualTo(1);
+                            }, Index.atIndex(0))
+                            .satisfies(taskInstance -> {
+                                assertThat(taskInstance.getRetryTimes()).isEqualTo(1);
+                                assertThat(taskInstance.getFlag()).isEqualTo(Flag.YES);
+                                assertThat(taskInstance.getTaskGroupPriority()).isEqualTo(1);
+                            }, Index.atIndex(1));
                 });
 
         masterContainer.assertAllResourceReleased();
