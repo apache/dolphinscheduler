@@ -47,4 +47,10 @@ public interface IFailoverCoordinator {
      * <p> This method is called when a worker server is removed from the cluster.
      */
     void failoverWorker(final WorkerFailoverEvent workerFailoverEvent);
+
+    /**
+     * Once the failover is finished, we will persist a mark in registry center.
+     * <p> This method is used to clean the finished marks which has expired to avoid the data accumulation.
+     */
+    void cleanHistoryFailoverFinishedMarks();
 }
