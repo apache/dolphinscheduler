@@ -93,7 +93,31 @@ spec:
           {{- if .Values.api.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:12345/dolphinscheduler/actuator/health/liveness"]
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                  {{- $excludeStr := .Values.common.configmap.MANAGEMENT_SECURITY_EXCLUDE | default "health,metrics" }}
+                  {{- $rawList := split "," $excludeStr }}
+                  {{- $cleanList := list }}
+                  {{- range $item := $rawList }}
+                    {{- $trimmed := trim $item }}
+                    {{- if $trimmed }}
+                      {{- $cleanList = append $cleanList $trimmed }}
+                    {{- end }}
+                  {{- end }}
+                  {{- $shouldPermitAll := has "health" $cleanList }}
+                  {{- $cmd := "curl -s http://localhost:12345/dolphinscheduler/actuator/health/liveness" }}
+                  {{- if (and $enableSecurity (not $shouldPermitAll)) }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
             initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
@@ -103,7 +127,31 @@ spec:
           {{- if .Values.api.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:12345/dolphinscheduler/actuator/health/readiness"]
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                  {{- $excludeStr := .Values.common.configmap.MANAGEMENT_SECURITY_EXCLUDE | default "health,metrics" }}
+                  {{- $rawList := split "," $excludeStr }}
+                  {{- $cleanList := list }}
+                  {{- range $item := $rawList }}
+                    {{- $trimmed := trim $item }}
+                    {{- if $trimmed }}
+                      {{- $cleanList = append $cleanList $trimmed }}
+                    {{- end }}
+                  {{- end }}
+                  {{- $shouldPermitAll := has "health" $cleanList }}
+                  {{- $cmd := "curl -s http://localhost:12345/dolphinscheduler/actuator/health/readiness" }}
+                  {{- if (and $enableSecurity (not $shouldPermitAll)) }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
             initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
