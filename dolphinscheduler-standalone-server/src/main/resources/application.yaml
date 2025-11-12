@@ -287,6 +287,11 @@ server:
       custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
+    exclude: [health,metrics]
   endpoints:
     web:
       exposure:
