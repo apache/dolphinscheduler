@@ -1,6 +1,6 @@
 # Introduction
 
-This module is the etcd registry plugin module, this plugin will use etcd as the registry center.
+This plugin will use etcd as the registry center.
 
 # How to use
 
@@ -30,12 +30,12 @@ registry:
 
 If your etcd server has configured with ssl, about certification files you can see [here](https://github.com/etcd-io/jetcd/blob/main/docs/SslConfig.md) for how to convert.
 
-> If you need ssl certification, you need to make sure your jdk version is newer than Java 8u252 (April 2020), jdk11 works well too. 
+> If you need ssl certification, you need to make sure your jdk version is newer than Java 8u252 (April 2020), jdk11 works well too.
 >
 > By the way, the jdk version in docker images `FROM eclipse-temurin:8-jre` now is 8u362 works well, don't need change.
 >
 > Because after version 8u252 has native support for ALPN. Detail you can see:
-> 
+>
 > https://github.com/grpc/grpc-java/issues/5369#issuecomment-751885384
 
 After do this config, you can start your DolphinScheduler cluster, your cluster will use etcd as registry center to
