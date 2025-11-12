@@ -17,9 +17,18 @@
 
 package org.apache.dolphinscheduler.meter.metrics;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
+import java.nio.file.FileStore;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 
@@ -28,8 +37,12 @@ public class DefaultMetricsProvider implements MetricsProvider {
 
     private final MeterRegistry meterRegistry;
 
+    // Data basedir path constant
+    private static final String DEFAULT_DATA_BASEDIR_PATH = "/tmp/dolphinscheduler";
+
     public DefaultMetricsProvider(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
+        registerDataBasedirPathMetrics();
     }
 
     private SystemMetrics systemMetrics;
@@ -41,11 +54,127 @@ public class DefaultMetricsProvider implements MetricsProvider {
 
     private static final long SYSTEM_METRICS_REFRESH_INTERVAL = 1_000L;
 
+    // Data basedir path metrics
+    private double dataBasedirPathTotalBytes = 0.0;
+    private double dataBasedirPathFreeBytes = 0.0;
+    private volatile boolean dataBasedirPathMetricsRegistered = false;
+    private String registeredDataBasedirPath = "";
+
+    /**
+     * Register data basedir path metrics to micrometer
+     */
+    private void registerDataBasedirPathMetrics() {
+        try {
+            String dataBasedirPath = getDataBasedirPath();
+            Path path = Paths.get(dataBasedirPath);
+
+            // Check if path exists, if not, try to create it
+            if (!Files.exists(path)) {
+                log.info("Data basedir path {} does not exist, trying to create it", dataBasedirPath);
+                Files.createDirectories(path);
+            }
+
+            // Register gauges for data basedir path disk usage
+            Gauge.builder("data.basedir.path.total", (Supplier<Number>) this::getDataBasedirPathTotalBytes)
+                    .description("Total space of data basedir path")
+                    .tag("path", dataBasedirPath)
+                    .register(meterRegistry);
+
+            Gauge.builder("data.basedir.path.free", (Supplier<Number>) this::getDataBasedirPathFreeBytes)
+                    .description("Free space of data basedir path")
+                    .tag("path", dataBasedirPath)
+                    .register(meterRegistry);
+
+            Gauge.builder("data.basedir.path.used", (Supplier<Number>) this::getDataBasedirPathUsedBytes)
+                    .description("Used space of data basedir path")
+                    .tag("path", dataBasedirPath)
+                    .register(meterRegistry);
+
+            Gauge.builder("data.basedir.path.used.percentage",
+                    (Supplier<Number>) this::getDataBasedirPathUsedPercentage)
+                    .description("Used space percentage of data basedir path")
+                    .tag("path", dataBasedirPath)
+                    .register(meterRegistry);
+
+            registeredDataBasedirPath = dataBasedirPath;
+            dataBasedirPathMetricsRegistered = true;
+            log.info("Successfully registered data basedir path metrics for path: {}", dataBasedirPath);
+        } catch (Exception e) {
+            log.warn("Failed to register data basedir path metrics", e);
+        }
+    }
+
+    /**
+     * Get data basedir path from configuration
+     * @return data basedir path
+     */
+    private String getDataBasedirPath() {
+        try {
+            return PropertyUtils.getString(Constants.DATA_BASEDIR_PATH, DEFAULT_DATA_BASEDIR_PATH);
+        } catch (Exception e) {
+            log.warn("Failed to get data.basedir.path from configuration, using default: {}", DEFAULT_DATA_BASEDIR_PATH,
+                    e);
+            return DEFAULT_DATA_BASEDIR_PATH;
+        }
+    }
+
+    /**
+     * Refresh data basedir path disk usage metrics
+     */
+    private void refreshDataBasedirPathMetrics() {
+        try {
+            if (!dataBasedirPathMetricsRegistered) {
+                return;
+            }
+
+            String dataBasedirPath = getDataBasedirPath();
+            // If the path has changed, we should re-register the metrics
+            if (!registeredDataBasedirPath.equals(dataBasedirPath)) {
+                log.info("Data basedir path changed from {} to {}, re-registering metrics", registeredDataBasedirPath,
+                        dataBasedirPath);
+                registerDataBasedirPathMetrics();
+                return;
+            }
+
+            Path path = Paths.get(dataBasedirPath);
+            FileStore fileStore = Files.getFileStore(path);
+
+            dataBasedirPathTotalBytes = fileStore.getTotalSpace();
+            dataBasedirPathFreeBytes = fileStore.getUsableSpace();
+        } catch (Exception e) {
+            log.warn("Failed to refresh data basedir path metrics", e);
+        }
+    }
+
+    // Getters for data basedir path metrics
+    public double getDataBasedirPathTotalBytes() {
+        return dataBasedirPathTotalBytes;
+    }
+
+    public double getDataBasedirPathFreeBytes() {
+        return dataBasedirPathFreeBytes;
+    }
+
+    public double getDataBasedirPathUsedBytes() {
+        return getDataBasedirPathTotalBytes() - getDataBasedirPathFreeBytes();
+    }
+
+    public double getDataBasedirPathUsedPercentage() {
+        double total = getDataBasedirPathTotalBytes();
+        if (total <= 0) {
+            return 0.0;
+        }
+        return getDataBasedirPathUsedBytes() / total;
+    }
+
     @Override
     public SystemMetrics getSystemMetrics() {
         if (System.currentTimeMillis() - lastRefreshTime < SYSTEM_METRICS_REFRESH_INTERVAL) {
             return systemMetrics;
         }
+
+        // Refresh data basedir path metrics
+        refreshDataBasedirPathMetrics();
 
         double systemCpuUsage = meterRegistry.get("system.cpu.usage").gauge().value();
         if (Double.compare(systemCpuUsage, Double.NaN) == 0) {
@@ -96,6 +225,9 @@ public class DefaultMetricsProvider implements MetricsProvider {
                 .diskUsed(diskToTalBytes - diskFreeBytes)
                 .diskTotal(diskToTalBytes)
                 .diskUsedPercentage((diskToTalBytes - diskFreeBytes) / diskToTalBytes)
+                .dataBasedirPathUsed(getDataBasedirPathUsedBytes())
+                .dataBasedirPathTotal(getDataBasedirPathTotalBytes())
+                .dataBasedirPathUsedPercentage(getDataBasedirPathUsedPercentage())
                 .build();
         lastRefreshTime = System.currentTimeMillis();
         return systemMetrics;

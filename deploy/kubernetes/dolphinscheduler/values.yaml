@@ -692,6 +692,8 @@ worker:
     WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
     WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Worker max data basedir disk usage, when the worker's data basedir disk usage is smaller then this value, worker server can be dispatched tasks.
+    WORKER_SERVER_LOAD_PROTECTION_MAX_DATA_BASEDIR_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Worker execute thread number to limit task instances
     WORKER_EXEC_THREADS: "100"
     # -- Worker heartbeat interval

@@ -118,7 +118,7 @@ const worker = defineComponent({
                     </NSpace>
                   </NSpace>
                 </NCard>
-                <NGrid x-gap='12' cols='4'>
+                <NGrid x-gap='12' cols='5'>
                   <NGi>
                     <Card title={t('monitor.worker.cpu_usage')}>
                       <div class={styles.card}>
@@ -152,6 +152,19 @@ const worker = defineComponent({
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).diskUsage * 100
+                            ).toFixed(2)}
+                          />
+                        )}
+                      </div>
+                    </Card>
+                  </NGi>
+                  <NGi>
+                    <Card title={t('monitor.worker.data_basedir_disk_usage')}>
+                      <div class={[styles.card]}>
+                        {item && (
+                          <Gauge
+                            data={(
+                              JSON.parse(item.heartBeatInfo).dataBasedirPathDiskUsagePercentage * 100
                             ).toFixed(2)}
                           />
                         )}

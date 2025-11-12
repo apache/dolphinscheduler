@@ -54,4 +54,9 @@ public class SystemMetrics {
     private double diskTotal;
     private double diskUsedPercentage;
 
+    // Data basedir path disk usage
+    private double dataBasedirPathUsed;
+    private double dataBasedirPathTotal;
+    private double dataBasedirPathUsedPercentage;
+
 }

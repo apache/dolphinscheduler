@@ -33,6 +33,7 @@ export default {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
     disk_usage: '磁盘使用量',
+    data_basedir_disk_usage: '数据目录磁盘使用量',
     thread_pool_usage: '线程池使用量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',

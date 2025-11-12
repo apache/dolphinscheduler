@@ -64,6 +64,14 @@ public class BaseServerLoadProtection implements ServerLoadProtection {
                     baseServerLoadProtectionConfig.getMaxSystemMemoryUsagePercentageThresholds());
             return true;
         }
+        if (systemMetrics.getDataBasedirPathUsedPercentage() > baseServerLoadProtectionConfig
+                .getMaxDataBasedirDiskUsagePercentageThresholds()) {
+            log.info(
+                    "OverLoad: the DataBasedirPathDiskUsagePercentage: {} is over then the maxDataBasedirDiskUsagePercentageThresholds {}",
+                    systemMetrics.getDataBasedirPathUsedPercentage(),
+                    baseServerLoadProtectionConfig.getMaxDataBasedirDiskUsagePercentageThresholds());
+            return true;
+        }
         return false;
     }
 }

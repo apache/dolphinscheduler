@@ -31,4 +31,5 @@ public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
     private int workerHostWeight; // worker host weight
     private double threadPoolUsage; // worker waiting task count
     private String workerGroup;
+    private double dataBasedirPathDiskUsagePercentage; // data basedir path disk usage percentage
 }
