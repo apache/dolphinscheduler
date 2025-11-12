@@ -34,6 +34,7 @@ class WorkerServerLoadProtectionTest {
                 .systemCpuUsagePercentage(0.71)
                 .jvmCpuUsagePercentage(0.71)
                 .diskUsedPercentage(0.71)
+                .dataBasedirPathUsedPercentage(0.71)
                 .build();
 
         workerConfig.getServerLoadProtection().setEnabled(false);
