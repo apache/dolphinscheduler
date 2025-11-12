@@ -146,11 +146,14 @@ public class ProjectWorkerGroupRelationServiceTest {
                         getWorkerGroups()));
 
         // fail when wg is referenced by task definition
+        // test case: project all wg: test, task used wg: test, new wg: test1
         Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
                 .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
+                .thenReturn(Sets.newHashSet(getProjectWorkerGroup().getWorkerGroup()));
         AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
                 () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                        getWorkerGroups()));
+                        getUnusedWorkerGroups()));
     }
 
     @Test
@@ -190,6 +193,10 @@ public class ProjectWorkerGroupRelationServiceTest {
 
     private List<String> getWorkerGroups() {
         return Lists.newArrayList("test");
+    }
+
+    private List<String> getUnusedWorkerGroups() {
+        return Lists.newArrayList("test1");
     }
 
     private List<String> getDiffWorkerGroups() {
