@@ -31,4 +31,3 @@
 [submodule ".github/actions/maximize-build-space"]
 	path = .github/actions/maximize-build-space
 	url = https://github.com/easimon/maximize-build-space
-	branch = master
