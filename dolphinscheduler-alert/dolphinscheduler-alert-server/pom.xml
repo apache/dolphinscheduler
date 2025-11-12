@@ -89,6 +89,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-actuator-authentication</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
