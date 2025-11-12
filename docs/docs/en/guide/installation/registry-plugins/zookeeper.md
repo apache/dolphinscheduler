@@ -1,6 +1,6 @@
 # Introduction
 
-This module is the zookeeper registry plugin module, this plugin will use zookeeper as the registry center.
+This plugin will use zookeeper as the registry center.
 
 # How to use
 

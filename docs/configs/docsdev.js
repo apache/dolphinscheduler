@@ -520,6 +520,23 @@ export default {
                             },
                         ],
                     },
+                    {
+                        title: 'registry-plugins',
+                        children: [
+                            {
+                                title: 'ETCD',
+                                link: '/en-us/docs/dev/user_doc/guide/installation/registry-plugins/etcd.html',
+                            },
+                            {
+                                title: 'JDBC',
+                                link: '/en-us/docs/dev/user_doc/guide/installation/registry-plugins/jdbc.html',
+                            },
+                            {
+                                title: 'Zookeeper',
+                                link: '/en-us/docs/dev/user_doc/guide/installation/registry-plugins/zookeeper.html',
+                            },
+                        ],
+                    },
                 ],
             },
             {
@@ -1216,6 +1233,23 @@ export default {
                             {
                                 title: '基于Rainbond部署(Cluster)',
                                 link: '/zh-cn/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '注册中心插件',
+                        children: [
+                            {
+                                title: 'ETCD',
+                                link: '/zh-cn/docs/dev/user_doc/guide/installation/registry-plugins/etcd.html',
+                            },
+                            {
+                                title: 'JDBC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/installation/registry-plugins/jdbc.html',
+                            },
+                            {
+                                title: 'Zookeeper',
+                                link: '/zh-cn/docs/dev/user_doc/guide/installation/registry-plugins/zookeeper.html',
                             },
                         ],
                     },
