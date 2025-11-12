@@ -409,14 +409,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                     long workflowDefinitionCode,
                                     int workflowDefinitionVersion,
                                     List<TaskDefinitionLog> taskDefinitionLogList) {
-        List<WorkflowTaskLineage> workflowTaskLineageList =
-                generateWorkflowLineageList(taskDefinitionLogList, workflowDefinitionCode, workflowDefinitionVersion);
-        if (workflowTaskLineageList.isEmpty()) {
-            return;
-        }
+        List<WorkflowTaskLineage> workflowTaskLineageList = generateWorkflowLineageList(taskDefinitionLogList,
+                workflowDefinitionCode, workflowDefinitionVersion);
 
-        int insertWorkflowLineageResult = workflowLineageService.updateWorkflowLineage(workflowTaskLineageList);
-        if (insertWorkflowLineageResult <= 0) {
+        int insertWorkflowLineageResult =
+                workflowLineageService.updateWorkflowLineage(workflowDefinitionCode, workflowTaskLineageList);
+        if (CollectionUtils.isEmpty(workflowTaskLineageList)) {
+            log.info(
+                    "Delete workflow lineage because current lineage is empty, projectCode: {}, workflowDefinitionCode: {}, workflowDefinitionVersion: {}",
+                    projectCode, workflowDefinitionCode, workflowDefinitionVersion);
+        } else if (insertWorkflowLineageResult <= 0) {
             log.error(
                     "Save workflow lineage error, projectCode: {}, workflowDefinitionCode: {}, workflowDefinitionVersion: {}",
                     projectCode, workflowDefinitionCode, workflowDefinitionVersion);
