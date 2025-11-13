@@ -33,6 +33,39 @@ The exporter port is the `server.port` defined in application.yaml, e.g: master:
 
 For example, you can get the master metrics by `curl http://localhost:5679/actuator/prometheus`.
 
+## Endpoint Security Authentication
+
+Spring Boot Actuator provides a series of HTTP endpoints for monitoring and managing applications. By default, these endpoints may be exposed on public or internal networks, posing a risk of information leakage.
+
+Therefore, we strongly recommend enabling endpoint security authentication in production environments. Currently, HTTP Basic Authentication is supported, and you can choose either of the following two configuration methods.
+
+- You can configure it individually in the application.yaml file of each service:
+
+```yaml
+management:
+  security:
+    enabled: true
+    username: username
+    password: password
+    exclude: [health,metrics]
+```
+
+- Alternatively, you can configure it globally via the dolphinscheduler_env.sh file:
+
+```sh
+export MANAGEMENT_SECURITY_ENABLED=true
+export MANAGEMENT_SECURITY_USERNAME=username
+export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_EXCLUDE="health,metrics"
+```
+
+- After enabling security authentication, you could access `prometheus-format` metrics using the following commands:
+
+```sh
+curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
+curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 
+```
+
 ## Naming Convention & Mapping
 
 - Naming of Apache DolphinScheduler metrics follows the officially-recommended approach by [Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc)

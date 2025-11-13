@@ -185,9 +185,9 @@ The default configuration is as follows:
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
 
 For ETCD Registry, please see more details
-on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md).
+on [link](../guide/installation/registry-plugins/etcd.md).
 For JDBC Registry, please see more details
-on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md).
+on [link](../guide/installation/registry-plugins/jdbc.md).
 
 ### common.properties [hadoop、s3、yarn config properties]
 
