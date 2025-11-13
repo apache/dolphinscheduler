@@ -164,7 +164,8 @@ const worker = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.heartBeatInfo).dataBasedirPathDiskUsagePercentage * 100
+                              JSON.parse(item.heartBeatInfo)
+                                .dataBasedirPathDiskUsagePercentage * 100
                             ).toFixed(2)}
                           />
                         )}
