@@ -59,7 +59,7 @@ jobs:
       - name: Maximize runner space
         uses: ./.github/actions/maximize-build-space
         with:
-          root-reserve-mb: 30720
+          root-reserve-mb: 28672
           temp-reserve-mb: 10240
           remove-dotnet: 'true'
           remove-android: 'true'
@@ -156,7 +156,7 @@ jobs:
       - name: Maximize runner space
         uses: ./.github/actions/maximize-build-space
         with:
-          root-reserve-mb: 30720
+          root-reserve-mb: 28672
           temp-reserve-mb: 10240
           remove-dotnet: 'true'
           remove-android: 'true'
