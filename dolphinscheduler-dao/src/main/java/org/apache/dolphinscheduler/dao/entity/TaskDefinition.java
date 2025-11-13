@@ -206,7 +206,7 @@ public class TaskDefinition {
      */
     private int taskGroupId;
     /**
-     * task group priority
+     * task group priority, todo: we should add this field to task instance when create task instance
      */
     private int taskGroupPriority;
 

@@ -43,7 +43,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         result.setProjectCode(originTaskInstance.getProjectCode());
         result.setTaskCode(originTaskInstance.getTaskCode());
         result.setTaskDefinitionVersion(originTaskInstance.getTaskDefinitionVersion());
-        result.setTaskGroupPriority(originTaskInstance.getTaskGroupPriority());
         result.setState(originTaskInstance.getState());
         result.setFirstSubmitTime(originTaskInstance.getFirstSubmitTime());
         result.setSubmitTime(originTaskInstance.getSubmitTime());
@@ -80,7 +79,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setTaskType(taskDefinition.getTaskType());
         taskInstance.setTaskCode(taskDefinition.getCode());
         taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
-        taskInstance.setTaskGroupPriority(taskDefinition.getTaskGroupPriority());
         taskInstance.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskInstance.setRetryInterval(taskDefinition.getFailRetryInterval());
         taskInstance.setTaskInstancePriority(taskDefinition.getTaskPriority());

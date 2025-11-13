@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.data.Index;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -146,7 +145,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(2))
                 .atLeast(Duration.ofSeconds(20))
                 .untilAsserted(() -> {
-
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(4)
@@ -721,50 +719,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     assertThat(latestTaskInstance.getSubmitTime())
                             .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
                 });
-        masterContainer.assertAllResourceReleased();
-    }
-
-    @Test
-    @DisplayName("Test start a workflow with one fake task(A) failed with retry using task group")
-    public void testStartWorkflow_with_oneFailedTaskWithRetryUsingTaskGroup() {
-        final String yaml = "/it/start/workflow_with_one_fake_task_failed_with_retry_using_task_group.yaml";
-        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getOneWorkflow();
-
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
-                .workflowDefinition(workflow)
-                .runWorkflowCommandParam(new RunWorkflowCommandParam())
-                .build();
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
-
-        await()
-                .atMost(Duration.ofMinutes(3))
-                .untilAsserted(() -> {
-                    Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
-
-                    final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
-                    Assertions
-                            .assertThat(taskInstances)
-                            .allSatisfy(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
-                            })
-                            .hasSize(2)
-                            .satisfies(taskInstance -> {
-                                assertThat(taskInstance.getRetryTimes()).isEqualTo(0);
-                                assertThat(taskInstance.getFlag()).isEqualTo(Flag.NO);
-                                assertThat(taskInstance.getTaskGroupPriority()).isEqualTo(1);
-                            }, Index.atIndex(0))
-                            .satisfies(taskInstance -> {
-                                assertThat(taskInstance.getRetryTimes()).isEqualTo(1);
-                                assertThat(taskInstance.getFlag()).isEqualTo(Flag.YES);
-                                assertThat(taskInstance.getTaskGroupPriority()).isEqualTo(1);
-                            }, Index.atIndex(1));
-                });
-
         masterContainer.assertAllResourceReleased();
     }
 
