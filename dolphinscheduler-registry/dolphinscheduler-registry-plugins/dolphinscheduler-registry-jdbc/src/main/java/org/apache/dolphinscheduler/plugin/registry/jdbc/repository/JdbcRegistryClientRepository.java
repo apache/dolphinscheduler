@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryCl
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class JdbcRegistryClientRepository {
                 .collect(Collectors.toList());
     }
 
-    public void deleteByIds(List<Long> clientIds) {
+    public void deleteByIds(Collection<Long> clientIds) {
         if (CollectionUtils.isEmpty(clientIds)) {
             return;
         }
