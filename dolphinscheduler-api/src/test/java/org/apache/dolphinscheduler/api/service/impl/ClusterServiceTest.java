@@ -139,6 +139,7 @@ public class ClusterServiceTest {
         when(clusterMapper.queryByClusterCode(1L)).thenReturn(getCluster());
         Cluster cluster = clusterService.updateClusterByCode(adminUser, 1L, "testName", getConfig(), "test");
         assertNotNull(cluster);
+        assertNotNull(cluster.getUpdateTime());
     }
 
     @Test

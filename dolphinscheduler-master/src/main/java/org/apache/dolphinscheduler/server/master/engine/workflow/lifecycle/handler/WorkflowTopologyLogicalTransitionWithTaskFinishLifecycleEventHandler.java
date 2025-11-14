@@ -35,7 +35,7 @@ public class WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEventHandle
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
 
-        workflowStateAction.topologyLogicalTransitionEventAction(
+        workflowStateAction.onTopologyLogicalTransitionEvent(
                 workflowExecutionRunnable,
                 workflowTopologyLogicalTransitionWithTaskFinishEvent);
     }

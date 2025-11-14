@@ -40,4 +40,10 @@ public enum TaskExecutorLifecycleEventType {
     FINALIZE,
     ;
 
+    public boolean isFinished() {
+        return (this == KILLED
+                || this == PAUSED
+                || this == FAILED
+                || this == SUCCESS);
+    }
 }

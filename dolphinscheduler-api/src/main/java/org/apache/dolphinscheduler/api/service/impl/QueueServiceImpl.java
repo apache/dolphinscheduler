@@ -192,6 +192,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         }
 
         Queue updateQueue = new Queue(id, queueName, queue);
+        updateQueue.setCreateTime(null);
         Queue existsQueue = queueMapper.selectById(id);
         updateQueueValid(existsQueue, updateQueue);
 

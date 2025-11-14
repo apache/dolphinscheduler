@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -106,6 +107,18 @@ public class TaskExecutionContextUtils {
             resourceContext.addResourceItem(resourceItem);
         }
         return resourceContext;
+    }
+
+    public static void clearTaskInstanceWorkingDirectory(TaskExecutionContext taskExecutionContext) {
+        final String execPath = taskExecutionContext.getExecutePath();
+        try {
+            if (StringUtils.isNotEmpty(execPath)) {
+                FileUtils.deleteFile(execPath);
+                log.info("Deleted task exec directory: {}", execPath);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to delete task exec directory.", e);
+        }
     }
 
 }

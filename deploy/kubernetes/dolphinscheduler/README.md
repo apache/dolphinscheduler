@@ -109,6 +109,10 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | common.configmap.HADOOP_HOME | string | `"/opt/soft/hadoop"` | Set `HADOOP_HOME` for DolphinScheduler's task environment |
 | common.configmap.HIVE_HOME | string | `"/opt/soft/hive"` | Set `HIVE_HOME` for DolphinScheduler's task environment |
 | common.configmap.JAVA_HOME | string | `"/opt/java/openjdk"` | Set `JAVA_HOME` for DolphinScheduler's task environment |
+| common.configmap.MANAGEMENT_SECURITY_ENABLED | bool | `false` | Whether to enable management endpoints security: false, true |
+| common.configmap.MANAGEMENT_SECURITY_EXCLUDE | string | `"health,metrics"` | A list of Actuator endpoint IDs that should be accessible without authentication, even when security is enabled. Common values: health, info, prometheus, metrics. |
+| common.configmap.MANAGEMENT_SECURITY_PASSWORD | string | `""` | management endpoints security password |
+| common.configmap.MANAGEMENT_SECURITY_USERNAME | string | `""` | management endpoints security username |
 | common.configmap.PYTHON_LAUNCHER | string | `"/usr/bin/python/bin/python3"` | Set `PYTHON_LAUNCHER` for DolphinScheduler's task environment |
 | common.configmap.RESOURCE_UPLOAD_PATH | string | `"/dolphinscheduler"` | Resource store on HDFS/S3 path, please make sure the directory exists on hdfs and have read write permissions |
 | common.configmap.SPARK_HOME | string | `"/opt/soft/spark"` | Set `SPARK_HOME` for DolphinScheduler's task environment |
@@ -155,6 +159,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."resource.manager.httpaddress.port" | int | `8088` | resourcemanager port, the default value is 8088 if not specified |
 | conf.common."resource.storage.type" | string | `"S3"` | resource storage type: HDFS, S3, OSS, GCS, ABS, NONE |
 | conf.common."resource.storage.upload.base.path" | string | `"/dolphinscheduler"` | resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended |
+| conf.common."shell.kill.wait.timeout" | int | `10` | If the shell process is still active after this timeout value (in seconds), then will use kill -9 to kill it |
 | conf.common."sudo.enable" | bool | `true` | use sudo or not, if set true, executing user is tenant user and deploy user needs sudo permissions; if set false, executing user is the deploy user and doesn't need sudo permissions |
 | conf.common."support.hive.oneSession" | bool | `false` | Whether hive SQL is executed in the same session |
 | conf.common."task.resource.limit.state" | bool | `false` | Task resource limit state |
@@ -249,6 +254,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | minio.auth.rootUser | string | `"minioadmin"` | minio username |
 | minio.defaultBuckets | string | `"dolphinscheduler"` | minio default buckets |
 | minio.enabled | bool | `true` | Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production. |
+| minio.image.registry | string | `"docker.io"` |  |
+| minio.image.repository | string | `"bitnamilegacy/minio"` |  |
+| minio.image.tag | string | `"2022.10.29-debian-11-r0"` |  |
 | minio.persistence.enabled | bool | `false` | Set minio.persistence.enabled to true to mount a new volume for internal minio |
 | mysql.auth.database | string | `"dolphinscheduler"` | mysql database |
 | mysql.auth.params | string | `"characterEncoding=utf8"` | mysql params |
@@ -256,11 +264,17 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | mysql.auth.username | string | `"ds"` | mysql username |
 | mysql.driverClassName | string | `"com.mysql.cj.jdbc.Driver"` | mysql driverClassName |
 | mysql.enabled | bool | `false` | If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL |
+| mysql.image.registry | string | `"docker.io"` |  |
+| mysql.image.repository | string | `"bitnamilegacy/mysql"` |  |
+| mysql.image.tag | string | `"8.0.31-debian-11-r0"` |  |
 | mysql.primary.persistence.enabled | bool | `false` | Set mysql.primary.persistence.enabled to true to mount a new volume for internal MySQL |
 | mysql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | mysql.primary.persistence.storageClass | string | `"-"` | MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
 | postgresql.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName for internal PostgreSQL |
 | postgresql.enabled | bool | `true` | If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL |
+| postgresql.image.registry | string | `"docker.io"` |  |
+| postgresql.image.repository | string | `"bitnamilegacy/postgresql"` |  |
+| postgresql.image.tag | string | `"11.11.0"` |  |
 | postgresql.params | string | `"characterEncoding=utf8"` | The params for internal PostgreSQL |
 | postgresql.persistence.enabled | bool | `false` | Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL |
 | postgresql.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
@@ -360,6 +374,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.updateStrategy | object | `{"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
+| zookeeper.image.registry | string | `"docker.io"` |  |
+| zookeeper.image.repository | string | `"bitnamilegacy/zookeeper"` |  |
+| zookeeper.image.tag | string | `"3.8.4"` |  |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |

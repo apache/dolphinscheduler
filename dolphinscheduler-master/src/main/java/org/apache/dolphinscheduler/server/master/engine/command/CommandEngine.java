@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
@@ -69,6 +70,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     private MasterConfig masterConfig;
 
     @Autowired
+    private MasterServerLoadProtection masterServerLoadProtection;
+
+    @Autowired
     private IWorkflowRepository workflowRepository;
 
     @Autowired
@@ -107,12 +111,11 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
 
     @Override
     public void run() {
-        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         while (flag) {
             try {
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-                if (serverLoadProtection.isOverload(systemMetrics)) {
+                if (masterServerLoadProtection.isOverload(systemMetrics)) {
                     log.warn("The current server is overload, cannot consumes commands.");
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -127,10 +130,15 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
 
                 List<CompletableFuture<Void>> allCompleteFutures = new ArrayList<>();
                 for (Command command : commands) {
-                    CompletableFuture<Void> completableFuture = bootstrapCommand(command)
+                    CompletableFuture<Void> completableFuture = supplyAsync(() -> {
+                        LogUtils.setWorkflowInstanceIdMDC(command.getWorkflowInstanceId());
+                        return command;
+                    }, commandHandleThreadPool)
+                            .thenApply(this::bootstrapCommand)
                             .thenAccept(this::bootstrapWorkflowExecutionRunnable)
                             .thenAccept((unused) -> bootstrapSuccess(command))
-                            .exceptionally(throwable -> bootstrapError(command, throwable));
+                            .exceptionally(throwable -> bootstrapError(command, throwable))
+                            .whenComplete((result, throwable) -> LogUtils.removeWorkflowInstanceIdMDC());
                     allCompleteFutures.add(completableFuture);
                 }
                 CompletableFuture.allOf(allCompleteFutures.toArray(new CompletableFuture[0])).join();
@@ -146,14 +154,14 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         }
     }
 
-    private CompletableFuture<IWorkflowExecutionRunnable> bootstrapCommand(Command command) {
-        return supplyAsync(
-                () -> workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command), commandHandleThreadPool);
+    private IWorkflowExecutionRunnable bootstrapCommand(Command command) {
+        return workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
     }
 
     private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final WorkflowInstance workflowInstance =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
+
         if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
             log.info("The workflow {} state is: {} will not be trigger now",
                     workflowInstance.getName(),

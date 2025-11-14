@@ -80,10 +80,6 @@ export default {
                                 title: 'Task Instance',
                                 link: '/en-us/docs/dev/user_doc/guide/project/task-instance.html',
                             },
-                            {
-                                title: 'Task Definition',
-                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
-                            },
                         ]
                     },
                     {
@@ -358,7 +354,11 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/vertica.html',
-                            }
+                            },
+                            {
+                                title: 'DolphinDB',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/dolphindb.html',
+                            },
                         ],
                     },
                     {
@@ -517,6 +517,23 @@ export default {
                             {
                                 title: 'Rainbond Deployment',
                                 link: '/en-us/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'registry-plugins',
+                        children: [
+                            {
+                                title: 'ETCD',
+                                link: '/en-us/docs/dev/user_doc/guide/installation/registry-plugins/etcd.html',
+                            },
+                            {
+                                title: 'JDBC',
+                                link: '/en-us/docs/dev/user_doc/guide/installation/registry-plugins/jdbc.html',
+                            },
+                            {
+                                title: 'Zookeeper',
+                                link: '/en-us/docs/dev/user_doc/guide/installation/registry-plugins/zookeeper.html',
                             },
                         ],
                     },
@@ -795,10 +812,6 @@ export default {
                                 title: '任务实例',
                                 link: '/zh-cn/docs/dev/user_doc/guide/project/task-instance.html',
                             },
-                            {
-                                title: '任务定义',
-                                link: '/zh-cn/docs/dev/user_doc/guide/project/task-definition.html',
-                            },
                         ]
                     },
                     {
@@ -1058,6 +1071,10 @@ export default {
                                 title: 'Vertica',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/vertica.html',
                             },
+                            {
+                                title: 'DolphinDB',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/dolphindb.html',
+                            },
                         ],
                     },
                     {
@@ -1216,6 +1233,23 @@ export default {
                             {
                                 title: '基于Rainbond部署(Cluster)',
                                 link: '/zh-cn/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '注册中心插件',
+                        children: [
+                            {
+                                title: 'ETCD',
+                                link: '/zh-cn/docs/dev/user_doc/guide/installation/registry-plugins/etcd.html',
+                            },
+                            {
+                                title: 'JDBC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/installation/registry-plugins/jdbc.html',
+                            },
+                            {
+                                title: 'Zookeeper',
+                                link: '/zh-cn/docs/dev/user_doc/guide/installation/registry-plugins/zookeeper.html',
                             },
                         ],
                     },

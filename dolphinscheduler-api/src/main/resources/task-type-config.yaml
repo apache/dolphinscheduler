@@ -24,6 +24,7 @@ task:
     - 'SQL'
     - 'SPARK'
     - 'FLINK'
+    - 'GRPC'
     - 'HTTP'
     - 'MR'
     - 'DINKY'

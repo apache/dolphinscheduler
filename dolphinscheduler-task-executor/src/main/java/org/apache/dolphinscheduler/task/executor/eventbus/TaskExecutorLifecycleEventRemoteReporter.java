@@ -17,13 +17,19 @@
 
 package org.apache.dolphinscheduler.task.executor.eventbus;
 
+import org.apache.dolphinscheduler.common.exception.BaseException;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
+import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
+import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
 import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -56,11 +62,15 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
 
     private final Condition taskExecutionEventEmptyCondition = eventChannelsLock.newCondition();
 
+    private final ITaskExecutorRepository taskExecutorRepository;
+
     public TaskExecutorLifecycleEventRemoteReporter(final String reporterName,
-                                                    final ITaskExecutorEventRemoteReporterClient taskExecutorEventRemoteReporterClient) {
+                                                    final ITaskExecutorEventRemoteReporterClient taskExecutorEventRemoteReporterClient,
+                                                    final ITaskExecutorRepository taskExecutorRepository) {
         super(reporterName);
         this.reporterName = reporterName;
         this.taskExecutorEventRemoteReporterClient = taskExecutorEventRemoteReporterClient;
+        this.taskExecutorRepository = taskExecutorRepository;
     }
 
     @Override
@@ -98,7 +108,8 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     public void reportTaskExecutorLifecycleEvent(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
         eventChannelsLock.lock();
         try {
-            log.debug("Report : {}", JSONUtils.toPrettyJsonString(reportableTaskExecutorLifecycleEvent));
+            log.info(TaskLogMarkers.excludeInTaskLog(), "Report : {}",
+                    JSONUtils.toPrettyJsonString(reportableTaskExecutorLifecycleEvent));
             int taskInstanceId = reportableTaskExecutorLifecycleEvent.getTaskInstanceId();
             eventChannels.computeIfAbsent(
                     taskInstanceId,
@@ -128,6 +139,11 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
                 log.info("Failed removed ReportableTaskExecutorLifecycleEvent by ack: {}", eventAck);
             }
             if (eventChannel.isEmpty()) {
+                // Extend the lifecycle of the TaskExecutor to span the entire processing cycle of the task.
+                // so we can finalize the TaskExecutor after the associated channel has been removed.
+                if (removed != null && removed.getType().isFinished()) {
+                    finalizeTaskExecutor(removed.getTaskInstanceId());
+                }
                 eventChannels.remove(taskExecutorId);
                 log.debug("Removed ReportableTaskExecutorLifecycleEventChannel: {}", taskExecutorId);
             }
@@ -138,15 +154,14 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
     }
 
     @Override
-    public boolean reassignWorkflowInstanceHost(int taskInstanceId, String workflowHost) {
+    public void onWorkflowInstanceHostChanged(int taskInstanceId) {
         eventChannelsLock.lock();
         try {
             final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskInstanceId);
-            if (eventChannel == null) {
-                return false;
+            if (eventChannel != null) {
+                eventChannel.taskExecutionEventsQueue.forEach(event -> event.setLatestReportTime(null));
+                taskExecutionEventEmptyCondition.signalAll();
             }
-            eventChannel.taskExecutionEventsQueue.forEach(event -> event.setWorkflowInstanceHost(workflowHost));
-            return true;
         } finally {
             eventChannelsLock.unlock();
         }
@@ -164,6 +179,16 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         return eventChannels;
     }
 
+    private void finalizeTaskExecutor(final Integer taskExecutorId) {
+        final Optional<ITaskExecutor> taskExecutorOptional = taskExecutorRepository.get(taskExecutorId);
+        if (taskExecutorOptional.isPresent()) {
+            taskExecutorOptional.get().getTaskExecutorEventBus()
+                    .publish(TaskExecutorFinalizeLifecycleEvent.of(taskExecutorOptional.get()));
+        } else {
+            log.warn("TaskExecutor is not exists: {}", taskExecutorId);
+        }
+    }
+
     private void handleTaskExecutionEventChannel(final ReportableTaskExecutorLifecycleEventChannel reportableTaskExecutorLifecycleEventChannel) {
         if (reportableTaskExecutorLifecycleEventChannel.isEmpty()) {
             return;
@@ -175,7 +200,16 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
                             TaskExecutorMDCUtils.logWithMDC(headEvent.getTaskInstanceId())) {
                 try {
                     if (isTaskExecutorEventNeverSent(headEvent) || isRetryIntervalExceeded(headEvent)) {
-                        taskExecutorEventRemoteReporterClient.reportTaskExecutionEventToMaster(headEvent);
+                        final Optional<ITaskExecutor> taskExecutorOptional =
+                                taskExecutorRepository.get(headEvent.getTaskInstanceId());
+                        if (!taskExecutorOptional.isPresent()) {
+                            throw new BaseException(String.format("The TaskExecutor id %d is not exist.",
+                                    headEvent.getTaskInstanceId()));
+                        }
+                        final String masterAddress =
+                                taskExecutorOptional.get().getTaskExecutionContext().getWorkflowInstanceHost();
+                        taskExecutorEventRemoteReporterClient.reportTaskExecutionEventToMaster(masterAddress,
+                                headEvent);
                         continue;
                     }
                     if (log.isDebugEnabled()) {

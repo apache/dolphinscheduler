@@ -120,7 +120,7 @@ The command is as follow:
 gpg --keyserver hkp://pool.sks-keyservers.net --send-key 85E11560
 ```
 
-`pool.sks-keyservers.net` is randomly chosen from [public key server](https://sks-keyservers.net/status/).
+`pool.sks-keyservers.net` is randomly chosen from [public key server](https://keyserver.ubuntu.com).
 Each server will automatically synchronize with one another, so it would be okay to choose any one, a backup keys servers
 is `gpg --keyserver hkp://keyserver.ubuntu.com --send-key <YOUR_KEY_ID>`
 
@@ -204,6 +204,7 @@ We need to update some documentation before the Maven release. For example, to r
   - `docs/configs/docsdev.js`: change `/dev/` to `/x.y.z/`, **DO NOT** change this filename, is will be auto change by website tools.
 
 > Note: `VERSION` is a place hold string, is same as the version we set in `VERSION=<THE-VERSION-YOU-RELEASE>`.
+> Please merge the dev branch of the main warehouse before merging the master branch of the website. When the modified pull requests are merged, it will take effect.
 
 ### Modify Correct year in NOTICE file
 

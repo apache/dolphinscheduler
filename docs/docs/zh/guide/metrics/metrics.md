@@ -33,6 +33,38 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 举例来说，您可通过访问链接获取`curl http://localhost:5679/actuator/prometheus`master metrics。
 
+## 端点安全认证
+
+Spring Boot Actuator 提供了一系列用于监控和管理应用的 HTTP 端点，默认情况下这些端点可能暴露在公网或内网中，存在信息泄露风险。
+因此，强烈建议您在生产环境中开启端点安全认证，目前提供HTTP Basic Authentication的认证方式，选择如下两种配置方式之一都可以。
+
+- 您可以通过各个服务的 application.yaml 文件进行单独配置:
+
+```yaml
+management:
+  security:
+    enabled: true
+    username: username
+    password: password
+    exclude: [health,metrics]
+```
+
+- 您也可以通过 dolphinscheduler_env.sh 文件进行统一配置：
+
+```sh
+export MANAGEMENT_SECURITY_ENABLED=true
+export MANAGEMENT_SECURITY_USERNAME=username
+export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_EXCLUDE="health,metrics"
+```
+
+- 添加安全认证之后，您可通过链接如下访问`prometheus格式`指标。
+
+```sh
+curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
+curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 
+```
+
 ## 命名规则 & 命名映射
 
 - Apache DolphinScheduler指标命名遵循[Micrometer](https://github.com/micrometer-metrics/micrometer-docs/blob/main/src/docs/concepts/naming.adoc)

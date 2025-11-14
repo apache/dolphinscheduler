@@ -24,12 +24,12 @@ export default {
   port: 8080,
   domain: 'dolphinscheduler.apache.org',
   copyToDist: ['asset', 'img', 'file', '.asf.yaml', 'sitemap.xml', '.nojekyll', '.htaccess', 'googled0df7b96f277a143.html'],
-  docsLatest: '3.3.0-alpha',
+  docsLatest: '3.3.2',
   defaultSearch: 'google', // default search engine
   defaultLanguage: 'en-us',
   'en-us': {
     banner: {
-      text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to disscuss them ',
+      text: '🤔 Have queries regarding Apache DolphinScheduler, Join Slack channel to discuss them ',
       link: 'https://s.apache.org/dolphinscheduler-slack'
     },
     pageMenu: [
@@ -45,7 +45,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.3.0-alpha)',
+            text: 'latest(3.3.2)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -173,7 +173,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.3.0-alpha)',
+            text: '最新版本latest(3.3.2)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {

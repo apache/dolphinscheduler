@@ -43,8 +43,10 @@ interface WorkFlowRelationList {
 }
 
 interface WorkflowRes {
-  workFlowRelationDetailList: WorkFlowRelationDetailListRes[]
-  workFlowRelationList: WorkFlowRelationList[]
+  data: {
+    workFlowRelationDetailList: WorkFlowRelationDetailListRes[]
+    workFlowRelationList: WorkFlowRelationList[]
+  }
 }
 
 interface DependentTaskReq extends WorkflowCodeReq {

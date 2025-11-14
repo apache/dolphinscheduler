@@ -112,11 +112,12 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
                         .scheduleWithFixedDelay(() -> {
                             try {
                                 UserGroupInformation.getLoginUser().checkTGTAndReloginFromKeytab();
+                                fs = FileSystem.get(configuration);
                                 log.info("checkTGTAndReloginFromKeytab finished");
                             } catch (Exception e) {
                                 log.error("checkTGTAndReloginFromKeytab Error", e);
                             }
-                        }, kerberosExpireTimeInHour, kerberosExpireTimeInHour, TimeUnit.MINUTES);
+                        }, kerberosExpireTimeInHour, kerberosExpireTimeInHour, TimeUnit.HOURS);
             }
             fs = FileSystem.get(configuration);
             log.info("Initialize HdfsStorageOperator with kerberos");

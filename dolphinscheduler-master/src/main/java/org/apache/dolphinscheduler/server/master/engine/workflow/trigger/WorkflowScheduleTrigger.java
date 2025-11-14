@@ -79,7 +79,6 @@ public class WorkflowScheduleTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(scheduleTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(scheduleTriggerRequest.getDryRun().getCode());
-        workflowInstance.setTestFlag(scheduleTriggerRequest.getTestFlag().getCode());
         return workflowInstance;
     }
 

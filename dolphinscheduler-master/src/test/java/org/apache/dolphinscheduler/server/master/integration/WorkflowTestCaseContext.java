@@ -43,7 +43,7 @@ public class WorkflowTestCaseContext {
 
     private List<WorkflowDefinition> workflows;
 
-    private WorkflowInstance workflowInstance;
+    private List<WorkflowInstance> workflowInstances;
 
     private List<TaskInstance> taskInstances;
 
@@ -62,4 +62,13 @@ public class WorkflowTestCaseContext {
         return workflows.get(0);
     }
 
+    public WorkflowDefinition getWorkflow(String name) {
+        if (CollectionUtils.isEmpty(workflows)) {
+            throw new IllegalStateException("workflows is empty");
+        }
+        return workflows.stream()
+                .filter(workflow -> workflow.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Workflow with name " + name + " not found"));
+    }
 }

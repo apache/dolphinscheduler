@@ -52,7 +52,7 @@ public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIn
         final String yaml = "/it/recover_failure_tasks/failure_workflow_with_two_serial_fake_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
 
-        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
         workflowOperator.recoverFailureTasks(workflowInstanceId);
 
         await()
@@ -101,7 +101,7 @@ public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIn
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final Integer workflowInstanceId = context.getWorkflowInstance().getId();
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
         workflowOperator.recoverFailureTasks(workflowInstanceId);
 
         await()

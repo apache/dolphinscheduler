@@ -37,8 +37,6 @@ public class TaskExecutorFailedLifecycleEvent extends AbstractTaskExecutorLifecy
 
     private int workflowInstanceId;
 
-    private String workflowInstanceHost;
-
     private String taskInstanceHost;
 
     private String appIds;
@@ -53,7 +51,6 @@ public class TaskExecutorFailedLifecycleEvent extends AbstractTaskExecutorLifecy
                 .taskInstanceId(taskExecutor.getId())
                 .workflowInstanceId(taskExecutionContext.getWorkflowInstanceId())
                 .taskInstanceHost(taskExecutionContext.getHost())
-                .workflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost())
                 .appIds(taskExecutionContext.getAppIds())
                 .endTime(taskExecutionContext.getEndTime())
                 .type(TaskExecutorLifecycleEventType.FAILED)

@@ -26,6 +26,7 @@
     <artifactId>dolphinscheduler-api</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -65,6 +66,11 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
         </dependency>
 
         <dependency>
@@ -232,17 +238,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hbase.thirdparty</groupId>
-            <artifactId>hbase-noop-htrace</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.casbin</groupId>
             <artifactId>casdoor-spring-boot-starter</artifactId>
         </dependency>
@@ -269,6 +264,11 @@
                     <artifactId>jna-platform</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-actuator-authentication</artifactId>
         </dependency>
 
     </dependencies>

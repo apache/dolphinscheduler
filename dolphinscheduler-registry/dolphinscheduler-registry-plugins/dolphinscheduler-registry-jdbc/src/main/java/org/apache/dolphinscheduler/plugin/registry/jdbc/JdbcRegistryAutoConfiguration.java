@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
 import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryClientHeartbeatMapper;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataChanceEventMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataChangeEventMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryClientRepository;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChanceEventRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChangeEventRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServer;
@@ -61,13 +61,13 @@ public class JdbcRegistryAutoConfiguration {
     public IJdbcRegistryServer jdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
                                                   JdbcRegistryLockRepository jdbcRegistryLockRepository,
                                                   JdbcRegistryClientRepository jdbcRegistryClientRepository,
-                                                  JdbcRegistryDataChanceEventRepository jdbcRegistryDataChanceEventRepository,
+                                                  JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
                                                   JdbcRegistryProperties jdbcRegistryProperties) {
         return new JdbcRegistryServer(
                 jdbcRegistryDataRepository,
                 jdbcRegistryLockRepository,
                 jdbcRegistryClientRepository,
-                jdbcRegistryDataChanceEventRepository,
+                jdbcRegistryDataChangeEventRepository,
                 jdbcRegistryProperties);
     }
 
@@ -108,9 +108,9 @@ public class JdbcRegistryAutoConfiguration {
     }
 
     @Bean
-    public JdbcRegistryDataChanceEventMapper jdbcRegistryDataChanceEventMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
-        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryDataChanceEventMapper.class);
-        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataChanceEventMapper.class);
+    public JdbcRegistryDataChangeEventMapper jdbcRegistryDataChangeEventMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryDataChangeEventMapper.class);
+        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataChangeEventMapper.class);
     }
 
     @Bean

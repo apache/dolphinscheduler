@@ -31,6 +31,6 @@
 
 ## 是否原生支持
 
-是，数据源不需要任务附加操作即可使用。
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+- 参考更多关于Redshift相关的JDBC文档[校验模式](https://docs.aws.amazon.com/redshift/latest/mgmt/generating-iam-credentials-configure-jdbc-odbc.html)
 
-参考更多关于Redshift相关的JDBC文档[校验模式](https://docs.aws.amazon.com/redshift/latest/mgmt/generating-iam-credentials-configure-jdbc-odbc.html)

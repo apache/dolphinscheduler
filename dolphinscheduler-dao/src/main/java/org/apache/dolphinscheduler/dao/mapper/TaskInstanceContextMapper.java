@@ -34,10 +34,6 @@ public interface TaskInstanceContextMapper extends BaseMapper<TaskInstanceContex
     int deleteByTaskInstanceIdAndContextType(@Param("taskInstanceId") int taskInstanceId,
                                              @Param("contextType") ContextType contextType);
 
-    int updateTaskInstanceContextByTaskInstanceIdAndContextType(@Param("taskInstanceId") int taskInstanceId,
-                                                                @Param("contextType") ContextType contextType,
-                                                                @Param("context") String context);
-
     List<TaskInstanceContext> batchQueryByTaskInstanceIdsAndContextType(@Param("taskInstanceIds") List<Integer> taskInstanceIds,
                                                                         @Param("contextType") ContextType contextType);
 }

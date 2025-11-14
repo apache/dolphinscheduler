@@ -548,7 +548,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input'],
         required: true,
         validator(validate: any, value: number) {
-          if (model.timeoutFlag && !/^[1-9]\d*$/.test(String(value))) {
+          if (model.timeoutFlag || !/^[1-9]\d*$/.test(String(value))) {
             return new Error(
               t('project.node.dependent_failure_waiting_time_tips')
             )

@@ -95,7 +95,7 @@ public class SqlTask extends AbstractTask {
         if (sqlParameters == null || !sqlParameters.checkParameters()) {
             throw new TaskException("sql task params is not valid");
         }
-        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
+        if (this.sqlParameters.getDatasource() == 0) {
             throw new TaskException("unbound test data source");
         }
 
@@ -198,6 +198,9 @@ public class SqlTask extends AbstractTask {
 
             // post execute
             executeUpdate(connection, postStatementsBinds, "post");
+
+            // set varPool
+            taskExecutionContext.setVarPool(sqlParameters.getVarPool());
         } catch (Exception e) {
             log.error("execute sql error: {}", e.getMessage());
             throw e;

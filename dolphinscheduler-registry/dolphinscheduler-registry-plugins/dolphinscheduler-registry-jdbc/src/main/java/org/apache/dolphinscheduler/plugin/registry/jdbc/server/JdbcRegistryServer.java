@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryClientHeartbeatDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryClientRepository;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChanceEventRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChangeEventRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +83,14 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     public JdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
                               JdbcRegistryLockRepository jdbcRegistryLockRepository,
                               JdbcRegistryClientRepository jdbcRegistryClientRepository,
-                              JdbcRegistryDataChanceEventRepository jdbcRegistryDataChanceEventRepository,
+                              JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
                               JdbcRegistryProperties jdbcRegistryProperties) {
         this.jdbcRegistryDataRepository = checkNotNull(jdbcRegistryDataRepository);
         this.jdbcRegistryLockRepository = checkNotNull(jdbcRegistryLockRepository);
         this.jdbcRegistryClientRepository = checkNotNull(jdbcRegistryClientRepository);
         this.jdbcRegistryProperties = checkNotNull(jdbcRegistryProperties);
         this.jdbcRegistryDataManager = new JdbcRegistryDataManager(
-                jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChanceEventRepository);
+                jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChangeEventRepository);
         this.jdbcRegistryLockManager = new JdbcRegistryLockManager(
                 jdbcRegistryProperties, jdbcRegistryLockRepository);
         this.jdbcRegistryServerState = JdbcRegistryServerState.INIT;
@@ -265,17 +266,18 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         }
         // remove the client which is already dead from the registry, and remove it's related data and lock.
         final List<JdbcRegistryClientHeartbeatDTO> jdbcRegistryClients = jdbcRegistryClientRepository.queryAll();
-        final List<Long> deadJdbcRegistryClientIds = jdbcRegistryClients
+        final Set<Long> deadJdbcRegistryClientIds = jdbcRegistryClients
                 .stream()
                 .filter(JdbcRegistryClientHeartbeatDTO::isDead)
                 .map(JdbcRegistryClientHeartbeatDTO::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         doPurgeJdbcRegistryClientInDB(deadJdbcRegistryClientIds);
 
         // remove the data and lock which client is not exist.
         final Set<Long> existJdbcRegistryClientIds = jdbcRegistryClients
                 .stream()
                 .map(JdbcRegistryClientHeartbeatDTO::getId)
+                .filter(id -> !deadJdbcRegistryClientIds.contains(id))
                 .collect(Collectors.toSet());
         jdbcRegistryDataManager.getAllJdbcRegistryData()
                 .stream()
@@ -298,13 +300,11 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         log.debug("Success purge invalid jdbcRegistryMetadata, cost: {} ms", stopWatch.getTime());
     }
 
-    private void doPurgeJdbcRegistryClientInDB(final List<Long> jdbcRegistryClientIds) {
+    private void doPurgeJdbcRegistryClientInDB(final Collection<Long> jdbcRegistryClientIds) {
         if (CollectionUtils.isEmpty(jdbcRegistryClientIds)) {
             return;
         }
         log.info("Begin to delete dead jdbcRegistryClient: {}", jdbcRegistryClientIds);
-        jdbcRegistryDataRepository.deleteEphemeralDateByClientIds(jdbcRegistryClientIds);
-        jdbcRegistryLockRepository.deleteByClientIds(jdbcRegistryClientIds);
         jdbcRegistryClientRepository.deleteByIds(jdbcRegistryClientIds);
         log.info("Success delete dead jdbcRegistryClient: {}", jdbcRegistryClientIds);
     }

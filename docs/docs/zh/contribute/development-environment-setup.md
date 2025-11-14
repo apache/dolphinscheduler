@@ -7,8 +7,8 @@
 * [Git](https://git-scm.com/downloads)
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
-* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
-* [Pnpm](https://pnpm.io/installation): v6.x
+* [Node](https://nodejs.org/en/download): v16.0+
+* [Pnpm](https://pnpm.io/installation): v8.0+ (请确保不同版本的pnpm与Node.js之间是相互兼容的，可参考：[Compatibility](https://pnpm.io/installation#compatibility))
 
 ### 克隆代码库
 
@@ -51,11 +51,28 @@ pre-commit install
 
 现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
 
+### Helm 模板规范
+
+当您修改了Helm模板相关的文件后， 可以使用如下命令来调试 Helm 模板：
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Helm模板调试通过之后，需要使用如下命令来自动更新README.md文件（手动更新很可能格式不符合要求）：
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
 
 * 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
+
+> -Pstaging 包含插件，适合开发和测试以及无网络环境离线部署
+> -Prelease 不包含插件，适合生产环境，有能访问插件的网络可以按需下载
 
 ```shell
 cd dolphinscheduler
@@ -63,7 +80,7 @@ cd dolphinscheduler
        -Dmaven.test.skip \
        -Dspotless.skip=true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
@@ -77,7 +94,7 @@ cd dolphinscheduler
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 * 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件
@@ -132,6 +149,14 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 安装前端依赖并运行前端组件
 
 > 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
+
+在运行前端组件前，如果你还没有安装`pnpm`，可以使用以下命令安装：
+
+```shell
+npm install -g pnpm
+```
+
+确保`pnpm`已经安装完成后，运行以下命令：
 
 ```shell
 cd dolphinscheduler-ui

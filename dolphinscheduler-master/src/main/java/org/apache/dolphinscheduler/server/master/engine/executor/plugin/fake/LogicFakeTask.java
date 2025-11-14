@@ -17,16 +17,26 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.fake;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.LogicFakeTaskParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +51,7 @@ import com.google.common.annotations.VisibleForTesting;
 @VisibleForTesting
 public class LogicFakeTask extends AbstractLogicTask<LogicFakeTaskParameters> {
 
-    private Process process;
+    private volatile Process process;
 
     public LogicFakeTask(final TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -60,22 +70,33 @@ public class LogicFakeTask extends AbstractLogicTask<LogicFakeTaskParameters> {
             if (StringUtils.isNotEmpty(taskExecutionContext.getEnvironmentConfig())) {
                 shellScript = taskExecutionContext.getEnvironmentConfig() + "\n" + shellScript;
             }
-            final String[] cmd = {"/bin/sh", "-c", shellScript};
-            process = Runtime.getRuntime().exec(cmd);
+            ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", shellScript);
+            processBuilder.redirectErrorStream(true);
+            process = processBuilder.start();
+            final Future<Map<String, String>> parseVarPoolFuture = parseVarPool();
             int exitCode = process.waitFor();
-            if (taskExecutionStatus != TaskExecutionStatus.RUNNING_EXECUTION) {
+            log.info("LogicFakeTask: {} execute finished with exit code: {}",
+                    taskExecutionContext.getTaskName(),
+                    exitCode);
+            if (taskExecutionStatus == TaskExecutionStatus.KILL) {
+                try {
+                    parseVarPoolFuture.get(1, TimeUnit.SECONDS);
+                } catch (TimeoutException interruptedException) {
+                    // ignore
+                }
                 // The task has been killed
+                log.info("LogicFakeTask: {} has been killed", taskExecutionContext.getTaskName());
                 return;
             }
+
+            final Map<String, String> taskOutputParams = parseVarPoolFuture.get();
             if (exitCode == 0) {
-                log.info("LogicFakeTask: {} execute success with exit code: {}",
-                        taskExecutionContext.getTaskName(),
-                        exitCode);
+                log.info("LogicFakeTask: {} execute success", taskExecutionContext.getTaskName());
+                taskParameters.dealOutParam(taskOutputParams);
+                taskExecutionContext.setVarPool(taskParameters.getVarPool());
                 onTaskSuccess();
             } else {
-                log.info("LogicFakeTask: {} execute failed with exit code: {}",
-                        taskExecutionContext.getTaskName(),
-                        exitCode);
+                log.info("LogicFakeTask: {} execute failed", taskExecutionContext.getTaskName());
                 onTaskFailed();
             }
         } catch (Exception ex) {
@@ -102,6 +123,27 @@ public class LogicFakeTask extends AbstractLogicTask<LogicFakeTaskParameters> {
     public ITaskParameterDeserializer<LogicFakeTaskParameters> getTaskParameterDeserializer() {
         return taskParamsJson -> JSONUtils.parseObject(taskParamsJson, new TypeReference<LogicFakeTaskParameters>() {
         });
+    }
+
+    private Future<Map<String, String>> parseVarPool() {
+        ExecutorService varPoolParseThreadPool = ThreadUtils.newSingleDaemonScheduledExecutorService(
+                "ResolveOutputLog-thread-" + taskExecutionContext.getTaskName());
+        Future<Map<String, String>> future = varPoolParseThreadPool.submit(() -> {
+            TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
+            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = inReader.readLine()) != null) {
+                    log.info(line);
+                    taskOutputParameterParser.appendParseLog(line);
+                }
+            } catch (Exception e) {
+                log.error("Parse var pool error", e);
+            }
+            return taskOutputParameterParser.getTaskOutputParams();
+        });
+
+        varPoolParseThreadPool.shutdown();
+        return future;
     }
 
 }

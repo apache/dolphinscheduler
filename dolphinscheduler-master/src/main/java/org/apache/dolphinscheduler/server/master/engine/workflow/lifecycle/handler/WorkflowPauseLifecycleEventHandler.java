@@ -38,7 +38,7 @@ public class WorkflowPauseLifecycleEventHandler
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowPauseLifecycleEvent pauseEvent) {
 
-        workflowStateAction.pauseEventAction(workflowExecutionRunnable, pauseEvent);
+        workflowStateAction.onPauseEvent(workflowExecutionRunnable, pauseEvent);
     }
 
     @Override

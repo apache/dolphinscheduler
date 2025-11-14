@@ -75,7 +75,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
@@ -349,14 +348,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2WorkflowDefinition();
         this.createWorkflowValid(loginUser, workflowDefinition);
 
-        long workflowDefinitionCode;
-        try {
-            workflowDefinitionCode = CodeGenerateUtils.genCode();
-        } catch (CodeGenerateException e) {
-            throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-        }
-
-        workflowDefinition.setCode(workflowDefinitionCode);
+        workflowDefinition.setCode(CodeGenerateUtils.genCode());
         workflowDefinition.setUserId(loginUser.getId());
 
         int create = workflowDefinitionMapper.insert(workflowDefinition);
@@ -467,12 +459,22 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private List<TaskDefinitionLog> generateTaskDefinitionList(String taskDefinitionJson) {
         try {
             List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
             if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
                 log.error("Generate task definition list failed, the given taskDefinitionJson is invalided: {}",
                         taskDefinitionJson);
                 throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             }
+
+            Set<String> taskNameSet = new HashSet<>();
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+                if (!taskNameSet.add(taskDefinitionLog.getName())) {
+                    log.error(
+                            "Generate task definition list failed, the given task definition name is duplicate, taskName: {}, taskDefinition: {}",
+                            taskDefinitionLog.getName(), taskDefinitionLog);
+                    throw new ServiceException(Status.TASK_NAME_DUPLICATE_ERROR, taskDefinitionLog.getName());
+                }
+
                 if (!checkTaskParameters(taskDefinitionLog.getTaskType(), taskDefinitionLog.getTaskParams())) {
                     log.error(
                             "Generate task definition list failed, the given task definition parameter is invalided, taskName: {}, taskDefinition: {}",
@@ -1062,7 +1064,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         // check workflow instances is already running
         List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowDefinitionCodeAndStatus(
-                workflowDefinition.getCode(), WorkflowExecutionStatus.getNotTerminalStatus());
+                workflowDefinition.getCode(), WorkflowExecutionStatus.NOT_TERMINAL_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
@@ -1121,6 +1123,18 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // If delete error, we can call this interface again.
         workflowDefinitionDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
+
+        // delete workflow lineage (lineage data only keeps one record per workflow code)
+        // It's safe to return 0 if no lineage exists (idempotent)
+        int deleteWorkflowLineageResult = workflowLineageService
+                .deleteWorkflowLineage(Collections.singletonList(workflowDefinition.getCode()));
+        if (deleteWorkflowLineageResult <= 0) {
+            if (deleteWorkflowLineageResult < 0) {
+                throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
+            } else {
+                log.warn("No workflow lineage to delete, workflowDefinitionCode: {}", code);
+            }
+        }
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
 
@@ -1424,7 +1438,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource,
-                                                           String sql) throws CodeGenerateException {
+                                                           String sql) {
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
         taskDefinition.setName(taskName);
         taskDefinition.setFlag(Flag.YES);
@@ -1480,15 +1494,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         workflowDefinition.setId(null);
         workflowDefinition.setProjectCode(projectCode);
         workflowDefinition.setUserId(loginUser.getId());
-        try {
-            workflowDefinition.setCode(CodeGenerateUtils.genCode());
-        } catch (CodeGenerateException e) {
-            log.error(
-                    "Save workflow definition error because generate workflow definition code error, projectCode:{}.",
-                    projectCode, e);
-            putMsg(result, Status.CREATE_WORKFLOW_DEFINITION_ERROR);
-            return false;
-        }
+        workflowDefinition.setCode(CodeGenerateUtils.genCode());
+
         List<TaskDefinition> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
         Map<Long, Long> taskCodeMap = new HashMap<>();
         Date now = new Date();
@@ -1503,16 +1510,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             taskDefinitionLog.setUpdateTime(now);
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
-            try {
-                long code = CodeGenerateUtils.genCode();
-                taskCodeMap.put(taskDefinitionLog.getCode(), code);
-                taskDefinitionLog.setCode(code);
-            } catch (CodeGenerateException e) {
-                log.error("Generate task definition code error, projectCode:{}, workflowDefinitionCode:{}",
-                        projectCode, workflowDefinition.getCode(), e);
-                putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
-                return false;
-            }
+            long code = CodeGenerateUtils.genCode();
+            taskCodeMap.put(taskDefinitionLog.getCode(), code);
+            taskDefinitionLog.setCode(code);
+
             taskDefinitionLogList.add(taskDefinitionLog);
         }
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
@@ -1576,6 +1577,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);
+            // not allow to import an online schedule
+            schedule.setReleaseState(ReleaseState.OFFLINE);
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
                 log.error(
@@ -2118,15 +2121,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 List<TaskDefinitionLog> taskDefinitionLogs =
                         taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
-                taskDefinitionLogs.forEach(taskDefinitionLog -> {
-                    try {
-                        taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode());
-                    } catch (CodeGenerateException e) {
-                        log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
-                        putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-                        throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-                    }
-                });
+                taskDefinitionLogs.forEach(
+                        taskDefinitionLog -> taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode()));
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     taskDefinitionLog.setCode(taskCodeMap.get(taskDefinitionLog.getCode()));
                     taskDefinitionLog.setProjectCode(targetProjectCode);
@@ -2162,13 +2158,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     }
                 }
                 final long oldWorkflowDefinitionCode = workflowDefinition.getCode();
-                try {
-                    workflowDefinition.setCode(CodeGenerateUtils.genCode());
-                } catch (CodeGenerateException e) {
-                    log.error("Generate workflow definition code error, projectCode:{}.", targetProjectCode, e);
-                    putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-                    throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-                }
+                workflowDefinition.setCode(CodeGenerateUtils.genCode());
+
                 workflowDefinition.setId(null);
                 workflowDefinition.setUserId(loginUser.getId());
                 workflowDefinition.setName(getNewName(workflowDefinition.getName(), COPY_SUFFIX));
@@ -2436,7 +2427,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowCodeVersionStatus(
                 code,
                 version,
-                WorkflowExecutionStatus.getNotTerminalStatus());
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
@@ -2448,12 +2439,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         log.info("Delete version: {} of workflow: {}, projectCode: {}", version, code, projectCode);
 
-        // delete workflow lineage
-        int deleteWorkflowLineageResult = workflowLineageService.deleteWorkflowLineage(Collections.singletonList(code));
-        if (deleteWorkflowLineageResult <= 0) {
-            log.error("Delete workflow lineage by workflow definition code error, workflowDefinitionCode: {}", code);
-            throw new ServiceException(Status.DELETE_WORKFLOW_LINEAGE_ERROR);
-        }
     }
 
     private void updateWorkflowValid(User user, WorkflowDefinition oldWorkflowDefinition,

@@ -38,7 +38,7 @@ jobs:
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3.0.2
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
           filters: |
@@ -62,7 +62,7 @@ jobs:
       - name: Maximize runner space
         uses: ./.github/actions/maximize-build-space
         with:
-          root-reserve-mb: 30720
+          root-reserve-mb: 28672
           temp-reserve-mb: 10240
           remove-dotnet: 'true'
           remove-android: 'true'
@@ -91,7 +91,8 @@ jobs:
           ./mvnw -B clean install \
                  -Pstaging \
                  -Dmaven.test.skip=true \
-                 -Dspotless.skip=true
+                 -Dspotless.skip=true \
+                 -Danalyze.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
       - uses: actions/upload-artifact@v4

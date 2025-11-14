@@ -68,7 +68,6 @@ export const useForm = () => {
       startParams: null,
       expectedParallelismNumber: '2',
       dryRun: 0,
-      testFlag: 0,
       version: null,
       allLevelDependent: 'false',
       executionOrder: 'DESC_ORDER'

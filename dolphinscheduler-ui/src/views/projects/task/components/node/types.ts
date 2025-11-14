@@ -286,6 +286,13 @@ interface ITaskParams {
   executorCores?: number
   mainArgs?: string
   others?: string
+  grpcCredentialType?: string
+  grpcServiceDefinition?: string
+  grpcServiceDefinitionJSON?: string
+  methodName?: string
+  message?: string
+  grpcCheckCondition?: string
+  grpcConnectTimeoutMs?: number
   httpMethod?: string
   httpBody?: string
   httpCheckCondition?: string
@@ -357,6 +364,7 @@ interface ITaskParams {
   resourceQueueId?: string
   codeType?: string
   engineReleaseVersion?: string
+  templateId?: string
   entryPoint?: string
   entryPointArguments?: string
   sparkSubmitParameters?: string

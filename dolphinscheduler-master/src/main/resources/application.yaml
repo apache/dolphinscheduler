@@ -47,7 +47,7 @@ spring:
       org.quartz.threadPool.makeThreadsDaemons: true
       org.quartz.threadPool.threadCount: 25
       org.quartz.jobStore.misfireThreshold: 60000
-      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 25
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
@@ -67,6 +67,13 @@ mybatis-plus:
       id-type: auto
     banner: false
 
+scheduler-plugin:
+  quartz:
+    # By default, will not use a separate datasource for quartz
+    # If you want to use a separate datasource, set it to true and configure the datasource below
+    # If set true, and you do not configure hikari below, it will use the same configuration as spring.datasource.hikari
+    using-separate-datasource: false
+    # hikari:
 
 registry:
   type: zookeeper
@@ -101,6 +108,8 @@ master:
     max-system-memory-usage-percentage-thresholds: 0.8
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
     max-disk-usage-percentage-thresholds: 0.8
+    # Master max concurrent workflow instances, when the master's workflow instance count exceeds this value, master server will be marked as busy.
+    max-concurrent-workflow-instances: 2147483647
   worker-group-refresh-interval: 5m
   command-fetch-strategy:
     type: ID_SLOT_BASED
@@ -122,6 +131,11 @@ server:
   port: 5679
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
+    exclude: [health,metrics]
   endpoints:
     web:
       exposure:

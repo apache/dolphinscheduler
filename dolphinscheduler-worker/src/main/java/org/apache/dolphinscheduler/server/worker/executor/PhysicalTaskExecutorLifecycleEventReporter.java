@@ -25,7 +25,9 @@ import org.springframework.stereotype.Component;
 public class PhysicalTaskExecutorLifecycleEventReporter extends TaskExecutorLifecycleEventRemoteReporter {
 
     public PhysicalTaskExecutorLifecycleEventReporter(
-                                                      final PhysicalTaskExecutorEventRemoteReporterClient physicalTaskExecutorEventRemoteReporterClient) {
-        super("PhysicalTaskExecutorLifecycleEventReporter", physicalTaskExecutorEventRemoteReporterClient);
+                                                      final PhysicalTaskExecutorEventRemoteReporterClient physicalTaskExecutorEventRemoteReporterClient,
+                                                      final PhysicalTaskExecutorRepository taskExecutorRepository) {
+        super("PhysicalTaskExecutorLifecycleEventReporter", physicalTaskExecutorEventRemoteReporterClient,
+                taskExecutorRepository);
     }
 }

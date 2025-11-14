@@ -71,7 +71,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         result.setCpuQuota(originTaskInstance.getCpuQuota());
         result.setMemoryMax(originTaskInstance.getMemoryMax());
         result.setTaskExecuteType(originTaskInstance.getTaskExecuteType());
-        result.setTestFlag(originTaskInstance.getTestFlag());
         return result;
     }
 
@@ -111,7 +110,6 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         taskInstance.setVarPool(workflowInstance.getVarPool());
         taskInstance.setExecutorName(workflowInstance.getExecutorName());
         taskInstance.setDryRun(workflowInstance.getDryRun());
-        taskInstance.setTestFlag(workflowInstance.getTestFlag());
     }
 
 }

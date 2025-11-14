@@ -132,7 +132,97 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public List<String> splitAndRemoveComment(String sql) {
         String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.postgresql);
-        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.postgresql);
+        return splitSqlRespectingDollarQuotes(cleanSQL);
+    }
+
+    private int findNextDollar(String sql, int from) {
+        for (int i = from; i < sql.length(); i++) {
+            if (sql.charAt(i) == '$') {
+                return i;
+            }
+            if (!Character.isLetterOrDigit(sql.charAt(i))) {
+                break; // Not a valid dollar tag
+            }
+        }
+        return -1;
+    }
+
+    private int findClosingTag(String sql, int startIndex, String tag) {
+        boolean inString = false;
+
+        for (int i = startIndex; i <= sql.length() - tag.length(); i++) {
+            char ch = sql.charAt(i);
+
+            if (ch == '\'') {
+                // Handle escaped quote: ''
+                if (i + 1 < sql.length() && sql.charAt(i + 1) == '\'') {
+                    i++; // skip escaped quote
+                } else {
+                    inString = !inString;
+                }
+            }
+
+            if (!inString && sql.startsWith(tag, i)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private List<String> splitSqlRespectingDollarQuotes(String sql) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+
+        boolean insideDollarBlock = false;
+        String dollarTag = null;
+        int i = 0;
+
+        while (i < sql.length()) {
+            char ch = sql.charAt(i);
+
+            // Detect start of dollar-quote block (e.g. $DO$, $func$)
+            if (!insideDollarBlock && ch == '$') {
+                int tagEnd = findNextDollar(sql, i + 1);
+                if (tagEnd > i) {
+                    String potentialTag = sql.substring(i, tagEnd + 1);
+                    int closingIndex = findClosingTag(sql, tagEnd + 1, potentialTag);
+                    if (closingIndex != -1) {
+                        // We're starting a dollar block
+                        insideDollarBlock = true;
+                        dollarTag = potentialTag;
+                        current.append(dollarTag);
+                        i = tagEnd + 1;
+                        continue;
+                    }
+                }
+            }
+
+            // Detect end of dollar-quote block
+            if (insideDollarBlock && dollarTag != null && sql.startsWith(dollarTag, i)) {
+                insideDollarBlock = false;
+                current.append(dollarTag);
+                i += dollarTag.length();
+                continue;
+            }
+
+            // Split only outside of a dollar block
+            if (!insideDollarBlock && ch == ';') {
+                result.add(current.toString().trim());
+                current.setLength(0);
+                i++;
+                continue;
+            }
+
+            current.append(ch);
+            i++;
+        }
+
+        if (!current.toString().trim().isEmpty()) {
+            result.add(current.toString().trim());
+        }
+
+        return result;
     }
 
     private String transformOther(Map<String, String> otherMap) {

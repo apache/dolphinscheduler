@@ -216,39 +216,39 @@ public class ProcedureTask extends AbstractTask {
         Object value = null;
         switch (dataType) {
             case VARCHAR:
-                log.info("out prameter varchar key : {} , value : {}", prop, stmt.getString(index));
+                log.info("out parameter varchar key : {} , value : {}", prop, stmt.getString(index));
                 value = stmt.getString(index);
                 break;
             case INTEGER:
-                log.info("out prameter integer key : {} , value : {}", prop, stmt.getInt(index));
+                log.info("out parameter integer key : {} , value : {}", prop, stmt.getInt(index));
                 value = stmt.getInt(index);
                 break;
             case LONG:
-                log.info("out prameter long key : {} , value : {}", prop, stmt.getLong(index));
+                log.info("out parameter long key : {} , value : {}", prop, stmt.getLong(index));
                 value = stmt.getLong(index);
                 break;
             case FLOAT:
-                log.info("out prameter float key : {} , value : {}", prop, stmt.getFloat(index));
+                log.info("out parameter float key : {} , value : {}", prop, stmt.getFloat(index));
                 value = stmt.getFloat(index);
                 break;
             case DOUBLE:
-                log.info("out prameter double key : {} , value : {}", prop, stmt.getDouble(index));
+                log.info("out parameter double key : {} , value : {}", prop, stmt.getDouble(index));
                 value = stmt.getDouble(index);
                 break;
             case DATE:
-                log.info("out prameter date key : {} , value : {}", prop, stmt.getDate(index));
+                log.info("out parameter date key : {} , value : {}", prop, stmt.getDate(index));
                 value = stmt.getDate(index);
                 break;
             case TIME:
-                log.info("out prameter time key : {} , value : {}", prop, stmt.getTime(index));
+                log.info("out parameter time key : {} , value : {}", prop, stmt.getTime(index));
                 value = stmt.getTime(index);
                 break;
             case TIMESTAMP:
-                log.info("out prameter timestamp key : {} , value : {}", prop, stmt.getTimestamp(index));
+                log.info("out parameter timestamp key : {} , value : {}", prop, stmt.getTimestamp(index));
                 value = stmt.getTimestamp(index);
                 break;
             case BOOLEAN:
-                log.info("out prameter boolean key : {} , value : {}", prop, stmt.getBoolean(index));
+                log.info("out parameter boolean key : {} , value : {}", prop, stmt.getBoolean(index));
                 value = stmt.getBoolean(index);
                 break;
             default:

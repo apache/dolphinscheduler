@@ -36,29 +36,29 @@ workflows:
     userId: 1
     executionType: PARALLEL
 
-workflowInstance:
-  id: 1
-  name: workflow_with_one_fake_task_killed-20250322201900000
-  workflowDefinitionCode: 1
-  workflowDefinitionVersion: 1
-  projectCode: 1
-  state: STOP
-  recovery: NO
-  startTime: 2025-03-22 20:19:00
-  endTime: null
-  runTimes: 1
-  host: "127.0.0.1:15678"
-  commandType: START_PROCESS
-  commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
-  taskDependType: TASK_POST
-  commandStartTime: 2025-03-22 20:19:00
-  isSubWorkflow: NO
-  executorId: 1
-  historyCmd: START_PROCESS
-  workerGroup: default
-  globalParams: '[]'
-  varPool: '[]'
-  dryRun: 0
+workflowInstances:
+  - id: 1
+    name: workflow_with_one_fake_task_killed-20250322201900000
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
+    projectCode: 1
+    state: STOP
+    recovery: NO
+    startTime: 2025-03-22 20:19:00
+    endTime: null
+    runTimes: 1
+    host: "127.0.0.1:15678"
+    commandType: START_PROCESS
+    commandParam: '{"commandType":"START_PROCESS","startNodes":[],"commandParams":[],"timeZone":"UTC"}'
+    taskDependType: TASK_POST
+    commandStartTime: 2025-03-22 20:19:00
+    isSubWorkflow: NO
+    executorId: 1
+    historyCmd: START_PROCESS
+    workerGroup: default
+    globalParams: '[]'
+    varPool: '[]'
+    dryRun: 0
 
 taskInstances:
   - id: 1

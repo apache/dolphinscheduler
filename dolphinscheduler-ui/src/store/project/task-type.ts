@@ -54,6 +54,9 @@ export const TASK_TYPES_MAP = {
   DEPENDENT: {
     alias: 'DEPENDENT'
   },
+  GRPC: {
+    alias: 'GRPC'
+  },
   HTTP: {
     alias: 'HTTP'
   },

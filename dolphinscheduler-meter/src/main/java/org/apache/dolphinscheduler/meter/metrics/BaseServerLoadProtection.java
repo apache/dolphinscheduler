@@ -17,49 +17,51 @@
 
 package org.apache.dolphinscheduler.meter.metrics;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Data
 public class BaseServerLoadProtection implements ServerLoadProtection {
 
-    protected boolean enabled = true;
+    protected final BaseServerLoadProtectionConfig baseServerLoadProtectionConfig;
 
-    protected double maxSystemCpuUsagePercentageThresholds = 0.7;
-
-    protected double maxJvmCpuUsagePercentageThresholds = 0.7;
-
-    protected double maxSystemMemoryUsagePercentageThresholds = 0.7;
-
-    protected double maxDiskUsagePercentageThresholds = 0.7;
+    public BaseServerLoadProtection(BaseServerLoadProtectionConfig baseServerLoadProtectionConfig) {
+        this.baseServerLoadProtectionConfig = baseServerLoadProtectionConfig;
+    }
 
     @Override
     public boolean isOverload(SystemMetrics systemMetrics) {
-        if (!enabled) {
+        if (!baseServerLoadProtectionConfig.isEnabled()) {
             return false;
         }
-        if (systemMetrics.getSystemCpuUsagePercentage() > maxSystemCpuUsagePercentageThresholds) {
+        if (systemMetrics.getSystemCpuUsagePercentage() > baseServerLoadProtectionConfig
+                .getMaxSystemCpuUsagePercentageThresholds()) {
             log.info(
                     "OverLoad: the system cpu usage: {} is over then the maxSystemCpuUsagePercentageThresholds {}",
-                    systemMetrics.getSystemCpuUsagePercentage(), maxSystemCpuUsagePercentageThresholds);
+                    systemMetrics.getSystemCpuUsagePercentage(),
+                    baseServerLoadProtectionConfig.getMaxSystemCpuUsagePercentageThresholds());
             return true;
         }
-        if (systemMetrics.getJvmCpuUsagePercentage() > maxJvmCpuUsagePercentageThresholds) {
+        if (systemMetrics.getJvmCpuUsagePercentage() > baseServerLoadProtectionConfig
+                .getMaxJvmCpuUsagePercentageThresholds()) {
             log.info(
                     "OverLoad: the jvm cpu usage: {} is over then the maxJvmCpuUsagePercentageThresholds {}",
-                    systemMetrics.getJvmCpuUsagePercentage(), maxJvmCpuUsagePercentageThresholds);
+                    systemMetrics.getJvmCpuUsagePercentage(),
+                    baseServerLoadProtectionConfig.getMaxJvmCpuUsagePercentageThresholds());
             return true;
         }
-        if (systemMetrics.getDiskUsedPercentage() > maxDiskUsagePercentageThresholds) {
+        if (systemMetrics.getDiskUsedPercentage() > baseServerLoadProtectionConfig
+                .getMaxDiskUsagePercentageThresholds()) {
             log.info("OverLoad: the DiskUsedPercentage: {} is over then the maxDiskUsagePercentageThresholds {}",
-                    systemMetrics.getDiskUsedPercentage(), maxDiskUsagePercentageThresholds);
+                    systemMetrics.getDiskUsedPercentage(),
+                    baseServerLoadProtectionConfig.getMaxDiskUsagePercentageThresholds());
             return true;
         }
-        if (systemMetrics.getSystemMemoryUsedPercentage() > maxSystemMemoryUsagePercentageThresholds) {
+        if (systemMetrics.getSystemMemoryUsedPercentage() > baseServerLoadProtectionConfig
+                .getMaxSystemMemoryUsagePercentageThresholds()) {
             log.info(
                     "OverLoad: the SystemMemoryUsedPercentage: {} is over then the maxSystemMemoryUsagePercentageThresholds {}",
-                    systemMetrics.getSystemMemoryUsedPercentage(), maxSystemMemoryUsagePercentageThresholds);
+                    systemMetrics.getSystemMemoryUsedPercentage(),
+                    baseServerLoadProtectionConfig.getMaxSystemMemoryUsagePercentageThresholds());
             return true;
         }
         return false;

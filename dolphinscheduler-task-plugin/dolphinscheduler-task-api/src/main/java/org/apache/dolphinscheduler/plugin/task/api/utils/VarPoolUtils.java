@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,26 +33,41 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import com.google.common.collect.Lists;
+
 @Slf4j
 @UtilityClass
 public class VarPoolUtils {
+
+    public String serializeVarPool(List<Property> varPool) {
+        if (CollectionUtils.isEmpty(varPool)) {
+            return null;
+        }
+        return JSONUtils.toJsonString(varPool);
+    }
 
     public List<Property> deserializeVarPool(String varPoolJson) {
         return JSONUtils.toList(varPoolJson, Property.class);
     }
 
+    public List<Property> mergeVarPoolJsonString(String... varPoolJsons) {
+        if (varPoolJsons == null) {
+            return Collections.emptyList();
+        }
+        return mergeVarPoolJsonString(Lists.newArrayList(varPoolJsons));
+    }
+
     /**
      * @see #mergeVarPool(List)
      */
-    public String mergeVarPoolJsonString(List<String> varPoolJsons) {
+    public List<Property> mergeVarPoolJsonString(List<String> varPoolJsons) {
         if (CollectionUtils.isEmpty(varPoolJsons)) {
             return null;
         }
         List<List<Property>> varPools = varPoolJsons.stream()
                 .map(VarPoolUtils::deserializeVarPool)
                 .collect(Collectors.toList());
-        List<Property> finalVarPool = mergeVarPool(varPools);
-        return JSONUtils.toJsonString(finalVarPool);
+        return mergeVarPool(varPools);
     }
 
     /**
@@ -61,7 +77,7 @@ public class VarPoolUtils {
      */
     public List<Property> mergeVarPool(List<List<Property>> varPools) {
         if (CollectionUtils.isEmpty(varPools)) {
-            return null;
+            return Collections.emptyList();
         }
         if (varPools.size() == 1) {
             return varPools.get(0);
@@ -73,7 +89,7 @@ public class VarPoolUtils {
             }
             for (Property property : varPool) {
                 if (!Direct.OUT.equals(property.getDirect())) {
-                    log.info("The direct should be OUT in varPool, but got {}", property.getDirect());
+                    log.warn("The direct should be OUT in varPool, but got {}", property.getDirect());
                     continue;
                 }
                 result.put(property.getProp(), property);

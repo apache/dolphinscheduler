@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -334,7 +335,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     @Override
-    public void acquireTaskGroupSlot(TaskInstance taskInstance) {
+    public void acquireTaskGroupSlot(TaskInstance taskInstance, TaskDefinition taskDefinition) {
         if (taskInstance == null || taskInstance.getTaskGroupId() <= 0) {
             throw new IllegalArgumentException("The current TaskInstance does not use task group");
         }
@@ -353,7 +354,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 .taskName(taskInstance.getName())
                 .groupId(taskInstance.getTaskGroupId())
                 .workflowInstanceId(taskInstance.getWorkflowInstanceId())
-                .priority(taskInstance.getTaskGroupPriority())
+                .priority(taskDefinition.getTaskGroupPriority())
                 .inQueue(Flag.YES.getCode())
                 .forceStart(Flag.NO.getCode())
                 .status(TaskGroupQueueStatus.WAIT_QUEUE)

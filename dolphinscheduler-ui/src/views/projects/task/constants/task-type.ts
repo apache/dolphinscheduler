@@ -24,6 +24,7 @@ export type TaskType =
   | 'MR'
   | 'PYTHON'
   | 'DEPENDENT'
+  | 'GRPC'
   | 'HTTP'
   | 'DATAX'
   | 'SQOOP'
@@ -85,6 +86,10 @@ export const TASK_TYPES_MAP = {
   },
   DEPENDENT: {
     alias: 'DEPENDENT'
+  },
+  GRPC: {
+    alias: 'GRPC',
+    helperLinkDisable: true
   },
   HTTP: {
     alias: 'HTTP'

@@ -183,8 +183,8 @@ DolphinScheduler默认使用Zookeeper进行集群管理、容错、事件监听�
 
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeeper相关的配置。
 
-如果使用etcd作为注册中心，详细请参考[链接](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md)。
-如果使用jdbc作为注册中心，详细请参考[链接](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md)。
+如果使用etcd作为注册中心，详细请参考[链接](../guide/installation/registry-plugins/etcd.md)。
+如果使用jdbc作为注册中心，详细请参考[链接](../guide/installation/registry-plugins/jdbc.md)。
 
 ## common.properties [hadoop、s3、yarn配置]
 
@@ -291,6 +291,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.7                          | master最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的JVM CPU |
 | master.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.7                          | master最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统内存          |
 | master.server-load-protection.max-disk-usage-percentage-thresholds          | 0.7                          | master最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统磁盘空间         |
+| master.server-load-protection.max-concurrent-workflow-instances             | 2147483647                   | Master最大并发工作流实例数. 当Master的工作流实例数达到或超过此值时，Master服务将被标记为繁忙.                               |
 | master.failover-interval                                                    | 10                           | failover间隔，单位为分钟                                                                        |
 | master.kill-application-when-task-failover                                  | true                         | 当任务实例failover时，是否kill掉yarn或k8s application                                              |
 | master.master.worker-group-refresh-interval                                 | 10s                          | 定期将workerGroup从数据库中同步到内存的时间间隔                                                           |

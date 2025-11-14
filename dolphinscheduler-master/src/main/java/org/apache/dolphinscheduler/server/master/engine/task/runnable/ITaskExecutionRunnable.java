@@ -57,6 +57,12 @@ public interface ITaskExecutionRunnable
     void initializeFirstRunTaskInstance();
 
     /**
+     * Initialize {@link TaskExecutionContext}.
+     * <p> The TaskExecutionContext should be initialized before dispatch stage.
+     */
+    void initializeTaskExecutionContext();
+
+    /**
      * Whether the task instance is running.
      */
     boolean isTaskInstanceCanRetry();

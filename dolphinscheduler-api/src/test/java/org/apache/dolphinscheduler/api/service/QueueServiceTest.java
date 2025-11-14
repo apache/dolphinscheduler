@@ -186,6 +186,8 @@ public class QueueServiceTest {
         // success
         when(userMapper.existUser(Mockito.anyString())).thenReturn(false);
         assertDoesNotThrow(() -> queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS));
+        Queue queue = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS);
+        Assertions.assertNull(queue.getCreateTime());
 
         // success update with same queue name
         when(queueMapper.existQueue(NOT_EXISTS_FINAL, null)).thenReturn(false);

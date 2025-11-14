@@ -17,9 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Assertions;
@@ -35,7 +42,7 @@ public class ExcelUtilsTest {
     private String xlsFilePath;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() {
         xlsFilePath = testFolder.toString();
     }
 
@@ -58,7 +65,7 @@ public class ExcelUtilsTest {
         Assertions.assertTrue(xlsFile.exists());
 
         // Invoke genExcelFile with incorrectContent, will cause RuntimeException
-        Assertions.assertThrows(AlertEmailException.class, () -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
         });
 
@@ -76,5 +83,33 @@ public class ExcelUtilsTest {
                                 + EmailConstants.EXCEL_SUFFIX_XLSX);
         file.delete();
         Assertions.assertFalse(file.exists());
+    }
+
+    @Test
+    void testGenExcelFile_TruncateLongString() throws Exception {
+        String title = "truncate_test";
+        String longStrKey = "longStr";
+        int maxLen = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < maxLen + 100; i++) {
+            sb.append('X');
+        }
+        String longValue = sb.toString();
+        String content = "[{\"" + longStrKey + "\":\"" + longValue + "\"}]";
+
+        ExcelUtils.genExcelFile(content, title, xlsFilePath);
+
+        try (
+                FileInputStream fis = new FileInputStream(xlsFilePath + "/" + title + ".xlsx");
+                Workbook wb = WorkbookFactory.create(fis)) {
+
+            Sheet sheet = wb.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
+            Row dataRow = sheet.getRow(1);
+
+            assertEquals(longStrKey, headerRow.getCell(0).getStringCellValue());
+            String expected = longValue.substring(0, maxLen - 67) + "...(truncated)";
+            assertEquals(expected, dataRow.getCell(0).getStringCellValue());
+        }
     }
 }

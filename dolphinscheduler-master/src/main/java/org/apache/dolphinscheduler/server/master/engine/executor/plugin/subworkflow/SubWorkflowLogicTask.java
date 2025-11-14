@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.subworkflow;
 
+import static java.util.Arrays.asList;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.deserializeVarPool;
+
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -35,6 +38,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowI
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
@@ -42,6 +46,14 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -148,7 +160,11 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
             return triggerNewSubWorkflow();
         }
 
-        switch (workflowExecutionRunnable.getWorkflowInstance().getCommandType()) {
+        // In some cases, workflow instance's command type has not been changed,
+        // there should better to use command.type instead
+        switch (workflowExecutionRunnable.getWorkflowExecuteContext().getCommand().getCommandType()) {
+            case RECOVER_TOLERANCE_FAULT_PROCESS:
+                return recoverFromFaultTolerantTasks();
             case RECOVER_SUSPENDED_PROCESS:
                 return recoverFromSuspendTasks();
             case START_FAILURE_TASK_PROCESS:
@@ -156,7 +172,21 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
             default:
                 return triggerNewSubWorkflow();
         }
+    }
 
+    private SubWorkflowLogicTaskRuntimeContext recoverFromFaultTolerantTasks() {
+        final WorkflowInstanceDao workflowInstanceDao = applicationContext.getBean(WorkflowInstanceDao.class);
+        final WorkflowInstance subWorkflowInstance = workflowInstanceDao.queryById(
+                subWorkflowLogicTaskRuntimeContext.getSubWorkflowInstanceId());
+
+        if (subWorkflowInstance != null) {
+            // If the sub workflow instance is existed, means we already trigger the sub workflow instance.
+            // So we don't need to trigger again.
+            return subWorkflowLogicTaskRuntimeContext;
+        }
+
+        // The sub-workflow's state is bad, trigger a new sub-workflow instance
+        return triggerNewSubWorkflow();
     }
 
     private SubWorkflowLogicTaskRuntimeContext recoverFromFailedTasks() {
@@ -204,6 +234,11 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         final ICommandParam commandParam =
                 JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
 
+        final List<Property> paramList = mergeParams(asList(
+                new ArrayList<>(deserializeVarPool(workflowInstance.getGlobalParams())),
+                commandParam.getCommandParams(),
+                new ArrayList<>(deserializeVarPool(workflowInstance.getVarPool()))));
+
         final WorkflowManualTriggerRequest workflowManualTriggerRequest = WorkflowManualTriggerRequest.builder()
                 .userId(taskExecutionContext.getExecutorId())
                 .workflowDefinitionCode(subWorkflowDefinition.getCode())
@@ -215,15 +250,32 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 .workerGroup(workflowInstance.getWorkerGroup())
                 .tenantCode(workflowInstance.getTenantCode())
                 .environmentCode(workflowInstance.getEnvironmentCode())
-                // todo: transport varpool and local params
-                .startParamList(commandParam.getCommandParams())
+                .startParamList(paramList)
                 .dryRun(Flag.of(workflowInstance.getDryRun()))
-                .testFlag(Flag.of(workflowInstance.getTestFlag()))
                 .build();
         final Integer subWorkflowInstanceId = applicationContext
                 .getBean(SubWorkflowControlClient.class)
                 .triggerSubWorkflow(workflowManualTriggerRequest);
         return SubWorkflowLogicTaskRuntimeContext.of(subWorkflowInstanceId);
+    }
+
+    private List<Property> mergeParams(List<List<Property>> params) {
+        if (CollectionUtils.isEmpty(params)) {
+            return Collections.emptyList();
+        }
+        if (params.size() == 1) {
+            return params.get(0);
+        }
+        Map<String, Property> result = new HashMap<>();
+        for (List<Property> param : params) {
+            if (CollectionUtils.isEmpty(param)) {
+                continue;
+            }
+            for (Property property : param) {
+                result.put(property.getProp(), property);
+            }
+        }
+        return new ArrayList<>(result.values());
     }
 
     private void upsertSubWorkflowRelation() {

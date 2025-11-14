@@ -25,7 +25,9 @@ import org.springframework.stereotype.Component;
 public class LogicTaskExecutorLifecycleEventReporter extends TaskExecutorLifecycleEventRemoteReporter {
 
     public LogicTaskExecutorLifecycleEventReporter(
-                                                   final LogicTaskExecutorEventRemoteReporterClient logicTaskExecutorEventRemoteReporterClient) {
-        super("LogicTaskExecutorLifecycleEventReporter", logicTaskExecutorEventRemoteReporterClient);
+                                                   final LogicTaskExecutorEventRemoteReporterClient logicTaskExecutorEventRemoteReporterClient,
+                                                   final LogicTaskExecutorRepository taskExecutorRepository) {
+        super("LogicTaskExecutorLifecycleEventReporter", logicTaskExecutorEventRemoteReporterClient,
+                taskExecutorRepository);
     }
 }
