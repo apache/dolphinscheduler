@@ -1,6 +1,6 @@
 # Introduction
 
-This module is the jdbc registry plugin module, this plugin will use jdbc as the registry center. Will use the database
+This plugin will use jdbc as the registry center. Will use the database
 configuration same as DolphinScheduler in api'yaml default.
 
 # How to use
