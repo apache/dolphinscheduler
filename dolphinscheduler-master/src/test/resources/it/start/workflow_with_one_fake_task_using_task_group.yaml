@@ -46,6 +46,7 @@ tasks:
     taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 5"}'
     workerGroup: default
     taskGroupId: 1
+    taskGroupPriority: 1
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
     taskExecuteType: BATCH

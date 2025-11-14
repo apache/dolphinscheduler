@@ -57,7 +57,7 @@ jobs:
     strategy:
       matrix:
         java: ['8', '11']
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -116,7 +116,7 @@ jobs:
   result:
     name: Unit Test
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 5
     needs: [ unit-test, paths-filter ]
     if: always()
     steps:

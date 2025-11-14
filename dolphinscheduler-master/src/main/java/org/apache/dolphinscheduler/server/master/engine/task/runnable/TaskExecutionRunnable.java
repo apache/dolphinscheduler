@@ -178,7 +178,7 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
 
         // larger number, higher priority
         int taskGroupPriorityCompareResult =
-                taskInstance.getTaskGroupPriority() - other.getTaskInstance().getTaskGroupPriority();
+                taskDefinition.getTaskGroupPriority() - other.getTaskDefinition().getTaskGroupPriority();
         if (taskGroupPriorityCompareResult != 0) {
             return -taskGroupPriorityCompareResult;
         }

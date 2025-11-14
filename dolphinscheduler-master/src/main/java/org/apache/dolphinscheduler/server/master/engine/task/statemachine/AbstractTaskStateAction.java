@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus.DISPATCH;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -84,7 +85,8 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
      */
     protected void acquireTaskGroupSlot(final ITaskExecutionRunnable taskExecutionRunnable) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        taskGroupCoordinator.acquireTaskGroupSlot(taskInstance);
+        final TaskDefinition taskDefinition = taskExecutionRunnable.getTaskDefinition();
+        taskGroupCoordinator.acquireTaskGroupSlot(taskInstance, taskDefinition);
     }
 
     /**
