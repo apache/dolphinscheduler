@@ -125,9 +125,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
-    @DisplayName("Test start a workflow with one fake task(A) using task group")
-    public void testStartWorkflow_with_oneSuccessTaskUsingTaskGroup() {
-        final String yaml = "/it/start/workflow_with_one_fake_task_using_task_group.yaml";
+    @DisplayName("Test start a workflow with two fake task(A) using task group")
+    public void testStartWorkflow_with_successTaskUsingTaskGroup() {
+        final String yaml = "/it/start/workflow_with_fake_tasks_using_task_group.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
@@ -137,19 +137,28 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .build();
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofMinutes(2))
                 .atLeast(Duration.ofSeconds(20))
                 .untilAsserted(() -> {
+                    final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
                     Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
-                            .hasSize(4)
-                            .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState())
-                                    && taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+                            .assertThat(taskInstances)
+                            .hasSize(2)
+                            .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState()) &&
+                                    taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+
+                    final TaskInstance taskA = taskInstances.stream()
+                            .filter(t -> "A".equals(t.getName()))
+                            .findFirst().get();
+                    final TaskInstance taskB = taskInstances.stream()
+                            .filter(t -> "B".equals(t.getName()))
+                            .findFirst().get();
+                    // TaskA's task group priority is smaller than B
+                    Assertions.assertThat(taskA.getStartTime()).isAfter(taskB.getStartTime());
+                    Assertions.assertThat(taskA.getEndTime()).isAfter(taskB.getEndTime());
+
                 });
 
         masterContainer.assertAllResourceReleased();
