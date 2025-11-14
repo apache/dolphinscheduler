@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -110,13 +111,15 @@ class TaskGroupCoordinatorTest {
     void acquireTaskGroupSlot() {
         // TaskInstance is NULL
         IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, () -> taskGroupCoordinator.acquireTaskGroupSlot(null));
+                assertThrows(IllegalArgumentException.class,
+                        () -> taskGroupCoordinator.acquireTaskGroupSlot(null, null));
         assertEquals("The current TaskInstance does not use task group", illegalArgumentException.getMessage());
 
+        TaskDefinition taskDefinition = new TaskDefinition();
         // TaskGroupId is NULL
         TaskInstance taskInstance = new TaskInstance();
         illegalArgumentException = assertThrows(IllegalArgumentException.class,
-                () -> taskGroupCoordinator.acquireTaskGroupSlot(taskInstance));
+                () -> taskGroupCoordinator.acquireTaskGroupSlot(taskInstance, taskDefinition));
         assertEquals("The current TaskInstance does not use task group", illegalArgumentException.getMessage());
 
         // TaskGroup not exist
@@ -124,12 +127,12 @@ class TaskGroupCoordinatorTest {
         taskInstance.setId(1);
         when(taskGroupDao.queryById(taskInstance.getTaskGroupId())).thenReturn(null);
         illegalArgumentException = assertThrows(IllegalArgumentException.class,
-                () -> taskGroupCoordinator.acquireTaskGroupSlot(taskInstance));
+                () -> taskGroupCoordinator.acquireTaskGroupSlot(taskInstance, taskDefinition));
         assertEquals("The current TaskGroup: 1 does not exist", illegalArgumentException.getMessage());
 
         // TaskGroup exist
         when(taskGroupDao.queryById(taskInstance.getTaskGroupId())).thenReturn(new TaskGroup());
-        Assertions.assertDoesNotThrow(() -> taskGroupCoordinator.acquireTaskGroupSlot(taskInstance));
+        Assertions.assertDoesNotThrow(() -> taskGroupCoordinator.acquireTaskGroupSlot(taskInstance, taskDefinition));
 
     }
 
