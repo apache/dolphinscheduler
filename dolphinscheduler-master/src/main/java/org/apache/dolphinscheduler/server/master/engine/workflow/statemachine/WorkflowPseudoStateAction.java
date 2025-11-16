@@ -17,29 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.statemachine;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Component;
-
-@Slf4j
-@Component
-public class WorkflowPausedStateAction extends WorkflowTerminalStateAction {
+/**
+ * A PseudoState is a special state that does not receive any event, including:
+ * WorkflowSerialWaitState, WorkflowSubmittedState,and WorkflowFailoverState, at present.
+ */
+public abstract class WorkflowPseudoStateAction extends WorkflowTerminalStateAction {
 
     @Override
-    public WorkflowExecutionStatus matchState() {
-        return WorkflowExecutionStatus.PAUSE;
-    }
-
-    /**
-     * The running state can only finish with success/failure.
-     */
-    @Override
-    protected void emitWorkflowFinishedEventIfApplicable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        throw new IllegalStateException(
-                "The workflow " + workflowExecutionRunnable.getName() +
-                        "is paused, shouldn't emit workflow finished event");
+    public void onFinalizeEvent(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                WorkflowFinalizeLifecycleEvent workflowFinalizeEvent) {
+        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
+        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowFinalizeEvent);
     }
 }

@@ -10,7 +10,7 @@
 ## About
 
 Apache DolphinScheduler is a modern data orchestration platform that empowers agile, low-code development of high-performance workflows.
-It is dedicated to handling complex task dependencies in data pipelines, and provides a wide range of built-in job types ** out of the box**
+It is dedicated to handling complex task dependencies in data pipelines, and provides a wide range of built-in job types **out of the box**
 
 Key features for DolphinScheduler are as follows:
 
