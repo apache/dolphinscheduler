@@ -21,8 +21,9 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 /**
- * A PseudoState is a special state that does not receive any event, including:
- * WorkflowSerialWaitState, WorkflowSubmittedState,and WorkflowFailoverState, at present.
+ * Abstract state action class for PseudoStates,including: WorkflowSerialWaitState,
+ * WorkflowSubmittedState,and WorkflowFailoverState, at present.
+ * A PseudoState does not receive any events and serves purely as a marker state.
  */
 public abstract class WorkflowPseudoStateAction extends WorkflowTerminalStateAction {
 

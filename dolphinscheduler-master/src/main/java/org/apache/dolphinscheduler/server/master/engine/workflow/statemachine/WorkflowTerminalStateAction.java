@@ -29,8 +29,9 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 /**
- * Abstract class for terminal state, including Stopped, Failed, Success, Paused.
- * A terminal state is a state that only response to {@link WorkflowFinalizeLifecycleEvent},
+ * Abstract state action class for TerminalStates, including WorkflowStoppedState,
+ * WorkflowFailedState, WorkflowSuccessState, and WorkflowPausedState.
+ * A terminal state only response to {@link WorkflowFinalizeLifecycleEvent},
  * and can't be transferred to another state.
  */
 public abstract class WorkflowTerminalStateAction extends AbstractWorkflowStateAction {
