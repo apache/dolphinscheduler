@@ -341,6 +341,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-boot-starter-json 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.7.3, Apache 2.0
     spring-boot-starter-logging 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging/2.7.3, Apache 2.0
     spring-boot-starter-quartz 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz/2.7.3, Apache 2.0
+    spring-boot-starter-security 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security/2.7.3, Apache 2.0
     spring-boot-starter-web 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.7.3, Apache 2.0
     spring-context 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.22, Apache 2.0
     spring-context-support 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.13, Apache 2.0
@@ -354,6 +355,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     springdoc-openapi-webmvc-core 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webmvc-core/1.6.9, Apache 2.0
     spring-jcl 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-jcl/5.3.13, Apache 2.0
     spring-jdbc 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-jdbc/5.3.22, Apache 2.0
+    spring-security-config 5.7.3: https://mvnrepository.com/artifact/org.springframework.security/spring-security-config/5.7.3, Apache 2.0
+    spring-security-core 5.7.3: https://mvnrepository.com/artifact/org.springframework.security/spring-security-core/5.7.3, Apache 2.0
+    spring-security-web 5.7.3: https://mvnrepository.com/artifact/org.springframework.security/spring-security-web/5.7.3, Apache 2.0
     spring-tx 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.22, Apache 2.0
     spring-web 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-web/5.3.13, Apache 2.0
     spring-webmvc 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.3.13, Apache 2.0

@@ -618,6 +618,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(scheduleMapper.deleteById(46)).thenReturn(1);
         when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
+        when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
         processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L);
         Mockito.verify(metricsCleanUpService, times(1)).cleanUpWorkflowMetricsByDefinitionCode(46L);
 
@@ -643,8 +644,16 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
         when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
+        when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
         Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(46L);
+
+        // delete success with no lineage (deleteWorkflowLineageResult == 0)
+        // This tests the new logic that handles idempotent deletion gracefully
+        when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(0);
+        Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
+        Mockito.verify(metricsCleanUpService, times(3)).cleanUpWorkflowMetricsByDefinitionCode(46L);
+        Mockito.verify(workflowLineageService, times(3)).deleteWorkflowLineage(anyList());
     }
 
     @Test
