@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.interceptor;
 
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
+import org.apache.dolphinscheduler.common.utils.MaskUtils;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,13 +76,13 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                              Object handler) throws ExecutionException {
         // tenant-level rate limit
         if (trafficConfiguration.isTenantSwitch()) {
-            String token = request.getHeader("token");
-            if (!StringUtils.isEmpty(token)) {
-                RateLimiter tenantRateLimiter = tenantRateLimiterCache.get(token);
+            final String token = request.getHeader("token");
+            if (StringUtils.isNotEmpty(token)) {
+                final RateLimiter tenantRateLimiter = tenantRateLimiterCache.get(token);
                 if (!tenantRateLimiter.tryAcquire()) {
                     response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                    log.warn("Too many request, reach tenant rate limit, current tenant:{} qps is {}", token,
-                            tenantRateLimiter.getRate());
+                    log.warn("Too many request, reach tenant token: {} rate limit, current tenant qps is {}",
+                            MaskUtils.maskString(token, 6), tenantRateLimiter.getRate());
                     return false;
                 }
             }
@@ -90,7 +91,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (trafficConfiguration.isGlobalSwitch()) {
             if (!globalRateLimiter.tryAcquire()) {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                log.warn("Too many request, reach global rate limit, current qps is {}",
+                log.warn("Too many request, reach global rate limit, current global qps is {}",
                         globalRateLimiter.getRate());
                 return false;
             }
