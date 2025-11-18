@@ -25,7 +25,7 @@ import lombok.Data;
 @Data
 public class SSHDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    protected String publicKey;
+    protected String privateKey;
 
     @Override
     public DbType getType() {
