@@ -38,3 +38,7 @@ This document records the incompatible updates between each version. You need to
 * Drop unused column `other_params_json` in `t_ds_worker_group` ([#16860])(https://github.com/apache/dolphinscheduler/pull/16860)
 * Remove the `Dynamic` from the `Task Plugin` ([#16482])(https://github.com/apache/dolphinscheduler/pull/16842)
 
+## 3.4.0
+
+* Renamed the publicKey field to privateKey in the SSH connection parameters under the datasource configuration. ([#17666])(https://github.com/apache/dolphinscheduler/pull/17666)
+
