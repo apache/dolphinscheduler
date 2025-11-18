@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,8 @@ public class ProcedureTask extends AbstractTask {
     private final TaskExecutionContext taskExecutionContext;
 
     private final ProcedureTaskExecutionContext procedureTaskExecutionContext;
+
+    private volatile Statement sessionStatement;
 
     /**
      * constructor
@@ -105,21 +108,26 @@ public class ProcedureTask extends AbstractTask {
             }
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);
             // call method
-            try (CallableStatement stmt = connection.prepareCall(proceduerSql)) {
+            try (CallableStatement tmpStatement = connection.prepareCall(proceduerSql)) {
+                sessionStatement = tmpStatement;
                 // set timeout
-                setTimeout(stmt);
+                setTimeout(tmpStatement);
 
                 // outParameterMap
-                Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
+                Map<Integer, Property> outParameterMap = getOutParameterMap(tmpStatement, sqlParamsMap, paramsMap);
 
-                stmt.executeUpdate();
+                tmpStatement.executeUpdate();
 
                 // print the output parameters to the log
-                printOutParameter(stmt, outParameterMap);
+                printOutParameter(tmpStatement, outParameterMap);
 
                 setExitStatusCode(EXIT_CODE_SUCCESS);
             }
         } catch (Exception e) {
+            if (exitStatusCode == TaskConstants.EXIT_CODE_KILL) {
+                log.info("procedure task has been killed");
+                return;
+            }
             setExitStatusCode(EXIT_CODE_FAILURE);
             log.error("procedure task error", e);
             throw new TaskException("Execute procedure task failed", e);
@@ -128,7 +136,14 @@ public class ProcedureTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+        try {
+            if (sessionStatement != null) {
+                sessionStatement.cancel();
+            }
+            exitStatusCode = TaskConstants.EXIT_CODE_KILL;
+        } catch (Exception e) {
+            throw new TaskException("Cancel procedure task failed", e);
+        }
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
