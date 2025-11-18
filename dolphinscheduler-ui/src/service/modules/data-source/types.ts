@@ -95,7 +95,7 @@ interface IDataSource {
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string
-  publicKey?: string
+  privateKey?: string
   datawarehouse?: string
   accessKeyId?: string
   accessKeySecret?: string
