@@ -52,7 +52,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class RemoteExecutorTest {
 
     private String connectJson =
-            "{\"user\":\"root\",\"password\":\"123456\",\"host\":\"dolphinscheduler.com\",\"port\":22, \"publicKey\":\"ssh-rsa AAAAB\"}";
+            "{\"user\":\"root\",\"password\":\"123456\",\"host\":\"dolphinscheduler.com\",\"port\":22, \"privateKey\":\"ssh-rsa AAAAB\"}";
 
     SSHConnectionParam sshConnectionParam;
 

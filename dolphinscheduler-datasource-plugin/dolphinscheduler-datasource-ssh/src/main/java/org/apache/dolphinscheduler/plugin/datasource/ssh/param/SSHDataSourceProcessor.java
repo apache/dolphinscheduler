@@ -69,7 +69,7 @@ public class SSHDataSourceProcessor extends AbstractDataSourceProcessor {
         sshDataSourceParamDTO.setPassword(connectionParams.getPassword());
         sshDataSourceParamDTO.setHost(connectionParams.getHost());
         sshDataSourceParamDTO.setPort(connectionParams.getPort());
-        sshDataSourceParamDTO.setPublicKey(connectionParams.getPublicKey());
+        sshDataSourceParamDTO.setPrivateKey(connectionParams.getPrivateKey());
 
         return sshDataSourceParamDTO;
     }
@@ -82,7 +82,7 @@ public class SSHDataSourceProcessor extends AbstractDataSourceProcessor {
         sshConnectionParam.setPassword(sshDataSourceParam.getPassword());
         sshConnectionParam.setHost(sshDataSourceParam.getHost());
         sshConnectionParam.setPort(sshDataSourceParam.getPort());
-        sshConnectionParam.setPublicKey(sshDataSourceParam.getPublicKey());
+        sshConnectionParam.setPrivateKey(sshDataSourceParam.getPrivateKey());
 
         return sshConnectionParam;
     }
@@ -121,7 +121,7 @@ public class SSHDataSourceProcessor extends AbstractDataSourceProcessor {
                         baseConnectionParam.getPort(),
                         baseConnectionParam.getUser(),
                         baseConnectionParam.getPassword(),
-                        baseConnectionParam.getPublicKey())) {
+                        baseConnectionParam.getPrivateKey())) {
 
             return sshClientWrapper.isAuth();
         } catch (Exception e) {
