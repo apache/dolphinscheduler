@@ -91,7 +91,12 @@ public class PytorchTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+        // cancel process
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     public String buildPythonExecuteCommand() throws Exception {
