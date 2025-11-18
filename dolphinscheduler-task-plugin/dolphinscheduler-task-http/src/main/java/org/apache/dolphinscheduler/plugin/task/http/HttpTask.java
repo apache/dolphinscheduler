@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.http;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
+import org.apache.dolphinscheduler.common.model.OkHttpResult;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
 
 @Slf4j
 public class HttpTask extends AbstractTask {
@@ -47,6 +49,9 @@ public class HttpTask extends AbstractTask {
     private HttpParameters httpParameters;
 
     private TaskExecutionContext taskExecutionContext;
+
+    // Field to hold the current HTTP call for cancellation
+    private volatile Call ongoingCall;
 
     /**
      * constructor
@@ -78,6 +83,21 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
+        Call call = this.ongoingCall;
+        if (call != null) {
+            if (!call.isCanceled()) {
+                call.cancel();
+                log.info("HTTP task canceled: {} {}",
+                        httpParameters.getHttpRequestMethod(),
+                        httpParameters.getUrl());
+            } else {
+                log.debug("HTTP task was already canceled: {} {}",
+                        httpParameters.getHttpRequestMethod(),
+                        httpParameters.getUrl());
+            }
+        } else {
+            log.debug("Attempted to cancel HTTP task, but no ongoing call exists.");
+        }
     }
 
     private void validateResponse(String body, int statusCode) {
@@ -124,7 +144,7 @@ public class HttpTask extends AbstractTask {
         exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
     }
 
-    private OkHttpResponse sendRequest() {
+    private OkHttpResponse sendRequest() throws TaskException {
         switch (httpParameters.getHttpRequestMethod()) {
             case GET:
                 return sendGetRequest();
@@ -135,64 +155,94 @@ public class HttpTask extends AbstractTask {
             case DELETE:
                 return sendDeleteRequest();
             default:
-                throw new TaskException(String.format("http request method %s not supported",
+                throw new TaskException(String.format("HTTP request method %s not supported",
                         httpParameters.getHttpRequestMethod()));
         }
     }
 
     @SneakyThrows
     private OkHttpResponse sendGetRequest() {
-        OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
-        okHttpRequestHeaders.setHeaders(getHeaders());
-        okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        OkHttpRequestHeaders headers = buildRequestHeaders();
         Map<String, Object> requestParams = getRequestParams();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.get(httpParameters.getUrl(), okHttpRequestHeaders,
-                requestParams, httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
-        addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
-        return okHttpResponse;
+        OkHttpResult result = OkHttpUtils.getWithCall(
+                httpParameters.getUrl(),
+                headers,
+                requestParams,
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout());
+
+        this.ongoingCall = result.getCall(); // Save for cancellation
+        OkHttpResponse response = result.getResponse();
+        addDefaultOutput(JSONUtils.toJsonString(response));
+        return response;
     }
 
     @SneakyThrows
     private OkHttpResponse sendPostRequest() {
-        OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
-        okHttpRequestHeaders.setHeaders(getHeaders());
-        okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        OkHttpRequestHeaders headers = buildRequestHeaders();
         Map<String, Object> requestBody = getRequestBody();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.post(httpParameters.getUrl(), okHttpRequestHeaders, null,
-                requestBody, httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
-        addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
-        return okHttpResponse;
+        OkHttpResult result = OkHttpUtils.postWithCall(
+                httpParameters.getUrl(),
+                headers,
+                null, // No query params for POST (or adjust if needed)
+                requestBody,
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout());
+
+        this.ongoingCall = result.getCall();
+        OkHttpResponse response = result.getResponse();
+        addDefaultOutput(JSONUtils.toJsonString(response));
+        return response;
     }
 
     @SneakyThrows
     private OkHttpResponse sendPutRequest() {
-        OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
-        okHttpRequestHeaders.setHeaders(getHeaders());
-        okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        OkHttpRequestHeaders headers = buildRequestHeaders();
         Map<String, Object> requestBody = getRequestBody();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.put(httpParameters.getUrl(), okHttpRequestHeaders,
-                requestBody, httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
-        addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
-        return okHttpResponse;
+        OkHttpResult result = OkHttpUtils.putWithCall(
+                httpParameters.getUrl(),
+                headers,
+                requestBody,
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout());
+
+        this.ongoingCall = result.getCall();
+        OkHttpResponse response = result.getResponse();
+        addDefaultOutput(JSONUtils.toJsonString(response));
+        return response;
     }
 
     @SneakyThrows
     private OkHttpResponse sendDeleteRequest() {
-        OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
-        okHttpRequestHeaders.setHeaders(getHeaders());
-        okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        OkHttpRequestHeaders headers = buildRequestHeaders();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.delete(httpParameters.getUrl(), okHttpRequestHeaders,
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
+        OkHttpResult result = OkHttpUtils.deleteWithCall(
+                httpParameters.getUrl(),
+                headers,
+                httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout(),
                 httpParameters.getConnectTimeout());
-        addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
-        return okHttpResponse;
+
+        this.ongoingCall = result.getCall();
+        OkHttpResponse response = result.getResponse();
+        addDefaultOutput(JSONUtils.toJsonString(response));
+        return response;
+    }
+
+    /**
+     * Helper method to avoid code duplication when building request headers.
+     */
+    private OkHttpRequestHeaders buildRequestHeaders() {
+        OkHttpRequestHeaders headers = new OkHttpRequestHeaders();
+        headers.setHeaders(getHeaders());
+        headers.setOkHttpRequestHeaderContentType(getContentType());
+        return headers;
     }
 
     private Map<String, String> getHeaders() {

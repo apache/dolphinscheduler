@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
+import org.apache.dolphinscheduler.common.model.OkHttpResult;
 
 import org.apache.http.HttpStatus;
 
@@ -31,12 +32,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class OkHttpUtils {
 
@@ -65,6 +60,59 @@ public class OkHttpUtils {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Get request execute failed, url: %s", url), e);
+        }
+    }
+
+    /**
+     * Executes a synchronous GET request and returns both the {@link Call} object (for cancellation support)
+     * and the HTTP response.
+     *
+     * <p>This method enables the caller to retain a reference to the underlying OkHttp {@link Call},
+     * allowing the request to be canceled from another thread (e.g., during task interruption).
+     * Although the execution is blocking, calling {@link Call#cancel()} concurrently will cause
+     * {@link Call#execute()} to throw an {@link IOException} with the message "canceled".
+     *
+     * @param url                the target URL for the GET request (must not be null)
+     * @param okHttpRequestHeaders optional HTTP headers; may be null
+     * @param requestParams      query parameters to be appended to the URL as key-value pairs; may be null
+     * @param connectTimeout     connection timeout in milliseconds
+     * @param writeTimeout       write (send) timeout in milliseconds
+     * @param readTimeout        read (receive) timeout in milliseconds
+     * @return                   a wrapper containing the {@link Call} and the resulting {@link OkHttpResponse}
+     * @throws IOException       if a network error occurs or the request is canceled during execution
+     * @throws RuntimeException  if an unexpected error occurs during request processing
+     */
+    public static @NonNull OkHttpResult getWithCall(
+                                                    @NonNull String url,
+                                                    @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                                    @Nullable Map<String, Object> requestParams,
+                                                    int connectTimeout,
+                                                    int writeTimeout,
+                                                    int readTimeout) throws IOException {
+
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+        String finalUrl = addUrlParams(requestParams, url);
+        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
+
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
+
+        // Build the final request and create a Call object
+        Request request = requestBuilder.build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()) {
+            // Wrap the raw response into the application-specific response type
+            OkHttpResponse okHttpResponse = new OkHttpResponse(response.code(), getResponseBody(response));
+            return new OkHttpResult(call, okHttpResponse);
+        } catch (IOException e) {
+            // Distinguish explicit cancellation from other I/O failures
+            if (call.isCanceled()) {
+                throw new IOException("Request was canceled", e);
+            }
+            // Wrap unexpected errors with context for debugging
+            throw new RuntimeException(String.format("GET request execution failed, URL: %s", url), e);
         }
     }
 
@@ -100,6 +148,75 @@ public class OkHttpUtils {
     }
 
     /**
+     * Executes a synchronous POST request and returns both the {@link Call} object (for cancellation support)
+     * and the HTTP response.
+     *
+     * <p>This method is designed to be used in scenarios where the caller needs to retain a reference
+     * to the underlying OkHttp {@link Call} in order to cancel the request later (e.g., during task interruption).
+     * The request is executed synchronously (blocking), but cancellation from another thread will cause
+     * {@link Call#execute()} to throw an {@link IOException} with the message "canceled".
+     *
+     * @param url                the request URL (must not be null)
+     * @param okHttpRequestHeaders optional request headers; may be null
+     * @param requestParamsMap   query parameters to append to the URL; may be null
+     * @param requestBodyMap     request body as a JSON-compatible map; if null, an empty plain-text body is used
+     * @param connectTimeout     connection timeout in milliseconds
+     * @param writeTimeout       write (send) timeout in milliseconds
+     * @param readTimeout        read (receive) timeout in milliseconds
+     * @return                   a wrapper containing the {@link Call} and the resulting {@link OkHttpResponse}
+     * @throws IOException       if a network error occurs or the request is canceled during execution
+     * @throws RuntimeException  if an unexpected error occurs during request processing
+     */
+    public static @NonNull OkHttpResult postWithCall(
+                                                     @NonNull String url,
+                                                     @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                                     @Nullable Map<String, Object> requestParamsMap,
+                                                     @Nullable Map<String, Object> requestBodyMap,
+                                                     int connectTimeout,
+                                                     int writeTimeout,
+                                                     int readTimeout) throws IOException {
+
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+        String finalUrl = addUrlParams(requestParamsMap, url);
+        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
+
+        if (okHttpRequestHeaders != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
+
+        if (requestBodyMap != null) {
+            String jsonBody = JSONUtils.toJsonString(requestBodyMap);
+            String contentType = OkHttpRequestHeaderContentType.APPLICATION_JSON.getValue();
+            if (okHttpRequestHeaders != null && okHttpRequestHeaders.getOkHttpRequestHeaderContentType() != null) {
+                contentType = okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue();
+            }
+            MediaType mediaType = MediaType.parse(contentType);
+            RequestBody body = RequestBody.create(jsonBody, mediaType);
+            requestBuilder.post(body);
+        } else {
+            // Use an empty body for POST requests without a payload (rare but allowed)
+            requestBuilder.post(RequestBody.create("", MediaType.parse("text/plain")));
+        }
+
+        // Build the final request and create a Call object
+        Request request = requestBuilder.build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()) {
+            // Wrap the raw OkHttp response into the application-specific OkHttpResponse
+            OkHttpResponse okHttpResponse = new OkHttpResponse(response.code(), getResponseBody(response));
+            return new OkHttpResult(call, okHttpResponse);
+        } catch (IOException e) {
+            // If the call was explicitly canceled, rethrow as a clear IOException
+            if (call.isCanceled()) {
+                throw new IOException("Request was canceled", e);
+            }
+            // For all other I/O failures, wrap in a RuntimeException with context
+            throw new RuntimeException(String.format("POST request execution failed, URL: %s", url), e);
+        }
+    }
+
+    /**
      * http put request
      * @param connectTimeout connect timeout in milliseconds
      * @param writeTimeout write timeout in milliseconds
@@ -129,6 +246,72 @@ public class OkHttpUtils {
     }
 
     /**
+     * Executes a synchronous PUT request and returns both the {@link Call} object (for cancellation support)
+     * and the HTTP response.
+     *
+     * <p>This method allows the caller to retain a reference to the underlying OkHttp {@link Call},
+     * enabling request cancellation from another thread (e.g., during task interruption).
+     * Although the request is executed synchronously (blocking), calling {@link Call#cancel()}
+     * from another thread will cause {@link Call#execute()} to throw an {@link IOException}
+     * with the message "canceled".
+     *
+     * @param url                the target URL for the PUT request (must not be null)
+     * @param okHttpRequestHeaders optional HTTP headers; may be null
+     * @param requestBodyMap     request body as a JSON-compatible map; if null, the PUT request will have no body
+     * @param connectTimeout     connection timeout in milliseconds
+     * @param writeTimeout       write (send) timeout in milliseconds
+     * @param readTimeout        read (receive) timeout in milliseconds
+     * @return                   a wrapper containing the {@link Call} and the resulting {@link OkHttpResponse}
+     * @throws IOException       if a network error occurs or the request is canceled during execution
+     * @throws RuntimeException  if an unexpected error occurs during request processing
+     */
+    public static @NonNull OkHttpResult putWithCall(
+                                                    @NonNull String url,
+                                                    @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                                    @Nullable Map<String, Object> requestBodyMap,
+                                                    int connectTimeout,
+                                                    int writeTimeout,
+                                                    int readTimeout) throws IOException {
+
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
+
+        if (requestBodyMap != null) {
+            String jsonBody = JSONUtils.toJsonString(requestBodyMap);
+
+            // Determine content type; default to application/json if not specified
+            String contentType = OkHttpRequestHeaderContentType.APPLICATION_JSON.getValue();
+            if (okHttpRequestHeaders != null && okHttpRequestHeaders.getOkHttpRequestHeaderContentType() != null) {
+                contentType = okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue();
+            }
+            MediaType mediaType = MediaType.parse(contentType);
+            RequestBody body = RequestBody.create(jsonBody, mediaType);
+            requestBuilder.put(body);
+        }
+
+        // Build the final request and create a Call object
+        Request request = requestBuilder.build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()) {
+            // Convert the raw OkHttp response into the application-specific response object
+            OkHttpResponse okHttpResponse = new OkHttpResponse(response.code(), getResponseBody(response));
+            return new OkHttpResult(call, okHttpResponse);
+        } catch (IOException e) {
+            // Distinguish cancellation from other I/O errors
+            if (call.isCanceled()) {
+                throw new IOException("Request was canceled", e);
+            }
+            // Wrap unexpected failures with context
+            throw new RuntimeException(String.format("PUT request execution failed, URL: %s", url), e);
+        }
+    }
+
+    /**
      * http delete request
      * @param connectTimeout connect timeout in milliseconds
      * @param writeTimeout write timeout in milliseconds
@@ -149,6 +332,57 @@ public class OkHttpUtils {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Delete request execute failed, url: %s", url), e);
+        }
+    }
+
+    /**
+     * Executes a synchronous DELETE request and returns both the {@link Call} object (for cancellation support)
+     * and the HTTP response.
+     *
+     * <p>This method enables the caller to keep a reference to the underlying OkHttp {@link Call},
+     * allowing the request to be canceled from another thread (e.g., during task interruption).
+     * Although the execution is blocking (synchronous), invoking {@link Call#cancel()} concurrently
+     * will cause {@link Call#execute()} to throw an {@link IOException} with the message "canceled".
+     *
+     * @param url                the target URL for the DELETE request (must not be null)
+     * @param okHttpRequestHeaders optional HTTP headers; may be null
+     * @param connectTimeout     connection timeout in milliseconds
+     * @param writeTimeout       write (send) timeout in milliseconds
+     * @param readTimeout        read (receive) timeout in milliseconds
+     * @return                   a wrapper containing the {@link Call} and the resulting {@link OkHttpResponse}
+     * @throws IOException       if a network error occurs or the request is canceled during execution
+     * @throws RuntimeException  if an unexpected error occurs during request processing
+     */
+    public static @NonNull OkHttpResult deleteWithCall(
+                                                       @NonNull String url,
+                                                       @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                                       int connectTimeout,
+                                                       int writeTimeout,
+                                                       int readTimeout) throws IOException {
+
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
+
+        requestBuilder.delete();
+        // Build the final request and create a Call object
+        Request request = requestBuilder.build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()) {
+            // Wrap the raw OkHttp response into the application-specific response type
+            OkHttpResponse okHttpResponse = new OkHttpResponse(response.code(), getResponseBody(response));
+            return new OkHttpResult(call, okHttpResponse);
+        } catch (IOException e) {
+            // If the call was canceled externally, propagate a clear cancellation exception
+            if (call.isCanceled()) {
+                throw new IOException("Request was canceled", e);
+            }
+            // For all other failures, wrap with context for easier debugging
+            throw new RuntimeException(String.format("DELETE request execution failed, URL: %s", url), e);
         }
     }
 
