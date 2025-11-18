@@ -46,6 +46,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -237,7 +244,8 @@ public class SqlTask extends AbstractTask {
 
         while (resultSet.next()) {
             ObjectNode rowObject = JSONUtils.createObjectNode();
-            Set<String> usedLabels = new HashSet<>(); // Track duplicate column labels in this row
+            // Track duplicate column labels in this row
+            Set<String> usedLabels = new HashSet<>();
 
             for (int i = 1; i <= columnCount; i++) {
                 String originalLabel = md.getColumnLabel(i);
