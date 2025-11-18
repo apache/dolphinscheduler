@@ -75,10 +75,17 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
-
-        OkHttpResponse httpResponse = sendRequest();
-
-        validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
+        try {
+            OkHttpResponse httpResponse = sendRequest();
+            validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
+        } catch (Exception ex) {
+            if (exitStatusCode == TaskConstants.EXIT_CODE_KILL) {
+                log.info("Http task has been killed");
+                return;
+            }
+            log.error("HTTP request failed", ex);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+        }
     }
 
     @Override
@@ -86,10 +93,14 @@ public class HttpTask extends AbstractTask {
         Call call = this.ongoingCall;
         if (call != null) {
             if (!call.isCanceled()) {
-                call.cancel();
-                log.info("HTTP task canceled: {} {}",
+                log.debug("Try to cancel this http task: {} {}",
                         httpParameters.getHttpRequestMethod(),
                         httpParameters.getUrl());
+                call.cancel();
+                log.debug("HTTP task was canceled: {} {}",
+                        httpParameters.getHttpRequestMethod(),
+                        httpParameters.getUrl());
+                setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
             } else {
                 log.debug("HTTP task was already canceled: {} {}",
                         httpParameters.getHttpRequestMethod(),
@@ -106,7 +117,7 @@ public class HttpTask extends AbstractTask {
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_CONTAINS.name(), body);
-                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                    setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
                     return;
                 }
                 break;
@@ -114,7 +125,7 @@ public class HttpTask extends AbstractTask {
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_NOT_CONTAINS.name(), body);
-                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                    setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
                     return;
                 }
                 break;
@@ -122,7 +133,7 @@ public class HttpTask extends AbstractTask {
                 if (statusCode != Integer.parseInt(httpParameters.getCondition())) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_CUSTOM.name(), body);
-                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                    setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
                     return;
                 }
                 break;
@@ -130,7 +141,7 @@ public class HttpTask extends AbstractTask {
                 if (HttpConstants.RESPONSE_CODE_SUCCESS != statusCode) {
                     log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
                             httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_DEFAULT.name(), body);
-                    exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
+                    setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
                     return;
                 }
                 break;
@@ -141,7 +152,7 @@ public class HttpTask extends AbstractTask {
 
         // default success log
         log.info("http request success, url: {}, statusCode: {}, body: {}", httpParameters.getUrl(), statusCode, body);
-        exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
+        setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
     }
 
     private OkHttpResponse sendRequest() throws TaskException {
