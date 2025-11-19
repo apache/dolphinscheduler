@@ -325,20 +325,20 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
                 Collections.singletonList(workflowDefinitionCode));
 
         if (CollectionUtils.isEmpty(workflowTaskLineages)) {
+            log.info("Current lineage is empty, workflowDefinitionCode: {}",
+                    workflowDefinitionCode);
             return 0;
         }
 
-        boolean hasMismatch = workflowTaskLineages.stream()
-                .anyMatch(lineage -> lineage.getWorkflowDefinitionCode() != workflowDefinitionCode);
-        if (hasMismatch) {
-            log.warn("Skip updating lineage due to workflowDefinitionCode mismatch, expected: {}",
-                    workflowDefinitionCode);
-            throw new IllegalArgumentException(
-                    String.format("All lineage items must belong to workflowDefinitionCode %s",
-                            workflowDefinitionCode));
+        int insertResult = workflowTaskLineageDao.batchInsert(workflowTaskLineages);
+        if (insertResult <= 0) {
+            log.error("Save workflow lineage error, workflowDefinitionCode: {}", workflowDefinitionCode);
+            throw new ServiceException(Status.CREATE_WORKFLOW_LINEAGE_ERROR);
         }
 
-        return workflowTaskLineageDao.batchInsert(workflowTaskLineages);
+        log.info("Save workflow lineage complete, workflowDefinitionCode: {}, inserted rows: {}",
+                workflowDefinitionCode, insertResult);
+        return insertResult;
     }
 
     @Override

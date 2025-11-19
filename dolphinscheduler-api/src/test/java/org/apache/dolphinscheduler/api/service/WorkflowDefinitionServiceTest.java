@@ -1467,9 +1467,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         taskLog.setTaskParams(taskParams);
         taskDefinitionLogList.add(taskLog);
 
-        // Mock updateWorkflowLineage to return 0 (insert failure)
+        // Mock updateWorkflowLineage to throw exception (insert failure)
         when(workflowLineageService.updateWorkflowLineage(eq(workflowDefinitionCode), anyList()))
-                .thenReturn(0);
+                .thenThrow(new ServiceException(Status.CREATE_WORKFLOW_LINEAGE_ERROR));
 
         // Execute and verify exception
         ServiceException exception = Assertions.assertThrows(ServiceException.class, () -> {

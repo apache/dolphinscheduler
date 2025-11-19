@@ -22,6 +22,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowLineageServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -309,8 +311,8 @@ public class WorkflowTaskLineageServiceTest {
     }
 
     @Test
-    public void testUpdateWorkflowLineageWithMismatchedWorkflowDefinitionCode() {
-        // Test case: Should throw exception when lineage items have different workflowDefinitionCode
+    public void testUpdateWorkflowLineageWithInsertFailure() {
+        // Test case: Should throw exception when insert fails
         long workflowDefinitionCode = 100L;
         List<WorkflowTaskLineage> workflowTaskLineages = new ArrayList<>();
 
@@ -319,24 +321,19 @@ public class WorkflowTaskLineageServiceTest {
         lineage1.setTaskDefinitionCode(200L);
         workflowTaskLineages.add(lineage1);
 
-        // Add a lineage with different workflowDefinitionCode
-        WorkflowTaskLineage lineage2 = new WorkflowTaskLineage();
-        lineage2.setWorkflowDefinitionCode(999L); // Different code
-        lineage2.setTaskDefinitionCode(300L);
-        workflowTaskLineages.add(lineage2);
-
-        // Mock DAO method for deletion
+        // Mock DAO methods
         when(workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(anyList())).thenReturn(1);
+        when(workflowTaskLineageDao.batchInsert(workflowTaskLineages)).thenReturn(0); // Insert failure
 
         // Execute and verify exception
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, () -> {
             workflowLineageService.updateWorkflowLineage(workflowDefinitionCode, workflowTaskLineages);
         });
 
-        Assertions.assertTrue(exception.getMessage().contains(String.valueOf(workflowDefinitionCode)));
+        Assertions.assertEquals(Status.CREATE_WORKFLOW_LINEAGE_ERROR.getCode(), exception.getCode());
         verify(workflowTaskLineageDao)
                 .batchDeleteByWorkflowDefinitionCode(eq(java.util.Collections.singletonList(workflowDefinitionCode)));
-        // batchInsert should not be called when validation fails
+        verify(workflowTaskLineageDao).batchInsert(workflowTaskLineages);
     }
 
 }
