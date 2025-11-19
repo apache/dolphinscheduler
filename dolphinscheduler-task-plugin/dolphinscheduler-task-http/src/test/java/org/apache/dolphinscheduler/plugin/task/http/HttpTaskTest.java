@@ -19,7 +19,13 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -30,11 +36,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -44,7 +52,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -181,6 +188,122 @@ public class HttpTaskTest {
         Assertions.assertEquals(response, property.getValue());
     }
 
+    @Test
+    public void testCancel_setsExitStatusCodeWhenCallIsCanceled() throws Exception {
+        // Arrange
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
+
+        Call mockCall = mock(Call.class);
+        when(mockCall.isCanceled()).thenReturn(false);
+
+        // Use reflection to set the private 'ongoingCall' field
+        Field ongoingCallField = HttpTask.class.getDeclaredField("ongoingCall");
+        ongoingCallField.setAccessible(true);
+        ongoingCallField.set(httpTask, mockCall);
+
+        // Act
+        httpTask.cancel();
+
+        // Assert: verify exit status code is set to KILL (replace 7 with actual constant if needed)
+        int actualExitCode = getPrivateField(httpTask, "exitStatusCode"); // or whatever the field name is
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_KILL, actualExitCode);
+
+        // Also verify that call.cancel() was invoked
+        verify(mockCall).cancel();
+    }
+
+    @Test
+    public void testCancel_whenOngoingCallExistsAndNotCanceled_shouldCancelCallAndSetKillCode() throws Exception {
+        // Arrange
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
+        Call mockCall = mock(Call.class);
+        when(mockCall.isCanceled()).thenReturn(false);
+
+        setPrivateField(httpTask, "ongoingCall", mockCall);
+
+        // Act
+        httpTask.cancel();
+
+        // Assert
+        verify(mockCall).cancel();
+        int exitCode = getPrivateField(httpTask, "exitStatusCode");
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_KILL, exitCode);
+    }
+
+    @Test
+    public void testCancel_whenOngoingCallAlreadyCanceled_shouldDoNothing() throws Exception {
+        // Arrange
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
+        Call mockCall = mock(Call.class);
+        when(mockCall.isCanceled()).thenReturn(true); // already canceled
+
+        setPrivateField(httpTask, "ongoingCall", mockCall);
+
+        // Record initial exit code (should remain unchanged)
+        int initialExitCode = getPrivateField(httpTask, "exitStatusCode");
+
+        // Act
+        httpTask.cancel();
+
+        // Assert
+        verify(mockCall, never()).cancel(); // should NOT call cancel again
+        int exitCode = getPrivateField(httpTask, "exitStatusCode");
+        Assertions.assertEquals(initialExitCode, exitCode); // unchanged
+    }
+
+    @Test
+    public void testCancel_whenNoOngoingCall_shouldHandleGracefully() throws TaskException, IOException {
+        // Arrange
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
+        // ongoingCall is null by default
+
+        int initialExitCode = getPrivateField(httpTask, "exitStatusCode");
+
+        // Act
+        httpTask.cancel(); // should not throw
+
+        // Assert
+        int exitCode = getPrivateField(httpTask, "exitStatusCode");
+        Assertions.assertEquals(initialExitCode, exitCode); // no change
+    }
+
+    // Helper: get private field via reflection
+    @SuppressWarnings("unchecked")
+    private <T> T getPrivateField(Object target, String fieldName) {
+        Class<?> clazz = target.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return (T) field.get(target);
+            } catch (NoSuchFieldException e) {
+                // Field not found in this class, continue to superclass
+                clazz = clazz.getSuperclass();
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Cannot access field: " + fieldName, e);
+            }
+        }
+        throw new RuntimeException("Field '" + fieldName + "' not found in class hierarchy of " + target.getClass());
+    }
+
+    // Helper: Set private field via reflection
+    private void setPrivateField(Object target, String fieldName, Object value) {
+        Class<?> clazz = target.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(target, value);
+                return;
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Cannot set field: " + fieldName, e);
+            }
+        }
+        throw new RuntimeException("Field '" + fieldName + "' not found in class hierarchy");
+    }
+
     private String withMockWebServer(String path, int actualResponseCode,
                                      String actualResponseBody) throws IOException {
         MockWebServer server = new MockWebServer();
@@ -214,8 +337,8 @@ public class HttpTaskTest {
     }
 
     private HttpTask generateHttpTaskFromParamData(String paramData, Map<String, String> prepareParamsMap) {
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
+        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
+        when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
         if (prepareParamsMap != null) {
             Map<String, Property> propertyParamsMap = new HashMap<>();
             prepareParamsMap.forEach((k, v) -> {
@@ -224,7 +347,7 @@ public class HttpTaskTest {
                 property.setValue(v);
                 propertyParamsMap.put(k, property);
             });
-            Mockito.when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
+            when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
         }
         HttpTask httpTask = new HttpTask(taskExecutionContext);
         httpTask.init();

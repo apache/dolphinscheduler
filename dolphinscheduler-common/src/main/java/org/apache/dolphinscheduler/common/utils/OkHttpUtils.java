@@ -61,7 +61,9 @@ public class OkHttpUtils {
         OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         String finalUrl = addUrlParams(requestParams, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
-        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
         Request request = requestBuilder.build();
         try (Response response = client.newCall(request).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
@@ -141,11 +143,19 @@ public class OkHttpUtils {
         OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         String finalUrl = addUrlParams(requestParamsMap, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
-        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
         if (requestBodyMap != null) {
+            // Determine Content-Type: use custom one if headers are provided and valid; otherwise default to JSON
+            String contentType = "application/json; charset=utf-8";
+            if (okHttpRequestHeaders != null && okHttpRequestHeaders.getOkHttpRequestHeaderContentType() != null) {
+                contentType = okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue();
+            }
+
             requestBuilder = requestBuilder.post(RequestBody.create(
                     JSONUtils.toJsonString(requestBodyMap),
-                    MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
+                    MediaType.parse(contentType)));
         }
         try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
@@ -187,7 +197,7 @@ public class OkHttpUtils {
         String finalUrl = addUrlParams(requestParamsMap, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
 
-        if (okHttpRequestHeaders != null) {
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
             addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
         }
 
@@ -239,11 +249,19 @@ public class OkHttpUtils {
                                               int readTimeout) throws IOException {
         OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         Request.Builder requestBuilder = new Request.Builder().url(url);
-        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
         if (requestBodyMap != null) {
-            requestBuilder = requestBuilder.put(RequestBody.create(
-                    JSONUtils.toJsonString(requestBodyMap),
-                    MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
+            String contentType = OkHttpRequestHeaderContentType.APPLICATION_JSON.getValue();
+            if (okHttpRequestHeaders != null && okHttpRequestHeaders.getOkHttpRequestHeaderContentType() != null) {
+                contentType = okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue();
+            }
+
+            requestBuilder = requestBuilder.put(
+                    RequestBody.create(
+                            JSONUtils.toJsonString(requestBodyMap),
+                            MediaType.parse(contentType)));
         }
         try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
@@ -333,7 +351,9 @@ public class OkHttpUtils {
                                                  int readTimeout) throws IOException {
         OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         Request.Builder requestBuilder = new Request.Builder().url(url);
-        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        if (okHttpRequestHeaders != null && okHttpRequestHeaders.getHeaders() != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
         requestBuilder = requestBuilder.delete();
         try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
