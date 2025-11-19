@@ -233,8 +233,8 @@ public class SqlTask extends AbstractTask {
     private String resultProcess(ResultSet resultSet) throws Exception {
         // Handle null ResultSet early
         if (resultSet == null) {
-            String emptyResult = JSONUtils.toJsonString(generateEmptyRow(null));
-            log.debug("SQL result is null; returning empty row: {}", emptyResult);
+            String emptyResult = JSONUtils.toJsonString(JSONUtils.createArrayNode());
+            log.debug("SQL result is null; returning empty array: {}", emptyResult);
             return emptyResult;
         }
 
@@ -244,21 +244,34 @@ public class SqlTask extends AbstractTask {
 
         while (resultSet.next()) {
             ObjectNode rowObject = JSONUtils.createObjectNode();
-            // Track duplicate column labels in this row
             Set<String> usedLabels = new HashSet<>();
 
             for (int i = 1; i <= columnCount; i++) {
-                String originalLabel = md.getColumnLabel(i);
-                String finalLabel = originalLabel;
-
-                // Resolve duplicate column labels by appending "_{index}" (e.g., name_2, name_3)
-                if (!usedLabels.add(finalLabel)) {
-                    finalLabel = originalLabel + "_" + i;
-                    // Note: We don't add finalLabel to usedLabels because duplicates are resolved per position,
-                    // and same base name may appear again later (e.g., name, name, name → name, name_2, name_3)
+                // Get the column label (alias) from metadata; fall back to a generic name if null or empty
+                String baseLabel = md.getColumnLabel(i);
+                if (baseLabel == null || baseLabel.isEmpty()) {
+                    baseLabel = "col_" + i;
                 }
 
-                rowObject.set(finalLabel, JSONUtils.toJsonNode(resultSet.getObject(i)));
+                // Generate a unique field key for the JSON object:
+                // If the base label is already used in this row, append a numeric suffix (e.g., name_2, name_3, ...)
+                String finalLabel = baseLabel;
+                int suffix = 2; // Start numbering duplicates from _2 to keep the first occurrence clean
+
+                while (!usedLabels.add(finalLabel)) {
+                    finalLabel = baseLabel + "_" + suffix++;
+                }
+
+                // Read the column value and convert it to a JSON node
+                try {
+                    Object value = resultSet.getObject(i);
+                    rowObject.set(finalLabel, JSONUtils.toJsonNode(value));
+                } catch (SQLException e) {
+                    // Log warning but continue processing: avoid failing the entire row due to one problematic column
+                    log.warn("Failed to read column {} (label: '{}') in row {}: {}",
+                            i, baseLabel, resultJSONArray.size() + 1, e.getMessage());
+                    rowObject.set(finalLabel, JSONUtils.toJsonNode(null));
+                }
             }
             resultJSONArray.add(rowObject);
         }
