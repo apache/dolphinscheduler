@@ -201,7 +201,7 @@ public class PytorchTaskTest {
                 +
                 "./venv/bin/python %s";
         System.out.println(task.buildPythonExecuteCommand());
-        assertEquals(String.format(expected, pythonPath, requirementFile, scriptFile),
+        assertEquals(String.format(expected, pyPath, requirementFile, scriptFile),
                 task.buildPythonExecuteCommand());
 
     }
