@@ -55,7 +55,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,10 +65,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class CuringParamsServiceImpl implements CuringParamsService {
 
@@ -160,107 +161,179 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     }
 
     /**
-     * Generate prepare params include project params, global parameters, local parameters, built-in parameters, varpool, start-up params.
-     * <p> The priority of the parameters is as follows:
-     * <p> varpool > command parameters > local parameters > global parameters > project parameters > built-in parameters
-     * todo: Use TaskRuntimeParams to represent this.
+     * Prepares the final map of task execution parameters by merging parameters from multiple sources
+     * in a well-defined priority order. The resulting map is guaranteed to contain only valid entries:
+     * - Keys are non-null and non-blank strings
+     * - Values are non-null {@link Property} objects
      *
-     * @param taskInstance
-     * @param parameters
-     * @param workflowInstance
-     * @param projectName
-     * @param workflowDefinitionName
-     * @return
+     * <p><strong>Parameter Precedence (highest to lowest):</strong>
+     * <ol>
+     *   <li>Built-in system parameters (e.g., ${task.id}, ${workflow.instance.id})</li>
+     *   <li>Project-level parameters</li>
+     *   <li>Workflow global parameters</li>
+     *   <li>Task local parameters</li>
+     *   <li>Command-line / complement parameters (e.g., from补数 or API)</li>
+     *   <li>VarPool overrides (only for {@link Direct#IN} parameters)</li>
+     *   <li>Business/scheduling time parameters (e.g., ${system.datetime})</li>
+     * </ol>
+     *
+     * <p><strong>Important Notes:</strong>
+     * <ul>
+     *   <li>All parameter sources are sanitized via {@link #safePutAll(Map, Map)} to prevent {@code null}
+     *       or blank keys, which would cause JSON serialization failures (e.g., Jackson's
+     *       "Null key for a Map not allowed in JSON").</li>
+     *   <li>Placeholders (e.g., {@code "${var}"}) in parameter values are resolved after all sources
+     *       are merged, using the consolidated parameter map. Global parameters are already
+     *       <em>solidified</em> (fully resolved at workflow instance creation), so no recursive
+     *       placeholder expansion is needed.</li>
+     *   <li>{@code VarPool} values (from upstream tasks) only override parameters marked as
+     *       {@link Direct#IN}; output or constant parameters are left unchanged.</li>
+     * </ul>
+     *
+     * @param taskInstance           the current task instance (must not be null)
+     * @param parameters             the parsed task-specific parameters (must not be null)
+     * @param workflowInstance       the parent workflow instance (must not be null)
+     * @param projectName            name of the project containing the workflow
+     * @param workflowDefinitionName name of the workflow definition
+     * @return a safe, fully resolved map of parameter name to {@link Property}, ready for task execution
      */
     @Override
-    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
+    public Map<String, Property> paramParsingPreparation(
+                                                         @NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters,
                                                          @NonNull WorkflowInstance workflowInstance,
                                                          String projectName,
                                                          String workflowDefinitionName) {
+
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
-        // assign value to definedParams here
-        Map<String, Property> globalParams = parseGlobalParamsMap(workflowInstance);
-
-        // combining local and global parameters
-        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
-
-        // stream pass params
-        List<Property> varPools = parseVarPool(taskInstance);
-
-        // if it is a complement,
-        // you need to pass in the task instance id to locate the time
-        // of the process instance complement
+        // Parse command param (defensive: commandParam may be null for normal runs)
         ICommandParam commandParam = JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
-        String timeZone = commandParam.getTimeZone();
+        String timeZone = (commandParam != null) ? commandParam.getTimeZone() : null;
 
-        // built-in params
-        Map<String, String> builtInParams =
-                setBuiltInParamsMap(taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
+        // 1. Built-in system parameters (e.g., task.id, workflow.instance.id, etc.)
+        Map<String, String> builtInParams = setBuiltInParamsMap(
+                taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
+        safePutAll(prepareParamsMap, ParameterUtils.getUserDefParamsMap(builtInParams));
 
-        // project-level params
+        // 2. Project-level parameters (shared across all workflows in the project)
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
+        safePutAll(prepareParamsMap, projectParams);
 
-        if (MapUtils.isNotEmpty(builtInParams)) {
-            prepareParamsMap.putAll(ParameterUtils.getUserDefParamsMap(builtInParams));
+        // 3. Workflow global parameters (defined at workflow level, solidified at instance creation)
+        Map<String, Property> globalParams = parseGlobalParamsMap(workflowInstance);
+        safePutAll(prepareParamsMap, globalParams);
+
+        // 4. Task local parameters (defined in the task node itself)
+        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
+        safePutAll(prepareParamsMap, localParams);
+
+        // 5. Command-line or complement (补数) parameters passed at runtime
+        if (commandParam != null && CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
+            Map<String, Property> commandParamsMap = commandParam.getCommandParams().stream()
+                    .filter(prop -> StringUtils.isNotBlank(prop.getProp())) // exclude invalid keys
+                    .collect(Collectors.toMap(
+                            Property::getProp,
+                            Function.identity(),
+                            (v1, v2) -> v2 // on duplicate keys, keep the last occurrence
+                    ));
+            safePutAll(prepareParamsMap, commandParamsMap);
         }
 
-        if (MapUtils.isNotEmpty(projectParams)) {
-            prepareParamsMap.putAll(projectParams);
-        }
-
-        if (MapUtils.isNotEmpty(globalParams)) {
-            prepareParamsMap.putAll(globalParams);
-        }
-
-        if (MapUtils.isNotEmpty(localParams)) {
-            prepareParamsMap.putAll(localParams);
-        }
-
-        if (CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
-            prepareParamsMap.putAll(commandParam.getCommandParams().stream()
-                    .collect(Collectors.toMap(Property::getProp, Function.identity())));
-        }
-
+        // 6. VarPool: override only input (Direct.IN) parameters with values from upstream tasks
+        List<Property> varPools = parseVarPool(taskInstance);
         if (CollectionUtils.isNotEmpty(varPools)) {
-            // overwrite the in parameter by varPool
             for (Property varPool : varPools) {
-                Property property = prepareParamsMap.get(varPool.getProp());
-                if (property == null || property.getDirect() != Direct.IN) {
-                    continue;
+                if (StringUtils.isBlank(varPool.getProp()))
+                    continue; // skip invalid
+                Property existing = prepareParamsMap.get(varPool.getProp());
+                if (existing != null && Direct.IN.equals(existing.getDirect())) {
+                    existing.setValue(varPool.getValue());
                 }
-                property.setValue(varPool.getValue());
             }
         }
 
-        Iterator<Map.Entry<String, Property>> iter = prepareParamsMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Property> en = iter.next();
-            Property property = en.getValue();
+        // 7. Resolve placeholders (e.g., "${output_dir}") using the fully merged parameter map
+        resolvePlaceholders(prepareParamsMap);
 
-            if (StringUtils.isNotEmpty(property.getValue())
-                    && property.getValue().contains(Constants.FUNCTION_START_WITH)) {
-                /**
-                 *  local parameter refers to global parameter with the same name
-                 *  note: the global parameters of the process instance here are solidified parameters,
-                 *  and there are no variables in them.
-                 */
-                String val = property.getValue();
+        // 8. Business/scheduling time parameters (e.g., ${system.datetime}, ${schedule.time})
+        Map<String, Property> businessParams = preBuildBusinessParams(workflowInstance);
+        safePutAll(prepareParamsMap, businessParams);
 
-                // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to
-                // `{"var1": 1, "var2": 1}`
-                val = convertParameterPlaceholders(val, prepareParamsMap);
-                property.setValue(val);
-            }
-        }
-
-        // put schedule time param to params map
-        Map<String, Property> paramsMap = preBuildBusinessParams(workflowInstance);
-        if (MapUtils.isNotEmpty(paramsMap)) {
-            prepareParamsMap.putAll(paramsMap);
-        }
         return prepareParamsMap;
+    }
+
+    /**
+     * Safely merges entries from the {@code source} map into the {@code target} map,
+     * skipping any entry with a {@code null}, empty, or blank key, or a {@code null} value.
+     *
+     * <p>This method is critical for ensuring that the resulting parameter map can be
+     * safely serialized to JSON (e.g., by Jackson), which does not allow {@code null} keys
+     * in maps. Invalid entries are logged as warnings to aid in debugging misconfigured
+     * parameters (e.g., project or workflow parameters with missing names).
+     *
+     * <p>Example of skipped entry:
+     * <pre>
+     *   key = null        → skipped
+     *   key = ""          → skipped
+     *   key = "  \t\n"    → skipped
+     *   value = null      → skipped
+     * </pre>
+     *
+     * <p>All valid entries (non-blank key and non-null value) are added to {@code target}
+     * using standard {@link Map#put(Object, Object)} semantics (later values overwrite earlier ones).
+     *
+     * @param target the destination map to merge into (must not be null)
+     * @param source the source map whose valid entries will be copied (may be null or empty)
+     */
+    private void safePutAll(Map<String, Property> target, Map<String, Property> source) {
+        if (MapUtils.isEmpty(source)) {
+            return;
+        }
+        source.forEach((key, value) -> {
+            if (StringUtils.isNotBlank(key) && value != null) {
+                target.put(key, value);
+            } else {
+                log.warn("Skipped invalid parameter entry: key='{}', value={}", key, value);
+            }
+        });
+    }
+
+    /**
+     * Resolves placeholder expressions (e.g., "${var}") in parameter values by substituting them
+     * with actual values from the current {@code paramsMap}.
+     *
+     * <p>This method supports parameter references where a local task parameter refers to a global
+     * workflow parameter of the same name. For example:
+     * <pre>
+     * Global parameters (solidified at workflow instance creation):
+     *   "output_dir" → "/data/20251119"
+     *
+     * Local task parameter definition:
+     *   "log_path" → "${output_dir}/task.log"
+     *
+     * After resolution:
+     *   "log_path" → "/data/20251119/task.log"
+     * </pre>
+     *
+     * <p><strong>Important:</strong> The global parameters included in {@code paramsMap} are
+     * <em>solidified</em>—meaning they were fully resolved at workflow instance creation time
+     * and contain no unresolved placeholders (e.g., no nested "${...}" expressions).
+     * Therefore, this resolution pass only needs to perform a single-level (or iterative chain)
+     * substitution without worrying about recursive variable expansion in global values.
+     *
+     * <p>The method processes all properties in-place. Only values containing
+     * {@link Constants#FUNCTION_START_WITH} (typically "${") are processed.
+     *
+     * @param paramsMap the map of parameters (key: parameter name, value: {@link Property}) to resolve.
+     */
+    private void resolvePlaceholders(Map<String, Property> paramsMap) {
+        for (Property prop : paramsMap.values()) {
+            String val = prop.getValue();
+            if (StringUtils.isNotEmpty(val) && val.contains(Constants.FUNCTION_START_WITH)) {
+                prop.setValue(convertParameterPlaceholders(val, paramsMap));
+            }
+        }
     }
 
     /**
