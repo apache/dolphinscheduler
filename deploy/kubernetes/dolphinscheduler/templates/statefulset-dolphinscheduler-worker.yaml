@@ -60,6 +60,10 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
+      {{- if .Values.worker.initContainers }}
+      initContainers:
+        {{- toYaml .Values.worker.initContainers | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker
           image: {{ include "dolphinscheduler.image.fullname.worker" . }}
@@ -83,6 +87,16 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
+            {{- if .Values.worker.envFromSecret }}
+            - secretRef:
+                name: {{ .Values.worker.envFromSecret }}
+            {{- end }}
+            {{- if .Values.worker.envFromSecrets }}
+            {{- range .Values.worker.envFromSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
           {{- if .Values.worker.resources }}
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
@@ -171,6 +185,9 @@ spec:
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
+            {{- if .Values.worker.extraVolumeMounts }}
+            {{- toYaml .Values.worker.extraVolumeMounts | nindent 12 }}
+            {{- end }}
       volumes:
         {{- if .Values.worker.persistentVolumeClaim.enabled }}
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
@@ -204,6 +221,9 @@ spec:
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
+        {{- if .Values.worker.extraVolumes }}
+        {{- toYaml .Values.worker.extraVolumes | nindent 8 }}
+        {{- end }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
