@@ -329,6 +329,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
 | worker.env.WORKER_TENANT_CONFIG_DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
+| worker.envFromSecret | string | `""` | Direct Secret Mounting Mount secrets directly as environment variables Single secret |
+| worker.initContainers | object | `{}` | Init Container for Advanced Processing Use when you need to transform, validate, or prepare configuration files |
 | worker.keda.advanced | object | `{}` | Specify HPA related options |
 | worker.keda.cooldownPeriod | int | `30` | How many seconds KEDA will wait before scaling to zero. Note that HPA has a separate cooldown period for scale-downs |
 | worker.keda.enabled | bool | `false` | Enable or disable the Keda component |
@@ -371,7 +373,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.service.serviceMonitor.labels | object | `{}` | serviceMonitor.labels ServiceMonitor extra labels |
 | worker.service.serviceMonitor.path | string | `"/actuator/prometheus"` | serviceMonitor.path path of the metrics endpoint |
 | worker.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
-| worker.updateStrategy | object | `{"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
+| worker.updateStrategy.type | string | `"RollingUpdate"` |  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
 | zookeeper.image.registry | string | `"docker.io"` |  |
