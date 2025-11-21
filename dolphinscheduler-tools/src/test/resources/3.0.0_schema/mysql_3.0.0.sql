@@ -371,6 +371,12 @@ CREATE TABLE `t_ds_datasource` (
 -- ----------------------------
 -- Records of t_ds_datasource
 -- ----------------------------
+INSERT INTO `t_ds_datasource` 
+(`id`, `name`, `note`, `type`, `user_id`, `connection_params`, `create_time`, `update_time`) 
+VALUES 
+(2, 'ssh_test_server', 'ssh test server', 17, 1, 
+'{"user":"admin","publicKey":"-----BEGIN RSA PRIVATE KEY-----\\nMIIEpAIBAAKCAQEA...\\n-----END RSA PRIVATE KEY-----","host":"10.0.0.50","port":2222}', 
+'2021-06-30 00:00:00', '2021-06-30 00:00:00');
 
 -- ----------------------------
 -- Table structure for t_ds_error_command

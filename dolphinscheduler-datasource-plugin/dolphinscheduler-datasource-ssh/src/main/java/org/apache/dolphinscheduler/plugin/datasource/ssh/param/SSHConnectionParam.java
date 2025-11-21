@@ -31,7 +31,7 @@ public class SSHConnectionParam implements ConnectionParam {
 
     protected String password;
 
-    protected String publicKey;
+    protected String privateKey;
 
     protected String host;
 
