@@ -14,3 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+UPDATE t_ds_datasource SET connection_params = REPLACE(connection_params, '"publicKey"', '"privateKey"') WHERE type = 17 AND connection_params LIKE '%"publicKey"%';
