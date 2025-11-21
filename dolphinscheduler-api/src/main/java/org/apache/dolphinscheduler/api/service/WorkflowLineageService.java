@@ -57,7 +57,15 @@ public interface WorkflowLineageService {
 
     int createWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages);
 
-    int updateWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages);
+    /**
+     * Replace the lineage of given workflow definition by new lineage list.
+     * When the list is empty, existing lineage data will be deleted.
+     *
+     * @param workflowDefinitionCode workflow definition to update
+     * @param workflowTaskLineages   new lineage list, can be empty
+     * @return affected rows
+     */
+    int updateWorkflowLineage(long workflowDefinitionCode, List<WorkflowTaskLineage> workflowTaskLineages);
 
     int deleteWorkflowLineage(List<Long> workflowDefinitionCodes);
 }

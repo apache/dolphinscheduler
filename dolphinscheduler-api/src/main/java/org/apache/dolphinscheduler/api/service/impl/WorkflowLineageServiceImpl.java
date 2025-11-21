@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -318,8 +319,26 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     }
 
     @Override
-    public int updateWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
-        return workflowTaskLineageDao.updateWorkflowTaskLineage(workflowTaskLineages);
+    public int updateWorkflowLineage(long workflowDefinitionCode, List<WorkflowTaskLineage> workflowTaskLineages) {
+        // Remove existing lineage first to keep data consistent
+        workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(
+                Collections.singletonList(workflowDefinitionCode));
+
+        if (CollectionUtils.isEmpty(workflowTaskLineages)) {
+            log.info("Current lineage is empty, workflowDefinitionCode: {}",
+                    workflowDefinitionCode);
+            return 0;
+        }
+
+        int insertResult = workflowTaskLineageDao.batchInsert(workflowTaskLineages);
+        if (insertResult <= 0) {
+            log.error("Save workflow lineage error, workflowDefinitionCode: {}", workflowDefinitionCode);
+            throw new ServiceException(Status.CREATE_WORKFLOW_LINEAGE_ERROR);
+        }
+
+        log.info("Save workflow lineage complete, workflowDefinitionCode: {}, inserted rows: {}",
+                workflowDefinitionCode, insertResult);
+        return insertResult;
     }
 
     @Override
