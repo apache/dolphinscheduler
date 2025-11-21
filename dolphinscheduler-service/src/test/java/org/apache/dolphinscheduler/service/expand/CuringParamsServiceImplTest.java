@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -63,11 +58,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.collect.Lists;
+import com.google.common.truth.Truth;
 
 @ExtendWith(MockitoExtension.class)
 public class CuringParamsServiceImplTest {
 
-    private static final String placeHolderName = "$[yyyy-MM-dd-1]";
+    private static final String YESTERDAY_DATE_PLACEHOLDER = "$[yyyy-MM-dd-1]";
 
     @Mock
     private CuringParamsService curingParamsService;
@@ -87,9 +83,9 @@ public class CuringParamsServiceImplTest {
 
     @Test
     public void testConvertParameterPlaceholders() {
-        when(curingParamsService.convertParameterPlaceholders(placeHolderName, paramMap))
+        Mockito.when(curingParamsService.convertParameterPlaceholders(YESTERDAY_DATE_PLACEHOLDER, paramMap))
                 .thenReturn("2022-06-26");
-        String result = curingParamsService.convertParameterPlaceholders(placeHolderName, paramMap);
+        String result = curingParamsService.convertParameterPlaceholders(YESTERDAY_DATE_PLACEHOLDER, paramMap);
         Assertions.assertNotNull(result);
     }
 
@@ -213,7 +209,7 @@ public class CuringParamsServiceImplTest {
 
         AbstractParameters parameters = new SubWorkflowParameters();
 
-        when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
+        Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
 
         Map<String, Property> propertyMap =
                 curingParamsServiceImpl.paramParsingPreparation(taskInstance, parameters, workflowInstance,
@@ -241,16 +237,16 @@ public class CuringParamsServiceImplTest {
         // empty cmd param
         Map<String, String> startParamMap = new HashMap<>();
         result = curingParamsServiceImpl.parseWorkflowStartParam(startParamMap);
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
 
         // without key
         startParamMap.put("testStartParam", "$[yyyyMMdd]");
         result = curingParamsServiceImpl.parseWorkflowStartParam(startParamMap);
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
 
         startParamMap.put("StartParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
         result = curingParamsServiceImpl.parseWorkflowStartParam(startParamMap);
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(2, result.keySet().size());
         Assertions.assertEquals("11111", result.get("param1").getValue());
         Assertions.assertEquals("22222", result.get("param2").getValue());
@@ -262,16 +258,16 @@ public class CuringParamsServiceImplTest {
         // empty cmd param
         Map<String, String> startParamMap = new HashMap<>();
         result = curingParamsServiceImpl.parseWorkflowFatherParam(startParamMap);
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
 
         // without key
         startParamMap.put("testfatherParams", "$[yyyyMMdd]");
         result = curingParamsServiceImpl.parseWorkflowFatherParam(startParamMap);
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
 
         startParamMap.put("fatherParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
         result = curingParamsServiceImpl.parseWorkflowFatherParam(startParamMap);
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(2, result.keySet().size());
         Assertions.assertEquals("11111", result.get("param1").getValue());
         Assertions.assertEquals("22222", result.get("param2").getValue());
@@ -289,7 +285,7 @@ public class CuringParamsServiceImplTest {
         @SuppressWarnings("unchecked")
         Map<String, Property> result = (Map<String, Property>) method.invoke(curingParamsServiceImpl, workflowInstance);
 
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(2, result.keySet().size());
         Assertions.assertEquals("11111", result.get("param1").getValue());
         Assertions.assertEquals("22222", result.get("param2").getValue());
@@ -306,7 +302,7 @@ public class CuringParamsServiceImplTest {
         @SuppressWarnings("unchecked")
         Map<String, Property> result = (Map<String, Property>) method.invoke(curingParamsServiceImpl, workflowInstance);
 
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
     }
 
     @Test
@@ -320,7 +316,7 @@ public class CuringParamsServiceImplTest {
         @SuppressWarnings("unchecked")
         Map<String, Property> result = (Map<String, Property>) method.invoke(curingParamsServiceImpl, workflowInstance);
 
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
     }
 
     @Test
@@ -335,9 +331,9 @@ public class CuringParamsServiceImplTest {
         Map<String, Property> result = (Map<String, Property>) method.invoke(curingParamsServiceImpl, workflowInstance);
 
         // The current implementation will include a null key
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(1, result.size());
-        assertTrue(result.containsKey(null));
+        Assertions.assertTrue(result.containsKey(null));
         Assertions.assertEquals("", result.get(null).getValue());
     }
 
@@ -369,7 +365,7 @@ public class CuringParamsServiceImplTest {
         @SuppressWarnings("unchecked")
         List<Property> result = (List<Property>) method.invoke(curingParamsServiceImpl, taskInstance);
 
-        assertTrue(result.isEmpty());
+        Assertions.assertTrue(result.isEmpty());
     }
 
     @Test
@@ -383,7 +379,7 @@ public class CuringParamsServiceImplTest {
         @SuppressWarnings("unchecked")
         List<Property> result = (List<Property>) method.invoke(curingParamsServiceImpl, taskInstance);
 
-        assertTrue(result.isEmpty());
+        Assertions.assertTrue(result.isEmpty());
     }
 
     @Test
@@ -394,25 +390,27 @@ public class CuringParamsServiceImplTest {
         Method method = CuringParamsServiceImpl.class.getDeclaredMethod("parseVarPool", TaskInstance.class);
         method.setAccessible(true);
 
-        InvocationTargetException exception = assertThrows(InvocationTargetException.class,
+        InvocationTargetException exception = Assertions.assertThrows(InvocationTargetException.class,
                 () -> method.invoke(curingParamsServiceImpl, taskInstance));
 
         // Check the root cause
-        assertThat(exception.getCause()).isInstanceOf(IllegalArgumentException.class);
-        assertThat(exception.getCause().getMessage()).contains("Parse json");
+        Truth.assertThat(exception.getCause()).isInstanceOf(IllegalArgumentException.class);
+        Truth.assertThat(exception.getCause().getMessage()).contains("Parse json");
     }
 
     @Test
     public void testPreBuildBusinessParams_withScheduleTime() {
+        // 1234567890 ms since epoch = 1970-01-15T06:56:07Z
         WorkflowInstance workflowInstance = new WorkflowInstance();
-        workflowInstance.setScheduleTime(new Date(1234567890L)); // fixed timestamp
+        workflowInstance.setScheduleTime(new Date(1234567890L));
 
         Map<String, Property> result = curingParamsServiceImpl.preBuildBusinessParams(workflowInstance);
 
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(1, result.size());
-        assertTrue(result.containsKey(DateConstants.PARAMETER_DATETIME));
-        Assertions.assertEquals("19700115145607", result.get(DateConstants.PARAMETER_DATETIME).getValue());
+        Assertions.assertTrue(result.containsKey(DateConstants.PARAMETER_DATETIME));
+        // Expect UTC time string
+        Assertions.assertEquals("19700115065607", result.get(DateConstants.PARAMETER_DATETIME).getValue());
     }
 
     @Test
@@ -422,7 +420,7 @@ public class CuringParamsServiceImplTest {
 
         Map<String, Property> result = curingParamsServiceImpl.preBuildBusinessParams(workflowInstance);
 
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
     }
 
     @Test
@@ -440,14 +438,14 @@ public class CuringParamsServiceImplTest {
         param2.setParamDataType("INTEGER");
 
         List<ProjectParameter> mockList = Arrays.asList(param1, param2);
-        when(projectParameterMapper.queryByProjectCode(projectCode)).thenReturn(mockList);
+        Mockito.when(projectParameterMapper.queryByProjectCode(projectCode)).thenReturn(mockList);
 
         Map<String, Property> result = curingParamsServiceImpl.getProjectParameterMap(projectCode);
 
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(2, result.size());
-        assertTrue(result.containsKey("env"));
-        assertTrue(result.containsKey("timeout"));
+        Assertions.assertTrue(result.containsKey("env"));
+        Assertions.assertTrue(result.containsKey("timeout"));
 
         Property envProp = result.get("env");
         Assertions.assertEquals("prod", envProp.getValue());
@@ -469,13 +467,13 @@ public class CuringParamsServiceImplTest {
         param.setParamDataType("VARCHAR");
 
         List<ProjectParameter> mockList = Collections.singletonList(param);
-        when(projectParameterMapper.queryByProjectCode(projectCode)).thenReturn(mockList);
+        Mockito.when(projectParameterMapper.queryByProjectCode(projectCode)).thenReturn(mockList);
 
         Map<String, Property> result = curingParamsServiceImpl.getProjectParameterMap(projectCode);
 
-        assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
         Assertions.assertEquals(1, result.size());
-        assertTrue(result.containsKey(null)); // null key is present
+        Assertions.assertTrue(result.containsKey(null)); // null key is present
         Property prop = result.get(null);
         Assertions.assertEquals("test-value", prop.getValue());
         Assertions.assertEquals(DataType.VARCHAR, prop.getType());
@@ -484,11 +482,11 @@ public class CuringParamsServiceImplTest {
     @Test
     public void testGetProjectParameterMap_withNoParameters() {
         long projectCode = 999L;
-        when(projectParameterMapper.queryByProjectCode(projectCode)).thenReturn(Collections.emptyList());
+        Mockito.when(projectParameterMapper.queryByProjectCode(projectCode)).thenReturn(Collections.emptyList());
 
         Map<String, Property> result = curingParamsServiceImpl.getProjectParameterMap(projectCode);
 
-        assertTrue(MapUtils.isEmpty(result));
+        Assertions.assertTrue(MapUtils.isEmpty(result));
     }
 
     @Test
@@ -527,8 +525,8 @@ public class CuringParamsServiceImplTest {
 
         // Assert
         Assertions.assertEquals(2, target.size());
-        assertTrue(target.containsKey("validKey"));
-        assertTrue(target.containsKey("anotherValid"));
+        Assertions.assertTrue(target.containsKey("validKey"));
+        Assertions.assertTrue(target.containsKey("anotherValid"));
         Assertions.assertEquals("validValue", target.get("validKey").getValue());
         Assertions.assertEquals("anotherValue", target.get("anotherValid").getValue());
 
