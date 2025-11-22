@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +70,6 @@ public class RegistryClient {
         if (!registry.exists(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath())) {
             registry.put(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath(), EMPTY, false);
         }
-        cleanHistoryFailoverFinishedNodes();
     }
 
     public boolean isConnected() {
@@ -233,28 +231,4 @@ public class RegistryClient {
         return getChildrenKeys(nodeType.getRegistryPath());
     }
 
-    private void cleanHistoryFailoverFinishedNodes() {
-        // Clean the history failover finished nodes
-        // which failover is before the current time minus 1 week
-        final Collection<String> failoverFinishedNodes =
-                registry.children(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath());
-        if (CollectionUtils.isEmpty(failoverFinishedNodes)) {
-            return;
-        }
-        for (final String failoverFinishedNode : failoverFinishedNodes) {
-            final String failoverFinishedNodePath = RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath()
-                    + Constants.SINGLE_SLASH + failoverFinishedNode;
-            try {
-                final String failoverFinishTime = registry.get(failoverFinishedNodePath);
-                if (System.currentTimeMillis() - Long.parseLong(failoverFinishTime) > TimeUnit.DAYS.toMillis(7)) {
-                    registry.delete(failoverFinishedNodePath);
-                    log.info(
-                            "Clear the failover finished node: {} which failover time is before the current time minus 1 week",
-                            failoverFinishedNodePath);
-                }
-            } catch (Exception ex) {
-                log.error("Failed to clean the failoverFinishedNode: {}", failoverFinishedNodePath, ex);
-            }
-        }
-    }
 }

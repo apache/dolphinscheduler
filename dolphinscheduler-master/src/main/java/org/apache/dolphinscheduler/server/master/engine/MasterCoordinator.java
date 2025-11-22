@@ -24,6 +24,10 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractHAServer;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractServerStatusChangeListener;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.failover.IFailoverCoordinator;
+import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
+
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,15 +42,19 @@ public class MasterCoordinator extends AbstractHAServer {
 
     private final ITaskGroupCoordinator taskGroupCoordinator;
 
+    private final IFailoverCoordinator failoverCoordinator;
+
     public MasterCoordinator(final Registry registry,
                              final MasterConfig masterConfig,
-                             final ITaskGroupCoordinator taskGroupCoordinator) {
+                             final ITaskGroupCoordinator taskGroupCoordinator,
+                             final IFailoverCoordinator failoverCoordinator) {
         super(
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
                 masterConfig.getMasterAddress());
         this.taskGroupCoordinator = taskGroupCoordinator;
-        addServerStatusChangeListener(new MasterCoordinatorListener(taskGroupCoordinator));
+        this.failoverCoordinator = failoverCoordinator;
+        addServerStatusChangeListener(new MasterCoordinatorListener(taskGroupCoordinator, failoverCoordinator));
     }
 
     @Override
@@ -65,13 +73,24 @@ public class MasterCoordinator extends AbstractHAServer {
 
         private final ITaskGroupCoordinator taskGroupCoordinator;
 
-        public MasterCoordinatorListener(ITaskGroupCoordinator taskGroupCoordinator) {
+        private final IFailoverCoordinator failoverCoordinator;
+
+        public MasterCoordinatorListener(ITaskGroupCoordinator taskGroupCoordinator,
+                                         IFailoverCoordinator failoverCoordinator) {
             this.taskGroupCoordinator = checkNotNull(taskGroupCoordinator);
+            this.failoverCoordinator = checkNotNull(failoverCoordinator);
         }
 
         @Override
         public void changeToActive() {
             taskGroupCoordinator.start();
+            MasterThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(() -> {
+                try {
+                    failoverCoordinator.cleanHistoryFailoverFinishedMarks();
+                } catch (Exception e) {
+                    log.error("FailoverCoordinator cleanHistoryFailoverFinishedMarks failed", e);
+                }
+            }, 0, 1, TimeUnit.DAYS);
         }
 
         @Override
