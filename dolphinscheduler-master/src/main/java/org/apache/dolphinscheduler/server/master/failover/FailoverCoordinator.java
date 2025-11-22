@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.failover;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -33,11 +34,14 @@ import org.apache.dolphinscheduler.server.master.engine.system.event.WorkerFailo
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -206,6 +210,32 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                         workerServerMetadata.getAddress(),
                         workerServerMetadata.getServerStartupTime(),
                         workerServerMetadata.getProcessId()));
+    }
+
+    @Override
+    public void cleanHistoryFailoverFinishedMarks() {
+        // Clean the history failover finished nodes
+        // which failover is before the current time minus 1 week
+        final Collection<String> failoverFinishedMarkSuffixes =
+                registryClient.getChildrenKeys(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath());
+        if (CollectionUtils.isEmpty(failoverFinishedMarkSuffixes)) {
+            return;
+        }
+        for (final String failoverFinishedMarkSuffix : failoverFinishedMarkSuffixes) {
+            final String failoverFinishedMarkFullPath = RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath()
+                    + Constants.SINGLE_SLASH + failoverFinishedMarkSuffix;
+            try {
+                final String failoverFinishTime = registryClient.get(failoverFinishedMarkFullPath);
+                if (System.currentTimeMillis() - Long.parseLong(failoverFinishTime) > TimeUnit.DAYS.toMillis(7)) {
+                    registryClient.remove(failoverFinishedMarkFullPath);
+                    log.info(
+                            "Clear the failover finished node: {} which failover time is before the current time minus 1 week",
+                            failoverFinishedMarkFullPath);
+                }
+            } catch (Exception ex) {
+                log.error("Failed to clean the failoverFinishedNode: {}", failoverFinishedMarkFullPath, ex);
+            }
+        }
     }
 
     private void doWorkerFailover(final String workerAddress,
