@@ -244,76 +244,65 @@ public class SqlTask extends AbstractTask {
      * @throws Exception Exception
      */
     private String resultProcess(ResultSet resultSet) throws Exception {
-        // Handle null ResultSet early
-        if (resultSet == null) {
-            String emptyResult = JSONUtils.toJsonString(JSONUtils.createArrayNode());
-            log.debug("SQL result is null; returning empty array: {}", emptyResult);
-            return emptyResult;
-        }
-
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
-        ResultSetMetaData md = resultSet.getMetaData();
-        int columnCount = md.getColumnCount();
+        if (resultSet != null) {
+            ResultSetMetaData md = resultSet.getMetaData();
+            int num = md.getColumnCount();
 
-        while (resultSet.next()) {
-            ObjectNode rowObject = JSONUtils.createObjectNode();
-            Set<String> usedLabels = new HashSet<>();
+            while (resultSet.next()) {
+                ObjectNode mapOfColValues = JSONUtils.createObjectNode();
+                Set<String> usedLabels = new HashSet<>();
 
-            for (int i = 1; i <= columnCount; i++) {
-                // Get the column label (alias) from metadata; fall back to a generic name if null or empty
-                String baseLabel = md.getColumnLabel(i);
-                if (baseLabel == null || baseLabel.isEmpty()) {
-                    baseLabel = "col_" + i;
+                for (int i = 1; i <= num; i++) {
+                    // Get the column label (alias) from metadata; fall back to a generic name if null or empty
+                    String baseLabel = md.getColumnLabel(i);
+                    if (baseLabel == null || baseLabel.isEmpty()) {
+                        baseLabel = "col_" + i;
+                    }
+
+                    // Generate a unique field key for the JSON object:
+                    // If the base label is already used in this row, append a numeric suffix (e.g., name_2, name_3)
+                    String finalLabel = baseLabel;
+                    int suffix = 2; // Start numbering duplicates from _2 to keep the first occurrence clean
+
+                    while (!usedLabels.add(finalLabel)) {
+                        finalLabel = baseLabel + "_" + suffix++;
+                    }
+
+                    // Read the column value and convert it to a JSON node
+                    try {
+                        Object value = resultSet.getObject(i);
+                        mapOfColValues.set(finalLabel, JSONUtils.toJsonNode(value));
+                    } catch (SQLException e) {
+                        // Log warning but continue processing: avoid failing the entire row due to one problematic
+                        // column
+                        log.warn("Failed to read column {} (label: '{}') in row {}: {}",
+                                i, baseLabel, resultJSONArray.size() + 1, e.getMessage());
+                        mapOfColValues.set(finalLabel, JSONUtils.toJsonNode(null));
+                    }
                 }
-
-                // Generate a unique field key for the JSON object:
-                // If the base label is already used in this row, append a numeric suffix (e.g., name_2, name_3, ...)
-                String finalLabel = baseLabel;
-                int suffix = 2; // Start numbering duplicates from _2 to keep the first occurrence clean
-
-                while (!usedLabels.add(finalLabel)) {
-                    finalLabel = baseLabel + "_" + suffix++;
-                }
-
-                // Read the column value and convert it to a JSON node
-                try {
-                    Object value = resultSet.getObject(i);
-                    rowObject.set(finalLabel, JSONUtils.toJsonNode(value));
-                } catch (SQLException e) {
-                    // Log warning but continue processing: avoid failing the entire row due to one problematic column
-                    log.warn("Failed to read column {} (label: '{}') in row {}: {}",
-                            i, baseLabel, resultJSONArray.size() + 1, e.getMessage());
-                    rowObject.set(finalLabel, JSONUtils.toJsonNode(null));
-                }
+                resultJSONArray.add(mapOfColValues);
             }
-            resultJSONArray.add(rowObject);
+
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            displayRows = Math.min(displayRows, resultJSONArray.size());
+            log.info("display sql result {} rows as follows:", displayRows);
+            for (int i = 0; i < displayRows; i++) {
+                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+                log.info("row {} : {}", i + 1, row);
+            }
         }
 
-        // Log preview of results (up to configured or default limit)
-        int maxDisplayRows = sqlParameters.getDisplayRows() > 0
-                ? sqlParameters.getDisplayRows()
-                : TaskConstants.DEFAULT_DISPLAY_ROWS;
-        int displayRows = Math.min(maxDisplayRows, resultJSONArray.size());
-
-        log.info("Displaying first {} row(s) of SQL result:", displayRows);
-        for (int i = 0; i < displayRows; i++) {
-            log.info("Row {} : {}", i + 1, JSONUtils.toJsonString(resultJSONArray.get(i)));
-        }
-
-        // Final result string
-        String result = resultJSONArray.isEmpty()
-                ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
+        String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
                 : JSONUtils.toJsonString(resultJSONArray);
 
-        // Optionally send via email
         if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
-            String title = StringUtils.defaultIfBlank(
-                    sqlParameters.getTitle(),
-                    taskExecutionContext.getTaskName() + " query result sets");
-            sendAttachment(sqlParameters.getGroupId(), title, result);
+            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
+                    ? sqlParameters.getTitle()
+                    : taskExecutionContext.getTaskName() + " query result sets", result);
         }
-
-        log.debug("SQL execution result: {}", result);
+        log.debug("execute sql result : {}", result);
         return result;
     }
 

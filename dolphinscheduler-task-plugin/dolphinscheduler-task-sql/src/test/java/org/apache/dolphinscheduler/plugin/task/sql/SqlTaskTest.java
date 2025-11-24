@@ -259,7 +259,7 @@ class SqlTaskTest {
         String result = (String) resultProcessMethod.invoke(sqlTask, (ResultSet) null);
 
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.equalsIgnoreCase("[]"));
+        Assertions.assertTrue(result.equalsIgnoreCase("[{\"error\":\"resultSet is null\"}]"));
     }
 
     @Test
