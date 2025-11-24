@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.GrpcDynamicService;
-import org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.JSONDescriptorHelper;
+import org.apache.dolphinscheduler.plugin.task.grpc.protofactory.ProtoFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,8 +79,10 @@ public class GrpcTask extends AbstractTask {
             } else {
                 channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
             }
+            // Descriptors.FileDescriptor fileDesc =
+            // JSONDescriptorHelper.fileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
             Descriptors.FileDescriptor fileDesc =
-                    JSONDescriptorHelper.fileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
+                    ProtoFactory.createFileDescriptorFromProtoContent(grpcParameters.getGrpcServiceDefinition());
             GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
             DynamicMessage message = stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage(),
                     grpcParameters.getConnectTimeoutMs());
