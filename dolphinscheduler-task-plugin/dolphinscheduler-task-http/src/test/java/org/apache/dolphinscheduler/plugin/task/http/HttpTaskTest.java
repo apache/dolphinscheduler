@@ -181,6 +181,39 @@ public class HttpTaskTest {
         Assertions.assertEquals(response, property.getValue());
     }
 
+    @Test
+    public void testHandleSetsVarPoolToTaskExecutionContext() throws Exception {
+        String responseBody = "{\"status\": \"success\", \"data\": \"test\"}";
+        String taskName = "testHttpTask";
+
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskName()).thenReturn(taskName);
+
+        String url = withMockWebServer(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, responseBody);
+        String paramData = generateHttpParameters(url, HttpRequestMethod.GET, "",
+                new ArrayList<>(), HttpCheckCondition.STATUS_CODE_DEFAULT, "");
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
+
+        HttpTask httpTask = new HttpTask(taskExecutionContext);
+        httpTask.init();
+        httpTask.handle(null);
+
+        Mockito.verify(taskExecutionContext, Mockito.times(1)).setVarPool(Mockito.anyList());
+
+        Mockito.verify(taskExecutionContext).setVarPool(Mockito.argThat(varPool -> {
+            if (varPool == null || varPool.isEmpty()) {
+                return false;
+            }
+            Property property = varPool.get(0);
+            return property.getProp().equals(taskName + ".response")
+                    && property.getDirect() == Direct.OUT
+                    && property.getType() == DataType.VARCHAR
+                    && property.getValue().contains("status");
+        }));
+
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
     private String withMockWebServer(String path, int actualResponseCode,
                                      String actualResponseBody) throws IOException {
         MockWebServer server = new MockWebServer();

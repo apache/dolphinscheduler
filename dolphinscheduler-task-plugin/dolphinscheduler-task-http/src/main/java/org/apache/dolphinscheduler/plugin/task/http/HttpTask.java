@@ -74,6 +74,8 @@ public class HttpTask extends AbstractTask {
         OkHttpResponse httpResponse = sendRequest();
 
         validateResponse(httpResponse.getBody(), httpResponse.getStatusCode());
+
+        taskExecutionContext.setVarPool(httpParameters.getVarPool());
     }
 
     @Override
