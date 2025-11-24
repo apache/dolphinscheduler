@@ -68,7 +68,7 @@ export function useForm(id?: number) {
     showMode: false,
     showDataBaseName: true,
     showJDBCConnectParameters: true,
-    showPublicKey: false,
+    showPrivateKey: false,
     showNamespace: false,
     showKubeConfig: false,
     showAccessKeyId: false,
@@ -282,13 +282,13 @@ export function useForm(id?: number) {
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
-      state.showPublicKey = false
+      state.showPrivateKey = false
       if (type === 'DOLPHINDB') {
         state.showJDBCConnectParameters = true
-        state.showPublicKey = false
+        state.showPrivateKey = false
       }
       if (type === 'SSH') {
-        state.showPublicKey = true
+        state.showPrivateKey = true
       }
       if (type === 'ZEPPELIN') {
         state.showHost = false
@@ -327,7 +327,7 @@ export function useForm(id?: number) {
       state.showDataBaseName = true
       state.requiredDataBase = true
       state.showJDBCConnectParameters = true
-      state.showPublicKey = false
+      state.showPrivateKey = false
       state.showRestEndpoint = false
       state.showNamespace = false
       state.showKubeConfig = false
