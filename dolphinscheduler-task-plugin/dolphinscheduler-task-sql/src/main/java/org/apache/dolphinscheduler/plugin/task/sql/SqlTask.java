@@ -250,7 +250,7 @@ public class SqlTask extends AbstractTask {
             int num = md.getColumnCount();
 
             while (resultSet.next()) {
-                ObjectNode mapOfColValues = JSONUtils.createObjectNode();
+                ObjectNode rowAsJson = JSONUtils.createObjectNode();
                 Set<String> usedLabels = new HashSet<>();
 
                 for (int i = 1; i <= num; i++) {
@@ -272,16 +272,16 @@ public class SqlTask extends AbstractTask {
                     // Read the column value and convert it to a JSON node
                     try {
                         Object value = resultSet.getObject(i);
-                        mapOfColValues.set(finalLabel, JSONUtils.toJsonNode(value));
+                        rowAsJson.set(finalLabel, JSONUtils.toJsonNode(value));
                     } catch (SQLException e) {
                         // Log warning but continue processing: avoid failing the entire row due to one problematic
                         // column
                         log.warn("Failed to read column {} (label: '{}') in row {}: {}",
                                 i, baseLabel, resultJSONArray.size() + 1, e.getMessage());
-                        mapOfColValues.set(finalLabel, JSONUtils.toJsonNode(null));
+                        rowAsJson.set(finalLabel, JSONUtils.toJsonNode(null));
                     }
                 }
-                resultJSONArray.add(mapOfColValues);
+                resultJSONArray.add(rowAsJson);
             }
 
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
