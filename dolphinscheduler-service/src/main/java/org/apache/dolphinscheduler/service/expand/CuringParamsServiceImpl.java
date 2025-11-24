@@ -163,8 +163,10 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     /**
      * Prepares the final map of task execution parameters by merging parameters from multiple sources
      * in a well-defined priority order. The resulting map is guaranteed to contain only valid entries:
-     * - Keys are non-null and non-blank strings
-     * - Values are non-null {@link Property} objects
+     * <ul>
+     *   <li>Keys are non-null and non-blank strings</li>
+     *   <li>Values are non-null {@link Property} objects</li>
+     * </ul>
      *
      * <p><strong>Parameter Precedence (highest to lowest):</strong>
      * <ol>
@@ -184,9 +186,9 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      *   <li>Placeholders (e.g., {@code "${var}"}) in parameter values are resolved after all sources
      *       are merged, using the consolidated parameter map. Global parameters are already
      *       <em>solidified</em> (fully resolved at workflow instance creation), so no recursive
-     *       placeholder expansion is needed.</li>
+     *       placeholder expansion is required.</li>
      *   <li>{@code VarPool} values (from upstream tasks) only override parameters marked as
-     *       {@link Direct#IN}; output or constant parameters are left unchanged.</li>
+     *       {@link Direct#IN}; output or constant parameters remain unchanged.</li>
      * </ul>
      *
      * @param taskInstance           the current task instance (must not be null)
@@ -209,7 +211,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         ICommandParam commandParam = JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
         String timeZone = commandParam != null ? commandParam.getTimeZone() : null;
 
-        // 1. Built-in parameters
+        // 1. Built-in parameters (lowest precedence)
         Map<String, String> builtInParams = setBuiltInParamsMap(
                 taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
         safePutAll(prepareParamsMap, ParameterUtils.getUserDefParamsMap(builtInParams));
@@ -218,43 +220,44 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
         safePutAll(prepareParamsMap, projectParams);
 
-        // 3. Global parameters
+        // 3. Workflow global parameters
         Map<String, Property> globalParams = parseGlobalParamsMap(workflowInstance);
         safePutAll(prepareParamsMap, globalParams);
 
-        // 4. Local parameters
+        // 4. Task-local parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
         safePutAll(prepareParamsMap, localParams);
 
-        // 5. Command parameters
+        // 5. Command-line / complement parameters
         if (commandParam != null && CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
             Map<String, Property> commandParamsMap = commandParam.getCommandParams().stream()
                     .filter(prop -> StringUtils.isNotBlank(prop.getProp()))
                     .collect(Collectors.toMap(
                             Property::getProp,
                             Function.identity(),
-                            (v1, v2) -> v2));
+                            (v1, v2) -> v2 // retain last on duplicate key
+                    ));
             safePutAll(prepareParamsMap, commandParamsMap);
         }
 
-        // 6. VarPool: override only existing Direct.IN parameters
+        // 6. VarPool: override values only for existing IN-direction parameters
         List<Property> varPools = parseVarPool(taskInstance);
         if (CollectionUtils.isNotEmpty(varPools)) {
             for (Property varPool : varPools) {
                 if (StringUtils.isBlank(varPool.getProp())) {
                     continue;
                 }
-                Property existing = prepareParamsMap.get(varPool.getProp());
-                if (existing != null && Direct.IN.equals(existing.getDirect())) {
-                    existing.setValue(varPool.getValue());
+                Property targetParam = prepareParamsMap.get(varPool.getProp());
+                if (targetParam != null && Direct.IN.equals(targetParam.getDirect())) {
+                    targetParam.setValue(varPool.getValue());
                 }
             }
         }
 
-        // 7. Resolve placeholders
+        // 7. Resolve placeholders (e.g., "${output_dir}") using the current parameter context
         resolvePlaceholders(prepareParamsMap);
 
-        // 8. Business/scheduling parameters (highest priority)
+        // 8. Business/scheduling parameters (highest precedence)
         Map<String, Property> businessParams = preBuildBusinessParams(workflowInstance);
         safePutAll(prepareParamsMap, businessParams);
 
@@ -265,12 +268,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * Safely merges entries from the {@code source} map into the {@code target} map,
      * skipping any entry with a {@code null}, empty, or blank key, or a {@code null} value.
      *
-     * <p>This method is critical for ensuring that the resulting parameter map can be
-     * safely serialized to JSON (e.g., by Jackson), which does not allow {@code null} keys
-     * in maps. Invalid entries are logged as warnings to aid in debugging misconfigured
-     * parameters (e.g., project or workflow parameters with missing names).
+     * <p>This method ensures the resulting parameter map can be safely serialized to JSON
+     * (e.g., by Jackson), which prohibits {@code null} keys in maps. Invalid entries are
+     * logged as warnings to aid in debugging misconfigured parameters.
      *
-     * <p>Example of skipped entry:
+     * <p>Examples of skipped entries:
      * <pre>
      *   key = null        → skipped
      *   key = ""          → skipped
@@ -301,8 +303,8 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * Resolves placeholder expressions (e.g., "${var}") in parameter values by substituting them
      * with actual values from the current {@code paramsMap}.
      *
-     * <p>This method supports parameter references where a local task parameter refers to a global
-     * workflow parameter of the same name. For example:
+     * <p>This supports references where a local task parameter refers to another parameter
+     * (e.g., a global workflow parameter). For example:
      * <pre>
      * Global parameters (solidified at workflow instance creation):
      *   "output_dir" → "/data/20251119"
@@ -314,16 +316,14 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      *   "log_path" → "/data/20251119/task.log"
      * </pre>
      *
-     * <p><strong>Important:</strong> The global parameters included in {@code paramsMap} are
-     * <em>solidified</em>—meaning they were fully resolved at workflow instance creation time
-     * and contain no unresolved placeholders (e.g., no nested "${...}" expressions).
-     * Therefore, this resolution pass only needs to perform a single-level (or iterative chain)
-     * substitution without worrying about recursive variable expansion in global values.
+     * <p><strong>Note:</strong> Global parameters in {@code paramsMap} are already solidified
+     * (i.e., contain no unresolved placeholders). Therefore, this method only needs to perform
+     * iterative substitution within the current context without recursive expansion.
      *
-     * <p>The method processes all properties in-place. Only values containing
-     * {@link Constants#FUNCTION_START_WITH} (typically "${") are processed.
+     * <p>Only values containing {@link Constants#FUNCTION_START_WITH} (typically "${") are processed.
+     * Substitution is performed in-place.
      *
-     * @param paramsMap the map of parameters (key: parameter name, value: {@link Property}) to resolve.
+     * @param paramsMap the map of parameters (key: parameter name, value: {@link Property}) to resolve
      */
     private void resolvePlaceholders(Map<String, Property> paramsMap) {
         for (Property prop : paramsMap.values()) {
