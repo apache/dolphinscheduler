@@ -168,13 +168,12 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      *
      * <p><strong>Parameter Precedence (highest to lowest):</strong>
      * <ol>
-     *   <li>Built-in system parameters (e.g., ${task.id}, ${workflow.instance.id})</li>
+     *   <li>Business/scheduling time parameters (e.g., {@code ${system.datetime}})</li>
+     *   <li>Command-line or runtime complement parameters</li>
+     *   <li>Task-local parameters</li>
+     *   <li>Workflow global parameters (solidified at instance creation)</li>
      *   <li>Project-level parameters</li>
-     *   <li>Workflow global parameters</li>
-     *   <li>Task local parameters</li>
-     *   <li>Command-line / complement parameters (e.g., from补数 or API)</li>
-     *   <li>VarPool overrides (only for {@link Direct#IN} parameters)</li>
-     *   <li>Business/scheduling time parameters (e.g., ${system.datetime})</li>
+     *   <li>Built-in system parameters (e.g., {@code ${task.id}})</li>
      * </ol>
      *
      * <p><strong>Important Notes:</strong>
@@ -207,45 +206,44 @@ public class CuringParamsServiceImpl implements CuringParamsService {
 
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
-        // Parse command param (defensive: commandParam may be null for normal runs)
         ICommandParam commandParam = JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
-        String timeZone = (commandParam != null) ? commandParam.getTimeZone() : null;
+        String timeZone = commandParam != null ? commandParam.getTimeZone() : null;
 
-        // 1. Built-in system parameters (e.g., task.id, workflow.instance.id, etc.)
+        // 1. Built-in parameters
         Map<String, String> builtInParams = setBuiltInParamsMap(
                 taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
         safePutAll(prepareParamsMap, ParameterUtils.getUserDefParamsMap(builtInParams));
 
-        // 2. Project-level parameters (shared across all workflows in the project)
+        // 2. Project-level parameters
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
         safePutAll(prepareParamsMap, projectParams);
 
-        // 3. Workflow global parameters (defined at workflow level, solidified at instance creation)
+        // 3. Global parameters
         Map<String, Property> globalParams = parseGlobalParamsMap(workflowInstance);
         safePutAll(prepareParamsMap, globalParams);
 
-        // 4. Task local parameters (defined in the task node itself)
+        // 4. Local parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
         safePutAll(prepareParamsMap, localParams);
 
-        // 5. Command-line or complement (补数) parameters passed at runtime
+        // 5. Command parameters
         if (commandParam != null && CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
             Map<String, Property> commandParamsMap = commandParam.getCommandParams().stream()
-                    .filter(prop -> StringUtils.isNotBlank(prop.getProp())) // exclude invalid keys
+                    .filter(prop -> StringUtils.isNotBlank(prop.getProp()))
                     .collect(Collectors.toMap(
                             Property::getProp,
                             Function.identity(),
-                            (v1, v2) -> v2 // on duplicate keys, keep the last occurrence
-                    ));
+                            (v1, v2) -> v2));
             safePutAll(prepareParamsMap, commandParamsMap);
         }
 
-        // 6. VarPool: override only input (Direct.IN) parameters with values from upstream tasks
+        // 6. VarPool: override only existing Direct.IN parameters
         List<Property> varPools = parseVarPool(taskInstance);
         if (CollectionUtils.isNotEmpty(varPools)) {
             for (Property varPool : varPools) {
-                if (StringUtils.isBlank(varPool.getProp()))
-                    continue; // skip invalid
+                if (StringUtils.isBlank(varPool.getProp())) {
+                    continue;
+                }
                 Property existing = prepareParamsMap.get(varPool.getProp());
                 if (existing != null && Direct.IN.equals(existing.getDirect())) {
                     existing.setValue(varPool.getValue());
@@ -253,10 +251,10 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             }
         }
 
-        // 7. Resolve placeholders (e.g., "${output_dir}") using the fully merged parameter map
+        // 7. Resolve placeholders
         resolvePlaceholders(prepareParamsMap);
 
-        // 8. Business/scheduling time parameters (e.g., ${system.datetime}, ${schedule.time})
+        // 8. Business/scheduling parameters (highest priority)
         Map<String, Property> businessParams = preBuildBusinessParams(workflowInstance);
         safePutAll(prepareParamsMap, businessParams);
 
