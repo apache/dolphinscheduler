@@ -33,17 +33,29 @@ public class WorkerServerLoadProtection extends BaseServerLoadProtection {
     @Autowired
     private PhysicalTaskExecutorContainerProvider physicalTaskExecutorContainerDelegator;
 
+    private final WorkerServerLoadProtectionConfig workerServerLoadProtectionConfig;
+
     public WorkerServerLoadProtection(WorkerConfig workerConfig) {
         super(workerConfig.getServerLoadProtection());
+        this.workerServerLoadProtectionConfig = workerConfig.getServerLoadProtection();
     }
 
     @Override
     public boolean isOverload(SystemMetrics systemMetrics) {
-        if (!baseServerLoadProtectionConfig.isEnabled()) {
+        if (!workerServerLoadProtectionConfig.isEnabled()) {
             return false;
         }
 
         if (super.isOverload(systemMetrics)) {
+            return true;
+        }
+
+        if (systemMetrics.getDataBasedirPathUsedPercentage() > workerServerLoadProtectionConfig
+                .getMaxDataBasedirDiskUsagePercentageThresholds()) {
+            log.info(
+                    "OverLoad: the DataBasedirPathDiskUsagePercentage: {} is over then the maxDataBasedirDiskUsagePercentageThresholds {}",
+                    systemMetrics.getDataBasedirPathUsedPercentage(),
+                    workerServerLoadProtectionConfig.getMaxDataBasedirDiskUsagePercentageThresholds());
             return true;
         }
 

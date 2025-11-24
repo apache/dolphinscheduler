@@ -28,9 +28,4 @@ public class MasterServerLoadProtectionConfig extends BaseServerLoadProtectionCo
 
     private int maxConcurrentWorkflowInstances = Integer.MAX_VALUE;
 
-    // Master node does not monitor disk usage of data.basedir.path directory,
-    // set threshold to 1.0 (100%) to disable the check
-    public MasterServerLoadProtectionConfig() {
-        this.maxDataBasedirDiskUsagePercentageThresholds = 1.0;
-    }
 }

@@ -32,6 +32,4 @@ public abstract class BaseServerLoadProtectionConfig {
 
     protected double maxDiskUsagePercentageThresholds = 0.7;
 
-    protected double maxDataBasedirDiskUsagePercentageThresholds = 0.7;
-
 }
