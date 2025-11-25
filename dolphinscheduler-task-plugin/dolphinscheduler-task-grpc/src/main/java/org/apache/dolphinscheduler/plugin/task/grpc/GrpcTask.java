@@ -81,41 +81,38 @@ public class GrpcTask extends AbstractTask {
             } else {
                 channel = GrpcDynamicService.ChannelFactory.createChannel(grpcParameters.getUrl());
             }
-
             Descriptors.FileDescriptor fileDesc =
                     JSONDescriptorHelper.fileDescFromJSON(grpcParameters.getGrpcServiceDefinitionJSON());
 
-            // → Attach a cancellable gRPC Context to support external cancellation.
+            // Attach a cancellable gRPC Context to support external cancellation.
             // This context propagates cancellation signals to the underlying RPC call.
             this.cancellableContext = (Context.CancellableContext) Context.current().withCancellation().attach();
             Context previous = this.cancellableContext;
 
             try {
                 GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
-
-                // → Perform the actual blocking gRPC call.
-                // If cancel() is invoked concurrently, this call will throw StatusRuntimeException(CANCELLED).
-                DynamicMessage message = stubService.call(
-                        grpcParameters.getMethodName(),
-                        grpcParameters.getMessage(),
+                DynamicMessage message = stubService.call(grpcParameters.getMethodName(), grpcParameters.getMessage(),
                         grpcParameters.getConnectTimeoutMs());
-
-                // → Format and store the response as task output
                 Printer printer = JsonFormat.printer().omittingInsignificantWhitespace();
                 addDefaultOutput(printer.print(message));
                 validateResponse(Status.OK);
             } finally {
-                // → Detach the cancellable context to restore the previous context and avoid leaks
+                // Detach the cancellable context to restore the previous context and avoid leaks
                 this.cancellableContext.detach(previous);
-                this.cancellableContext = null; // Clear reference for GC and idempotent cancel
+                this.cancellableContext = null;
             }
-        } catch (StatusRuntimeException ex) {
-            validateResponse(ex.getStatus());
-        } catch (Exception ex) {
+        } catch (StatusRuntimeException statusre) {
+            if (statusre.getStatus().getCode() == Status.Code.CANCELLED) {
+                setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+            } else {
+                setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            }
+            validateResponse(statusre.getStatus());
+        } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw new GrpcTaskException("gRPC handle exception", ex);
+            throw new GrpcTaskException("gRPC handle exception:", e);
         } finally {
-            // → Gracefully shut down the gRPC channel to release network resources
+            // Gracefully shut down the gRPC channel to release network resources
             if (channel != null) {
                 channel.shutdown();
             }
@@ -124,36 +121,31 @@ public class GrpcTask extends AbstractTask {
 
     @Override
     public void cancel() {
-        // → Read volatile reference once for thread safety (avoid repeated reads under race conditions)
+        // Read volatile reference once for thread safety (avoid repeated reads under race conditions)
         Context.CancellableContext ctx = this.cancellableContext;
 
         if (ctx != null && !ctx.isCancelled()) {
             try {
-                log.debug("Canceling gRPC task: method={}", grpcParameters.getMethodName());
+                log.info("Canceling gRPC task: method={}", grpcParameters.getMethodName());
 
-                // → Trigger gRPC cancellation by canceling the context.
+                // Trigger gRPC cancellation by canceling the context.
                 // This interrupts the ongoing RPC and causes stubService.call() to throw CANCELLED.
                 ctx.cancel(new TaskException("gRPC task was canceled by user"));
 
-                // → Record user intent: task was explicitly killed, not failed
+                // Record user intent: task was explicitly killed, not failed
                 setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
-                log.debug("gRPC task was successfully canceled");
+                log.info("gRPC task was successfully canceled");
             } catch (Exception ex) {
-                log.warn("Failed to cancel gRPC context", ex);
+                log.error("Failed to cancel gRPC context", ex);
                 throw new TaskException("Cancel gRPC task failed", ex);
             }
         } else {
-            // → No active context: task may not have started, already finished, or already canceled
-            log.debug("gRPC task cancel requested, but no active cancellable context.");
+            // No active context: task may not have started, already finished, or already canceled
+            log.warn("gRPC task cancel requested, but no active cancellable context.");
         }
     }
 
     private void validateResponse(Status statusCode) {
-        if (exitStatusCode == TaskConstants.EXIT_CODE_KILL) {
-            log.info("this gRPC task has been killed");
-            return;
-        }
-
         switch (grpcParameters.getGrpcCheckCondition()) {
             case STATUS_CODE_DEFAULT:
                 if (!statusCode.isOk()) {
