@@ -126,26 +126,36 @@ public class SagemakerTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() {
-        initPipelineId();
         try {
+            initPipelineId();
             // stop pipeline
             utils.stopPipelineExecution(client, pipelineId);
         } catch (Exception e) {
             throw new TaskException("cancel application error", e);
+        } finally {
+            // shutdown client
+            client.shutdown();
         }
     }
 
     @Override
     public void trackApplicationStatus() throws TaskException {
-        initPipelineId();
-        // Keep checking the health status
-        exitStatusCode = utils.checkPipelineExecutionStatus(client, pipelineId);
+        try {
+            initPipelineId();
+            // Keep checking the health status
+            exitStatusCode = utils.checkPipelineExecutionStatus(client, pipelineId);
+        } catch (Exception e) {
+            throw new TaskException(e.getMessage(), e);
+        } finally {
+            // shutdown client
+            client.shutdown();
+        }
     }
 
     /**
      * init sagemaker applicationId if null
      */
-    private void initPipelineId() {
+    public void initPipelineId() {
         if (pipelineId == null) {
             if (StringUtils.isNotEmpty(getAppIds())) {
                 pipelineId = JSONUtils.parseObject(getAppIds(), PipelineUtils.PipelineId.class);

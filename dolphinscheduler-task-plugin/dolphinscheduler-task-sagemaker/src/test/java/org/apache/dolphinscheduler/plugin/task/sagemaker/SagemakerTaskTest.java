@@ -17,13 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.sagemaker.param.SagemakerConnectionParam;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
@@ -138,5 +144,34 @@ public class SagemakerTaskTest {
         parameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(parameters);
+    }
+
+    @Test
+    public void testTrackApplicationStatus_InitPipelineIdThrowsException() throws Exception {
+        doThrow(new TaskException("sagemaker applicationID is null")).when(sagemakerTask).initPipelineId();
+
+        TaskException exception = assertThrows(TaskException.class, () -> {
+            sagemakerTask.trackApplicationStatus();
+        });
+
+        assertEquals("sagemaker applicationID is null", exception.getMessage());
+        verify(client, times(1)).shutdown();
+    }
+
+    @Test
+    public void testCancelApplication_InitPipelineIdThrowsException() {
+        // Mock the behavior of initPipelineId to throw an exception
+        doThrow(new TaskException("sagemaker applicationID is null")).when(sagemakerTask).initPipelineId();
+
+        // Call the method under test and expect an exception
+        TaskException exception = assertThrows(TaskException.class, () -> {
+            sagemakerTask.cancelApplication();
+        });
+
+        // Verify the exception message
+        assertEquals("cancel application error", exception.getMessage());
+
+        // Verify that client.shutdown() was called
+        verify(client, times(1)).shutdown();
     }
 }
