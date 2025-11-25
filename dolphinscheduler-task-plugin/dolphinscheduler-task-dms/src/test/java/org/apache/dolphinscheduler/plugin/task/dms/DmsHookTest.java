@@ -23,6 +23,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 
@@ -238,4 +243,61 @@ public class DmsHookTest {
             }
         });
     }
+
+    @Test
+    public void replaceFileParameters_NullParameter_ReturnsNull() throws IOException {
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
+                DmsHook dmsHook = spy(new DmsHook());
+                String parameter = null;
+                String result = dmsHook.replaceFileParameters(parameter);
+                Assertions.assertEquals(null, result);
+            }
+        });
+    }
+
+    @Test
+    public void replaceFileParameters_NormalString_ReturnsSameString() throws IOException {
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
+                DmsHook dmsHook = spy(new DmsHook());
+                String parameter = "normal string";
+                String result = dmsHook.replaceFileParameters(parameter);
+                Assertions.assertEquals(parameter, result);
+            }
+        });
+    }
+
+    @Test
+    public void replaceFileParameters_FileExists_ReturnsFileContent() throws IOException {
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
+                DmsHook dmsHook = spy(new DmsHook());
+                File tempFile = new File("tempFile.txt");
+                String fileContent = "content of the file";
+                FileUtils.writeStringToFile(tempFile, fileContent, StandardCharsets.UTF_8);
+                String parameter = "file://" + tempFile.getAbsolutePath();
+                String result = dmsHook.replaceFileParameters(parameter);
+                Assertions.assertEquals(fileContent, result);
+            }
+        });
+    }
+
+    @Test
+    public void replaceFileParameters_FileNotExists_ThrowsIOException() {
+        Assertions.assertTimeout(Duration.ofMillis(60000), () -> {
+            try (MockedStatic<DmsHook> mockHook = Mockito.mockStatic(DmsHook.class)) {
+                mockHook.when(DmsHook::createClient).thenReturn(client);
+                DmsHook dmsHook = spy(new DmsHook());
+                String parameter = "file://nonexistentfile.txt";
+                Assertions.assertThrows(IOException.class, () -> {
+                    dmsHook.replaceFileParameters(parameter);
+                });
+            }
+        });
+    }
+
 }
