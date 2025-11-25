@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseCon
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -41,6 +43,7 @@ import org.springframework.test.annotation.DirtiesContext;
         MasterServer.class,
         DaoConfiguration.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ResourceLock(Resources.SYSTEM_OUT)
 public abstract class AbstractMasterIntegrationTestCase {
 
     @Autowired
