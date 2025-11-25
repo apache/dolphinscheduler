@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
@@ -1389,5 +1390,94 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 "application/json",
                 content);
         return multipartFile;
+    }
+
+    @Test
+    public void testSaveWorkflowLineageWithEmptyList() {
+        // Test case: Empty lineage list should delete historical lineage
+        long projectCode = 1L;
+        long workflowDefinitionCode = 100L;
+        int workflowDefinitionVersion = 1;
+        List<TaskDefinitionLog> emptyTaskDefinitionLogList = new ArrayList<>();
+
+        // Mock updateWorkflowLineage to return 0 for empty list
+        when(workflowLineageService.updateWorkflowLineage(eq(workflowDefinitionCode), anyList()))
+                .thenReturn(0);
+
+        // Execute - should not throw exception
+        Assertions.assertDoesNotThrow(() -> {
+            processDefinitionService.saveWorkflowLineage(projectCode, workflowDefinitionCode,
+                    workflowDefinitionVersion, emptyTaskDefinitionLogList);
+        });
+
+        // Verify that updateWorkflowLineage was called with empty list
+        verify(workflowLineageService).updateWorkflowLineage(eq(workflowDefinitionCode), anyList());
+    }
+
+    @Test
+    public void testSaveWorkflowLineageWithNonEmptyList() {
+        // Test case: Normal save with non-empty lineage list
+        long projectCode = 1L;
+        long workflowDefinitionCode = 100L;
+        int workflowDefinitionVersion = 1;
+
+        // Create task definition logs with dependent tasks
+        List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
+        TaskDefinitionLog taskLog = new TaskDefinitionLog();
+        taskLog.setCode(200L);
+        taskLog.setVersion(1);
+        taskLog.setProjectCode(projectCode);
+        taskLog.setTaskType("DEPENDENT");
+        // Set taskParams with dependent parameters
+        String taskParams =
+                "{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[{\"definitionCode\":50,\"depTaskCode\":300}]}]}}";
+        taskLog.setTaskParams(taskParams);
+        taskDefinitionLogList.add(taskLog);
+
+        // Mock updateWorkflowLineage to return success
+        when(workflowLineageService.updateWorkflowLineage(eq(workflowDefinitionCode), anyList()))
+                .thenReturn(1);
+
+        // Execute - should not throw exception
+        Assertions.assertDoesNotThrow(() -> {
+            processDefinitionService.saveWorkflowLineage(projectCode, workflowDefinitionCode,
+                    workflowDefinitionVersion, taskDefinitionLogList);
+        });
+
+        // Verify that updateWorkflowLineage was called
+        verify(workflowLineageService).updateWorkflowLineage(eq(workflowDefinitionCode), anyList());
+    }
+
+    @Test
+    public void testSaveWorkflowLineageWithInsertFailure() {
+        // Test case: Should throw exception when insert fails
+        long projectCode = 1L;
+        long workflowDefinitionCode = 100L;
+        int workflowDefinitionVersion = 1;
+
+        // Create task definition logs
+        List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
+        TaskDefinitionLog taskLog = new TaskDefinitionLog();
+        taskLog.setCode(200L);
+        taskLog.setVersion(1);
+        taskLog.setProjectCode(projectCode);
+        taskLog.setTaskType("DEPENDENT");
+        String taskParams =
+                "{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[{\"definitionCode\":50,\"depTaskCode\":300}]}]}}";
+        taskLog.setTaskParams(taskParams);
+        taskDefinitionLogList.add(taskLog);
+
+        // Mock updateWorkflowLineage to throw exception (insert failure)
+        when(workflowLineageService.updateWorkflowLineage(eq(workflowDefinitionCode), anyList()))
+                .thenThrow(new ServiceException(Status.CREATE_WORKFLOW_LINEAGE_ERROR));
+
+        // Execute and verify exception
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, () -> {
+            processDefinitionService.saveWorkflowLineage(projectCode, workflowDefinitionCode,
+                    workflowDefinitionVersion, taskDefinitionLogList);
+        });
+
+        Assertions.assertEquals(Status.CREATE_WORKFLOW_LINEAGE_ERROR.getCode(), exception.getCode());
+        verify(workflowLineageService).updateWorkflowLineage(eq(workflowDefinitionCode), anyList());
     }
 }

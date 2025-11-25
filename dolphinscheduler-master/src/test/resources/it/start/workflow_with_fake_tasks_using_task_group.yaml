@@ -25,11 +25,11 @@ project:
   updateTime: 2021-08-12 00:00:00
 
 workflows:
-  - name: workflow_with_one_fake_task_success
+  - name: workflow_with_fake_tasks_using_task_group_success
     code: 1
     version: 1
     projectCode: 1
-    description: This is a fake workflow with single task
+    description: This is a fake workflow with two fake tasks
     releaseState: ONLINE
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
@@ -51,6 +51,20 @@ tasks:
     updateTime: 2021-08-12 00:00:00
     taskExecuteType: BATCH
 
+  - name: B
+    code: 2
+    version: 1
+    projectCode: 1
+    userId: 1
+    taskType: LogicFakeTask
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"sleep 5"}'
+    workerGroup: default
+    taskGroupId: 1
+    taskGroupPriority: 2
+    createTime: 2024-08-12 00:00:00
+    updateTime: 2021-08-12 00:00:00
+    taskExecuteType: BATCH
+
 taskRelations:
   - projectCode: 1
     workflowDefinitionCode: 1
@@ -61,12 +75,22 @@ taskRelations:
     postTaskVersion: 1
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
+  - projectCode: 1
+    workflowDefinitionCode: 1
+    workflowDefinitionVersion: 1
+    preTaskCode: 0
+    preTaskVersion: 0
+    postTaskCode: 2
+    postTaskVersion: 1
+    createTime: 2024-08-12 00:00:00
+    updateTime: 2024-08-12 00:00:00
+
 
 taskGroups:
   - id: 1
     name: default
     projectCode: 1
-    groupSize: 2
+    groupSize: 1
     useSize: 0
     userId: 1
     status: YES

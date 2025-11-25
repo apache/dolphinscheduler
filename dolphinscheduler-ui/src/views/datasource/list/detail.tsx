@@ -166,7 +166,7 @@ const DetailModal = defineComponent({
       showMode,
       showDataBaseName,
       showJDBCConnectParameters,
-      showPublicKey,
+      showPrivateKey,
       showNamespace,
       showKubeConfig,
       modeOptions,
@@ -739,12 +739,12 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showPublicKey}
-                  label='PublicKey'
-                  path='publicKey'
+                  v-show={showPrivateKey}
+                  label='PrivateKey'
+                  path='privateKey'
                 >
                   <NInput
-                    v-model={[detailForm.publicKey, 'value']}
+                    v-model={[detailForm.privateKey, 'value']}
                     type='textarea'
                     autosize={{
                       minRows: 4

@@ -17,8 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowLineageServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -254,6 +259,81 @@ public class WorkflowTaskLineageServiceTest {
         Optional<String> result =
                 workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
         Assertions.assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void testUpdateWorkflowLineageWithNonEmptyList() {
+        // Test case: Normal update with non-empty lineage list
+        long workflowDefinitionCode = 100L;
+        List<WorkflowTaskLineage> workflowTaskLineages = new ArrayList<>();
+
+        WorkflowTaskLineage lineage1 = new WorkflowTaskLineage();
+        lineage1.setWorkflowDefinitionCode(workflowDefinitionCode);
+        lineage1.setTaskDefinitionCode(200L);
+        workflowTaskLineages.add(lineage1);
+
+        WorkflowTaskLineage lineage2 = new WorkflowTaskLineage();
+        lineage2.setWorkflowDefinitionCode(workflowDefinitionCode);
+        lineage2.setTaskDefinitionCode(300L);
+        workflowTaskLineages.add(lineage2);
+
+        // Mock DAO methods
+        when(workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(anyList())).thenReturn(2);
+        when(workflowTaskLineageDao.batchInsert(workflowTaskLineages)).thenReturn(2);
+
+        // Execute
+        int result = workflowLineageService.updateWorkflowLineage(workflowDefinitionCode, workflowTaskLineages);
+
+        // Verify
+        Assertions.assertEquals(2, result);
+        verify(workflowTaskLineageDao)
+                .batchDeleteByWorkflowDefinitionCode(eq(java.util.Collections.singletonList(workflowDefinitionCode)));
+        verify(workflowTaskLineageDao).batchInsert(workflowTaskLineages);
+    }
+
+    @Test
+    public void testUpdateWorkflowLineageWithEmptyList() {
+        // Test case: Empty list should delete historical lineage and return 0
+        long workflowDefinitionCode = 100L;
+        List<WorkflowTaskLineage> emptyList = new ArrayList<>();
+
+        // Mock DAO method
+        when(workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(anyList())).thenReturn(1);
+
+        // Execute
+        int result = workflowLineageService.updateWorkflowLineage(workflowDefinitionCode, emptyList);
+
+        // Verify
+        Assertions.assertEquals(0, result);
+        verify(workflowTaskLineageDao)
+                .batchDeleteByWorkflowDefinitionCode(eq(java.util.Collections.singletonList(workflowDefinitionCode)));
+        // batchInsert should not be called when list is empty
+    }
+
+    @Test
+    public void testUpdateWorkflowLineageWithInsertFailure() {
+        // Test case: Should throw exception when insert fails
+        long workflowDefinitionCode = 100L;
+        List<WorkflowTaskLineage> workflowTaskLineages = new ArrayList<>();
+
+        WorkflowTaskLineage lineage1 = new WorkflowTaskLineage();
+        lineage1.setWorkflowDefinitionCode(workflowDefinitionCode);
+        lineage1.setTaskDefinitionCode(200L);
+        workflowTaskLineages.add(lineage1);
+
+        // Mock DAO methods
+        when(workflowTaskLineageDao.batchDeleteByWorkflowDefinitionCode(anyList())).thenReturn(1);
+        when(workflowTaskLineageDao.batchInsert(workflowTaskLineages)).thenReturn(0); // Insert failure
+
+        // Execute and verify exception
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, () -> {
+            workflowLineageService.updateWorkflowLineage(workflowDefinitionCode, workflowTaskLineages);
+        });
+
+        Assertions.assertEquals(Status.CREATE_WORKFLOW_LINEAGE_ERROR.getCode(), exception.getCode());
+        verify(workflowTaskLineageDao)
+                .batchDeleteByWorkflowDefinitionCode(eq(java.util.Collections.singletonList(workflowDefinitionCode)));
+        verify(workflowTaskLineageDao).batchInsert(workflowTaskLineages);
     }
 
 }
