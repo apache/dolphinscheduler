@@ -616,6 +616,12 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.3.0.6276</version>
+            </plugin>
+
             <!-- jenkins plugin jacoco report-->
             <plugin>
                 <groupId>org.jacoco</groupId>
