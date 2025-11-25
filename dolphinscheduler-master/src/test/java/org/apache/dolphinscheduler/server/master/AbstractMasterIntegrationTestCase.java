@@ -41,7 +41,6 @@ import org.springframework.test.annotation.DirtiesContext;
         MasterServer.class,
         DaoConfiguration.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@MasterIntegrationTestResourceLock
 public abstract class AbstractMasterIntegrationTestCase {
 
     @Autowired
