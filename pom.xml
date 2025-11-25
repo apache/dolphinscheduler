@@ -610,8 +610,8 @@
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                     <parallel>methods</parallel>
-                    <threadCount>4</threadCount>
-                    <forkCount>4</forkCount>
+                    <threadCount>6</threadCount>
+                    <forkCount>6</forkCount>
                     <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>

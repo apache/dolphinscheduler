@@ -28,8 +28,12 @@ import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 import lombok.SneakyThrows;
@@ -244,8 +248,40 @@ class LocalStorageOperatorTest {
 
     }
 
+    @SneakyThrows
     @Test
     void testListStorageEntity_directoryNotEmpty() {
+        Path tenantBasePath = Paths.get(TENANT_BASE_DIR);
+        if (Files.exists(tenantBasePath)) {
+            Files.walkFileTree(tenantBasePath, new SimpleFileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    try {
+                        Files.delete(file);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                public FileVisitResult postVisitDirectory(Path dir, Exception exc) {
+                    try {
+                        Files.delete(dir);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
+
+        // 重新创建当前测试所需的干净目录结构
+        Files.createDirectories(tenantBasePath);
+        Files.createDirectories(tenantBasePath.resolve("emptyDirectory"));
+        Files.createDirectories(tenantBasePath.resolve("sqlDirectory"));
+
+        // 原测试逻辑不变
         List<StorageEntity> storageEntities = storageOperator.listStorageEntity(TENANT_BASE_DIR);
         assertThat(storageEntities.size()).isEqualTo(2);
 
