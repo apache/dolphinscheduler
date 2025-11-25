@@ -83,8 +83,8 @@ jobs:
       - name: Run Unit tests
         run: export MAVEN_OPTS="-Xmx6g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m" && ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true
       - name: Upload coverage report to codecov
-        run: CODECOV_TOKEN=$CODECOV_TOKEN bash <(curl -s https://codecov.io/bash)
-        with:
+        run: CODECOV_TOKEN=$token bash <(curl -s https://codecov.io/bash)
+        env:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       # Set up JDK 17 for SonarCloud.
