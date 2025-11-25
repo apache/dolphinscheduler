@@ -110,6 +110,9 @@ public class EmrJobFlowTask extends AbstractEmrTask {
             final int exitStatusCode = calculateExitStatusCode(clusterStatus);
             setExitStatusCode(exitStatusCode);
             log.info("emr task finished with cluster status : {}", clusterStatus);
+
+            // shutdown emrclient
+            emrClient.shutdown();
         }
     }
 
@@ -185,6 +188,9 @@ public class EmrJobFlowTask extends AbstractEmrTask {
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
         log.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
+
+        // shutdown emrclient
+        emrClient.shutdown();
     }
 
 }
