@@ -132,6 +132,8 @@ public class DmsHook {
     public Boolean checkFinishedReplicationTask() {
         log.info("checkFinishedReplicationTask ......");
         awaitReplicationTaskStatus(STATUS.STOPPED);
+        // shutdown client
+        client.shutdown();
         String stopReason = describeReplicationTasks().getStopReason();
         return stopReason.endsWith(STATUS.FINISH_END_TOKEN);
     }
@@ -145,6 +147,8 @@ public class DmsHook {
                 .withReplicationTaskArn(replicationTaskArn);
         client.stopReplicationTask(request);
         awaitReplicationTaskStatus(STATUS.STOPPED);
+        // shutdown client
+        client.shutdown();
     }
 
     public Boolean deleteReplicationTask() {
@@ -158,6 +162,8 @@ public class DmsHook {
         } catch (ResourceNotFoundException e) {
             isDeleteSuccessfully = true;
         }
+        // shutdown client
+        client.shutdown();
         return isDeleteSuccessfully;
     }
 
@@ -268,8 +274,8 @@ public class DmsHook {
         }
         if (parameter.startsWith("file://")) {
             String filePath = parameter.substring(7);
-            try {
-                return IOUtils.toString(new FileInputStream(filePath), StandardCharsets.UTF_8);
+            try (FileInputStream fis = new FileInputStream(filePath)) {
+                return IOUtils.toString(fis, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new IOException("Error reading file: " + filePath, e);
             }
