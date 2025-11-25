@@ -28,12 +28,8 @@ import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 import lombok.SneakyThrows;
@@ -41,10 +37,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 
-@Execution(ExecutionMode.SAME_THREAD)
 class LocalStorageOperatorTest {
 
     private StorageOperator storageOperator;
@@ -248,51 +241,25 @@ class LocalStorageOperatorTest {
 
     }
 
-    @SneakyThrows
     @Test
     void testListStorageEntity_directoryNotEmpty() {
-        Path tenantBasePath = Paths.get(TENANT_BASE_DIR);
-        if (Files.exists(tenantBasePath)) {
-            Files.walkFileTree(tenantBasePath, new SimpleFileVisitor<Path>() {
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    try {
-                        Files.delete(file);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-
-                public FileVisitResult postVisitDirectory(Path dir, Exception exc) {
-                    try {
-                        Files.delete(dir);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        }
-
-        // 重新创建当前测试所需的干净目录结构
-        Files.createDirectories(tenantBasePath);
-        Files.createDirectories(tenantBasePath.resolve("emptyDirectory"));
-        Files.createDirectories(tenantBasePath.resolve("sqlDirectory"));
-
-        // 原测试逻辑不变
         List<StorageEntity> storageEntities = storageOperator.listStorageEntity(TENANT_BASE_DIR);
         assertThat(storageEntities.size()).isEqualTo(2);
 
-        StorageEntity storageEntity1 = storageEntities.get(0);
+        StorageEntity storageEntity1 = storageEntities.stream()
+                .filter(v -> v.getFileName().contains("emptyDirectory"))
+                .findFirst()
+                .orElse(null);
         assertThat(storageEntity1.getFullName()).isEqualTo(TENANT_BASE_DIR + "/emptyDirectory");
         assertThat(storageEntity1.getFileName()).isEqualTo("emptyDirectory");
         assertThat(storageEntity1.getPfullName()).isEqualTo(TENANT_BASE_DIR);
         assertThat(storageEntity1.isDirectory()).isTrue();
         assertThat(storageEntity1.getType()).isEqualTo(ResourceType.FILE);
 
-        StorageEntity storageEntity2 = storageEntities.get(1);
+        StorageEntity storageEntity2 = storageEntities.stream()
+                .filter(v -> v.getFileName().contains("sqlDirectory"))
+                .findFirst()
+                .orElse(null);
         assertThat(storageEntity2.getFullName()).isEqualTo(TENANT_BASE_DIR + "/sqlDirectory");
         assertThat(storageEntity2.getFileName()).isEqualTo("sqlDirectory");
         assertThat(storageEntity2.getPfullName()).isEqualTo(TENANT_BASE_DIR);
