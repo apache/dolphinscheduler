@@ -81,7 +81,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
       - name: Run Unit tests
-        run: export MAVEN_OPTS="-Xmx6g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m" && ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true
+        run: export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m" && ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true
       - name: Upload coverage report to codecov
         run: CODECOV_TOKEN=$token bash <(curl -s https://codecov.io/bash)
         env:
