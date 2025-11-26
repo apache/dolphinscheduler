@@ -112,7 +112,9 @@ public class EmrJobFlowTask extends AbstractEmrTask {
             log.info("emr task finished with cluster status : {}", clusterStatus);
 
             // shutdown emrclient
-            emrClient.shutdown();
+            if (emrClient != null) {
+                emrClient.shutdown();
+            }
         }
     }
 
@@ -183,14 +185,21 @@ public class EmrJobFlowTask extends AbstractEmrTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        log.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(),
-                clusterId);
-        TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
-        TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
-        log.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
-
-        // shutdown emrclient
-        emrClient.shutdown();
+        try {
+            log.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(),
+                    clusterId);
+            TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
+            TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
+            log.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
+        } catch (Exception e) {
+            log.error("emr job flow task cancel error: {}", e.getMessage(), e);
+            throw new TaskException("emr job flow task cancel error: " + e.getMessage(), e);
+        } finally {
+            // shutdown emrclient
+            if (emrClient != null) {
+                emrClient.shutdown();
+            }
+        }
     }
 
 }

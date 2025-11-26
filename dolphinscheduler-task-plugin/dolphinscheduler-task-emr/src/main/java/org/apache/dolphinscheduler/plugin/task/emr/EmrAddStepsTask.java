@@ -118,7 +118,9 @@ public class EmrAddStepsTask extends AbstractEmrTask {
             log.info("emr task finished with step status : {}", stepStatus);
 
             // shutdown emrclient
-            emrClient.shutdown();
+            if (emrClient != null) {
+                emrClient.shutdown();
+            }
         }
     }
 
@@ -217,7 +219,9 @@ public class EmrAddStepsTask extends AbstractEmrTask {
             throw new TaskException("cancel emr step failed", e);
         } finally {
             // shutdown emrclient
-            emrClient.shutdown();
+            if (emrClient != null) {
+                emrClient.shutdown();
+            }
         }
     }
 
