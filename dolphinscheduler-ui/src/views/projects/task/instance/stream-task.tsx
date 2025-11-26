@@ -39,7 +39,6 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
 import { streamStateType } from '@/common/common'
-import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 import totalCount from '@/utils/tableTotalCount'
@@ -48,8 +47,6 @@ const BatchTaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
     let setIntervalP: number
-    const uiSettingStore = useUISettingStore()
-    const logTimer = uiSettingStore.getLogTimer
     const { t, variables, getTableData, createColumns } = useTable()
 
     const onUpdatePageSize = () => {
@@ -96,7 +93,7 @@ const BatchTaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    const getLogs = (row: any, logTimer: number) => {
+    const getLogs = (row: any) => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: Number(row.id),
@@ -105,18 +102,10 @@ const BatchTaskInstance = defineComponent({
         }).then((res: any) => {
           variables.logRef += res.message || ''
           if (res && res.message !== '') {
-            variables.limit += 1000
             variables.skipLineNum += res.lineNum
-            getLogs(row, logTimer)
+            getLogs(row)
           } else {
             variables.logLoadingRef = false
-            setTimeout(() => {
-              variables.logRef = ''
-              variables.limit = 1000
-              variables.skipLineNum = 0
-              variables.logLoadingRef = true
-              getLogs(row, logTimer)
-            }, logTimer * 1000)
           }
         }),
         {}
@@ -129,7 +118,7 @@ const BatchTaskInstance = defineComponent({
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0
-      getLogs(row, logTimer)
+      getLogs(row)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -154,7 +143,7 @@ const BatchTaskInstance = defineComponent({
       () => variables.showModalRef,
       () => {
         if (variables.showModalRef) {
-          getLogs(variables.row, logTimer)
+          getLogs(variables.row)
         } else {
           variables.row = {}
           variables.logRef = ''
