@@ -24,8 +24,9 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryLo
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,7 +43,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
     private final JdbcRegistryLockRepository jdbcRegistryLockRepository;
 
     // lockKey -> LockEntry
-    private final Map<String, LockEntry> jdbcRegistryLockHolderMap = new HashMap<>();
+    private final Map<String, LockEntry> jdbcRegistryLockHolderMap = new ConcurrentHashMap<>();
 
     public JdbcRegistryLockManager(JdbcRegistryProperties jdbcRegistryProperties,
                                    JdbcRegistryLockRepository jdbcRegistryLockRepository) {
@@ -56,6 +57,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
         while (true) {
             LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
             if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
+                lockEntry.lockCount.incrementAndGet();
                 return;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -92,6 +94,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
         while (System.currentTimeMillis() - start <= timeout) {
             LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
             if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
+                lockEntry.lockCount.incrementAndGet();
                 return true;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -124,13 +127,21 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
 
     @Override
     public void releaseJdbcRegistryLock(Long clientId, String lockKey) {
+        String lockOwner = LockUtils.getLockOwner();
         LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
-        if (lockEntry == null) {
+        if (lockEntry == null || !lockOwner.equals(lockEntry.getLockOwner())) {
             return;
         }
         if (!clientId.equals(lockEntry.getJdbcRegistryLock().getClientId())) {
             throw new UnsupportedOperationException(
                     "The client " + clientId + " is not the lock owner of the lock: " + lockKey);
+        }
+        int newLockCount = lockEntry.lockCount.decrementAndGet();
+        if (newLockCount > 0) {
+            return;
+        }
+        if (newLockCount < 0) {
+            throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + lockKey);
         }
         jdbcRegistryLockRepository.deleteById(lockEntry.getJdbcRegistryLock().getId());
         jdbcRegistryLockHolderMap.remove(lockKey);
@@ -144,6 +155,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
 
         private String lockKey;
         private String lockOwner;
+        final AtomicInteger lockCount = new AtomicInteger(1);
         private JdbcRegistryLockDTO jdbcRegistryLock;
     }
 }
