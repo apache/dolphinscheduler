@@ -70,7 +70,7 @@ class ProcedureTaskTest {
     private ResourceParametersHelper mockResourceHelper;
 
     @Mock
-    private ProcedureParameters procedureParams = new ProcedureParameters();
+    private ProcedureParameters procedureParams;
 
     private ProcedureTask procedureTask;
 

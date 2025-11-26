@@ -135,17 +135,17 @@ public class ProcedureTask extends AbstractTask {
     }
 
     @Override
-    public void cancel() {
+    public void cancel() throws TaskException {
         Statement stmt = this.sessionStatement;
         if (stmt != null) {
             try {
                 log.debug("Try to cancel this procedure task");
-                stmt.cancel();
                 setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+                stmt.cancel();
                 log.debug("this procedure task was canceled");
             } catch (SQLException ex) {
                 log.warn("Failed to cancel stored procedure (driver/DB may not support it)", ex);
-                throw new TaskException("Cancel http task failed", ex);
+                throw new TaskException("Cancel procedure task failed", ex);
             }
         } else {
             log.warn(
