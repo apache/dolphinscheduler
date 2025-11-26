@@ -131,7 +131,8 @@ public class SagemakerTask extends AbstractRemoteTask {
             // stop pipeline
             utils.stopPipelineExecution(client, pipelineId);
         } catch (Exception e) {
-            throw new TaskException("cancel application error", e);
+            log.error("SageMaker task cancel application error: {}", e.getMessage(), e);
+            throw new TaskException("SageMaker task cancel application error: " + e.getMessage(), e);
         } finally {
             // shutdown client
             if (client != null) {
@@ -147,7 +148,8 @@ public class SagemakerTask extends AbstractRemoteTask {
             // Keep checking the health status
             exitStatusCode = utils.checkPipelineExecutionStatus(client, pipelineId);
         } catch (Exception e) {
-            throw new TaskException(e.getMessage(), e);
+            log.error("SageMaker task track application error: {}", e.getMessage(), e);
+            throw new TaskException("SageMaker task track application error: " + e.getMessage(), e);
         } finally {
             // shutdown client
             if (client != null) {
