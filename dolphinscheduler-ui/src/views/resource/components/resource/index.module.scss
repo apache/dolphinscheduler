@@ -20,6 +20,7 @@
   height: calc(100vh - 160px);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   > h2 {
     line-height: 60px;
     text-align: center;
@@ -32,8 +33,8 @@
 .editor-wrapper {
   flex: 1;
   min-height: 200px;
-  display: flex;
-  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .button-area {
@@ -46,6 +47,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .submit {
