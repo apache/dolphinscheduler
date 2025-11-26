@@ -209,7 +209,7 @@ public class EmrAddStepsTaskTest {
     public void cancelApplication_CancelStepsResultIsNull_ShouldThrowException() {
         Mockito.when(emrClient.cancelSteps(any(CancelStepsRequest.class))).thenReturn(null);
 
-        TaskException exception = Assertions.assertThrows(TaskException.class, () -> {
+        Assertions.assertThrows(TaskException.class, () -> {
             emrAddStepsTask.cancelApplication();
         });
 
@@ -228,10 +228,31 @@ public class EmrAddStepsTaskTest {
 
         Mockito.when(emrClient.cancelSteps(any(CancelStepsRequest.class))).thenReturn(cancelStepsResult);
 
-        TaskException exception = Assertions.assertThrows(TaskException.class, () -> {
+        emrAddStepsTask.stepId = "step-123";
+
+        Assertions.assertThrows(TaskException.class, () -> {
             emrAddStepsTask.cancelApplication();
         });
 
+        verify(emrClient, times(1)).shutdown();
+    }
+
+    @Test
+    public void testCancelApplication_Success() throws TaskException {
+        CancelStepsInfo cancelStepsInfo = new CancelStepsInfo()
+                .withStepId("step-123")
+                .withStatus(CancelStepsRequestStatus.SUBMITTED.toString());
+
+        CancelStepsResult cancelStepsResult = new CancelStepsResult()
+                .withCancelStepsInfoList(cancelStepsInfo);
+
+        emrAddStepsTask.stepId = "step-123";
+
+        Mockito.when(emrClient.cancelSteps(any(CancelStepsRequest.class))).thenReturn(cancelStepsResult);
+
+        Assertions.assertDoesNotThrow(() -> emrAddStepsTask.cancelApplication());
+
+        verify(emrClient, times(1)).cancelSteps(any(CancelStepsRequest.class));
         verify(emrClient, times(1)).shutdown();
     }
 }

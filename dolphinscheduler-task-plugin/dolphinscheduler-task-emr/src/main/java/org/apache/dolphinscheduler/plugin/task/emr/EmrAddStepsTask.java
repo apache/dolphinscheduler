@@ -51,7 +51,7 @@ import com.google.common.collect.Sets;
 @Slf4j
 public class EmrAddStepsTask extends AbstractEmrTask {
 
-    private String stepId;
+    String stepId;
 
     private final HashSet<String> waitingStateSet = Sets.newHashSet(
             StepState.PENDING.toString(),
