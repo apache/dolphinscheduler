@@ -433,13 +433,12 @@ public class EtcdRegistry implements Registry {
                 .build();
     }
 
-    private static class LockEntry
-    {
+    private static class LockEntry {
+
         final Long leaseId;
         final AtomicInteger lockCount = new AtomicInteger(1);
 
-        private LockEntry(Long leaseId)
-        {
+        private LockEntry(Long leaseId) {
             this.leaseId = leaseId;
         }
     }
