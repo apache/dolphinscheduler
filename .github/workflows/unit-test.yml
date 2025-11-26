@@ -104,7 +104,7 @@ jobs:
           -Dsonar.organization=apache
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
-          -Dsonar.token="$token"
+          -Dsonar.token=$token
           -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false
           -Dmaven.wagon.http.pool=false
@@ -112,7 +112,7 @@ jobs:
           -DskipUT=true
           -Danalyze.skip=true
         env:
-          token: ${{ secrets.SONAR_TOKEN_1 }}
+          token: ${{ secrets.SONARCLOUD_TOKEN }}
 
   result:
     name: Unit Test
