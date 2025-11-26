@@ -17,17 +17,35 @@
 
 .file-edit-content {
   width: 100%;
-  padding-bottom: 20px;
+  height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
   > h2 {
     line-height: 60px;
     text-align: center;
     padding-right: 170px;
     position: relative;
+    flex-shrink: 0;
   }
+}
+
+.editor-wrapper {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-area {
+  flex-shrink: 0;
+  padding-top: 12px;
 }
 
 .form-content {
   padding: 0 50px 0 50px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .submit {

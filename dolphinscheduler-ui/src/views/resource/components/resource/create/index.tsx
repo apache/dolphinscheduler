@@ -27,7 +27,6 @@ import { useForm } from './use-form'
 import { fileTypeArr } from '@/common/common'
 
 import styles from '../index.module.scss'
-import { EDITOR_VERTICAL_OFFSET_CREATE } from '../constants'
 
 import type { Router } from 'vue-router'
 
@@ -67,43 +66,48 @@ export default defineComponent({
     const { t } = useI18n()
     return (
       <Card title={t('resource.file.file_details')}>
-        <NForm
-          rules={this.rules}
-          ref='fileFormRef'
-          class={styles['form-content']}
-        >
-          <NFormItem label={t('resource.file.file_name')} path='fileName'>
-            <NInput
-              allowInput={this.trim}
-              v-model={[this.fileForm.fileName, 'value']}
-              placeholder={t('resource.file.enter_name_tips')}
-              style={{ width: '300px' }}
-              class='input-file-name'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.file_format')} path='suffix'>
-            <NSelect
-              defaultValue={[this.fileForm.suffix]}
-              v-model={[this.fileForm.suffix, 'value']}
-              options={this.fileSuffixOptions}
-              style={{ width: '100px' }}
-              class='select-file-format'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.file_content')} path='content'>
-            <div
-              style={{
-                width: '90%'
-              }}
-            >
-              <MonacoEditor
-                v-model={[this.fileForm.content, 'value']}
-                height={`calc(100vh - ${EDITOR_VERTICAL_OFFSET_CREATE}px)`}
+        <div class={styles['file-edit-content']}>
+          <NForm
+            rules={this.rules}
+            ref='fileFormRef'
+            class={styles['form-content']}
+          >
+            <NFormItem label={t('resource.file.file_name')} path='fileName'>
+              <NInput
+                allowInput={this.trim}
+                v-model={[this.fileForm.fileName, 'value']}
+                placeholder={t('resource.file.enter_name_tips')}
+                style={{ width: '300px' }}
+                class='input-file-name'
               />
-            </div>
-          </NFormItem>
-          <div class={styles['file-edit-content']}>
-            <div class={styles.submit}>
+            </NFormItem>
+            <NFormItem label={t('resource.file.file_format')} path='suffix'>
+              <NSelect
+                defaultValue={[this.fileForm.suffix]}
+                v-model={[this.fileForm.suffix, 'value']}
+                options={this.fileSuffixOptions}
+                style={{ width: '100px' }}
+                class='select-file-format'
+              />
+            </NFormItem>
+            <NFormItem
+              label={t('resource.file.file_content')}
+              path='content'
+              class={styles['editor-wrapper']}
+            >
+              <div
+                style={{
+                  width: '90%',
+                  height: '100%'
+                }}
+              >
+                <MonacoEditor
+                  v-model={[this.fileForm.content, 'value']}
+                  height='100%'
+                />
+              </div>
+            </NFormItem>
+            <div class={styles['button-area']}>
               <NButton
                 type='info'
                 size='small'
@@ -124,8 +128,8 @@ export default defineComponent({
                 {t('resource.file.return')}
               </NButton>
             </div>
-          </div>
-        </NForm>
+          </NForm>
+        </div>
       </Card>
     )
   }
