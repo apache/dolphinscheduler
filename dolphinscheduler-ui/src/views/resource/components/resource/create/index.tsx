@@ -27,6 +27,7 @@ import { useForm } from './use-form'
 import { fileTypeArr } from '@/common/common'
 
 import styles from '../index.module.scss'
+import { EDITOR_VERTICAL_OFFSET_CREATE } from '../constants'
 
 import type { Router } from 'vue-router'
 
@@ -97,7 +98,7 @@ export default defineComponent({
             >
               <MonacoEditor 
                 v-model={[this.fileForm.content, 'value']} 
-                height='calc(100vh - 420px)'
+                height={`calc(100vh - ${EDITOR_VERTICAL_OFFSET_CREATE}px)`}
               />
             </div>
           </NFormItem>

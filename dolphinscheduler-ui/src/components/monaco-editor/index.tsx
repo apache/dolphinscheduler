@@ -169,6 +169,7 @@ export default defineComponent({
         ref='editorRef'
         style={{
           height: this.height,
+          minHeight: '200px',
           width: '100%',
           border: '1px solid #eee'
         }}

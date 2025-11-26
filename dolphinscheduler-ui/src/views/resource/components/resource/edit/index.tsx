@@ -25,6 +25,7 @@ import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import styles from '../index.module.scss'
 import { useDetailPageStore } from '@/views/resource/components/resource/table/use-table'
+import { EDITOR_VERTICAL_OFFSET_EDIT } from '../constants'
 
 export default defineComponent({
   name: 'ResourceEdit',
@@ -96,7 +97,7 @@ export default defineComponent({
               <NFormItem path='content'>
                 <MonacoEditor
                   v-model={[this.resourceViewRef.state.value.content, 'value']}
-                  height='calc(100vh - 320px)'
+                  height={`calc(100vh - ${EDITOR_VERTICAL_OFFSET_EDIT}px)`}
                 />
               </NFormItem>
               <NSpace>
