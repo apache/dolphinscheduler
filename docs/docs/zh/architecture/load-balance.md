@@ -11,9 +11,11 @@ DolphinScheduler-Master 分配任务至 worker，提供了四种负载均衡算�
 - **平滑轮询** (FIXED_WEIGHTED_ROUND_ROBIN)
 - **动态平滑轮询** (DYNAMIC_WEIGHTED_ROUND_ROBIN) - 默认算法
 
-## 负载均衡配置
+## 负载均衡算法配置
 
 在配置文件中配置负载均衡算法：
+
+位置：`master-server/conf/application.yaml`
 
 ```yaml
 worker-load-balancer-configuration-properties:
@@ -26,6 +28,7 @@ worker-load-balancer-configuration-properties:
 ### 平滑轮询权重配置 (FIXED_WEIGHTED_ROUND_ROBIN)
 
 对于 `FIXED_WEIGHTED_ROUND_ROBIN` 算法，可以在每个 worker 的配置文件中修改固定权重：
+
 位置：`worker-server/conf/application.yaml`
 
 ```yaml
@@ -35,6 +38,7 @@ host-weight: 100 #默认值为 100
 ### 动态平滑轮询权重配置 (DYNAMIC_WEIGHTED_ROUND_ROBIN)
 
 当使用 `DYNAMIC_WEIGHTED_ROUND_ROBIN` 算法时，可以配置各项指标的权重：
+
 位置：`master-server/conf/application.yaml`
 
 ```yaml

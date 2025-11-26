@@ -32,7 +32,8 @@ For the `FIXED_WEIGHTED_ROUND_ROBIN` algorithm, you can modify the fixed weight 
 Location: `worker-server/conf/application.yaml`
 
 ```yaml
-host-weight: 100 #default value is 100
+worker:
+  host-weight: 100 #default value is 100
 ```
 
 ### Dynamic Smooth Round Robin Configuration (DYNAMIC_WEIGHTED_ROUND_ROBIN)
