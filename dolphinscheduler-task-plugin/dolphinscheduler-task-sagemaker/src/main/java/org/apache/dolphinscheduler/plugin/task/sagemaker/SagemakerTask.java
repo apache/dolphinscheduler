@@ -134,7 +134,9 @@ public class SagemakerTask extends AbstractRemoteTask {
             throw new TaskException("cancel application error", e);
         } finally {
             // shutdown client
-            client.shutdown();
+            if (client != null) {
+                client.shutdown();
+            }
         }
     }
 
@@ -148,14 +150,16 @@ public class SagemakerTask extends AbstractRemoteTask {
             throw new TaskException(e.getMessage(), e);
         } finally {
             // shutdown client
-            client.shutdown();
+            if (client != null) {
+                client.shutdown();
+            }
         }
     }
 
     /**
      * init sagemaker applicationId if null
      */
-    public void initPipelineId() {
+    void initPipelineId() {
         if (pipelineId == null) {
             if (StringUtils.isNotEmpty(getAppIds())) {
                 pipelineId = JSONUtils.parseObject(getAppIds(), PipelineUtils.PipelineId.class);
