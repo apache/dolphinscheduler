@@ -48,6 +48,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -199,17 +200,21 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * @return a safe, fully resolved map of parameter name to {@link Property}, ready for task execution
      */
     @Override
-    public Map<String, Property> paramParsingPreparation(
-                                                         @NonNull TaskInstance taskInstance,
+    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters,
                                                          @NonNull WorkflowInstance workflowInstance,
                                                          String projectName,
                                                          String workflowDefinitionName) {
-
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
+        // If it is a complement, you need to pass in the task instance id
+        // to locate the time of the process instance complement.
         ICommandParam commandParam = JSONUtils.parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
-        String timeZone = commandParam != null ? commandParam.getTimeZone() : null;
+        if (commandParam == null) {
+            throw new ServiceException(String.format("Failed to parse command parameter for workflow instance %s",
+                    workflowInstance.getId()));
+        }
+        String timeZone = commandParam.getTimeZone();
 
         // 1. Built-in parameters (lowest precedence)
         Map<String, String> builtInParams = setBuiltInParamsMap(
@@ -229,7 +234,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         safePutAll(prepareParamsMap, localParams);
 
         // 5. Command-line / complement parameters
-        if (commandParam != null && CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
+        if (CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
             Map<String, Property> commandParamsMap = commandParam.getCommandParams().stream()
                     .filter(prop -> StringUtils.isNotBlank(prop.getProp()))
                     .collect(Collectors.toMap(
@@ -254,12 +259,12 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             }
         }
 
-        // 7. Resolve placeholders (e.g., "${output_dir}") using the current parameter context
-        resolvePlaceholders(prepareParamsMap);
-
-        // 8. Business/scheduling parameters (highest precedence)
+        // 7. Inject business/scheduling parameters (e.g., ${datetime}), which may contain or reference placeholders
         Map<String, Property> businessParams = preBuildBusinessParams(workflowInstance);
         safePutAll(prepareParamsMap, businessParams);
+
+        // 8. Resolve all placeholders (e.g., "${output_dir}") using the current parameter context
+        resolvePlaceholders(prepareParamsMap);
 
         return prepareParamsMap;
     }
