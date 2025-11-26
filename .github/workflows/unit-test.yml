@@ -66,26 +66,24 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-#      - name: Sanity Check
-#        uses: ./.github/actions/sanity-check
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#      - name: Set up JDK ${{ matrix.java }}
-#        uses: actions/setup-java@v4
-#        with:
-#          java-version: ${{ matrix.java }}
-#          distribution: 'adopt'
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
       - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
-#      - name: Run Unit tests
-#        run: export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m" && ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true
-#      - name: Upload coverage report to codecov
-#        run: CODECOV_TOKEN=$token bash <(curl -s https://codecov.io/bash)
-#        env:
-#          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Run Unit tests
+        run: export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m" && ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true
+      - name: Upload coverage report to codecov
+        run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
 
       # Set up JDK 17 for SonarCloud.
       - name: Set up JDK 17
