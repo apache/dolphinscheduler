@@ -132,9 +132,9 @@ public class DmsHook {
     public Boolean checkFinishedReplicationTask() {
         log.info("checkFinishedReplicationTask ......");
         awaitReplicationTaskStatus(STATUS.STOPPED);
+        String stopReason = describeReplicationTasks().getStopReason();
         // shutdown client
         client.shutdown();
-        String stopReason = describeReplicationTasks().getStopReason();
         return stopReason.endsWith(STATUS.FINISH_END_TOKEN);
     }
 
