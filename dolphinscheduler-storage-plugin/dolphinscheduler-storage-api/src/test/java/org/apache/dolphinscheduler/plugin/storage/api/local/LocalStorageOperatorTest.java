@@ -246,14 +246,20 @@ class LocalStorageOperatorTest {
         List<StorageEntity> storageEntities = storageOperator.listStorageEntity(TENANT_BASE_DIR);
         assertThat(storageEntities.size()).isEqualTo(2);
 
-        StorageEntity storageEntity1 = storageEntities.get(0);
+        StorageEntity storageEntity1 = storageEntities.stream()
+                .filter(v -> v.getFileName().contains("emptyDirectory"))
+                .findFirst()
+                .orElse(null);
         assertThat(storageEntity1.getFullName()).isEqualTo(TENANT_BASE_DIR + "/emptyDirectory");
         assertThat(storageEntity1.getFileName()).isEqualTo("emptyDirectory");
         assertThat(storageEntity1.getPfullName()).isEqualTo(TENANT_BASE_DIR);
         assertThat(storageEntity1.isDirectory()).isTrue();
         assertThat(storageEntity1.getType()).isEqualTo(ResourceType.FILE);
 
-        StorageEntity storageEntity2 = storageEntities.get(1);
+        StorageEntity storageEntity2 = storageEntities.stream()
+                .filter(v -> v.getFileName().contains("sqlDirectory"))
+                .findFirst()
+                .orElse(null);
         assertThat(storageEntity2.getFullName()).isEqualTo(TENANT_BASE_DIR + "/sqlDirectory");
         assertThat(storageEntity2.getFileName()).isEqualTo("sqlDirectory");
         assertThat(storageEntity2.getPfullName()).isEqualTo(TENANT_BASE_DIR);
