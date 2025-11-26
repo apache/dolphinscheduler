@@ -32,7 +32,8 @@ worker-load-balancer-configuration-properties:
 位置：`worker-server/conf/application.yaml`
 
 ```yaml
-host-weight: 100 #默认值为 100
+worker:
+  host-weight: 100 #默认值为 100
 ```
 
 ### 动态平滑轮询权重配置 (DYNAMIC_WEIGHTED_ROUND_ROBIN)
@@ -42,14 +43,15 @@ host-weight: 100 #默认值为 100
 位置：`master-server/conf/application.yaml`
 
 ```yaml
-worker-load-balancer-configuration-properties:
-  type: DYNAMIC_WEIGHTED_ROUND_ROBIN
-  # 动态权重配置，仅用于 DYNAMIC_WEIGHTED_ROUND_ROBIN 算法
-  # memory-usage、cpu-usage、task-thread-pool-usage 的权重总和必须为 100
-  dynamic-weight-config-properties:
-    memory-usage-weight: 30    # 内存使用率权重
-    cpu-usage-weight: 30       # CPU 使用率权重  
-    task-thread-pool-usage-weight: 40  # 任务线程池使用率权重
+master:
+  worker-load-balancer-configuration-properties:
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # 动态权重配置，仅用于 DYNAMIC_WEIGHTED_ROUND_ROBIN 算法
+    # memory-usage、cpu-usage、task-thread-pool-usage 的权重总和必须为 100
+    dynamic-weight-config-properties:
+      memory-usage-weight: 30    # 内存使用率权重
+      cpu-usage-weight: 30       # CPU 使用率权重  
+      task-thread-pool-usage-weight: 40  # 任务线程池使用率权重
 ```
 
 ## 负载均衡算法详解

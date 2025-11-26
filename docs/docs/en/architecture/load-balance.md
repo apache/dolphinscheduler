@@ -41,14 +41,15 @@ worker:
 When using the `DYNAMIC_WEIGHTED_ROUND_ROBIN` algorithm, you can configure the weights for various metrics:
 
 ```yaml
-worker-load-balancer-configuration-properties:
-  type: DYNAMIC_WEIGHTED_ROUND_ROBIN
-  # Dynamic weight configuration, only used for DYNAMIC_WEIGHTED_ROUND_ROBIN algorithm
-  # The sum of memory-usage, cpu-usage, task-thread-pool-usage weights must be 100
-  dynamic-weight-config-properties:
-    memory-usage-weight: 30    # Memory usage weight
-    cpu-usage-weight: 30       # CPU usage weight  
-    task-thread-pool-usage-weight: 40  # Task thread pool usage weight
+master:
+  worker-load-balancer-configuration-properties:
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # Dynamic weight configuration, only used for DYNAMIC_WEIGHTED_ROUND_ROBIN algorithm
+    # The sum of memory-usage, cpu-usage, task-thread-pool-usage weights must be 100
+    dynamic-weight-config-properties:
+      memory-usage-weight: 30    # Memory usage weight
+      cpu-usage-weight: 30       # CPU usage weight  
+      task-thread-pool-usage-weight: 40  # Task thread pool usage weight
 ```
 
 ## Load Balancing Algorithm Details
