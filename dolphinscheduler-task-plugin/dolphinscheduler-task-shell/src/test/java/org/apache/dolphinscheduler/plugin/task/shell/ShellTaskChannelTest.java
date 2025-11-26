@@ -63,7 +63,6 @@ public class ShellTaskChannelTest {
     @Test
     @DisplayName("parseParameters should parse task_params with simple script and one resource")
     public void testParseShellTaskParamsWithSimpleScript() {
-        // Given: 转义后的 JSON 字符串（JDK 8 兼容）
         String taskParams = "{\n" +
                 "  \"localParams\": [],\n" +
                 "  \"rawScript\": \"#!/bin/bash\\nset -e\\n\\n\\n \\necho \\\"====================================\\\"\",\n"
