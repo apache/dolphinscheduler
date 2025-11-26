@@ -56,27 +56,29 @@ datasource:
 postgresql:
   # -- If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL
   enabled: true
-  # -- The username for internal PostgreSQL
-  postgresqlUsername: "root"
-  # -- The password for internal PostgreSQL
-  postgresqlPassword: "root"
-  # -- The database for internal PostgreSQL
-  postgresqlDatabase: "dolphinscheduler"
   # -- The driverClassName for internal PostgreSQL
   driverClassName: "org.postgresql.Driver"
   # -- The params for internal PostgreSQL
   params: "characterEncoding=utf8"
-  persistence:
-    # -- Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL
-    enabled: false
-    # -- `PersistentVolumeClaim` size
-    size: "20Gi"
-    # -- PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
-    storageClass: "-"
+  auth:
+    # -- The username for internal PostgreSQL
+    username: "root"
+    # -- The password for internal PostgreSQL
+    password: "root"
+    # -- The database for internal PostgreSQL
+    database: "dolphinscheduler"
+  primary:
+    persistence:
+      # -- Set postgresql.primary.persistence.enabled to true to mount a new volume for internal PostgreSQL
+      enabled: false
+      # -- `PersistentVolumeClaim` size
+      size: "20Gi"
+      # -- PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
+      storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnamilegacy/postgresql
-    tag: 11.11.0
+    repository: bitnami/postgresql
+    tag: 15.1.0-debian-11-r12
 
 mysql:
   # -- If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL
@@ -102,8 +104,8 @@ mysql:
       storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnamilegacy/mysql
-    tag: 8.0.31-debian-11-r0
+    repository: bitnami/mysql
+    tag: 8.0.36-debian-12-r8
 
 minio:
   # -- Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production.
@@ -120,8 +122,8 @@ minio:
   defaultBuckets: "dolphinscheduler"
   image:
     registry: docker.io
-    repository: bitnamilegacy/minio
-    tag: 2022.10.29-debian-11-r0
+    repository: bitnami/minio
+    tag: 2023.12.23-debian-11-r3
 
 
 externalDatabase:
@@ -162,8 +164,8 @@ zookeeper:
     storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnamilegacy/zookeeper
-    tag: 3.8.4
+    repository: bitnami/zookeeper
+    tag: 3.9.3-debian-12-r21
 
 registryEtcd:
   # -- If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false
