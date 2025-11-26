@@ -96,6 +96,7 @@ export default defineComponent({
               <NFormItem path='content'>
                 <MonacoEditor
                   v-model={[this.resourceViewRef.state.value.content, 'value']}
+                  height='calc(100vh - 320px)'
                 />
               </NFormItem>
               <NSpace>

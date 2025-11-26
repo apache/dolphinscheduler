@@ -95,7 +95,10 @@ export default defineComponent({
                 width: '90%'
               }}
             >
-              <MonacoEditor v-model={[this.fileForm.content, 'value']} />
+              <MonacoEditor 
+                v-model={[this.fileForm.content, 'value']} 
+                height='calc(100vh - 420px)'
+              />
             </div>
           </NFormItem>
           <div class={styles['file-edit-content']}>
