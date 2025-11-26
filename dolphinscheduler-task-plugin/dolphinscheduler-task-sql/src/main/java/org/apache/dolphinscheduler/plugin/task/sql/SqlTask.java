@@ -254,29 +254,26 @@ public class SqlTask extends AbstractTask {
                 Set<String> usedLabels = new HashSet<>();
 
                 for (int i = 1; i <= num; i++) {
-                    // Get the column label (alias) from metadata; fall back to a generic name if null or empty
                     String baseLabel = md.getColumnLabel(i);
-                    if (baseLabel == null || baseLabel.isEmpty()) {
+                    // fall back to a generic name if null or empty
+                    if (StringUtils.isEmpty(baseLabel)) {
                         baseLabel = "col_" + i;
                     }
 
                     // Generate a unique field key for the JSON object:
                     // If the base label is already used in this row, append a numeric suffix (e.g., name_2, name_3)
                     String finalLabel = baseLabel;
-                    int suffix = 2; // Start numbering duplicates from _2 to keep the first occurrence clean
-
+                    // Start numbering duplicates from _2 to keep the first occurrence clean
+                    int suffix = 2;
                     while (!usedLabels.add(finalLabel)) {
                         finalLabel = baseLabel + "_" + suffix++;
                     }
 
-                    // Read the column value and convert it to a JSON node
                     try {
                         Object value = resultSet.getObject(i);
                         rowAsJson.set(finalLabel, JSONUtils.toJsonNode(value));
                     } catch (SQLException e) {
-                        // Log warning but continue processing: avoid failing the entire row due to one problematic
-                        // column
-                        log.warn("Failed to read column {} (label: '{}') in row {}: {}",
+                        log.warn("Failed to read column {}, label: {}, in row {}: {}",
                                 i, baseLabel, resultJSONArray.size() + 1, e.getMessage());
                         rowAsJson.set(finalLabel, JSONUtils.toJsonNode(null));
                     }
