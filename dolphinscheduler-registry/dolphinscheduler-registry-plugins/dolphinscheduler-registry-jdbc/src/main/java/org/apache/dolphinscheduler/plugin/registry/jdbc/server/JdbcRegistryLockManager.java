@@ -55,9 +55,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
     public void acquireJdbcRegistryLock(Long clientId, String lockKey) {
         String lockOwner = LockUtils.getLockOwner();
         while (true) {
-            LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
-            if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
-                lockEntry.lockCount.incrementAndGet();
+            if (currentThreadIsReentrant(lockKey, lockOwner)) {
                 return;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -87,14 +85,21 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
         }
     }
 
+    private boolean currentThreadIsReentrant(String lockKey, String lockOwner) {
+        LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
+        if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
+            lockEntry.lockCount.incrementAndGet();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean acquireJdbcRegistryLock(Long clientId, String lockKey, long timeout) {
         String lockOwner = LockUtils.getLockOwner();
         long start = System.currentTimeMillis();
         while (System.currentTimeMillis() - start <= timeout) {
-            LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
-            if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
-                lockEntry.lockCount.incrementAndGet();
+            if (currentThreadIsReentrant(lockKey, lockOwner)) {
                 return true;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -141,7 +146,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
             return;
         }
         if (newLockCount < 0) {
-            throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + lockKey);
+            throw new IllegalMonitorStateException("Jdbc lock count has gone negative for lock: " + lockKey);
         }
         jdbcRegistryLockRepository.deleteById(lockEntry.getJdbcRegistryLock().getId());
         jdbcRegistryLockHolderMap.remove(lockKey);

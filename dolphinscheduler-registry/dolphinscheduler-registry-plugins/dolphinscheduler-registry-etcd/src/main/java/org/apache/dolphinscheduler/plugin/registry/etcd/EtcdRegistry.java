@@ -298,15 +298,9 @@ public class EtcdRegistry implements Registry {
      * get the lock with a lease
      */
     @Override
-    public boolean acquireLock(String key) {
-        Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
-        if (null == lockEntryMap) {
-            lockEntryMap = new HashMap<>();
-            threadLocalLockMap.set(lockEntryMap);
-        }
-        LockEntry lockEntry = lockEntryMap.get(key);
-        if (lockEntry != null) {
-            lockEntry.lockCount.incrementAndGet();
+    public boolean acquireLock(String lockKey) {
+        Map<String, LockEntry> lockMap = getLockMapFromThreadLocal();
+        if (currentThreadIsReentrant(lockKey, lockMap)) {
             return true;
         }
 
@@ -318,29 +312,41 @@ public class EtcdRegistry implements Registry {
             // keep the lease
             client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
             }));
-            lockClient.lock(byteSequence(key), leaseId).get();
+            lockClient.lock(byteSequence(lockKey), leaseId).get();
 
             // save the leaseId for release Lock
-            lockEntryMap.put(key, new LockEntry(leaseId));
+            lockMap.put(lockKey, new LockEntry(leaseId));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get lock error", e);
         } catch (Exception e) {
-            throw new RegistryException("etcd get lock error, lockKey: " + key, e);
+            throw new RegistryException("etcd get lock error, lockKey: " + lockKey, e);
         }
     }
 
-    @Override
-    public boolean acquireLock(String key, long timeout) {
+    private static boolean currentThreadIsReentrant(String lockKey, Map<String, LockEntry> lockEntryMap) {
+        LockEntry lockEntry = lockEntryMap.get(lockKey);
+        if (lockEntry != null) {
+            lockEntry.lockCount.incrementAndGet();
+            return true;
+        }
+        return false;
+    }
+
+    private static Map<String, LockEntry> getLockMapFromThreadLocal() {
         Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
         if (null == lockEntryMap) {
             lockEntryMap = new HashMap<>();
             threadLocalLockMap.set(lockEntryMap);
         }
-        LockEntry lockEntry = lockEntryMap.get(key);
-        if (lockEntry != null) {
-            lockEntry.lockCount.incrementAndGet();
+        return lockEntryMap;
+    }
+
+    @Override
+    public boolean acquireLock(String key, long timeout) {
+        Map<String, LockEntry> lockEntryMap = getLockMapFromThreadLocal();
+        if (currentThreadIsReentrant(key, lockEntryMap)) {
             return true;
         }
 
@@ -374,7 +380,11 @@ public class EtcdRegistry implements Registry {
     @Override
     public boolean releaseLock(String key) {
         try {
-            LockEntry lockEntry = threadLocalLockMap.get().get(key);
+            Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
+            if (lockEntryMap == null) {
+                return true;
+            }
+            LockEntry lockEntry = lockEntryMap.get(key);
             if (lockEntry == null) {
                 return true;
             }
@@ -383,17 +393,17 @@ public class EtcdRegistry implements Registry {
                 return true;
             }
             if (newLockCount < 0) {
-                throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + key);
+                throw new IllegalMonitorStateException("Etcd lock count has gone negative for lock: " + key);
             }
             client.getLeaseClient().revoke(lockEntry.leaseId);
-            threadLocalLockMap.get().remove(key);
-            if (threadLocalLockMap.get().isEmpty()) {
+            lockEntryMap.remove(key);
+            if (lockEntryMap.isEmpty()) {
                 threadLocalLockMap.remove();
             }
         } catch (Exception e) {
             throw new RegistryException("etcd release lock error, lockKey: " + key, e);
         }
-        return true;
+        return false;
     }
 
     @Override

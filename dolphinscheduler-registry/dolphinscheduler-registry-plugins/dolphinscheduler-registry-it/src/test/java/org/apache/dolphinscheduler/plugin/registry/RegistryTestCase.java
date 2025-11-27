@@ -263,31 +263,20 @@ public abstract class RegistryTestCase<R extends Registry> {
     public void testReentrantLock() {
         registry.start();
         String lockKey = "/lock" + System.nanoTime();
-        // 1. Acquire the lock in the main thread
         assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
-        // Acquire the lock in the main thread
-        // It should acquire success
         assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
 
-        // 2. Acquire the lock at another thread
-        // It should acquire failed
         CompletableFuture<Boolean> acquireResult =
                 CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
         assertThat(acquireResult.get()).isFalse();
 
-        // 3. Release the lock in the main thread
         assertThat(registry.releaseLock(lockKey)).isTrue();
 
-        // Acquire the lock at another thread
-        // It should acquire failed
         acquireResult = CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
         assertThat(acquireResult.get()).isFalse();
 
-        // 4. Release the lock in the main thread again
         assertThat(registry.releaseLock(lockKey)).isTrue();
 
-        // Acquire the lock at another thread
-        // It should acquire success
         acquireResult = CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
         assertThat(acquireResult.get()).isTrue();
     }
