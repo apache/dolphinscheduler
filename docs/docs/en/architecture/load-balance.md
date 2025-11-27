@@ -1,52 +1,89 @@
-# Load Balance
+# Load Balancing
 
-Load balancing refers to the reasonable allocation of server pressure through routing algorithms (usually in cluster environments) to achieve the maximum optimization of server performance.
+Load balancing distributes server pressure reasonably through routing algorithms (typically in cluster environments) to optimize server performance to the maximum extent.
 
 ## DolphinScheduler-Worker Load Balancing Algorithms
 
-DolphinScheduler-Master allocates tasks to workers, and by default provides three algorithms:
+DolphinScheduler-Master provides four load balancing algorithms for distributing tasks to workers:
 
-- Weighted random (random)
+- **Random** (RANDOM)
+- **Round Robin** (ROUND_ROBIN)
+- **Smooth Round Robin** (FIXED_WEIGHTED_ROUND_ROBIN)
+- **Dynamic Smooth Round Robin** (DYNAMIC_WEIGHTED_ROUND_ROBIN) - Default algorithm
 
-- Smoothing polling (round-robin)
+## Load Balancing Configuration
 
-- Linear load (lower weight)
+Configure the load balancing algorithm in the configuration file:
 
-The default configuration is the linear load.
+Location: `master-server/conf/application.yaml`
 
-As the routing sets on the client side, the master service, you can change master.host.selector in master.properties to configure the algorithm.
+```yaml
+worker-load-balancer-configuration-properties:
+  # types: RANDOM, ROUND_ROBIN, FIXED_WEIGHTED_ROUND_ROBIN, DYNAMIC_WEIGHTED_ROUND_ROBIN
+  type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+```
 
-e.g. master.host.selector=random (case-insensitive)
+## Worker Weight Configuration
 
-## Worker Load Balancing Configuration
+### Smooth Round Robin Configuration (FIXED_WEIGHTED_ROUND_ROBIN)
 
-The configuration file is worker.properties
+For the `FIXED_WEIGHTED_ROUND_ROBIN` algorithm, you can modify the fixed weight in each worker's configuration file:
 
-### Weight
+Location: `worker-server/conf/application.yaml`
 
-All the load algorithms above are weighted based on weights, which affect the routing outcome. You can set different weights for different machines by modifying the `worker.weight` value.
+```yaml
+worker:
+  host-weight: 100 #default value is 100
+```
 
-### Preheating
+### Dynamic Smooth Round Robin Configuration (DYNAMIC_WEIGHTED_ROUND_ROBIN)
 
-Consider JIT optimization, worker runs at low power for a period of time after startup, so that it can gradually reach its optimal state, a process we call preheating. If you are interested, you can read some articles about JIT.
+When using the `DYNAMIC_WEIGHTED_ROUND_ROBIN` algorithm, you can configure the weights for various metrics:
 
-So the worker gradually reaches its maximum weight with time after starts up ( by default ten minutes, there is no configuration about the pre-heating duration, it's recommend to submit a PR if have needs to change the duration).
+```yaml
+master:
+  worker-load-balancer-configuration-properties:
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # Dynamic weight configuration, only used for DYNAMIC_WEIGHTED_ROUND_ROBIN algorithm
+    # The sum of memory-usage, cpu-usage, task-thread-pool-usage weights must be 100
+    dynamic-weight-config-properties:
+      memory-usage-weight: 30    # Memory usage weight
+      cpu-usage-weight: 30       # CPU usage weight  
+      task-thread-pool-usage-weight: 40  # Task thread pool usage weight
+```
 
-## Load Balancing Algorithm in Details
+## Load Balancing Algorithm Details
 
-### Random (Weighted)
+### Random (RANDOM)
 
-This algorithm is relatively simple, select a worker by random (the weight affects its weighting).
+Randomly selects one available worker node to execute tasks.
 
-### Smoothed Polling (Weighted)
+### Round Robin (ROUND_ROBIN)
 
-An obvious drawback of the weighted polling algorithm, which is under special weights circumstance, weighted polling scheduling generates an imbalanced sequence of instances, and this unsmooth load may cause some instances to experience transient high loads, leading to a risk of system crash. To address this scheduling flaw, we provide a smooth weighted polling algorithm.
+Selects worker nodes in a fixed order to ensure each worker receives tasks evenly.
 
-Each worker has two weights parameters, weight (which remains constant after warm-up is complete) and current_weight (which changes dynamically). For every route, calculate the current_weight + weight and is iterated over all the workers, the weight of all the workers sum up and count as total_weight, then the worker with the largest current_weight is selected as the worker for this task. By meantime, set worker's current_weight-total_weight.
+### Smooth Round Robin (FIXED_WEIGHTED_ROUND_ROBIN)
 
-### Linear Weighting (Default Algorithm)
+Each worker has two weights: weight (remains constant after warm-up) and current_weight (dynamically changes). During each routing, all workers are traversed, and their current_weight is increased by their weight. The total weight of all workers is accumulated as total_weight. The worker with the highest current_weight is selected to execute the task, and then that worker's current_weight is decreased by total_weight.
 
-This algorithm reports its own load information to the registry at regular intervals. We mainly judge by CPU usage, memory usage and worker slot usage.
+- Example: For instance, with 3 workers (A, B, C) having weights of 1, 2, and 3 respectively
+- Worker selection order will be: C B C A B C C B C A B C C B C A B C C B C A B C C B C A B C ... (In this 30-round scheduling example, the number of tasks allocated to each worker is: C:15, B:10, A:5, exactly matching the weight ratio)
 
-If either of these is lower than the configured item, then this worker will not participate in the load. (no traffic will be allocated)
+### Dynamic Smooth Round Robin (DYNAMIC_WEIGHTED_ROUND_ROBIN) - Default Algorithm
 
+This algorithm reports its own load information to the registry at regular intervals. We primarily evaluate based on CPU usage, memory usage, and worker thread pool usage, with specific weight configurations as follows:
+- **Memory Usage** (Default weight: 30%)
+- **CPU Usage** (Default weight: 30%)
+- **Task Thread Pool Usage** (Default weight: 40%)
+
+**Weight Calculation Principle:**
+The dynamic weight of each worker is calculated using the following formula:
+
+```
+Weight = 100 - (CPU Weight × CPU Usage + Memory Weight × Memory Usage + Thread Pool Weight × Thread Pool Usage) ÷ 3
+```
+
+Therefore, when a worker's load is lower, its weight will be higher, and the system will prioritize selecting worker nodes with lower loads to execute tasks.
+
+In the final worker node selection process, the workflow is consistent with smooth round robin, with the only difference being that in this algorithm, worker weights change dynamically.
+Through this dynamic smooth round robin algorithm, DolphinScheduler can intelligently distribute tasks to workers with the lowest loads, achieving true dynamic load balancing.
