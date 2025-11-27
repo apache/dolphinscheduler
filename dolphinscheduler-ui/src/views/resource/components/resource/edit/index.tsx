@@ -93,10 +93,10 @@ export default defineComponent({
               class={styles['form-content']}
               disabled={this.componentName !== 'resource-file-edit'}
             >
-              <NFormItem path='content' class={styles['editor-wrapper']}>
+              <NFormItem path='content'>
                 <MonacoEditor
                   v-model={[this.resourceViewRef.state.value.content, 'value']}
-                  height='100%'
+                  height='calc(100vh - 380px)'
                 />
               </NFormItem>
               <NSpace class={styles['button-area']}>

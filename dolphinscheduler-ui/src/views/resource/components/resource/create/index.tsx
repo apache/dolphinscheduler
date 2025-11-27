@@ -93,19 +93,11 @@ export default defineComponent({
             <NFormItem
               label={t('resource.file.file_content')}
               path='content'
-              class={styles['editor-wrapper']}
             >
-              <div
-                style={{
-                  width: '90%',
-                  height: '100%'
-                }}
-              >
-                <MonacoEditor
-                  v-model={[this.fileForm.content, 'value']}
-                  height='100%'
-                />
-              </div>
+              <MonacoEditor
+                v-model={[this.fileForm.content, 'value']}
+                height='calc(100vh - 440px)'
+              />
             </NFormItem>
             <div class={styles['button-area']}>
               <NButton
