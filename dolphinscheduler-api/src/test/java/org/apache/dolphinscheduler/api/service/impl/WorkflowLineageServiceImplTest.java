@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -37,11 +42,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkflowLineageServiceImplTest {
@@ -70,7 +70,7 @@ class WorkflowLineageServiceImplTest {
         long workflowCode = 100L;
         when(workflowTaskLineageDao
                 .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, workflowCode, Constants.DEPENDENT_ALL_TASK))
-                .thenReturn(Collections.emptyList());
+                        .thenReturn(Collections.emptyList());
 
         List<DependentWorkflowDefinition> result =
                 workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowCode);
@@ -97,7 +97,7 @@ class WorkflowLineageServiceImplTest {
         when(workflowTaskLineageDao
                 .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, upstreamWorkflowCode,
                         Constants.DEPENDENT_ALL_TASK))
-                .thenReturn(Arrays.asList(taskLineage, workflowLineage));
+                                .thenReturn(Arrays.asList(taskLineage, workflowLineage));
 
         WorkflowDefinition workflowDefinition200 = new WorkflowDefinition();
         workflowDefinition200.setCode(200L);
@@ -144,4 +144,3 @@ class WorkflowLineageServiceImplTest {
         verify(taskDefinitionMapper).queryByCodeList(Collections.singletonList(300L));
     }
 }
-

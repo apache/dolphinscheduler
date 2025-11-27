@@ -247,13 +247,14 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.queryByCodeList(workflowTaskLineageList.stream()
                 .map(WorkflowTaskLineage::getTaskDefinitionCode).filter(code -> code != 0).distinct()
                 .collect(Collectors.toList()));
-        
+
         for (WorkflowTaskLineage workflowLineage : workflowTaskLineageList) {
             DependentWorkflowDefinition dependentWorkflowDefinition = new DependentWorkflowDefinition();
             dependentWorkflowDefinition.setWorkflowDefinitionCode(workflowLineage.getWorkflowDefinitionCode());
             dependentWorkflowDefinition.setTaskDefinitionCode(workflowLineage.getTaskDefinitionCode());
-            
-            // If taskDefinitionCode is 0, it means dependency on entire workflow, taskParams and workerGroup remain null
+
+            // If taskDefinitionCode is 0, it means dependency on entire workflow, taskParams and workerGroup remain
+            // null
             if (workflowLineage.getTaskDefinitionCode() != 0) {
                 taskDefinitionList.stream()
                         .filter(taskDefinition -> taskDefinition.getCode() == workflowLineage.getTaskDefinitionCode())
@@ -263,14 +264,15 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
                             dependentWorkflowDefinition.setWorkerGroup(taskDefinition.getWorkerGroup());
                         });
             }
-            
+
             workflowDefinitionList.stream()
-                    .filter(workflowDefinition -> workflowDefinition.getCode() == workflowLineage.getWorkflowDefinitionCode())
+                    .filter(workflowDefinition -> workflowDefinition.getCode() == workflowLineage
+                            .getWorkflowDefinitionCode())
                     .findFirst()
                     .ifPresent(workflowDefinition -> {
                         dependentWorkflowDefinition.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
                     });
-            
+
             dependentWorkflowDefinitionList.add(dependentWorkflowDefinition);
         }
 
