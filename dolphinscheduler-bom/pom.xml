@@ -69,7 +69,7 @@
         <activation.version>1.1</activation.version>
         <javax-mail>1.6.2</javax-mail>
         <guava.version>31.1-jre</guava.version>
-        <postgresql.version>42.4.1</postgresql.version>
+        <postgresql.version>42.4.4</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.19.0</commons-io.version>
