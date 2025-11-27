@@ -73,13 +73,14 @@
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
         <aspectj-maven-plugin.version>1.14.0</aspectj-maven-plugin.version>
         <spotless.version>2.27.2</spotless.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.14</jacoco.version>
+        <sonar.maven.plugin.version>5.3.0.6276</sonar.maven.plugin.version>
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
         <auto-service.version>1.0.1</auto-service.version>
         <jacoco.skip>false</jacoco.skip>
@@ -610,6 +611,12 @@
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar.maven.plugin.version}</version>
             </plugin>
 
             <!-- jenkins plugin jacoco report-->
