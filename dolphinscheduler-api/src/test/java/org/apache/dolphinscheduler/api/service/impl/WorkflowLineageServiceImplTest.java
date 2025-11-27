@@ -126,7 +126,7 @@ class WorkflowLineageServiceImplTest {
         DependentWorkflowDefinition taskDependent = result.stream()
                 .filter(dependent -> dependent.getWorkflowDefinitionCode() == 200L)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new AssertionError("Expected DependentWorkflowDefinition with code 200 not found"));
         assertThat(taskDependent.getTaskDefinitionCode()).isEqualTo(300L);
         assertThat(taskDependent.getTaskParams()).isEqualTo("task-params");
         assertThat(taskDependent.getWorkerGroup()).isEqualTo("test-group");
@@ -135,7 +135,7 @@ class WorkflowLineageServiceImplTest {
         DependentWorkflowDefinition workflowDependent = result.stream()
                 .filter(dependent -> dependent.getWorkflowDefinitionCode() == 201L)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new AssertionError("Expected DependentWorkflowDefinition with code 201 not found"));
         assertThat(workflowDependent.getTaskDefinitionCode()).isEqualTo(0L);
         assertThat(workflowDependent.getTaskParams()).isNull();
         assertThat(workflowDependent.getWorkerGroup()).isNull();
