@@ -235,13 +235,10 @@ class ProcedureTaskTest {
         // Verify the cause is the original SQLException
         assertEquals(sqlEx, taskEx.getCause());
 
-        // Verify logging behavior indirectly (optional: use MockLogger for strict verification)
-        // Here we assume logging occurs as per implementation
-
         // Verify that exit status was NOT set (since stmt.cancel() threw before setExitStatusCode)
         // You may need a getter or reflection to check internal state
         Integer exitCode = getPrivateField(procedureTask, "exitStatusCode");
-        assertEquals(exitCode, -1);
+        assertEquals(exitCode, TaskConstants.EXIT_CODE_KILL);
     }
 
     @Test
