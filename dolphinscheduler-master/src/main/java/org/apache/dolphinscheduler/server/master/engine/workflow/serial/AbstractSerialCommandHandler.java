@@ -78,6 +78,7 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
             @Override
             public Void doInTransaction(TransactionStatus status) {
                 serialCommandDao.deleteById(serialCommand.getId());
+
                 // todo: call api to stop the workflow instance
                 final Integer workflowInstanceId = serialCommand.getWorkflowInstanceId();
                 final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(workflowInstanceId);

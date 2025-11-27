@@ -155,7 +155,10 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
             transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
             if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType()
                     .isSerial()) {
-                serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId());
+                if (serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
+                    log.info("Success clear SerialCommand for WorkflowExecuteRunnable: {}",
+                            workflowExecutionRunnable.getName());
+                }
             }
             workflowExecutionRunnable.getWorkflowEventBus()
                     .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecutionRunnable));

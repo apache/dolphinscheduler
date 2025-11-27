@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
@@ -34,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +65,7 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     @Autowired
     private SerialCommandPriorityHandler serialCommandPriorityHandler;
 
-    private boolean flag = false;
+    private volatile boolean flag = false;
 
     private Thread internalThread;
 
@@ -103,7 +103,7 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
                 log.error("WorkflowSerialCoordinator error", e);
             } finally {
                 // sleep 5s
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * DEFAULT_FETCH_INTERVAL_SECONDS);
+                ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
             }
         }
     }
@@ -166,5 +166,10 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
                 .executionType(workflowDefinitionLog.getExecutionType())
                 .serialCommands(new ArrayList<>())
                 .build();
+    }
+
+    @Override
+    public void close() {
+        flag = false;
     }
 }

@@ -21,11 +21,14 @@ import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 /**
  * This strategy will discard the new workflow instance if there is a running workflow instance.
  */
+@Slf4j
 @Component
 public class SerialCommandDiscardHandler extends AbstractSerialCommandHandler {
 
@@ -35,16 +38,21 @@ public class SerialCommandDiscardHandler extends AbstractSerialCommandHandler {
         // Discard all other items in the queue.
         List<SerialCommandDto> serialCommands = serialCommandsGroup.getSerialCommands();
         for (int i = 0; i < serialCommands.size(); i++) {
-            SerialCommandDto serialCommandDto = serialCommands.get(i);
-            if (i == 0 && serialCommandDto.getState() == SerialCommandDto.State.WAITING) {
-                launchSerialCommand(serialCommandDto);
+            SerialCommandDto serialCommand = serialCommands.get(i);
+            if (i == 0) {
+                if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
+                    launchSerialCommand(serialCommand);
+                    log.info("Launched SerialCommand: {}", serialCommand);
+                }
                 continue;
             }
             // Discard all other items in the queue.
-            if (serialCommandDto.getState() != SerialCommandDto.State.WAITING) {
-                throw new IllegalStateException("The post commands must be in waiting state");
+            if (serialCommand.getState() != SerialCommandDto.State.WAITING) {
+                throw new IllegalStateException(
+                        "The post SerialCommand except WAITING state but -> " + serialCommand.getState());
             }
-            discardSerialCommandAndStopWorkflowInstanceInDB(serialCommandDto);
+            discardSerialCommandAndStopWorkflowInstanceInDB(serialCommand);
+            log.info("Discard SerialCommand: {}", serialCommand);
         }
     }
 

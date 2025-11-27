@@ -29,8 +29,8 @@
         limit #{fetchSize}
     </select>
 
-    <select id="deleteByWorkflowInstanceId">
+    <delete id="deleteByWorkflowInstanceId">
         delete from t_ds_serial_command where workflow_instance_id = #{workflowInstanceId}
-    </select>
+    </delete>
     
 </mapper>

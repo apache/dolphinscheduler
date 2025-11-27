@@ -26,6 +26,6 @@ public interface SerialCommandDao extends IDao<SerialCommand> {
 
     List<SerialCommandDto> fetchSerialCommands(int fetchSize);
 
-    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
+    int deleteByWorkflowInstanceId(Integer workflowInstanceId);
 
 }

@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
-public interface IWorkflowSerialCoordinator {
+public interface IWorkflowSerialCoordinator extends AutoCloseable {
 
     void start();
+
+    @Override
+    void close();
 
 }

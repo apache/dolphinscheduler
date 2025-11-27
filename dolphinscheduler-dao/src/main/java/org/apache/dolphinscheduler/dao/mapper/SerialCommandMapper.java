@@ -29,6 +29,6 @@ public interface SerialCommandMapper extends BaseMapper<SerialCommand> {
 
     List<SerialCommand> fetchSerialCommands(@Param("fetchSize") int fetchSize);
 
-    void deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
+    int deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 
 }

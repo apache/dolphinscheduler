@@ -44,7 +44,7 @@ public class SerialCommandDaoImpl extends BaseDao<SerialCommand, SerialCommandMa
     }
 
     @Override
-    public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
-        mybatisMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    public int deleteByWorkflowInstanceId(Integer workflowInstanceId) {
+        return mybatisMapper.deleteByWorkflowInstanceId(workflowInstanceId);
     }
 }

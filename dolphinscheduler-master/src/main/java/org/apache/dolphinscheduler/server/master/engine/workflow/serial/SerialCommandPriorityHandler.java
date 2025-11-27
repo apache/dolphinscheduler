@@ -21,11 +21,14 @@ import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 /**
  * This strategy will stop the previous workflow instance and notify the newly workflow instance.
  */
+@Slf4j
 @Component
 public class SerialCommandPriorityHandler extends AbstractSerialCommandHandler {
 
@@ -38,14 +41,18 @@ public class SerialCommandPriorityHandler extends AbstractSerialCommandHandler {
             if (i == serialCommands.size() - 1) {
                 if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
                     launchSerialCommand(serialCommand);
+                    log.info("Launched SerialCommand: {}", serialCommand);
                 }
                 continue;
             }
 
             if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
                 discardSerialCommandAndStopWorkflowInstanceInDB(serialCommand);
+                log.info("Discard SerialCommand: {}", serialCommand);
             } else {
                 stopWorkflowInstanceInMaster(serialCommand);
+                log.info("Stop the pre WorkflowInstance: {} due to the workflow using SERIAL_PRIORITY strategy",
+                        serialCommand.getWorkflowInstanceId());
             }
         }
     }

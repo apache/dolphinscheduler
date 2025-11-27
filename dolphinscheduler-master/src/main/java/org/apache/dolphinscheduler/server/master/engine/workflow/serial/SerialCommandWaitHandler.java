@@ -23,11 +23,14 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 /**
  * This strategy will wait the oldest workflow instance.
  */
+@Slf4j
 @Component
 public class SerialCommandWaitHandler extends AbstractSerialCommandHandler {
 
@@ -41,6 +44,7 @@ public class SerialCommandWaitHandler extends AbstractSerialCommandHandler {
         final SerialCommandDto serialCommand = serialCommands.get(0);
         if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
             launchSerialCommand(serialCommand);
+            log.info("Launched SerialCommand: {}", serialCommand);
         }
     }
 
