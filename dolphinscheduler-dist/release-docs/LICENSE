@@ -328,21 +328,21 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     snappy-java 1.1.8.4: https://github.com/xerial/snappy-java, Apache 2.0
     spring-aop 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-aop/5.3.13, Apache 2.0
     spring-beans 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-beans/5.3.22, Apache 2.0
-    spring-boot 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot/2.7.3, Apache 2.0
-    spring-boot-actuator 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator/2.7.3, Apache 2.0
-    spring-boot-actuator-autoconfigure 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator-autoconfigure/2.7.3, Apache 2.0
-    spring-boot-configuration-processor 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor/2.7.3, Apache 2.0
-    spring-boot-autoconfigure 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure/2.7.3, Apache 2.0
-    spring-boot-starter 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter/2.7.3, Apache 2.0
-    spring-boot-starter-actuator 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator/2.7.3, Apache 2.0
-    spring-boot-starter-aop 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop/2.7.3, Apache 2.0
-    spring-boot-starter-jdbc 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc/2.7.3, Apache 2.0
-    spring-boot-starter-jetty 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jetty/2.7.3, Apache 2.0
-    spring-boot-starter-json 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.7.3, Apache 2.0
-    spring-boot-starter-logging 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging/2.7.3, Apache 2.0
-    spring-boot-starter-quartz 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz/2.7.3, Apache 2.0
-    spring-boot-starter-security 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security/2.7.3, Apache 2.0
-    spring-boot-starter-web 2.7.3: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.7.3, Apache 2.0
+    spring-boot 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot/2.7.11, Apache 2.0
+    spring-boot-actuator 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator/2.7.11, Apache 2.0
+    spring-boot-actuator-autoconfigure 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-actuator-autoconfigure/2.7.11, Apache 2.0
+    spring-boot-configuration-processor 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor/2.7.11, Apache 2.0
+    spring-boot-autoconfigure 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure/2.7.11, Apache 2.0
+    spring-boot-starter 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter/2.7.11, Apache 2.0
+    spring-boot-starter-actuator 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator/2.7.11, Apache 2.0
+    spring-boot-starter-aop 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop/2.7.11, Apache 2.0
+    spring-boot-starter-jdbc 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc/2.7.11, Apache 2.0
+    spring-boot-starter-jetty 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jetty/2.7.11, Apache 2.0
+    spring-boot-starter-json 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.7.11, Apache 2.0
+    spring-boot-starter-logging 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging/2.7.11, Apache 2.0
+    spring-boot-starter-quartz 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz/2.7.11, Apache 2.0
+    spring-boot-starter-security 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security/2.7.11, Apache 2.0
+    spring-boot-starter-web 2.7.11: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.7.11, Apache 2.0
     spring-context 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.22, Apache 2.0
     spring-context-support 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.13, Apache 2.0
     spring-core 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.22, Apache 2.0
