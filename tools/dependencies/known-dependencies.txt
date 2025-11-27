@@ -214,7 +214,7 @@ okio-3.6.0.jar
 okio-jvm-3.6.0.jar
 oshi-core-6.1.1.jar
 paranamer-2.3.jar
-postgresql-42.4.1.jar
+postgresql-42.4.4.jar
 profiles-2.17.282.jar
 protocol-core-2.17.282.jar
 py4j-0.10.9.jar
