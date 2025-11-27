@@ -251,6 +251,30 @@ class SqlTaskTest {
     }
 
     @Test
+    void testGenerateEmptyRow_WithDuplicateColumns_DeduplicatesLabels() throws Exception {
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(3);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockMetaData.getColumnLabel(2)).thenReturn("id"); // duplicate
+        when(mockMetaData.getColumnLabel(3)).thenReturn("name");
+
+        Method method = SqlTask.class.getDeclaredMethod("generateEmptyRow", ResultSet.class);
+        method.setAccessible(true);
+
+        ArrayNode result = (ArrayNode) method.invoke(sqlTask, mockResultSet);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+
+        ObjectNode row = (ObjectNode) result.get(0);
+        Assertions.assertTrue(row.has("id"));
+        Assertions.assertTrue(row.has("name"));
+    }
+
+    @Test
     void testResultProcess_NullResultSet_ReturnsEmptyResult() throws Exception {
         Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
         resultProcessMethod.setAccessible(true);
@@ -330,6 +354,33 @@ class SqlTaskTest {
     }
 
     @Test
+    void testResultProcess_MultipleNullColumnLabels_GeneratesUniqueGenericNames() throws Exception {
+        ResultSet mockRs = mock(ResultSet.class);
+        ResultSetMetaData mockMd = mock(ResultSetMetaData.class);
+
+        when(mockRs.getMetaData()).thenReturn(mockMd);
+        when(mockMd.getColumnCount()).thenReturn(3);
+        when(mockMd.getColumnLabel(1)).thenReturn(null);
+        when(mockMd.getColumnLabel(2)).thenReturn("");
+        when(mockMd.getColumnLabel(3)).thenReturn(null);
+
+        when(mockRs.next()).thenReturn(true, false);
+        when(mockRs.getObject(1)).thenReturn("val1");
+        when(mockRs.getObject(2)).thenReturn("val2");
+        when(mockRs.getObject(3)).thenReturn("val3");
+
+        Method method = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+        method.setAccessible(true);
+
+        String result = (String) method.invoke(sqlTask, mockRs);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.contains("\"col_1\":\"val1\""));
+        Assertions.assertTrue(result.contains("\"col_2\":\"val2\""));
+        Assertions.assertTrue(result.contains("\"col_3\":\"val3\""));
+    }
+
+    @Test
     void testResultProcess_SingleRowWithDuplicateColumns_GeneratesUniqueKeys() throws Exception {
         ResultSet mockResultSet = mock(ResultSet.class);
         ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
@@ -390,7 +441,7 @@ class SqlTaskTest {
     }
 
     @Test
-    void testResultProcess_ColumnNames_IdIdId2Id2Id3_HandlesSuffixCollisionCorrectly() throws Exception {
+    void testResultProcess_HandlesSuffixCollisionWithDuplicateColumns() throws Exception {
         // Arrange: ResultSet with column labels: id, id, id_2, id_2, id_3
         ResultSet mockRs = mock(ResultSet.class);
         ResultSetMetaData mockMd = mock(ResultSetMetaData.class);
