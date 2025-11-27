@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
@@ -31,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @Component
@@ -40,6 +42,12 @@ public class StopWorkflowInstanceExecutorDelegate
 
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    @Autowired
+    private SerialCommandDao serialCommandDao;
 
     @Override
     public Void execute(StopWorkflowInstanceOperation workflowInstanceControlRequest) {
@@ -65,10 +73,15 @@ public class StopWorkflowInstanceExecutorDelegate
     }
 
     void directStopInDB(WorkflowInstance workflowInstance) {
-        workflowInstanceDao.updateWorkflowInstanceState(
-                workflowInstance.getId(),
-                workflowInstance.getState(),
-                WorkflowExecutionStatus.STOP);
+        // todo: move the stop logic to master
+        transactionTemplate.execute(status -> {
+            workflowInstanceDao.updateWorkflowInstanceState(
+                    workflowInstance.getId(),
+                    workflowInstance.getState(),
+                    WorkflowExecutionStatus.STOP);
+            serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId());
+            return null;
+        });
         log.info("Update workflow instance {} state from: {} to {} success",
                 workflowInstance.getName(),
                 workflowInstance.getState().name(),

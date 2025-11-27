@@ -125,6 +125,108 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow with one fake task(A) using serial wait strategy")
+    public void testStartWorkflow_with_serialWaitStrategy() {
+        final String yaml = "/it/start/workflow_with_serial_wait_strategy.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId1 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId2 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId3 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
+                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
+                            .isEqualTo(WorkflowExecutionStatus.SERIAL_WAIT);
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
+                            .isEqualTo(WorkflowExecutionStatus.SERIAL_WAIT);
+                });
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
+                    final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
+                    final WorkflowInstance workflowInstance3 = repository.queryWorkflowInstance(workflowInstanceId3);
+                    assertThat(workflowInstance1.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance2.getEndTime())
+                            .isAtLeast(DateUtils.addSeconds(workflowInstance1.getEndTime(), 5));
+                    assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance3.getEndTime())
+                            .isAtLeast(DateUtils.addSeconds(workflowInstance2.getEndTime(), 5));
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one fake task(A) using serial discard strategy")
+    public void testStartWorkflow_with_serialDiscardStrategy() {
+        final String yaml = "/it/start/workflow_with_serial_discard_strategy.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId1 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId2 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId3 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
+                            .isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
+                            .isEqualTo(WorkflowExecutionStatus.STOP);
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with one fake task(A) using serial priority strategy")
+    public void testStartWorkflow_with_serialPriorityStrategy() {
+        final String yaml = "/it/start/workflow_with_serial_priority_strategy.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId1 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId2 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId3 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
+                            .isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
+                            .isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with two fake task(A) using task group")
     public void testStartWorkflow_with_successTaskUsingTaskGroup() {
         final String yaml = "/it/start/workflow_with_fake_tasks_using_task_group.yaml";

@@ -17,15 +17,21 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
+import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,20 +55,33 @@ public abstract class AbstractWorkflowTrigger<TriggerRequest, TriggerResponse>
     @Autowired
     private CommandDao commandDao;
 
+    @Autowired
+    private SerialCommandDao serialCommandDao;
+
     @Override
     @Transactional
     public TriggerResponse triggerWorkflow(final TriggerRequest triggerRequest) {
-        final WorkflowInstance workflowInstance = constructWorkflowInstance(triggerRequest);
-        workflowInstanceDao.insert(workflowInstance);
-
-        final Command command = constructTriggerCommand(triggerRequest, workflowInstance);
-        commandDao.insert(command);
+        final ImmutablePair<WorkflowDefinition, WorkflowInstance> pair = constructWorkflowInstance(triggerRequest);
+        final WorkflowDefinition workflowDefinition = pair.getLeft();
+        final WorkflowInstance workflowInstance = pair.getRight();
+        if (workflowDefinition.getExecutionType() == WorkflowExecutionTypeEnum.PARALLEL) {
+            workflowInstanceDao.insert(workflowInstance);
+            final Command command = constructTriggerCommand(triggerRequest, workflowInstance);
+            commandDao.insert(command);
+        } else {
+            workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SERIAL_WAIT, "Waiting for serial execution");
+            workflowInstanceDao.insert(workflowInstance);
+            final Command command = constructTriggerCommand(triggerRequest, workflowInstance);
+            serialCommandDao.insert(SerialCommandDto.newSerialCommand(command).toEntity());
+        }
 
         return onTriggerSuccess(workflowInstance);
     }
 
-    protected abstract WorkflowInstance constructWorkflowInstance(final TriggerRequest triggerRequest);
+    // todo: 使用WorkflowInstanceConstructor封装
+    protected abstract ImmutablePair<WorkflowDefinition, WorkflowInstance> constructWorkflowInstance(final TriggerRequest triggerRequest);
 
+    // todo: 使用CommandConstructor封装
     protected abstract Command constructTriggerCommand(final TriggerRequest triggerRequest,
                                                        final WorkflowInstance workflowInstance);
 
