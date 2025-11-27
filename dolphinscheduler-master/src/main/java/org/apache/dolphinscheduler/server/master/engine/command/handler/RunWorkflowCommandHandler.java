@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
@@ -35,7 +34,6 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopol
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -61,16 +59,10 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
     private MasterConfig masterConfig;
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private CuringParamsService curingParamsService;
 
     /**
      * Will generate a new workflow instance based on the command.
