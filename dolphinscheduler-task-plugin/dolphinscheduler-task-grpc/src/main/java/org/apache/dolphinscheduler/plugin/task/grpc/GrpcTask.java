@@ -86,8 +86,8 @@ public class GrpcTask extends AbstractTask {
 
             // Attach a cancellable gRPC Context to support external cancellation.
             // This context propagates cancellation signals to the underlying RPC call.
-            this.cancellableContext = (Context.CancellableContext) Context.current().withCancellation().attach();
-            Context previous = this.cancellableContext;
+            this.cancellableContext = Context.current().withCancellation();
+            Context previous = this.cancellableContext.attach();
 
             try {
                 GrpcDynamicService stubService = new GrpcDynamicService(channel, fileDesc);
@@ -105,9 +105,8 @@ public class GrpcTask extends AbstractTask {
             if (statusre.getStatus().getCode() == Status.Code.CANCELLED) {
                 setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
             } else {
-                setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+                validateResponse(statusre.getStatus());
             }
-            validateResponse(statusre.getStatus());
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new GrpcTaskException("gRPC handle exception:", e);
@@ -120,13 +119,14 @@ public class GrpcTask extends AbstractTask {
     }
 
     @Override
-    public void cancel() {
+    public void cancel() throws TaskException {
         // Read volatile reference once for thread safety (avoid repeated reads under race conditions)
         Context.CancellableContext ctx = this.cancellableContext;
 
         if (ctx != null && !ctx.isCancelled()) {
             try {
-                log.info("Canceling gRPC task: method={}", grpcParameters.getMethodName());
+                log.info("Canceling gRPC task: method={}",
+                        grpcParameters != null ? grpcParameters.getMethodName() : "unknown");
 
                 // Trigger gRPC cancellation by canceling the context.
                 // This interrupts the ongoing RPC and causes stubService.call() to throw CANCELLED.
