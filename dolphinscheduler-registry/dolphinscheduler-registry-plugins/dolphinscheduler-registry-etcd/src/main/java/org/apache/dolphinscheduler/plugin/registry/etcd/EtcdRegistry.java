@@ -403,7 +403,7 @@ public class EtcdRegistry implements Registry {
         } catch (Exception e) {
             throw new RegistryException("etcd release lock error, lockKey: " + key, e);
         }
-        return false;
+        return true;
     }
 
     @Override
