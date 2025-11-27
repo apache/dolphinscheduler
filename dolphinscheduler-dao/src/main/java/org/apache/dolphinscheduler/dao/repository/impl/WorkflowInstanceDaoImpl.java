@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 
 @Slf4j
 @Repository
@@ -70,6 +71,17 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
                     "updateWorkflowInstance " + workflowInstanceId + " state failed, expect original state is "
                             + originalStatus.name() + " actual state is : {} " + workflowInstance.getState().name());
         }
+    }
+
+    @Override
+    public void forceUpdateWorkflowInstanceState(Integer id, WorkflowExecutionStatus status) {
+        mybatisMapper.forceUpdateWorkflowInstanceState(id, status);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    public void performTransactionalUpsert(WorkflowInstance workflowInstance) {
+        this.upsertWorkflowInstance(workflowInstance);
     }
 
     /**
