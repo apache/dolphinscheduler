@@ -20,8 +20,16 @@ package org.apache.dolphinscheduler.plugin.task.grpc;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.mockito.AdditionalAnswers.delegatesTo;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -35,6 +43,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +67,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.grpc.Context;
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
@@ -221,6 +233,233 @@ public class GrpcTaskTest {
             resultStringBuilder.setLength(resultStringBuilder.length() - 1);
         }
         return resultStringBuilder.toString();
+    }
+
+    @Test
+    void cancel_shouldCancelContextAndSetKillCode_whenActiveAndNotCancelled() throws Exception {
+        GrpcTask grpcTaskOK = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        // Set grpcParameters for logging
+        GrpcParameters params = new GrpcParameters();
+        params.setMethodName("TestMethod");
+        setPrivateField(grpcTaskOK, "grpcParameters", params);
+
+        // Mock active, not-cancelled context
+        Context.CancellableContext mockCtx = mock(Context.CancellableContext.class);
+        when(mockCtx.isCancelled()).thenReturn(false);
+        setPrivateField(grpcTaskOK, "cancellableContext", mockCtx);
+
+        // Act
+        grpcTaskOK.cancel();
+
+        // Assert
+        verify(mockCtx).cancel(argThat(e -> e instanceof TaskException &&
+                "gRPC task was canceled by user".equals(e.getMessage())));
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_KILL, grpcTaskOK.getExitStatusCode());
+    }
+
+    @Test
+    void cancel_shouldDoNothing_whenCancellableContextIsNull() throws Exception {
+        GrpcTask grpcTaskOK = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        setPrivateField(grpcTaskOK, "cancellableContext", null);
+
+        Assertions.assertDoesNotThrow(grpcTaskOK::cancel);
+        Assertions.assertNotEquals(TaskConstants.EXIT_CODE_KILL, grpcTaskOK.getExitStatusCode());
+    }
+
+    @Test
+    void cancel_shouldDoNothing_whenContextAlreadyCancelled() throws Exception {
+        GrpcTask grpcTaskOK = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        Context.CancellableContext mockCtx = mock(Context.CancellableContext.class);
+        when(mockCtx.isCancelled()).thenReturn(true);
+        setPrivateField(grpcTaskOK, "cancellableContext", mockCtx);
+
+        grpcTaskOK.cancel();
+
+        verify(mockCtx, never()).cancel(any());
+        Assertions.assertNotEquals(TaskConstants.EXIT_CODE_KILL, grpcTaskOK.getExitStatusCode());
+    }
+
+    @Test
+    void cancel_shouldThrowTaskException_whenCtxCancelThrows() throws Exception {
+        GrpcTask grpcTaskOK = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        GrpcParameters params = new GrpcParameters();
+        params.setMethodName("TestMethod");
+        setPrivateField(grpcTaskOK, "grpcParameters", params);
+
+        Context.CancellableContext mockCtx = mock(Context.CancellableContext.class);
+        when(mockCtx.isCancelled()).thenReturn(false);
+        doThrow(new RuntimeException("gRPC internal error"))
+                .when(mockCtx).cancel(any(TaskException.class));
+        setPrivateField(grpcTaskOK, "cancellableContext", mockCtx);
+
+        // Act & Assert
+        TaskException thrown = Assertions.assertThrows(TaskException.class, grpcTaskOK::cancel);
+        Assertions.assertTrue(thrown.getMessage().contains("Cancel gRPC task failed"));
+        Assertions.assertNotNull(thrown.getCause());
+        Assertions.assertEquals("gRPC internal error", thrown.getCause().getMessage());
+
+        // Exit code should NOT be set to KILL because cancellation failed
+        Assertions.assertNotEquals(TaskConstants.EXIT_CODE_KILL, grpcTaskOK.getExitStatusCode());
+    }
+
+    @Test
+    void validateResponse_shouldSetSuccessForOK_whenCheckConditionIsDefault() throws Exception {
+        GrpcTask task = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        // Setup grpcParameters
+        GrpcParameters params = new GrpcParameters();
+        params.setGrpcCheckCondition(GrpcCheckCondition.STATUS_CODE_DEFAULT);
+        params.setUrl("test-url");
+        params.setMethodName("TestMethod");
+        setPrivateField(task, "grpcParameters", params);
+
+        // Call private method via reflection
+        invokePrivateMethod(task, "validateResponse", new Class[]{Status.class}, Status.OK);
+
+        // Assert exit code is SUCCESS
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, getPrivateField(task, "exitStatusCode"));
+    }
+
+    @Test
+    void validateResponse_shouldSetFailureForNonOK_whenCheckConditionIsDefault() throws Exception {
+        GrpcTask task = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        GrpcParameters params = new GrpcParameters();
+        params.setGrpcCheckCondition(GrpcCheckCondition.STATUS_CODE_DEFAULT);
+        params.setUrl("test-url");
+        params.setMethodName("TestMethod");
+        setPrivateField(task, "grpcParameters", params);
+
+        invokePrivateMethod(task, "validateResponse", new Class[]{Status.class}, Status.NOT_FOUND);
+
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE, getPrivateField(task, "exitStatusCode"));
+    }
+
+    @Test
+    void validateResponse_shouldSetSuccessForMatchingCustomCode() throws Exception {
+        GrpcTask task = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        GrpcParameters params = new GrpcParameters();
+        params.setGrpcCheckCondition(GrpcCheckCondition.STATUS_CODE_CUSTOM);
+        params.setCondition("UNIMPLEMENTED"); // matches Status.UNIMPLEMENTED
+        params.setUrl("test-url");
+        params.setMethodName("TestMethod");
+        setPrivateField(task, "grpcParameters", params);
+
+        invokePrivateMethod(task, "validateResponse", new Class[]{Status.class}, Status.UNIMPLEMENTED);
+
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, getPrivateField(task, "exitStatusCode"));
+    }
+
+    @Test
+    void validateResponse_shouldSetFailureForMismatchedCustomCode() throws Exception {
+        GrpcTask task = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        GrpcParameters params = new GrpcParameters();
+        params.setGrpcCheckCondition(GrpcCheckCondition.STATUS_CODE_CUSTOM);
+        params.setCondition("NOT_FOUND");
+        params.setUrl("test-url");
+        params.setMethodName("TestMethod");
+        setPrivateField(task, "grpcParameters", params);
+
+        invokePrivateMethod(task, "validateResponse", new Class[]{Status.class}, Status.UNIMPLEMENTED);
+
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE, getPrivateField(task, "exitStatusCode"));
+    }
+
+    @Test
+    void validateResponse_shouldThrowGrpcTaskException_forInvalidCustomCondition() throws IOException {
+        GrpcTask task = generateGrpcTask("TaskTester/TestOK", "{\"username\":\"test username\"}",
+                GrpcCheckCondition.STATUS_CODE_DEFAULT, "OK");
+
+        GrpcParameters params = new GrpcParameters();
+        params.setGrpcCheckCondition(GrpcCheckCondition.STATUS_CODE_CUSTOM);
+        params.setCondition("INVALID_CODE"); // not a valid Status.Code
+        params.setUrl("test-url");
+        params.setMethodName("TestMethod");
+        setPrivateField(task, "grpcParameters", params);
+
+        GrpcTaskException exception = Assertions.assertThrows(GrpcTaskException.class, () -> {
+            invokePrivateMethod(task, "validateResponse", new Class[]{Status.class}, Status.OK);
+        });
+
+        Assertions.assertTrue(exception.getMessage().contains("grpc unrecogenized condition INVALID_CODE"));
+    }
+
+    /**
+     * Gets the value of a private field from the target object, searching up the inheritance hierarchy.
+     */
+    private Object getPrivateField(Object target, String fieldName) {
+        Class<?> clazz = target.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to get field '" + fieldName + "' from " + target.getClass(), e);
+            }
+        }
+        throw new RuntimeException("Field '" + fieldName + "' not found in class hierarchy of " + target.getClass());
+    }
+
+    /**
+     * Sets a private field on the target object, searching up the inheritance hierarchy.
+     */
+    private void setPrivateField(Object target, String fieldName, Object value) {
+        Class<?> clazz = target.getClass();
+        while (clazz != null) {
+            try {
+                Field field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(target, value);
+                return;
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to set field '" + fieldName + "' on " + target.getClass(), e);
+            }
+        }
+        throw new RuntimeException("Field '" + fieldName + "' not found in class hierarchy of " + target.getClass());
+    }
+
+    /**
+     * Invokes a private method with given arguments.
+     * If the method throws an exception, it is rethrown as-is (unchecked) or wrapped in RuntimeException if checked.
+     */
+    private void invokePrivateMethod(Object target, String methodName, Class<?>[] paramTypes, Object... args) {
+        try {
+            Method method = target.getClass().getDeclaredMethod(methodName, paramTypes);
+            method.setAccessible(true);
+            method.invoke(target, args);
+        } catch (InvocationTargetException e) {
+            // Unwrap the actual exception thrown by the target method
+            Throwable cause = e.getTargetException();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            } else if (cause instanceof Error) {
+                throw (Error) cause;
+            } else {
+                // For checked exceptions (should not happen in your case, but safe)
+                throw new RuntimeException("Checked exception thrown in private method: " + cause.getMessage(), cause);
+            }
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException("Reflection setup failed for method: " + methodName, e);
+        }
     }
 
 }
