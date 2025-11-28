@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowB
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Date;
 import java.util.List;
@@ -48,7 +49,7 @@ public class WorkflowBackfillTrigger
             AbstractWorkflowTrigger<WorkflowBackfillTriggerRequest, WorkflowBackfillTriggerResponse> {
 
     @Override
-    protected WorkflowInstance constructWorkflowInstance(WorkflowBackfillTriggerRequest backfillTriggerRequest) {
+    protected ImmutablePair<WorkflowDefinition, WorkflowInstance> constructWorkflowInstance(WorkflowBackfillTriggerRequest backfillTriggerRequest) {
         final CommandType commandType = CommandType.COMPLEMENT_DATA;
         final Long workflowCode = backfillTriggerRequest.getWorkflowCode();
         final Integer workflowVersion = backfillTriggerRequest.getWorkflowVersion();
@@ -84,7 +85,7 @@ public class WorkflowBackfillTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(backfillTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(backfillTriggerRequest.getDryRun().getCode());
-        return workflowInstance;
+        return ImmutablePair.of(workflowDefinition, workflowInstance);
     }
 
     @Override
