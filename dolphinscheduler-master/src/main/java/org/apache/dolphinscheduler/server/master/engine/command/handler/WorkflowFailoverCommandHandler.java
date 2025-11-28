@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
@@ -53,9 +52,6 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
 
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
-
-    @Autowired
-    private ITaskGroupCoordinator taskGroupCoordinator;
 
     @Autowired
     private ApplicationContext applicationContext;
