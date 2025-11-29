@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
@@ -29,8 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,7 +40,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.micrometer.core.annotation.Counted;
@@ -64,21 +60,11 @@ public class CommandServiceImpl implements CommandService {
     @Autowired
     private ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private WorkflowDefinitionMapper processDefineMapper;
-
-    @Autowired
-    private WorkflowInstanceDao workflowInstanceDao;
-
     @Override
-    @Transactional
     public void moveToErrorCommand(Command command, String message) {
         final ErrorCommand errorCommand = new ErrorCommand(command, message);
         errorCommandMapper.insert(errorCommand);
         commandMapper.deleteById(command.getId());
-        workflowInstanceDao.forceUpdateWorkflowInstanceState(command.getWorkflowInstanceId(),
-                WorkflowExecutionStatus.FAILURE);
-        log.info("Set workflow instance {} state to FAILURE", command.getWorkflowInstanceId());
     }
 
     @Override
