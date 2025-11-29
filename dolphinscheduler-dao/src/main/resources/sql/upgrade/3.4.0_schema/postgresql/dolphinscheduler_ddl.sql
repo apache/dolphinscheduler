@@ -43,3 +43,9 @@ COMMENT ON COLUMN "t_ds_serial_command"."state" IS 'state of the serial queue: 0
 COMMENT ON COLUMN "t_ds_serial_command"."command" IS 'command json';
 COMMENT ON COLUMN "t_ds_serial_command"."create_time" IS 'create time';
 COMMENT ON COLUMN "t_ds_serial_command"."update_time" IS 'update time';
+
+-- Add indexes for workflow instance and task instance
+CREATE INDEX idx_project_code_start_time ON t_ds_workflow_instance (project_code, start_time DESC, id DESC);
+CREATE INDEX idx_workflow_definition_code_start_time ON t_ds_workflow_instance (workflow_definition_code, start_time DESC);
+CREATE INDEX idx_project_code_submit_time ON t_ds_task_instance (project_code, submit_time DESC);
+CREATE INDEX idx_project_code_start_time ON t_ds_task_instance (project_code, start_time DESC);

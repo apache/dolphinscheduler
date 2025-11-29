@@ -36,3 +36,8 @@ CREATE TABLE IF NOT EXISTS `t_ds_serial_command` (
    KEY `idx_workflow_instance_id` (`workflow_instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
+-- Add indexes for workflow instance and task instance
+ALTER TABLE `t_ds_workflow_instance` ADD INDEX `idx_project_code_start_time` (`project_code`, `start_time` DESC, `id` DESC) USING BTREE;
+ALTER TABLE `t_ds_workflow_instance` ADD INDEX `idx_workflow_definition_code_start_time` (`workflow_definition_code`, `start_time` DESC) USING BTREE;
+ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_project_code_submit_time` (`project_code`, `submit_time` DESC) USING BTREE;
+ALTER TABLE `t_ds_task_instance` ADD INDEX `idx_project_code_start_time` (`project_code`, `start_time` DESC) USING BTREE;
