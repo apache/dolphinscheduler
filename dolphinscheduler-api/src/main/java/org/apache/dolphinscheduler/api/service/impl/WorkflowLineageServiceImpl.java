@@ -242,29 +242,38 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
 
         List<WorkflowDefinition> workflowDefinitionList =
                 workflowDefinitionMapper.queryByCodes(workflowTaskLineageList.stream()
-                        .map(WorkflowTaskLineage::getDeptWorkflowDefinitionCode).distinct()
+                        .map(WorkflowTaskLineage::getWorkflowDefinitionCode).distinct()
                         .collect(Collectors.toList()));
         List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.queryByCodeList(workflowTaskLineageList.stream()
-                .map(WorkflowTaskLineage::getDeptTaskDefinitionCode).distinct().collect(Collectors.toList()));
-        for (TaskDefinition taskDefinition : taskDefinitionList) {
+                .map(WorkflowTaskLineage::getTaskDefinitionCode).filter(code -> code != 0).distinct()
+                .collect(Collectors.toList()));
+
+        for (WorkflowTaskLineage workflowLineage : workflowTaskLineageList) {
             DependentWorkflowDefinition dependentWorkflowDefinition = new DependentWorkflowDefinition();
-            workflowTaskLineageList.stream()
-                    .filter(workflowLineage -> workflowLineage.getDeptTaskDefinitionCode() == taskDefinition.getCode())
-                    .findFirst()
-                    .ifPresent(workflowLineage -> {
-                        dependentWorkflowDefinition
-                                .setWorkflowDefinitionCode(workflowLineage.getDeptWorkflowDefinitionCode());
-                        dependentWorkflowDefinition.setTaskDefinitionCode(taskDefinition.getCode());
-                        dependentWorkflowDefinition.setTaskParams(taskDefinition.getTaskParams());
-                        dependentWorkflowDefinition.setWorkerGroup(taskDefinition.getWorkerGroup());
-                    });
+            dependentWorkflowDefinition.setWorkflowDefinitionCode(workflowLineage.getWorkflowDefinitionCode());
+            dependentWorkflowDefinition.setTaskDefinitionCode(workflowLineage.getTaskDefinitionCode());
+
+            // If taskDefinitionCode is 0, it means dependency on entire workflow, taskParams and workerGroup remain
+            // null
+            if (workflowLineage.getTaskDefinitionCode() != 0) {
+                taskDefinitionList.stream()
+                        .filter(taskDefinition -> taskDefinition.getCode() == workflowLineage.getTaskDefinitionCode())
+                        .findFirst()
+                        .ifPresent(taskDefinition -> {
+                            dependentWorkflowDefinition.setTaskParams(taskDefinition.getTaskParams());
+                            dependentWorkflowDefinition.setWorkerGroup(taskDefinition.getWorkerGroup());
+                        });
+            }
+
             workflowDefinitionList.stream()
-                    .filter(workflowDefinition -> workflowDefinition.getCode() == dependentWorkflowDefinition
+                    .filter(workflowDefinition -> workflowDefinition.getCode() == workflowLineage
                             .getWorkflowDefinitionCode())
                     .findFirst()
                     .ifPresent(workflowDefinition -> {
                         dependentWorkflowDefinition.setWorkflowDefinitionVersion(workflowDefinition.getVersion());
                     });
+
+            dependentWorkflowDefinitionList.add(dependentWorkflowDefinition);
         }
 
         return dependentWorkflowDefinitionList;
