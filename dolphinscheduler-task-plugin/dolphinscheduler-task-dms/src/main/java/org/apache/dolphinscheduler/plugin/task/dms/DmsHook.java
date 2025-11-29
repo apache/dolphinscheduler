@@ -131,10 +131,18 @@ public class DmsHook {
 
     public Boolean checkFinishedReplicationTask() {
         log.info("checkFinishedReplicationTask ......");
-        awaitReplicationTaskStatus(STATUS.STOPPED);
-        String stopReason = describeReplicationTasks().getStopReason();
-        // shutdown client
-        client.shutdown();
+        String stopReason = "";
+        try {
+            awaitReplicationTaskStatus(STATUS.STOPPED);
+            stopReason = describeReplicationTasks().getStopReason();
+        } catch (Exception e) {
+            log.error("checkFinishedReplicationTask error: ", e);
+        } finally {
+            if (client != null) {
+                // shutdown client
+                client.shutdown();
+            }
+        }
         return stopReason.endsWith(STATUS.FINISH_END_TOKEN);
     }
 
@@ -143,12 +151,19 @@ public class DmsHook {
         if (replicationTaskArn == null) {
             return;
         }
-        StopReplicationTaskRequest request = new StopReplicationTaskRequest()
-                .withReplicationTaskArn(replicationTaskArn);
-        client.stopReplicationTask(request);
-        awaitReplicationTaskStatus(STATUS.STOPPED);
-        // shutdown client
-        client.shutdown();
+        try {
+            StopReplicationTaskRequest request = new StopReplicationTaskRequest()
+                    .withReplicationTaskArn(replicationTaskArn);
+            client.stopReplicationTask(request);
+            awaitReplicationTaskStatus(STATUS.STOPPED);
+        } catch (Exception e) {
+            log.error("stopReplicationTask error: ", e);
+        } finally {
+            if (client != null) {
+                // shutdown client
+                client.shutdown();
+            }
+        }
     }
 
     public Boolean deleteReplicationTask() {
@@ -161,9 +176,12 @@ public class DmsHook {
             isDeleteSuccessfully = awaitReplicationTaskStatus(STATUS.DELETE);
         } catch (ResourceNotFoundException e) {
             isDeleteSuccessfully = true;
+        } finally {
+            if (client != null) {
+                // shutdown client
+                client.shutdown();
+            }
         }
-        // shutdown client
-        client.shutdown();
         return isDeleteSuccessfully;
     }
 
