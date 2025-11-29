@@ -18,9 +18,12 @@
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin.subworkflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowManualTrigger;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import org.springframework.stereotype.Component;
 
@@ -31,10 +34,11 @@ import org.springframework.stereotype.Component;
 public class SubWorkflowManualTrigger extends WorkflowManualTrigger {
 
     @Override
-    protected WorkflowInstance constructWorkflowInstance(final WorkflowManualTriggerRequest workflowManualTriggerRequest) {
-        final WorkflowInstance workflowInstance = super.constructWorkflowInstance(workflowManualTriggerRequest);
-        workflowInstance.setIsSubWorkflow(Flag.YES);
-        return workflowInstance;
+    protected ImmutablePair<WorkflowDefinition, WorkflowInstance> constructWorkflowInstance(final WorkflowManualTriggerRequest workflowManualTriggerRequest) {
+        final ImmutablePair<WorkflowDefinition, WorkflowInstance> pair =
+                super.constructWorkflowInstance(workflowManualTriggerRequest);
+        pair.getRight().setIsSubWorkflow(Flag.YES);
+        return pair;
     }
 
 }
