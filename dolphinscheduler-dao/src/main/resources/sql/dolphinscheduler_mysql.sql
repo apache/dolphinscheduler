@@ -351,6 +351,27 @@ CREATE TABLE `t_ds_command` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_serial_command
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_serial_command`;
+CREATE TABLE `t_ds_serial_command` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+  `workflow_definition_code` int(11) NOT NULL COMMENT 'workflow definition code',
+  `workflow_definition_version` int(11) NOT NULL COMMENT 'workflow definition version',
+  `workflow_instance_id` bigint(20) NOT NULL COMMENT 'workflow instance id',
+  `state` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'state of the serial queue: 0 waiting, 1 fired',
+  `command` text COMMENT 'command json',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  KEY `idx_workflow_instance_id` (`workflow_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Table structure for t_ds_serial_command
+-- ----------------------------
+    
+-- ----------------------------
 -- Table structure for t_ds_datasource
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_datasource`;

@@ -27,7 +27,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum WorkflowExecutionTypeEnum {
 
     PARALLEL(0, "parallel"),
-    // todo: the serial is unstable, so we don't support them now
     SERIAL_WAIT(1, "serial wait"),
     SERIAL_DISCARD(2, "serial discard"),
     SERIAL_PRIORITY(3, "serial priority");
@@ -54,6 +53,10 @@ public enum WorkflowExecutionTypeEnum {
             return EXECUTION_STATUS_MAP.get(executionType);
         }
         throw new IllegalArgumentException("invalid status : " + executionType);
+    }
+
+    public boolean isSerial() {
+        return this != PARALLEL;
     }
 
 }

@@ -13,9 +13,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-create index idx_t_ds_task_group_queue_task_id on t_ds_task_group_queue(task_id);
-create index idx_t_ds_task_group_queue_group_id on t_ds_task_group_queue(group_id);
-create index idx_t_ds_task_group_queue_status on t_ds_task_group_queue(status);
-create index idx_t_ds_task_group_queue_workflow_instance_id on t_ds_task_group_queue(workflow_instance_id);
+package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
+
+public interface ISerialCommandHandler {
+
+    void handle(SerialCommandsGroup serialCommandsGroup);
+
+}

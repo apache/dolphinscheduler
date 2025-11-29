@@ -17,10 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
-import org.apache.dolphinscheduler.dao.repository.UserDao;
+import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
@@ -35,31 +39,47 @@ public abstract class AbstractWorkflowInstanceTrigger<TriggerRequest, TriggerRes
             IWorkflowTrigger<TriggerRequest, TriggerResponse> {
 
     @Autowired
-    private WorkflowDefinitionLogDao workflowDefinitionDao;
-
-    @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private UserDao userDao;
+    private CommandDao commandDao;
 
     @Autowired
-    private CommandDao commandDao;
+    protected SerialCommandDao serialCommandDao;
+
+    @Autowired
+    protected WorkflowDefinitionLogDao workflowDefinitionLogDao;
 
     @Override
     @Transactional
     public TriggerResponse triggerWorkflow(final TriggerRequest triggerRequest) {
         final WorkflowInstance workflowInstance = constructWorkflowInstance(triggerRequest);
-        workflowInstanceDao.updateById(workflowInstance);
-
+        final Long workflowDefinitionCode = workflowInstance.getWorkflowDefinitionCode();
+        final int workflowDefinitionVersion = workflowInstance.getWorkflowDefinitionVersion();
+        final WorkflowDefinitionLog workflowDefinition = workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(
+                workflowDefinitionCode, workflowDefinitionVersion);
+        if (workflowDefinition == null) {
+            throw new IllegalStateException(
+                    "Workflow definition not found: " + workflowDefinitionCode + " version: "
+                            + workflowDefinitionVersion);
+        }
         final Command command = constructTriggerCommand(triggerRequest, workflowInstance);
-        commandDao.insert(command);
+        if (workflowDefinition.getExecutionType() == WorkflowExecutionTypeEnum.PARALLEL) {
+            workflowInstanceDao.updateById(workflowInstance);
+            commandDao.insert(command);
+        } else {
+            workflowInstance.setState(WorkflowExecutionStatus.SERIAL_WAIT);
+            workflowInstanceDao.updateById(workflowInstance);
+            serialCommandDao.insert(SerialCommandDto.newSerialCommand(command).toEntity());
+        }
 
         return onTriggerSuccess(workflowInstance);
     }
 
+    // todo: 使用WorkflowInstanceConstructor封装
     protected abstract WorkflowInstance constructWorkflowInstance(final TriggerRequest triggerRequest);
 
+    // todo: 使用CommandConstructor封装
     protected abstract Command constructTriggerCommand(final TriggerRequest triggerRequest,
                                                        final WorkflowInstance workflowInstance);
 
