@@ -137,8 +137,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_project where id in
-           (select project_id from t_ds_relation_project_user  where user_id=#{userId}
-             union select id as project_id  from t_ds_project where user_id=#{userId})
+           (select project_id from t_ds_relation_project_user  where user_id=#{userId})
     </select>
 
     <select id="queryProjectWithUserByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
@@ -171,7 +170,6 @@
         where  1=1
         <if test="userId != 0">
             and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
-            union select id as project_id  from t_ds_project where user_id=#{userId})
         </if>
         <if test="projectsIds != null and projectsIds.size() > 0">
             and dp.id  in

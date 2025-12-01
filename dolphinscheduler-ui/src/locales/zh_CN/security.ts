@@ -154,6 +154,7 @@ export default {
     revoke_auth: '撤销权限',
     grant_read: '授予读权限',
     grant_all: '授予所有权限',
+    grant_owner: '授予拥有者权限',
     authorize_project: '项目授权',
     authorize_namespace: '命名空间授权',
     authorize_datasource: '数据源授权',

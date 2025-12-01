@@ -129,9 +129,18 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .createTime(now)
                 .updateTime(now)
                 .build();
-
         if (projectMapper.insert(project) > 0) {
             log.info("Project is created and id is :{}", project.getId());
+
+            // project creator default has owner permission
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(loginUser.getId());
+            projectUser.setProjectId(project.getId());
+            projectUser.setPerm(Constants.OWNER_PERMISSION);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+
             result.setData(project);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -268,13 +277,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             if (loginUser.getUserType() == UserType.ADMIN_USER) {
                 return true;
             }
-            // case 2: user is project owner
-            if (project.getUserId().equals(loginUser.getId())) {
-                return true;
-            }
-            // case 3: check user permission level
+            // case 2: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+            if (projectUser == null || projectUser.getPerm() >= Constants.WRITE_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -295,13 +300,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             if (loginUser.getUserType() == UserType.ADMIN_USER) {
                 return true;
             }
-            // case 2: user is project owner
-            if (project.getUserId().equals(loginUser.getId())) {
-                return true;
-            }
-            // case 3: check user permission level
+            // case 2: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+            if (projectUser == null || projectUser.getPerm() >= Constants.DEFAULT_ADMIN_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -326,13 +327,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             return;
         }
-        // case 2: user is project owner
-        if (project.getUserId().equals(loginUser.getId())) {
-            return;
-        }
-        // case 3: check user permission level
+        // case 2: check user permission level
         ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-        if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+        if (projectUser == null || projectUser.getPerm() < Constants.WRITE_PERMISSION) {
             throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         }
     }

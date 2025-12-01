@@ -31,9 +31,6 @@
             (select datasource_id
             from t_ds_relation_datasource_user
             where user_id=#{userId}
-            union select id as datasource_id
-            from t_ds_datasource
-            where user_id=#{userId}
             )
         </if>
     </select>
@@ -50,9 +47,6 @@
             and d.id in
             (select datasource_id
             from t_ds_relation_datasource_user
-            where user_id=#{userId}
-            union select id as datasource_id
-            from t_ds_datasource
             where user_id=#{userId}
             )
         </if>
@@ -90,8 +84,7 @@
         from t_ds_datasource
         where 1=1
         <if test="userId != 0">
-            and id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId}
-            union select id as datasource_id from t_ds_datasource where user_id=#{userId})
+            and id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId})
         </if>
         <if test="dataSourceIds != null and dataSourceIds.length > 0">
             and id in

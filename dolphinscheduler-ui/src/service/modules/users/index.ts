@@ -120,6 +120,14 @@ export function grantProjectWithReadPerm(data: GrantProject) {
   })
 }
 
+export function grantProjectWithOwnerPerm(data: GrantProject) {
+  return axios({
+    url: 'users/grant-project-with-Owner-perm',
+    method: 'post',
+      data
+  })
+}
+
 export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   return axios({
     url: '/users/grant-project-by-code',

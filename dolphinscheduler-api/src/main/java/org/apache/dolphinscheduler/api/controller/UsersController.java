@@ -253,6 +253,29 @@ public class UsersController extends BaseController {
     }
 
     /**
+     * grant project with owner permission
+     *
+     * @param loginUser  login user
+     * @param userId     user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Operation(summary = "grantProjectWithOwnerPerm", description = "GRANT_PROJECT_WITH_OWNER_PERM_NOTES")
+    @Parameters({
+            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectIds", description = "PROJECT_IDS", required = true, schema = @Schema(implementation = String.class))
+    })
+    @PostMapping(value = "/grant-project-with-owner-perm")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GRANT_PROJECT_ERROR)
+    public Result grantProjectWithOwnerPerm(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @RequestParam(value = "userId") int userId,
+                                            @RequestParam(value = "projectIds") String projectIds) {
+        Map<String, Object> result = usersService.grantProjectWithOwnerPerm(loginUser, userId, projectIds);
+        return returnDataList(result);
+    }
+
+    /**
      * grant project
      *
      * @param loginUser  login user

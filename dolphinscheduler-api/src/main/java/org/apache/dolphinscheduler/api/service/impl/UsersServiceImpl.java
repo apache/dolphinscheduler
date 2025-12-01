@@ -64,7 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -474,15 +473,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, id);
             return result;
         }
-        // check if is a project owner
-        List<Project> projects = projectMapper.queryProjectCreatedByUser(id);
-        if (CollectionUtils.isNotEmpty(projects)) {
-            String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
-            putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
-            log.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
-                    projectNames);
-            return result;
-        }
         // delete user
         userMapper.queryTenantCodeByUserId(id);
 
@@ -590,6 +580,61 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setUserId(userId);
             projectUser.setProjectId(Integer.parseInt(projectId));
             projectUser.setPerm(Constants.READ_PERMISSION);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+        });
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * grant project
+     *
+     * @param loginUser  login user
+     * @param userId     user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> grantProjectWithOwnerPerm(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+
+        // check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            log.error("User does not exist, userId:{}.", userId);
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            log.warn("Parameter projectIds is empty.");
+            return result;
+        }
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
+            Date now = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setPerm(Constants.OWNER_PERMISSION);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
             projectUserMapper.insert(projectUser);

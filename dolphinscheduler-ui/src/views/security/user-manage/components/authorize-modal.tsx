@@ -61,6 +61,7 @@ export const AuthorizeModal = defineComponent({
       revokeProjectByIdRequest,
       grantProjectRequest,
       grantProjectWithReadPermRequest,
+      grantProjectWithOwnerPermRequest,
       requestData,
       handleChangePageSize
     } = useAuthorize()
@@ -80,6 +81,9 @@ export const AuthorizeModal = defineComponent({
     }
     const onGrantAllPerm = () => {
       grantProjectRequest(props.userId, state.projectIds)
+    }
+    const onGrantOwnerPerm = () => {
+      grantProjectWithOwnerPermRequest(props.userId, state.projectIds)
     }
 
     const { columnsRef } = useColumns()
@@ -108,7 +112,8 @@ export const AuthorizeModal = defineComponent({
       handleChangePageSize,
       onRevokeProject,
       onGrantReadPerm,
-      onGrantAllPerm
+      onGrantAllPerm,
+      onGrantOwnerPerm
     }
   },
   render(props: { type: TAuthType; userId: number }) {
@@ -147,6 +152,13 @@ export const AuthorizeModal = defineComponent({
                 onClick={this.onGrantAllPerm}
               >
                 {t('security.user.grant_all')}
+              </NButton>
+              <NButton
+                size='small'
+                type='primary'
+                onClick={this.onGrantOwnerPerm}
+              >
+                {t('security.user.grant_owner')}
               </NButton>
               <NInput
                 size='small'

@@ -186,6 +186,11 @@ public final class Constants {
     public static final int EXECUTE_PERMISSION = 1;
 
     /**
+     * owner permission
+     */
+    public static final int OWNER_PERMISSION = 99;
+
+    /**
      * default admin permission
      */
     public static final int DEFAULT_ADMIN_PERMISSION = 7;

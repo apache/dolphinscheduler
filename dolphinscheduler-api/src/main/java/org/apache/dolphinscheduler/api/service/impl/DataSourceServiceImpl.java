@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
@@ -123,6 +124,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setUpdateTime(now);
         try {
             dataSourceMapper.insert(dataSource);
+            DatasourceUser datasourceUser = new DatasourceUser();
+            datasourceUser.setUserId(loginUser.getId());
+            datasourceUser.setDatasourceId(dataSource.getId());
+            datasourceUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+            datasourceUser.setCreateTime(now);
+            datasourceUser.setUpdateTime(now);
+            datasourceUserMapper.insert(datasourceUser);
             return dataSource;
         } catch (DuplicateKeyException ex) {
             throw new ServiceException(Status.DATASOURCE_EXIST);

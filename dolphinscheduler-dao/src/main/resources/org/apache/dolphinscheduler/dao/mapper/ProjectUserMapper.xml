@@ -35,6 +35,7 @@
         from t_ds_relation_project_user
         where project_id = #{projectId}
         and user_id = #{userId}
+        order by perm desc
         limit 1
     </select>
 </mapper>

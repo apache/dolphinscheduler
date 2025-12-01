@@ -29,6 +29,7 @@ import {
   grantNamespaceFunc,
   grantProject,
   grantProjectWithReadPerm,
+  grantProjectWithOwnerPerm,
   revokeProjectById
 } from '@/service/modules/users'
 import type { IOption, IRecord, IResourceOption, TAuthType } from '../types'
@@ -118,6 +119,17 @@ export function useAuthorize() {
     await getProjects(userId)
   }
 
+  const grantProjectWithOwnerPermRequest = async (
+      userId: number,
+      projectIds: string
+  ) => {
+    await grantProjectWithOwnerPerm({
+      userId,
+      projectIds: projectIds
+    })
+    await getProjects(userId)
+  }
+
   const getDatasources = async (userId: number) => {
     if (state.loading) return
     state.loading = true
@@ -198,6 +210,7 @@ export function useAuthorize() {
     revokeProjectByIdRequest,
     grantProjectRequest,
     grantProjectWithReadPermRequest,
+    grantProjectWithOwnerPermRequest,
     requestData,
     handleChangePageSize
   }

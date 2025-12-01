@@ -156,6 +156,7 @@ export default {
     revoke_auth: 'Revoke',
     grant_read: 'Grant Read',
     grant_all: 'Grant All',
+    grant_owner: 'Grant Owner',
     authorize_project: 'Project Authorize',
     authorize_namespace: 'Namespace Authorize',
     authorize_datasource: 'Datasource Authorize',
