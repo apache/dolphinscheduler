@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 public abstract class AbstractWorkflowStateAction implements IWorkflowStateAction {
@@ -65,6 +67,12 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     @Autowired
     protected WorkflowAlertManager workflowAlertManager;
+
+    @Autowired
+    protected TransactionTemplate transactionTemplate;
+
+    @Autowired
+    protected SerialCommandDao serialCommandDao;
 
     /**
      * Try to trigger the tasks if the trigger condition is met.
@@ -140,11 +148,22 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                   final WorkflowExecutionStatus workflowExecutionStatus) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        workflowInstance.setEndTime(new Date());
-        transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
-        workflowExecutionRunnable.getWorkflowEventBus()
-                .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecutionRunnable));
+        // todo: add transaction configuration in lifecycle event, all sync lifecycle should be in transaction
+        transactionTemplate.execute(status -> {
+            final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+            workflowInstance.setEndTime(new Date());
+            transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
+            if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType()
+                    .isSerial()) {
+                if (serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
+                    log.info("Success clear SerialCommand for WorkflowExecuteRunnable: {}",
+                            workflowExecutionRunnable.getName());
+                }
+            }
+            workflowExecutionRunnable.getWorkflowEventBus()
+                    .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecutionRunnable));
+            return null;
+        });
     }
 
     /**
