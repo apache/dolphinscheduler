@@ -315,7 +315,7 @@ public class EtcdRegistry implements Registry {
             lockClient.lock(byteSequence(lockKey), leaseId).get();
 
             // save the leaseId for release Lock
-            lockMap.put(lockKey, new LockEntry(leaseId));
+            threadHeldLocks.put(lockKey, new LockEntry(leaseId));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -325,23 +325,16 @@ public class EtcdRegistry implements Registry {
         }
     }
 
-    private static boolean currentThreadIsReentrant(String lockKey, Map<String, LockEntry> lockEntryMap) {
-        LockEntry lockEntry = lockEntryMap.get(lockKey);
-        if (lockEntry != null) {
-            lockEntry.lockCount.incrementAndGet();
-            return true;
-        }
-        return false;
     private static boolean acquireBasedOnThreadHeldLocks(String lockKey, Map<String, LockEntry> threadHeldLocks) {
         LockEntry lockEntry = threadHeldLocks.get(lockKey);
         if (lockEntry != null) {
             lockEntry.lockCount.incrementAndGet();
             return true;
-}
+        }
         return false;
     }
 
-    private static Map<String, LockEntry> getThreadLocks() {
+    private static Map<String, LockEntry> getThreadHeldLocks() {
         Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
         if (null == lockEntryMap) {
             lockEntryMap = new HashMap<>();
@@ -352,8 +345,8 @@ public class EtcdRegistry implements Registry {
 
     @Override
     public boolean acquireLock(String key, long timeout) {
-        Map<String, LockEntry> lockEntryMap = getLockMapFromThreadLocal();
-        if (currentThreadIsReentrant(key, lockEntryMap)) {
+        Map<String, LockEntry> threadHeldLocks = getThreadHeldLocks();
+        if (acquireBasedOnThreadHeldLocks(key, threadHeldLocks)) {
             return true;
         }
 
@@ -368,7 +361,7 @@ public class EtcdRegistry implements Registry {
             }));
 
             // save the leaseId for release Lock
-            lockEntryMap.put(key, new LockEntry(leaseId));
+            threadHeldLocks.put(key, new LockEntry(leaseId));
             return true;
         } catch (TimeoutException timeoutException) {
             log.debug("Acquire lock: {} in {}/ms timeout", key, timeout);

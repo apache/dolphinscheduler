@@ -55,7 +55,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
     public void acquireJdbcRegistryLock(Long clientId, String lockKey) {
         String lockOwner = LockUtils.getLockOwner();
         while (true) {
-            if (currentThreadIsReentrant(lockKey, lockOwner)) {
+            if (tryReenterLock(lockKey, lockOwner)) {
                 return;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -87,7 +87,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
 
     private boolean tryReenterLock(String lockKey, String lockAcquirer) {
         LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
-        if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
+        if (lockEntry != null && lockAcquirer.equals(lockEntry.getLockOwner())) {
             lockEntry.lockCount.incrementAndGet();
             return true;
         }
@@ -99,7 +99,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
         String lockOwner = LockUtils.getLockOwner();
         long start = System.currentTimeMillis();
         while (System.currentTimeMillis() - start <= timeout) {
-            if (currentThreadIsReentrant(lockKey, lockOwner)) {
+            if (tryReenterLock(lockKey, lockOwner)) {
                 return true;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
