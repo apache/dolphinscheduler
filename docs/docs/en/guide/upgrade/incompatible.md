@@ -2,21 +2,6 @@
 
 This document records the incompatible updates between each version. You need to check this document before you upgrade to related version.
 
-## dev
-
-* Upgrade mysql driver version from 8.0.16 to 8.0.33 ([#14684](https://github.com/apache/dolphinscheduler/pull/14684))
-* Change env `PYTHON_HOME` to `PYTHON_LAUNCHER` and `DATAX_HOME` to `DATAX_LAUNCHER` ([#14523](https://github.com/apache/dolphinscheduler/pull/14523))
-* Change regex matching sql params in SQL task plugin ([#13378](https://github.com/apache/dolphinscheduler/pull/13378))
-* Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
-* Change the default unix shell executor from sh to bash ([#12180](https://github.com/apache/dolphinscheduler/pull/12180)).
-* Remove `deleteSource` in `download()` of `StorageOperate` ([#14084](https://github.com/apache/dolphinscheduler/pull/14084))
-* Remove default key for attribute `data-quality.jar.name` in `common.properties` ([#15551](https://github.com/apache/dolphinscheduler/pull/15551))
-* Rename attribute `data-quality.jar.name` to `data-quality.jar.dir` in `common.properties` and represent for directory ([#15563](https://github.com/apache/dolphinscheduler/pull/15563))
-
-## 3.2.0
-
-* Remove parameter `description` from public interfaces of new resource center  ([#14394](https://github.com/apache/dolphinscheduler/pull/14394))
-
 ## 3.0.0
 
 * Copy and import workflow without 'copy' suffix [#10607](https://github.com/apache/dolphinscheduler/pull/10607)
@@ -24,7 +9,16 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.2.0
 
+* Rename attribute `data-quality.jar.name` to `data-quality.jar.dir` in `common.properties` and represent for directory ([#15563](https://github.com/apache/dolphinscheduler/pull/15563))
+* Remove default key for attribute `data-quality.jar.name` in `common.properties` ([#15551](https://github.com/apache/dolphinscheduler/pull/15551))
+* Remove `deleteSource` in `download()` of `StorageOperate` ([#14084](https://github.com/apache/dolphinscheduler/pull/14084))
+* Change the default unix shell executor from sh to bash ([#12180](https://github.com/apache/dolphinscheduler/pull/12180)).
+* Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
+* Change regex matching sql params in SQL task plugin ([#13378](https://github.com/apache/dolphinscheduler/pull/13378))
+* Change env `PYTHON_HOME` to `PYTHON_LAUNCHER` and `DATAX_HOME` to `DATAX_LAUNCHER` ([#14523](https://github.com/apache/dolphinscheduler/pull/14523))
+* Upgrade mysql driver version from 8.0.16 to 8.0.33 ([#14684](https://github.com/apache/dolphinscheduler/pull/14684))
 * Add required field `database` in /datasources/tables && /datasources/tableColumns Api [#14406](https://github.com/apache/dolphinscheduler/pull/14406)
+* Remove parameter `description` from public interfaces of new resource center  ([#14394](https://github.com/apache/dolphinscheduler/pull/14394))
 
 ## 3.3.0
 
@@ -41,4 +35,5 @@ This document records the incompatible updates between each version. You need to
 ## 3.4.0
 
 * Renamed the publicKey field to privateKey in the SSH connection parameters under the datasource configuration. ([#17666])(https://github.com/apache/dolphinscheduler/pull/17666)
+* Add table t_ds_serial_command. ([#17531])(https://github.com/apache/dolphinscheduler/pull/17531)
 

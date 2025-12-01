@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowS
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerResponse;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Date;
 
@@ -44,7 +45,7 @@ public class WorkflowScheduleTrigger
             AbstractWorkflowTrigger<WorkflowScheduleTriggerRequest, WorkflowScheduleTriggerResponse> {
 
     @Override
-    protected WorkflowInstance constructWorkflowInstance(WorkflowScheduleTriggerRequest scheduleTriggerRequest) {
+    protected ImmutablePair<WorkflowDefinition, WorkflowInstance> constructWorkflowInstance(WorkflowScheduleTriggerRequest scheduleTriggerRequest) {
         final CommandType commandType = CommandType.SCHEDULER;
         final Long workflowCode = scheduleTriggerRequest.getWorkflowCode();
         final Integer workflowVersion = scheduleTriggerRequest.getWorkflowVersion();
@@ -79,7 +80,7 @@ public class WorkflowScheduleTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(scheduleTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(scheduleTriggerRequest.getDryRun().getCode());
-        return workflowInstance;
+        return ImmutablePair.of(workflowDefinition, workflowInstance);
     }
 
     @Override
