@@ -85,7 +85,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
         }
     }
 
-    private boolean currentThreadIsReentrant(String lockKey, String lockOwner) {
+    private boolean tryReenterLock(String lockKey, String lockAcquirer) {
         LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
         if (lockEntry != null && lockOwner.equals(lockEntry.getLockOwner())) {
             lockEntry.lockCount.incrementAndGet();

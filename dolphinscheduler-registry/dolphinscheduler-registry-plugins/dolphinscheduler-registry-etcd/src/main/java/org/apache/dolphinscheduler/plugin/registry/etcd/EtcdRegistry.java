@@ -299,8 +299,8 @@ public class EtcdRegistry implements Registry {
      */
     @Override
     public boolean acquireLock(String lockKey) {
-        Map<String, LockEntry> lockMap = getLockMapFromThreadLocal();
-        if (currentThreadIsReentrant(lockKey, lockMap)) {
+        Map<String, LockEntry> threadHeldLocks = getThreadHeldLocks();
+        if (acquireBasedOnThreadHeldLocks(lockKey, threadHeldLocks)) {
             return true;
         }
 
@@ -332,9 +332,16 @@ public class EtcdRegistry implements Registry {
             return true;
         }
         return false;
+    private static boolean acquireBasedOnThreadHeldLocks(String lockKey, Map<String, LockEntry> threadHeldLocks) {
+        LockEntry lockEntry = threadHeldLocks.get(lockKey);
+        if (lockEntry != null) {
+            lockEntry.lockCount.incrementAndGet();
+            return true;
+}
+        return false;
     }
 
-    private static Map<String, LockEntry> getLockMapFromThreadLocal() {
+    private static Map<String, LockEntry> getThreadLocks() {
         Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
         if (null == lockEntryMap) {
             lockEntryMap = new HashMap<>();
