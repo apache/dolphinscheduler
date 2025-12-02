@@ -248,37 +248,28 @@ public class SqlTask extends AbstractTask {
         if (resultSet != null) {
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
+            String[] columnLabels = new String[num];
+
+            // Check for duplicates in column definitions (across all columns)
+            Set<String> uniqueLabels = new HashSet<>(num);
+            for (int i = 1; i <= num; i++) {
+                String label = md.getColumnLabel(i);
+                if (StringUtils.isEmpty(label)) {
+                    label = "col_" + i;
+                }
+                columnLabels[i - 1] = label;
+                if (!uniqueLabels.add(label)) {
+                    throw new TaskException("SQL column name conflict: duplicate column name '" + label
+                            + "'. Please use aliases to ensure unique column names.");
+                }
+            }
 
             while (resultSet.next()) {
-                ObjectNode rowAsJson = JSONUtils.createObjectNode();
-                Set<String> usedLabels = new HashSet<>();
-
+                ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
-                    String baseLabel = md.getColumnLabel(i);
-                    // fall back to a generic name if null or empty
-                    if (StringUtils.isEmpty(baseLabel)) {
-                        baseLabel = "col_" + i;
-                    }
-
-                    // Generate a unique field key for the JSON object:
-                    // If the base label is already used in this row, append a numeric suffix (e.g., name_2, name_3)
-                    String finalLabel = baseLabel;
-                    // Start numbering duplicates from _2 to keep the first occurrence clean
-                    int suffix = 2;
-                    while (!usedLabels.add(finalLabel)) {
-                        finalLabel = baseLabel + "_" + suffix++;
-                    }
-
-                    try {
-                        Object value = resultSet.getObject(i);
-                        rowAsJson.set(finalLabel, JSONUtils.toJsonNode(value));
-                    } catch (SQLException e) {
-                        log.warn("Failed to read column {}, label: {}, in row {}: {}",
-                                i, baseLabel, resultJSONArray.size() + 1, e.getMessage());
-                        rowAsJson.set(finalLabel, JSONUtils.toJsonNode(null));
-                    }
+                    mapOfColValues.set(columnLabels[i - 1], JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
-                resultJSONArray.add(rowAsJson);
+                resultJSONArray.add(mapOfColValues);
             }
 
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
