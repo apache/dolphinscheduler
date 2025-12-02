@@ -122,7 +122,7 @@ export function grantProjectWithReadPerm(data: GrantProject) {
 
 export function grantProjectWithOwnerPerm(data: GrantProject) {
   return axios({
-    url: 'users/grant-project-with-Owner-perm',
+    url: 'users/grant-project-with-owner-perm',
     method: 'post',
       data
   })

@@ -40,6 +40,7 @@ export default {
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
     all_permission: 'All Permission',
+    owner_permission: 'Owner Permission',
     assign_worker_group: 'Worker Group',
     total_items: 'Total Item is'
   },

@@ -40,6 +40,7 @@ export default {
     no_permission: '无权限',
     read_permission: '读权限',
     all_permission: '所有权限',
+    owner_permission: '拥有者权限',
     assign_worker_group: '分配WorkerGroup',
     total_items: '总条目为'
   },

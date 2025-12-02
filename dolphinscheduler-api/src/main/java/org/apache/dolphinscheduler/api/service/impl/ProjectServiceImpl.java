@@ -439,10 +439,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         for (Project project : projectList) {
             if (userProjectIds.contains(project.getId())) {
                 ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
-                if (projectUser == null) {
-                    // in this case, the user is the project owner, maybe it's better to set it to ALL_PERMISSION.
-                    project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
-                } else {
+                if (projectUser != null) {
                     project.setPerm(projectUser.getPerm());
                 }
             } else {

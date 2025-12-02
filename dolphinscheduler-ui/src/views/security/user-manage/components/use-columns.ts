@@ -37,6 +37,10 @@ const PERM_LIST = [
   {
     label: 'project.list.all_permission',
     value: 7
+  },
+  {
+    label: 'project.list.owner_permission',
+    value: 99
   }
 ]
 
