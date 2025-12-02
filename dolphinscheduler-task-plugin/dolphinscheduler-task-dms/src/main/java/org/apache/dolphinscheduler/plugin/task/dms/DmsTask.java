@@ -23,7 +23,11 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.*;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -98,7 +102,8 @@ public class DmsTask extends AbstractRemoteTask {
             if (StringUtils.isNotEmpty(getAppIds())) {
                 taskRequest.setAppIds(getAppIds());
                 // callback to update remote application info
-                taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(), new ApplicationInfo(getAppIds()));
+                taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(),
+                        new ApplicationInfo(getAppIds()));
             }
 
             // keep tracking application status
