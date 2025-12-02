@@ -169,35 +169,16 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      *   <li>Values are non-null {@link Property} objects</li>
      * </ul>
      *
-     * <p><strong>Parameter Precedence (highest to lowest):</strong>
-     * <ol>
-     *   <li>Business/scheduling time parameters (e.g., {@code ${system.datetime}})</li>
-     *   <li>Command-line or runtime complement parameters</li>
-     *   <li>Task-local parameters</li>
-     *   <li>Workflow global parameters (solidified at instance creation)</li>
-     *   <li>Project-level parameters</li>
-     *   <li>Built-in system parameters (e.g., {@code ${task.id}})</li>
-     * </ol>
+     * <p> The priority of the parameters is as follows:
+     * <p> varpool > command parameters > local parameters > global parameters > project parameters > built-in parameters
+     * todo: Use TaskRuntimeParams to represent this.
      *
-     * <p><strong>Important Notes:</strong>
-     * <ul>
-     *   <li>All parameter sources are sanitized via {@link #safePutAll(Map, Map)} to prevent {@code null}
-     *       or blank keys, which would cause JSON serialization failures (e.g., Jackson's
-     *       "Null key for a Map not allowed in JSON").</li>
-     *   <li>Placeholders (e.g., {@code "${var}"}) in parameter values are resolved after all sources
-     *       are merged, using the consolidated parameter map. Global parameters are already
-     *       <em>solidified</em> (fully resolved at workflow instance creation), so no recursive
-     *       placeholder expansion is required.</li>
-     *   <li>{@code VarPool} values (from upstream tasks) only override parameters marked as
-     *       {@link Direct#IN}; output or constant parameters remain unchanged.</li>
-     * </ul>
-     *
-     * @param taskInstance           the current task instance (must not be null)
-     * @param parameters             the parsed task-specific parameters (must not be null)
-     * @param workflowInstance       the parent workflow instance (must not be null)
-     * @param projectName            name of the project containing the workflow
-     * @param workflowDefinitionName name of the workflow definition
-     * @return a safe, fully resolved map of parameter name to {@link Property}, ready for task execution
+     * @param taskInstance
+     * @param parameters
+     * @param workflowInstance
+     * @param projectName
+     * @param workflowDefinitionName
+     * @return
      */
     @Override
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
@@ -273,21 +254,6 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * Safely merges entries from the {@code source} map into the {@code target} map,
      * skipping any entry with a {@code null}, empty, or blank key, or a {@code null} value.
      *
-     * <p>This method ensures the resulting parameter map can be safely serialized to JSON
-     * (e.g., by Jackson), which prohibits {@code null} keys in maps. Invalid entries are
-     * logged as warnings to aid in debugging misconfigured parameters.
-     *
-     * <p>Examples of skipped entries:
-     * <pre>
-     *   key = null        → skipped
-     *   key = ""          → skipped
-     *   key = "  \t\n"    → skipped
-     *   value = null      → skipped
-     * </pre>
-     *
-     * <p>All valid entries (non-blank key and non-null value) are added to {@code target}
-     * using standard {@link Map#put(Object, Object)} semantics (later values overwrite earlier ones).
-     *
      * @param target the destination map to merge into (must not be null)
      * @param source the source map whose valid entries will be copied (may be null or empty)
      */
@@ -307,26 +273,6 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     /**
      * Resolves placeholder expressions (e.g., "${var}") in parameter values by substituting them
      * with actual values from the current {@code paramsMap}.
-     *
-     * <p>This supports references where a local task parameter refers to another parameter
-     * (e.g., a global workflow parameter). For example:
-     * <pre>
-     * Global parameters (solidified at workflow instance creation):
-     *   "output_dir" → "/data/20251119"
-     *
-     * Local task parameter definition:
-     *   "log_path" → "${output_dir}/task.log"
-     *
-     * After resolution:
-     *   "log_path" → "/data/20251119/task.log"
-     * </pre>
-     *
-     * <p><strong>Note:</strong> Global parameters in {@code paramsMap} are already solidified
-     * (i.e., contain no unresolved placeholders). Therefore, this method only needs to perform
-     * iterative substitution within the current context without recursive expansion.
-     *
-     * <p>Only values containing {@link Constants#FUNCTION_START_WITH} (typically "${") are processed.
-     * Substitution is performed in-place.
      *
      * @param paramsMap the map of parameters (key: parameter name, value: {@link Property}) to resolve
      */
