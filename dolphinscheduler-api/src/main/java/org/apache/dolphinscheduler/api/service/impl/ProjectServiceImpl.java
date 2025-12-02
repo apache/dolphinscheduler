@@ -51,7 +51,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -279,7 +278,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
             // case 2: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() >= Constants.WRITE_PERMISSION) {
+            if (projectUser == null || projectUser.getPerm() < Constants.WRITE_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -302,7 +301,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
             // case 2: check user permission level
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() >= Constants.DEFAULT_ADMIN_PERMISSION) {
+            if (projectUser == null || projectUser.getPerm() < Constants.WRITE_PERMISSION) {
                 putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
                 checkResult = false;
             } else {
@@ -771,10 +770,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     private int queryPermission(User user, Project project) {
         if (user.getUserType() == UserType.ADMIN_USER) {
             return Constants.READ_PERMISSION;
-        }
-
-        if (Objects.equals(project.getUserId(), user.getId())) {
-            return Constants.ALL_PERMISSIONS;
         }
 
         ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());

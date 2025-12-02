@@ -431,10 +431,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return true;
         }
 
-        if (project.getUserId().equals(loginUser.getId())) {
-            return true;
-        }
-
         ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
         if (projectUser == null) {
             log.warn("User {} does not have operation permission for project {}", loginUser.getUserName(),
@@ -442,7 +438,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
             return false;
         }
-        if (writePermission && projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+        if (writePermission && projectUser.getPerm() < Constants.WRITE_PERMISSION) {
             log.warn("User {} does not have write permission for project {}", loginUser.getUserName(),
                     project.getCode());
             putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
