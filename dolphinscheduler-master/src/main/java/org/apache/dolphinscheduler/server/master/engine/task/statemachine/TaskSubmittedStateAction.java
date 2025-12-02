@@ -109,7 +109,14 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                     taskInstance.getDelayTime(),
                     remainTimeMills);
         }
-        taskExecutionRunnable.initializeTaskExecutionContext();
+
+        try {
+            taskExecutionRunnable.initializeTaskExecutionContext();
+        } catch (Exception ex) {
+            log.error("Current taskInstance: {} initializeTaskExecutionContext error", taskInstance.getName(), ex);
+            workerGroupDispatcherCoordinator.addInitializeFailTask(taskExecutionRunnable);
+            return;
+        }
         workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }
 
