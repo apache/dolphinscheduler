@@ -218,12 +218,6 @@ final class ZookeeperRegistry implements Registry {
         try {
             interProcessMutex =
                     Optional.ofNullable(processMutexMap.get(key)).orElse(new InterProcessMutex(client, key));
-            if (interProcessMutex.isAcquiredInThisProcess()) {
-                // Since etcd/jdbc cannot implement a reentrant lock, we need to check if the lock is already acquired
-                // If it is already acquired, return true directly
-                // This means you only need to release once when you acquire multiple times
-                return true;
-            }
             interProcessMutex.acquire();
             processMutexMap.put(key, interProcessMutex);
             return true;
@@ -250,9 +244,6 @@ final class ZookeeperRegistry implements Registry {
         try {
             interProcessMutex =
                     Optional.ofNullable(processMutexMap.get(key)).orElse(new InterProcessMutex(client, key));
-            if (interProcessMutex.isAcquiredInThisProcess()) {
-                return true;
-            }
             if (interProcessMutex.acquire(timeout, MILLISECONDS)) {
                 processMutexMap.put(key, interProcessMutex);
                 return true;
@@ -282,6 +273,9 @@ final class ZookeeperRegistry implements Registry {
         }
         try {
             interProcessMutex.release();
+            if (interProcessMutex.isOwnedByCurrentThread()) {
+                return true;
+            }
             processMutexMap.remove(key);
             if (processMutexMap.isEmpty()) {
                 threadLocalLockMap.remove();
