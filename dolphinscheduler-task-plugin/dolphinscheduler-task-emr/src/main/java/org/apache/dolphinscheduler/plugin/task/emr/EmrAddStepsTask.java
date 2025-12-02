@@ -116,11 +116,6 @@ public class EmrAddStepsTask extends AbstractEmrTask {
             final int exitStatusCode = calculateExitStatusCode(stepStatus);
             setExitStatusCode(exitStatusCode);
             log.info("emr task finished with step status : {}", stepStatus);
-
-            // shutdown emrclient
-            if (emrClient != null) {
-                emrClient.shutdown();
-            }
         }
     }
 
