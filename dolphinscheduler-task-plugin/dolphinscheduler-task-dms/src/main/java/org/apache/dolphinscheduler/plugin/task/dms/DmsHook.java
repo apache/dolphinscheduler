@@ -131,18 +131,8 @@ public class DmsHook {
 
     public Boolean checkFinishedReplicationTask() {
         log.info("checkFinishedReplicationTask ......");
-        String stopReason = "";
-        try {
-            awaitReplicationTaskStatus(STATUS.STOPPED);
-            stopReason = describeReplicationTasks().getStopReason();
-        } catch (Exception e) {
-            log.error("checkFinishedReplicationTask error: ", e);
-        } finally {
-            if (client != null) {
-                // shutdown client
-                client.shutdown();
-            }
-        }
+        awaitReplicationTaskStatus(STATUS.STOPPED);
+        String stopReason = describeReplicationTasks().getStopReason();
         return stopReason.endsWith(STATUS.FINISH_END_TOKEN);
     }
 
@@ -176,11 +166,6 @@ public class DmsHook {
             isDeleteSuccessfully = awaitReplicationTaskStatus(STATUS.DELETE);
         } catch (ResourceNotFoundException e) {
             isDeleteSuccessfully = true;
-        } finally {
-            if (client != null) {
-                // shutdown client
-                client.shutdown();
-            }
         }
         return isDeleteSuccessfully;
     }
