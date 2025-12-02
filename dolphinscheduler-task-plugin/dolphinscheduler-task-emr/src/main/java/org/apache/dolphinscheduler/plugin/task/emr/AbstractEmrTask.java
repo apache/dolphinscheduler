@@ -119,9 +119,8 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
 
             // keep tracking application status
             trackApplicationStatus();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         } finally {
+            // shutdown emrclient
             if (emrClient != null) {
                 emrClient.shutdown();
             }
