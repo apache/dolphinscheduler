@@ -28,9 +28,11 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.sagemaker.param.SagemakerConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -108,6 +110,42 @@ public class SagemakerTask extends AbstractRemoteTask {
         utils = new PipelineUtils();
     }
 
+    /**
+     * If appIds is empty, submit a new remote application; otherwise, just track application status.
+     *
+     * @param taskCallBack
+     * @throws TaskException
+     */
+    @Override
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
+        try {
+            // if appIds is not empty, just track application status, avoid resubmitting remote task
+            if (StringUtils.isNotEmpty(taskRequest.getAppIds())) {
+                setAppIds(taskRequest.getAppIds());
+                trackApplicationStatus();
+                return;
+            }
+
+            // submit a remote application
+            submitApplication();
+
+            if (StringUtils.isNotEmpty(getAppIds())) {
+                taskRequest.setAppIds(getAppIds());
+                // callback to update remote application info
+                taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(),
+                        new ApplicationInfo(getAppIds()));
+            }
+
+            // keep tracking application status
+            trackApplicationStatus();
+        } finally {
+            // shutdown client
+            if (client != null) {
+                client.shutdown();
+            }
+        }
+    }
+
     @Override
     public void submitApplication() throws TaskException {
         try {
@@ -120,6 +158,7 @@ public class SagemakerTask extends AbstractRemoteTask {
             setAppIds(JSONUtils.toJsonString(pipelineId));
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            log.error("SageMaker task submit application error: {}", e.getMessage(), e);
             throw new TaskException("SageMaker task submit error", e);
         }
     }
@@ -150,11 +189,6 @@ public class SagemakerTask extends AbstractRemoteTask {
         } catch (Exception e) {
             log.error("SageMaker task track application error: {}", e.getMessage(), e);
             throw new TaskException("SageMaker task track application error: " + e.getMessage(), e);
-        } finally {
-            // shutdown client
-            if (client != null) {
-                client.shutdown();
-            }
         }
     }
 

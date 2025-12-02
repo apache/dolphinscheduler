@@ -155,7 +155,6 @@ public class SagemakerTaskTest {
         });
 
         assertEquals("SageMaker task track application error: sagemaker applicationID is null", exception.getMessage());
-        verify(client, times(1)).shutdown();
     }
 
     @Test
@@ -169,7 +168,8 @@ public class SagemakerTaskTest {
         });
 
         // Verify the exception message
-        assertEquals("SageMaker task cancel application error: sagemaker applicationID is null", exception.getMessage());
+        assertEquals("SageMaker task cancel application error: sagemaker applicationID is null",
+                exception.getMessage());
 
         // Verify that client.shutdown() was called
         verify(client, times(1)).shutdown();
