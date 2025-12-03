@@ -125,6 +125,30 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow with two fake task(A) has the same name")
+    public void testStartWorkflow_contains_duplicateTaskName() {
+        final String yaml = "/it/start/workflow_with_duplicate_task_name.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.FAILURE);
+                    assertThat(repository.queryTaskInstance(workflowInstanceId)).isEmpty();
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with one fake task(A) using serial wait strategy")
     public void testStartWorkflow_with_serialWaitStrategy() {
         final String yaml = "/it/start/workflow_with_serial_wait_strategy.yaml";
