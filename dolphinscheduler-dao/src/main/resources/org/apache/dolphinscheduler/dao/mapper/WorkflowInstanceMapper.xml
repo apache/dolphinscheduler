@@ -158,6 +158,10 @@
         where id = #{workflowInstanceId} and state = #{originState}
     </update>
 
+    <update id="forceUpdateWorkflowInstanceState">
+        update t_ds_workflow_instance set state = #{status} where id = #{id}
+    </update>
+
     <update id="updateWorkflowInstanceByTenantCode">
         update t_ds_workflow_instance
         set tenant_code = #{destTenantCode}
