@@ -90,10 +90,7 @@ export default defineComponent({
                 class='select-file-format'
               />
             </NFormItem>
-            <NFormItem
-              label={t('resource.file.file_content')}
-              path='content'
-            >
+            <NFormItem label={t('resource.file.file_content')} path='content'>
               <MonacoEditor
                 v-model={[this.fileForm.content, 'value']}
                 height='calc(100vh - 440px)'
