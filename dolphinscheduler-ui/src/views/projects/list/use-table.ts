@@ -109,11 +109,11 @@ export function useTable() {
             }
           )
       },
-      {
-        title: t('project.list.owned_users'),
-        key: 'userName',
-        ...COLUMN_WIDTH_CONFIG['userName']
-      },
+      // {
+      //   title: t('project.list.owned_users'),
+      //   key: 'userName',
+      //   ...COLUMN_WIDTH_CONFIG['userName']
+      // },
       {
         title: t('project.list.workflow_define_count'),
         key: 'defCount',

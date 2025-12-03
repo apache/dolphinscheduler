@@ -124,14 +124,14 @@ const ProjectModal = defineComponent({
               class='input-project-name'
             />
           </NFormItem>
-          <NFormItem label={t('project.list.owned_users')} path='userName'>
-            <NInput
-              allowInput={this.trim}
-              disabled={true}
-              v-model={[this.model.userName, 'value']}
-              placeholder={t('project.list.username_tips')}
-            />
-          </NFormItem>
+          {/*<NFormItem label={t('project.list.owned_users')} path='userName'>*/}
+          {/*  <NInput*/}
+          {/*    allowInput={this.trim}*/}
+          {/*    disabled={true}*/}
+          {/*    v-model={[this.model.userName, 'value']}*/}
+          {/*    placeholder={t('project.list.username_tips')}*/}
+          {/*  />*/}
+          {/*</NFormItem>*/}
           <NFormItem
             label={t('project.list.project_description')}
             path='description'
