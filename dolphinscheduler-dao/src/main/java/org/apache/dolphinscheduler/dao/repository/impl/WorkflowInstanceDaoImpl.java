@@ -72,6 +72,11 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
         }
     }
 
+    @Override
+    public void forceUpdateWorkflowInstanceState(Integer id, WorkflowExecutionStatus status) {
+        mybatisMapper.forceUpdateWorkflowInstanceState(id, status);
+    }
+
     /**
      * find last scheduler process instance in the date interval
      *
