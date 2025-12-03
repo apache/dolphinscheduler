@@ -30,6 +30,10 @@ public enum TaskLifecycleEventType implements ILifecycleEventType {
      */
     DISPATCH,
     /**
+     * Severe and unrecoverable errors, such as initialization failure.
+     */
+    FATAL,
+    /**
      * The task instance is dispatched to the target executor server.
      */
     DISPATCHED,

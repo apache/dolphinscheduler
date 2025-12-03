@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKilledLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRetryLifecycleEvent;
@@ -43,6 +44,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
@@ -97,6 +99,29 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         if (taskGroupCoordinator.needToReleaseTaskGroupSlot(taskInstance)) {
             taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
         }
+    }
+
+    @Override
+    public void onFatalEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final ITaskExecutionRunnable taskExecutionRunnable,
+                             final TaskFatalLifecycleEvent taskFatalEvent) {
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+
+        // Update task state to FAILURE
+        taskInstance.setState(TaskExecutionStatus.FAILURE);
+        taskInstance.setEndTime(taskFatalEvent.getEndTime());
+        taskInstanceDao.updateById(taskInstance);
+
+        // Mark task as inactive in the execution graph
+        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableInActive(taskExecutionRunnable);
+        // Mark taskExecutionRunnable as failure in the execution graph
+        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
+
+        log.info(
+                "Publishing WorkflowStopLifecycleEvent due to fatal failure of task[id={}, name={}] in workflow[processInstanceId={}].",
+                taskInstance.getId(), taskInstance.getName(), workflowExecutionRunnable.getWorkflowInstance().getId());
+        workflowExecutionRunnable.getWorkflowEventBus()
+                .publish(WorkflowStopLifecycleEvent.of(workflowExecutionRunnable));
     }
 
     @Override

@@ -46,8 +46,6 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final Set<Integer> waitingDispatchTaskIds;
 
-    private final Set<Integer> initializeFailTaskIds;
-
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient) {
@@ -55,7 +53,6 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupEventBus = new TaskDispatchableEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
-        this.initializeFailTaskIds = ConcurrentHashMap.newKeySet();
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
 
@@ -141,13 +138,5 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     int queueSize() {
         return this.workerGroupEventBus.size();
-    }
-
-    public void addInitializeFailTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        initializeFailTaskIds.add(taskExecutionRunnable.getId());
-    }
-
-    public boolean removeInitializeFailTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        return initializeFailTaskIds.remove(taskExecutionRunnable.getId());
     }
 }

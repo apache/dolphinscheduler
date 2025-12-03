@@ -66,15 +66,7 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
      */
     public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
         final String workerGroup = taskExecutionRunnable.getTaskInstance().getWorkerGroup();
-
-        boolean removed = getOrCreateWorkerGroupDispatcher(workerGroup).removeInitializeFailTask(taskExecutionRunnable);
-        if (removed) {
-            log.info("Success removed Initialize Fail Task[id={}] from WorkerGroupDispatcher[name={}]",
-                    taskExecutionRunnable.getId(), workerGroup);
-            return removed;
-        }
-
-        removed = getOrCreateWorkerGroupDispatcher(workerGroup).removeTask(taskExecutionRunnable);
+        boolean removed = getOrCreateWorkerGroupDispatcher(workerGroup).removeTask(taskExecutionRunnable);
         if (removed) {
             log.info("Success removed Task[id={}] from WorkerGroupDispatcher[name={}]",
                     taskExecutionRunnable.getId(), workerGroup);
@@ -103,13 +95,6 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
             }
         }
         log.info("WorkerGroupDispatcherCoordinator closed...");
-    }
-
-    public void addInitializeFailTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        final String workerGroup = taskExecutionRunnable.getTaskInstance().getWorkerGroup();
-        getOrCreateWorkerGroupDispatcher(workerGroup).addInitializeFailTask(taskExecutionRunnable);
-        log.info("add Initialize Fail Task[id={}] to WorkerGroupDispatcher[name={}]", taskExecutionRunnable.getId(),
-                workerGroup);
     }
 
     private WorkerGroupDispatcher getOrCreateWorkerGroupDispatcher(String workerGroup) {
