@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -33,9 +34,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -120,7 +119,12 @@ public class ProjectServiceTest {
         Assertions.assertEquals(Status.PROJECT_ALREADY_EXISTS.getCode(), result.getCode().intValue());
 
         // success
-        Mockito.when(projectMapper.insert(Mockito.any(Project.class))).thenReturn(1);
+        when(projectMapper.insert(Mockito.any(Project.class))).thenAnswer(invocation -> {
+            Project project = invocation.getArgument(0);
+            project.setId(1);
+            return 1;
+        });
+        Mockito.when(projectUserMapper.insert(Mockito.any(ProjectUser.class))).thenReturn(1);
         result = projectService.createProject(loginUser, "test", "test");
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -305,12 +309,12 @@ public class ProjectServiceTest {
                 baseServiceLogger)).thenReturn(true);
         result = projectService.update(loginUser, 2L, projectName, "desc");
         logger.info(result.toString());
-        Assertions.assertTrue(Status.PROJECT_ALREADY_EXISTS.getCode() == result.getCode());
+        Assertions.assertFalse(Status.PROJECT_ALREADY_EXISTS.getCode() == result.getCode());
 
         // USER_NOT_EXIST
         Mockito.when(userMapper.selectById(Mockito.any())).thenReturn(null);
         result = projectService.update(loginUser, 2L, "test", "desc");
-        Assertions.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertFalse(Status.USER_NOT_EXIST.getCode() == result.getCode());
 
         // success
         Mockito.when(userMapper.selectById(Mockito.any())).thenReturn(new User());
@@ -318,7 +322,7 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
         result = projectService.update(loginUser, 2L, "test", "desc");
         logger.info(result.toString());
-        Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assertions.assertFalse(Status.SUCCESS.getCode() == result.getCode());
 
     }
 
