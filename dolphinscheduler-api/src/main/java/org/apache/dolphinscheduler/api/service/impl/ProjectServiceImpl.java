@@ -377,7 +377,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         List<Project> projectList = projectIPage.getRecords();
         if (loginUser.getUserType() != UserType.ADMIN_USER) {
             for (Project project : projectList) {
-                project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
+                ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+                if (projectUser != null) {
+                    project.setPerm(projectUser.getPerm());
+                }
             }
         }
         if (CollectionUtils.isEmpty(projectList)) {
