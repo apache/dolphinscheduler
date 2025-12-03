@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -52,6 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Master scheduler thread, this thread will consume the commands from database and trigger processInstance executed.
@@ -76,6 +78,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     private IWorkflowRepository workflowRepository;
 
     @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
+
+    @Autowired
     private WorkflowExecutionRunnableFactory workflowExecutionRunnableFactory;
 
     @Autowired
@@ -83,6 +88,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
 
     @Autowired
     private WorkflowEventBusCoordinator workflowEventBusCoordinator;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     private ExecutorService commandHandleThreadPool;
 
@@ -189,8 +197,18 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
                     throwable);
             return null;
         }
-        log.error("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
-        commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
+
+        transactionTemplate.execute(status -> {
+            log.warn("Failed bootstrap command {} ", JSONUtils.toPrettyJsonString(command), throwable);
+            final int workflowInstanceId = command.getWorkflowInstanceId();
+
+            workflowInstanceDao.forceUpdateWorkflowInstanceState(workflowInstanceId, WorkflowExecutionStatus.FAILURE);
+            log.info("Set workflow instance {} state to FAILURE", workflowInstanceId);
+
+            commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));
+            log.info("Move command {} to error command table", command.getId());
+            return null;
+        });
         return null;
     }
 

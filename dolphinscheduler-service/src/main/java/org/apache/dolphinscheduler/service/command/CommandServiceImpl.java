@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -61,14 +60,11 @@ public class CommandServiceImpl implements CommandService {
     @Autowired
     private ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private WorkflowDefinitionMapper processDefineMapper;
-
     @Override
     public void moveToErrorCommand(Command command, String message) {
-        ErrorCommand errorCommand = new ErrorCommand(command, message);
-        this.errorCommandMapper.insert(errorCommand);
-        this.commandMapper.deleteById(command.getId());
+        final ErrorCommand errorCommand = new ErrorCommand(command, message);
+        errorCommandMapper.insert(errorCommand);
+        commandMapper.deleteById(command.getId());
     }
 
     @Override
