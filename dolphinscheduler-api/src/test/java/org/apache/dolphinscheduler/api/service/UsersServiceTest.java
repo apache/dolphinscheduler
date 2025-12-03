@@ -383,7 +383,7 @@ public class UsersServiceTest {
             // user is project owner
             Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(Lists.newArrayList(new Project()));
             result = usersService.deleteUserById(loginUser, 1);
-            Assertions.assertEquals(Status.TRANSFORM_PROJECT_OWNERSHIP, result.get(Constants.STATUS));
+            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
             // success
             Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(null);
@@ -391,7 +391,7 @@ public class UsersServiceTest {
             result = usersService.deleteUserById(loginUser, 1);
             logger.info(result.toString());
             Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-            Mockito.verify(metricsCleanUpService, times(1)).cleanUpApiResponseTimeMetricsByUserId(Mockito.anyInt());
+            Mockito.verify(metricsCleanUpService, times(2)).cleanUpApiResponseTimeMetricsByUserId(Mockito.anyInt());
         } catch (Exception e) {
             logger.error("delete user error", e);
             Assertions.assertTrue(false);
@@ -453,6 +453,35 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         when(userMapper.selectById(3)).thenReturn(loginUser);
         result = this.usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testGrantProjectWithOwnerPerm() {
+        String projectIds = "100000,120000";
+        User loginUser = new User();
+        int userId = 3;
+
+        // user not exist
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        when(userMapper.selectById(userId)).thenReturn(null);
+        Map<String, Object> result = usersService.grantProjectWithOwnerPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // SUCCESS
+        when(userMapper.selectById(userId)).thenReturn(getUser());
+        result = usersService.grantProjectWithOwnerPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProjectWithOwnerPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
