@@ -254,9 +254,6 @@ public class SqlTask extends AbstractTask {
             Set<String> uniqueLabels = new HashSet<>(num);
             for (int i = 1; i <= num; i++) {
                 String label = md.getColumnLabel(i);
-                if (StringUtils.isEmpty(label)) {
-                    label = "col_" + i;
-                }
                 columnLabels[i - 1] = label;
                 if (!uniqueLabels.add(label)) {
                     throw new TaskException("SQL column name conflict: duplicate column name '" + label
