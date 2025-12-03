@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class WorkflowGraph implements IWorkflowGraph {
@@ -46,12 +45,20 @@ public class WorkflowGraph implements IWorkflowGraph {
         this.predecessors = new HashMap<>();
         this.successors = new HashMap<>();
 
-        this.taskDefinitionMap = taskDefinitions
-                .stream()
-                .collect(Collectors.toMap(TaskDefinition::getName, Function.identity()));
-        this.taskDefinitionCodeMap = taskDefinitions
-                .stream()
-                .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
+        this.taskDefinitionMap = new HashMap<>(taskDefinitions.size());
+        this.taskDefinitionCodeMap = new HashMap<>(taskDefinitions.size());
+        for (TaskDefinition taskDefinition : taskDefinitions) {
+            if (taskDefinitionMap.containsKey(taskDefinition.getName())) {
+                throw new IllegalArgumentException(
+                        "Duplicate task name: " + taskDefinition.getName() + " in the workflow");
+            }
+            taskDefinitionMap.put(taskDefinition.getName(), taskDefinition);
+            if (taskDefinitionCodeMap.containsKey(taskDefinition.getCode())) {
+                throw new IllegalArgumentException(
+                        "Duplicate task code: " + taskDefinition.getCode() + " in the workflow");
+            }
+            taskDefinitionCodeMap.put(taskDefinition.getCode(), taskDefinition);
+        }
 
         addTaskNodes(taskDefinitions);
         addTaskEdge(workflowTaskRelations);
