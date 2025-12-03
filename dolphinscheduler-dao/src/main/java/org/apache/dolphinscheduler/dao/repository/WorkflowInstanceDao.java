@@ -39,6 +39,8 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
                                      WorkflowExecutionStatus originState,
                                      WorkflowExecutionStatus targetState);
 
+    void forceUpdateWorkflowInstanceState(Integer id, WorkflowExecutionStatus status);
+
     /**
      * find last scheduler workflow instance in the date interval
      *
