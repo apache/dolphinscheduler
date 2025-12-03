@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
@@ -122,7 +124,6 @@ public class DataSourceServiceTest {
         String dataSourceDesc = "test dataSource";
 
         PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
-        postgreSqlDatasourceParam.setDatabase(dataSourceName);
         postgreSqlDatasourceParam.setNote(dataSourceDesc);
         postgreSqlDatasourceParam.setHost("172.16.133.200");
         postgreSqlDatasourceParam.setPort(5432);
@@ -148,10 +149,24 @@ public class DataSourceServiceTest {
                 () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
 
         try (
-                MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
-                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils =
+                        Mockito.mockStatic(DataSourceUtils.class)) {
 
             when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
+
+            // Test datasource parameter validation failure
+            mockedStaticDataSourceUtils.when(() -> DataSourceUtils.checkDatasourceParam(postgreSqlDatasourceParam))
+                    .thenThrow(new ServiceException(Status.DATASOURCE_CONNECT_FAILED));
+            assertThrowsServiceException(Status.DATASOURCE_CONNECT_FAILED,
+                    () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+
+            // Reset datasource parameter validation
+            mockedStaticDataSourceUtils.when(() -> DataSourceUtils.checkDatasourceParam(postgreSqlDatasourceParam))
+                    .thenAnswer(invocation -> null);
+
+            // Reset connection parameter build
+            mockedStaticDataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam))
+                    .thenReturn(Mockito.mock(ConnectionParam.class));
 
             // DESCRIPTION TOO LONG
             postgreSqlDatasourceParam.setNote(randomStringWithLengthN(512));
@@ -160,6 +175,12 @@ public class DataSourceServiceTest {
             postgreSqlDatasourceParam.setNote(dataSourceDesc);
 
             // SUCCESS
+            when(dataSourceMapper.insert(Mockito.any(DataSource.class))).thenAnswer(invocation -> {
+                DataSource ds = invocation.getArgument(0);
+                ds.setId(1);
+                return 1;
+            });
+            when(datasourceUserMapper.insert(Mockito.any(DatasourceUser.class))).thenReturn(1);
             assertDoesNotThrow(() -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
 
             // Duplicated Key Exception
