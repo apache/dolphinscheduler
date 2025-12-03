@@ -267,9 +267,9 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         storageEntities.addAll(
                 listObjectsV2Result.getObjectSummaries().stream()
                         // Filter out the current directory itself
-                        .filter(s3ObjectSummary -> !s3ObjectSummary.getKey().equals(ossResourceAbsolutePath))
+                        .filter(ossObjectSummary -> !ossObjectSummary.getKey().equals(ossResourceAbsolutePath))
                         // Filter out directory marker objects that are already in commonPrefixes
-                        .filter(s3ObjectSummary -> !commonPrefixSet.contains(s3ObjectSummary.getKey()))
+                        .filter(ossObjectSummary -> !commonPrefixSet.contains(ossObjectSummary.getKey()))
                         .map(this::transformOSSObjectToStorageEntity)
                         .collect(Collectors.toList()));
 
