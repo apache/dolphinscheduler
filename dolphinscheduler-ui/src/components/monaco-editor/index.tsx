@@ -55,6 +55,10 @@ const props = {
       readOnly: false,
       language: 'shell'
     })
+  },
+  height: {
+    type: String as PropType<string>,
+    default: '300px'
   }
 }
 
@@ -164,7 +168,8 @@ export default defineComponent({
       <div
         ref='editorRef'
         style={{
-          height: '300px',
+          height: this.height,
+          minHeight: '150px',
           width: '100%',
           border: '1px solid #eee'
         }}
