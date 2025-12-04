@@ -97,6 +97,15 @@ class WorkflowInstanceDaoImplTest extends BaseDaoTest {
     }
 
     @Test
+    void forceUpdateWorkflowInstanceState() {
+        WorkflowInstance workflowInstance = createWorkflowInstance(1L, 1, WorkflowExecutionStatus.RUNNING_EXECUTION);
+        workflowInstanceDao.insert(workflowInstance);
+        workflowInstanceDao.forceUpdateWorkflowInstanceState(workflowInstance.getId(), WorkflowExecutionStatus.FAILURE);
+        assertEquals(WorkflowExecutionStatus.FAILURE,
+                workflowInstanceDao.queryById(workflowInstance.getId()).getState());
+    }
+
+    @Test
     void queryByWorkflowCodeVersionStatus_EXIST_FINISH_INSTANCE() {
         long workflowDefinitionCode = 1L;
         int workflowDefinitionVersion = 1;
