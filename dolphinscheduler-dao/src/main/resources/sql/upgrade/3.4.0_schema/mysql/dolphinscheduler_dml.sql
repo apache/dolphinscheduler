@@ -16,3 +16,5 @@
 */
 
 UPDATE t_ds_datasource SET connection_params = REPLACE(connection_params, '"publicKey"', '"privateKey"') WHERE type = 17 AND connection_params LIKE '%"publicKey"%';
+INSERT INTO t_ds_relation_project_user (user_id, project_id, perm, create_time, update_time) SELECT user_id, id, 99, now(), now() FROM t_ds_project;
+INSERT INTO t_ds_relation_datasource_user (user_id, datasource_id, perm, create_time, update_time) SELECT user_id, id, 7, now(), now() FROM t_ds_datasource;
