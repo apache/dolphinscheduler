@@ -125,6 +125,30 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow with two fake task(A) has the same name")
+    public void testStartWorkflow_contains_duplicateTaskName() {
+        final String yaml = "/it/start/workflow_with_duplicate_task_name.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.FAILURE);
+                    assertThat(repository.queryTaskInstance(workflowInstanceId)).isEmpty();
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with one fake task(A) using serial wait strategy")
     public void testStartWorkflow_with_serialWaitStrategy() {
         final String yaml = "/it/start/workflow_with_serial_wait_strategy.yaml";
@@ -745,6 +769,50 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
                                 assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
                                         .isEqualTo(assertVarPools);
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow which using null key params")
+    public void testStartWorkflow_usingNullKeyParam() {
+        final String yaml = "/it/start/workflow_with_null_key_param.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
+                .commandParams(Lists.newArrayList(Property.builder()
+                        .prop(null)
+                        .direct(Direct.IN)
+                        .type(DataType.VARCHAR)
+                        .value("commandParam")
+                        .build()))
+                .build();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(runWorkflowCommandParam)
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
