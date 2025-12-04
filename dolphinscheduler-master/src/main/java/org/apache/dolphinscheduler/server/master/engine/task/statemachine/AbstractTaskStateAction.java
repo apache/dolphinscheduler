@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
@@ -105,23 +104,23 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     public void onFatalEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                              final ITaskExecutionRunnable taskExecutionRunnable,
                              final TaskFatalLifecycleEvent taskFatalEvent) {
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
 
-        // Update task state to FAILURE
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.FAILURE);
         taskInstance.setEndTime(taskFatalEvent.getEndTime());
         taskInstanceDao.updateById(taskInstance);
 
-        // Mark task as inactive in the execution graph
-        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableInActive(taskExecutionRunnable);
-        // Mark taskExecutionRunnable as failure in the execution graph
+        // If all successors are condition tasks, then the task will not be marked as failure.
+        // And the DAG will continue to execute.
+        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
+        if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
+            mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
+            publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+            return;
+        }
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
-
-        log.info(
-                "Publishing WorkflowStopLifecycleEvent due to fatal failure of task[id={}, name={}] in workflow[processInstanceId={}].",
-                taskInstance.getId(), taskInstance.getName(), workflowExecutionRunnable.getWorkflowInstance().getId());
-        workflowExecutionRunnable.getWorkflowEventBus()
-                .publish(WorkflowStopLifecycleEvent.of(workflowExecutionRunnable));
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
     }
 
     @Override
