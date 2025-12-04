@@ -49,9 +49,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -246,11 +248,23 @@ public class SqlTask extends AbstractTask {
         if (resultSet != null) {
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
+            String[] columnLabels = new String[num];
+
+            // Check for duplicates in column definitions (across all columns)
+            Set<String> uniqueLabels = new HashSet<>(num);
+            for (int i = 1; i <= num; i++) {
+                String label = md.getColumnLabel(i);
+                columnLabels[i - 1] = label;
+                if (!uniqueLabels.add(label)) {
+                    throw new TaskException("SQL column name conflict: duplicate column name '" + label
+                            + "'. Please use aliases to ensure unique column names.");
+                }
+            }
 
             while (resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
-                    mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
+                    mapOfColValues.set(columnLabels[i - 1], JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
                 resultJSONArray.add(mapOfColValues);
             }
