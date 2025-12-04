@@ -255,6 +255,10 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
                 .withPrefix(ossResourceAbsolutePath);
 
         ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
+
+        // Collect common prefixes (directories)
+        Set<String> commonPrefixSet = new HashSet<>(listObjectsV2Result.getCommonPrefixes());
+
         List<StorageEntity> storageEntities = new ArrayList<>();
         storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()
                 .stream()
@@ -262,7 +266,10 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
                 .collect(Collectors.toList()));
         storageEntities.addAll(
                 listObjectsV2Result.getObjectSummaries().stream()
-                        .filter(s3ObjectSummary -> !s3ObjectSummary.getKey().equals(resourceAbsolutePath))
+                        // Filter out the current directory itself
+                        .filter(ossObjectSummary -> !ossObjectSummary.getKey().equals(ossResourceAbsolutePath))
+                        // Filter out directory marker objects that are already in commonPrefixes
+                        .filter(ossObjectSummary -> !commonPrefixSet.contains(ossObjectSummary.getKey()))
                         .map(this::transformOSSObjectToStorageEntity)
                         .collect(Collectors.toList()));
 
@@ -363,11 +370,13 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         StorageEntity entity = new StorageEntity();
         entity.setFileName(new File(absolutePath).getName());
         entity.setFullName(absolutePath);
+        entity.setPfullName(resourceMetaData.getResourceParentAbsolutePath());
         entity.setDirectory(resourceMetaData.isDirectory());
         entity.setType(resourceMetaData.getResourceType());
         entity.setSize(0L);
         entity.setCreateTime(null);
         entity.setUpdateTime(null);
+        entity.setRelativePath(resourceMetaData.getResourceRelativePath());
         return entity;
     }
 
