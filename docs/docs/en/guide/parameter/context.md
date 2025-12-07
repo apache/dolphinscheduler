@@ -27,7 +27,7 @@ Upstream parameter will be override when defining parameter with the same name i
 >
 >**1. Parameter passing behavior has changed in version 3.3.x**
 >
-> In older version 3.2.x, downstream node B could obtain the out type output X of upstream node A without configuring an IN type local variable X.
+> In older version before 3.2.2, downstream node B could obtain the out type output X of upstream node A without configuring an IN type local variable X.
 >
 > In the new version 3.3.x, the logic for obtaining local variables has been modified: downstream node B can only use the out type output X of upstream node A if it has configured an IN type local variable X.
 >
