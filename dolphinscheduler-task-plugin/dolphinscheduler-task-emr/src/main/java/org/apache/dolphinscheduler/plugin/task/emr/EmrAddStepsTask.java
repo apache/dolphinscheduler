@@ -187,37 +187,27 @@ public class EmrAddStepsTask extends AbstractEmrTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        try {
-            log.info("trying cancel emr step, taskId:{}, clusterId:{}, stepId:{}",
-                    this.taskExecutionContext.getTaskInstanceId(), clusterId, stepId);
-            CancelStepsRequest cancelStepsRequest =
-                    new CancelStepsRequest().withClusterId(clusterId).withStepIds(stepId);
-            CancelStepsResult cancelStepsResult = emrClient.cancelSteps(cancelStepsRequest);
+        log.info("trying cancel emr step, taskId:{}, clusterId:{}, stepId:{}",
+                this.taskExecutionContext.getTaskInstanceId(), clusterId, stepId);
+        CancelStepsRequest cancelStepsRequest =
+                new CancelStepsRequest().withClusterId(clusterId).withStepIds(stepId);
+        CancelStepsResult cancelStepsResult = emrClient.cancelSteps(cancelStepsRequest);
 
-            if (cancelStepsResult == null) {
-                throw new EmrTaskException("cancel emr step failed");
-            }
-
-            CancelStepsInfo cancelEmrStepInfo = cancelStepsResult.getCancelStepsInfoList()
-                    .stream()
-                    .filter(cancelStepsInfo -> cancelStepsInfo.getStepId().equals(stepId))
-                    .findFirst()
-                    .orElseThrow(() -> new EmrTaskException("cancel emr step failed"));
-
-            if (CancelStepsRequestStatus.FAILED.toString().equals(cancelEmrStepInfo.getStatus())) {
-                throw new EmrTaskException("cancel emr step failed, message:" + cancelEmrStepInfo.getReason());
-            }
-
-            log.info("the result of cancel emr step is:{}", cancelStepsResult);
-        } catch (EmrTaskException | SdkBaseException e) {
-            log.error("cancel emr step failed", e);
-            throw new TaskException("cancel emr step failed", e);
-        } finally {
-            // shutdown emrclient
-            if (emrClient != null) {
-                emrClient.shutdown();
-            }
+        if (cancelStepsResult == null) {
+            throw new EmrTaskException("cancel emr step failed");
         }
+
+        CancelStepsInfo cancelEmrStepInfo = cancelStepsResult.getCancelStepsInfoList()
+                .stream()
+                .filter(cancelStepsInfo -> cancelStepsInfo.getStepId().equals(stepId))
+                .findFirst()
+                .orElseThrow(() -> new EmrTaskException("cancel emr step failed"));
+
+        if (CancelStepsRequestStatus.FAILED.toString().equals(cancelEmrStepInfo.getStatus())) {
+            throw new EmrTaskException("cancel emr step failed, message:" + cancelEmrStepInfo.getReason());
+        }
+
+        log.info("the result of cancel emr step is:{}", cancelStepsResult);
     }
 
 }

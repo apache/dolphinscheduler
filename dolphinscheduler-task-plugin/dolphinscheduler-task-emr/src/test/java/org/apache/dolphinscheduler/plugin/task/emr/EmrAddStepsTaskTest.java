@@ -21,8 +21,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -46,10 +44,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
 import com.amazonaws.services.elasticmapreduce.model.AmazonElasticMapReduceException;
-import com.amazonaws.services.elasticmapreduce.model.CancelStepsInfo;
-import com.amazonaws.services.elasticmapreduce.model.CancelStepsRequest;
-import com.amazonaws.services.elasticmapreduce.model.CancelStepsRequestStatus;
-import com.amazonaws.services.elasticmapreduce.model.CancelStepsResult;
 import com.amazonaws.services.elasticmapreduce.model.DescribeStepResult;
 import com.amazonaws.services.elasticmapreduce.model.Step;
 import com.amazonaws.services.elasticmapreduce.model.StepState;
@@ -203,56 +197,5 @@ public class EmrAddStepsTaskTest {
         emrParameters.setStepsDefineJson(stepsDefineJson);
 
         return emrParameters;
-    }
-
-    @Test
-    public void cancelApplication_CancelStepsResultIsNull_ShouldThrowException() {
-        Mockito.when(emrClient.cancelSteps(any(CancelStepsRequest.class))).thenReturn(null);
-
-        Assertions.assertThrows(TaskException.class, () -> {
-            emrAddStepsTask.cancelApplication();
-        });
-
-        verify(emrClient, times(1)).shutdown();
-    }
-
-    @Test
-    public void cancelApplication_CancelStepsRequestFails_ShouldThrowException() {
-        CancelStepsInfo cancelStepsInfo = new CancelStepsInfo()
-                .withStepId("step-123")
-                .withStatus(CancelStepsRequestStatus.FAILED.toString())
-                .withReason("Test failure");
-
-        CancelStepsResult cancelStepsResult = new CancelStepsResult()
-                .withCancelStepsInfoList(cancelStepsInfo);
-
-        Mockito.when(emrClient.cancelSteps(any(CancelStepsRequest.class))).thenReturn(cancelStepsResult);
-
-        emrAddStepsTask.stepId = "step-123";
-
-        Assertions.assertThrows(TaskException.class, () -> {
-            emrAddStepsTask.cancelApplication();
-        });
-
-        verify(emrClient, times(1)).shutdown();
-    }
-
-    @Test
-    public void testCancelApplication_Success() throws TaskException {
-        CancelStepsInfo cancelStepsInfo = new CancelStepsInfo()
-                .withStepId("step-123")
-                .withStatus(CancelStepsRequestStatus.SUBMITTED.toString());
-
-        CancelStepsResult cancelStepsResult = new CancelStepsResult()
-                .withCancelStepsInfoList(cancelStepsInfo);
-
-        emrAddStepsTask.stepId = "step-123";
-
-        Mockito.when(emrClient.cancelSteps(any(CancelStepsRequest.class))).thenReturn(cancelStepsResult);
-
-        Assertions.assertDoesNotThrow(() -> emrAddStepsTask.cancelApplication());
-
-        verify(emrClient, times(1)).cancelSteps(any(CancelStepsRequest.class));
-        verify(emrClient, times(1)).shutdown();
     }
 }

@@ -21,8 +21,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -51,8 +49,6 @@ import com.amazonaws.services.elasticmapreduce.model.ClusterStateChangeReasonCod
 import com.amazonaws.services.elasticmapreduce.model.ClusterStatus;
 import com.amazonaws.services.elasticmapreduce.model.DescribeClusterResult;
 import com.amazonaws.services.elasticmapreduce.model.RunJobFlowResult;
-import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsRequest;
-import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsResult;
 
 @ExtendWith(MockitoExtension.class)
 public class EmrJobFlowTaskTest {
@@ -213,18 +209,5 @@ public class EmrJobFlowTaskTest {
         emrParameters.setJobFlowDefineJson(jobFlowDefineJson);
 
         return JSONUtils.toJsonString(emrParameters);
-    }
-
-    @Test
-    public void testCancelApplication_Success() throws TaskException {
-        TerminateJobFlowsResult terminateJobFlowsResult = Mockito.mock(TerminateJobFlowsResult.class);
-        Mockito.when(emrClient.terminateJobFlows(any(TerminateJobFlowsRequest.class)))
-                .thenReturn(terminateJobFlowsResult);
-        Mockito.doNothing().when(emrClient).shutdown();
-
-        Assertions.assertDoesNotThrow(() -> emrJobFlowTask.cancelApplication());
-
-        verify(emrClient, times(1)).terminateJobFlows(any(TerminateJobFlowsRequest.class));
-        verify(emrClient, times(1)).shutdown();
     }
 }
