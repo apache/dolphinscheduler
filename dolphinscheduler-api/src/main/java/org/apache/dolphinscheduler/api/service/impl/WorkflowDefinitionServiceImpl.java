@@ -116,6 +116,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskM
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
@@ -1513,6 +1514,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return false;
         }
 
+        // Updates task code references in all SWITCH-type tasks within the given list
+        if (!updateSwitchTaskReferences(taskDefinitionLogList, taskCodeMap, result)) {
+            return false;
+        }
+
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
@@ -1683,6 +1689,70 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     .collect(Collectors.toList());
             result.setFailedNode(updatedFailed);
         }
+    }
+
+    /**
+     * Updates task code references in all SWITCH-type tasks within the given list.
+     * Specifically replaces:
+     *   - {@code nextBranch} at the top level of SwitchParameters
+     *   - {@code nextNode} in the default branch (switchResult.nextNode)
+     *   - {@code nextNode} in each conditional branch (switchResult.dependTaskList[*].nextNode)
+     * using the provided mapping from old task codes to new ones.
+     *
+     * @param taskDefinitionLogList list of task definition logs to process
+     * @param taskCodeMap           mapping from old task code to new task code
+     * @param result                result context for error reporting
+     * @return {@code true} if all SWITCH tasks were processed successfully;
+     *         {@code false} if any task parameter failed to parse (error already set in {@code result})
+     */
+    private boolean updateSwitchTaskReferences(
+                                               List<TaskDefinitionLog> taskDefinitionLogList,
+                                               Map<Long, Long> taskCodeMap,
+                                               Map<String, Object> result) {
+
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
+            if (!"SWITCH".equals(taskDefinitionLog.getTaskType())) {
+                continue;
+            }
+
+            SwitchParameters switchParams = JSONUtils.parseObject(
+                    taskDefinitionLog.getTaskParams(),
+                    new TypeReference<SwitchParameters>() {
+                    });
+
+            if (switchParams == null) {
+                log.warn("Failed to parse taskParams for SWITCH task: {}", taskDefinitionLog.getTaskParams());
+                putMsg(result, Status.DATA_IS_NOT_VALID, "taskParams");
+                return false;
+            }
+
+            // Update top-level nextBranch
+            if (switchParams.getNextBranch() != null && taskCodeMap.containsKey(switchParams.getNextBranch())) {
+                switchParams.setNextBranch(taskCodeMap.get(switchParams.getNextBranch()));
+            }
+
+            // Update switchResult block
+            SwitchParameters.SwitchResult switchResult = switchParams.getSwitchResult();
+            if (switchResult != null) {
+                // Default branch
+                if (switchResult.getNextNode() != null && taskCodeMap.containsKey(switchResult.getNextNode())) {
+                    switchResult.setNextNode(taskCodeMap.get(switchResult.getNextNode()));
+                }
+
+                // Conditional branches
+                if (CollectionUtils.isNotEmpty(switchResult.getDependTaskList())) {
+                    for (SwitchResultVo vo : switchResult.getDependTaskList()) {
+                        if (vo != null && vo.getNextNode() != null && taskCodeMap.containsKey(vo.getNextNode())) {
+                            vo.setNextNode(taskCodeMap.get(vo.getNextNode()));
+                        }
+                    }
+                }
+            }
+
+            // Persist changes
+            taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParams));
+        }
+        return true;
     }
 
     /**
