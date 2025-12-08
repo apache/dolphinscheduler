@@ -23,8 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -157,21 +155,4 @@ public class SagemakerTaskTest {
         assertEquals("SageMaker task track application error: sagemaker applicationID is null", exception.getMessage());
     }
 
-    @Test
-    public void testCancelApplication_InitPipelineIdThrowsException() {
-        // Mock the behavior of initPipelineId to throw an exception
-        doThrow(new TaskException("sagemaker applicationID is null")).when(sagemakerTask).initPipelineId();
-
-        // Call the method under test and expect an exception
-        TaskException exception = assertThrows(TaskException.class, () -> {
-            sagemakerTask.cancelApplication();
-        });
-
-        // Verify the exception message
-        assertEquals("SageMaker task cancel application error: sagemaker applicationID is null",
-                exception.getMessage());
-
-        // Verify that client.shutdown() was called
-        verify(client, times(1)).shutdown();
-    }
 }

@@ -172,11 +172,6 @@ public class SagemakerTask extends AbstractRemoteTask {
         } catch (Exception e) {
             log.error("SageMaker task cancel application error: {}", e.getMessage(), e);
             throw new TaskException("SageMaker task cancel application error: " + e.getMessage(), e);
-        } finally {
-            // shutdown client
-            if (client != null) {
-                client.shutdown();
-            }
         }
     }
 
