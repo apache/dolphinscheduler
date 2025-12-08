@@ -141,19 +141,10 @@ public class DmsHook {
         if (replicationTaskArn == null) {
             return;
         }
-        try {
-            StopReplicationTaskRequest request = new StopReplicationTaskRequest()
-                    .withReplicationTaskArn(replicationTaskArn);
-            client.stopReplicationTask(request);
-            awaitReplicationTaskStatus(STATUS.STOPPED);
-        } catch (Exception e) {
-            log.error("stopReplicationTask error: ", e);
-        } finally {
-            if (client != null) {
-                // shutdown client
-                client.shutdown();
-            }
-        }
+        StopReplicationTaskRequest request = new StopReplicationTaskRequest()
+                .withReplicationTaskArn(replicationTaskArn);
+        client.stopReplicationTask(request);
+        awaitReplicationTaskStatus(STATUS.STOPPED);
     }
 
     public Boolean deleteReplicationTask() {
