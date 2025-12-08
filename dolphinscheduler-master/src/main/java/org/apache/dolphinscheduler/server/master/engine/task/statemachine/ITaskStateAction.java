@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 
 /**
  * Represents the action to be taken when a task is in a certain state and receive a target event.
@@ -90,7 +91,7 @@ public interface ITaskStateAction {
      */
     void onDispatchEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                          final ITaskExecutionRunnable taskExecutionRunnable,
-                         final TaskDispatchLifecycleEvent taskDispatchEvent);
+                         final TaskDispatchLifecycleEvent taskDispatchEvent) throws TaskFatalException;
 
     /**
      * Perform the necessary actions when the task in a certain state receive a {@link TaskFatalLifecycleEvent}.

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine;
 
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 
 /**
  * The event handler interface, used to handle the event
@@ -25,7 +26,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 public interface ILifecycleEventHandler<T extends AbstractLifecycleEvent> {
 
     void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                final T event);
+                final T event) throws TaskFatalException;
 
     ILifecycleEventType matchEventType();
 

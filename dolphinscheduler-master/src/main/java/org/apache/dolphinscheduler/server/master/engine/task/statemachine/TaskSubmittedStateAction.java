@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailoverLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKillLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKilledLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPauseLifecycleEvent;
@@ -37,8 +36,8 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
@@ -97,7 +96,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     @Override
     public void onDispatchEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                final TaskDispatchLifecycleEvent taskDispatchEvent) {
+                                final TaskDispatchLifecycleEvent taskDispatchEvent) throws TaskFatalException {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         long remainTimeMills = DateUtils.getRemainTime(
@@ -114,13 +113,8 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
         try {
             taskExecutionRunnable.initializeTaskExecutionContext();
         } catch (Exception ex) {
-            log.error("Current taskInstance: {} initializeTaskExecutionContext error", taskInstance.getName(), ex);
-            final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
-                    .taskExecutionRunnable(taskExecutionRunnable)
-                    .endTime(new Date())
-                    .build();
-            taskExecutionRunnable.getWorkflowEventBus().publish(taskFatalEvent);
-            return;
+            log.error("Current taskInstance: {} initializeTaskExecutionContext fail", taskInstance.getName(), ex);
+            throw new TaskFatalException(taskInstance.getName() + " initializeTaskExecutionContext fail");
         }
         workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }

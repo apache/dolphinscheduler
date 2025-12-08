@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,7 @@ public class TaskStartLifecycleEventHandler extends AbstractTaskLifecycleEventHa
 
     @Override
     public void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final TaskStartLifecycleEvent taskStartLifecycleEvent) {
+                       final TaskStartLifecycleEvent taskStartLifecycleEvent) throws TaskFatalException {
         final ITaskExecutionRunnable taskExecutionRunnable = taskStartLifecycleEvent.getTaskExecutionRunnable();
         // Since if the ITaskExecutionRunnable is start at the first time, then it might not be initialized.
         // So we need to initialize the task instance here.

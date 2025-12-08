@@ -15,19 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.utils;
+package org.apache.dolphinscheduler.server.master.exception;
 
-import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
+public class TaskFatalException extends MasterException {
 
-import org.springframework.dao.DataAccessResourceFailureException;
-
-public class ExceptionUtils {
-
-    public static boolean isDatabaseConnectedFailedException(Throwable e) {
-        return e instanceof DataAccessResourceFailureException;
+    public TaskFatalException(String message) {
+        super(message);
     }
 
-    public static boolean isTaskFatalException(Throwable e) {
-        return e instanceof TaskFatalException;
+    public TaskFatalException(String message, Throwable cause) {
+        super(message, cause);
     }
+
 }
