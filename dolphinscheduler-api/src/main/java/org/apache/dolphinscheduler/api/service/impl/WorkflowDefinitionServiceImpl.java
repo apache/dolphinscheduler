@@ -111,9 +111,12 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -166,6 +169,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -1503,6 +1507,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
             taskDefinitionLogList.add(taskDefinitionLog);
         }
+
+        // Updates task code references in all CONDITIONS-type tasks within the given list
+        if (!updateConditionTaskReferences(taskDefinitionLogList, taskCodeMap, result)) {
+            return false;
+        }
+
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
@@ -1580,6 +1590,99 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         log.info("Import workflow definition complete, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                 workflowDefinition.getCode());
         return true;
+    }
+
+    /**
+     * Updates task code references in all CONDITIONS-type tasks within the given list.
+     * Specifically replaces:
+     *   - {@code depTaskCode} in each {@code ConditionDependentItem}
+     *   - node IDs in {@code successNode} and {@code failedNode}
+     * using the provided mapping from old task codes to new ones.
+     * <p>
+     * Unmapped codes are left unchanged. The updated parameters are serialized back
+     * into the {@code taskParams} field of each matching task log.
+     *
+     * @param taskDefinitionLogList list of task definition logs to process
+     * @param taskCodeMap           mapping from old task code to new task code (non-null)
+     * @param result                result context for error reporting
+     * @return {@code true} if all CONDITIONS tasks were processed successfully;
+     *         {@code false} if any task parameter failed to parse (error already set in {@code result})
+     */
+    private boolean updateConditionTaskReferences(
+                                                  List<TaskDefinitionLog> taskDefinitionLogList,
+                                                  Map<Long, Long> taskCodeMap,
+                                                  Map<String, Object> result) {
+
+        for (TaskDefinitionLog taskLog : taskDefinitionLogList) {
+            if (!"CONDITIONS".equals(taskLog.getTaskType())) {
+                continue;
+            }
+
+            ConditionsParameters params = JSONUtils.parseObject(
+                    taskLog.getTaskParams(),
+                    new TypeReference<ConditionsParameters>() {
+                    });
+
+            if (params == null) {
+                log.warn("Failed to parse taskParams for CONDITIONS task: {}", taskLog.getTaskParams());
+                putMsg(result, Status.DATA_IS_NOT_VALID, "taskParams");
+                return false;
+            }
+
+            updateDependenceTaskCodes(params, taskCodeMap);
+            updateConditionResultNodes(params, taskCodeMap);
+
+            taskLog.setTaskParams(JSONUtils.toJsonString(params));
+        }
+        return true;
+    }
+
+    /**
+     * Replaces {@code depTaskCode} in all dependent items using the given code mapping.
+     */
+    private void updateDependenceTaskCodes(ConditionsParameters params, Map<Long, Long> taskCodeMap) {
+        ConditionsParameters.ConditionDependency dependence = params.getDependence();
+        if (dependence == null || CollectionUtils.isEmpty(dependence.getDependTaskList())) {
+            return;
+        }
+
+        for (ConditionDependentTaskModel dependTask : dependence.getDependTaskList()) {
+            if (CollectionUtils.isEmpty(dependTask.getDependItemList())) {
+                continue;
+            }
+            for (ConditionDependentItem item : dependTask.getDependItemList()) {
+                Long oldCode = item.getDepTaskCode();
+                if (taskCodeMap.containsKey(oldCode)) {
+                    item.setDepTaskCode(taskCodeMap.get(oldCode));
+                }
+            }
+        }
+    }
+
+    /**
+     * Replaces node IDs in {@code successNode} and {@code failedNode} lists using the given mapping.
+     */
+    private void updateConditionResultNodes(ConditionsParameters params, Map<Long, Long> taskCodeMap) {
+        ConditionsParameters.ConditionResult result = params.getConditionResult();
+        if (result == null) {
+            return;
+        }
+
+        // Update success branch
+        if (CollectionUtils.isNotEmpty(result.getSuccessNode())) {
+            List<Long> updatedSuccess = result.getSuccessNode().stream()
+                    .map(code -> taskCodeMap.getOrDefault(code, code))
+                    .collect(Collectors.toList());
+            result.setSuccessNode(updatedSuccess);
+        }
+
+        // Update failure branch
+        if (CollectionUtils.isNotEmpty(result.getFailedNode())) {
+            List<Long> updatedFailed = result.getFailedNode().stream()
+                    .map(code -> taskCodeMap.getOrDefault(code, code))
+                    .collect(Collectors.toList());
+            result.setFailedNode(updatedFailed);
+        }
     }
 
     /**
