@@ -24,11 +24,9 @@ import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_G
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -78,42 +76,6 @@ public class DmsTask extends AbstractRemoteTask {
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);
         log.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
         initDmsHook();
-    }
-
-    /**
-     * If appIds is empty, submit a new remote application; otherwise, just track application status.
-     *
-     * @param taskCallBack
-     * @throws TaskException
-     */
-    @Override
-    public void handle(TaskCallBack taskCallBack) throws TaskException {
-        try {
-            // if appIds is not empty, just track application status, avoid resubmitting remote task
-            if (StringUtils.isNotEmpty(taskRequest.getAppIds())) {
-                setAppIds(taskRequest.getAppIds());
-                trackApplicationStatus();
-                return;
-            }
-
-            // submit a remote application
-            submitApplication();
-
-            if (StringUtils.isNotEmpty(getAppIds())) {
-                taskRequest.setAppIds(getAppIds());
-                // callback to update remote application info
-                taskCallBack.updateRemoteApplicationInfo(taskRequest.getTaskInstanceId(),
-                        new ApplicationInfo(getAppIds()));
-            }
-
-            // keep tracking application status
-            trackApplicationStatus();
-        } finally {
-            // shutdown dmsHook client
-            if (dmsHook.getClient() != null) {
-                dmsHook.getClient().shutdown();
-            }
-        }
     }
 
     @Override
