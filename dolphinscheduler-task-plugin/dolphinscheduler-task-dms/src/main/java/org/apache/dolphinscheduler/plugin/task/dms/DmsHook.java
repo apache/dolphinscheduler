@@ -21,11 +21,10 @@ import org.apache.dolphinscheduler.authentication.aws.AWSDatabaseMigrationServic
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -268,8 +267,8 @@ public class DmsHook {
         }
         if (parameter.startsWith("file://")) {
             String filePath = parameter.substring(7);
-            try (FileInputStream fis = new FileInputStream(filePath)) {
-                return IOUtils.toString(fis, StandardCharsets.UTF_8);
+            try {
+                return new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new IOException("Error reading file: " + filePath, e);
             }
