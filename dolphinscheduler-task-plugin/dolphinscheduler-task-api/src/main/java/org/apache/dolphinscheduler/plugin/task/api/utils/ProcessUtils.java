@@ -99,6 +99,10 @@ public final class ProcessUtils {
      */
     private static final Pattern PID_PATTERN = Pattern.compile("\\s+");
 
+    private static final String SIGINT = "2";
+    private static final String SIGTERM = "15";
+    private static final String SIGKILL = "9";
+
     /**
      * Terminate the task process, support multi-level signal processing and fallback strategy
      * @param request Task execution context
@@ -117,26 +121,26 @@ public final class ProcessUtils {
             List<Integer> pidList = getPidList(processId);
 
             // 1. Try to terminate gracefully `kill -2`
-            boolean gracefulKillSuccess = sendKillSignal("2", pidList, request.getTenantCode());
+            boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, request.getTenantCode());
             if (gracefulKillSuccess) {
-                log.info("Successfully killed process tree using signal 2, processId: {}", processId);
+                log.info("Successfully killed process tree by SIGINT, processId: {}", processId);
                 return true;
             }
 
             // 2. Try to terminate gracefully `kill -15`
-            boolean termKillSuccess = sendKillSignal("15", pidList, request.getTenantCode());
+            boolean termKillSuccess = sendKillSignal(SIGTERM, pidList, request.getTenantCode());
             if (termKillSuccess) {
-                log.info("Successfully killed process tree using signal 15, processId: {}", processId);
+                log.info("Successfully killed process tree by SIGTERM, processId: {}", processId);
                 return true;
             }
 
             // 3. As a last resort, use `kill -9`
             log.warn("Killing process by signal 2 & 15 failed, using signal 9 as a last resort for processId: {}", processId);
-            boolean forceKillSuccess = sendKillSignal("9", pidList, request.getTenantCode());
+            boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, request.getTenantCode());
             if (forceKillSuccess) {
-                log.info("Successfully killed process tree using signal 9, processId: {}", processId);
+                log.info("Successfully killed process tree by SIGKILL, processId: {}", processId);
             } else {
-                log.error("Error sending signal 9 to process tree, processId: {}", processId);
+                log.error("Error killing process tree by SIGKILL, processId: {}", processId);
             }
             return forceKillSuccess;
 
