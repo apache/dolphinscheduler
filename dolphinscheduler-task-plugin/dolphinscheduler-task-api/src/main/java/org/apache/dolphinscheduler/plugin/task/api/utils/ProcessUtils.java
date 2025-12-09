@@ -135,7 +135,7 @@ public final class ProcessUtils {
             }
 
             // 3. As a last resort, use `kill -9`
-            log.warn("Killing process by signal 2 & 15 failed, using signal 9 as a last resort for processId: {}", processId);
+            log.warn("Killing process by SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}", processId);
             boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, request.getTenantCode());
             if (forceKillSuccess) {
                 log.info("Successfully killed process tree by SIGKILL, processId: {}", processId);
