@@ -115,6 +115,10 @@ export function formatParams(data: INodeData): {
     taskParams.connectTimeout = data.connectTimeout
     taskParams.socketTimeout = data.socketTimeout
   }
+  if (data.taskType === 'EXTERNAL_SYSTEM') {
+    taskParams.externalSystemId = data.externalSystemId
+    taskParams.externalTaskId = data.externalTaskId
+  }
 
   if (data.taskType === 'SQOOP') {
     taskParams.jobType = data.isCustomTask ? 'CUSTOM' : 'TEMPLATE'

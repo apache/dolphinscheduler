@@ -108,4 +108,5 @@ dolphinscheduler-task-spark
 dolphinscheduler-task-sql
 dolphinscheduler-task-sqoop
 dolphinscheduler-task-zeppelin
+dolphinscheduler-task-external-system
 --end--

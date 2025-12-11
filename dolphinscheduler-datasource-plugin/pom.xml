@@ -58,6 +58,7 @@
         <module>dolphinscheduler-datasource-hana</module>
         <module>dolphinscheduler-datasource-aliyunserverlessspark</module>
         <module>dolphinscheduler-datasource-dolphindb</module>
+        <module>dolphinscheduler-datasource-thirdpartysystemconnector</module>
     </modules>
 
     <dependencyManagement>

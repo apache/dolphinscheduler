@@ -549,6 +549,8 @@ export default {
     target_task_name: 'Target Task Name',
     datasource_type: 'Datasource types',
     datasource_instances: 'Datasource instances',
+    external_systems: 'External Systems',
+    external_system_tasks: 'External System Tasks',
     sql_type: 'SQL Type',
     sql_type_query: 'Query',
     sql_type_non_query: 'Non Query',

@@ -302,6 +302,8 @@ interface ITaskParams {
   connectTimeout?: number
   socketTimeout?: number
   type?: string
+  externalSystemId?: string
+  externalTaskId?: string
   datasource?: string
   sql?: string
   sqlType?: string

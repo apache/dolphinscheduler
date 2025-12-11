@@ -52,6 +52,7 @@ export type TaskType =
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
   | 'ALIYUN_SERVERLESS_SPARK'
+  | 'EXTERNAL_SYSTEM'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -155,6 +156,10 @@ export const TASK_TYPES_MAP = {
     alias: 'FLINK_STREAM',
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
+  },
+  EXTERNAL_SYSTEM: {
+    alias: 'EXTERNAL_SYSTEM',
+    helperLinkDisable: true
   },
   PYTORCH: {
     alias: 'Pytorch',

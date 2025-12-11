@@ -126,6 +126,10 @@ export const TASK_TYPES_MAP = {
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
   },
+  EXTERNAL_SYSTEM : {
+    alias: 'EXTERNAL_SYSTEM',
+    helperLinkDisable: true
+  },
   PYTORCH: {
     alias: 'Pytorch',
     helperLinkDisable: true

@@ -22,8 +22,73 @@ import type {
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import type { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 
+// THIRDPARTY_SYSTEM_CONNECTOR
+interface AuthMapping {
+  key: string
+  value: string
+}
+
+interface AuthConfig {
+  authType: string
+  basicUsername?: string
+  basicPassword?: string
+  jwtToken?: string
+  oauth2TokenUrl?: string
+  oauth2ClientId?: string
+  oauth2ClientSecret?: string
+  oauth2GrantType?: string
+  oauth2Username?: string
+  oauth2Password?: string
+  headerPrefix?: string
+  authMappings?: AuthMapping[]
+}
+
+interface InterfaceParameter {
+  paramName: string
+  paramValue: string
+  location: string
+}
+
+interface ResponseParameter {
+  key: string
+  jsonPath: string
+  disabled?: boolean
+}
+
+interface InterfaceConfig {
+  url: string
+  method: string
+  parameters: InterfaceParameter[]
+  body: string
+  responseParameters?: ResponseParameter[]
+}
+
+interface PollingSuccessConfig {
+  successField: string
+  successValue: string
+}
+
+interface PollingFailureConfig {
+  failureField: string
+  failureValue: string
+}
+
+interface PollStatusInterfaceConfig extends InterfaceConfig {
+  pollingSuccessConfig: PollingSuccessConfig
+  pollingFailureConfig: PollingFailureConfig
+}
+
 interface IDataSourceDetail extends Omit<IDataSource, 'other'> {
   other?: string
+  // THIRDPARTY_SYSTEM_CONNECTOR
+  systemName?: string
+  serviceAddress?: string
+  interfaceTimeout?: number
+  authConfig?: AuthConfig
+  selectInterface?: InterfaceConfig
+  submitInterface?: InterfaceConfig
+  pollStatusInterface?: PollStatusInterfaceConfig
+  stopInterface?: InterfaceConfig
 }
 
 interface IDataBaseOption extends SelectBaseOption {

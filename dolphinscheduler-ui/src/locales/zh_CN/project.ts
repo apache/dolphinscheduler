@@ -532,6 +532,8 @@ export default {
     target_task_name: '目标任务名',
     datasource_type: '数据源类型',
     datasource_instances: '数据源实例',
+    external_systems: '第三方系统列表',
+    external_system_tasks: '第三方系统任务列表',
     sql_type: 'SQL类型',
     sql_type_query: '查询',
     sql_type_non_query: '非查询',

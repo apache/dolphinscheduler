@@ -99,6 +99,27 @@ public class OkHttpUtils {
         }
     }
 
+    public static @NonNull OkHttpResponse postFormBody(@NonNull String url,
+                                                       @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                                       @Nullable Map<String, Object> requestParamsMap,
+                                                       @Nullable RequestBody formBody,
+                                                       int connectTimeout,
+                                                       int writeTimeout,
+                                                       int readTimeout) throws IOException {
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
+        String finalUrl = addUrlParams(requestParamsMap, url);
+        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
+        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        Request request = requestBuilder
+                .post(formBody) // 明确使用POST方法
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            return new OkHttpResponse(response.code(), getResponseBody(response));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Post request execute failed, url: %s", url), e);
+        }
+    }
+
     /**
      * http put request
      * @param connectTimeout connect timeout in milliseconds

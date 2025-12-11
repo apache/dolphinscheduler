@@ -17,7 +17,7 @@
 
 import { ref, onMounted, nextTick, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryDataSourceList } from '@/service/modules/data-source'
+import { queryDataSourceList, queryExternalSystemList, queryExternalSystemTasks } from '@/service/modules/data-source'
 import { indexOf, find } from 'lodash'
 import type { IJsonItem } from '../types'
 import type { TypeReq } from '@/service/modules/data-source/types'
@@ -34,7 +34,7 @@ export function useDatasource(
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
-  const datasourceOptions = ref([] as { label: string; value: number }[])
+  const datasourceOptions = ref([] as { label: string; value: number | string }[])
 
   const datasourceTypes = [
     {
@@ -165,6 +165,11 @@ export function useDatasource(
     {
       id: 28,
       code: 'DOLPHINDB',
+      disabled: false
+    },
+    {
+      id: 29,
+      code: 'THIRDPARTY_SYSTEM_CONNECTOR',
       disabled: false
     }
   ]

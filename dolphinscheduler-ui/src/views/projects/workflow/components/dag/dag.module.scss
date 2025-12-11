@@ -117,6 +117,9 @@ $bgLight: #ffffff;
     &.icon-flink_stream {
       background-image: url('/images/task-icons/flink.png');
     }
+    &.icon-external_system {
+      background-image: url('/images/task-icons/external_system.png');
+    }
     &.icon-mr {
       background-image: url('/images/task-icons/mr.png');
     }
@@ -229,6 +232,9 @@ $bgLight: #ffffff;
       &.icon-flink,
       &.icon-flink_stream {
         background-image: url('/images/task-icons/flink_hover.png');
+      }
+      &.icon-external_stream {
+        background-image: url('/images/task-icons/external_stream_hover.png');
       }
       &.icon-mr {
         background-image: url('/images/task-icons/mr_hover.png');

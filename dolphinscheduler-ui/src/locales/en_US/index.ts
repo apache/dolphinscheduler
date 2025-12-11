@@ -29,6 +29,7 @@ import project from '@/locales/en_US/project'
 import resource from '@/locales/en_US/resource'
 import security from '@/locales/en_US/security'
 import theme from '@/locales/en_US/theme'
+import thirdparty_api_source from '@/locales/en_US/thirdparty-api-source'
 import user_dropdown from '@/locales/en_US/user-dropdown'
 import ui_setting from '@/locales/en_US/ui_setting'
 import about from '@/locales/en_US/about'
@@ -48,6 +49,7 @@ export default {
   project,
   security,
   datasource,
+  thirdparty_api_source,
   crontab,
   ui_setting,
   input_search

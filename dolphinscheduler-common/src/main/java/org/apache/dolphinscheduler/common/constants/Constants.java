@@ -212,6 +212,11 @@ public final class Constants {
 
     public static final String DEFAULT = "default";
     public static final String PASSWORD = "password";
+    public static final String BASICPASSWORD = "basicPassword";
+    public static final String OAUTH2CLIENTSECRET = "oauth2ClientSecret";
+    public static final String JWTTOKEN = "jwtToken";
+    public static final String OAUTH2PASSWORD = "oauth2Password";
+
     public static final String XXXXXX = "******";
     public static final String NULL = "NULL";
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";

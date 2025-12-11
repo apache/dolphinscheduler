@@ -31,6 +31,7 @@ import { useSeaTunnel } from './use-sea-tunnel'
 import { useSwitch } from './use-switch'
 import { useConditions } from './use-conditions'
 import { useDataX } from './use-datax'
+import { useExternalSystem } from './use-external-system'
 import { useDependent } from './use-dependent'
 import { useEmr } from './use-emr'
 import { useZeppelin } from './use-zeppelin'
@@ -81,6 +82,7 @@ export default {
   SAGEMAKER: userSagemaker,
   CHUNJUN: useChunjun,
   FLINK_STREAM: useFlinkStream,
+  EXTERNAL_SYSTEM: useExternalSystem,
   JAVA: useJava,
   PYTORCH: usePytorch,
   HIVECLI: useHiveCli,
