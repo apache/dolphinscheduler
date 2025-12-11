@@ -105,11 +105,12 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
                              final ITaskExecutionRunnable taskExecutionRunnable,
                              final TaskFatalLifecycleEvent taskFatalEvent) {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
+        persistentTaskInstanceFatalEventToDB(taskExecutionRunnable, taskFatalEvent);
 
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        taskInstance.setState(TaskExecutionStatus.FAILURE);
-        taskInstance.setEndTime(taskFatalEvent.getEndTime());
-        taskInstanceDao.updateById(taskInstance);
+        if (taskExecutionRunnable.isTaskInstanceCanRetry()) {
+            taskExecutionRunnable.getWorkflowEventBus().publish(TaskRetryLifecycleEvent.of(taskExecutionRunnable));
+            return;
+        }
 
         // If all successors are condition tasks, then the task will not be marked as failure.
         // And the DAG will continue to execute.
@@ -121,6 +122,14 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         }
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
         publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+    }
+
+    private void persistentTaskInstanceFatalEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
+                                                      final TaskFatalLifecycleEvent taskFatalEvent) {
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        taskInstance.setState(TaskExecutionStatus.FAILURE);
+        taskInstance.setEndTime(taskFatalEvent.getEndTime());
+        taskInstanceDao.updateById(taskInstance);
     }
 
     @Override

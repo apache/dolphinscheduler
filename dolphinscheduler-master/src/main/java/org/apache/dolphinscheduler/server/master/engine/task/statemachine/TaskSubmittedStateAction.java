@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 
 import java.util.concurrent.TimeUnit;
 
@@ -96,7 +95,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
     @Override
     public void onDispatchEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                final TaskDispatchLifecycleEvent taskDispatchEvent) throws TaskFatalException {
+                                final TaskDispatchLifecycleEvent taskDispatchEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
         long remainTimeMills = DateUtils.getRemainTime(
@@ -110,12 +109,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                     taskInstance.getDelayTime(),
                     remainTimeMills);
         }
-        try {
-            taskExecutionRunnable.initializeTaskExecutionContext();
-        } catch (Exception ex) {
-            log.error("Current taskInstance: {} initializeTaskExecutionContext fail", taskInstance.getName(), ex);
-            throw new TaskFatalException(taskInstance.getName() + " initializeTaskExecutionContext fail");
-        }
+        taskExecutionRunnable.initializeTaskExecutionContext();
         workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }
 

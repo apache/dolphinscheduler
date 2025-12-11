@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecu
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.TaskStateActionFactory;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +39,7 @@ public abstract class AbstractTaskLifecycleEventHandler<T extends AbstractTaskLi
 
     @Override
     public void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final T event) throws TaskFatalException {
+                       final T event) {
         final ITaskExecutionRunnable taskExecutionRunnable = event.getTaskExecutionRunnable();
         final TaskExecutionStatus state = taskExecutionRunnable.getTaskInstance().getState();
         final ITaskStateAction taskStateAction = taskStateActionFactory.getTaskStateAction(state);
@@ -54,6 +53,6 @@ public abstract class AbstractTaskLifecycleEventHandler<T extends AbstractTaskLi
     public abstract void handle(final ITaskStateAction taskStateAction,
                                 final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                 final ITaskExecutionRunnable taskExecutionRunnable,
-                                final T event) throws TaskFatalException;
+                                final T event);
 
 }

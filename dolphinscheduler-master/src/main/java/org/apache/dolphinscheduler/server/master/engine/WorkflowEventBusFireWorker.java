@@ -24,10 +24,9 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 
@@ -131,18 +130,18 @@ public class WorkflowEventBusFireWorker {
                     workflowEventBus.publish(lifecycleEvent);
                     ThreadUtils.sleep(5_000);
                     return;
-                }
-                // the task encounters an unrecoverable error (e.g., initialization failure).
-                if (ExceptionUtils.isTaskFatalException(ex)) {
-                    log.warn("Task fatal exception occurred during event handling: {}", lifecycleEvent, ex);
-                    if (lifecycleEvent instanceof TaskDispatchLifecycleEvent) {
-                        TaskDispatchLifecycleEvent dispatchEvent = (TaskDispatchLifecycleEvent) lifecycleEvent;
+                } else {
+                    log.warn("exception occurred during event handling: {}", lifecycleEvent, ex);
+                    // If other exceptions and the event is task-related, construct and publish a dedicated
+                    // TaskFatalLifecycleEvent
+                    // so that the event will be handled by TaskFatalLifecycleEventHandler
+                    if (lifecycleEvent instanceof AbstractTaskLifecycleEvent) {
+                        AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
                         final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
-                                .taskExecutionRunnable(dispatchEvent.getTaskExecutionRunnable())
+                                .taskExecutionRunnable(taskLifecycleEvent.getTaskExecutionRunnable())
                                 .endTime(new Date())
                                 .build();
                         workflowEventBus.publish(taskFatalEvent);
-                        return;
                     }
                 }
                 workflowEventBus.getWorkflowEventBusSummary().decreaseFireSuccessEventCount();
@@ -153,7 +152,7 @@ public class WorkflowEventBusFireWorker {
     }
 
     private void doFireSingleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                   final AbstractLifecycleEvent event) throws TaskFatalException {
+                                   final AbstractLifecycleEvent event) {
         final ILifecycleEventHandler lifecycleEventHandler = eventHandlerMap.get(event.getEventType());
         if (lifecycleEventHandler == null) {
             throw new RuntimeException("No EventHandler found for event: " + event.getEventType());

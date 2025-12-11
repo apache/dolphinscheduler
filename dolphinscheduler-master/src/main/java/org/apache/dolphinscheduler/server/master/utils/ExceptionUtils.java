@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
-import org.apache.dolphinscheduler.server.master.exception.TaskFatalException;
-
 import org.springframework.dao.DataAccessResourceFailureException;
 
 public class ExceptionUtils {
@@ -27,7 +25,4 @@ public class ExceptionUtils {
         return e instanceof DataAccessResourceFailureException;
     }
 
-    public static boolean isTaskFatalException(Throwable e) {
-        return e instanceof TaskFatalException;
-    }
 }
