@@ -49,22 +49,14 @@ public class PythonTask extends AbstractTask {
 
     protected PythonParameters pythonParameters;
 
-    private ShellCommandExecutor shellCommandExecutor;
-
-    protected TaskExecutionContext taskRequest;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     protected static final String PYTHON_LAUNCHER = "PYTHON_LAUNCHER";
 
-    /**
-     * constructor
-     *
-     * @param taskRequest taskRequest
-     */
     public PythonTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.taskRequest = taskRequest;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskRequest);
     }
 
     @Override

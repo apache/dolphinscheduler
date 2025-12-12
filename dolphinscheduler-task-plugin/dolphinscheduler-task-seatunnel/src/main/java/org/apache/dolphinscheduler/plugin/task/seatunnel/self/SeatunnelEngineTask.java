@@ -37,7 +37,7 @@ public class SeatunnelEngineTask extends SeatunnelTask {
     @Override
     public void init() {
         seatunnelParameters =
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SeatunnelEngineParameters.class);
+                JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelEngineParameters.class);
         setSeatunnelParameters(seatunnelParameters);
         super.init();
     }

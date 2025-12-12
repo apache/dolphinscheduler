@@ -46,25 +46,14 @@ import com.google.common.base.Preconditions;
 @Slf4j
 public class JavaTask extends AbstractTask {
 
-    /**
-     * Contains various parameters for this task
-     */
     private JavaParameters javaParameters;
 
-    /**
-     * To run shell commands
-     */
-    private ShellCommandExecutor shellCommandExecutor;
-
-    /**
-     * task execution context
-     */
-    private TaskExecutionContext taskRequest;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     public JavaTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskRequest = taskRequest;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskRequest);
     }
 
     /**
