@@ -40,6 +40,7 @@ public class WorkerLoadBalancerConfigurationProperties {
         private int memoryUsageWeight = 30;
 
         private int taskThreadPoolUsageWeight = 40;
+        private double oversubscriptionFactor = 1.5; // NEW
 
         public void validated(Errors errors) {
             if (cpuUsageWeight < 0) {

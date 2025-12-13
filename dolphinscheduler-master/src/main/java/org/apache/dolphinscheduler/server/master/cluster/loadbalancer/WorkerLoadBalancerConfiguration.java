@@ -41,6 +41,10 @@ public class WorkerLoadBalancerConfiguration {
                 return new DynamicWeightedRoundRobinWorkerLoadBalancer(
                         clusterManager.getWorkerClusters(),
                         workerLoadBalancerConfigurationProperties.getDynamicWeightConfigProperties());
+            case RESOURCE_OVERSUBSCRIPTION:
+                return new ResourceOversubscriptionLoadBalancer(
+                        clusterManager.getWorkerClusters(),
+                        workerLoadBalancerConfigurationProperties.getDynamicWeightConfigProperties());
             default:
                 throw new IllegalArgumentException(
                         "unSupport worker load balancer type " + workerLoadBalancerConfigurationProperties.getType());
