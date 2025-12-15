@@ -306,8 +306,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | security.authentication.ldap.ssl.jksbase64content | string | `""` | LDAP jks file base64 content. If you use macOS, please run `base64 -b 0 -i /path/to/your.jks`. If you use Linux, please run `base64 -w 0 /path/to/your.jks`. If you use Windows, please run `certutil -f -encode /path/to/your.jks`. Then copy the base64 content to below field in one line |
 | security.authentication.ldap.ssl.truststore | string | `"/opt/ldapkeystore.jks"` | LDAP jks file absolute path, do not change this value |
 | security.authentication.ldap.ssl.truststorepassword | string | `""` | LDAP jks password |
-| security.authentication.ldap.urls | string | `"ldap://ldap.forumsys.com:389/"` | LDAP urls |
-| security.authentication.ldap.user.admin | string | `"read-only-admin"` | Admin user account when you log-in with LDAP |
+| security.authentication.ldap.url | string | `"ldap://ldap.forumsys.com:389/"` | LDAP url |
+| security.authentication.ldap.user.adminuserfilter | string | `"(&(uid={0})(memberOf=cn=admin-group,ou=apps,dc=example,dc=com))"` | Any user matching this filter becomes an Admin. If set to `""`, ignore this option |
+| security.authentication.ldap.user.adminusername | string | `"read-only-admin"` | Admin user account when you log-in with LDAP. If the filter doesn't match anything this also acts as fallback. Set to `""` to ignore this option if you want to use filter only |
 | security.authentication.ldap.user.emailattribute | string | `"mail"` | LDAP user email attribute |
 | security.authentication.ldap.user.identityattribute | string | `"uid"` | LDAP user identity attribute |
 | security.authentication.ldap.user.notexistaction | string | `"CREATE"` | action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY) |
