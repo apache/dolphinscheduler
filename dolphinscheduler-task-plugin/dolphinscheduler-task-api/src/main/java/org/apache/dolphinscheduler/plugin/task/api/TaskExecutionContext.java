@@ -126,6 +126,11 @@ public class TaskExecutionContext implements Serializable {
 
     private boolean failover;
 
+    /**
+     * Timestamp (ms) when the task was first enqueued for dispatch.
+     */
+    private final long firstDispatchEnqueueTimeMs = System.currentTimeMillis();
+
     public int increaseDispatchFailTimes() {
         return ++dispatchFailTimes;
     }

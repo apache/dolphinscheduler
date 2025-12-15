@@ -15,24 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.utils;
+package org.apache.dolphinscheduler.server.master.exception.dispatch;
 
-import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerNotFoundException;
+public class WorkerNotFoundException extends TaskDispatchException {
 
-import org.springframework.dao.DataAccessResourceFailureException;
-
-public class ExceptionUtils {
-
-    public static boolean isDatabaseConnectedFailedException(Throwable e) {
-        return e instanceof DataAccessResourceFailureException;
-    }
-
-    public static boolean isWorkerGroupNotFoundException(Throwable e) {
-        return e instanceof WorkerGroupNotFoundException;
-    }
-
-    public static boolean isWorkerNotFoundException(Throwable e) {
-        return e instanceof WorkerNotFoundException;
+    public WorkerNotFoundException(String message) {
+        super(message);
     }
 }

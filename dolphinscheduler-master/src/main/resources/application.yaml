@@ -111,6 +111,9 @@ master:
     # Master max concurrent workflow instances, when the master's workflow instance count exceeds this value, master server will be marked as busy.
     max-concurrent-workflow-instances: 2147483647
   worker-group-refresh-interval: 5m
+  # Timeout for task dispatching. If a task cannot be successfully dispatched to any worker within this duration,
+  # it will be marked as failed. Prevents tasks from being stuck indefinitely in the dispatch queue.
+  dispatch-timeout: 5m
   command-fetch-strategy:
     type: ID_SLOT_BASED
     config:
