@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
@@ -46,7 +47,8 @@ class WorkerGroupDispatcherTest {
     @BeforeEach
     void setUp() {
         taskExecutorClient = mock(ITaskExecutorClient.class);
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient);
+        final MasterConfig masterConfig = new MasterConfig();
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, masterConfig.getDispatchTimeout());
     }
 
     @Test

@@ -74,6 +74,12 @@ public class MasterConfig implements Validator {
      */
     private String masterRegistryPath;
 
+    /**
+     * Maximum time allowed for a task to be successfully dispatched.
+     * Default: 5 minutes.
+     */
+    private Duration dispatchTimeout = Duration.ofMinutes(5);
+
     @Override
     public boolean supports(Class<?> clazz) {
         return MasterConfig.class.isAssignableFrom(clazz);
