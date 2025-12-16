@@ -77,7 +77,7 @@ postgresql:
       storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnami/postgresql
+    repository: bitnamilegacy/postgresql
     tag: 15.1.0-debian-11-r12
 
 mysql:
@@ -104,7 +104,7 @@ mysql:
       storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnami/mysql
+    repository: bitnamilegacy/mysql
     tag: 8.0.36-debian-12-r8
 
 minio:
@@ -122,7 +122,7 @@ minio:
   defaultBuckets: "dolphinscheduler"
   image:
     registry: docker.io
-    repository: bitnami/minio
+    repository: bitnamilegacy/minio
     tag: 2023.12.23-debian-11-r3
 
 
@@ -164,7 +164,7 @@ zookeeper:
     storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnami/zookeeper
+    repository: bitnamilegacy/zookeeper
     tag: 3.9.3-debian-12-r21
 
 registryEtcd:
