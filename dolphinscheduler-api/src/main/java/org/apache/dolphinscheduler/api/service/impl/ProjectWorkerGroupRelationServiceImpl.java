@@ -100,6 +100,11 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return result;
         }
 
+        /*
+         * Todo : For modification operations on projects, we should acquire project row locks. All project-related
+         * operations and modification/creation actions for workflows/task definitions within the project require
+         * acquiring row locks first
+         */
         if (CollectionUtils.isEmpty(workerGroups)) {
             Set<String> projectWorkerGroupNames =
                     projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
