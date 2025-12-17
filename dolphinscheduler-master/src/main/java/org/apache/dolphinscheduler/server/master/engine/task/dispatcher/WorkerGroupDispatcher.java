@@ -149,7 +149,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
                     .endTime(new Date())
                     .build();
             taskExecutionRunnable.getWorkflowEventBus().publish(taskFatalEvent);
-        } else if (ExceptionUtils.isWorkerNotFoundException(exception)) {
+        } else if (ExceptionUtils.isNoAvailableWorkerException(exception)) {
             log.error("[DISPATCH_FAILED] taskName: {}, No available worker.", taskName, exception);
             final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
