@@ -19,6 +19,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Global settings for Bitnami subcharts
+global:
+  security:
+    # -- Allow using non-standard container images (required for bitnamilegacy images)
+    allowInsecureImages: true
+
 # -- World time and date for cities in all time zones
 timezone: "Asia/Shanghai"
 
