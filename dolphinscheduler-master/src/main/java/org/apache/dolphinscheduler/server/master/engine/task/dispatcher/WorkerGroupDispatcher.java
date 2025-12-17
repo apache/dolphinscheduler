@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.server.master.config.MasterDispatchTimeoutCheckerConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
@@ -29,7 +30,6 @@ import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatch
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
-import java.time.Duration;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,15 +55,15 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
-    private final Duration dispatchTimeout;
+    private final MasterDispatchTimeoutCheckerConfig dispatchTimeoutChecker;
 
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient,
-                                 Duration dispatchTimeout) {
+                                 MasterDispatchTimeoutCheckerConfig dispatchTimeoutChecker) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupEventBus = new TaskDispatchableEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
-        this.dispatchTimeout = dispatchTimeout;
+        this.dispatchTimeoutChecker = dispatchTimeoutChecker;
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
 
@@ -97,7 +97,6 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     private void doDispatchTask(ITaskExecutionRunnable taskExecutionRunnable) {
         final int taskId = taskExecutionRunnable.getId();
         final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
-        final long timeoutMs = this.dispatchTimeout.toMillis();
         try {
             if (!waitingDispatchTaskIds.remove(taskId)) {
                 log.info(
@@ -107,11 +106,14 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
             }
             taskExecutorClient.dispatch(taskExecutionRunnable);
         } catch (TaskDispatchException ex) {
-            // Checks whether the given task has exceeded its allowed dispatch timeout.
-            long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchEnqueueTimeMs();
-            if (elapsed > timeoutMs) {
-                handleDispatchFailure(taskExecutionRunnable, ex, elapsed, timeoutMs);
-                return;
+            if (dispatchTimeoutChecker.isEnabled()) {
+                // Checks whether the given task has exceeded its allowed dispatch timeout.
+                long timeoutMs = this.dispatchTimeoutChecker.getTimeoutDuration().toMillis();
+                long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchEnqueueTimeMs();
+                if (elapsed > timeoutMs) {
+                    handleDispatchFailure(taskExecutionRunnable, ex, elapsed, timeoutMs);
+                    return;
+                }
             }
 
             // If dispatch failed, will put the task back to the queue
