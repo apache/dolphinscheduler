@@ -18,6 +18,9 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.utils.SqlWithRowLockProviderAdapter;
+
+import org.apache.ibatis.annotations.SelectProvider;
 
 import java.util.Collection;
 import java.util.List;
@@ -57,5 +60,6 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
      */
     TaskDefinition queryByCode(long taskCode);
 
+    @SelectProvider(type = SqlWithRowLockProviderAdapter.class, method = "select")
     List<String> queryAllTaskDefinitionWorkerGroups(long projectCode);
 }

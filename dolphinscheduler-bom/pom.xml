@@ -32,6 +32,7 @@
         <spring-boot.version>2.7.11</spring-boot.version>
         <spring-ldap.version>2.4.1</spring-ldap.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <mybatis-dynamic-sql.version>1.5.0</mybatis-dynamic-sql.version>
         <quartz.version>2.3.2</quartz.version>
         <druid.version>1.2.20</druid.version>
         <curator-test.version>2.12.0</curator-test.version>
@@ -273,6 +274,11 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.dynamic-sql</groupId>
+                <artifactId>mybatis-dynamic-sql</artifactId>
+                <version>${mybatis-dynamic-sql.version}</version>
             </dependency>
 
             <!-- quartz-->

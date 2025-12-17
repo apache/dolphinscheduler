@@ -18,8 +18,10 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.utils.SqlWithRowLockProviderAdapter;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.SelectProvider;
 
 import java.util.List;
 
@@ -85,6 +87,7 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      * @param projectName projectName
      * @return schedule list
      */
+    @SelectProvider(type = SqlWithRowLockProviderAdapter.class, method = "select")
     List<Schedule> querySchedulerListByProjectName(@Param("projectName") String projectName);
 
     /**
