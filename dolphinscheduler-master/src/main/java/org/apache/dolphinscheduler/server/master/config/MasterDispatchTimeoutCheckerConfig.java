@@ -23,7 +23,7 @@ import lombok.Data;
 
 /**
  * Configuration for the master's task dispatch timeout checker.
- * If enabled, tasks that remain in the dispatch queue longer than {@link #timeoutDuration} will be marked as failed to prevent indefinite queuing.
+ * If enabled, tasks that remain in the dispatch queue longer than {@link #maxTaskDispatchDuration} will be marked as failed to prevent indefinite queuing.
  */
 @Data
 public class MasterDispatchTimeoutCheckerConfig {
@@ -38,5 +38,5 @@ public class MasterDispatchTimeoutCheckerConfig {
      * Tasks exceeding this duration in the dispatch queue will be failed.
      * Examples: "2m", "5m", "30m". Defaults to 5 minutes.
      */
-    private Duration timeoutDuration = Duration.ofMinutes(5);
+    private Duration maxTaskDispatchDuration = Duration.ofMinutes(5);
 }

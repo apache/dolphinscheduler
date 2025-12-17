@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.utils;
 
 import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerNotFoundException;
 
 import org.springframework.dao.DataAccessResourceFailureException;
 
