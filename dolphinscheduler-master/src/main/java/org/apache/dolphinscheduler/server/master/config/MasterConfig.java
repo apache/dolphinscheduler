@@ -75,10 +75,11 @@ public class MasterConfig implements Validator {
     private String masterRegistryPath;
 
     /**
-     * Maximum time allowed for a task to be successfully dispatched.
-     * Default: 5 minutes.
+     * Configuration for the master's task dispatch timeout check mechanism.
+     * This controls whether the system enforces a time limit for dispatching tasks to workers,
+     * and if so, how long to wait before marking a task as failed due to dispatch timeout.
      */
-    private Duration dispatchTimeout = Duration.ofMinutes(5);
+    private MasterDispatchTimeoutCheckerConfig dispatchTimeoutChecker = new MasterDispatchTimeoutCheckerConfig();
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -103,6 +104,19 @@ public class MasterConfig implements Validator {
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
             errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }
+
+        // Validate dispatch timeout checker config
+        MasterDispatchTimeoutCheckerConfig timeoutChecker = masterConfig.getDispatchTimeoutChecker();
+        if (timeoutChecker != null && timeoutChecker.isEnabled()) {
+            if (timeoutChecker.getTimeoutDuration() == null) {
+                errors.rejectValue("master-dispatch-timeout-checker.timeout-duration", null,
+                        "must be specified when dispatch timeout checker is enabled");
+            } else if (timeoutChecker.getTimeoutDuration().toMillis() <= 0) {
+                errors.rejectValue("master-dispatch-timeout-checker.timeout-duration", null,
+                        "must be a positive duration (e.g., '2m', '5m', '30m')");
+            }
+        }
+
         if (StringUtils.isEmpty(masterConfig.getMasterAddress())) {
             masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         }

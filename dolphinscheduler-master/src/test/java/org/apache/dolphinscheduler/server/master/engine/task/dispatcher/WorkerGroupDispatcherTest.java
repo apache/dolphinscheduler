@@ -48,7 +48,8 @@ class WorkerGroupDispatcherTest {
     void setUp() {
         taskExecutorClient = mock(ITaskExecutorClient.class);
         final MasterConfig masterConfig = new MasterConfig();
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, masterConfig.getDispatchTimeout());
+        dispatcher =
+                new WorkerGroupDispatcher("TestGroup", taskExecutorClient, masterConfig.getDispatchTimeoutChecker());
     }
 
     @Test
