@@ -52,7 +52,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -82,12 +81,6 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     private WorkerGroupService workerGroupService;
 
     @Override
-    @Transactional
-    /*
-     * Todo : For modification operations on projects, we should acquire project row locks. All project-related
-     * operations and modification/creation actions for workflows/task definitions within the project require acquiring
-     * row locks first
-     */
     public Result assignWorkerGroupsToProject(User loginUser, Long projectCode, List<String> workerGroups) {
         Result result = new Result();
 
