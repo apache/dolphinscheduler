@@ -28,9 +28,9 @@ import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.IWorkerLoadBalancer;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.NoAvailableWorkerException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerNotFoundException;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchResponse;
@@ -67,20 +67,13 @@ public class PhysicalTaskExecutorClientDelegator implements ITaskExecutorClientD
         final String taskName = taskExecutionContext.getTaskName();
         final String workerGroup = taskExecutionContext.getWorkerGroup();
         if (!clusterManager.getWorkerClusters().containsWorkerGroup(workerGroup)) {
-            throw new WorkerGroupNotFoundException(
-                    String.format("Cannot find worker group to dispatch Task[id=%s, name=%s, workerGroup=%s]",
-                            taskExecutionContext.getTaskInstanceId(), taskName,
-                            workerGroup));
+            throw new WorkerGroupNotFoundException(workerGroup);
         }
         final String physicalTaskExecutorAddress = workerLoadBalancer
                 .select(workerGroup)
                 .map(Host::of)
                 .map(Host::getAddress)
-                .orElseThrow(() -> new WorkerNotFoundException(
-                        String.format(
-                                "Cannot find available worker host to dispatch Task[id=%s, name=%s, workerGroup=%s]",
-                                taskExecutionContext.getTaskInstanceId(), taskName,
-                                workerGroup)));
+                .orElseThrow(() -> new NoAvailableWorkerException(workerGroup));
 
         taskExecutionContext.setHost(physicalTaskExecutorAddress);
         taskExecutionRunnable.getTaskInstance().setHost(physicalTaskExecutorAddress);

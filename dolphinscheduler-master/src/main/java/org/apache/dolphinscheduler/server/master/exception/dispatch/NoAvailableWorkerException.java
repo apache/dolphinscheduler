@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.exception.dispatch;
 
-public class WorkerNotFoundException extends TaskDispatchException {
+public class NoAvailableWorkerException extends TaskDispatchException {
 
-    public WorkerNotFoundException(String message) {
-        super(message);
+    public NoAvailableWorkerException(String workerGroup) {
+        super("Cannot find available worker under worker group: " + workerGroup);
     }
 }

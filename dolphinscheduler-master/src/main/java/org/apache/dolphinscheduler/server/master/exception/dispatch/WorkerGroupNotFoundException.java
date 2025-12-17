@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.exception.dispatch;
 
 public class WorkerGroupNotFoundException extends TaskDispatchException {
 
-    public WorkerGroupNotFoundException(String message) {
-        super(message);
+    public WorkerGroupNotFoundException(String workerGroup) {
+        super("Cannot find worker group: " + workerGroup);
     }
 }

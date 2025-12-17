@@ -95,21 +95,21 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     }
 
     private void doDispatchTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        final int taskId = taskExecutionRunnable.getId();
+        final int taskInstanceId = taskExecutionRunnable.getId();
         final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
         try {
-            if (!waitingDispatchTaskIds.remove(taskId)) {
+            if (!waitingDispatchTaskIds.remove(taskInstanceId)) {
                 log.info(
                         "The task: {} doesn't exist in waitingDispatchTaskIds(it might be paused or killed), will skip dispatch",
-                        taskId);
+                        taskInstanceId);
                 return;
             }
             taskExecutorClient.dispatch(taskExecutionRunnable);
         } catch (TaskDispatchException ex) {
             if (dispatchTimeoutChecker.isEnabled()) {
                 // Checks whether the given task has exceeded its allowed dispatch timeout.
-                long timeoutMs = this.dispatchTimeoutChecker.getTimeoutDuration().toMillis();
-                long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchEnqueueTimeMs();
+                long timeoutMs = this.dispatchTimeoutChecker.getMaxTaskDispatchDuration().toMillis();
+                long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchTime();
                 if (elapsed > timeoutMs) {
                     handleDispatchFailure(taskExecutionRunnable, ex, elapsed, timeoutMs);
                     return;
@@ -122,7 +122,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
             long waitingTimeMillis = Math.min(
                     taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
             dispatchTask(taskExecutionRunnable, waitingTimeMillis);
-            log.warn("Dispatch Task: {} failed will retry after: {}/ms", taskId,
+            log.warn("Dispatch Task: {} failed will retry after: {}/ms", taskInstanceId,
                     waitingTimeMillis, ex);
         }
     }
@@ -138,31 +138,26 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      */
     private void handleDispatchFailure(ITaskExecutionRunnable taskExecutionRunnable, TaskDispatchException exception,
                                        long elapsed, long timeoutMs) {
-        int taskId = taskExecutionRunnable.getId();
-        int workflowId = taskExecutionRunnable.getWorkflowInstance().getId();
+        final String taskName = taskExecutionRunnable.getName();
 
-        log.warn("[DISPATCH_FAILED] taskId: {}, workflowId: {}, timed out after {} ms (limit: {} ms))", taskId,
-                workflowId, elapsed, timeoutMs);
+        log.warn("[DISPATCH_FAILED] taskName: {}, timed out after {} ms (limit: {} ms))", taskName, elapsed, timeoutMs);
 
         if (ExceptionUtils.isWorkerGroupNotFoundException(exception)) {
-            log.error("[DISPATCH_FAILED] Worker group not found. taskId: {}, workflowId: {}", taskId, workflowId,
-                    exception);
+            log.error("[DISPATCH_FAILED] taskName: {}, Worker group not found.", taskName, exception);
             final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
                     .endTime(new Date())
                     .build();
             taskExecutionRunnable.getWorkflowEventBus().publish(taskFatalEvent);
         } else if (ExceptionUtils.isWorkerNotFoundException(exception)) {
-            log.error("[DISPATCH_FAILED] No available workers. taskId: {}, workflowId: {}", taskId, workflowId,
-                    exception);
+            log.error("[DISPATCH_FAILED] taskName: {}, No available worker.", taskName, exception);
             final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
                     .endTime(new Date())
                     .build();
             taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
         } else {
-            log.error("[DISPATCH_FAILED] Unexpected dispatch error. taskId: {}, workflowId: {}", taskId, workflowId,
-                    exception);
+            log.error("[DISPATCH_FAILED] taskName: {}, Unexpected dispatch error.", taskName, exception);
             final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
                     .endTime(new Date())

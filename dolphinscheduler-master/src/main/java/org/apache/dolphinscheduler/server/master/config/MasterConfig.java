@@ -108,11 +108,11 @@ public class MasterConfig implements Validator {
         // Validate dispatch timeout checker config
         MasterDispatchTimeoutCheckerConfig timeoutChecker = masterConfig.getDispatchTimeoutChecker();
         if (timeoutChecker != null && timeoutChecker.isEnabled()) {
-            if (timeoutChecker.getTimeoutDuration() == null) {
-                errors.rejectValue("master-dispatch-timeout-checker.timeout-duration", null,
+            if (timeoutChecker.getMaxTaskDispatchDuration() == null) {
+                errors.rejectValue("dispatch-timeout-checker.max-task-dispatch-duration", null,
                         "must be specified when dispatch timeout checker is enabled");
-            } else if (timeoutChecker.getTimeoutDuration().toMillis() <= 0) {
-                errors.rejectValue("master-dispatch-timeout-checker.timeout-duration", null,
+            } else if (timeoutChecker.getMaxTaskDispatchDuration().toMillis() <= 0) {
+                errors.rejectValue("dispatch-timeout-checker.max-task-dispatch-duration", null,
                         "must be a positive duration (e.g., '2m', '5m', '30m')");
             }
         }
@@ -142,6 +142,7 @@ public class MasterConfig implements Validator {
                         "\n  command-fetch-strategy: " + commandFetchStrategy +
                         "\n  worker-load-balancer-configuration-properties: "
                         + workerLoadBalancerConfigurationProperties +
+                        "\n dispatchTimeoutChecker: " + dispatchTimeoutChecker +
                         "\n****************************Master Configuration**************************************";
         log.info(config);
     }
