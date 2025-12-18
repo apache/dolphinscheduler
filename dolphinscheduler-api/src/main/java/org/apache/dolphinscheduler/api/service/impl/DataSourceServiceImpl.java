@@ -189,7 +189,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     /**
-     * updateWorkflowInstance datasource
+     * query datasource with hidden password
      *
      * @param id datasource id
      * @return data source detail
@@ -216,6 +216,30 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setPassword(getHiddenPassword());
 
         return baseDataSourceParamDTO;
+    }
+
+    /**
+     * query datasource real password
+     *
+     * @param id datasource id
+     * @return data source detail
+     */
+    @Override
+    public String queryDataSourceRealPassword(int id, User loginUser) {
+        DataSource dataSource = dataSourceMapper.selectById(id);
+        if (dataSource == null) {
+            log.error("Datasource does not exist, id:{}.", id);
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
+        }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        ConnectionParam connectionParam =
+                DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams());
+        return connectionParam.getPassword();
     }
 
     /**
@@ -268,7 +292,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @return hidden password
      */
-    private String getHiddenPassword() {
+    @Override
+    public String getHiddenPassword() {
         return Constants.XXXXXX;
     }
 

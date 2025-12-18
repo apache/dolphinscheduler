@@ -51,12 +51,27 @@ public interface DataSourceService {
     DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
-     * updateWorkflowInstance datasource
+     * query datasource with hidden password
      *
      * @param id datasource id
      * @return data source detail
      */
     BaseDataSourceParamDTO queryDataSource(int id, User loginUser);
+
+    /**
+     * get hidden password (resolve the security hotspot)
+     *
+     * @return hidden password
+     */
+    String getHiddenPassword();
+
+    /**
+     * query datasource real password
+     *
+     * @param id datasource id
+     * @return data source detail
+     */
+    String queryDataSourceRealPassword(int id, User loginUser);
 
     /**
      * query datasource list by keyword

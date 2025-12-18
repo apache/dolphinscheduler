@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -214,6 +215,11 @@ public class DataSourceController extends BaseController {
     public Result<Boolean> connectDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
+        if (dataSourceParam.getId() != null
+                && dataSourceParam.getPassword().equals(dataSourceService.getHiddenPassword())) {
+            String passwordInDb = dataSourceService.queryDataSourceRealPassword(dataSourceParam.getId(), loginUser);
+            dataSourceParam.setPassword(PasswordUtils.decodePassword(passwordInDb));
+        }
         DataSourceUtils.checkDatasourceParam(dataSourceParam);
         ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
         dataSourceService.checkConnection(dataSourceParam.getType(), connectionParams);
