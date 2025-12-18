@@ -104,6 +104,11 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     public void onFatalEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                              final ITaskExecutionRunnable taskExecutionRunnable,
                              final TaskFatalLifecycleEvent taskFatalEvent) {
+        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
+        // if (taskExecutionRunnable.getTaskInstance().getState().isFinished()) {
+        // logWarningIfCannotDoAction(taskExecutionRunnable, taskFatalEvent);
+        // return;
+        // }
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceFatalEventToDB(taskExecutionRunnable, taskFatalEvent);
 
