@@ -210,11 +210,6 @@ public class WorkflowInstance {
         return commandType;
     }
 
-    /**
-     * set state with desc
-     * @param state
-     * @param stateDesc
-     */
     public void setStateWithDesc(WorkflowExecutionStatus state, String stateDesc) {
         this.setState(state);
         if (StringUtils.isEmpty(this.getStateHistory())) {

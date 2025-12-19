@@ -56,7 +56,7 @@ public class WorkflowCreateRequest {
     private int timeout;
 
     @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
-    private String executionType;
+    private String executionType = WorkflowExecutionTypeEnum.PARALLEL.name();
 
     public WorkflowDefinition convert2WorkflowDefinition() {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
