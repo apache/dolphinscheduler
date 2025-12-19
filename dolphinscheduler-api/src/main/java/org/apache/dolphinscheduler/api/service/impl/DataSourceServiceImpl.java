@@ -91,7 +91,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser       login user
      * @param datasourceParam datasource parameters
-     * @return create result code
+     * @return create datasource
      */
     @Override
     public DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
@@ -107,7 +107,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         if (checkDescriptionLength(datasourceParam.getNote())) {
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
+
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
+
+        // check connect
+        checkConnection(datasourceParam.getType(), connectionParam);
 
         // build datasource
         DataSource dataSource = new DataSource();
@@ -130,10 +134,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     /**
-     * updateWorkflowInstance datasource
+     * update datasource
      *
      * @param loginUser login user
-     * @return update result code
+     * @return update datasource
      */
     @Override
     public DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam) {
@@ -166,6 +170,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
+
+        // check connect
+        checkConnection(dataSource.getType(), connectionParam);
 
         Date now = new Date();
 
@@ -317,8 +324,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param type            data source type
      * @param connectionParam connectionParam
-     * @return true if connect successfully, otherwise false
-     * @return true if connect successfully, otherwise false
+     * @throws ServiceException when connection test fails
      */
     @Override
     public void checkConnection(DbType type, ConnectionParam connectionParam) {
