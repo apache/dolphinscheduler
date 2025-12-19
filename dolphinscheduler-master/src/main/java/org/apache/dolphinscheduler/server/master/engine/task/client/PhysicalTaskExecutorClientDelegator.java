@@ -66,9 +66,13 @@ public class PhysicalTaskExecutorClientDelegator implements ITaskExecutorClientD
         final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
         final String taskName = taskExecutionContext.getTaskName();
         final String workerGroup = taskExecutionContext.getWorkerGroup();
+
+        // workerGroup not exist
         if (!clusterManager.getWorkerClusters().containsWorkerGroup(workerGroup)) {
             throw new WorkerGroupNotFoundException(workerGroup);
         }
+
+        // select an available worker from the worker group; throws NoAvailableWorkerException if none is available.
         final String physicalTaskExecutorAddress = workerLoadBalancer
                 .select(workerGroup)
                 .map(Host::of)

@@ -30,6 +30,10 @@ public enum TaskLifecycleEventType implements ILifecycleEventType {
      */
     DISPATCH,
     /**
+     * Task instance encounters catastrophic failure(such as initialization failure), it will enter a failed state.
+     */
+    FATAL,
+    /**
      * The task instance is dispatched to the target executor server.
      */
     DISPATCHED,
