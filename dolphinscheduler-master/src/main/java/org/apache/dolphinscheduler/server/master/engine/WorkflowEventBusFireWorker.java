@@ -24,8 +24,6 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
@@ -34,7 +32,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -130,19 +127,6 @@ public class WorkflowEventBusFireWorker {
                     workflowEventBus.publish(lifecycleEvent);
                     ThreadUtils.sleep(5_000);
                     return;
-                } else {
-                    log.warn("exception occurred during event handling: {}", lifecycleEvent, ex);
-                    // If other exceptions and the event is task-related, construct and publish a dedicated
-                    // TaskFatalLifecycleEvent
-                    // so that the event will be handled by TaskFatalLifecycleEventHandler
-                    if (lifecycleEvent instanceof AbstractTaskLifecycleEvent) {
-                        AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
-                        final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
-                                .taskExecutionRunnable(taskLifecycleEvent.getTaskExecutionRunnable())
-                                .endTime(new Date())
-                                .build();
-                        workflowEventBus.publish(taskFatalEvent);
-                    }
                 }
                 workflowEventBus.getWorkflowEventBusSummary().decreaseFireSuccessEventCount();
                 workflowEventBus.getWorkflowEventBusSummary().increaseFireFailedEventCount();
