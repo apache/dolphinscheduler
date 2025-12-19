@@ -228,9 +228,7 @@ public class RemoteExecutor implements AutoCloseable {
 
     public String runRemote(String command) throws IOException {
         StringBuilder out = new StringBuilder();
-        runRemoteAndProcessLines(command, line -> {
-            out.append(line).append(System.lineSeparator());
-        });
+        runRemoteAndProcessLines(command, line -> out.append(line).append(System.lineSeparator()));
         return out.toString();
     }
 
