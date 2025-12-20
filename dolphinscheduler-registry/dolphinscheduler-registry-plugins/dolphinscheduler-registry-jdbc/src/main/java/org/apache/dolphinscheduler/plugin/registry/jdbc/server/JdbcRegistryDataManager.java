@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.transaction.support.TransactionTemplate;
+
 import com.google.common.collect.Lists;
 
 @Slf4j
@@ -57,23 +59,27 @@ public class JdbcRegistryDataManager
 
     private final JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository;
 
+    private final TransactionTemplate jdbcRegistryTransactionTemplate;
+
     private final List<RegistryRowChangeListener<JdbcRegistryDataDTO>> registryRowChangeListeners;
 
     private long lastDetectedJdbcRegistryDataChangeEventId = -1;
 
     public JdbcRegistryDataManager(JdbcRegistryProperties registryProperties,
                                    JdbcRegistryDataRepository jdbcRegistryDataRepository,
-                                   JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository) {
+                                   JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
+                                   TransactionTemplate jdbcRegistryTransactionTemplate) {
         this.registryProperties = registryProperties;
         this.jdbcRegistryDataChangeEventRepository = jdbcRegistryDataChangeEventRepository;
         this.jdbcRegistryDataRepository = jdbcRegistryDataRepository;
+        this.jdbcRegistryTransactionTemplate = jdbcRegistryTransactionTemplate;
         this.registryRowChangeListeners = new CopyOnWriteArrayList<>();
-        this.lastDetectedJdbcRegistryDataChangeEventId =
-                jdbcRegistryDataChangeEventRepository.getMaxJdbcRegistryDataChangeEventId();
     }
 
     @Override
     public void start() {
+        this.lastDetectedJdbcRegistryDataChangeEventId =
+                jdbcRegistryDataChangeEventRepository.getMaxJdbcRegistryDataChangeEventId();
         JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
                 this::detectJdbcRegistryDataChangeEvent,
                 registryProperties.getHeartbeatRefreshInterval().toMillis(),
@@ -162,67 +168,73 @@ public class JdbcRegistryDataManager
         checkNotNull(key);
         checkNotNull(dataType);
 
-        Optional<JdbcRegistryDataDTO> jdbcRegistryDataOptional = jdbcRegistryDataRepository.selectByKey(key);
-        if (jdbcRegistryDataOptional.isPresent()) {
-            JdbcRegistryDataDTO jdbcRegistryData = jdbcRegistryDataOptional.get();
-            if (!dataType.name().equals(jdbcRegistryData.getDataType())) {
-                throw new UnsupportedOperationException("The data type: " + jdbcRegistryData.getDataType()
-                        + " of the key: " + key + " cannot be updated");
-            }
+        final Optional<JdbcRegistryDataDTO> jdbcRegistryDataOptional = jdbcRegistryDataRepository.selectByKey(key);
 
-            if (DataType.EPHEMERAL.name().equals(jdbcRegistryData.getDataType())) {
-                if (!jdbcRegistryData.getClientId().equals(clientId)) {
-                    throw new UnsupportedOperationException(
-                            "The EPHEMERAL data: " + key + " can only be updated by its owner: "
-                                    + jdbcRegistryData.getClientId() + " but not: " + clientId);
+        jdbcRegistryTransactionTemplate.execute(status -> {
+            if (jdbcRegistryDataOptional.isPresent()) {
+                JdbcRegistryDataDTO jdbcRegistryData = jdbcRegistryDataOptional.get();
+                if (!dataType.name().equals(jdbcRegistryData.getDataType())) {
+                    throw new UnsupportedOperationException("The data type: " + jdbcRegistryData.getDataType()
+                            + " of the key: " + key + " cannot be updated");
                 }
+
+                if (DataType.EPHEMERAL.name().equals(jdbcRegistryData.getDataType())) {
+                    if (!jdbcRegistryData.getClientId().equals(clientId)) {
+                        throw new UnsupportedOperationException(
+                                "The EPHEMERAL data: " + key + " can only be updated by its owner: "
+                                        + jdbcRegistryData.getClientId() + " but not: " + clientId);
+                    }
+                }
+
+                jdbcRegistryData.setDataValue(value);
+                jdbcRegistryData.setLastUpdateTime(new Date());
+                jdbcRegistryDataRepository.updateById(jdbcRegistryData);
+
+                JdbcRegistryDataChangeEventDTO jdbcRegistryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
+                        .jdbcRegistryData(jdbcRegistryData)
+                        .eventType(JdbcRegistryDataChangeEventDTO.EventType.UPDATE)
+                        .createTime(new Date())
+                        .build();
+                jdbcRegistryDataChangeEventRepository.insert(jdbcRegistryDataChangeEvent);
+            } else {
+                JdbcRegistryDataDTO jdbcRegistryDataDTO = JdbcRegistryDataDTO.builder()
+                        .clientId(clientId)
+                        .dataKey(key)
+                        .dataValue(value)
+                        .dataType(dataType.name())
+                        .createTime(new Date())
+                        .lastUpdateTime(new Date())
+                        .build();
+                jdbcRegistryDataRepository.insert(jdbcRegistryDataDTO);
+                JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
+                        .jdbcRegistryData(jdbcRegistryDataDTO)
+                        .eventType(JdbcRegistryDataChangeEventDTO.EventType.ADD)
+                        .createTime(new Date())
+                        .build();
+                jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
             }
-
-            jdbcRegistryData.setDataValue(value);
-            jdbcRegistryData.setLastUpdateTime(new Date());
-            jdbcRegistryDataRepository.updateById(jdbcRegistryData);
-
-            JdbcRegistryDataChangeEventDTO jdbcRegistryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
-                    .jdbcRegistryData(jdbcRegistryData)
-                    .eventType(JdbcRegistryDataChangeEventDTO.EventType.UPDATE)
-                    .createTime(new Date())
-                    .build();
-            jdbcRegistryDataChangeEventRepository.insert(jdbcRegistryDataChangeEvent);
-        } else {
-            JdbcRegistryDataDTO jdbcRegistryDataDTO = JdbcRegistryDataDTO.builder()
-                    .clientId(clientId)
-                    .dataKey(key)
-                    .dataValue(value)
-                    .dataType(dataType.name())
-                    .createTime(new Date())
-                    .lastUpdateTime(new Date())
-                    .build();
-            jdbcRegistryDataRepository.insert(jdbcRegistryDataDTO);
-            JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
-                    .jdbcRegistryData(jdbcRegistryDataDTO)
-                    .eventType(JdbcRegistryDataChangeEventDTO.EventType.ADD)
-                    .createTime(new Date())
-                    .build();
-            jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
-        }
+            return null;
+        });
 
     }
 
     @Override
     public void deleteJdbcRegistryDataByKey(String key) {
         checkNotNull(key);
-        // todo: this is not atomic, need to be improved
         Optional<JdbcRegistryDataDTO> jdbcRegistryDataOptional = jdbcRegistryDataRepository.selectByKey(key);
         if (!jdbcRegistryDataOptional.isPresent()) {
             return;
         }
-        jdbcRegistryDataRepository.deleteByKey(key);
-        final JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
-                .jdbcRegistryData(jdbcRegistryDataOptional.get())
-                .eventType(JdbcRegistryDataChangeEventDTO.EventType.DELETE)
-                .createTime(new Date())
-                .build();
-        jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
+        jdbcRegistryTransactionTemplate.execute(status -> {
+            jdbcRegistryDataRepository.deleteByKey(key);
+            final JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
+                    .jdbcRegistryData(jdbcRegistryDataOptional.get())
+                    .eventType(JdbcRegistryDataChangeEventDTO.EventType.DELETE)
+                    .createTime(new Date())
+                    .build();
+            jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
+            return null;
+        });
     }
 
     private void doTriggerJdbcRegistryDataAddedListener(List<JdbcRegistryDataDTO> valuesToAdd) {

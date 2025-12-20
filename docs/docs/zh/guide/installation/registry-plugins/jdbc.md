@@ -32,19 +32,11 @@ registry:
   heartbeat-refresh-interval: 3s
   # Once the client's heartbeat is not refresh in this time, the server will consider the client is offline.
   session-timeout: 60s
-  # The hikari configuration, default will use the same datasource pool as DolphinScheduler.
-  hikari-config:
-    jdbc-url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
-    maximum-pool-size: 5
-    connection-timeout: 9000
-    idle-timeout: 600000
 ```
 
-## 对 JDBC 注册中心使用不同的数据库配置
+## 为 worker 配置数据源
 
-需要在 master/worker/api 的 application.yml 中设置属性
+由于Worker服务默认不包含数据源，因此你需要在 worker 的 application.yml 中为注册中心设置数据源属性
 
 ### 使用 MySQL 作为注册中心
 
