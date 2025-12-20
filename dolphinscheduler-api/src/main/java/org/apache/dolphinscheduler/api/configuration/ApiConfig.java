@@ -61,7 +61,7 @@ public class ApiConfig implements Validator {
     }
 
     private void validatePythonGateway(Errors errors) {
-        if (pythonGateway.isEnabled() && StringUtils.isNotEmpty(pythonGateway.getAuthToken())) {
+        if (pythonGateway.isEnabled() && StringUtils.isEmpty(pythonGateway.getAuthToken())) {
             errors.rejectValue("pythonGateway.auth-token", null, "should not be empty when enabled is true");
         }
     }
