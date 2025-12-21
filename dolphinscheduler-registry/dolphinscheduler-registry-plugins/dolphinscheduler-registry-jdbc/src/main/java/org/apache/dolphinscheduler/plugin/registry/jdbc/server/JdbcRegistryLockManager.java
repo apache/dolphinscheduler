@@ -79,7 +79,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
                 // The lock is already exist, wait it release.
                 continue;
             }
-            log.debug("Acquire the lock {} failed try again", lockKey);
+            log.debug("{} acquire the lock {} failed try again", lockOwner, lockKey);
             // acquire failed, wait and try again
             ThreadUtils.sleep(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis());
         }
@@ -123,7 +123,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
                 // The lock is already exist, wait it release.
                 continue;
             }
-            log.debug("Acquire the lock {} failed try again", lockKey);
+            log.debug("{} acquire the lock {} failed try again", lockOwner, lockKey);
             // acquire failed, wait and try again
             ThreadUtils.sleep(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis());
         }

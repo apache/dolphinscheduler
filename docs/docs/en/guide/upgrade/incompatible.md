@@ -36,4 +36,5 @@ This document records the incompatible updates between each version. You need to
 
 * Renamed the publicKey field to privateKey in the SSH connection parameters under the datasource configuration. ([#17666])(https://github.com/apache/dolphinscheduler/pull/17666)
 * Add table t_ds_serial_command. ([#17531])(https://github.com/apache/dolphinscheduler/pull/17531)
+* Remove the default value of `python-gateway.auth-token` at `api-server/application.yaml`. ([#17801])(https://github.com/apache/dolphinscheduler/pull/17801)
 

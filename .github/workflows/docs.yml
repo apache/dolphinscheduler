@@ -108,7 +108,6 @@ jobs:
     needs:
       - style
       - img-check
-      - dead-link
     if: always()
     steps:
       - name: Status

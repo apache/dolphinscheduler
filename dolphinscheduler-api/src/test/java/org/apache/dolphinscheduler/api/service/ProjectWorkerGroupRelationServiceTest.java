@@ -138,6 +138,13 @@ public class ProjectWorkerGroupRelationServiceTest {
                 getWorkerGroups());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
+        // success when no task referenced any wg
+        Mockito.when(projectWorkerGroupDao.deleteByProjectCode(projectCode))
+                .thenReturn(true);
+        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
+                new ArrayList<>());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+
         // db deletion fail
         Mockito.when(projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(Mockito.any(), Mockito.any()))
                 .thenReturn(false);
@@ -151,6 +158,26 @@ public class ProjectWorkerGroupRelationServiceTest {
                 .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
         Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
                 .thenReturn(Sets.newHashSet(getProjectWorkerGroup().getWorkerGroup()));
+        AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
+                () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
+                        getUnusedWorkerGroups()));
+
+        // test clear all wg and fail when wg is referenced by task definition
+        // test case: project all wg: test, task used wg: test, new wg: null
+        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
+                .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
+                .thenReturn(Sets.newHashSet(getProjectWorkerGroup().getWorkerGroup()));
+        AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
+                () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
+                        new ArrayList<>()));
+
+        // test delete superset of the used wg collection and fail when wg is referenced by task definition
+        // test case: project all wg: test,test1,test2. task used wg: test. new wg: test1, delete test2 and test
+        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
+                .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
+                .thenReturn(Sets.newHashSet("test", "test1", "test2"));
         AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
                 () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                         getUnusedWorkerGroups()));
