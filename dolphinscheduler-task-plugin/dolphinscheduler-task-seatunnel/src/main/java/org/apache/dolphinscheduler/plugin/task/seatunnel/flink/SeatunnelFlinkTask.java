@@ -36,7 +36,7 @@ public class SeatunnelFlinkTask extends SeatunnelTask {
     @Override
     public void init() {
         seatunnelParameters =
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SeatunnelFlinkParameters.class);
+                JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelFlinkParameters.class);
         setSeatunnelParameters(seatunnelParameters);
         super.init();
     }

@@ -48,30 +48,13 @@ import lombok.extern.slf4j.Slf4j;
 public class MlflowTask extends AbstractTask {
 
     private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)");
-    /**
-     * shell command executor
-     */
     private final ShellCommandExecutor shellCommandExecutor;
 
-    /**
-     * taskExecutionContext
-     */
-    private final TaskExecutionContext taskExecutionContext;
-    /**
-     * shell parameters
-     */
     private MlflowParameters mlflowParameters;
 
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     public MlflowTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-
-        this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     static public String getPresetRepository() {
@@ -105,7 +88,7 @@ public class MlflowTask extends AbstractTask {
     @Override
     public void init() {
 
-        mlflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MlflowParameters.class);
+        mlflowParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), MlflowParameters.class);
 
         log.info("Initialize MLFlow task params {}", JSONUtils.toPrettyJsonString(mlflowParameters));
         if (mlflowParameters == null || !mlflowParameters.checkParameters()) {
@@ -254,7 +237,7 @@ public class MlflowTask extends AbstractTask {
     }
 
     private Map<String, Property> getParamsMap() {
-        return taskExecutionContext.getPrepareParamsMap();
+        return taskRequest.getPrepareParamsMap();
 
     }
 

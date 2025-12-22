@@ -43,7 +43,7 @@ public class SeatunnelSparkTask extends SeatunnelTask {
     @Override
     public void init() {
         seatunnelParameters =
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SeatunnelSparkParameters.class);
+                JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelSparkParameters.class);
         setSeatunnelParameters(seatunnelParameters);
         super.init();
     }
