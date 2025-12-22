@@ -60,26 +60,13 @@ public class ChunJunTask extends AbstractTask {
      */
     private static final String CHUNJUN_DIST_DIR = "${CHUNJUN_HOME}/chunjun-dist";
 
-    /**
-     * chunJun parameters
-     */
     private ChunJunParameters chunJunParameters;
 
-    /**
-     * shell command executor
-     */
-    private ShellCommandExecutor shellCommandExecutor;
-
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     public ChunJunTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.taskExecutionContext = taskExecutionContext;
-
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     /**
@@ -87,9 +74,8 @@ public class ChunJunTask extends AbstractTask {
      */
     @Override
     public void init() {
-        chunJunParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ChunJunParameters.class);
-        log.info("Initialize chunjun task params {}",
-                JSONUtils.toPrettyJsonString(taskExecutionContext.getTaskParams()));
+        chunJunParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), ChunJunParameters.class);
+        log.info("Initialize chunjun task params {}", JSONUtils.toPrettyJsonString(taskRequest.getTaskParams()));
 
         if (!chunJunParameters.checkParameters()) {
             throw new RuntimeException("chunjun task params is not valid");
@@ -100,7 +86,7 @@ public class ChunJunTask extends AbstractTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
 
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
                     .properties(ParameterUtils.convert(paramsMap))
@@ -133,9 +119,7 @@ public class ChunJunTask extends AbstractTask {
      */
     private String buildChunJunJsonFile(Map<String, Property> paramsMap) throws Exception {
         // generate json
-        String fileName = String.format("%s/%s_job.json",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+        String fileName = String.format("%s/%s_job.json", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
 
         String json = null;
 

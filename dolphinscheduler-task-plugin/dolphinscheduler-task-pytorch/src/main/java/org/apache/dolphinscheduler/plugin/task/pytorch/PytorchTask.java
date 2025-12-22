@@ -41,21 +41,19 @@ public class PytorchTask extends AbstractTask {
 
     private final ShellCommandExecutor shellCommandExecutor;
     protected PytorchParameters pytorchParameters;
-    protected TaskExecutionContext taskExecutionContext;
     private PythonEnvManager pythonEnvManager;
 
     public PytorchTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
     public void init() {
 
-        pytorchParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PytorchParameters.class);
-        log.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
+        pytorchParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PytorchParameters.class);
+        log.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskRequest));
 
         if (pytorchParameters == null || !pytorchParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
@@ -71,7 +69,7 @@ public class PytorchTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
                     .appendScript(buildPythonExecuteCommand());
 
             TaskResponse taskResponse = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
@@ -102,7 +100,7 @@ public class PytorchTask extends AbstractTask {
         if (GitProjectManager.isGitPath(pythonPath)) {
             GitProjectManager gpm = new GitProjectManager();
             gpm.setPath(pythonPath);
-            gpm.setBaseDir(taskExecutionContext.getExecutePath());
+            gpm.setBaseDir(taskRequest.getExecutePath());
             gpm.prepareProject();
             pytorchParameters.setPythonPath(gpm.getGitLocalPath());
         }

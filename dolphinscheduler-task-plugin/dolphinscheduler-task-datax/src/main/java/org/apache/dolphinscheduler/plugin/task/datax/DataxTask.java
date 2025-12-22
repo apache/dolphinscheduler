@@ -103,33 +103,16 @@ public class DataxTask extends AbstractTask {
      */
     private static final int DATAX_CHANNEL_COUNT = 1;
 
-    /**
-     * datax parameters
-     */
     private DataxParameters dataXParameters;
 
-    /**
-     * shell command executor
-     */
-    private ShellCommandExecutor shellCommandExecutor;
-
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     private DataxTaskExecutionContext dataxTaskExecutionContext;
 
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     public DataxTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     /**
@@ -137,7 +120,7 @@ public class DataxTask extends AbstractTask {
      */
     @Override
     public void init() {
-        dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
+        dataXParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), DataxParameters.class);
         log.info("Initialize datax task params {}", JSONUtils.toPrettyJsonString(dataXParameters));
 
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
@@ -145,7 +128,7 @@ public class DataxTask extends AbstractTask {
         }
         SensitiveDataConverter.addMaskPattern(POST_JDBC_INFO_REGEX);
         dataxTaskExecutionContext =
-                dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+                dataXParameters.generateExtendedContext(taskRequest.getResourceParametersHelper());
     }
 
     @SuppressWarnings("unchecked")
@@ -153,7 +136,7 @@ public class DataxTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // replace placeholder,and combine local and global parameters
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
 
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
                     .properties(ParameterUtils.convert(paramsMap))
@@ -198,9 +181,7 @@ public class DataxTask extends AbstractTask {
      */
     private String buildDataxJsonFile(Map<String, Property> paramsMap) throws Exception {
         // generate json
-        String fileName = String.format("%s/%s_job.json",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+        String fileName = String.format("%s/%s_job.json", taskRequest.getExecutePath(), taskRequest.getTaskAppId());
         String json;
 
         Path path = new File(fileName).toPath();

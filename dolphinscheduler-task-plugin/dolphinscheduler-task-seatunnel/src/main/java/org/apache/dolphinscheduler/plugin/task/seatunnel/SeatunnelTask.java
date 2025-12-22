@@ -57,31 +57,14 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
 
-    /**
-     * seatunnel parameters
-     */
     private SeatunnelParameters seatunnelParameters;
 
-    /**
-     * shell command executor
-     */
-    private ShellCommandExecutor shellCommandExecutor;
+    private final ShellCommandExecutor shellCommandExecutor;
 
-    /**
-     * taskExecutionContext
-     */
-    protected final TaskExecutionContext taskExecutionContext;
-
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     public SeatunnelTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
 
-        this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
@@ -163,7 +146,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
             scriptContent = buildCustomConfigContent();
         } else {
             String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();
-            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            ResourceContext resourceContext = taskRequest.getResourceContext();
             scriptContent = FileUtils.readFileToString(
                     new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                     StandardCharsets.UTF_8);
@@ -177,8 +160,8 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     private List<String> generateTaskParameters() {
         Map<String, String> variables = new HashMap<>();
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
+        Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
+        List<Property> propertyList = JSONUtils.toList(taskRequest.getGlobalParams(), Property.class);
         if (propertyList != null && !propertyList.isEmpty()) {
             for (Property property : propertyList) {
                 variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());
@@ -208,8 +191,8 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.%s", taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(), formatDetector());
+        return String.format("%s/seatunnel_%s.%s", taskRequest.getExecutePath(),
+                taskRequest.getTaskAppId(), formatDetector());
     }
 
     private String formatDetector() {
@@ -218,8 +201,8 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
-        log.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(),
-                taskExecutionContext.getExecutePath());
+        log.info("tenantCode :{}, task dir:{}", taskRequest.getTenantCode(),
+                taskRequest.getExecutePath());
 
         if (!Files.exists(Paths.get(scriptFile))) {
             log.info("generate script file:{}", scriptFile);
@@ -235,7 +218,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String parseScript(String script) {
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
     }
 

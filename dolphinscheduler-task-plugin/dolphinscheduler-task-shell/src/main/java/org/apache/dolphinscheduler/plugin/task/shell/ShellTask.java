@@ -36,37 +36,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ShellTask extends AbstractTask {
 
-    /**
-     * shell parameters
-     */
     private ShellParameters shellParameters;
 
-    /**
-     * shell command executor
-     */
-    private ShellCommandExecutor shellCommandExecutor;
+    private final ShellCommandExecutor shellCommandExecutor;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
-
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     public ShellTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
 
-        this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
     public void init() {
 
-        shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
+        shellParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), ShellParameters.class);
         log.info("Initialize shell task params {}", JSONUtils.toPrettyJsonString(shellParameters));
 
         if (shellParameters == null || !shellParameters.checkParameters()) {
@@ -79,14 +62,14 @@ public class ShellTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
                     .appendScript(shellParameters.getRawScript());
 
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setProcessId(commandExecuteResult.getProcessId());
             shellParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
-            taskExecutionContext.setVarPool(shellParameters.getVarPool());
+            taskRequest.setVarPool(shellParameters.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current Shell task has been interrupted", e);

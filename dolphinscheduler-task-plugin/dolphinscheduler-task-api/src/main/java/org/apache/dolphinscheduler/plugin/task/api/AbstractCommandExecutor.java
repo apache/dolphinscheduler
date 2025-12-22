@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_HARD_KILL;
@@ -42,12 +41,10 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
@@ -59,41 +56,12 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 public abstract class AbstractCommandExecutor {
 
     protected volatile Map<String, String> taskOutputParams = new HashMap<>();
-    /**
-     * process
-     */
     private Process process;
 
-    /**
-     * log handler
-     */
-    protected Consumer<LinkedBlockingQueue<String>> logHandler;
-
-    /**
-     * log list
-     */
-    protected LinkedBlockingQueue<String> logBuffer;
-
-    protected boolean processLogOutputIsSuccess = false;
-
-    protected boolean podLogOutputIsFinished = false;
-
-    /**
-     * taskRequest
-     */
     protected TaskExecutionContext taskRequest;
 
-    protected Future<?> taskOutputFuture;
-
-    protected Future<?> podLogOutputFuture;
-
-    public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                   TaskExecutionContext taskRequest) {
-        this.logHandler = logHandler;
+    public AbstractCommandExecutor(TaskExecutionContext taskRequest) {
         this.taskRequest = taskRequest;
-        this.logBuffer = new LinkedBlockingQueue<>();
-        this.logBuffer.add(EMPTY_STRING);
-
     }
 
     // todo: We need to build the IShellActuator in outer class, since different task may have specific logic to build
@@ -135,10 +103,10 @@ public abstract class AbstractCommandExecutor {
         process = iShellInterceptor.execute();
 
         // parse process output
-        parseProcessOutput(this.process);
+        final CompletableFuture<Void> collectProcessLogFuture = collectProcessLog(this.process);
 
         // collect pod log
-        collectPodLogIfNeeded();
+        final Optional<CompletableFuture<?>> collectPodLogFuture = collectPodLogIfNeeded();
 
         int processId = getProcessId(this.process);
 
@@ -164,24 +132,14 @@ public abstract class AbstractCommandExecutor {
         TaskExecutionStatus kubernetesStatus =
                 ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
 
-        if (taskOutputFuture != null) {
-            try {
-                // Wait the task log process finished.
-                taskOutputFuture.get();
-            } catch (ExecutionException e) {
-                log.error("Handle task log error", e);
-            }
-        }
+        // Wait the task log process finished.
+        collectProcessLogFuture.join();
 
-        if (podLogOutputFuture != null) {
-            try {
-                // Wait kubernetes pod log collection finished
-                podLogOutputFuture.get();
-                // delete pod after successful execution and log collection
-                ProcessUtils.cancelApplication(taskRequest);
-            } catch (ExecutionException e) {
-                log.error("Handle pod log error", e);
-            }
+        if (collectPodLogFuture.isPresent()) {
+            // Wait kubernetes pod log collection finished
+            collectPodLogFuture.get().join();
+            // delete pod after successful execution and log collection
+            ProcessUtils.cancelApplication(taskRequest);
         }
 
         // if SHELL task exit
@@ -227,16 +185,15 @@ public abstract class AbstractCommandExecutor {
         ProcessUtils.cancelApplication(taskRequest);
     }
 
-    private void collectPodLogIfNeeded() {
+    private Optional<CompletableFuture<?>> collectPodLogIfNeeded() {
         if (null == taskRequest.getK8sTaskExecutionContext()) {
-            podLogOutputIsFinished = true;
-            return;
+            return Optional.empty();
         }
 
         ExecutorService collectPodLogExecutorService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
 
-        podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
+        final CompletableFuture<Void> collectPodLogFuture = CompletableFuture.runAsync(() -> {
             // wait for launching (driver) pod
             ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
             try (
@@ -248,67 +205,43 @@ public abstract class AbstractCommandExecutor {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                         while ((line = reader.readLine()) != null) {
-                            logBuffer.add(String.format("[K8S-pod-log-%s]: %s", taskRequest.getTaskName(), line));
+                            log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
                         }
                     }
                 }
             } catch (Exception e) {
+                log.error("Collect pod log error", e);
                 throw new RuntimeException(e);
-            } finally {
-                podLogOutputIsFinished = true;
             }
-
-        });
+        }, collectPodLogExecutorService);
 
         collectPodLogExecutorService.shutdown();
+        return Optional.of(collectPodLogFuture);
     }
 
-    private void parseProcessOutput(Process process) {
+    private CompletableFuture<Void> collectProcessLog(Process process) {
         // todo: remove this this thread pool.
-        ExecutorService getOutputLogService = ThreadUtils
-                .newSingleDaemonScheduledExecutorService("ResolveOutputLog-thread-" + taskRequest.getTaskName());
-        getOutputLogService.execute(() -> {
+        final ExecutorService collectProcessLogService = ThreadUtils.newSingleDaemonScheduledExecutorService(
+                "ResolveOutputLog-thread-" + taskRequest.getTaskName());
+        final CompletableFuture<Void> collectProcessLogFuture = CompletableFuture.runAsync(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 while ((line = inReader.readLine()) != null) {
-                    logBuffer.add(line);
+                    log.info(" -> {}", line);
                     taskOutputParameterParser.appendParseLog(line);
                 }
-                processLogOutputIsSuccess = true;
             } catch (Exception e) {
                 log.error("Parse var pool error", e);
-                processLogOutputIsSuccess = true;
             } finally {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
             }
             taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
-        });
+        }, collectProcessLogService);
 
-        getOutputLogService.shutdown();
-
-        ExecutorService parseProcessOutputExecutorService = ThreadUtils
-                .newSingleDaemonScheduledExecutorService("TaskInstanceLogOutput-thread-" + taskRequest.getTaskName());
-        taskOutputFuture = parseProcessOutputExecutorService.submit(() -> {
-            try {
-                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
-                while (logBuffer.size() > 1 || !processLogOutputIsSuccess || !podLogOutputIsFinished) {
-                    if (logBuffer.size() > 1) {
-                        logHandler.accept(logBuffer);
-                        logBuffer.clear();
-                        logBuffer.add(EMPTY_STRING);
-                    } else {
-                        Thread.sleep(TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Output task log error", e);
-            } finally {
-                LogUtils.removeTaskInstanceLogFullPathMDC();
-            }
-        });
-        parseProcessOutputExecutorService.shutdown();
+        collectProcessLogService.shutdown();
+        return collectProcessLogFuture;
     }
 
     /**
