@@ -28,10 +28,8 @@ RUN apt update ; \
 WORKDIR $DOLPHINSCHEDULER_HOME
 
 COPY ./target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
-RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz ; \
-    rm -rf apache-dolphinscheduler-*-bin.tar.gz ; \
-    mv apache-dolphinscheduler-*-bin/* . ; \
-    rm -rf apache-dolphinscheduler-*-bin
+RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz --strip-components=1 ; \
+    rm -f apache-dolphinscheduler-*-bin.tar.gz
 
 EXPOSE 12345 25333
 

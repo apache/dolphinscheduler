@@ -29,9 +29,7 @@ WORKDIR $DOLPHINSCHEDULER_HOME
 
 # see doc: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/upgrade.html
 COPY ./target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
-RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz ; \
-    rm -rf apache-dolphinscheduler-*-bin.tar.gz ; \
-    mv apache-dolphinscheduler-*-bin/* . ; \
-    rm -rf apache-dolphinscheduler-*-bin
+RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz --strip-components=1 ; \
+    rm -f apache-dolphinscheduler-*-bin.tar.gz
 
 ENTRYPOINT [ "/bin/bash" ]
