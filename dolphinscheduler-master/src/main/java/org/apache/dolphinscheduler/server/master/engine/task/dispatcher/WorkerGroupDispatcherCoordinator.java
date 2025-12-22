@@ -104,7 +104,7 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
     private WorkerGroupDispatcher getOrCreateWorkerGroupDispatcher(String workerGroup) {
         return workerGroupDispatcherMap.computeIfAbsent(workerGroup, wg -> {
             WorkerGroupDispatcher workerGroupDispatcher =
-                    new WorkerGroupDispatcher(wg, taskExecutorClient, masterConfig.getDispatchTimeoutChecker());
+                    new WorkerGroupDispatcher(wg, taskExecutorClient, masterConfig.getTaskDispatchPolicy());
             workerGroupDispatcher.start();
             return workerGroupDispatcher;
         });

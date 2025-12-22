@@ -34,11 +34,10 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.config.MasterDispatchTimeoutCheckerConfig;
+import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.NoAvailableWorkerException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
@@ -64,7 +63,7 @@ class WorkerGroupDispatcherTest {
         taskExecutorClient = mock(ITaskExecutorClient.class);
         final MasterConfig masterConfig = new MasterConfig();
         dispatcher =
-                new WorkerGroupDispatcher("TestGroup", taskExecutorClient, masterConfig.getDispatchTimeoutChecker());
+                new WorkerGroupDispatcher("TestGroup", taskExecutorClient, masterConfig.getTaskDispatchPolicy());
     }
 
     @Test
@@ -175,15 +174,14 @@ class WorkerGroupDispatcherTest {
                     // Ensure NO event has been published during this time
                     WorkflowEventBus eventBus = task.getWorkflowEventBus();
                     verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
-                    verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
                 });
     }
 
     @Test
     void dispatchTask_WorkerGroupNotFound_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         // Given
-        MasterDispatchTimeoutCheckerConfig dispatchTimeoutCheckerConfig = new MasterDispatchTimeoutCheckerConfig();
-        dispatchTimeoutCheckerConfig.setEnabled(true);
+        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
+        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
         dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
@@ -202,17 +200,16 @@ class WorkerGroupDispatcherTest {
                 .untilAsserted(() -> {
                     verify(taskExecutorClient, times(1)).dispatch(taskExecutionRunnable);
                     WorkflowEventBus eventBus = taskExecutionRunnable.getWorkflowEventBus();
-                    verify(eventBus).publish(argThat(evt -> evt instanceof TaskFatalLifecycleEvent &&
-                            ((TaskFatalLifecycleEvent) evt).getTaskExecutionRunnable() == taskExecutionRunnable));
-                    verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
+                    verify(eventBus).publish(argThat(evt -> evt instanceof TaskFailedLifecycleEvent &&
+                            ((TaskFailedLifecycleEvent) evt).getTaskExecutionRunnable() == taskExecutionRunnable));
                 });
     }
 
     @Test
     void dispatchTask_WorkerGroupNotFound_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         // Given: Dispatcher configured with a 5-minute timeout (enabled)
-        MasterDispatchTimeoutCheckerConfig dispatchTimeoutCheckerConfig = new MasterDispatchTimeoutCheckerConfig();
-        dispatchTimeoutCheckerConfig.setEnabled(true);
+        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
+        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
         dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
@@ -241,7 +238,6 @@ class WorkerGroupDispatcherTest {
         // Then: Verify NO failure events are published because timeout has NOT been exceeded
         WorkflowEventBus eventBus = taskExecutionRunnable.getWorkflowEventBus();
         verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
-        verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
     }
 
     @Test
@@ -263,15 +259,14 @@ class WorkerGroupDispatcherTest {
                     // Ensure NO event has been published during this time
                     WorkflowEventBus eventBus = task.getWorkflowEventBus();
                     verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
-                    verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
                 });
     }
 
     @Test
     void dispatchTask_NoAvailableWorker_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         // Given: enable timeout (200ms), task already waited 500ms
-        MasterDispatchTimeoutCheckerConfig dispatchTimeoutCheckerConfig = new MasterDispatchTimeoutCheckerConfig();
-        dispatchTimeoutCheckerConfig.setEnabled(true);
+        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
+        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
         dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
@@ -292,15 +287,14 @@ class WorkerGroupDispatcherTest {
                     WorkflowEventBus eventBus = taskExecutionRunnable.getWorkflowEventBus();
                     verify(eventBus).publish(argThat(evt -> evt instanceof TaskFailedLifecycleEvent &&
                             ((TaskFailedLifecycleEvent) evt).getTaskExecutionRunnable() == taskExecutionRunnable));
-                    verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
                 });
     }
 
     @Test
     void dispatchTask_NoAvailableWorker_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         // Given: Configure dispatcher with a 5-minute dispatch timeout (enabled)
-        MasterDispatchTimeoutCheckerConfig dispatchTimeoutCheckerConfig = new MasterDispatchTimeoutCheckerConfig();
-        dispatchTimeoutCheckerConfig.setEnabled(true);
+        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
+        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
         dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
@@ -329,7 +323,6 @@ class WorkerGroupDispatcherTest {
         // Then: Verify NO failure events are published since timeout has NOT been exceeded
         WorkflowEventBus eventBus = taskExecutionRunnable.getWorkflowEventBus();
         verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
-        verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
     }
 
     @Test
@@ -351,15 +344,14 @@ class WorkerGroupDispatcherTest {
                     // Ensure NO event has been published during this time
                     WorkflowEventBus eventBus = task.getWorkflowEventBus();
                     verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
-                    verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
                 });
     }
 
     @Test
     void dispatchTask_GenericTaskDispatchException_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         // Given
-        MasterDispatchTimeoutCheckerConfig dispatchTimeoutCheckerConfig = new MasterDispatchTimeoutCheckerConfig();
-        dispatchTimeoutCheckerConfig.setEnabled(true);
+        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
+        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
         dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
@@ -380,15 +372,14 @@ class WorkerGroupDispatcherTest {
                     WorkflowEventBus eventBus = taskExecutionRunnable.getWorkflowEventBus();
                     verify(eventBus).publish(argThat(evt -> evt instanceof TaskFailedLifecycleEvent &&
                             ((TaskFailedLifecycleEvent) evt).getTaskExecutionRunnable() == taskExecutionRunnable));
-                    verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
                 });
     }
 
     @Test
     void dispatchTask_GenericTaskDispatchException_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         // Given: Dispatcher configured with a 5-minute dispatch timeout (enabled)
-        MasterDispatchTimeoutCheckerConfig config = new MasterDispatchTimeoutCheckerConfig();
-        config.setEnabled(true);
+        TaskDispatchPolicy config = new TaskDispatchPolicy();
+        config.setDispatchTimeoutFailedEnabled(true);
         config.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, config);
@@ -417,7 +408,6 @@ class WorkerGroupDispatcherTest {
         // Then: Verify NO failure events are published because timeout has NOT been exceeded
         WorkflowEventBus eventBus = task.getWorkflowEventBus();
         verify(eventBus, never()).publish(any(TaskFailedLifecycleEvent.class));
-        verify(eventBus, never()).publish(any(TaskFatalLifecycleEvent.class));
     }
 
     private ITaskExecutionRunnable mockTaskExecutionRunnableWithFirstDispatchTime(long firstDispatchTime) {

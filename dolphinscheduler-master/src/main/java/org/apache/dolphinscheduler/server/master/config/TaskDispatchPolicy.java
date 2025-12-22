@@ -22,21 +22,27 @@ import java.time.Duration;
 import lombok.Data;
 
 /**
- * Configuration for the master's task dispatch timeout checker.
- * If enabled, tasks that remain in the dispatch queue longer than {@link #maxTaskDispatchDuration} will be marked as failed to prevent indefinite queuing.
+ * Configuration for the master's task dispatch policy.
+ * <p>
+ * When enabled, tasks that remain in the dispatch queue longer than
+ * {@link #maxTaskDispatchDuration} will be marked as failed to prevent indefinite queuing.
  */
 @Data
-public class MasterDispatchTimeoutCheckerConfig {
+public class TaskDispatchPolicy {
 
     /**
-     * Whether to enable the dispatch timeout checking mechanism.
+     * Indicates whether the dispatch timeout checking mechanism is enabled.
+     * <p>
+     * If {@code true}, tasks exceeding the configured dispatch duration will be failed automatically.
      */
-    private boolean enabled = false;
+    private boolean dispatchTimeoutFailedEnabled = false;
 
     /**
-     * Maximum allowed time for a task to be dispatched to a worker.
-     * Tasks exceeding this duration in the dispatch queue will be failed.
-     * Examples: "2m", "5m", "30m". Defaults to 5 minutes.
+     * The maximum allowed duration a task may wait in the dispatch queue before being assigned to a worker.
+     * <p>
+     * Tasks that exceed this duration will be marked as failed.
+     * <p>
+     * Examples: {@code "2m"}, {@code "5m"}, {@code "30m"}.
      */
-    private Duration maxTaskDispatchDuration = Duration.ofMinutes(5);
+    private Duration maxTaskDispatchDuration;
 }

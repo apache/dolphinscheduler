@@ -20,13 +20,11 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.config.MasterDispatchTimeoutCheckerConfig;
+import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
@@ -55,15 +53,15 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final AtomicBoolean runningFlag = new AtomicBoolean(false);
 
-    private final MasterDispatchTimeoutCheckerConfig dispatchTimeoutChecker;
+    private final TaskDispatchPolicy taskDispatchPolicy;
 
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient,
-                                 MasterDispatchTimeoutCheckerConfig dispatchTimeoutChecker) {
+                                 TaskDispatchPolicy taskDispatchPolicy) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
         this.taskExecutorClient = taskExecutorClient;
         this.workerGroupEventBus = new TaskDispatchableEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
-        this.dispatchTimeoutChecker = dispatchTimeoutChecker;
+        this.taskDispatchPolicy = taskDispatchPolicy;
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
 
@@ -105,10 +103,10 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
                 return;
             }
             taskExecutorClient.dispatch(taskExecutionRunnable);
-        } catch (TaskDispatchException ex) {
-            if (dispatchTimeoutChecker.isEnabled()) {
+        } catch (Exception ex) {
+            if (taskDispatchPolicy.isDispatchTimeoutFailedEnabled()) {
                 // Checks whether the given task has exceeded its allowed dispatch timeout.
-                long timeoutMs = this.dispatchTimeoutChecker.getMaxTaskDispatchDuration().toMillis();
+                long timeoutMs = this.taskDispatchPolicy.getMaxTaskDispatchDuration().toMillis();
                 long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchTime();
                 if (elapsed > timeoutMs) {
                     handleDispatchFailure(taskExecutionRunnable, ex, elapsed, timeoutMs);
@@ -132,32 +130,32 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      * Once this method is called, the task is considered permanently failed and will not be retried.
      *
      * @param taskExecutionRunnable the task to mark as fatally failed; must not be null
-     * @param exception             the dispatch exception that triggered this failure handling; must not be null
+     * @param ex             the dispatch exception that triggered this failure handling; must not be null
      * @param elapsed               the time (in milliseconds) already spent attempting to dispatch the task
      * @param timeoutMs             the configured dispatch timeout threshold (in milliseconds)
      */
-    private void handleDispatchFailure(ITaskExecutionRunnable taskExecutionRunnable, TaskDispatchException exception,
+    private void handleDispatchFailure(ITaskExecutionRunnable taskExecutionRunnable, Exception ex,
                                        long elapsed, long timeoutMs) {
         final String taskName = taskExecutionRunnable.getName();
 
         log.warn("[DISPATCH_FAILED] taskName: {}, timed out after {} ms (limit: {} ms))", taskName, elapsed, timeoutMs);
 
-        if (ExceptionUtils.isWorkerGroupNotFoundException(exception)) {
-            log.error("[DISPATCH_FAILED] taskName: {}, Worker group not found.", taskName, exception);
-            final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
+        if (ExceptionUtils.isWorkerGroupNotFoundException(ex)) {
+            log.error("[DISPATCH_FAILED] taskName: {}, Worker group not found.", taskName, ex);
+            final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
                     .endTime(new Date())
                     .build();
-            taskExecutionRunnable.getWorkflowEventBus().publish(taskFatalEvent);
-        } else if (ExceptionUtils.isNoAvailableWorkerException(exception)) {
-            log.error("[DISPATCH_FAILED] taskName: {}, No available worker.", taskName, exception);
+            taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
+        } else if (ExceptionUtils.isNoAvailableWorkerException(ex)) {
+            log.error("[DISPATCH_FAILED] taskName: {}, No available worker.", taskName, ex);
             final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
                     .endTime(new Date())
                     .build();
             taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
         } else {
-            log.error("[DISPATCH_FAILED] taskName: {}, Unexpected dispatch error.", taskName, exception);
+            log.error("[DISPATCH_FAILED] taskName: {}, Unexpected dispatch error.", taskName, ex);
             final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecutionRunnable(taskExecutionRunnable)
                     .endTime(new Date())
