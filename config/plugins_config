@@ -99,7 +99,6 @@ dolphinscheduler-task-mr
 dolphinscheduler-task-openmldb
 dolphinscheduler-task-procedure
 dolphinscheduler-task-python
-dolphinscheduler-task-pytorch
 dolphinscheduler-task-remoteshell
 dolphinscheduler-task-sagemaker
 dolphinscheduler-task-seatunnel
