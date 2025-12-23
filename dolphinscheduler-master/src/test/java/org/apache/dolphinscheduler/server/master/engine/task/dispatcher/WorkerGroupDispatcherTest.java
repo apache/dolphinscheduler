@@ -180,11 +180,11 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_WorkerGroupNotFound_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         // Given
-        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
-        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
-        dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMillis(200));
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
 
         ITaskExecutionRunnable taskExecutionRunnable = mockTaskExecutionRunnableWithFirstDispatchTime(
                 System.currentTimeMillis() - 500);
@@ -208,11 +208,11 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_WorkerGroupNotFound_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         // Given: Dispatcher configured with a 5-minute timeout (enabled)
-        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
-        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
-        dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
 
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
 
         // Mock task with first dispatch time set to 100ms ago → well within timeout window
         ITaskExecutionRunnable taskExecutionRunnable = mockTaskExecutionRunnableWithFirstDispatchTime(
@@ -265,11 +265,11 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_NoAvailableWorker_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         // Given: enable timeout (200ms), task already waited 500ms
-        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
-        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
-        dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMillis(200));
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
 
         ITaskExecutionRunnable taskExecutionRunnable =
                 mockTaskExecutionRunnableWithFirstDispatchTime(System.currentTimeMillis() - 500);
@@ -293,11 +293,11 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_NoAvailableWorker_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         // Given: Configure dispatcher with a 5-minute dispatch timeout (enabled)
-        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
-        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
-        dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
 
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
 
         // Mock task with first dispatch time set to 100ms ago → ensures it's NOT timed out yet
         ITaskExecutionRunnable taskExecutionRunnable = mockTaskExecutionRunnableWithFirstDispatchTime(
@@ -350,11 +350,11 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_GenericTaskDispatchException_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         // Given
-        TaskDispatchPolicy dispatchTimeoutCheckerConfig = new TaskDispatchPolicy();
-        dispatchTimeoutCheckerConfig.setDispatchTimeoutFailedEnabled(true);
-        dispatchTimeoutCheckerConfig.setMaxTaskDispatchDuration(Duration.ofMillis(200));
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, dispatchTimeoutCheckerConfig);
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
 
         ITaskExecutionRunnable taskExecutionRunnable = mockTaskExecutionRunnableWithFirstDispatchTime(
                 System.currentTimeMillis() - 500);
@@ -378,11 +378,11 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_GenericTaskDispatchException_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         // Given: Dispatcher configured with a 5-minute dispatch timeout (enabled)
-        TaskDispatchPolicy config = new TaskDispatchPolicy();
-        config.setDispatchTimeoutFailedEnabled(true);
-        config.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMinutes(5));
 
-        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, config);
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
 
         // Mock task with first dispatch time set to 100ms ago → well within timeout window
         ITaskExecutionRunnable task = mockTaskExecutionRunnableWithFirstDispatchTime(
