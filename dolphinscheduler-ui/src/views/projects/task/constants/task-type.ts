@@ -43,7 +43,6 @@ export type TaskType =
   | 'SAGEMAKER'
   | 'CHUNJUN'
   | 'FLINK_STREAM'
-  | 'PYTORCH'
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
@@ -155,10 +154,6 @@ export const TASK_TYPES_MAP = {
     alias: 'FLINK_STREAM',
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
-  },
-  PYTORCH: {
-    alias: 'Pytorch',
-    helperLinkDisable: true
   },
   HIVECLI: {
     alias: 'HIVECLI',
