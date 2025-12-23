@@ -395,16 +395,6 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
     taskParams.awsRegion = data.awsRegion
   }
-  if (data.taskType === 'PYTORCH') {
-    taskParams.script = data.script
-    taskParams.scriptParams = data.scriptParams
-    taskParams.pythonPath = data.pythonPath
-    taskParams.isCreateEnvironment = data.isCreateEnvironment
-    taskParams.pythonLauncher = data.pythonLauncher
-    taskParams.pythonEnvTool = data.pythonEnvTool
-    taskParams.requirements = data.requirements
-    taskParams.condaPythonVersion = data.condaPythonVersion
-  }
 
   if (data.taskType === 'DINKY') {
     taskParams.address = data.address

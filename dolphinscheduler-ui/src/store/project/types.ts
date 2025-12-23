@@ -49,7 +49,6 @@ type TaskType =
   | 'SAGEMAKER'
   | 'CHUNJUN'
   | 'FLINK_STREAM'
-  | 'PYTORCH'
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
