@@ -106,6 +106,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
         } catch (Exception ex) {
             if (taskDispatchPolicy.isDispatchTimeoutFailedEnabled()) {
                 // Checks whether the given task has exceeded its allowed dispatch timeout.
+                // If a dispatch timeout occurs, the task will NOT be put back into the queue.
                 long timeoutMs = this.taskDispatchPolicy.getMaxTaskDispatchDuration().toMillis();
                 long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchTime();
                 if (elapsed > timeoutMs) {
@@ -130,7 +131,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      * Once this method is called, the task is considered permanently failed and will not be retried.
      *
      * @param taskExecutionRunnable the task to mark as fatally failed; must not be null
-     * @param ex             the dispatch exception that triggered this failure handling; must not be null
+     * @param ex                    the dispatch exception that triggered this failure handling; must not be null
      * @param elapsed               the time (in milliseconds) already spent attempting to dispatch the task
      * @param timeoutMs             the configured dispatch timeout threshold (in milliseconds)
      */
