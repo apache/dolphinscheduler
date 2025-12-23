@@ -244,6 +244,13 @@ public class AlertDao {
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,
                                      TaskInstance taskInstance,
                                      ProjectUser projectUser) {
+        assert projectUser != null;
+
+        // A null warningGroupId indicates that the user has explicitly configured a "no-alert" policy.
+        if (workflowInstance.getWarningGroupId() == null) {
+            return;
+        }
+
         Alert alert = new Alert();
         List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
         WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()

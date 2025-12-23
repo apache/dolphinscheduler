@@ -90,8 +90,7 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
     private void doTaskTimeoutAlert(final ITaskExecutionRunnable taskExecutionRunnable) {
         final WorkflowInstance workflowInstance = taskExecutionRunnable.getWorkflowInstance();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        // todo: inject the projectUser
-        workflowAlertManager.sendTaskTimeoutAlert(workflowInstance, taskInstance, null);
+        workflowAlertManager.sendTaskTimeoutAlert(workflowInstance, taskInstance);
     }
 
     @Override

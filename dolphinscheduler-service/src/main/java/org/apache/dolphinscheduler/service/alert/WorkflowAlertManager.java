@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowAlertContent;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
@@ -59,6 +60,9 @@ public class WorkflowAlertManager {
 
     @Autowired
     private ProjectDao projectDao;
+
+    @Autowired
+    private ProjectMapper projectMapper;
 
     /**
      * convert command type to human-readable name
@@ -260,8 +264,8 @@ public class WorkflowAlertManager {
     }
 
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,
-                                     TaskInstance taskInstance,
-                                     ProjectUser projectUser) {
+                                     TaskInstance taskInstance) {
+        ProjectUser projectUser = projectMapper.queryProjectWithUserByWorkflowInstanceId(workflowInstance.getId());
         alertDao.sendTaskTimeoutAlert(workflowInstance, taskInstance, projectUser);
     }
 }
