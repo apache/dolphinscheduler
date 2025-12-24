@@ -192,9 +192,10 @@ public class AlertDao {
      * workflow time out alert
      *
      * @param workflowInstance workflowInstance
-     * @param projectUser     projectUser
+     * @param projectUser      projectUser
+     * @param modifyBy      modifyBy
      */
-    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
+    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser, String modifyBy) {
         int alertGroupId = workflowInstance.getWarningGroupId();
         Alert alert = new Alert();
         List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
@@ -207,6 +208,8 @@ public class AlertDao {
                 .workflowInstanceName(workflowInstance.getName())
                 .commandType(workflowInstance.getCommandType())
                 .workflowExecutionStatus(workflowInstance.getState())
+                .modifyBy(modifyBy)
+                .recovery(workflowInstance.getRecovery())
                 .runTimes(workflowInstance.getRunTimes())
                 .workflowStartTime(workflowInstance.getStartTime())
                 .workflowHost(workflowInstance.getHost())

@@ -57,5 +57,9 @@ public enum WorkflowLifecycleEventType implements ILifecycleEventType {
      * Finalize the workflow instance.
      */
     FINALIZE,
+    /**
+     * The workflow instance timeout
+     */
+    TIMEOUT,
 
 }
