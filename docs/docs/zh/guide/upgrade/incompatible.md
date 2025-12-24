@@ -36,3 +36,11 @@
 * 在 `t_ds_worker_group` 表中移除 无用的 `other_params_json` 字段 ([#16860])(https://github.com/apache/dolphinscheduler/pull/16860)
 * 从 `任务插件` 中移除 `Dynamic` 类型 ([#16482])(https://github.com/apache/dolphinscheduler/pull/16842)
 
+## 3.4.0
+
+* 将数据源配置下SSH连接参数中的publicKey字段重命名为privateKey。 ([#17666])(https://github.com/apache/dolphinscheduler/pull/17666)
+* 添加数据表 t_ds_serial_command。 ([#17531])(https://github.com/apache/dolphinscheduler/pull/17531)
+* 移除 `api-server/application.yaml` 中 `python-gateway.auth-token` 的默认值。 ([#17801])(https://github.com/apache/dolphinscheduler/pull/17801)
+* 重构使用 ShellCommandExecutor 的任务插件 ([#17790])(https://github.com/apache/dolphinscheduler/pull/17790)
+* 从 `任务插件` 中移除 `Pytorch` 类型 ([#17808])(https://github.com/apache/dolphinscheduler/pull/17808)，如果您仍在使用该任务类型，请在升级前删除 `t_ds_task_definition` 和 `t_ds_task_definition_log` 中 `task_type = 'PYTORCH'` 的数据。
+

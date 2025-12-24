@@ -126,10 +126,6 @@ export const TASK_TYPES_MAP = {
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
   },
-  PYTORCH: {
-    alias: 'Pytorch',
-    helperLinkDisable: true
-  },
   HIVECLI: {
     alias: 'HIVECLI',
     helperLinkDisable: true

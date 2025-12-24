@@ -52,7 +52,6 @@ task:
     - 'OPENMLDB'
     - 'DVC'
     - 'SAGEMAKER'
-    - 'PYTORCH'
     - 'KUBEFLOW'
   other:
     - 'ZEPPELIN'
