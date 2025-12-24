@@ -244,11 +244,11 @@ public class AlertDao {
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,
                                      TaskInstance taskInstance,
                                      ProjectUser projectUser) {
-        assert projectUser != null;
-
-        // A null warningGroupId indicates that the user has explicitly configured a "no-alert" policy.
+        if (projectUser == null) {
+            throw new IllegalArgumentException("projectUser must not be null");
+        }
         if (workflowInstance.getWarningGroupId() == null) {
-            return;
+            throw new IllegalArgumentException("warningGroupId of the workflow instance must not be null");
         }
 
         Alert alert = new Alert();
