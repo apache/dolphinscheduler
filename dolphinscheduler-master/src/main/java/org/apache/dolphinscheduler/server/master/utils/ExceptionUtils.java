@@ -25,4 +25,7 @@ public class ExceptionUtils {
         return e instanceof DataAccessResourceFailureException;
     }
 
+    public static boolean isIllegalArgumentException(Throwable e) {
+        return e instanceof IllegalArgumentException;
+    }
 }
