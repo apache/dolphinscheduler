@@ -131,10 +131,11 @@ public class WorkflowEventBusFireWorker {
                     ThreadUtils.sleep(5_000);
                     return;
                 }
+
+                // If task initializeTaskExecutionContext before dispatch is failed
+                // construct and publish a dedicated TaskFatalLifecycleEvent
+                // so that the event will be handled by TaskFatalLifecycleEventHandler
                 if (ExceptionUtils.isTaskExecutionContextCreateException(ex)) {
-                    // If task initializeTaskExecutionContext before dispatch is failed
-                    // construct and publish a dedicated TaskFatalLifecycleEvent
-                    // so that the event will be handled by TaskFatalLifecycleEventHandler
                     AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
                     final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
                             .taskExecutionRunnable(taskLifecycleEvent.getTaskExecutionRunnable())
@@ -142,6 +143,7 @@ public class WorkflowEventBusFireWorker {
                             .build();
                     workflowEventBus.publish(taskFatalEvent);
                 }
+
                 workflowEventBus.getWorkflowEventBusSummary().decreaseFireSuccessEventCount();
                 workflowEventBus.getWorkflowEventBusSummary().increaseFireFailedEventCount();
                 throw new WorkflowEventFireException(lifecycleEvent, ex);
