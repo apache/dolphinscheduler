@@ -44,7 +44,6 @@ import { useJava } from './use-java'
 import { useDinky } from './use-dinky'
 import { userSagemaker } from './use-sagemaker'
 import { useChunjun } from './use-chunjun'
-import { usePytorch } from './use-pytorch'
 import { useHiveCli } from './use-hive-cli'
 import { useDms } from './use-dms'
 import { useDatasync } from './use-datasync'
@@ -84,7 +83,6 @@ export default {
   FLINK_STREAM: useFlinkStream,
   EXTERNAL_SYSTEM: useExternalSystem,
   JAVA: useJava,
-  PYTORCH: usePytorch,
   HIVECLI: useHiveCli,
   DMS: useDms,
   DATASYNC: useDatasync,

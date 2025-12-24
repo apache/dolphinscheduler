@@ -126,7 +126,8 @@ export const TASK_TYPES_MAP = {
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
   },
-  EXTERNAL_SYSTEM : {
+  
+ NAL_SYSTEM : {
     alias: 'EXTERNAL_SYSTEM',
     helperLinkDisable: true
   },

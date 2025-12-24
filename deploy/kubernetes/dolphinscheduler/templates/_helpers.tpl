@@ -195,16 +195,18 @@ Create a security environment variables.
 - name: SECURITY_AUTHENTICATION_TYPE
   value: {{ .Values.security.authentication.type | quote }}
 {{- if eq .Values.security.authentication.type "LDAP" }}
-- name: SECURITY_AUTHENTICATION_LDAP_URLS
-  value: {{ .Values.security.authentication.ldap.urls | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_URL
+  value: {{ .Values.security.authentication.ldap.url | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_BASE_DN
   value: {{ .Values.security.authentication.ldap.basedn | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_USERNAME
   value: {{ .Values.security.authentication.ldap.username | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_PASSWORD
   value: {{ .Values.security.authentication.ldap.password | quote }}
-- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN
-  value: {{ .Values.security.authentication.ldap.user.admin | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN_USERNAME
+  value: {{ .Values.security.authentication.ldap.user.adminusername | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN_USER_FILTER
+  value: {{ .Values.security.authentication.ldap.user.adminuserfilter | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_USER_IDENTITY_ATTRIBUTE
   value: {{ .Values.security.authentication.ldap.user.identityattribute | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_USER_EMAIL_ATTRIBUTE

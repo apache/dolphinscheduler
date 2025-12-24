@@ -34,11 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractYarnTask extends AbstractRemoteTask {
 
-    private ShellCommandExecutor shellCommandExecutor;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskRequest);
     }
 
     // todo split handle to submit and track
