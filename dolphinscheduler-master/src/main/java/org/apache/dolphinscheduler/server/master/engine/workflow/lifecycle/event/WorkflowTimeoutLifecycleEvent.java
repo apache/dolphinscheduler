@@ -27,9 +27,6 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 
 import java.util.concurrent.TimeUnit;
 
-import lombok.Getter;
-
-@Getter
 public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
     private final IWorkflowExecutionRunnable workflowExecutionRunnable;
@@ -38,6 +35,11 @@ public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLife
                                             final long timeout) {
         super(timeout);
         this.workflowExecutionRunnable = workflowExecutionRunnable;
+    }
+
+    @Override
+    public IWorkflowExecutionRunnable getWorkflowExecutionRunnable() {
+        return workflowExecutionRunnable;
     }
 
     public static WorkflowTimeoutLifecycleEvent of(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
