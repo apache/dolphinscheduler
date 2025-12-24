@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
 
 import java.util.concurrent.TimeUnit;
 
@@ -109,7 +110,14 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                     taskInstance.getDelayTime(),
                     remainTimeMills);
         }
-        taskExecutionRunnable.initializeTaskExecutionContext();
+
+        try {
+            taskExecutionRunnable.initializeTaskExecutionContext();
+        } catch (Exception ex) {
+            log.error("Failed to initialize task execution context, taskName: {}", taskInstance.getName(), ex);
+            throw new TaskExecutionContextCreateException(ex.getMessage());
+
+        }
         workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }
 

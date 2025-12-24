@@ -131,9 +131,8 @@ public class WorkflowEventBusFireWorker {
                     ThreadUtils.sleep(5_000);
                     return;
                 }
-                if (ExceptionUtils.isIllegalArgumentException(ex)
-                        && lifecycleEvent instanceof AbstractTaskLifecycleEvent) {
-                    // If exception is IllegalArgumentException and the event is task-related
+                if (ExceptionUtils.isTaskExecutionContextCreateException(ex)) {
+                    // If task initializeTaskExecutionContext before dispatch is failed
                     // construct and publish a dedicated TaskFatalLifecycleEvent
                     // so that the event will be handled by TaskFatalLifecycleEventHandler
                     AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
