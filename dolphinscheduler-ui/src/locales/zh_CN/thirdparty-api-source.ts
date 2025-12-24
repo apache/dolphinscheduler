@@ -63,10 +63,12 @@ export default {
   param_location_tips: '请选择参数位置',
   param_name_tips: '请输入参数名',
   param_value_tips: '请输入参数值',
-  extract_response_data: '提取响应数据并存储变量',
+  extract_response_data: '提取响应并存储变量',
   extract_field: '请输入提取参数',
   json_path_list: '请输入,例如:$.data[*].id',
   json_path: '请输入,例如$.data.taskInstanceId',
+  header_prefix:'Authorization Token前缀',
+  header_prefix_tips: 'Authorization Token前缀,e.g.Bearer',
   system_field_tips: '请选择系统字段',
   request_body: '请求Body',
   header: '请求头',
@@ -83,14 +85,14 @@ export default {
   polling_config: '轮询配置',
   success_condition: '成功条件',
   success_field: '成功字段',
-  success_field_tips: '请输入成功字段',
+  success_field_tips: '成功字段JSONPath:$.data.status',
   success_value: '成功值',
-  success_value_tips: '请输入成功值',
+  success_value_tips: '成功值枚举值:SUCCESS,FINISHED',
   failure_condition: '失败条件',
   failure_field: '失败字段',
-  failure_field_tips: '请输入失败字段',
+  failure_field_tips: '失败字段JSONPath:$.data.status',
   failure_value: '失败值',
-  failure_value_tips: '请输入失败值',
+  failure_value_tips: '失败值所有枚举值:CANCELED,FAILED',
 
   // 按钮和操作
   cancel: '取消',
@@ -128,13 +130,12 @@ export default {
   submit_interface_url_required: '提交接口地址为必填项',
   query_interface_url_required: '查询接口地址为必填项',
   stop_interface_url_required: '停止接口地址为必填项',
-  success_condition_required: '成功条件字段和值不能为空',
-  failure_condition_required: '失败条件字段和值不能为空',
+  success_condition_required: '成功条件字段路径和值不能为空',
+  failure_condition_required: '失败条件字段路径和值不能为空',
 
   external_system_required: '第三方系统不能为空',
   external_system_task_required: '第三方系统任务不能为空',
   id_jsonpath_required: '字段id以及JSONPath为必填项',
   name_jsonpath_required: '字段name以及JSONPath为必填项',
-  taskinstanceid_jsonpath_required: '字段taskInstanceId以及JSONPath为必填项'
 
 } 

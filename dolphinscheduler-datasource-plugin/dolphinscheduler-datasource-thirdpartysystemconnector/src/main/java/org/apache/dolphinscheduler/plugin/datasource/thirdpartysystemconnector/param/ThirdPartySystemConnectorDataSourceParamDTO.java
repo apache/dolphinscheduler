@@ -27,8 +27,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ThirdPartySystemConnectorDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    private String systemName;
-
     private String serviceAddress;
 
     private AuthConfig authConfig;

@@ -17,16 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_CONNECT_TIMEOUT;
-
-import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
-import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
-import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.AuthenticationUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -34,14 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -61,6 +51,7 @@ public class ThirdPartySystemConnectorDataSourceProcessor extends AbstractDataSo
         if (StringUtils.isEmpty(thirdPartySystemConnectorParamDTO.getServiceAddress())) {
             throw new IllegalArgumentException("third party system connector datasource param is not valid");
         }
+        checkExternalSystemParam(thirdPartySystemConnectorParamDTO);
     }
 
     @Override
@@ -78,7 +69,6 @@ public class ThirdPartySystemConnectorDataSourceProcessor extends AbstractDataSo
         ThirdPartySystemConnectorDataSourceParamDTO thirdPartySystemConnectorDataSourceParamDTO =
                 new ThirdPartySystemConnectorDataSourceParamDTO();
 
-        thirdPartySystemConnectorDataSourceParamDTO.setSystemName(connectionParams.getSystemName());
         thirdPartySystemConnectorDataSourceParamDTO.setServiceAddress(connectionParams.getServiceAddress());
         thirdPartySystemConnectorDataSourceParamDTO.setAuthConfig(connectionParams.getAuthConfig());
         thirdPartySystemConnectorDataSourceParamDTO.setSelectInterface(connectionParams.getSelectInterface());
@@ -98,8 +88,6 @@ public class ThirdPartySystemConnectorDataSourceProcessor extends AbstractDataSo
         ThirdPartySystemConnectorConnectionParam thirdPartySystemConnectorConnectionParam =
                 new ThirdPartySystemConnectorConnectionParam();
 
-        thirdPartySystemConnectorConnectionParam.setSystemName(
-                thirdPartySystemConnectorDataSourceParamDTO.getSystemName());
         thirdPartySystemConnectorConnectionParam.setServiceAddress(
                 thirdPartySystemConnectorDataSourceParamDTO.getServiceAddress());
         thirdPartySystemConnectorConnectionParam.setAuthConfig(
@@ -147,145 +135,12 @@ public class ThirdPartySystemConnectorDataSourceProcessor extends AbstractDataSo
     public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
         ThirdPartySystemConnectorConnectionParam baseConnectionParam =
                 (ThirdPartySystemConnectorConnectionParam) connectionParam;
-
         try {
-            OkHttpResponse response = callSelectInterface(baseConnectionParam);
-            if (response.getStatusCode() == 200) {
-                return true;
-            }
-            return false;
+            String token = AuthenticationUtils.authenticateAndGetToken(baseConnectionParam);
+            return token != null;
         } catch (Exception e) {
             log.error("connect error, e:{}", e.getMessage());
             return false;
-        }
-    }
-
-    private OkHttpResponse callSelectInterface(ThirdPartySystemConnectorConnectionParam baseConnectionParam) {
-        try {
-            InterfaceInfo selectConfig = baseConnectionParam.getSelectInterface();
-
-            // 替换参数占位符
-            String url = selectConfig.getUrl();
-
-            OkHttpRequestHeaders headers = new OkHttpRequestHeaders();
-            headers.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_JSON);
-
-            Map<String, String> headerMap = new HashMap<>();
-            Map<String, Object> requestBody = new HashMap<>();
-            Map<String, Object> requestParams = new HashMap<>();
-
-            // 获取认证token
-            String token = authenticateAndGetToken(baseConnectionParam);
-
-            headerMap.put("Authorization", token);
-
-            // 处理参数
-            if (selectConfig.getParameters() != null) {
-                for (RequestParameter param : selectConfig.getParameters()) {
-                    String value = param.getParamValue();
-
-                    switch (param.getLocation()) {
-                        case "HEADER":
-                            headerMap.put(param.getParamName(), value);
-                            break;
-                        case "BODY":
-                            if ("body".equals(param.getParamName())) {
-                                requestBody = JSONUtils.parseObject(value, Map.class);
-                            }
-                            break;
-                        case "PARAM":
-                            requestParams.put(param.getParamName(), value);
-                            break;
-                    }
-                }
-            }
-
-            if (!headerMap.isEmpty()) {
-                headers.setHeaders(headerMap);
-            }
-
-            OkHttpResponse response;
-            if ("POST".equals(selectConfig.getMethod())) {
-                response = OkHttpUtils.post(url, headers, requestParams, requestBody,
-                        HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT);
-            } else if ("PUT".equals(selectConfig.getMethod())) {
-                response = OkHttpUtils.put(url, headers, requestBody,
-                        HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT);
-            } else {
-                response = OkHttpUtils.get(url, headers, requestParams,
-                        HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT);
-            }
-            return response;
-
-        } catch (Exception e) {
-            log.error("select task failed", e);
-            throw new RuntimeException("select task failed", e);
-        }
-    }
-
-    private String authenticateAndGetToken(ThirdPartySystemConnectorConnectionParam baseConnectionParam) throws Exception {
-        AuthConfig authConfig = baseConnectionParam.getAuthConfig();
-        if (authConfig == null) {
-            throw new RuntimeException("AuthConfig is not provided");
-        }
-
-        switch (authConfig.getAuthType()) {
-            case "BASIC":
-                // 基础认证
-                String auth = authConfig.getBasicUsername() + ":" + authConfig.getBasicPassword();
-                String encoding = java.util.Base64.getEncoder().encodeToString(auth.getBytes());
-                return encoding;
-            case "JWT":
-                // JWT认证
-                return authConfig.getJwtToken();
-            case "OAUTH2":
-                // OAuth2认证
-                return getOAuth2Token(baseConnectionParam);
-            default:
-                throw new RuntimeException("Unsupported auth type: " + authConfig.getAuthType());
-        }
-    }
-
-    private String getOAuth2Token(ThirdPartySystemConnectorConnectionParam baseConnectionParam) throws Exception {
-        AuthConfig authConfig = baseConnectionParam.getAuthConfig();
-
-        OkHttpRequestHeaders headers = new OkHttpRequestHeaders();
-        headers.setHeaders(new HashMap<>());
-        headers.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED);
-
-        FormBody.Builder formBodyBuilder = new FormBody.Builder()
-                .add("client_id", authConfig.getOauth2ClientId())
-                .add("client_secret", authConfig.getOauth2ClientSecret())
-                .add("username", authConfig.getOauth2Username())
-                .add("password", authConfig.getOauth2Password())
-                .add("grant_type", authConfig.getOauth2GrantType());
-
-        // 添加 authMappings 中的参数
-        if (authConfig.getAuthMappings() != null) {
-            for (AuthMapping authMapping : authConfig.getAuthMappings()) {
-                formBodyBuilder.add(authMapping.getKey(), authMapping.getValue());
-            }
-        }
-
-        RequestBody formBody = formBodyBuilder.build();
-
-        OkHttpResponse response = OkHttpUtils.postFormBody(
-                baseConnectionParam.getServiceAddress() + authConfig.getOauth2TokenUrl(),
-                headers,
-                null,
-                formBody,
-                HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT, HTTP_CONNECT_TIMEOUT);
-
-        if (response.getStatusCode() != 200) {
-            throw new RuntimeException("Authentication failed: " + response.getBody());
-        }
-
-        JsonNode authResult = JSONUtils.parseObject(response.getBody(), JsonNode.class);
-        if (authResult.has("access_token")) {
-            log.info("Authentication successful, token obtained");
-            return authResult.get("access_token").asText();
-        } else {
-            throw new RuntimeException("Failed to get access token from response");
         }
     }
 
@@ -298,4 +153,113 @@ public class ThirdPartySystemConnectorDataSourceProcessor extends AbstractDataSo
     public DataSourceProcessor create() {
         return new ThirdPartySystemConnectorDataSourceProcessor();
     }
+
+    private void checkExternalSystemParam(ThirdPartySystemConnectorDataSourceParamDTO paramDTO) {
+
+        // Check system name
+        if (paramDTO.getName() == null || paramDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("system name cannot be empty");
+        }
+        String systemName = paramDTO.getName().trim();
+        if (systemName.length() > 64) {
+            throw new IllegalArgumentException("system name length cannot exceed 64 characters");
+        }
+        paramDTO.setName(systemName);
+
+        // Check service address
+        if (paramDTO.getServiceAddress() == null || paramDTO.getServiceAddress().trim().isEmpty()) {
+            throw new IllegalArgumentException("service address cannot be empty");
+        }
+        paramDTO.setServiceAddress(paramDTO.getServiceAddress().trim());
+
+        // Check authentication configuration
+        AuthConfig authConfig = paramDTO.getAuthConfig();
+        if (authConfig == null) {
+            throw new IllegalArgumentException("auth config cannot be empty");
+        }
+        if (authConfig.getAuthType() == null) {
+            throw new IllegalArgumentException("auth type cannot be empty");
+        }
+
+        // 根据认证类型进行具体校验
+        switch (authConfig.getAuthType()) {
+            case BASIC_AUTH:
+                if (authConfig.getBasicUsername() == null || authConfig.getBasicUsername().trim().isEmpty()) {
+                    throw new IllegalArgumentException("basic auth username cannot be empty");
+                }
+                authConfig.setBasicUsername(authConfig.getBasicUsername().trim());
+                if (authConfig.getBasicPassword() == null || authConfig.getBasicPassword().trim().isEmpty()) {
+                    throw new IllegalArgumentException("basic auth password cannot be empty");
+                }
+                authConfig.setBasicPassword(authConfig.getBasicPassword().trim());
+                break;
+            case JWT:
+                if (authConfig.getJwtToken() == null || authConfig.getJwtToken().trim().isEmpty()) {
+                    throw new IllegalArgumentException("JWT token cannot be empty");
+                }
+                authConfig.setJwtToken(authConfig.getJwtToken().trim());
+                break;
+            case OAUTH2:
+                if (authConfig.getOauth2TokenUrl() == null || authConfig.getOauth2TokenUrl().trim().isEmpty()) {
+                    throw new IllegalArgumentException("OAuth2 token URL cannot be empty");
+                }
+                authConfig.setOauth2TokenUrl(authConfig.getOauth2TokenUrl().trim());
+                if (authConfig.getOauth2ClientId() == null || authConfig.getOauth2ClientId().trim().isEmpty()) {
+                    throw new IllegalArgumentException("OAuth2 client ID cannot be empty");
+                }
+                authConfig.setOauth2ClientId(authConfig.getOauth2ClientId().trim());
+                if (authConfig.getOauth2ClientSecret() == null || authConfig.getOauth2ClientSecret().trim().isEmpty()) {
+                    throw new IllegalArgumentException("OAuth2 client secret cannot be empty");
+                }
+                authConfig.setOauth2ClientSecret(authConfig.getOauth2ClientSecret().trim());
+                if (authConfig.getOauth2GrantType() == null || authConfig.getOauth2GrantType().trim().isEmpty()) {
+                    throw new IllegalArgumentException("OAuth2 grant type cannot be empty");
+                }
+                authConfig.setOauth2GrantType(authConfig.getOauth2GrantType().trim());
+                if (authConfig.getOauth2GrantType().equals("password")) {
+                    if (authConfig.getOauth2Username() == null || authConfig.getOauth2Username().trim().isEmpty()) {
+                        throw new IllegalArgumentException("OAuth2 username cannot be empty");
+                    }
+                    authConfig.setOauth2Username(authConfig.getOauth2Username().trim());
+                    if (authConfig.getOauth2Password() == null || authConfig.getOauth2Password().trim().isEmpty()) {
+                        throw new IllegalArgumentException("OAuth2 password cannot be empty");
+                    }
+                    authConfig.setOauth2Password(authConfig.getOauth2Password().trim());
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("unsupported auth type");
+        }
+
+        // Check interface configuration
+        if (paramDTO.getSelectInterface() == null) {
+            throw new IllegalArgumentException("select interface config cannot be empty");
+        }
+        if (paramDTO.getSubmitInterface() == null) {
+            throw new IllegalArgumentException("submit interface config cannot be empty");
+        }
+        if (paramDTO.getPollStatusInterface() == null) {
+            throw new IllegalArgumentException("poll status interface config cannot be empty");
+        }
+        if (paramDTO.getStopInterface() == null) {
+            throw new IllegalArgumentException("stop interface config cannot be empty");
+        }
+
+        // Check interface configuration URL and method
+        checkInterfaceConfig(paramDTO.getSelectInterface());
+        checkInterfaceConfig(paramDTO.getSubmitInterface());
+        checkInterfaceConfig(paramDTO.getPollStatusInterface());
+        checkInterfaceConfig(paramDTO.getStopInterface());
+    }
+
+    private void checkInterfaceConfig(InterfaceInfo interfaceInfo) {
+        if (interfaceInfo.getUrl() == null || interfaceInfo.getUrl().trim().isEmpty()) {
+            throw new IllegalArgumentException("interface URL cannot be empty");
+        }
+        interfaceInfo.setUrl(interfaceInfo.getUrl().trim());
+        if (interfaceInfo.getMethod() == null) {
+            throw new IllegalArgumentException("interface method cannot be empty");
+        }
+    }
+
 }

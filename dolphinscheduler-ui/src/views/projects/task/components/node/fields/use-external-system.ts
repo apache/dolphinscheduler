@@ -51,7 +51,7 @@ export function useExternalSystem(
   }
 
   const refreshTasks = async () => {
-    const datasourceId = model[params.externalSystemField || 'externalSystemId']
+    const datasourceId = model[params.externalSystemField || 'datasource']
     if (!datasourceId) return
 
     try {
@@ -75,13 +75,22 @@ export function useExternalSystem(
   }
 
   const onChange = () => {
-    // 清空任务选项
     taskOptions.value = []
-    // 清空模型中的任务字段
     const taskField = params.taskField || 'externalTaskId'
     model[taskField] = null
-    // 刷新任务选项
+    model.externalTaskName = ''
     refreshTasks()
+  }
+
+  const onTaskChange = (value: string) => {
+    if (value) {
+      const taskItem = taskOptions.value.find(item => item.value === value)
+      if (taskItem) {
+        model.externalTaskName = taskItem.label // Set the name based on the selected task
+      }
+    } else {
+      model.externalTaskName = ''
+    }
   }
 
   onMounted(async () => {
@@ -93,7 +102,7 @@ export function useExternalSystem(
   return [
     {
       type: 'select',
-      field: params.externalSystemField || 'externalSystemId',
+      field: params.externalSystemField || 'datasource',
       span: params.span || 24,
       name: t('project.node.datasource_instances'),
       props: { 'on-update:value': onChange },
@@ -113,6 +122,7 @@ export function useExternalSystem(
       field: params.taskField || 'externalTaskId',
       span: params.span || 24,
       name: t('project.node.external_system_tasks'),
+      props: { 'on-update:value': onTaskChange },
       options: taskOptions,
       validate: {
         trigger: ['input', 'blur'],

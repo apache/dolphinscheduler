@@ -109,9 +109,16 @@ public class OkHttpUtils {
         OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         String finalUrl = addUrlParams(requestParamsMap, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
-        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+
+        if (okHttpRequestHeaders != null) {
+            addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        }
+
+        RequestBody safeFormBody = formBody != null ? formBody
+                : RequestBody.create("",
+                        MediaType.parse(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED.getValue()));
         Request request = requestBuilder
-                .post(formBody) // 明确使用POST方法
+                .post(safeFormBody)
                 .build();
         try (Response response = client.newCall(request).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));

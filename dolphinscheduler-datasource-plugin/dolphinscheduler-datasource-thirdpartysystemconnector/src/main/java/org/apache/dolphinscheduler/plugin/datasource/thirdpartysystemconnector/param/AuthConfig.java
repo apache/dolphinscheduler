@@ -24,8 +24,8 @@ import lombok.Data;
 @Data
 public class AuthConfig {
 
-    private String authType; // authType：BASIC, JWT, OAUTH2
-    private String headerPrefix; // headerPrefix：BASIC, JWT, OAUTH2
+    private AuthType authType; // authType：BASIC, JWT, OAUTH2
+    private String headerPrefix; // headerPrefix：Basic, Bearer
 
     // === （Basic Auth） ===
     private String basicUsername;
@@ -44,4 +44,8 @@ public class AuthConfig {
 
     // === other authMappings ===
     private List<AuthMapping> authMappings;
+
+    public enum AuthType {
+        BASIC_AUTH, JWT, OAUTH2
+    }
 }

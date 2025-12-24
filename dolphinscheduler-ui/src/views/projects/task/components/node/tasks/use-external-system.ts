@@ -47,8 +47,10 @@ export function useExternalSystem({
     cpuQuota: -1,
     memoryMax: -1,
     delayTime: 0,
-    externalSystemId: '',
-    externalTaskId: ''
+    datasource: '',
+    type: 'THIRDPARTY_SYSTEM_CONNECTOR',
+    externalTaskId: '',
+    externalTaskName: ''
   } as INodeData)
 
   return {

@@ -22,6 +22,14 @@ import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.AuthenticationUtils;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.InterfaceInfo;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.PollingFailureConfig;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.PollingInterfaceInfo;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.PollingSuccessConfig;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.RequestParameter;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.ResponseParameter;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.ThirdPartySystemConnectorConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -52,7 +60,7 @@ public class ExternalSystemTask extends AbstractTask {
     private Boolean traceEnabled = true;
 
     private ExternalSystemParameters externalSystemParameters;
-    private BaseExternalSystemParams baseExternalSystemParams;
+    private ThirdPartySystemConnectorConnectionParam baseExternalSystemParams;
     private TaskExecutionContext taskExecutionContext;
     private String accessToken;
     private Map<String, String> parameterMap = new HashMap<>();
@@ -69,10 +77,12 @@ public class ExternalSystemTask extends AbstractTask {
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ExternalSystemParameters.class);
         baseExternalSystemParams =
                 externalSystemParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
-        accessToken =
-                baseExternalSystemParams.getTokenPrefix(baseExternalSystemParams.getAuthConfig().getHeaderPrefix())
-                        + baseExternalSystemParams.getAuthConfig().getJwtToken();// todo
-                                                                                 // AuthenticationUtils.generateTokenForSystem
+        try {
+            accessToken = baseExternalSystemParams.getAuthConfig().getHeaderPrefix() + " "
+                    + AuthenticationUtils.authenticateAndGetToken(baseExternalSystemParams);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -80,8 +90,10 @@ public class ExternalSystemTask extends AbstractTask {
         externalSystemParameters = JSONUtils.parseObject(
                 taskExecutionContext.getTaskParams(),
                 ExternalSystemParameters.class);
-        log.info("Initialize external system task params {}",
-                JSONUtils.toPrettyJsonString(externalSystemParameters));
+        log.info("Initialize external system task with externalSystemId: {}, externalTaskId: {}, externalTaskName: {}",
+                externalSystemParameters.getDatasource(),
+                externalSystemParameters.getExternalTaskId(),
+                externalSystemParameters.getExternalTaskName());
 
         if (externalSystemParameters == null || !externalSystemParameters.checkParameters()) {
             throw new RuntimeException("external system task params is not valid");
@@ -142,7 +154,7 @@ public class ExternalSystemTask extends AbstractTask {
 
     private void submitExternalTask() throws TaskException {
         try {
-            BaseExternalSystemParams.InterfaceConfig submitConfig = baseExternalSystemParams.getSubmitInterface();
+            InterfaceInfo submitConfig = baseExternalSystemParams.getSubmitInterface();
             String url = replaceParameterPlaceholders(baseExternalSystemParams.getCompleteUrl(submitConfig.getUrl()));
             Map<String, String> headers = new HashMap<>();
             buildAuthHeader(accessToken, headers);
@@ -213,7 +225,7 @@ public class ExternalSystemTask extends AbstractTask {
 
     private String pollTaskStatus() throws TaskException {
         try {
-            BaseExternalSystemParams.PollingInterfaceConfig pollConfig =
+            PollingInterfaceInfo pollConfig =
                     baseExternalSystemParams.getPollStatusInterface();
             String url = replaceParameterPlaceholders(baseExternalSystemParams.getCompleteUrl(pollConfig.getUrl()));
             Map<String, String> headers = new HashMap<>();
@@ -258,7 +270,7 @@ public class ExternalSystemTask extends AbstractTask {
     private void cancelTaskInstance() throws TaskException {
         try {
             traceEnabled = false;
-            BaseExternalSystemParams.InterfaceConfig stopConfig = baseExternalSystemParams.getStopInterface();
+            InterfaceInfo stopConfig = baseExternalSystemParams.getStopInterface();
             log.info("start cancel External System TaskInstance");
             String url = replaceParameterPlaceholders(baseExternalSystemParams.getCompleteUrl(stopConfig.getUrl()));
             Map<String, String> headers = new HashMap<>();
@@ -283,7 +295,7 @@ public class ExternalSystemTask extends AbstractTask {
         }
     }
 
-    private OkHttpResponse executeRequestWithoutRetry(BaseExternalSystemParams.HttpMethod method, String url,
+    private OkHttpResponse executeRequestWithoutRetry(InterfaceInfo.HttpMethod method, String url,
                                                       Map<String, String> headers, Map<String, Object> requestParams,
                                                       Map<String, Object> requestBody, int connectTimeout,
                                                       int readTimeout,
@@ -292,7 +304,7 @@ public class ExternalSystemTask extends AbstractTask {
                 writeTimeout, 0);
     }
 
-    private OkHttpResponse executeRequestWithRetry(BaseExternalSystemParams.HttpMethod method, String url,
+    private OkHttpResponse executeRequestWithRetry(InterfaceInfo.HttpMethod method, String url,
                                                    Map<String, String> headers, Map<String, Object> requestParams,
                                                    Map<String, Object> requestBody, int connectTimeout, int readTimeout,
                                                    int writeTimeout, int maxRetries) throws TaskException {
@@ -355,17 +367,17 @@ public class ExternalSystemTask extends AbstractTask {
         headers.put("Authorization", accessToken);
     }
 
-    private Map<String, String> buildHeaders(BaseExternalSystemParams.InterfaceConfig config,
+    private Map<String, String> buildHeaders(InterfaceInfo config,
                                              Map<String, String> requestParams) {
-        for (BaseExternalSystemParams.RequestParameter param : config.getParameters()) {
-            if (param.getLocation().equals(BaseExternalSystemParams.ParamLocation.HEADER)) {
+        for (RequestParameter param : config.getParameters()) {
+            if (param.getLocation().equals(RequestParameter.ParamLocation.HEADER)) {
                 requestParams.put(param.getParamName(), replaceParameterPlaceholders(param.getParamValue()));
             }
         }
         return requestParams;
     }
 
-    private Map<String, Object> buildRequestBody(BaseExternalSystemParams.InterfaceConfig config) {
+    private Map<String, Object> buildRequestBody(InterfaceInfo config) {
         Map<String, Object> requestBody = new HashMap<>();
         if (config.getBody() != null) {
             requestBody = JSONUtils.parseObject(replaceParameterPlaceholders(config.getBody()), Map.class);
@@ -373,10 +385,10 @@ public class ExternalSystemTask extends AbstractTask {
         return requestBody;
     }
 
-    private Map<String, Object> buildRequestParams(BaseExternalSystemParams.InterfaceConfig config) {
+    private Map<String, Object> buildRequestParams(InterfaceInfo config) {
         Map<String, Object> requestParams = new HashMap<>();
-        for (BaseExternalSystemParams.RequestParameter param : config.getParameters()) {
-            if (param.getLocation().equals(BaseExternalSystemParams.ParamLocation.PARAM)) {
+        for (RequestParameter param : config.getParameters()) {
+            if (param.getLocation().equals(RequestParameter.ParamLocation.PARAM)) {
                 requestParams.put(param.getParamName(), replaceParameterPlaceholders(param.getParamValue()));
             }
         }
@@ -401,10 +413,10 @@ public class ExternalSystemTask extends AbstractTask {
         return resultString;
     }
 
-    private void parseSubmitResponse(List<BaseExternalSystemParams.ResponseParameter> responseParameters,
+    private void parseSubmitResponse(List<ResponseParameter> responseParameters,
                                      String responseBody) throws TaskException {
         try {
-            for (BaseExternalSystemParams.ResponseParameter param : responseParameters) {
+            for (ResponseParameter param : responseParameters) {
                 String jsonPath = param.getJsonPath();
                 String key = param.getKey();
                 Object value = JsonPath.read(responseBody, jsonPath);
@@ -446,7 +458,7 @@ public class ExternalSystemTask extends AbstractTask {
     }
 
     private void initStatusCache() {
-        BaseExternalSystemParams.PollingSuccessConfig successConfig =
+        PollingSuccessConfig successConfig =
                 baseExternalSystemParams.getPollStatusInterface().getPollingSuccessConfig();
 
         if (successConfig != null && successConfig.getSuccessValue() != null) {
@@ -462,7 +474,7 @@ public class ExternalSystemTask extends AbstractTask {
                 log.error("Error: successValue is null");
             }
         }
-        BaseExternalSystemParams.PollingFailureConfig failureConfig =
+        PollingFailureConfig failureConfig =
                 baseExternalSystemParams.getPollStatusInterface().getPollingFailureConfig();
         if (failureConfig != null && failureConfig.getFailureField() != null) {
             try {

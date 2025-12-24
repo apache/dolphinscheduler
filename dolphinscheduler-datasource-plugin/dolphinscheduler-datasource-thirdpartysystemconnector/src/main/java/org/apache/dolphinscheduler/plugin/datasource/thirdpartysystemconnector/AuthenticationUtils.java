@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.externalSystem;
+package org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector;
 
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.AuthConfig;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.AuthMapping;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.ThirdPartySystemConnectorConnectionParam;
 
 import java.util.HashMap;
 
@@ -36,44 +38,44 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class AuthenticationUtils {
 
     /**
-     * 认证并获取Token
+     * Authenticate and get Token
      *
-     * @param baseExternalSystemParams 认证配置
-     * @return 认证后的Token
+     * @param  thirdPartySystemConnectorConnectionParam configuration
+     * @return Authenticated Token
      * @throws Exception
      */
-    public static String authenticateAndGetToken(BaseExternalSystemParams baseExternalSystemParams) throws Exception {
-        BaseExternalSystemParams.AuthConfig authConfig = baseExternalSystemParams.getAuthConfig();
+    public static String authenticateAndGetToken(ThirdPartySystemConnectorConnectionParam thirdPartySystemConnectorConnectionParam) throws Exception {
+        AuthConfig authConfig = thirdPartySystemConnectorConnectionParam.getAuthConfig();
         if (authConfig == null) {
             throw new RuntimeException("AuthConfig is not provided");
         }
 
         switch (authConfig.getAuthType()) {
             case BASIC_AUTH:
-                // 基础认证
+                // Basic authentication
                 String auth = authConfig.getBasicUsername() + ":" + authConfig.getBasicPassword();
                 String encoding = java.util.Base64.getEncoder().encodeToString(auth.getBytes());
                 return encoding;
             case JWT:
-                // JWT认证
+                // JWT authentication
                 return authConfig.getJwtToken();
             case OAUTH2:
-                // OAuth2认证
-                return getOAuth2Token(baseExternalSystemParams);
+                // OAuth2 authentication
+                return getOAuth2Token(thirdPartySystemConnectorConnectionParam);
             default:
                 throw new RuntimeException("Unsupported auth type: " + authConfig.getAuthType());
         }
     }
 
     /**
-     * 获取OAuth2 Token
+     * Get OAuth2 Token
      *
-     * @param baseExternalSystemParams 认证配置
+     * @param thirdPartySystemConnectorConnectionParam Authentication configuration
      * @return OAuth2 Token
      * @throws Exception
      */
-    private static String getOAuth2Token(BaseExternalSystemParams baseExternalSystemParams) throws Exception {
-        BaseExternalSystemParams.AuthConfig authConfig = baseExternalSystemParams.getAuthConfig();
+    private static String getOAuth2Token(ThirdPartySystemConnectorConnectionParam thirdPartySystemConnectorConnectionParam) throws Exception {
+        AuthConfig authConfig = thirdPartySystemConnectorConnectionParam.getAuthConfig();
         try {
             OkHttpRequestHeaders headers = new OkHttpRequestHeaders();
             headers.setHeaders(new HashMap<>());
@@ -86,9 +88,9 @@ public class AuthenticationUtils {
                     .add("password", authConfig.getOauth2Password())
                     .add("grant_type", authConfig.getOauth2GrantType());
 
-            // 添加 authMappings 中的参数
+            // Add parameters from authMappings
             if (authConfig.getAuthMappings() != null) {
-                for (BaseExternalSystemParams.AuthMapping authMapping : authConfig.getAuthMappings()) {
+                for (AuthMapping authMapping : authConfig.getAuthMappings()) {
                     formBodyBuilder.add(authMapping.getKey(), authMapping.getValue());
                 }
             }
@@ -96,14 +98,14 @@ public class AuthenticationUtils {
             RequestBody formBody = formBodyBuilder.build();
 
             OkHttpResponse response = OkHttpUtils.postFormBody(
-                    baseExternalSystemParams.getCompleteUrl(authConfig.getOauth2TokenUrl()),
+                    thirdPartySystemConnectorConnectionParam.getCompleteUrl(authConfig.getOauth2TokenUrl()),
                     headers,
                     null,
                     formBody,
                     30000, 30000, 30000);
 
             if (response.getStatusCode() != 200) {
-                throw new TaskException("Authentication failed: " + response.getBody());
+                throw new RuntimeException("Authentication failed: " + response.getBody());
             }
 
             JsonNode authResult = JSONUtils.parseObject(response.getBody(), JsonNode.class);
@@ -111,12 +113,12 @@ public class AuthenticationUtils {
                 log.info("Authentication successful, token obtained");
                 return authResult.get("access_token").asText();
             } else {
-                throw new TaskException("Failed to get access token from response");
+                throw new RuntimeException("Failed to get access token from response");
             }
 
         } catch (Exception e) {
             log.error("Authentication failed", e);
-            throw new TaskException("Authentication failed", e);
+            throw new RuntimeException("Authentication failed", e);
         }
     }
 

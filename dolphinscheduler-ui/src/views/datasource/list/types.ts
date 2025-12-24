@@ -81,7 +81,6 @@ interface PollStatusInterfaceConfig extends InterfaceConfig {
 interface IDataSourceDetail extends Omit<IDataSource, 'other'> {
   other?: string
   // THIRDPARTY_SYSTEM_CONNECTOR
-  systemName?: string
   serviceAddress?: string
   interfaceTimeout?: number
   authConfig?: AuthConfig

@@ -53,7 +53,6 @@ export function useForm(id?: number) {
     dbUser: '',
     datawarehouse: '',
     // THIRDPARTY_SYSTEM_CONNECTOR
-    systemName: '',
     serviceAddress: 'http://',
     interfaceTimeout: 120000,
     authConfig: {
@@ -269,14 +268,6 @@ export function useForm(id?: number) {
         }
       },
       // THIRDPARTY_SYSTEM_CONNECTOR check rule
-      systemName: {
-        trigger: ['input'],
-        validator() {
-          if (state.detailForm.type === 'THIRDPARTY_SYSTEM_CONNECTOR' && !state.detailForm.systemName) {
-            return new Error(t('thirdparty_api_source.system_name_required'))
-          }
-        }
-      },
       serviceAddress: {
         trigger: ['input'],
         validator() {

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.externalSystem;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.ThirdPartySystemConnectorConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -28,8 +29,6 @@ import org.jetbrains.annotations.NotNull;
 public class ExternalSystemParameters extends AbstractParameters {
 
     private int datasource;
-
-    private int externalSystemId;
 
     private String authenticationToken;
 
@@ -68,14 +67,6 @@ public class ExternalSystemParameters extends AbstractParameters {
         this.externalTaskName = externalTaskName;
     }
 
-    public int getExternalSystemId() {
-        return externalSystemId;
-    }
-
-    public void setExternalSystemId(int externalSystemId) {
-        this.externalSystemId = externalSystemId;
-    }
-
     @Override
     public ResourceParametersHelper getResources() {
         ResourceParametersHelper resources = super.getResources();
@@ -88,13 +79,13 @@ public class ExternalSystemParameters extends AbstractParameters {
         return true;
     }
 
-    public BaseExternalSystemParams generateExtendedContext(@NotNull ResourceParametersHelper parametersHelper) {
+    public ThirdPartySystemConnectorConnectionParam generateExtendedContext(@NotNull ResourceParametersHelper parametersHelper) {
         DataSourceParameters externalSystemResourceParameters =
                 (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE,
-                        externalSystemId);
-        BaseExternalSystemParams baseExternalSystemParams =
+                        datasource);
+        ThirdPartySystemConnectorConnectionParam baseExternalSystemParams =
                 JSONUtils.parseObject(externalSystemResourceParameters.getConnectionParams(),
-                        BaseExternalSystemParams.class);
+                        ThirdPartySystemConnectorConnectionParam.class);
         return baseExternalSystemParams;
     }
 

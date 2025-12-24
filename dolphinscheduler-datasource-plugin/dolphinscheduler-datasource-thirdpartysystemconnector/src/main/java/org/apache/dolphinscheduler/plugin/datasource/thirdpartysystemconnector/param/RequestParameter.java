@@ -24,5 +24,9 @@ public class RequestParameter {
 
     private String paramName;
     private String paramValue;
-    private String location; // header,param,body
+    private ParamLocation location; // header,param,body
+
+    public enum ParamLocation {
+        HEADER, PARAM, BODY
+    }
 }

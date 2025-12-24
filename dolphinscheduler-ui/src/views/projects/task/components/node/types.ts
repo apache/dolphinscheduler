@@ -302,7 +302,7 @@ interface ITaskParams {
   connectTimeout?: number
   socketTimeout?: number
   type?: string
-  externalSystemId?: string
+  externalTaskName?: string
   externalTaskId?: string
   datasource?: string
   sql?: string

@@ -20,14 +20,16 @@ package org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Slf4j
 public class ThirdPartySystemConnectorConnectionParam implements ConnectionParam {
 
-    private String systemName;
+    private Integer id; // System ID
 
     private String serviceAddress;
 
@@ -39,4 +41,23 @@ public class ThirdPartySystemConnectorConnectionParam implements ConnectionParam
     private InterfaceInfo stopInterface;
 
     private int interfaceTimeout = 120000;
+
+    public String getCompleteUrl(String url) {
+        if (url == null || !url.startsWith("http")) {
+            if (serviceAddress == null) {
+                log.warn("Service address is not set.");
+                return url;
+            }
+            return serviceAddress + url;
+        }
+        return url;
+    }
+
+    public String getTokenPrefix(String headerPrefix) {
+        if (null == headerPrefix || headerPrefix.isEmpty()) {
+            return "";
+        } else {
+            return headerPrefix.trim() + " ";
+        }
+    }
 }

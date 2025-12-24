@@ -46,9 +46,8 @@ export default defineComponent({
     ])
 
     const form = reactive({
-      systemName: '',
       serviceAddress: '',
-      interfaceTimeout: 120000, // 默认2分钟
+      interfaceTimeout: 120000, // default 2 min
       authConfig: {
         authType: 'BASIC_AUTH',
         basicUsername: '',
@@ -104,11 +103,8 @@ export default defineComponent({
       }
     })
 
-    // 表单校验规则
+    // Form validation rules
     const rules = {
-      systemName: [
-        { required: true, message: t('thirdparty_api_source.system_name_required'), trigger: 'blur' }
-      ],
       serviceAddress: [
         { required: true, message: t('thirdparty_api_source.service_address_required'), trigger: 'blur' }
       ],
@@ -248,11 +244,10 @@ export default defineComponent({
     const formRef = ref<FormInst | null>(null)
     const isEditMode = computed(() => props.operationType === 'edit')
 
-    // 定义表单的初始状态
+    // Define the initial state of the form
     const getInitialFormState = () => ({
-      systemName: '',
       serviceAddress: 'http://',
-      interfaceTimeout: 120000, // 默认2分钟
+      interfaceTimeout: 120000, // default 2 minutes
       authConfig: {
         authType: '',
         headerPrefix: '',
@@ -297,7 +292,7 @@ export default defineComponent({
       stopInterface: { url: '', method: 'POST', parameters: [] as any[], body: '' }
     })
 
-    // 重置表单数据的函数
+    // Function to reset form data
     const resetForm = () => {
       const initialState = getInitialFormState()
       Object.keys(form).forEach(key => {
@@ -307,21 +302,21 @@ export default defineComponent({
       formRef.value?.restoreValidation?.()
     }
 
-    // 保存原始编辑数据，用于测试连接
+    // Save original edit data for testing connection
     const originalEditData = ref<any>(null)
-    // 监听modal显示状态和数据变化
+    // Listen for modal visibility and data changes
     watch([() => props.show, () => props.data, () => props.operationType], ([show, data, operationType]) => {
       if (show) {
         if (data && operationType === 'edit') {
           originalEditData.value = JSON.parse(JSON.stringify(data))
           resetForm()
           const editData = originalEditData.value
-          // 完全使用后端返回的数据
+          // Use data returned from backend completely
           Object.assign(form, editData)
         } else {
           originalEditData.value = null
           resetForm()
-          // 只在创建模式下设置默认值
+          // Only set default values in create mode
           form.authConfig.authType = 'BASIC_AUTH'
           form.authConfig.headerPrefix = 'Basic'
         }
@@ -329,7 +324,7 @@ export default defineComponent({
     }, { immediate: true })
 
     watch(() => form.authConfig.authType, (newAuthType) => {
-      // 只在创建模式下自动设置headerPrefix
+      // Only automatically set headerPrefix in create mode
       if (!isEditMode.value) {
         if (newAuthType === 'BASIC_AUTH') {
           form.authConfig.headerPrefix = 'Basic'
@@ -384,7 +379,7 @@ export default defineComponent({
       })
     }
 
-    // location 下拉选项与 method 联动
+    // Location dropdown options linked with method
     const getLocationOptions = (method: string) => {
       return [
         { label: 'Header', value: 'HEADER' },
@@ -416,16 +411,6 @@ export default defineComponent({
            rules={rules}
            ref={formRef}
          >
-           <NFormItem
-             label={t('thirdparty_api_source.system_name')}
-             path="systemName"
-             required
-           >
-             <NInput
-               v-model={[form.systemName, 'value']}
-               placeholder={t('thirdparty_api_source.system_name_tips')}
-             />
-           </NFormItem>
 
            <NFormItem
              label={t('thirdparty_api_source.service_address')}
@@ -438,7 +423,7 @@ export default defineComponent({
              />
            </NFormItem>
 
-           {/* 接口超时时间 */}
+           {/* Interface timeout */}
            <NFormItem label={t('thirdparty_api_source.interface_timeout')} path="interfaceTimeout">
              <NInputNumber
                v-model={[form.interfaceTimeout, 'value']}
@@ -459,7 +444,7 @@ export default defineComponent({
 
            <NDivider />
 
-           {/* 认证类型 */}
+           {/* authType */}
            <NFormItem path="authConfig.authType" required>
              {{
                label: () => (
@@ -628,7 +613,7 @@ export default defineComponent({
              />
            </NFormItem>
 
-           {/* 额外参数 */}
+           {/* additional params */}
            <NFormItem label={t('thirdparty_api_source.additional_params')}>
              <NDynamicInput
                v-model={[form.authConfig.authMappings, 'value']}
@@ -656,7 +641,7 @@ export default defineComponent({
 
            <NDivider />
 
-           {/* 输入接口 */}
+           {/* selectInterface */}
            <NFormItem path="selectInterface.url" required>
              {{
                label: () => (
@@ -818,7 +803,7 @@ export default defineComponent({
 
            <NDivider />
 
-           {/* 提交接口 */}
+           {/* submitInterface */}
            <NFormItem path="submitInterface.url" required>
              {{
                label: () => (
@@ -981,7 +966,7 @@ export default defineComponent({
 
            <NDivider />
 
-           {/* 查询接口 */}
+           {/* pollStatusInterface */}
            <NFormItem path="pollStatusInterface.url" required>
              {{
                label: () => (
@@ -1170,7 +1155,7 @@ export default defineComponent({
 
            <NDivider />
 
-           {/* 停止接口 */}
+           {/* stopInterface */}
            <NFormItem path="stopInterface.url" required>
              {{
                label: () => (

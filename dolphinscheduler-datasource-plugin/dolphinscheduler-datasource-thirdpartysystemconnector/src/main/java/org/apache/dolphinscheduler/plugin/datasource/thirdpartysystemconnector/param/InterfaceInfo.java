@@ -25,8 +25,13 @@ import lombok.Data;
 public class InterfaceInfo {
 
     private String url;
-    private String method;
+    private HttpMethod method;
     private String body;
     private List<RequestParameter> parameters;
     private List<ResponseParameter> responseParameters;
+
+    public enum HttpMethod {
+        GET, POST, PUT
+    }
+
 }

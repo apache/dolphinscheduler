@@ -117,7 +117,7 @@ const DetailModal = defineComponent({
       }
     ),
 
-    //monitor authType change，update headerPrefix
+    // Monitor authType change, update headerPrefix
     watch(
       () => state.detailForm.authConfig?.authType,
       (newAuthType) => {
@@ -392,7 +392,7 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.krb5_conf_tips')}
                   />
                 </NFormItem>
-                {/* 验证条件选择 */}
+                {/* validation */}
                 <NFormItem
                   v-show={showMode}
                   label={t('datasource.validation')}
@@ -799,19 +799,9 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.namespace_tips')}
                   />
                 </NFormItem>
-                {/* THIRDPARTY_SYSTEM_CONNECTOR 特殊字段 */}
+                {/* THIRDPARTY_SYSTEM_CONNECTOR */}
                 {detailForm.type === 'THIRDPARTY_SYSTEM_CONNECTOR' && (
                   <>
-                    <NFormItem
-                      label={t('thirdparty_api_source.system_name')}
-                      path='systemName'
-                    >
-                      <NInput
-                        allowInput={this.trim}
-                        v-model={[detailForm.systemName, 'value']}
-                        placeholder={t('thirdparty_api_source.system_name_tips')}
-                      />
-                    </NFormItem>
                     <NFormItem
                       label={t('thirdparty_api_source.service_address')}
                       path='serviceAddress'
@@ -960,10 +950,10 @@ const DetailModal = defineComponent({
                         />
                       </NFormItem>
                     )}
-                    {/* 额外参数 */}
+                    {/* additional params */}
                     <NFormItem label={t('thirdparty_api_source.additional_params')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.authConfig.authMappings) {
@@ -976,7 +966,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* param list */}
                         {detailForm.authConfig.authMappings && detailForm.authConfig.authMappings.map((param: { key: string; value: string }, index: number) => (
                           <div 
                             key={index} 
@@ -1029,7 +1019,7 @@ const DetailModal = defineComponent({
                     </NFormItem>
                     <NFormItem label={t('thirdparty_api_source.parameters')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add Button*/}
                         <NButton
                           onClick={() => {
                             if (!detailForm.selectInterface.parameters) {
@@ -1042,7 +1032,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* parameter list */}
                         {detailForm.selectInterface.parameters && detailForm.selectInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
                           <div 
                             key={index} 
@@ -1094,7 +1084,7 @@ const DetailModal = defineComponent({
                     )}
                     <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add Button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.selectInterface.responseParameters) {
@@ -1107,7 +1097,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* responseParameters */}
                         {detailForm.selectInterface.responseParameters && detailForm.selectInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
                           <div 
                             key={index} 
@@ -1160,7 +1150,7 @@ const DetailModal = defineComponent({
                     </NFormItem>
                     <NFormItem label={t('thirdparty_api_source.parameters')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.submitInterface.parameters) {
@@ -1173,7 +1163,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* parameter list */}
                         {detailForm.submitInterface.parameters && detailForm.submitInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
                           <div 
                             key={index} 
@@ -1225,7 +1215,7 @@ const DetailModal = defineComponent({
                     )}
                     <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.submitInterface.responseParameters) {
@@ -1238,7 +1228,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* param list */}
                         {detailForm.submitInterface.responseParameters && detailForm.submitInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
                           <div 
                             key={index} 
@@ -1291,7 +1281,7 @@ const DetailModal = defineComponent({
                     </NFormItem>
                     <NFormItem label={t('thirdparty_api_source.parameters')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.pollStatusInterface.parameters) {
@@ -1304,7 +1294,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* param list */}
                         {detailForm.pollStatusInterface.parameters && detailForm.pollStatusInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
                           <div 
                             key={index} 
@@ -1356,7 +1346,7 @@ const DetailModal = defineComponent({
                     )}
                     <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.pollStatusInterface.responseParameters) {
@@ -1369,7 +1359,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* param list */}
                         {detailForm.pollStatusInterface.responseParameters && detailForm.pollStatusInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
                           <div 
                             key={index} 
@@ -1450,7 +1440,7 @@ const DetailModal = defineComponent({
                     </NFormItem>
                     <NFormItem label={t('thirdparty_api_source.parameters')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.stopInterface.parameters) {
@@ -1463,7 +1453,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* param list */}
                         {detailForm.stopInterface.parameters && detailForm.stopInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
                           <div 
                             key={index} 
@@ -1515,7 +1505,7 @@ const DetailModal = defineComponent({
                     )}
                     <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
                       <div style={{ width: '100%' }}>
-                        {/* 添加按钮 */}
+                        {/* add button */}
                         <NButton
                           onClick={() => {
                             if (!detailForm.stopInterface.responseParameters) {
@@ -1528,7 +1518,7 @@ const DetailModal = defineComponent({
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
                         
-                        {/* 参数列表 */}
+                        {/* param list */}
                         {detailForm.stopInterface.responseParameters && detailForm.stopInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
                           <div 
                             key={index} 

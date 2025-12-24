@@ -31,9 +31,13 @@ import org.apache.dolphinscheduler.dao.entity.ExternalSystemTaskQuery;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.AuthenticationUtils;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.AuthConfig;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.InterfaceInfo;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.RequestParameter;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.ResponseParameter;
+import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param.ThirdPartySystemConnectorConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.externalSystem.AuthenticationUtils;
-import org.apache.dolphinscheduler.plugin.task.externalSystem.BaseExternalSystemParams;
 import org.apache.dolphinscheduler.plugin.task.externalSystem.ExternalTaskConstants;
 
 import java.util.ArrayList;
@@ -59,14 +63,16 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
     private static final String EXTERNAL_TASK_ID = "id";
     private static final String EXTERNAL_TASK_NAME = "name";
 
-    private OkHttpResponse callSelectInterface(BaseExternalSystemParams baseExternalSystemParam, boolean dbPassword) {
+    private OkHttpResponse callSelectInterface(ThirdPartySystemConnectorConnectionParam baseExternalSystemParam,
+                                               boolean dbPassword) {
         if (baseExternalSystemParam == null || baseExternalSystemParam.getSelectInterface() == null) {
-            throw new IllegalArgumentException("BaseExternalSystemParams or SelectInterface cannot be null");
+            throw new IllegalArgumentException(
+                    "ThirdPartySystemConnectorConnectionParam or SelectInterface cannot be null");
         }
 
-        BaseExternalSystemParams.InterfaceConfig selectConfig = baseExternalSystemParam.getSelectInterface();
+        InterfaceInfo selectConfig = baseExternalSystemParam.getSelectInterface();
 
-        // 替换参数占位符
+        // Replace parameter placeholders
         String url = baseExternalSystemParam.getCompleteUrl(selectConfig.getUrl());
 
         Map<String, String> headeMap = new HashMap<>();
@@ -76,8 +82,8 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
 
         try {
             if (dbPassword) {
-                // 已保存信息，从数据库中获取，并解密
-                BaseExternalSystemParams.AuthConfig authConfig = baseExternalSystemParam.getAuthConfig();
+                // Saved information, retrieve from database and decrypt
+                AuthConfig authConfig = baseExternalSystemParam.getAuthConfig();
                 decodePassword(authConfig);
                 baseExternalSystemParam.setAuthConfig(authConfig);
                 token = AuthenticationUtils.authenticateAndGetToken(baseExternalSystemParam);
@@ -85,14 +91,15 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
                 if (baseExternalSystemParam.getId() != null) {
                     DataSource existingSystem = dataSourceMapper.selectById(baseExternalSystemParam.getId());
                     if (existingSystem == null) {
-                        // 新建信息测试连接
+                        // New information test connection
                         token = AuthenticationUtils.authenticateAndGetToken(baseExternalSystemParam);
                     } else {
-                        // 更新信息测试连接，如果密码没有修改，则使用数据库中保存的密码进行测试连接
-                        BaseExternalSystemParams oldParams =
+                        // Update information test connection, if password is not modified, use password saved in
+                        // database for test connection
+                        ThirdPartySystemConnectorConnectionParam oldParams =
                                 JSONUtils.parseObject(existingSystem.getConnectionParams(),
-                                        BaseExternalSystemParams.class);
-                        BaseExternalSystemParams.AuthConfig authConfig = baseExternalSystemParam.getAuthConfig();
+                                        ThirdPartySystemConnectorConnectionParam.class);
+                        AuthConfig authConfig = baseExternalSystemParam.getAuthConfig();
                         if (authConfig.getBasicPassword() != null
                                 && authConfig.getBasicPassword().equals(Constants.XXXXXX)) {
                             authConfig.setBasicPassword(oldParams.getAuthConfig().getBasicPassword());
@@ -113,7 +120,6 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
                         token = AuthenticationUtils.authenticateAndGetToken(baseExternalSystemParam);
                     }
                 } else {
-                    // 新建信息测试连接
                     token = AuthenticationUtils.authenticateAndGetToken(baseExternalSystemParam);
                 }
             }
@@ -127,8 +133,8 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
                     baseExternalSystemParam.getTokenPrefix(baseExternalSystemParam.getAuthConfig().getHeaderPrefix())
                             + token);
 
-            // 处理参数
-            for (BaseExternalSystemParams.RequestParameter param : selectConfig.getParameters()) {
+            // Process parameters
+            for (RequestParameter param : selectConfig.getParameters()) {
                 // todo String value = replaceParameterPlaceholders(param.getParamValue());
                 String value = param.getParamValue();
 
@@ -152,7 +158,7 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
                 headers.setHeaders(headeMap);
             }
             OkHttpResponse response;
-            if (BaseExternalSystemParams.HttpMethod.POST.equals(selectConfig.getMethod())) {
+            if (InterfaceInfo.HttpMethod.POST.equals(selectConfig.getMethod())) {
                 if (contentType.equals(OkHttpRequestHeaderContentType.APPLICATION_JSON)) {
                     response = OkHttpUtils.post(url, headers, requestParams, requestBody, 120000, 120000, 120000);
 
@@ -169,7 +175,7 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
                     log.error("select task failed, OkHttpRequestHeaderContentType not support: {},", contentType);
                     throw new ServiceException(Status.EXTERNAL_SYSTEM_CONNECT_AUTH_FAILED);
                 }
-            } else if (BaseExternalSystemParams.HttpMethod.PUT.equals(selectConfig.getMethod())) {
+            } else if (InterfaceInfo.HttpMethod.PUT.equals(selectConfig.getMethod())) {
                 response = OkHttpUtils.put(url, headers, requestBody, 120000, 120000, 120000);
             } else {
                 response = OkHttpUtils.get(url, headers, requestParams, 120000, 120000, 120000);
@@ -177,7 +183,9 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
             return response;
 
         } catch (Exception e) {
-            log.error("select task failed, baseExternalSystemParam: {}, dbPassword: {}", baseExternalSystemParam,
+            log.error("select task failed, id: {}, serviceAddress: {}, dbPassword: {}",
+                    baseExternalSystemParam.getId(),
+                    baseExternalSystemParam.getServiceAddress(),
                     dbPassword, e);
             throw new ServiceException(Status.EXTERNAL_SYSTEM_CONNECT_AUTH_FAILED);
         }
@@ -195,7 +203,7 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
         return OkHttpRequestHeaderContentType.APPLICATION_JSON; // 默认值
     }
 
-    private void decodePassword(BaseExternalSystemParams.AuthConfig authConfig) {
+    private void decodePassword(AuthConfig authConfig) {
         if (null != authConfig.getOauth2ClientSecret() && !authConfig.getOauth2ClientSecret().isEmpty()) {
             authConfig.setOauth2ClientSecret(PasswordUtils.decodePassword(authConfig.getOauth2ClientSecret()));
         }
@@ -223,13 +231,13 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
     public List<ExternalSystemTaskQuery> queryExternalSystemTasks(User loginUser, int externalSystemId) {
 
         DataSource dataSource = dataSourceMapper.selectById(externalSystemId);
-        BaseExternalSystemParams baseExternalSystemParam =
-                JSONUtils.parseObject(dataSource.getConnectionParams(), BaseExternalSystemParams.class);
+        ThirdPartySystemConnectorConnectionParam baseExternalSystemParam =
+                JSONUtils.parseObject(dataSource.getConnectionParams(), ThirdPartySystemConnectorConnectionParam.class);
 
-        // 校验查询必要
+        // Validate query parameters
         String taskIdExpression = "";
         String taskNameExpression = "";
-        for (BaseExternalSystemParams.ResponseParameter param : baseExternalSystemParam.getSelectInterface()
+        for (ResponseParameter param : baseExternalSystemParam.getSelectInterface()
                 .getResponseParameters()) {
             if (EXTERNAL_TASK_ID.equals(param.getKey())) {
                 taskIdExpression = param.getJsonPath();
