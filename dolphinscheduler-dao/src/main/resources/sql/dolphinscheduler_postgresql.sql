@@ -274,6 +274,34 @@ CREATE TABLE t_ds_command (
 
 create index priority_id_index on t_ds_command (workflow_instance_priority,id);
 
+-- ----------------------------
+-- Table structure for t_ds_serial_command
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_serial_command;
+CREATE TABLE t_ds_serial_command (
+     id SERIAL PRIMARY KEY,
+     workflow_definition_code BIGINT NOT NULL,
+     workflow_definition_version INT NOT NULL,
+     workflow_instance_id BIGINT NOT NULL,
+     state SMALLINT NOT NULL DEFAULT 0,
+     command TEXT,
+     create_time TIMESTAMP NOT NULL DEFAULT now(),
+     update_time TIMESTAMP NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_workflow_instance_id ON t_ds_serial_command (workflow_instance_id);
+COMMENT ON TABLE t_ds_serial_command IS 'serial command queue table';
+COMMENT ON COLUMN t_ds_serial_command.id IS 'primary key';
+COMMENT ON COLUMN t_ds_serial_command.workflow_definition_code IS 'workflow definition code';
+COMMENT ON COLUMN t_ds_serial_command.workflow_definition_version IS 'workflow definition version';
+COMMENT ON COLUMN t_ds_serial_command.workflow_instance_id IS 'workflow instance id';
+COMMENT ON COLUMN t_ds_serial_command.state IS 'state of the serial queue: 0 waiting, 1 fired';
+COMMENT ON COLUMN t_ds_serial_command.command IS 'command json';
+COMMENT ON COLUMN t_ds_serial_command.create_time IS 'create time';
+COMMENT ON COLUMN t_ds_serial_command.update_time IS 'update time';
+-- ----------------------------
+-- Table structure for t_ds_serial_command
+-- ----------------------------
+
 --
 -- Table structure for table t_ds_datasource
 --

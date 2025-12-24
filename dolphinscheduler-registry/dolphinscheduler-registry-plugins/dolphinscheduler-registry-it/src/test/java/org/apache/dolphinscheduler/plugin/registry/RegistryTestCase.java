@@ -258,6 +258,29 @@ public abstract class RegistryTestCase<R extends Registry> {
         assertThat(acquireResult.get()).isTrue();
     }
 
+    @SneakyThrows
+    @Test
+    public void testReentrantLock() {
+        registry.start();
+        String lockKey = "/lock" + System.nanoTime();
+        assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
+        assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
+
+        CompletableFuture<Boolean> acquireResult =
+                CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
+        assertThat(acquireResult.get()).isFalse();
+
+        assertThat(registry.releaseLock(lockKey)).isTrue();
+
+        acquireResult = CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
+        assertThat(acquireResult.get()).isFalse();
+
+        assertThat(registry.releaseLock(lockKey)).isTrue();
+
+        acquireResult = CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
+        assertThat(acquireResult.get()).isTrue();
+    }
+
     public abstract R createRegistry();
 
 }

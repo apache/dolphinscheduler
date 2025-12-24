@@ -17,13 +17,20 @@
 
 .file-edit-content {
   width: 100%;
-  padding-bottom: 20px;
   > h2 {
     line-height: 60px;
     text-align: center;
     padding-right: 170px;
     position: relative;
   }
+}
+
+.editor-wrapper {
+  overflow: hidden;
+}
+
+.button-area {
+  padding: 16px 0;
 }
 
 .form-content {

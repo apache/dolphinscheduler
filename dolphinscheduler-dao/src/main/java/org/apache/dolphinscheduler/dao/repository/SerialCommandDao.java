@@ -13,9 +13,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_task_id` (`task_id`);
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_group_id` (`group_id`);
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_status` (`status`);
-ALTER TABLE `t_ds_task_group_queue` ADD KEY `idx_workflow_instance_id` (`workflow_instance_id`);
+package org.apache.dolphinscheduler.dao.repository;
+
+import org.apache.dolphinscheduler.dao.entity.SerialCommand;
+import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
+
+import java.util.List;
+
+public interface SerialCommandDao extends IDao<SerialCommand> {
+
+    List<SerialCommandDto> fetchSerialCommands(int fetchSize);
+
+    int deleteByWorkflowInstanceId(Integer workflowInstanceId);
+
+}
