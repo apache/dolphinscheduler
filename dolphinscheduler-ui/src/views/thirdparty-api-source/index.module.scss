@@ -1,4 +1,20 @@
-// 模态框基础样式
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 .thirdparty-modal {
   position: relative;
   width: 700px;
@@ -8,7 +24,6 @@
   overflow: hidden;
 }
 
-// 隐藏模态框关闭按钮
 .thirdparty-modal :global(.n-modal__close),
 .thirdparty-modal :global(.n-modal-header__close),
 .thirdparty-modal :global(.n-modal-header .n-button),
@@ -21,7 +36,6 @@
   display: none !important;
 }
 
-// 模态框内容区域
 .modal-content {
   flex: 1;
   max-height: calc(90vh - 120px);
@@ -32,95 +46,6 @@
   box-sizing: border-box;
 }
 
-// 表单基础样式
-.modal-content :global(.n-form) {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-form-item) {
-  width: 100%;
-  margin-bottom: 16px;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-form-item__content) {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-form-item__label) {
-  min-width: 120px;
-  text-align: right;
-  padding-right: 12px;
-  box-sizing: border-box;
-}
-
-// 输入框和选择器基础样式
-.modal-content :global(.n-input),
-.modal-content :global(.n-select) {
-  box-sizing: border-box;
-}
-
-// 空间组件
-.modal-content :global(.n-space) {
-  flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-// 动态输入组件
-.modal-content :global(.n-dynamic-input) {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-dynamic-input .n-dynamic-input-item) {
-  width: 100%;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-dynamic-input .n-dynamic-input-item .n-space) {
-  width: 100%;
-  justify-content: flex-start;
-  flex: 1;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-dynamic-input .n-dynamic-input-item .n-button) {
-  margin-left: 8px;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-dynamic-input .n-dynamic-input-item .n-input) {
-  flex: 1;
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-.modal-content :global(.n-dynamic-input .n-dynamic-input-item .n-select) {
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-// 字段映射特殊样式
-.modal-content :global(.n-dynamic-input .n-dynamic-input-item .n-space .n-input) {
-  flex: 1;
-  width: 50%;
-  min-width: 200px;
-  box-sizing: border-box;
-}
-
-// 参数输入框样式
 .param-location {
   width: 100px;
   min-width: 100px;
@@ -136,16 +61,12 @@
   min-width: 180px;
 }
 
-
-
-// 选择器样式
 .method-select,
 .auth-type-select {
   width: 120px;
   min-width: 120px;
 }
 
-// 条件输入框样式
 .condition-field {
   width: calc(50% - 4px);
   min-width: 200px;
@@ -157,7 +78,6 @@
   margin-left: 8px;
 }
 
-// 提交接口样式
 .submit-url {
   flex: 1;
   min-width: 300px;
@@ -168,7 +88,6 @@
   min-width: 120px;
 }
 
-// 超时时间输入框样式
 .timeout-input {
   width: 200px;
 }
@@ -180,30 +99,12 @@
   line-height: 1.4;
 }
 
-// 键值对输入框样式
 .key-input,
 .value-input {
   width: 200px;
   min-width: 150px;
 }
 
-// Monaco编辑器样式
-.modal-content :global(.monaco-editor) {
-  height: 200px !important;
-  min-height: 200px !important;
-}
-
-.modal-content :global(.monaco-editor .monaco-editor-background) {
-  background-color: #fafafa !important;
-}
-
-// 分割线样式
-.modal-content :global(.n-divider) {
-  margin: 20px 0;
-  border-color: #f0f0f0;
-}
-
-// 底部按钮区域
 .modal-footer {
   position: sticky;
   bottom: 0;
@@ -229,7 +130,6 @@
   padding: 0 14px;
 }
 
-// 响应式设计
 @media screen and (min-width: 1920px) {
   .thirdparty-modal {
     width: 700px;

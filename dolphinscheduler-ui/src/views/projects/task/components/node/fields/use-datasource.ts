@@ -17,7 +17,7 @@
 
 import { ref, onMounted, nextTick, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryDataSourceList, queryExternalSystemList, queryExternalSystemTasks } from '@/service/modules/data-source'
+import { queryDataSourceList } from '@/service/modules/data-source'
 import { indexOf, find } from 'lodash'
 import type { IJsonItem } from '../types'
 import type { TypeReq } from '@/service/modules/data-source/types'

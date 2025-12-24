@@ -17,7 +17,7 @@
 import { ref, onMounted, nextTick, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryDataSourceList, queryExternalSystemTasks } from '@/service/modules/data-source'
-import { indexOf, find } from 'lodash'
+import { find } from 'lodash'
 import type { IJsonItem } from '../types'
 import type { TypeReq } from '@/service/modules/data-source/types'
 
@@ -46,7 +46,7 @@ export function useExternalSystem(
         value: String(item.id)
       }))
     } catch (error) {
-      console.error('Error fetching data sources:', error)
+      // Error handling is done by the calling function
     }
   }
 
@@ -61,7 +61,7 @@ export function useExternalSystem(
         value: String(item.id)
       }))
     } catch (error) {
-      console.error('Error fetching external system tasks:', error)
+      // Error handling is done by the calling function
     }
 
     const taskField = params.taskField || 'task'

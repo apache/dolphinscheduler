@@ -1,10 +1,25 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 export default {
-  // 路由标题
   thirdparty_api_source: '第三方系统API',
   create_thirdparty_api_source: '创建第三方系统API',
   edit_thirdparty_api_source: '编辑第三方系统API',
 
-  // 基本信息
   basic_info: '基本信息',
   id: 'ID',
   system_name: '系统名称',
@@ -17,7 +32,6 @@ export default {
   create_time: '创建时间',
   update_time: '更新时间',
 
-  // 认证配置
   auth_config: '认证配置',
   auth_type: '认证类型',
   auth_type_tips: '请选择认证类型',
@@ -48,7 +62,6 @@ export default {
   key: '键名',
   value: '键值',
 
-  // 接口配置
   interface_config: '接口配置',
   input_interface: '查询任务列表接口',
   input_interface_tips: '请输入接口地址',
@@ -81,7 +94,6 @@ export default {
   millisecond: '毫秒',
   interface_timeout_description: '设置接口请求超时时间，默认为120000毫秒（2分钟）',
 
-  // 轮询配置
   polling_config: '轮询配置',
   success_condition: '成功条件',
   success_field: '成功字段',
@@ -94,7 +106,6 @@ export default {
   failure_value: '失败值',
   failure_value_tips: '失败值所有枚举值:CANCELED,FAILED',
 
-  // 按钮和操作
   cancel: '取消',
   submit: '确定',
   test: '测试连接',
@@ -104,7 +115,6 @@ export default {
   edit: '编辑',
   delete: '删除',
 
-  // 消息提示
   create_success: '创建成功',
   edit_success: '编辑成功',
   delete_success: '删除成功',
@@ -115,7 +125,6 @@ export default {
   test_failed: '测试失败',
   submit_failed: '提交失败，请检查表单内容',
 
-  // 表单验证消息
   system_name_required: '系统名称为必填项',
   service_address_required: '服务地址为必填项',
   auth_type_required: '认证类型为必选项',
