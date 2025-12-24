@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,15 +104,7 @@ public class WorkflowAlertManager {
                                              Project project) {
 
         String res;
-        WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogDao
-                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
-                        workflowInstance.getWorkflowDefinitionVersion());
-
-        String modifyBy = "";
-        if (workflowDefinitionLog != null) {
-            User operator = userDao.queryById(workflowDefinitionLog.getOperator());
-            modifyBy = operator == null ? "" : operator.getUserName();
-        }
+        String modifyBy = queryWorkflowOperator(workflowInstance);
 
         List<WorkflowAlertContent> successTaskList = new ArrayList<>(1);
         WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
@@ -136,6 +129,19 @@ public class WorkflowAlertManager {
         return res;
     }
 
+    private String queryWorkflowOperator(WorkflowInstance workflowInstance) {
+        WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogDao
+                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
+                        workflowInstance.getWorkflowDefinitionVersion());
+
+        String modifyBy = "";
+        if (workflowDefinitionLog != null) {
+            User operator = userDao.queryById(workflowDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
+        return modifyBy;
+    }
+
     /**
      * getting worker fault tolerant content
      *
@@ -147,14 +153,7 @@ public class WorkflowAlertManager {
 
         List<WorkflowAlertContent> toleranceTaskInstanceList = new ArrayList<>();
 
-        WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogDao
-                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
-                        workflowInstance.getWorkflowDefinitionVersion());
-        String modifyBy = "";
-        if (workflowDefinitionLog != null) {
-            User operator = userDao.queryById(workflowDefinitionLog.getOperator());
-            modifyBy = operator == null ? "" : operator.getUserName();
-        }
+        String modifyBy = queryWorkflowOperator(workflowInstance);
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
@@ -263,5 +262,19 @@ public class WorkflowAlertManager {
                                      TaskInstance taskInstance) {
         ProjectUser projectUser = projectDao.queryProjectWithUserByWorkflowInstanceId(workflowInstance.getId());
         alertDao.sendTaskTimeoutAlert(workflowInstance, taskInstance, projectUser);
+    }
+
+    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
+        // Get workflow definition log for modifyBy
+        String modifyBy = queryWorkflowOperator(workflowInstance);
+        if (Objects.isNull(projectUser)) {
+            Project project = projectDao.queryByCode(workflowInstance.getProjectCode());
+            projectUser = new ProjectUser();
+            projectUser.setProjectCode(project.getCode());
+            projectUser.setProjectName(project.getName());
+            projectUser.setUserName(project.getUserName());
+        }
+
+        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser, modifyBy);
     }
 }

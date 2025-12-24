@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.hand
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTimeoutLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.IWorkflowStateAction;
+import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,33 +31,42 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class WorkflowStartLifecycleEventHandler
+public class WorkflowTimeoutLifecycleEventHandler
         extends
-            AbstractWorkflowLifecycleEventHandler<WorkflowStartLifecycleEvent> {
+            AbstractWorkflowLifecycleEventHandler<WorkflowTimeoutLifecycleEvent> {
+
+    private final WorkflowAlertManager workflowAlertManager;
+
+    public WorkflowTimeoutLifecycleEventHandler(final WorkflowAlertManager workflowAlertManager) {
+        this.workflowAlertManager = workflowAlertManager;
+    }
 
     @Override
     public void handle(final IWorkflowStateAction workflowStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final WorkflowStartLifecycleEvent workflowStartEvent) {
-        workflowTimeoutMonitor(workflowExecutionRunnable);
-        workflowStateAction.onStartEvent(workflowExecutionRunnable, workflowStartEvent);
+                       final WorkflowTimeoutLifecycleEvent workflowTimeoutEvent) {
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final String workflowName = workflowExecutionRunnable.getName();
+
+        // Check if workflow is still active (not finished)
+        if (workflowInstance.getState().isFinalState()) {
+            log.info("The workflow {} has been finished with state: {}, skip timeout alert.",
+                    workflowName,
+                    workflowInstance.getState().name());
+            return;
+        }
+
+        log.info("The workflow {} has timeout, try to send a timeout alert.", workflowName);
+        doWorkflowTimeoutAlert(workflowInstance);
+    }
+
+    private void doWorkflowTimeoutAlert(final WorkflowInstance workflowInstance) {
+        // ProjectUser will be built in WorkflowAlertManager
+        workflowAlertManager.sendWorkflowTimeoutAlert(workflowInstance, null);
     }
 
     @Override
     public ILifecycleEventType matchEventType() {
-        return WorkflowLifecycleEventType.START;
+        return WorkflowLifecycleEventType.TIMEOUT;
     }
-
-    private void workflowTimeoutMonitor(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        if (workflowInstance.getTimeout() <= 0) {
-            log.debug("The workflow {} timeout {} is not configured, skip timeout monitor.",
-                    workflowInstance.getName(),
-                    workflowInstance.getTimeout());
-            return;
-        }
-        workflowExecutionRunnable.getWorkflowEventBus()
-                .publish(WorkflowTimeoutLifecycleEvent.of(workflowExecutionRunnable));
-    }
-
 }

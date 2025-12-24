@@ -18,10 +18,16 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -65,5 +71,50 @@ class AlertDaoTest extends BaseDaoTest {
                 .filter(alert -> alert.getContent().contains(host))
                 .count();
         Assertions.assertEquals(1L, count);
+    }
+
+    @Test
+    void testSendWorkflowTimeoutAlert() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setName("test-workflow-timeout");
+        workflowInstance.setWorkflowDefinitionCode(100L);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        workflowInstance.setStartTime(new Date());
+        workflowInstance.setHost("localhost");
+        workflowInstance.setWarningGroupId(1);
+
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setProjectCode(1L);
+        projectUser.setProjectName("test-project");
+        projectUser.setUserName("admin");
+
+        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser, "admin");
+
+        List<Alert> alerts = alertDao.listPendingAlerts(-1);
+        Assertions.assertNotNull(alerts);
+
+        long timeoutAlertCount = alerts.stream()
+                .filter(alert -> AlertType.WORKFLOW_INSTANCE_TIMEOUT.equals(alert.getAlertType()))
+                .filter(alert -> alert.getWorkflowInstanceId() != null
+                        && alert.getWorkflowInstanceId().equals(workflowInstance.getId()))
+                .count();
+        Assertions.assertEquals(1L, timeoutAlertCount);
+
+        Alert timeoutAlert = alerts.stream()
+                .filter(alert -> AlertType.WORKFLOW_INSTANCE_TIMEOUT.equals(alert.getAlertType()))
+                .filter(alert -> alert.getWorkflowInstanceId() != null
+                        && alert.getWorkflowInstanceId().equals(workflowInstance.getId()))
+                .findFirst()
+                .orElse(null);
+
+        Assertions.assertNotNull(timeoutAlert);
+        Assertions.assertEquals("Workflow Timeout Warn", timeoutAlert.getTitle());
+        Assertions.assertEquals(projectUser.getProjectCode(), timeoutAlert.getProjectCode());
+        Assertions.assertEquals(workflowInstance.getWorkflowDefinitionCode(),
+                timeoutAlert.getWorkflowDefinitionCode());
+        Assertions.assertEquals(workflowInstance.getId(), timeoutAlert.getWorkflowInstanceId());
+        Assertions.assertTrue(timeoutAlert.getContent().contains("test-workflow-timeout"));
     }
 }
