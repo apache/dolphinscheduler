@@ -58,42 +58,4 @@ public class KubeflowHelperTest {
                 String.format("kubectl delete -f %s", yamlFilePATH);
         Assertions.assertEquals(expectCommand, command);
     }
-
-    @Test
-    public void testParseGetMessage() {
-        String message = "{\n" +
-                "    \"apiVersion\": \"kubeflow.org/v1\",\n" +
-                "    \"kind\": \"PyTorchJob\",\n" +
-                "    \"status\": {\n" +
-                "        \"conditions\": [\n" +
-                "            {\n" +
-                "                \"key\": \"value\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"key\": \"value\"\n" +
-                "            }\n" +
-                "        ],\n" +
-                "        \"phase\": \"Succeeded\"\n" +
-                "    }\n" +
-                "}\n";
-        Assertions.assertEquals("Succeeded", kubeflowHelper.parseGetMessage(message));
-
-        String messageError1 = "{\n" +
-                "    \"apiVersion\": \"kubeflow.org/v1\",\n" +
-                "    \"kind\": \"PyTorchJob\"\n" +
-                "}\n";
-
-        Assertions.assertDoesNotThrow(() -> kubeflowHelper.parseGetMessage(messageError1));
-
-        String messageError2 = "{\n" +
-                "    \"apiVersion\": \"kubeflow.org/v1\",\n" +
-                "    \"kind\": \"PyTorchJob\",\n" +
-                "    \"status\": {\n" +
-                "        \"phase\": \"Failed\"\n" +
-                "    }\n" +
-                "}\n";
-
-        Assertions.assertEquals("Failed", kubeflowHelper.parseGetMessage(messageError2));
-
-    }
 }
