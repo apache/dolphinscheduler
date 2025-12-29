@@ -46,20 +46,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LinkisTask extends AbstractRemoteTask {
 
-    /**
-     * linkis parameters
-     */
     private LinkisParameters linkisParameters;
 
-    /**
-     * shell command executor
-     */
-    private ShellCommandExecutor shellCommandExecutor;
-
-    /**
-     * taskExecutionContext
-     */
-    protected final TaskExecutionContext taskExecutionContext;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     private String taskId;
 
@@ -67,16 +56,9 @@ public class LinkisTask extends AbstractRemoteTask {
 
     protected static final Pattern LINKIS_STATUS_REGEX = Pattern.compile(Constants.LINKIS_STATUS_REGEX);
 
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     public LinkisTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-
-        this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
@@ -86,7 +68,7 @@ public class LinkisTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        linkisParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), LinkisParameters.class);
+        linkisParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), LinkisParameters.class);
         log.info("Initialize Linkis task params {}", JSONUtils.toPrettyJsonString(linkisParameters));
 
         if (!linkisParameters.checkParameters()) {
@@ -99,7 +81,7 @@ public class LinkisTask extends AbstractRemoteTask {
         try {
             // construct process
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
                     .appendScript(buildCommand());
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, null);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());

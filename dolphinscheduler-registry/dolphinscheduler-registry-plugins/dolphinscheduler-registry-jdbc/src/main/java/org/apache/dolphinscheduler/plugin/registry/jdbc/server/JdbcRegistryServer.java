@@ -49,6 +49,8 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.transaction.support.TransactionTemplate;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -84,13 +86,15 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                               JdbcRegistryLockRepository jdbcRegistryLockRepository,
                               JdbcRegistryClientRepository jdbcRegistryClientRepository,
                               JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
-                              JdbcRegistryProperties jdbcRegistryProperties) {
+                              JdbcRegistryProperties jdbcRegistryProperties,
+                              TransactionTemplate transactionTemplate) {
         this.jdbcRegistryDataRepository = checkNotNull(jdbcRegistryDataRepository);
         this.jdbcRegistryLockRepository = checkNotNull(jdbcRegistryLockRepository);
         this.jdbcRegistryClientRepository = checkNotNull(jdbcRegistryClientRepository);
         this.jdbcRegistryProperties = checkNotNull(jdbcRegistryProperties);
         this.jdbcRegistryDataManager = new JdbcRegistryDataManager(
-                jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChangeEventRepository);
+                jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChangeEventRepository,
+                transactionTemplate);
         this.jdbcRegistryLockManager = new JdbcRegistryLockManager(
                 jdbcRegistryProperties, jdbcRegistryLockRepository);
         this.jdbcRegistryServerState = JdbcRegistryServerState.INIT;

@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryClientHeartbeatMapper;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataChangeEventMapper;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataMapper;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryClientRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChangeEventRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataRepository;
@@ -29,6 +25,8 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServ
 import org.apache.dolphinscheduler.plugin.registry.jdbc.server.JdbcRegistryServer;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+
+import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +38,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
@@ -62,13 +63,15 @@ public class JdbcRegistryAutoConfiguration {
                                                   JdbcRegistryLockRepository jdbcRegistryLockRepository,
                                                   JdbcRegistryClientRepository jdbcRegistryClientRepository,
                                                   JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
-                                                  JdbcRegistryProperties jdbcRegistryProperties) {
+                                                  JdbcRegistryProperties jdbcRegistryProperties,
+                                                  TransactionTemplate jdbcTransactionTemplate) {
         return new JdbcRegistryServer(
                 jdbcRegistryDataRepository,
                 jdbcRegistryLockRepository,
                 jdbcRegistryClientRepository,
                 jdbcRegistryDataChangeEventRepository,
-                jdbcRegistryProperties);
+                jdbcRegistryProperties,
+                jdbcTransactionTemplate);
     }
 
     @Bean
@@ -81,42 +84,38 @@ public class JdbcRegistryAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SqlSessionFactory sqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
-        log.info("Initialize jdbcRegistrySqlSessionFactory");
+    public DataSource jdbcRegistryDataSource(JdbcRegistryProperties jdbcRegistryProperties) {
+        return new HikariDataSource(jdbcRegistryProperties.getHikariConfig());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PlatformTransactionManager jdbcRegistryTransactionManager(DataSource jdbcRegistryDataSource) {
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+        transactionManager.setDataSource(jdbcRegistryDataSource);
+        return transactionManager;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TransactionTemplate jdbcTransactionTemplate(PlatformTransactionManager jdbcRegistryTransactionManager) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate();
+        transactionTemplate.setTransactionManager(jdbcRegistryTransactionManager);
+        return transactionTemplate;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SqlSessionFactory jdbcRegistrySqlSessionFactory(DataSource jdbcRegistryDataSource) throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(new HikariDataSource(jdbcRegistryProperties.getHikariConfig()));
+        sqlSessionFactoryBean.setDataSource(jdbcRegistryDataSource);
         return sqlSessionFactoryBean.getObject();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory jdbcRegistrySqlSessionFactory) {
-        log.info("Initialize jdbcRegistrySqlSessionTemplate");
+    public SqlSessionTemplate jdbcRegistrySqlSessionTemplate(SqlSessionFactory jdbcRegistrySqlSessionFactory) {
         return new SqlSessionTemplate(jdbcRegistrySqlSessionFactory);
-    }
-
-    @Bean
-    public JdbcRegistryDataMapper jdbcRegistryDataMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
-        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryDataMapper.class);
-        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataMapper.class);
-    }
-
-    @Bean
-    public JdbcRegistryLockMapper jdbcRegistryLockMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
-        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryLockMapper.class);
-        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryLockMapper.class);
-    }
-
-    @Bean
-    public JdbcRegistryDataChangeEventMapper jdbcRegistryDataChangeEventMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
-        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryDataChangeEventMapper.class);
-        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataChangeEventMapper.class);
-    }
-
-    @Bean
-    public JdbcRegistryClientHeartbeatMapper jdbcRegistryClientHeartbeatMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
-        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryClientHeartbeatMapper.class);
-        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryClientHeartbeatMapper.class);
     }
 
 }
