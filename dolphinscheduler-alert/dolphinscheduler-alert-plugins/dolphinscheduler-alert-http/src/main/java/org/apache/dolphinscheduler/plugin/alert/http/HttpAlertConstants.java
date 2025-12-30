@@ -38,6 +38,8 @@ public final class HttpAlertConstants {
 
     public static final String NAME_REQUEST_TYPE = "requestType";
 
+    public static final String MSG_PARAMS = "${msg}";
+
     private HttpAlertConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }

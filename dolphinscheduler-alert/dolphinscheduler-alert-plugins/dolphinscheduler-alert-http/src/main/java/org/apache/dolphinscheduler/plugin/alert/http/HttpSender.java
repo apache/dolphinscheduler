@@ -163,14 +163,55 @@ public final class HttpSender {
      */
     private void setMsgInRequestBody(String msg) {
         try {
-            ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
-            //set msg content field
-            objectNode.put(contentField, msg);
-            StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
-            ((HttpPost) httpRequest).setEntity(entity);
+            // 检查 bodyParams 是否包含 ${msg} 占位符
+            if (StringUtils.isNotBlank(bodyParams) && bodyParams.contains(HttpAlertConstants.MSG_PARAMS)) {
+                // 方式1: 直接全文替换，不解析 JSON，不使用 contentField
+                String replacedBody = bodyParams.replace(HttpAlertConstants.MSG_PARAMS, msg);
+                logger.debug("Using raw template with ${msg} replacement. Final body: {}", replacedBody);
+                StringEntity entity = new StringEntity(replacedBody, DEFAULT_CHARSET);
+                ((HttpPost) httpRequest).setEntity(entity);
+            } else {
+                // 方式2: 没有 ${msg}，走结构化 JSON + contentField 路径
+                ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
+                if (StringUtils.isNotBlank(contentField)) {
+                    setNestedField(objectNode, contentField, msg);
+                }
+                String finalJson = JSONUtils.toJsonString(objectNode);
+                logger.debug("Using structured JSON with contentField. Final body: {}", finalJson);
+                StringEntity entity = new StringEntity(finalJson, DEFAULT_CHARSET);
+                ((HttpPost) httpRequest).setEntity(entity);
+            }
         } catch (Exception e) {
-            logger.error("send http alert msg  exception : {}", e.getMessage());
+            logger.error("send http alert msg exception: {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * 设置嵌套字段值
+     * @param objectNode JSON 对象节点
+     * @param path 字段路径，如 "text.content"
+     * @param value 要设置的值
+     */
+    private void setNestedField(ObjectNode objectNode, String path, String value) {
+        if (StringUtils.isBlank(path)) {
+            return;
+        }
+
+        String[] pathParts = path.split("\\.");
+        ObjectNode current = objectNode;
+
+        // 遍历路径的前 n-1 级
+        for (int i = 0; i < pathParts.length - 1; i++) {
+            String field = pathParts[i];
+            if (!current.has(field) || !current.get(field).isObject()) {
+                current.set(field, JSONUtils.createObjectNode());
+            }
+            current = (ObjectNode) current.get(field);
+        }
+
+        // 设置最后一级字段值
+        String lastField = pathParts[pathParts.length - 1];
+        current.put(lastField, value);
     }
 
     public String getRequestUrl() {
