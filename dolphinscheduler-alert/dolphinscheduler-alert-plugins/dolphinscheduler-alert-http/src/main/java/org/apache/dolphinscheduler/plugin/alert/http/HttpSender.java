@@ -34,15 +34,13 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class HttpSender {
     private static final Logger logger = LoggerFactory.getLogger(HttpSender.class);
@@ -56,12 +54,16 @@ public final class HttpSender {
      */
     private static final String REQUEST_TYPE_GET = "GET";
     private static final String DEFAULT_CHARSET = "utf-8";
+    // 在类的开头添加
+    private static final String MARKDOWN_QUOTE = ">";
+    private static final String MARKDOWN_ENTER = "\n";
     private final String headerParams;
     private final String bodyParams;
     private final String contentField;
     private final String requestType;
     private String url;
     private HttpRequestBase httpRequest;
+
 
     public HttpSender(Map<String, String> paramsMap) {
 
@@ -70,6 +72,35 @@ public final class HttpSender {
         bodyParams = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
         contentField = paramsMap.get(HttpAlertConstants.NAME_CONTENT_FIELD);
         requestType = paramsMap.get(HttpAlertConstants.NAME_REQUEST_TYPE);
+    }
+
+    /**
+     * convert text to markdown style (from WeChat implementation)
+     *
+     * @param content the content
+     * @return markdown text
+     */
+    private static String convertToMarkdown(String content) {
+        if (StringUtils.isNotEmpty(content)) {
+            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+            if (null == mapItemsList || mapItemsList.isEmpty()) {
+                logger.warn("Failed to parse content as JSON array, returning original content");
+                return content;
+            }
+
+            StringBuilder contents = new StringBuilder(100);
+            contents.append(String.format("`DolphinScheduler Alert Message`%n"));
+            for (LinkedHashMap mapItems : mapItemsList) {
+                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
+                for (Map.Entry<String, Object> entry : entries) {
+                    contents.append(MARKDOWN_QUOTE);
+                    contents.append(entry.getKey()).append(":").append(entry.getValue());
+                    contents.append(MARKDOWN_ENTER);
+                }
+            }
+            return contents.toString();
+        }
+        return content;
     }
 
     public AlertResult send(String msg) {
@@ -163,10 +194,11 @@ public final class HttpSender {
      */
     private void setMsgInRequestBody(String msg) {
         try {
+            String processedMsg = convertToMarkdown(msg);
             // 检查 bodyParams 是否包含 ${msg} 占位符
             if (StringUtils.isNotBlank(bodyParams) && bodyParams.contains(HttpAlertConstants.MSG_PARAMS)) {
                 // 方式1: 直接全文替换，不解析 JSON，不使用 contentField
-                String replacedBody = bodyParams.replace(HttpAlertConstants.MSG_PARAMS, msg);
+                String replacedBody = bodyParams.replace(HttpAlertConstants.MSG_PARAMS, processedMsg);
                 logger.debug("Using raw template with ${msg} replacement. Final body: {}", replacedBody);
                 StringEntity entity = new StringEntity(replacedBody, DEFAULT_CHARSET);
                 ((HttpPost) httpRequest).setEntity(entity);
@@ -174,7 +206,7 @@ public final class HttpSender {
                 // 方式2: 没有 ${msg}，走结构化 JSON + contentField 路径
                 ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
                 if (StringUtils.isNotBlank(contentField)) {
-                    setNestedField(objectNode, contentField, msg);
+                    setNestedField(objectNode, contentField, processedMsg);
                 }
                 String finalJson = JSONUtils.toJsonString(objectNode);
                 logger.debug("Using structured JSON with contentField. Final body: {}", finalJson);
@@ -188,9 +220,10 @@ public final class HttpSender {
 
     /**
      * 设置嵌套字段值
+     *
      * @param objectNode JSON 对象节点
-     * @param path 字段路径，如 "text.content"
-     * @param value 要设置的值
+     * @param path       字段路径，如 "text.content"
+     * @param value      要设置的值
      */
     private void setNestedField(ObjectNode objectNode, String path, String value) {
         if (StringUtils.isBlank(path)) {

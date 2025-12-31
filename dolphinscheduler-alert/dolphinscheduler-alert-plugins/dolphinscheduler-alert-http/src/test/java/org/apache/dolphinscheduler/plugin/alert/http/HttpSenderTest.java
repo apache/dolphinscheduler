@@ -39,4 +39,26 @@ public class HttpSenderTest {
         AlertResult alertResult = httpSender.send("Fault tolerance warning");
         Assert.assertEquals("true", alertResult.getStatus());
     }
+
+    @Test
+    public void sendActualWeChatRobotTest() throws Exception {
+        Map<String, String> paramsMap = new HashMap<>();
+        String url = "http://wechatapi.gi.compal.com:3002/api/Robot/Send/R000047";
+        String contentField = "text.content";
+
+        paramsMap.put(HttpAlertConstants.NAME_URL, url);
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, "POST");
+        paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS,
+                "{\"Authorization\":\"Basic R0lcUFVCX0NJVElJX1NWTjphaWRzaWRAMjAyNQ==\",\"Content-Type\":\"application/json\"}");
+        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS,
+                "{\"msgtype\":\"text\",\"text\":{\"content\":\"\"}}");
+        paramsMap.put(HttpAlertConstants.NAME_CONTENT_FIELD, contentField);
+
+        HttpSender httpSender = new HttpSender(paramsMap);
+        AlertResult alertResult = httpSender.send("[{\"projectCode\":15379329985376,\"projectName\":\"test\",\"owner\":\"zachary_zhang\",\"processId\":1021216,\"processDefinitionCode\":15464960863968,\"processName\":\"补数-6-20251230104409314\",\"taskCode\":15464943982432,\"taskName\":\"时间\",\"taskType\":\"SHELL\",\"taskState\":\"FAILURE\",\"taskStartTime\":\"2025-12-30 10:44:09\",\"taskEndTime\":\"2025-12-30 10:44:09\",\"taskHost\":\"10.129.137.136:1234\",\"logPath\":\"/opt/apps/dolphinscheduler/worker-server/logs/20251230/15464960863968_6-1021216-2219793.log\"}]");
+        Assert.assertEquals("true", alertResult.getStatus());
+        // 验证发送结果
+        System.out.println("发送结果: " + alertResult);
+        System.out.println("请求URL: " + httpSender.getRequestUrl());
+    }
 }
