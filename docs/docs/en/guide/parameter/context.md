@@ -23,7 +23,14 @@ The value of upstream parameter can be updated in downstream node in the same wa
 
 Upstream parameter will be override when defining parameter with the same name in downstream node.
 
-> Note: If there are no dependencies between nodes, local parameters cannot be passed upstream.
+> Note:
+>
+> 1. Parameter passing behavior has changed in version 3.3.x**
+>    In older version before 3.2.2, downstream node B could obtain the out type output X of upstream node A without configuring an IN type local variable X.
+>    In the new version after 3.3.0, the logic for obtaining local variables has been modified: downstream node B can only use the out type output X of upstream node A if it has configured an IN type local variable X.
+>    See the Node_B and Node_mysql examples below for details.
+>
+> 2. If there are no dependencies between nodes, local parameters cannot be passed upstream.
 
 ### Example
 
@@ -46,11 +53,15 @@ When the SHELL node is defined, the log detects the format of `${setValue(output
 
 Create the Node_B task, which is mainly used to test and output the parameters passed by the upstream task Node_A.
 
+In the custom parameters, add an IN type value parameter and an output parameter.
+
 ![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
 #### Create SQL tasks and use parameters
 
 When the SHELL task is completed, we can use the output passed upstream as the query object for the SQL. The id of the query is renamed to ID and is output as a parameter.
+
+In the custom parameters, add an `OUT` type `ID` parameter and an `IN` type `output` parameter.
 
 ![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
