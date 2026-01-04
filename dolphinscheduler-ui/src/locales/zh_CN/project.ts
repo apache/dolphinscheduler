@@ -228,7 +228,7 @@ export default {
     workflow_relation_no_data_result_title: '工作流关系不存在',
     workflow_relation_no_data_result_desc:
       '目前没有任何工作流，请先创建工作流，再访问该页面',
-    failover: '容错',
+    failover: '恢复容错',
     confirm_to_online: '是否确定上线该工作流?',
     confirm_to_offline: '是否确定下线该工作流?',
     time_to_online: '是否确定上线该定时?',
