@@ -368,13 +368,13 @@ export const workflowExecutionState = (
     isSpin: true,
     classNames: 'serial_wait'
   },
-  WAIT_TO_RUN: {
+  FAILOVER: {
     id: 18,
-    desc: `${t('project.workflow.wait_to_run')}`,
+    desc: `${t('project.workflow.failover')}`,
     color: '#5102ce',
     icon: HourglassOutlined,
     isSpin: false,
-    classNames: 'wait_to_run'
+    classNames: 'failover'
   }
 })
 

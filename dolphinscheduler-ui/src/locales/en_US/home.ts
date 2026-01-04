@@ -39,6 +39,5 @@ export default {
   dispatch: 'DISPATCH',
   ready_block: 'READY_BLOCK',
   block: 'BLOCK',
-  wait_to_run: 'WAIT_TO_RUN',
   failover: 'FAILOVER'
 }
