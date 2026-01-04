@@ -112,7 +112,7 @@ export const runningType = (t: any) => [
     desc: `${t('project.workflow.stop')}`,
     code: 'STOP'
   },
-　{
+  {
     desc: `${t('project.workflow.recover_serial_wait')}`,
     code: 'RECOVER_SERIAL_WAIT'
   },
