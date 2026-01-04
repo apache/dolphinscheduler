@@ -30,7 +30,7 @@ import {
   StopOutlined,
   IssuesCloseOutlined,
   SendOutlined,
-  HourglassOutlined
+  SwapOutlined
 } from '@vicons/antd'
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
@@ -112,11 +112,7 @@ export const runningType = (t: any) => [
     desc: `${t('project.workflow.stop')}`,
     code: 'STOP'
   },
-  {
-    desc: `${t('project.workflow.recovery_waiting_thread')}`,
-    code: 'RECOVER_WAITING_THREAD'
-  },
-  {
+　{
     desc: `${t('project.workflow.recover_serial_wait')}`,
     code: 'RECOVER_SERIAL_WAIT'
   },
@@ -372,7 +368,7 @@ export const workflowExecutionState = (
     id: 18,
     desc: `${t('project.workflow.failover')}`,
     color: '#5102ce',
-    icon: HourglassOutlined,
+    icon: SwapOutlined,
     isSpin: false,
     classNames: 'failover'
   }

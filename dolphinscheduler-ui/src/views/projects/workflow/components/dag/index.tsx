@@ -143,7 +143,6 @@ export default defineComponent({
     const menuDisplay = computed(() => {
       if (props.instance) {
         return (
-          props.instance.state === 'WAITING_THREAD' ||
           props.instance.state === 'SUCCESS' ||
           props.instance.state === 'PAUSE' ||
           props.instance.state === 'FAILURE' ||

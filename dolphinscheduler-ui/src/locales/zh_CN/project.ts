@@ -44,7 +44,7 @@ export default {
     total_items: '总条目为'
   },
   workflow: {
-    on_line: '线上',
+    on_line: '上线',
     test: '测试',
     operating_environment: '运行环境',
     workflow_relation: '工作流关系',
@@ -173,7 +173,6 @@ export default {
     rerun: '重跑',
     stop: '停止',
     pause: '暂停',
-    recovery_waiting_thread: '恢复等待线程',
     recover_serial_wait: '串行恢复',
     execute_task: '执行指定任务',
     dynamic_generation: '动态生成',
@@ -189,7 +188,6 @@ export default {
     failed: '失败',
     need_fault_tolerance: '需要容错',
     kill: 'Kill',
-    waiting_for_thread: '等待线程',
     waiting_for_dependence: '等待依赖',
     waiting_for_dependency_to_complete: '等待依赖完成',
     delay_execution: '延时执行',
@@ -247,7 +245,7 @@ export default {
     warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.'
   },
   task: {
-    on_line: '线上',
+    on_line: '上线',
     test: '测试',
     operating_environment: '运行环境',
     cancel_full_screen: '取消全屏',
