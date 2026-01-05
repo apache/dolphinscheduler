@@ -1442,13 +1442,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_withTimeoutWarnTask() {
         final String yaml = "/it/start/workflow_with_timeout_warn_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warn_task");
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
-                .workflowDefinition(workflow)
+                .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         // Wait for the timeout to occur and alert to be sent (timeout + some buffer time)
         await()
@@ -1456,7 +1456,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     // Check if the task instance has reached the expected state
                     Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("warn_task_with_timeout_alert");
@@ -1465,13 +1465,49 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
                     // Check if the alert was sent
                     Assertions
-                            .assertThat(repository.queryAlert(workflow))
+                            .assertThat(repository.queryAlert(workflowInstanceId))
                             .hasSize(1)
                             .satisfiesExactly(alert -> {
-                                assertThat(alert.getProjectCode()).isEqualTo(workflow.getProjectCode());
-                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(workflow.getCode());
+                                assertThat(alert.getProjectCode()).isEqualTo(1);
+                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(1);
                                 assertThat(alert.getAlertType()).isEqualTo(AlertType.TASK_TIMEOUT);
                             });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test timeout WARN task does NOT send alert when workflow has no warningGroupId")
+    public void testStartWorkflow_withTimeoutWarnTaskButNoWarningGroupId() {
+        final String yaml = "/it/start/workflow_with_timeout_warn_no_warning_group.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        // Wait long enough for timeout to occur (60s + buffer)
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    // Task should still be running (WARN strategy doesn't kill)
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("warn_task_no_alert_due_to_missing_warning_group");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                            });
+
+                    // NO alert should be sent because warningGroupId is null
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .isEmpty();
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -1482,13 +1518,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     public void testStartWorkflow_withTimeoutWarnFailedTask() {
         final String yaml = "/it/start/workflow_with_timeout_warnfailed_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warnfailed_task");
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
-                .workflowDefinition(workflow)
+                .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         // Wait for the timeout to occur, alert to be sent, and task to be killed (timeout + buffer)
         await()
@@ -1496,23 +1532,58 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     // Check that the task instance has been marked as FAILED due to timeout kill
                     Assertions
-                            .assertThat(repository.queryTaskInstance(workflow))
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("warnfailed_task_with_timeout_alert_kill");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL); // Task should
-                                                                                                         // be killed
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
                             });
 
                     // Check that the timeout alert was sent
                     Assertions
-                            .assertThat(repository.queryAlert(workflow))
+                            .assertThat(repository.queryAlert(workflowInstanceId))
                             .hasSize(1)
                             .satisfiesExactly(alert -> {
-                                assertThat(alert.getProjectCode()).isEqualTo(workflow.getProjectCode());
-                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(workflow.getCode());
+                                assertThat(alert.getProjectCode()).isEqualTo(1);
+                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(1);
                                 assertThat(alert.getAlertType()).isEqualTo(AlertType.TASK_TIMEOUT);
                             });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test WARNFAILED task kills the task but does NOT send alert when warningGroupId is null")
+    public void testStartWorkflow_withTimeoutWarnFailedTaskButNoWarningGroupId() {
+        final String yaml = "/it/start/workflow_with_timeout_warnfailed_no_warning_group.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        // Wait for timeout to trigger kill (60s timeout + buffer)
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    // Task should be KILLED → state = KILL
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("warnfailed_task_no_alert_due_to_missing_warning_group");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            });
+
+                    // NO alert should be sent because warningGroupId is null
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .isEmpty();
                 });
 
         masterContainer.assertAllResourceReleased();
