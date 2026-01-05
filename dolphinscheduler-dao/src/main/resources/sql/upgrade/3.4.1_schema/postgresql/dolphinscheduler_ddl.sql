@@ -13,21 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.dao.repository;
-
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-
-import java.util.Collection;
-import java.util.List;
-
-public interface ProjectDao extends IDao<Project> {
-
-    List<Project> queryByCodes(Collection<Long> projectCodes);
-
-    Project queryByCode(Long projectCode);
-
-    ProjectUser queryProjectWithUserByWorkflowInstanceId(int workflowInstanceId);
-}
+CREATE SEQUENCE IF NOT EXISTS t_ds_task_instance_context_id_seq;
+ALTER TABLE t_ds_task_instance_context
+ALTER COLUMN id SET DEFAULT nextval('t_ds_task_instance_context_id_seq'::regclass);
