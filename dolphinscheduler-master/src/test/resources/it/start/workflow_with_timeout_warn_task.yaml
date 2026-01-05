@@ -49,7 +49,7 @@ tasks:
     timeoutNotifyStrategy: 'WARN'      # Only send alert on timeout (do NOT kill the task)
     timeout: 1                         # Timeout after 1 minute
     taskType: LogicFakeTask
-    taskParams: '{"localParams":[],"shellScript":"sleep 120","resourceList":[]}'  # Sleeps for 120s (> timeout), simulating a hanging task
+    taskParams: '{"localParams":[],"shellScript":"sleep 70","resourceList":[]}'  # Sleeps for 70s (> timeout), simulating a hanging task
     workerGroup: default
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00

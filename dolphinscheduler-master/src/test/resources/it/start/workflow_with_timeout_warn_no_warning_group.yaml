@@ -48,7 +48,7 @@ tasks:
     timeoutNotifyStrategy: 'WARN'      # Should trigger alert IF warningGroupId exists
     timeout: 1                         # 1 minute
     taskType: LogicFakeTask
-    taskParams: '{"localParams":[],"shellScript":"sleep 120","resourceList":[]}'
+    taskParams: '{"localParams":[],"shellScript":"sleep 70","resourceList":[]}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
