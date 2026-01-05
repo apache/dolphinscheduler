@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -44,5 +45,10 @@ public class ProjectDaoImpl extends BaseDao<Project, ProjectMapper> implements P
     @Override
     public Project queryByCode(Long projectCode) {
         return mybatisMapper.queryByCode(projectCode);
+    }
+
+    @Override
+    public ProjectUser queryProjectWithUserByWorkflowInstanceId(int workflowInstanceId) {
+        return mybatisMapper.queryProjectWithUserByWorkflowInstanceId(workflowInstanceId);
     }
 }
