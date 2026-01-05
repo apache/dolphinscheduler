@@ -36,11 +36,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.sshd.client.channel.ChannelExec;
+import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -205,5 +208,72 @@ public class RemoteExecutorTest {
         // Verify that the output parameter was parsed and stored
         Assertions.assertEquals(1, remoteExecutor.getTaskOutputParams().size());
         Assertions.assertEquals("my_value", remoteExecutor.getTaskOutputParams().get("my_prop"));
+    }
+
+    @Test
+    void testRunRemoteWithEmptyOutput() throws Exception {
+        // Test empty output scenario (readLines = 0)
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
+
+        when(clientSession.auth().verify().isSuccess()).thenReturn(true);
+        when(clientSession.createExecChannel(anyString())).thenReturn(channel);
+        when(channel.getInvertedOut()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        when(channel.getExitStatus()).thenReturn(0);
+        when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
+                .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
+
+        String result = Assertions.assertDoesNotThrow(() -> remoteExecutor.runRemote("echo"));
+        Assertions.assertEquals("", result);
+    }
+
+    @Test
+    void testRunRemoteWithNonZeroExitStatus() throws Exception {
+        // Test command failure scenario (exitStatus != 0)
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
+
+        when(clientSession.auth().verify().isSuccess()).thenReturn(true);
+        when(clientSession.createExecChannel(anyString())).thenReturn(channel);
+        when(channel.getInvertedOut()).thenReturn(IOUtils.toInputStream("error output", StandardCharsets.UTF_8));
+        when(channel.getExitStatus()).thenReturn(1);
+        when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
+                .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
+
+        Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("failing_command"));
+    }
+
+    @Test
+    void testRunRemoteWithNullExitStatus() throws Exception {
+        // Test null exitStatus scenario
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
+
+        when(clientSession.auth().verify().isSuccess()).thenReturn(true);
+        when(clientSession.createExecChannel(anyString())).thenReturn(channel);
+        when(channel.getInvertedOut()).thenReturn(IOUtils.toInputStream("some output", StandardCharsets.UTF_8));
+        when(channel.getExitStatus()).thenReturn(null);
+        when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
+                .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
+
+        Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("command"));
+    }
+
+    @Test
+    void testTrackWithEmptyLogOutput() throws Exception {
+        // Test track with empty log output (readLines = 0 scenario in track loop)
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        String taskId = "1234";
+        ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
+
+        doReturn("9527").doReturn("").when(remoteExecutor).getTaskPid(taskId);
+        when(clientSession.auth().verify().isSuccess()).thenReturn(true);
+        when(clientSession.createExecChannel(anyString())).thenReturn(channel);
+        when(channel.getInvertedOut()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        when(channel.getExitStatus()).thenReturn(0);
+        when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
+                .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
+
+        Assertions.assertDoesNotThrow(() -> remoteExecutor.track(taskId));
     }
 }
