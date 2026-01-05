@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.integration;
 
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +41,9 @@ public class Repository {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private AlertDao alertDao;
 
     /**
      * Return the list of process instances for a given workflow definition in ascending order of their IDs.
@@ -87,4 +93,25 @@ public class Repository {
         return taskInstanceDao.queryAll();
     }
 
+    public List<Alert> queryAlert(final Integer workflowInstanceId) {
+        return alertDao.listAlerts(workflowInstanceId);
+    }
+
+    /**
+     * Return the list of alerts for all workflow instances of the given workflow definition,
+     * sorted in ascending order by alert ID.
+     */
+    public List<Alert> queryAlert(final WorkflowDefinition workflowDefinition) {
+        List<WorkflowInstance> workflowInstances = queryWorkflowInstance(workflowDefinition);
+
+        if (workflowInstances.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return workflowInstances.stream()
+                .map(WorkflowInstance::getId)
+                .flatMap(id -> this.queryAlert(id).stream())
+                .sorted(Comparator.comparingInt(Alert::getId))
+                .collect(Collectors.toList());
+    }
 }

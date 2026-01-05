@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.integration.cases;
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -1435,4 +1436,86 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 });
         masterContainer.assertAllResourceReleased();
     }
+
+    @Test
+    @DisplayName("Test start a workflow which contains a task with timeout warn strategy")
+    public void testStartWorkflow_withTimeoutWarnTask() {
+        final String yaml = "/it/start/workflow_with_timeout_warn_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warn_task");
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        // Wait for the timeout to occur and alert to be sent (timeout + some buffer time)
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    // Check if the task instance has reached the expected state
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("warn_task_with_timeout_alert");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                            });
+
+                    // Check if the alert was sent
+                    Assertions
+                            .assertThat(repository.queryAlert(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(alert -> {
+                                assertThat(alert.getProjectCode()).isEqualTo(workflow.getProjectCode());
+                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(workflow.getCode());
+                                assertThat(alert.getAlertType()).isEqualTo(AlertType.TASK_TIMEOUT);
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow which contains a task with timeout WARNFAILED strategy")
+    public void testStartWorkflow_withTimeoutWarnFailedTask() {
+        final String yaml = "/it/start/workflow_with_timeout_warnfailed_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warnfailed_task");
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        // Wait for the timeout to occur, alert to be sent, and task to be killed (timeout + buffer)
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    // Check that the task instance has been marked as FAILED due to timeout kill
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("warnfailed_task_with_timeout_alert_kill");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL); // Task should
+                                                                                                         // be killed
+                            });
+
+                    // Check that the timeout alert was sent
+                    Assertions
+                            .assertThat(repository.queryAlert(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(alert -> {
+                                assertThat(alert.getProjectCode()).isEqualTo(workflow.getProjectCode());
+                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(workflow.getCode());
+                                assertThat(alert.getAlertType()).isEqualTo(AlertType.TASK_TIMEOUT);
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
 }
