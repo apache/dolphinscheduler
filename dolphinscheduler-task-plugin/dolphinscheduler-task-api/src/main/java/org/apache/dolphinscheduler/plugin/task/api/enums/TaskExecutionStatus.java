@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 public enum TaskExecutionStatus {
 
+    // todo: refactor the state like WorkflowExecutionStatus
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
     PAUSE(3, "pause"),

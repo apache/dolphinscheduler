@@ -47,7 +47,7 @@ public class TaskPauseStateAction extends AbstractTaskStateAction {
                              final TaskStartLifecycleEvent taskStartEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainPause(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     @Override
