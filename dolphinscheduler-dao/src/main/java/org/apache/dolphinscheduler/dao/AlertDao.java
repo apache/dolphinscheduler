@@ -244,6 +244,13 @@ public class AlertDao {
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,
                                      TaskInstance taskInstance,
                                      ProjectUser projectUser) {
+        if (projectUser == null) {
+            throw new IllegalArgumentException("projectUser must not be null");
+        }
+        if (workflowInstance.getWarningGroupId() == null) {
+            throw new IllegalArgumentException("warningGroupId of the workflow instance must not be null");
+        }
+
         Alert alert = new Alert();
         List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
         WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
