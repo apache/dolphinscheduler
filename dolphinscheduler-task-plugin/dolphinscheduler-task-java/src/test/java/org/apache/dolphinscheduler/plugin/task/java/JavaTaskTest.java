@@ -55,7 +55,7 @@ class JavaTaskTest {
         JavaTask javaTask = runJarType();
         assertThat(javaTask.buildJarCommand())
                 .isEqualTo(
-                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+                        "${JAVA_HOME}/bin/java -xms:50m -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080");
     }
 
     /**
@@ -68,7 +68,7 @@ class JavaTaskTest {
         JavaTask javaTask = runNormalJarType();
         assertThat(javaTask.buildNormalJarCommand())
                 .isEqualTo(
-                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar Test -host 127.0.0.1 -port 8080 -xms:50m");
+                        "${JAVA_HOME}/bin/java -xms:50m -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar Test -host 127.0.0.1 -port 8080");
     }
 
     /**
