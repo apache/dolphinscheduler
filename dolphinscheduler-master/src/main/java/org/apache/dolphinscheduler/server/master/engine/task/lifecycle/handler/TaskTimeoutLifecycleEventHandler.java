@@ -62,10 +62,18 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
             log.info("The task {} TimeoutStrategy is null.", taskName);
             return;
         }
+
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null;
+
         switch (timeoutNotifyStrategy) {
             case WARN:
                 log.info("The task {} TimeoutStrategy is WARN, try to send a timeout alert.", taskName);
-                doTaskTimeoutAlert(taskExecutionRunnable);
+                if (shouldSendAlert) {
+                    doTaskTimeoutAlert(taskExecutionRunnable);
+                } else {
+                    log.info("Skipped sending timeout alert for task {} because warningGroupId is null.", taskName);
+                }
                 break;
             case FAILED:
                 log.info("The task {} TimeoutStrategy is FAILED, try to publish a kill event.", taskName);
@@ -76,7 +84,11 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
                         "The task {} TimeoutStrategy is WARNFAILED, try to publish a kill event and send a timeout alert.",
                         taskName);
                 doTaskTimeoutKill(taskExecutionRunnable);
-                doTaskTimeoutAlert(taskExecutionRunnable);
+                if (shouldSendAlert) {
+                    doTaskTimeoutAlert(taskExecutionRunnable);
+                } else {
+                    log.info("Skipped sending timeout alert for task {} because warningGroupId is null.", taskName);
+                }
             default:
                 log.warn("The task {} TimeoutStrategy is invalided.", taskName);
                 break;
@@ -90,8 +102,7 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
     private void doTaskTimeoutAlert(final ITaskExecutionRunnable taskExecutionRunnable) {
         final WorkflowInstance workflowInstance = taskExecutionRunnable.getWorkflowInstance();
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        // todo: inject the projectUser
-        workflowAlertManager.sendTaskTimeoutAlert(workflowInstance, taskInstance, null);
+        workflowAlertManager.sendTaskTimeoutAlert(workflowInstance, taskInstance);
     }
 
     @Override

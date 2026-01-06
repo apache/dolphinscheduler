@@ -865,7 +865,7 @@ create index idx_task_instance_code_version on t_ds_task_instance (task_code, ta
 --
 DROP TABLE IF EXISTS t_ds_task_instance_context;
 CREATE TABLE t_ds_task_instance_context (
-  id int NOT NULL,
+  id SERIAL NOT NULL,
   task_instance_id int NOT NULL,
   context text NOT NULL,
   context_type varchar(200) NOT NULL,
