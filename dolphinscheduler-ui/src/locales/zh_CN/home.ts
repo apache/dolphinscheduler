@@ -31,14 +31,10 @@ export default {
   success: '成功',
   need_fault_tolerance: '需要容错',
   kill: 'KILL',
-  waiting_thread: '等待线程',
   waiting_depend: '等待依赖完成',
   delay_execution: '延时执行',
   forced_success: '强制成功',
   serial_wait: '串行等待',
   dispatch: '派发',
-  ready_block: '准备阻断',
-  block: '阻断',
-  wait_to_run: '等待执行',
   failover: '恢复容错'
 }
