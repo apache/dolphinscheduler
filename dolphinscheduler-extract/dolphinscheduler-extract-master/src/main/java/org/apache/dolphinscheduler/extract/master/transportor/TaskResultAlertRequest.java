@@ -15,37 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.task.executor.events;
+package org.apache.dolphinscheduler.extract.master.transportor;
 
-public enum TaskExecutorLifecycleEventType {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    DISPATCHED,
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskResultAlertRequest {
 
-    RUNNING,
+    private String title;
 
-    RUNTIME_CONTEXT_CHANGE,
+    private String content;
 
-    PAUSE,
+    private Integer alertGroupId;
 
-    PAUSED,
+    private Long workflowDefinitionCode;
 
-    KILL,
+    private Integer workflowInstanceId;
 
-    KILLED,
-
-    SUCCESS,
-
-    FAILED,
-
-    RESULT_ALERT,
-
-    FINALIZE,
-    ;
-
-    public boolean isFinished() {
-        return (this == KILLED
-                || this == PAUSED
-                || this == FAILED
-                || this == SUCCESS);
-    }
+    private int taskInstanceId;
 }

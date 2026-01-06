@@ -66,9 +66,9 @@ public class SqlParameters extends AbstractParameters {
     private int sqlType;
 
     /**
-     * send email
+     * send alert
      */
-    private Boolean sendEmail;
+    private Boolean sendAlert;
 
     /**
      * display rows
@@ -147,12 +147,12 @@ public class SqlParameters extends AbstractParameters {
         this.sqlType = sqlType;
     }
 
-    public Boolean getSendEmail() {
-        return sendEmail;
+    public Boolean getSendAlert() {
+        return sendAlert;
     }
 
-    public void setSendEmail(Boolean sendEmail) {
-        this.sendEmail = sendEmail;
+    public void setSendAlert(Boolean sendAlert) {
+        this.sendAlert = sendAlert;
     }
 
     public int getDisplayRows() {
@@ -273,7 +273,7 @@ public class SqlParameters extends AbstractParameters {
                 + ", datasource=" + datasource
                 + ", sql='" + sql + '\''
                 + ", sqlType=" + sqlType
-                + ", sendEmail=" + sendEmail
+                + ", sendAlert=" + sendAlert
                 + ", displayRows=" + displayRows
                 + ", limit=" + limit
                 + ", showType='" + showType + '\''

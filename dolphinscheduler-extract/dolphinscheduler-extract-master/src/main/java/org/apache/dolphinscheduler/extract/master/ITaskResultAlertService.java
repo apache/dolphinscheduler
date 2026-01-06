@@ -15,37 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.task.executor.events;
+package org.apache.dolphinscheduler.extract.master;
 
-public enum TaskExecutorLifecycleEventType {
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskResultAlertRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskResultAlertResponse;
 
-    DISPATCHED,
+@RpcService
+public interface ITaskResultAlertService {
 
-    RUNNING,
-
-    RUNTIME_CONTEXT_CHANGE,
-
-    PAUSE,
-
-    PAUSED,
-
-    KILL,
-
-    KILLED,
-
-    SUCCESS,
-
-    FAILED,
-
-    RESULT_ALERT,
-
-    FINALIZE,
-    ;
-
-    public boolean isFinished() {
-        return (this == KILLED
-                || this == PAUSED
-                || this == FAILED
-                || this == SUCCESS);
-    }
+    @RpcMethod
+    TaskResultAlertResponse reportTaskResultAlertToMaster(TaskResultAlertRequest taskResultAlertRequest);
 }

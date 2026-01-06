@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
-public class TaskAlertInfo {
+import lombok.Data;
+
+@Data
+public class TaskResultAlertInfo {
 
     private String title;
 
@@ -25,27 +28,10 @@ public class TaskAlertInfo {
 
     private Integer alertGroupId;
 
-    public String getTitle() {
-        return title;
-    }
+    private Long workflowDefinitionCode;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    private Integer workflowInstanceId;
 
-    public String getContent() {
-        return content;
-    }
+    private int taskInstanceId;
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Integer getAlertGroupId() {
-        return alertGroupId;
-    }
-
-    public void setAlertGroupId(Integer alertGroupId) {
-        this.alertGroupId = alertGroupId;
-    }
 }

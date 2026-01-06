@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.zeppelin.client.NoteResult;
@@ -80,6 +81,11 @@ public class ZeppelinTaskTest {
 
         @Override
         public void updateTaskInstanceInfo(int taskInstanceId) {
+
+        }
+
+        @Override
+        public void reportTaskResultAlertInfo(TaskResultAlertInfo taskResultAlertInfo) {
 
         }
     };

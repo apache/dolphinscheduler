@@ -24,8 +24,8 @@ import type { IJsonItem } from '../types'
 export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const querySpan = computed(() => (model.sqlType === '0' ? 6 : 0))
-  const emailSpan = computed(() =>
-    model.sqlType === '0' && model.sendEmail ? 24 : 0
+  const alertSpan = computed(() =>
+    model.sqlType === '0' && model.sendAlert ? 24 : 0
   )
   const groups = ref([])
   const groupsLoading = ref(false)
@@ -69,7 +69,7 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'switch',
-      field: 'sendEmail',
+      field: 'sendAlert',
       span: querySpan,
       name: t('project.node.send_alarm')
     },
@@ -109,12 +109,12 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
       props: {
         placeholder: t('project.node.title_tips')
       },
-      span: emailSpan,
+      span: alertSpan,
       validate: {
         trigger: ['input', 'blur'],
         required: true,
         validator(unuse, value) {
-          if (model.sendEmail && !value)
+          if (model.sendAlert && !value)
             return new Error(t('project.node.title_tips'))
         }
       }
@@ -124,7 +124,7 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
       field: 'groupId',
       name: t('project.node.alarm_group'),
       options: groups,
-      span: emailSpan,
+      span: alertSpan,
       props: {
         loading: groupsLoading,
         placeholder: t('project.node.alarm_group_tips')
@@ -133,7 +133,7 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'blur'],
         required: true,
         validator(unuse, value) {
-          if (model.sendEmail && !value)
+          if (model.sendAlert && !value)
             return new Error(t('project.node.alarm_group_tips'))
         }
       }

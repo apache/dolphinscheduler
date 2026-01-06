@@ -29,7 +29,7 @@ public enum AlertType {
 
     /**
      * 0 workflow instance failure, 1 workflow instance success, 2 workflow instance blocked, 3 workflow instance timeout, 4 fault tolerance warning,
-     * 5 task failure, 6 task success, 7 task timeout, 8 close alert
+     * 5 task failure, 6 task success, 7 task timeout, 8 task result
       */
     WORKFLOW_INSTANCE_FAILURE(0, "workflow instance failure"),
     WORKFLOW_INSTANCE_SUCCESS(1, "workflow instance success"),
@@ -39,6 +39,7 @@ public enum AlertType {
     TASK_FAILURE(5, "task failure"),
     TASK_SUCCESS(6, "task success"),
     TASK_TIMEOUT(7, "task timeout"),
+    TASK_RESULT(8, "task result");
     ;
 
     AlertType(int code, String descp) {

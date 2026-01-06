@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.task.executor.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorStateMappings;
+import org.apache.dolphinscheduler.task.executor.events.TaskExecutorResultAlertLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
 import java.util.ArrayList;
@@ -85,6 +87,12 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
             @Override
             public void updateTaskInstanceInfo(final int taskInstanceId) {
                 taskExecutorEventBus.publish(TaskExecutorRuntimeContextChangedLifecycleEvent.of(taskExecutor));
+            }
+
+            @Override
+            public void reportTaskResultAlertInfo(TaskResultAlertInfo taskResultAlertInfo) {
+                taskExecutorEventBus
+                        .publish(TaskExecutorResultAlertLifecycleEvent.of(taskExecutor, taskResultAlertInfo));
             }
         });
     }

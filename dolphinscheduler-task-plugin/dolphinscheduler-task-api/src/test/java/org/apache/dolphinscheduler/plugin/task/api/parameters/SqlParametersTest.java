@@ -35,7 +35,7 @@ public class SqlParametersTest {
     private final String sql = "select * from t_ds_user";
     private final int datasource = 1;
     private final int sqlType = 0;
-    private final Boolean sendEmail = true;
+    private final Boolean sendAlert = true;
     private final int displayRows = 10;
     private final String showType = "TABLE";
     private final String title = "sql test";
@@ -58,7 +58,7 @@ public class SqlParametersTest {
         sqlParameters.setSql(sql);
         sqlParameters.setDatasource(datasource);
         sqlParameters.setSqlType(sqlType);
-        sqlParameters.setSendEmail(sendEmail);
+        sqlParameters.setSendAlert(sendAlert);
         sqlParameters.setDisplayRows(displayRows);
         sqlParameters.setShowType(showType);
         sqlParameters.setTitle(title);
@@ -68,7 +68,7 @@ public class SqlParametersTest {
         Assertions.assertEquals(sql, sqlParameters.getSql());
         Assertions.assertEquals(datasource, sqlParameters.getDatasource());
         Assertions.assertEquals(sqlType, sqlParameters.getSqlType());
-        Assertions.assertEquals(sendEmail, sqlParameters.getSendEmail());
+        Assertions.assertEquals(sendAlert, sqlParameters.getSendAlert());
         Assertions.assertEquals(displayRows, sqlParameters.getDisplayRows());
         Assertions.assertEquals(showType, sqlParameters.getShowType());
         Assertions.assertEquals(title, sqlParameters.getTitle());

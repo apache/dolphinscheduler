@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -155,6 +155,11 @@ public class SqlTask extends AbstractTask {
             executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds);
 
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
+
+            if (this.getNeedAlert()) {
+                // callback to report taskResult alert
+                taskCallBack.reportTaskResultAlertInfo(this.getTaskResultAlertInfo());
+            }
 
         } catch (Exception e) {
             if (exitStatusCode == TaskConstants.EXIT_CODE_KILL) {
@@ -282,8 +287,8 @@ public class SqlTask extends AbstractTask {
         String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
                 : JSONUtils.toJsonString(resultJSONArray);
 
-        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
-            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
+        if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
+            sendTaskResultAlert(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
                     : taskExecutionContext.getTaskName() + " query result sets", result);
         }
@@ -312,18 +317,21 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * send alert as an attachment
+     * send alert
      *
      * @param title   title
      * @param content content
      */
-    private void sendAttachment(int groupId, String title, String content) {
+    private void sendTaskResultAlert(int groupId, String title, String content) {
         setNeedAlert(Boolean.TRUE);
-        TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
+        TaskResultAlertInfo taskAlertInfo = new TaskResultAlertInfo();
         taskAlertInfo.setAlertGroupId(groupId);
         taskAlertInfo.setContent(content);
         taskAlertInfo.setTitle(title);
-        setTaskAlertInfo(taskAlertInfo);
+        taskAlertInfo.setWorkflowDefinitionCode(this.taskExecutionContext.getWorkflowDefinitionCode());
+        taskAlertInfo.setWorkflowInstanceId(this.taskExecutionContext.getWorkflowInstanceId());
+        taskAlertInfo.setTaskInstanceId(this.taskExecutionContext.getTaskInstanceId());
+        setTaskResultAlertInfo(taskAlertInfo);
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {

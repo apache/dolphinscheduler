@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 
 public interface TaskCallBack {
 
@@ -26,4 +27,6 @@ public interface TaskCallBack {
     // todo:The pid should put into runtime context
     @Deprecated
     void updateTaskInstanceInfo(int taskInstanceId);
+
+    void reportTaskResultAlertInfo(TaskResultAlertInfo taskResultAlertInfo);
 }
