@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -69,6 +70,14 @@ class JavaTaskTest {
         assertThat(javaTask.buildNormalJarCommand())
                 .isEqualTo(
                         "${JAVA_HOME}/bin/java -xms:50m -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar:/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar Test -host 127.0.0.1 -port 8080");
+    }
+
+    @Test
+    void testParameterPass() {
+        JavaTask javaTask = createJavaTaskWithCusVar();
+        assertThat(javaTask.buildNormalJarCommand())
+                .isEqualTo(
+                        "${JAVA_HOME}/bin/java -xms:1G -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar Test -host 0.0.0.0 -port 12345");
     }
 
     /**
@@ -134,16 +143,26 @@ class JavaTaskTest {
         return javaParameters;
     }
 
-    /**
-     * The Java task to construct the jar run mode
-     *
-     * @return JavaTask
-     **/
-    private JavaTask runJarType() {
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_FAT_JAR)));
-        taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
-        taskExecutionContext.setTaskAppId("runJavaType");
+    private JavaParameters createJavaTaskWithCusVar(String runType) {
+        JavaParameters javaParameters = new JavaParameters();
+        javaParameters.setRunType(runType);
+        javaParameters.setModulePath(false);
+        javaParameters.setJvmArgs("-xms:${max_mem}");
+        javaParameters.setMainArgs("-host ${host} -port ${port}");
+        ResourceInfo resourceJar = new ResourceInfo();
+        resourceJar.setResourceName("/opt/share/jar/resource2.jar");
+        ArrayList<ResourceInfo> resourceInfoArrayList = new ArrayList<>();
+        resourceInfoArrayList.add(resourceJar);
+        javaParameters.setResourceList(resourceInfoArrayList);
+        ArrayList<Property> localParams = new ArrayList<>();
+        javaParameters.setLocalParams(localParams);
+        ResourceInfo mainJar = new ResourceInfo();
+        mainJar.setResourceName("/opt/share/jar/main.jar");
+        javaParameters.setMainJar(mainJar);
+        return javaParameters;
+    }
+
+    private ResourceContext createResourceContext() {
         ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
         resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
         resourceItem1
@@ -156,8 +175,21 @@ class JavaTaskTest {
         ResourceContext resourceContext = new ResourceContext();
         resourceContext.addResourceItem(resourceItem1);
         resourceContext.addResourceItem(resourceItem2);
-        taskExecutionContext.setResourceContext(resourceContext);
+        return resourceContext;
+    }
 
+    /**
+     * The Java task to construct the jar run mode
+     *
+     * @return JavaTask
+     **/
+    private JavaTask runJarType() {
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_FAT_JAR)));
+        taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
+        taskExecutionContext.setTaskAppId("runJavaType");
+        ResourceContext resourceContext = createResourceContext();
+        taskExecutionContext.setResourceContext(resourceContext);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;
@@ -174,20 +206,44 @@ class JavaTaskTest {
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createNormalJarJavaParameters(RUN_TYPE_NORMAL_JAR)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
-        ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
-        resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
-        resourceItem1
-                .setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar");
-
-        ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
-        resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
-        resourceItem2.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar");
-
-        ResourceContext resourceContext = new ResourceContext();
-        resourceContext.addResourceItem(resourceItem1);
-        resourceContext.addResourceItem(resourceItem2);
+        ResourceContext resourceContext = createResourceContext();
         taskExecutionContext.setResourceContext(resourceContext);
+        JavaTask javaTask = new JavaTask(taskExecutionContext);
+        javaTask.init();
+        return javaTask;
+    }
 
+    private JavaTask createJavaTaskWithCusVar() {
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaTaskWithCusVar(RUN_TYPE_NORMAL_JAR)));
+        taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
+        taskExecutionContext.setTaskAppId("runJavaType");
+        Property property = new Property();
+        property.setProp("max_mem");
+        property.setValue("1G");
+        property.setDirect(IN);
+        property.setType(VARCHAR);
+
+        Property property2 = new Property();
+        property2.setProp("host");
+        property2.setValue("0.0.0.0");
+        property2.setDirect(IN);
+        property2.setType(VARCHAR);
+
+        Property property3 = new Property();
+        property3.setProp("port");
+        property3.setValue("12345");
+        property3.setDirect(IN);
+        property3.setType(VARCHAR);
+
+        HashMap<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("max_mem", property);
+        prepareParamsMap.put("host", property2);
+        prepareParamsMap.put("port", property3);
+
+        taskExecutionContext.setPrepareParamsMap(prepareParamsMap);
+        ResourceContext resourceContext = createResourceContext();
+        taskExecutionContext.setResourceContext(resourceContext);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;
