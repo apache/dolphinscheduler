@@ -40,6 +40,7 @@ export default {
   cancel: '取消',
   create: '创建',
   edit: '编辑',
+  edit_password: '编辑密码',
   success: '成功',
   test_connect: '测试连接',
   ip: 'IP主机名',
@@ -102,5 +103,10 @@ export default {
   region_id: 'Region Id',
   region_id_tips: '请输入Region Id',
   endpoint: 'endpoint',
-  endpoint_tips: '请输入endpoint'
+  endpoint_tips: '请输入endpoint',
+  update_password_success: '密码更新成功',
+  update_password_failed: '密码更新失败',
+  confirm_password: '确认密码',
+  confirm_password_tips: '请再次输入密码',
+  password_mismatch: '两次输入的密码不一致'
 }

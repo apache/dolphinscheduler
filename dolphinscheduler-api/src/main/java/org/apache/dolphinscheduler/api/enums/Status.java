@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.api.enums;
 
+import lombok.Getter;
+import org.springframework.context.i18n.LocaleContextHolder;
+
 import java.util.Locale;
 import java.util.Optional;
-
-import lombok.Getter;
-
-import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * status enum      // todo #4855 One category one interval
@@ -261,6 +260,8 @@ public enum Status {
     QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
     EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
+    DATASOURCE_PASSWORD_ENTERED_TWICE_NOT_MATCH(10207, "datasource password entered twice not match", "数据源两次输入的密码不一致"),
+    DATASOURCE_PASSWORD_SAME_WITH_OLD(10208, "datasource new password same with old", "数据源修改密码与原来密码一致"),
 
     DELETE_QUEUE_BY_ID_ERROR(10307, "delete queue by id error", "删除队列错误"),
     DELETE_QUEUE_BY_ID_FAIL_USERS(10308, "delete queue by id fail, for there are {0} users using it",
@@ -274,6 +275,7 @@ public enum Status {
     LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR(10210, "list azure data factory pipeline error", "查询AZURE数据工厂pipeline列表错误"),
     NOT_SUPPORT_SSO(10211, "Not support SSO login.", "不支持SSO登录"),
     STATE_CODE_ERROR(10212, "state inconsistency or state and code not pair", "状态码前后不一致或状态码和code不匹配"),
+    UPDATE_DATASOURCE_PASSWORD_ERROR(10213, "update datasource password error", "更新数据源密码错误"),
 
     CREATE_PROJECT_PARAMETER_ERROR(10214, "create project parameter error", "创建项目参数错误"),
 

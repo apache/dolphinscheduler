@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
-import static org.mockito.Mockito.when;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -41,6 +38,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourcePr
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.datasource.hive.param.HiveDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceParamDTO;
@@ -49,20 +47,6 @@ import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQL
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,7 +59,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * data source service test
@@ -109,10 +105,10 @@ public class DataSourceServiceTest {
     }
 
     private void passResourcePermissionCheckService() {
-        when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
-                Mockito.anyString(), Mockito.any())).thenReturn(true);
-        when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
-                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+        when(resourcePermissionCheckService.operationPermissionCheck(any(), Mockito.anyInt(),
+                anyString(), any())).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(any(), any(),
+                Mockito.anyInt(), any())).thenReturn(true);
     }
 
     @Test
@@ -149,7 +145,7 @@ public class DataSourceServiceTest {
 
         try (
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
-                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+                        mockStatic(DataSourceClientProvider.class)) {
 
             when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
 
@@ -163,7 +159,7 @@ public class DataSourceServiceTest {
             assertDoesNotThrow(() -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
 
             // Duplicated Key Exception
-            when(dataSourceMapper.insert(Mockito.any(DataSource.class))).thenThrow(DuplicateKeyException.class);
+            when(dataSourceMapper.insert(any(DataSource.class))).thenThrow(DuplicateKeyException.class);
             assertThrowsServiceException(Status.DATASOURCE_EXIST,
                     () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
         }
@@ -220,7 +216,7 @@ public class DataSourceServiceTest {
 
         try (
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
-                        Mockito.mockStatic(DataSourceClientProvider.class)) {
+                        mockStatic(DataSourceClientProvider.class)) {
             // DATASOURCE_CONNECT_FAILED
             when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
 
@@ -234,10 +230,58 @@ public class DataSourceServiceTest {
             assertDoesNotThrow(() -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
 
             // Duplicated Key Exception
-            when(dataSourceMapper.updateById(Mockito.any(DataSource.class))).thenThrow(DuplicateKeyException.class);
+            when(dataSourceMapper.updateById(any(DataSource.class))).thenThrow(DuplicateKeyException.class);
             assertThrowsServiceException(Status.DATASOURCE_EXIST,
                     () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
         }
+    }
+
+    @Test
+    public void testUpdateDataSourcePassword_Success() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserName("testUser");
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        DataSource dataSource = new DataSource();
+        Integer validId = 1;
+        dataSource.setId(validId);
+        dataSource.setType(DbType.MYSQL);
+        dataSource.setConnectionParams("{\"user\":\"datawings\",\"password\":\"oldEncodedPassword\",\"address\":\"jdbc:mysql://127.0.0.1:50001\",\"database\":\"dolphinscheduler330\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:50001/dolphinscheduler330\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}");
+        // 模拟数据源存在
+        when(dataSourceMapper.selectById(1)).thenReturn(dataSource);
+
+        // 设置权限检查通过 - 使用精确的参数匹配
+        when(resourcePermissionCheckService.operationPermissionCheck(
+                eq(AuthorizationType.DATASOURCE),  // 确保类型匹配
+                eq(loginUser.getId()),             // 用户ID
+                eq("datasource:update"),           // 权限字符串
+                any(Logger.class)                  // 日志对象可以是任意值
+        )).thenReturn(true);
+
+        // 设置资源权限检查通过
+        when(resourcePermissionCheckService.resourcePermissionCheck(
+                eq(AuthorizationType.DATASOURCE),
+                eq(new Object[]{validId}),
+                eq(loginUser.getId()),
+                any(Logger.class)
+        )).thenReturn(true);
+
+        // 模拟旧密码解码
+        try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
+            passwordUtilsMock.when(() -> PasswordUtils.decodePassword("oldEncodedPassword"))
+                    .thenReturn("oldPassword");
+        }
+        // 模拟更新成功
+        when(dataSourceMapper.updateById(any(DataSource.class))).thenReturn(1);
+
+        String validPassword = "newPassword123";
+        String validConfirmPassword = "newPassword123";
+        DataSource result = dataSourceService.updateDataSourcePassword(loginUser, validId, validPassword, validConfirmPassword);
+
+        assertNotNull(result);
+        assertEquals(validId, result.getId());
+        verify(dataSourceMapper, times(1)).updateById(dataSource);
     }
 
     @Test
@@ -255,7 +299,7 @@ public class DataSourceServiceTest {
 
         // test query datasource as general user with no datasource authed
         when(dataSourceList.getRecords()).thenReturn(getSingleDataSourceList());
-        when(dataSourceMapper.selectPagingByIds(Mockito.any(), Mockito.any(), Mockito.any()))
+        when(dataSourceMapper.selectPagingByIds(any(), any(), any()))
                 .thenReturn(dataSourceList);
         assertDoesNotThrow(() -> dataSourceService.queryDataSourceListPaging(generalUser, searchVal, pageNo, pageSize));
 
@@ -274,16 +318,16 @@ public class DataSourceServiceTest {
 
         try (
                 MockedStatic<DataSourceUtils> ignored =
-                        Mockito.mockStatic(DataSourceUtils.class)) {
+                        mockStatic(DataSourceUtils.class)) {
             DataSource dataSource = getOracleDataSource(999);
             when(dataSourceMapper.selectById(dataSource.getId())).thenReturn(dataSource);
             DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
 
-            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
-            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+            when(DataSourceUtils.getDatasourceProcessor(any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(any())).thenReturn(true);
             assertDoesNotThrow(() -> dataSourceService.connectionTest(dataSource.getId()));
 
-            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
+            when(dataSourceProcessor.checkDataSourceConnectivity(any())).thenReturn(false);
             assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
                     () -> dataSourceService.connectionTest(dataSource.getId()));
         }
@@ -484,7 +528,7 @@ public class DataSourceServiceTest {
                         + "\"driverClassName\":\"oracle.jdbc.OracleDriver\",\"validationQuery\":\"select 1 from dual\",\"connectType\":\"ORACLE_SERVICE_NAME\"}";
         Assertions.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
 
-        try (MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+        try (MockedStatic<CommonUtils> mockedStaticCommonUtils = mockStatic(CommonUtils.class)) {
             mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(true);
             HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
             hiveDataSourceParamDTO.setHost("192.168.9.1");
@@ -509,7 +553,7 @@ public class DataSourceServiceTest {
 
     @Test
     public void buildParameterWithDecodePassword() {
-        try (MockedStatic<PropertyUtils> mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+        try (MockedStatic<PropertyUtils> mockedStaticPropertyUtils = mockStatic(PropertyUtils.class)) {
             mockedStaticPropertyUtils
                     .when(() -> PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false))
                     .thenReturn(true);
@@ -589,16 +633,16 @@ public class DataSourceServiceTest {
 
         try (
                 MockedStatic<DataSourceUtils> mockedStaticDataSourceClientProvider =
-                        Mockito.mockStatic(DataSourceUtils.class)) {
+                        mockStatic(DataSourceUtils.class)) {
             DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
 
-            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
-            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
+            when(DataSourceUtils.getDatasourceProcessor(any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(any())).thenReturn(false);
 
             assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
                     () -> dataSourceService.checkConnection(dataSourceType, connectionParam));
 
-            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+            when(dataSourceProcessor.checkDataSourceConnectivity(any())).thenReturn(true);
             assertDoesNotThrow(() -> dataSourceService.checkConnection(dataSourceType, connectionParam));
         }
     }
@@ -619,9 +663,9 @@ public class DataSourceServiceTest {
         when(dataSourceMapper.selectById(datasourceId)).thenReturn(dataSource);
         MySQLConnectionParam connectionParam = new MySQLConnectionParam();
         Connection connection = Mockito.mock(Connection.class);
-        MockedStatic<DataSourceUtils> dataSourceUtils = Mockito.mockStatic(DataSourceUtils.class);
-        dataSourceUtils.when(() -> DataSourceUtils.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
-        dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+        MockedStatic<DataSourceUtils> dataSourceUtils = mockStatic(DataSourceUtils.class);
+        dataSourceUtils.when(() -> DataSourceUtils.getConnection(any(), any())).thenReturn(connection);
+        dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(any(), any()))
                 .thenReturn(connectionParam);
 
         try {
@@ -630,7 +674,7 @@ public class DataSourceServiceTest {
             Assertions.assertTrue(e.getMessage().contains(Status.GET_DATASOURCE_TABLES_ERROR.getMsg()));
         }
 
-        dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+        dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(any(), any()))
                 .thenReturn(null);
 
         try {

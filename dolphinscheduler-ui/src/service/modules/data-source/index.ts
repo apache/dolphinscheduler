@@ -15,15 +15,8 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import {
-  ListReq,
-  IDataSource,
-  UserIdReq,
-  TypeReq,
-  NameReq,
-  IdReq
-} from './types'
+import {axios} from '@/service/service'
+import {IDataSource, IdReq, ListReq, NameReq, TypeReq, UserIdReq} from './types'
 
 export function queryDataSourceListPaging(params: ListReq): any {
   return axios({
@@ -165,5 +158,24 @@ export function getDatasourceTableColumnsById(
       database,
       tableName
     }
+  })
+}
+
+export function updateDataSourcePassword(
+  id: IdReq,
+  password: string,
+  confirmPassword: string
+): Promise<any> {
+  return axios({
+    url: `/datasources/password/${id}`,
+    method: 'put',
+    data: {
+      password,
+      confirmPassword
+    },
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    },
+    transformRequest: (params) => JSON.stringify(params)
   })
 }

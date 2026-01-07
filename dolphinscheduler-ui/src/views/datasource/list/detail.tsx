@@ -15,29 +15,12 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  getCurrentInstance,
-  PropType,
-  toRefs,
-  watch
-} from 'vue'
-import {
-  NButton,
-  NSpin,
-  NForm,
-  NFormItem,
-  NSelect,
-  NInput,
-  NInputNumber,
-  NRadioGroup,
-  NRadio,
-  NSpace
-} from 'naive-ui'
+import {defineComponent, getCurrentInstance, PropType, toRefs, watch} from 'vue'
+import {NButton, NForm, NFormItem, NInput, NInputNumber, NRadio, NRadioGroup, NSelect, NSpace, NSpin} from 'naive-ui'
 import Modal from '@/components/modal'
-import { useI18n } from 'vue-i18n'
-import { useForm, datasourceType } from './use-form'
-import { useDetail } from './use-detail'
+import {useI18n} from 'vue-i18n'
+import {datasourceType, useForm} from './use-form'
+import {useDetail} from './use-detail'
 import styles from './index.module.scss'
 
 const props = {
@@ -89,7 +72,7 @@ const DetailModal = defineComponent({
 
     const onTest = async () => {
       await state.detailFormRef.validate()
-      testConnect()
+      testConnect(props.id)
     }
 
     const onChangeType = changeType
@@ -408,7 +391,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'SqlPassword'}
+                  v-show={showMode && detailForm.mode === 'SqlPassword' && !id}
                   label={t('datasource.database_password')}
                   path='password'
                   show-require-mark
@@ -438,7 +421,7 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 <NFormItem
                   v-show={
-                    showMode && detailForm.mode === 'ActiveDirectoryPassword'
+                    showMode && detailForm.mode === 'ActiveDirectoryPassword' && !id
                   }
                   label={t('datasource.Azure_AD_password')}
                   path='password'
@@ -453,7 +436,7 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 {/* ActiveDirectoryMSI */}
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'ActiveDirectoryMSI'}
+                  v-show={showMode && detailForm.mode === 'ActiveDirectoryMSI' && !id}
                   label={t('datasource.MSIClientId')}
                   path='MSIClientId'
                 >
@@ -484,7 +467,7 @@ const DetailModal = defineComponent({
                 <NFormItem
                   v-show={
                     showMode &&
-                    detailForm.mode === 'ActiveDirectoryServicePrincipal'
+                    detailForm.mode === 'ActiveDirectoryServicePrincipal' && !id
                   }
                   label={t('datasource.clientSecret')}
                   path='password'
@@ -512,7 +495,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'accessToken'}
+                  v-show={showMode && detailForm.mode === 'accessToken' && !id}
                   label={t('datasource.clientSecret')}
                   path='password'
                   show-require-mark
@@ -552,7 +535,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  v-show={showMode && detailForm.mode === 'IAM-accessKey' && !id}
                   label={t('datasource.SecretAccessKey')}
                   path='password'
                   show-require-mark
@@ -629,7 +612,8 @@ const DetailModal = defineComponent({
                   v-show={
                     (!showMode || detailForm.mode === 'password') &&
                     detailForm.type != 'K8S' &&
-                    detailForm.type != 'ALIYUN_SERVERLESS_SPARK'
+                    detailForm.type != 'ALIYUN_SERVERLESS_SPARK' &&
+                    !id
                   }
                   label={t('datasource.user_password')}
                   path='password'

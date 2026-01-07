@@ -15,25 +15,19 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  getCurrentInstance,
-  onMounted,
-  ref,
-  toRefs,
-  watch
-} from 'vue'
-import { NButton, NIcon, NDataTable, NPagination, NSpace } from 'naive-ui'
-import { SearchOutlined } from '@vicons/antd'
-import { useI18n } from 'vue-i18n'
-import { useColumns } from './use-columns'
-import { useTable } from './use-table'
-import { DefaultTableWidth } from '@/common/column-width-config'
+import {defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch} from 'vue'
+import {NButton, NDataTable, NIcon, NPagination, NSpace} from 'naive-ui'
+import {SearchOutlined} from '@vicons/antd'
+import {useI18n} from 'vue-i18n'
+import {useColumns} from './use-columns'
+import {useTable} from './use-table'
+import {DefaultTableWidth} from '@/common/column-width-config'
 import Card from '@/components/card'
 import Search from '@/components/input-search'
 import DetailModal from './detail'
-import type { TableColumns } from './types'
+import type {TableColumns} from './types'
 import SourceModal from './source-modal'
+import PasswordModal from './password-modal'
 
 const list = defineComponent({
   name: 'list',
@@ -41,6 +35,7 @@ const list = defineComponent({
     const { t } = useI18n()
     const showDetailModal = ref(false)
     const showSourceModal = ref(false)
+    const showEditPasswordModal = ref(false)
     const selectType = ref('MYSQL')
     const selectId = ref()
     const columns = ref({
@@ -51,9 +46,13 @@ const list = defineComponent({
       useTable()
 
     const { getColumns } = useColumns(
-      (id: number, type: 'edit' | 'delete', row?: any) => {
+      (id: number, type: 'edit' | 'delete' | 'editPassword', row?: any) => {
         if (type === 'edit') {
           showDetailModal.value = true
+          selectId.value = id
+          selectType.value = row.type
+        } else if (type === 'editPassword') {
+          showEditPasswordModal.value = true
           selectId.value = id
           selectType.value = row.type
         } else {
@@ -96,6 +95,7 @@ const list = defineComponent({
       t,
       showDetailModal,
       showSourceModal,
+      showEditPasswordModal,
       id: selectId,
       columns,
       ...toRefs(data),
@@ -194,6 +194,13 @@ const list = defineComponent({
           onCancel={() => void (this.showDetailModal = false)}
           onUpdate={onUpdatedList}
           onOpen={handleSourceModalOpen}
+        />
+        <PasswordModal
+          show={this.showEditPasswordModal}
+          id={id}
+          selectType={selectType}
+          onCancel={() => void (this.showEditPasswordModal = false)}
+          onUpdate={onUpdatedList}
         />
       </NSpace>
     )

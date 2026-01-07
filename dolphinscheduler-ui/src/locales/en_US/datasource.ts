@@ -40,6 +40,7 @@ export default {
   cancel: 'Cancel',
   create: 'Create',
   edit: 'Edit',
+  edit_password: 'Edit password',
   success: 'Success',
   test_connect: 'Test Connect',
   ip: 'IP',
@@ -105,5 +106,10 @@ export default {
   region_id: 'Region Id',
   region_id_tips: 'Please enter Region Id',
   endpoint: 'Endpoint',
-  endpoint_tips: 'Please enter endpoint'
+  endpoint_tips: 'Please enter endpoint',
+  update_password_success: 'Password updated successfully',
+  update_password_failed: 'Password update failed',
+  confirm_password: 'Confirm Password',
+  confirm_password_tips: 'Please enter password again',
+  password_mismatch: 'Passwords do not match'
 }

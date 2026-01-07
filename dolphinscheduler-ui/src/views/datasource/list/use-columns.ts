@@ -15,25 +15,14 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { useI18n } from 'vue-i18n'
-import {
-  NPopover,
-  NButton,
-  NIcon,
-  NPopconfirm,
-  NSpace,
-  NTooltip
-} from 'naive-ui'
-import { EditOutlined, DeleteOutlined } from '@vicons/antd'
+import {h} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {NButton, NIcon, NPopconfirm, NPopover, NSpace, NTooltip} from 'naive-ui'
+import {DeleteOutlined, EditOutlined, LockOutlined} from '@vicons/antd'
 import JsonHighlight from './json-highlight'
 import ButtonLink from '@/components/button-link'
-import {
-  COLUMN_WIDTH_CONFIG,
-  calculateTableWidth,
-  DefaultTableWidth
-} from '@/common/column-width-config'
-import type { TableColumns } from './types'
+import {calculateTableWidth, COLUMN_WIDTH_CONFIG, DefaultTableWidth} from '@/common/column-width-config'
+import type {TableColumns} from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
@@ -97,7 +86,7 @@ export function useColumns(onCallback: Function) {
       {
         title: t('datasource.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render: (rowData) => {
           return h(NSpace, null, {
             default: () => [
@@ -150,6 +139,24 @@ export function useColumns(onCallback: Function) {
                     }
                   ),
                 default: () => t('datasource.delete')
+              }),
+              h(NTooltip, null, {
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      circle: true,
+                      type: 'warning',
+                      size: 'small',
+                      onClick: () =>
+                        void onCallback(rowData.id, 'editPassword', rowData)
+                    },
+                    {
+                      default: () =>
+                        h(NIcon, null, { default: () => h(LockOutlined) })
+                    }
+                  ),
+                default: () => t('datasource.edit_password')
               })
             ]
           })

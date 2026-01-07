@@ -34,8 +34,10 @@ public class DataSyncClientFactory {
         // todo: upgrade the version of aws sdk
         String awsAccessKeyId = awsProperties.get(AwsConfigurationKeys.AWS_ACCESS_KEY_ID);
         String awsSecretAccessKey = awsProperties.get(AwsConfigurationKeys.AWS_SECRET);
-        final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
-        final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
+        final AwsBasicCredentials basicAWSCredentials =
+                AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
+        final AwsCredentialsProvider awsCredentialsProvider =
+                StaticCredentialsProvider.create(basicAWSCredentials);
 
         // create a datasync client
         return DataSyncClient.builder()
@@ -43,5 +45,4 @@ public class DataSyncClientFactory {
                 .credentialsProvider(awsCredentialsProvider)
                 .build();
     }
-
 }

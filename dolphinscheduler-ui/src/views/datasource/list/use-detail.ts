@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import {reactive} from 'vue'
 import {
-  queryDataSource,
-  createDataSource,
-  updateDataSource,
-  connectDataSource,
-  verifyDataSourceName
+    connectDataSource,
+    createDataSource,
+    queryDataSource,
+    updateDataSource,
+    updateDataSourcePassword,
+    verifyDataSourceName
 } from '@/service/modules/data-source'
-import { useI18n } from 'vue-i18n'
-import type { IDataSource } from './types'
+import {useI18n} from 'vue-i18n'
+import type {IDataSource} from './types'
 
-export function useDetail(getFieldsValue: Function) {
+export function useDetail(getFieldsValue?: Function) {
   const { t } = useI18n()
   const status = reactive({
     saving: false,
@@ -36,12 +37,24 @@ export function useDetail(getFieldsValue: Function) {
 
   let PREV_NAME: string
 
-  const formatParams = (): IDataSource => {
+  const formatParams = (id?: number, includePassword?: boolean): IDataSource => {
+    if (!getFieldsValue) {
+      throw new Error('getFieldsValue function is required')
+    }
     const values = getFieldsValue()
-    return {
+    
+    const params: any = {
       ...values,
       other: values.other ? JSON.parse(values.other) : null
     }
+    
+    // 如果是编辑模式且不需要包含密码，则移除密码相关字段
+    if (id && !includePassword) {
+      delete params.password
+      delete params.confirmPassword
+    }
+    
+    return params
   }
 
   const queryById = async (id: number) => {
@@ -53,11 +66,13 @@ export function useDetail(getFieldsValue: Function) {
     return dataSourceRes
   }
 
-  const testConnect = async () => {
+  const testConnect = async (id?: number) => {
     if (status.testing) return
     status.testing = true
     try {
-      const res = await connectDataSource(formatParams())
+      // 测试连接时始终传递密码
+      const params = formatParams(id, true)
+      const res = await connectDataSource(params)
       window.$message.success(
         res && res.msg
           ? res.msg
@@ -70,6 +85,9 @@ export function useDetail(getFieldsValue: Function) {
   }
 
   const createOrUpdate = async (id?: number) => {
+    if (!getFieldsValue) {
+      throw new Error('getFieldsValue function is required')
+    }
     const values = getFieldsValue()
 
     if (status.saving || !values.name) return false
@@ -81,7 +99,7 @@ export function useDetail(getFieldsValue: Function) {
       }
 
       id
-        ? await updateDataSource(formatParams(), id)
+        ? await updateDataSource(formatParams(id, false), id)
         : await createDataSource(formatParams())
 
       status.saving = false
@@ -92,5 +110,22 @@ export function useDetail(getFieldsValue: Function) {
     }
   }
 
-  return { status, queryById, testConnect, createOrUpdate }
+  const updatePassword = async (id: number, password: string, confirmPassword: string) => {
+    if (status.saving) return false
+    status.saving = true
+
+    try {
+      // 使用专门的密码更新接口
+      await updateDataSourcePassword(id, password, confirmPassword)
+      status.saving = false
+      window.$message.success(t('datasource.update_password_success'))
+      return true
+    } catch (err) {
+      status.saving = false
+      window.$message.error(t('datasource.update_password_failed'))
+      return false
+    }
+  }
+
+  return { status, queryById, testConnect, createOrUpdate, updatePassword }
 }

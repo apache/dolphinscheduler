@@ -51,6 +51,16 @@ public interface DataSourceService {
     DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
+     * updateDataSourcePassword datasource
+     *
+     * @param loginUser login user
+     * @param password password
+     * @param confirmPassword confirmPassword
+     * @return update result code
+     */
+    DataSource updateDataSourcePassword(User loginUser, Integer id, String password, String confirmPassword);
+
+    /**
      * updateWorkflowInstance datasource
      *
      * @param id datasource id
