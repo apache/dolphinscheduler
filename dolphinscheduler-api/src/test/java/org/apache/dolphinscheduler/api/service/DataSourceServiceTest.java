@@ -17,8 +17,19 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.apache.commons.collections4.CollectionUtils;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -47,6 +58,20 @@ import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQL
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,19 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * data source service test
@@ -247,16 +260,17 @@ public class DataSourceServiceTest {
         Integer validId = 1;
         dataSource.setId(validId);
         dataSource.setType(DbType.MYSQL);
-        dataSource.setConnectionParams("{\"user\":\"datawings\",\"password\":\"oldEncodedPassword\",\"address\":\"jdbc:mysql://127.0.0.1:50001\",\"database\":\"dolphinscheduler330\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:50001/dolphinscheduler330\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}");
+        dataSource.setConnectionParams(
+                "{\"user\":\"datawings\",\"password\":\"oldEncodedPassword\",\"address\":\"jdbc:mysql://127.0.0.1:50001\",\"database\":\"dolphinscheduler330\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:50001/dolphinscheduler330\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\"}");
         // 模拟数据源存在
         when(dataSourceMapper.selectById(1)).thenReturn(dataSource);
 
         // 设置权限检查通过 - 使用精确的参数匹配
         when(resourcePermissionCheckService.operationPermissionCheck(
-                eq(AuthorizationType.DATASOURCE),  // 确保类型匹配
-                eq(loginUser.getId()),             // 用户ID
-                eq("datasource:update"),           // 权限字符串
-                any(Logger.class)                  // 日志对象可以是任意值
+                eq(AuthorizationType.DATASOURCE), // 确保类型匹配
+                eq(loginUser.getId()), // 用户ID
+                eq("datasource:update"), // 权限字符串
+                any(Logger.class) // 日志对象可以是任意值
         )).thenReturn(true);
 
         // 设置资源权限检查通过
@@ -264,8 +278,7 @@ public class DataSourceServiceTest {
                 eq(AuthorizationType.DATASOURCE),
                 eq(new Object[]{validId}),
                 eq(loginUser.getId()),
-                any(Logger.class)
-        )).thenReturn(true);
+                any(Logger.class))).thenReturn(true);
 
         // 模拟旧密码解码
         try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
@@ -277,7 +290,8 @@ public class DataSourceServiceTest {
 
         String validPassword = "newPassword123";
         String validConfirmPassword = "newPassword123";
-        DataSource result = dataSourceService.updateDataSourcePassword(loginUser, validId, validPassword, validConfirmPassword);
+        DataSource result =
+                dataSourceService.updateDataSourcePassword(loginUser, validId, validPassword, validConfirmPassword);
 
         assertNotNull(result);
         assertEquals(validId, result.getId());
