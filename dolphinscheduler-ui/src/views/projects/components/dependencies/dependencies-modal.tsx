@@ -59,7 +59,7 @@ export default defineComponent({
     }
 
     const cancelToHandle = () => {
-      ctx.emit('update:show', showRef.value)
+      ctx.emit('update:show', showRef)
     }
 
     const renderDownstreamDependencies = () => {
