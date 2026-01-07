@@ -639,7 +639,6 @@ export function useForm(id?: number) {
   }
 
   const setFieldsValue = (values: IDataSource) => {
-    // 处理第三方系统连接器相关的接口参数，确保数组类型正确
     const processedValues = {
       ...values,
       other: values.other ? JSON.stringify(values.other) : values.other,
