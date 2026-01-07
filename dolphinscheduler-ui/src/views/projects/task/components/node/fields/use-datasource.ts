@@ -34,7 +34,9 @@ export function useDatasource(
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
-  const datasourceOptions = ref([] as { label: string; value: number | string }[])
+  const datasourceOptions = ref(
+    [] as { label: string; value: number | string }[]
+  )
 
   const datasourceTypes = [
     {

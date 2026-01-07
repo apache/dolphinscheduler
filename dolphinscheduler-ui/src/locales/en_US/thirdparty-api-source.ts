@@ -82,11 +82,13 @@ export default {
   param_value_tips: 'Please enter parameter value',
   extract_response_data: 'Please enter response data jsonPath',
   extract_field: 'Please enter extract field',
-  json_path: 'Please enter json path',
-  header_prefix:'Authorization Token Prefix',
+  json_path_list: 'Please enter, e.g: $.data[*].id',
+  json_path: 'Please enter, e.g: $.data.taskInstanceId',
+  header_prefix: 'Authorization Token Prefix',
   header_prefix_tips: 'Authorization header before token,e.g.Bearer',
   system_field_tips: 'Please select system field',
   request_body: 'Request Body',
+  request_body_placeholder: 'Please enter JSON format request body',
   header: 'Header',
   query: 'Query',
   get: 'GET',
@@ -96,7 +98,8 @@ export default {
   interface_timeout_tips: 'Please enter interface timeout',
   millisecond: 'millisecond',
 
-  interface_timeout_description: 'Set the interface request timeout, default is 120000 milliseconds (2 minutes)',
+  interface_timeout_description:
+    'Set the interface request timeout, default is 120000 milliseconds (2 minutes)',
 
   // Polling Configuration
   polling_config: 'Polling Configuration',
@@ -104,12 +107,14 @@ export default {
   success_field: 'Success Field',
   success_field_tips: 'Please enter success field JSONPath,e.g.$.data.status',
   success_value: 'Success Value',
-  success_value_tips: 'Please enter  all enum values for success,e.g.SUCCESS,FINISHED',
+  success_value_tips:
+    'Please enter  all enum values for success,e.g.SUCCESS,FINISHED',
   failure_condition: 'Failure Condition',
   failure_field: 'Failure Field',
   failure_field_tips: 'Please enter failure field JSONPath,e.g.$.data.status',
   failure_value: 'Failure Value',
-  failure_value_tips: 'Please enter all enum values for failure,e.g.CANCELED, FAILED',
+  failure_value_tips:
+    'Please enter all enum values for failure,e.g.CANCELED, FAILED',
 
   // Buttons and Operations
   cancel: 'Cancel',
@@ -147,12 +152,15 @@ export default {
   submit_interface_url_required: 'Submit interface address is required',
   query_interface_url_required: 'Query interface address is required',
   stop_interface_url_required: 'Stop interface address is required',
-  success_condition_required: 'Success condition field and value cannot be empty',
-  failure_condition_required: 'Failure condition field and value cannot be empty',
+  success_condition_required:
+    'Success condition field and value cannot be empty',
+  failure_condition_required:
+    'Failure condition field and value cannot be empty',
 
   external_system_required: 'External system is required',
   external_system_task_required: 'External system task is required',
   id_jsonpath_required: 'ID field and JSONPath is required',
   name_jsonpath_required: 'Name field and JSONPath is required',
-  taskinstanceid_jsonpath_required: 'TaskInstanceId field and JSONPath is required'
-} 
+  taskinstanceid_jsonpath_required:
+    'TaskInstanceId field and JSONPath is required'
+}

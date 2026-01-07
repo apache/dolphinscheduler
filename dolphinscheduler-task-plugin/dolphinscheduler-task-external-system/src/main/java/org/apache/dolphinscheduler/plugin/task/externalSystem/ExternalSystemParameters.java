@@ -74,6 +74,7 @@ public class ExternalSystemParameters extends AbstractParameters {
         return resources;
     }
 
+    @Override
     public boolean checkParameters() {
         // Add validation logic here
         return true;

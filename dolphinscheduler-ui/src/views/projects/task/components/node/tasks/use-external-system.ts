@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'

@@ -16,10 +16,16 @@
  */
 import { ref, onMounted, nextTick, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryDataSourceList, queryExternalSystemTasks } from '@/service/modules/data-source'
+import {
+  queryDataSourceList,
+  queryExternalSystemTasks
+} from '@/service/modules/data-source'
 import { find } from 'lodash'
 import type { IJsonItem } from '../types'
-import type { TypeReq } from '@/service/modules/data-source/types'
+import type {
+  TypeReq,
+  IDataBase as unusedIDataBase
+} from '@/service/modules/data-source/types'
 
 export function useExternalSystem(
   model: { [field: string]: any },
@@ -39,7 +45,7 @@ export function useExternalSystem(
       const parameters = {
         type: 'THIRDPARTY_SYSTEM_CONNECTOR'
       } as TypeReq
-      
+
       const res = await queryDataSourceList(parameters)
       datasourceOptions.value = res.map((item: any) => ({
         label: item.name,
@@ -84,7 +90,7 @@ export function useExternalSystem(
 
   const onTaskChange = (value: string) => {
     if (value) {
-      const taskItem = taskOptions.value.find(item => item.value === value)
+      const taskItem = taskOptions.value.find((item) => item.value === value)
       if (taskItem) {
         model.externalTaskName = taskItem.label // Set the name based on the selected task
       }
@@ -129,7 +135,9 @@ export function useExternalSystem(
         required: true,
         validator(unuse: any, value) {
           if (!value) {
-            return new Error(t('thirdparty_api_source.external_system_task_required'))
+            return new Error(
+              t('thirdparty_api_source.external_system_task_required')
+            )
           }
         }
       }

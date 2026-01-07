@@ -44,12 +44,14 @@ export function useDetail(getFieldsValue: Function) {
     }
 
     if (values.type === 'THIRDPARTY_SYSTEM_CONNECTOR') {
-      if (params.authConfig && params.authConfig.authMappings) {
-        params.authConfig.authMappings = params.authConfig.authMappings.filter(
-          (mapping: { key: string; value: string }) => mapping.key || mapping.value
-        )
+      if (params.authConfig?.authMappings) {
+        params.authConfig.authMappings =
+          params.authConfig?.authMappings?.filter(
+            (mapping: { key: string; value: string }) =>
+              mapping.key || mapping.value
+          )
       }
-      
+
       if (!params.selectInterface) {
         params.selectInterface = {
           url: '',
@@ -63,42 +65,48 @@ export function useDetail(getFieldsValue: Function) {
         }
       } else {
         if (params.selectInterface.parameters) {
-          params.selectInterface.parameters = params.selectInterface.parameters.filter(
-            (param: { paramName: string; paramValue: string }) => param.paramName || param.paramValue
-          )
+          params.selectInterface.parameters =
+            params.selectInterface.parameters.filter(
+              (param: { paramName: string; paramValue: string }) =>
+                param.paramName || param.paramValue
+            )
         }
-        
+
         if (params.selectInterface.responseParameters) {
-          params.selectInterface.responseParameters = params.selectInterface.responseParameters.filter(
-            (param: { key: string; jsonPath: string }) => param.key || param.jsonPath
-          )
+          params.selectInterface.responseParameters =
+            params.selectInterface.responseParameters.filter(
+              (param: { key: string; jsonPath: string }) =>
+                param.key || param.jsonPath
+            )
         }
       }
-      
+
       if (!params.submitInterface) {
         params.submitInterface = {
           url: '',
           method: 'POST',
           parameters: [],
           body: '',
-          responseParameters: [
-            { key: 'taskInstanceId', jsonPath: '' }
-          ]
+          responseParameters: [{ key: 'taskInstanceId', jsonPath: '' }]
         }
       } else {
         if (params.submitInterface.parameters) {
-          params.submitInterface.parameters = params.submitInterface.parameters.filter(
-            (param: { paramName: string; paramValue: string }) => param.paramName || param.paramValue
-          )
+          params.submitInterface.parameters =
+            params.submitInterface.parameters.filter(
+              (param: { paramName: string; paramValue: string }) =>
+                param.paramName || param.paramValue
+            )
         }
-        
+
         if (params.submitInterface.responseParameters) {
-          params.submitInterface.responseParameters = params.submitInterface.responseParameters.filter(
-            (param: { key: string; jsonPath: string }) => param.key || param.jsonPath
-          )
+          params.submitInterface.responseParameters =
+            params.submitInterface.responseParameters.filter(
+              (param: { key: string; jsonPath: string }) =>
+                param.key || param.jsonPath
+            )
         }
       }
-      
+
       if (!params.pollStatusInterface) {
         params.pollStatusInterface = {
           url: '',
@@ -117,32 +125,36 @@ export function useDetail(getFieldsValue: Function) {
         }
       } else {
         if (params.pollStatusInterface.parameters) {
-          params.pollStatusInterface.parameters = params.pollStatusInterface.parameters.filter(
-            (param: { paramName: string; paramValue: string }) => param.paramName || param.paramValue
-          )
+          params.pollStatusInterface.parameters =
+            params.pollStatusInterface.parameters.filter(
+              (param: { paramName: string; paramValue: string }) =>
+                param.paramName || param.paramValue
+            )
         }
-        
+
         if (!params.pollStatusInterface.pollingSuccessConfig) {
           params.pollStatusInterface.pollingSuccessConfig = {
             successField: '',
             successValue: ''
           }
         }
-        
+
         if (!params.pollStatusInterface.pollingFailureConfig) {
           params.pollStatusInterface.pollingFailureConfig = {
             failureField: '',
             failureValue: ''
           }
         }
-        
+
         if (params.pollStatusInterface.responseParameters) {
-          params.pollStatusInterface.responseParameters = params.pollStatusInterface.responseParameters.filter(
-            (param: { key: string; jsonPath: string }) => param.key || param.jsonPath
-          )
+          params.pollStatusInterface.responseParameters =
+            params.pollStatusInterface.responseParameters.filter(
+              (param: { key: string; jsonPath: string }) =>
+                param.key || param.jsonPath
+            )
         }
       }
-      
+
       if (!params.stopInterface) {
         params.stopInterface = {
           url: '',
@@ -153,18 +165,22 @@ export function useDetail(getFieldsValue: Function) {
         }
       } else {
         if (params.stopInterface.parameters) {
-          params.stopInterface.parameters = params.stopInterface.parameters.filter(
-            (param: { paramName: string; paramValue: string }) => param.paramName || param.paramValue
-          )
+          params.stopInterface.parameters =
+            params.stopInterface.parameters.filter(
+              (param: { paramName: string; paramValue: string }) =>
+                param.paramName || param.paramValue
+            )
         }
-        
+
         if (params.stopInterface.responseParameters) {
-          params.stopInterface.responseParameters = params.stopInterface.responseParameters.filter(
-            (param: { key: string; jsonPath: string }) => param.key || param.jsonPath
-          )
+          params.stopInterface.responseParameters =
+            params.stopInterface.responseParameters.filter(
+              (param: { key: string; jsonPath: string }) =>
+                param.key || param.jsonPath
+            )
         }
       }
-      
+
       if (!params.authConfig) {
         params.authConfig = {
           authType: 'BASIC_AUTH',
@@ -181,9 +197,9 @@ export function useDetail(getFieldsValue: Function) {
           authMappings: []
         }
       }
-      
-      delete params.userName;
-      delete params.password;
+
+      delete params.userName
+      delete params.password
     }
 
     return params

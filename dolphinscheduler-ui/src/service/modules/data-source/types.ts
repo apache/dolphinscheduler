@@ -44,6 +44,7 @@ type IDataBase =
   | 'K8S'
   | 'ALIYUN_SERVERLESS_SPARK'
   | 'DOLPHINDB'
+  | 'THIRDPARTY_SYSTEM_CONNECTOR'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -101,6 +102,94 @@ interface IDataSource {
   accessKeySecret?: string
   regionId?: string
   endpoint?: string
+  // THIRDPARTY_SYSTEM_CONNECTOR fields
+  serviceAddress?: string
+  interfaceTimeout?: number
+  authConfig?: {
+    authType: string
+    basicUsername?: string
+    basicPassword?: string
+    jwtToken?: string
+    oauth2TokenUrl?: string
+    oauth2ClientId?: string
+    oauth2ClientSecret?: string
+    oauth2GrantType?: string
+    oauth2Username?: string
+    oauth2Password?: string
+    headerPrefix?: string
+    authMappings?: {
+      key: string
+      value: string
+    }[]
+  }
+  selectInterface?: {
+    url: string
+    method: string
+    parameters?: {
+      paramName: string
+      paramValue: string
+      location: string
+    }[]
+    body: string
+    responseParameters?: {
+      key: string
+      jsonPath: string
+      disabled?: boolean
+    }[]
+  }
+  submitInterface?: {
+    url: string
+    method: string
+    parameters?: {
+      paramName: string
+      paramValue: string
+      location: string
+    }[]
+    body: string
+    responseParameters?: {
+      key: string
+      jsonPath: string
+      disabled?: boolean
+    }[]
+  }
+  pollStatusInterface?: {
+    url: string
+    method: string
+    parameters?: {
+      paramName: string
+      paramValue: string
+      location: string
+    }[]
+    body: string
+    pollingSuccessConfig: {
+      successField: string
+      successValue: string
+    }
+    pollingFailureConfig: {
+      failureField: string
+      failureValue: string
+    }
+    responseParameters?: {
+      key: string
+      jsonPath: string
+      disabled?: boolean
+    }[]
+  }
+  stopInterface?: {
+    url: string
+    method: string
+    parameters?: {
+      paramName: string
+      paramValue: string
+      location: string
+    }[]
+    body: string
+    responseParameters?: {
+      key: string
+      jsonPath: string
+      disabled?: boolean
+    }[]
+  }
 }
 
 interface ListReq {

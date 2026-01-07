@@ -90,14 +90,15 @@ public class ExternalSystemTask extends AbstractTask {
         externalSystemParameters = JSONUtils.parseObject(
                 taskExecutionContext.getTaskParams(),
                 ExternalSystemParameters.class);
-        log.info("Initialize external system task with externalSystemId: {}, externalTaskId: {}, externalTaskName: {}",
-                externalSystemParameters.getDatasource(),
-                externalSystemParameters.getExternalTaskId(),
-                externalSystemParameters.getExternalTaskName());
 
         if (externalSystemParameters == null || !externalSystemParameters.checkParameters()) {
             throw new RuntimeException("external system task params is not valid");
         }
+
+        log.info("Initialize external system task with externalSystemId: {}, externalTaskId: {}, externalTaskName: {}",
+                externalSystemParameters.getDatasource(),
+                externalSystemParameters.getExternalTaskId(),
+                externalSystemParameters.getExternalTaskName());
 
         // Initialize parameter mapping
         initParameterMap();
@@ -131,8 +132,7 @@ public class ExternalSystemTask extends AbstractTask {
             if (isTimeoutFailureEnabled()) {
                 long currentTime = System.currentTimeMillis();
                 long usedTimeMillis = currentTime - taskStartTime;
-                long usedTime = (usedTimeMillis + 29999) / 60000; // Over 30 seconds takes 1 minute, less than 30
-                                                                  // seconds takes 0 minutes
+                long usedTime = (usedTimeMillis + 59999) / 60000; // Round up to minutes (ceiling division)
                 log.info(
                         "External task timeout check, used time: {}m, timeout: {}m, currentTime: {}, taskStartTime: {}",
                         usedTime, taskExecutionContext.getTaskTimeout() / 60, currentTime, taskStartTime);
@@ -187,8 +187,7 @@ public class ExternalSystemTask extends AbstractTask {
                 if (isTimeoutFailureEnabled()) {
                     long currentTime = System.currentTimeMillis();
                     long usedTimeMillis = currentTime - taskStartTime;
-                    long usedTime = (usedTimeMillis + 29999) / 60000; // Over 30 seconds takes 1 minute, less than 30
-                                                                      // seconds takes 0 minutes
+                    long usedTime = (usedTimeMillis + 59999) / 60000; // Round up to minutes (ceiling division)
                     if (usedTime >= taskExecutionContext.getTaskTimeout()) {
                         isTimeout = true;
                         log.error("External task timeout, used time: {}m, timeout: {}m",
@@ -502,8 +501,8 @@ public class ExternalSystemTask extends AbstractTask {
     }
 
     private OkHttpRequestHeaderContentType getContentType(Map<String, String> headers) {
-        if (headers == null || !headers.containsKey(ExternalTaskConstants.CONTENT_TYPE)
-                || !headers.containsKey(ExternalTaskConstants.CONTENT_TYPE_LOWERCASE)) {
+        if (headers == null || (!headers.containsKey(ExternalTaskConstants.CONTENT_TYPE)
+                && !headers.containsKey(ExternalTaskConstants.CONTENT_TYPE_LOWERCASE))) {
             return OkHttpRequestHeaderContentType.APPLICATION_JSON;
         }
         String contentType = headers.get(ExternalTaskConstants.CONTENT_TYPE);

@@ -78,12 +78,13 @@ export default {
   param_value_tips: '请输入参数值',
   extract_response_data: '提取响应并存储变量',
   extract_field: '请输入提取参数',
-  json_path_list: '请输入,例如:$.data[*].id',
-  json_path: '请输入,例如$.data.taskInstanceId',
-  header_prefix:'Authorization Token前缀',
+  json_path_list: '请输入，例如：$.data[*].id',
+  json_path: '请输入，例如：$.data.taskInstanceId',
+  header_prefix: 'Authorization Token前缀',
   header_prefix_tips: 'Authorization Token前缀,e.g.Bearer',
   system_field_tips: '请选择系统字段',
   request_body: '请求Body',
+  request_body_placeholder: '请输入JSON格式的请求体',
   header: '请求头',
   query: '查询参数',
   get: 'GET',
@@ -92,7 +93,8 @@ export default {
   interface_timeout: '接口超时时间',
   interface_timeout_tips: '请输入接口超时时间',
   millisecond: '毫秒',
-  interface_timeout_description: '设置接口请求超时时间，默认为120000毫秒（2分钟）',
+  interface_timeout_description:
+    '设置接口请求超时时间，默认为120000毫秒（2分钟）',
 
   polling_config: '轮询配置',
   success_condition: '成功条件',
@@ -145,6 +147,5 @@ export default {
   external_system_required: '第三方系统不能为空',
   external_system_task_required: '第三方系统任务不能为空',
   id_jsonpath_required: '字段id以及JSONPath为必填项',
-  name_jsonpath_required: '字段name以及JSONPath为必填项',
-
-} 
+  name_jsonpath_required: '字段name以及JSONPath为必填项'
+}

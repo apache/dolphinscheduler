@@ -116,23 +116,25 @@ const DetailModal = defineComponent({
         props.show && props.id && setFieldsValue(await queryById(props.id))
       }
     ),
-
-    // Monitor authType change, update headerPrefix
-    watch(
-      () => state.detailForm.authConfig?.authType,
-      (newAuthType) => {
-        if (state.detailForm.type === 'THIRDPARTY_SYSTEM_CONNECTOR' && state.detailForm.authConfig) {
-          if (newAuthType === 'BASIC_AUTH') {
-            state.detailForm.authConfig.headerPrefix = 'Basic'
-          } else if (newAuthType === 'JWT' || newAuthType === 'OAUTH2') {
-            state.detailForm.authConfig.headerPrefix = 'Bearer'
-          } else {
-            state.detailForm.authConfig.headerPrefix = ''
+      // Monitor authType change, update headerPrefix
+      watch(
+        () => state.detailForm.authConfig?.authType,
+        (newAuthType) => {
+          if (
+            state.detailForm.type === 'THIRDPARTY_SYSTEM_CONNECTOR' &&
+            state.detailForm.authConfig
+          ) {
+            if (newAuthType === 'BASIC_AUTH') {
+              state.detailForm.authConfig.headerPrefix = 'Basic'
+            } else if (newAuthType === 'JWT' || newAuthType === 'OAUTH2') {
+              state.detailForm.authConfig.headerPrefix = 'Bearer'
+            } else {
+              state.detailForm.authConfig.headerPrefix = ''
+            }
           }
-        }
-      },
-      { immediate: true }
-    )
+        },
+        { immediate: true }
+      )
 
     watch(
       () => props.selectType,
@@ -819,7 +821,9 @@ const DetailModal = defineComponent({
                     >
                       <NInputNumber
                         v-model={[detailForm.interfaceTimeout, 'value']}
-                        placeholder={t('thirdparty_api_source.interface_timeout_tips')}
+                        placeholder={t(
+                          'thirdparty_api_source.interface_timeout_tips'
+                        )}
                         min={1000}
                         max={1200000}
                         step={1000}
@@ -829,24 +833,48 @@ const DetailModal = defineComponent({
                         }}
                       </NInputNumber>
                     </NFormItem>
-                    <NFormItem label={t('thirdparty_api_source.auth_type')} path='authConfig.authType'>
+                    <NFormItem
+                      label={t('thirdparty_api_source.auth_type')}
+                      path='authConfig.authType'
+                    >
                       <NSelect
-                        v-model={[detailForm.authConfig.authType, 'value']}
+                        value={detailForm.authConfig?.authType || ''}
+                        onUpdateValue={(value: string) => {
+                          if (detailForm.authConfig) {
+                            detailForm.authConfig.authType = value
+                          }
+                        }}
                         options={[
-                          { label: t('thirdparty_api_source.basic_auth'), value: 'BASIC_AUTH' },
-                          { label: t('thirdparty_api_source.oauth2'), value: 'OAUTH2' },
-                          { label: t('thirdparty_api_source.jwt'), value: 'JWT' }
+                          {
+                            label: t('thirdparty_api_source.basic_auth'),
+                            value: 'BASIC_AUTH'
+                          },
+                          {
+                            label: t('thirdparty_api_source.oauth2'),
+                            value: 'OAUTH2'
+                          },
+                          {
+                            label: t('thirdparty_api_source.jwt'),
+                            value: 'JWT'
+                          }
                         ]}
                       />
                     </NFormItem>
                     <NFormItem label={t('thirdparty_api_source.header_prefix')}>
                       <NInput
                         allowInput={this.trim}
-                        v-model={[detailForm.authConfig.headerPrefix, 'value']}
-                        placeholder={t('thirdparty_api_source.header_prefix_tips')}
+                        value={detailForm.authConfig?.headerPrefix || ''}
+                        onUpdateValue={(value: string) => {
+                          if (detailForm.authConfig) {
+                            detailForm.authConfig.headerPrefix = value
+                          }
+                        }}
+                        placeholder={t(
+                          'thirdparty_api_source.header_prefix_tips'
+                        )}
                       />
                     </NFormItem>
-                    {detailForm.authConfig.authType === 'BASIC_AUTH' && (
+                    {detailForm.authConfig?.authType === 'BASIC_AUTH' && (
                       <>
                         <NFormItem
                           label={t('thirdparty_api_source.username')}
@@ -854,8 +882,15 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.basicUsername, 'value']}
-                            placeholder={t('thirdparty_api_source.username_tips')}
+                            value={detailForm.authConfig?.basicUsername || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.basicUsername = value
+                              }
+                            }}
+                            placeholder={t(
+                              'thirdparty_api_source.username_tips'
+                            )}
                           />
                         </NFormItem>
                         <NFormItem
@@ -864,15 +899,22 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.basicPassword, 'value']}
+                            value={detailForm.authConfig?.basicPassword || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.basicPassword = value
+                              }
+                            }}
                             type='password'
                             showPasswordOn='click'
-                            placeholder={t('thirdparty_api_source.password_tips')}
+                            placeholder={t(
+                              'thirdparty_api_source.password_tips'
+                            )}
                           />
                         </NFormItem>
                       </>
                     )}
-                    {detailForm.authConfig.authType === 'OAUTH2' && (
+                    {detailForm.authConfig?.authType === 'OAUTH2' && (
                       <>
                         <NFormItem
                           label={t('thirdparty_api_source.oauth2_token_url')}
@@ -880,8 +922,15 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.oauth2TokenUrl, 'value']}
-                            placeholder={t('thirdparty_api_source.oauth2_token_url_tips')}
+                            value={detailForm.authConfig?.oauth2TokenUrl || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.oauth2TokenUrl = value
+                              }
+                            }}
+                            placeholder={t(
+                              'thirdparty_api_source.oauth2_token_url_tips'
+                            )}
                           />
                         </NFormItem>
                         <NFormItem
@@ -890,18 +939,36 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.oauth2ClientId, 'value']}
-                            placeholder={t('thirdparty_api_source.oauth2_client_id_tips')}
+                            value={detailForm.authConfig?.oauth2ClientId || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.oauth2ClientId = value
+                              }
+                            }}
+                            placeholder={t(
+                              'thirdparty_api_source.oauth2_client_id_tips'
+                            )}
                           />
                         </NFormItem>
                         <NFormItem
-                          label={t('thirdparty_api_source.oauth2_client_secret')}
+                          label={t(
+                            'thirdparty_api_source.oauth2_client_secret'
+                          )}
                           path='authConfig.oauth2ClientSecret'
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.oauth2ClientSecret, 'value']}
-                            placeholder={t('thirdparty_api_source.oauth2_client_secret_tips')}
+                            value={
+                              detailForm.authConfig?.oauth2ClientSecret || ''
+                            }
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.oauth2ClientSecret = value
+                              }
+                            }}
+                            placeholder={t(
+                              'thirdparty_api_source.oauth2_client_secret_tips'
+                            )}
                           />
                         </NFormItem>
                         <NFormItem
@@ -910,8 +977,15 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.oauth2GrantType, 'value']}
-                            placeholder={t('thirdparty_api_source.oauth2_grant_type_tips')}
+                            value={detailForm.authConfig?.oauth2GrantType || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.oauth2GrantType = value
+                              }
+                            }}
+                            placeholder={t(
+                              'thirdparty_api_source.oauth2_grant_type_tips'
+                            )}
                           />
                         </NFormItem>
                         <NFormItem
@@ -920,8 +994,15 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.oauth2Username, 'value']}
-                            placeholder={t('thirdparty_api_source.oauth2_username_tips')}
+                            value={detailForm.authConfig?.oauth2Username || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.oauth2Username = value
+                              }
+                            }}
+                            placeholder={t(
+                              'thirdparty_api_source.oauth2_username_tips'
+                            )}
                           />
                         </NFormItem>
                         <NFormItem
@@ -930,88 +1011,170 @@ const DetailModal = defineComponent({
                         >
                           <NInput
                             allowInput={this.trim}
-                            v-model={[detailForm.authConfig.oauth2Password, 'value']}
+                            value={detailForm.authConfig?.oauth2Password || ''}
+                            onUpdateValue={(value: string) => {
+                              if (detailForm.authConfig) {
+                                detailForm.authConfig.oauth2Password = value
+                              }
+                            }}
                             type='password'
                             showPasswordOn='click'
-                            placeholder={t('thirdparty_api_source.oauth2_password_tips')}
+                            placeholder={t(
+                              'thirdparty_api_source.oauth2_password_tips'
+                            )}
                           />
                         </NFormItem>
                       </>
                     )}
-                    {detailForm.authConfig.authType === 'JWT' && (
+                    {detailForm.authConfig?.authType === 'JWT' && (
                       <NFormItem
                         label={t('thirdparty_api_source.jwt_token')}
                         path='authConfig.jwtToken'
                       >
                         <NInput
                           allowInput={this.trim}
-                          v-model={[detailForm.authConfig.jwtToken, 'value']}
-                          placeholder={t('thirdparty_api_source.jwt_token_tips')}
+                          value={detailForm.authConfig?.jwtToken || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.authConfig) {
+                              detailForm.authConfig.jwtToken = value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.jwt_token_tips'
+                          )}
                         />
                       </NFormItem>
                     )}
                     {/* additional params */}
-                    <NFormItem label={t('thirdparty_api_source.additional_params')}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.additional_params')}
+                    >
                       <div style={{ width: '100%' }}>
                         {/* add button */}
                         <NButton
                           onClick={() => {
+                            if (!detailForm.authConfig) {
+                              detailForm.authConfig = {
+                                authType: 'BASIC_AUTH',
+                                basicUsername: '',
+                                basicPassword: '',
+                                jwtToken: '',
+                                oauth2TokenUrl: '',
+                                oauth2ClientId: '',
+                                oauth2ClientSecret: '',
+                                oauth2GrantType: '',
+                                oauth2Username: '',
+                                oauth2Password: '',
+                                headerPrefix: 'Basic',
+                                authMappings: []
+                              }
+                            }
                             if (!detailForm.authConfig.authMappings) {
                               detailForm.authConfig.authMappings = []
                             }
-                            detailForm.authConfig.authMappings.push({ key: '', value: '' })
+                            detailForm.authConfig.authMappings.push({
+                              key: '',
+                              value: ''
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
-                        
+
                         {/* param list */}
-                        {detailForm.authConfig.authMappings && detailForm.authConfig.authMappings.map((param: { key: string; value: string }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NInput
-                              v-model={[param.key, 'value']}
-                              placeholder={t('thirdparty_api_source.key')}
-                              style={{ width: '40%' }}
-                            />
-                            <NInput
-                              v-model={[param.value, 'value']}
-                              placeholder={t('thirdparty_api_source.value')}
-                              style={{ width: '40%', marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.authConfig.authMappings.splice(index, 1)
-                              }}
-                              style={{ width: '20%', marginLeft: '10px' }}
-                              size="small"
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.authConfig?.authMappings &&
+                          detailForm.authConfig.authMappings.map(
+                            (
+                              param: { key: string; value: string },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NInput
+                                  value={param.key}
+                                  onUpdateValue={(value: string) =>
+                                    (param.key = value)
+                                  }
+                                  placeholder={t('thirdparty_api_source.key')}
+                                  style={{ width: '40%' }}
+                                />
+                                <NInput
+                                  value={param.value}
+                                  onUpdateValue={(value: string) =>
+                                    (param.value = value)
+                                  }
+                                  placeholder={t('thirdparty_api_source.value')}
+                                  style={{ width: '40%', marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.authConfig?.authMappings?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ width: '20%', marginLeft: '10px' }}
+                                  size='small'
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
                     <NFormItem
                       label={t('thirdparty_api_source.input_interface')}
                       path='selectInterface.url'
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%'
+                        }}
+                      >
                         <NInput
                           allowInput={this.trim}
-                          v-model={[detailForm.selectInterface.url, 'value']}
-                          placeholder={t('thirdparty_api_source.input_interface_tips')}
+                          value={detailForm.selectInterface?.url || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.selectInterface) {
+                              detailForm.selectInterface.url = value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.input_interface_tips'
+                          )}
                           style={{ flex: 1 }}
                         />
                         <NSelect
-                          v-model={[detailForm.selectInterface.method, 'value']}
+                          value={detailForm.selectInterface?.method || 'GET'}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.selectInterface) {
+                              detailForm.selectInterface.method = value
+                            }
+                          }}
                           options={[
-                            { label: t('thirdparty_api_source.get'), value: 'GET' },
-                            { label: t('thirdparty_api_source.post'), value: 'POST' },
-                            { label: t('thirdparty_api_source.put'), value: 'PUT' }
+                            {
+                              label: t('thirdparty_api_source.get'),
+                              value: 'GET'
+                            },
+                            {
+                              label: t('thirdparty_api_source.post'),
+                              value: 'POST'
+                            },
+                            {
+                              label: t('thirdparty_api_source.put'),
+                              value: 'PUT'
+                            }
                           ]}
                           style={{ width: '120px', marginLeft: '10px' }}
                         />
@@ -1022,127 +1185,253 @@ const DetailModal = defineComponent({
                         {/* add Button*/}
                         <NButton
                           onClick={() => {
+                            if (!detailForm.selectInterface) {
+                              detailForm.selectInterface = {
+                                url: '',
+                                method: 'GET',
+                                parameters: [],
+                                body: '',
+                                responseParameters: []
+                              }
+                            }
                             if (!detailForm.selectInterface.parameters) {
                               detailForm.selectInterface.parameters = []
                             }
-                            detailForm.selectInterface.parameters.push({ paramName: '', paramValue: '', location: 'HEADER' })
+                            detailForm.selectInterface.parameters.push({
+                              paramName: '',
+                              paramValue: '',
+                              location: 'HEADER'
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
-                        
+
                         {/* parameter list */}
-                        {detailForm.selectInterface.parameters && detailForm.selectInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NSelect
-                              v-model={[param.location, 'value']}
-                              options={[
-                                { label: 'Header', value: 'HEADER' },
-                                { label: 'Param', value: 'PARAM' }
-                              ]}
-                              placeholder={t('thirdparty_api_source.param_location_tips')}
-                              style={{ width: '120px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramName, 'value']}
-                              placeholder={t('thirdparty_api_source.param_name_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramValue, 'value']}
-                              placeholder={t('thirdparty_api_source.param_value_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.selectInterface.parameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.selectInterface?.parameters &&
+                          detailForm.selectInterface.parameters.map(
+                            (
+                              param: {
+                                paramName: string
+                                paramValue: string
+                                location: string
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NSelect
+                                  value={param.location}
+                                  onUpdateValue={(value: string) =>
+                                    (param.location = value)
+                                  }
+                                  options={[
+                                    { label: 'Header', value: 'HEADER' },
+                                    { label: 'Param', value: 'PARAM' }
+                                  ]}
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_location_tips'
+                                  )}
+                                  style={{ width: '120px' }}
+                                />
+                                <NInput
+                                  value={param.paramName}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramName = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_name_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NInput
+                                  value={param.paramValue}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramValue = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_value_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.selectInterface?.parameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
-                    {(detailForm.selectInterface.method === 'POST' || detailForm.selectInterface.method === 'PUT') && (
-                      <NFormItem label={t('thirdparty_api_source.request_body')}>
+                    {(detailForm.selectInterface?.method === 'POST' ||
+                      detailForm.selectInterface?.method === 'PUT') && (
+                      <NFormItem
+                        label={t('thirdparty_api_source.request_body')}
+                      >
                         <NInput
-                          v-model={[detailForm.selectInterface.body, 'value']}
-                          type="textarea"
+                          value={detailForm.selectInterface?.body || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.selectInterface) {
+                              detailForm.selectInterface.body = value
+                            }
+                          }}
+                          type='textarea'
                           autosize={{
                             minRows: 4,
                             maxRows: 10
                           }}
-                          placeholder="请输入JSON格式的请求体"
+                          placeholder='请输入JSON格式的请求体'
                         />
                       </NFormItem>
                     )}
-                    <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.extract_response_data')}
+                    >
                       <div style={{ width: '100%' }}>
                         {/* add Button */}
                         <NButton
                           onClick={() => {
-                            if (!detailForm.selectInterface.responseParameters) {
+                            if (!detailForm.selectInterface) {
+                              detailForm.selectInterface = {
+                                url: '',
+                                method: 'GET',
+                                parameters: [],
+                                body: '',
+                                responseParameters: []
+                              }
+                            }
+                            if (
+                              !detailForm.selectInterface.responseParameters
+                            ) {
                               detailForm.selectInterface.responseParameters = []
                             }
-                            detailForm.selectInterface.responseParameters.push({ key: '', jsonPath: '', disabled: false })
+                            detailForm.selectInterface.responseParameters.push({
+                              key: '',
+                              jsonPath: '',
+                              disabled: false
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
-                        
+
                         {/* responseParameters */}
-                        {detailForm.selectInterface.responseParameters && detailForm.selectInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NInput
-                              v-model={[param.key, 'value']}
-                              placeholder={t('thirdparty_api_source.extract_field')}
-                              style={{ flex: 1 }}
-                              disabled={param.disabled}
-                            />
-                            <NInput
-                              v-model={[param.jsonPath, 'value']}
-                              placeholder={t('thirdparty_api_source.json_path_list')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.selectInterface.responseParameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.selectInterface?.responseParameters &&
+                          detailForm.selectInterface.responseParameters.map(
+                            (
+                              param: {
+                                key: string
+                                jsonPath: string
+                                disabled?: boolean
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NInput
+                                  value={param.key}
+                                  onUpdateValue={(value: string) =>
+                                    (param.key = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.extract_field'
+                                  )}
+                                  style={{ flex: 1 }}
+                                  disabled={param.disabled}
+                                />
+                                <NInput
+                                  value={param.jsonPath}
+                                  onUpdateValue={(value: string) =>
+                                    (param.jsonPath = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.json_path_list'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.selectInterface?.responseParameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
                     <NFormItem
                       label={t('thirdparty_api_source.submit_interface')}
                       path='submitInterface.url'
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%'
+                        }}
+                      >
                         <NInput
                           allowInput={this.trim}
-                          v-model={[detailForm.submitInterface.url, 'value']}
-                          placeholder={t('thirdparty_api_source.submit_interface_tips')}
+                          value={detailForm.submitInterface?.url || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.submitInterface) {
+                              detailForm.submitInterface.url = value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.submit_interface_tips'
+                          )}
                           style={{ flex: 1 }}
                         />
                         <NSelect
-                          v-model={[detailForm.submitInterface.method, 'value']}
+                          value={detailForm.submitInterface?.method || 'POST'}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.submitInterface) {
+                              detailForm.submitInterface.method = value
+                            }
+                          }}
                           options={[
-                            { label: t('thirdparty_api_source.get'), value: 'GET' },
-                            { label: t('thirdparty_api_source.post'), value: 'POST' },
-                            { label: t('thirdparty_api_source.put'), value: 'PUT' }
+                            {
+                              label: t('thirdparty_api_source.get'),
+                              value: 'GET'
+                            },
+                            {
+                              label: t('thirdparty_api_source.post'),
+                              value: 'POST'
+                            },
+                            {
+                              label: t('thirdparty_api_source.put'),
+                              value: 'PUT'
+                            }
                           ]}
                           style={{ width: '120px', marginLeft: '10px' }}
                         />
@@ -1153,127 +1442,250 @@ const DetailModal = defineComponent({
                         {/* add button */}
                         <NButton
                           onClick={() => {
+                            if (!detailForm.submitInterface) {
+                              detailForm.submitInterface = {
+                                url: '',
+                                method: 'POST',
+                                parameters: [],
+                                body: '',
+                                responseParameters: []
+                              }
+                            }
                             if (!detailForm.submitInterface.parameters) {
                               detailForm.submitInterface.parameters = []
                             }
-                            detailForm.submitInterface.parameters.push({ paramName: '', paramValue: '', location: 'HEADER' })
+                            detailForm.submitInterface.parameters.push({
+                              paramName: '',
+                              paramValue: '',
+                              location: 'HEADER'
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
-                        
+
                         {/* parameter list */}
-                        {detailForm.submitInterface.parameters && detailForm.submitInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NSelect
-                              v-model={[param.location, 'value']}
-                              options={[
-                                { label: 'Header', value: 'HEADER' },
-                                { label: 'Param', value: 'PARAM' }
-                              ]}
-                              placeholder={t('thirdparty_api_source.param_location_tips')}
-                              style={{ width: '120px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramName, 'value']}
-                              placeholder={t('thirdparty_api_source.param_name_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramValue, 'value']}
-                              placeholder={t('thirdparty_api_source.param_value_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.submitInterface.parameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.submitInterface?.parameters &&
+                          detailForm.submitInterface.parameters.map(
+                            (
+                              param: {
+                                paramName: string
+                                paramValue: string
+                                location: string
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NSelect
+                                  value={param.location}
+                                  onUpdateValue={(value: string) =>
+                                    (param.location = value)
+                                  }
+                                  options={[
+                                    { label: 'Header', value: 'HEADER' },
+                                    { label: 'Param', value: 'PARAM' }
+                                  ]}
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_location_tips'
+                                  )}
+                                  style={{ width: '120px' }}
+                                />
+                                <NInput
+                                  value={param.paramName}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramName = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_name_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NInput
+                                  value={param.paramValue}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramValue = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_value_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.submitInterface?.parameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
-                    {(detailForm.submitInterface.method === 'POST' || detailForm.submitInterface.method === 'PUT') && (
-                      <NFormItem label={t('thirdparty_api_source.request_body')}>
+                    {(detailForm.submitInterface?.method === 'POST' ||
+                      detailForm.submitInterface?.method === 'PUT') && (
+                      <NFormItem
+                        label={t('thirdparty_api_source.request_body')}
+                      >
                         <NInput
-                          v-model={[detailForm.submitInterface.body, 'value']}
-                          type="textarea"
+                          value={detailForm.submitInterface?.body || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.submitInterface) {
+                              detailForm.submitInterface.body = value
+                            }
+                          }}
+                          type='textarea'
                           autosize={{
                             minRows: 4,
                             maxRows: 10
                           }}
-                          placeholder="请输入JSON格式的请求体"
+                          placeholder='请输入JSON格式的请求体'
                         />
                       </NFormItem>
                     )}
-                    <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.extract_response_data')}
+                    >
                       <div style={{ width: '100%' }}>
                         {/* add button */}
                         <NButton
                           onClick={() => {
-                            if (!detailForm.submitInterface.responseParameters) {
+                            if (!detailForm.submitInterface) {
+                              detailForm.submitInterface = {
+                                url: '',
+                                method: 'POST',
+                                parameters: [],
+                                body: '',
+                                responseParameters: []
+                              }
+                            }
+                            if (
+                              !detailForm.submitInterface.responseParameters
+                            ) {
                               detailForm.submitInterface.responseParameters = []
                             }
-                            detailForm.submitInterface.responseParameters.push({ key: '', jsonPath: '', disabled: false })
+                            detailForm.submitInterface.responseParameters.push({
+                              key: '',
+                              jsonPath: '',
+                              disabled: false
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
-                        
+
                         {/* param list */}
-                        {detailForm.submitInterface.responseParameters && detailForm.submitInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ width: '100%', marginBottom: '10px' }}
-                          >
-                            <NInput
-                              v-model={[param.key, 'value']}
-                              placeholder={t('thirdparty_api_source.extract_field')}
-                              style={{ width: '180px' }}
-                              disabled={param.disabled}
-                            />
-                            <NInput
-                              v-model={[param.jsonPath, 'value']}
-                              placeholder={t('thirdparty_api_source.json_path')}
-                              style={{ width: '180px' }}
-                              disabled={param.disabled}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.submitInterface.responseParameters.splice(index, 1)
-                              }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.submitInterface?.responseParameters &&
+                          detailForm.submitInterface.responseParameters.map(
+                            (
+                              param: {
+                                key: string
+                                jsonPath: string
+                                disabled?: boolean
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{ width: '100%', marginBottom: '10px' }}
+                              >
+                                <NInput
+                                  value={param.key}
+                                  onUpdateValue={(value: string) =>
+                                    (param.key = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.extract_field'
+                                  )}
+                                  style={{ width: '180px' }}
+                                  disabled={param.disabled}
+                                />
+                                <NInput
+                                  value={param.jsonPath}
+                                  onUpdateValue={(value: string) =>
+                                    (param.jsonPath = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.json_path'
+                                  )}
+                                  style={{ width: '180px' }}
+                                  disabled={param.disabled}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.submitInterface?.responseParameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
                     <NFormItem
                       label={t('thirdparty_api_source.query_interface')}
                       path='pollStatusInterface.url'
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%'
+                        }}
+                      >
                         <NInput
                           allowInput={this.trim}
-                          v-model={[detailForm.pollStatusInterface.url, 'value']}
-                          placeholder={t('thirdparty_api_source.query_interface_tips')}
+                          value={detailForm.pollStatusInterface?.url || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.pollStatusInterface) {
+                              detailForm.pollStatusInterface.url = value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.query_interface_tips'
+                          )}
                           style={{ flex: 1 }}
                         />
                         <NSelect
-                          v-model={[detailForm.pollStatusInterface.method, 'value']}
+                          value={
+                            detailForm.pollStatusInterface?.method || 'GET'
+                          }
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.pollStatusInterface) {
+                              detailForm.pollStatusInterface.method = value
+                            }
+                          }}
                           options={[
-                            { label: t('thirdparty_api_source.get'), value: 'GET' },
-                            { label: t('thirdparty_api_source.post'), value: 'POST' },
-                            { label: t('thirdparty_api_source.put'), value: 'PUT' }
+                            {
+                              label: t('thirdparty_api_source.get'),
+                              value: 'GET'
+                            },
+                            {
+                              label: t('thirdparty_api_source.post'),
+                              value: 'POST'
+                            },
+                            {
+                              label: t('thirdparty_api_source.put'),
+                              value: 'PUT'
+                            }
                           ]}
                           style={{ width: '120px', marginLeft: '10px' }}
                         />
@@ -1284,134 +1696,320 @@ const DetailModal = defineComponent({
                         {/* add button */}
                         <NButton
                           onClick={() => {
+                            if (!detailForm.pollStatusInterface) {
+                              detailForm.pollStatusInterface = {
+                                url: '',
+                                method: 'GET',
+                                parameters: [],
+                                body: '',
+                                pollingSuccessConfig: {
+                                  successField: '',
+                                  successValue: ''
+                                },
+                                pollingFailureConfig: {
+                                  failureField: '',
+                                  failureValue: ''
+                                },
+                                responseParameters: []
+                              }
+                            }
                             if (!detailForm.pollStatusInterface.parameters) {
                               detailForm.pollStatusInterface.parameters = []
                             }
-                            detailForm.pollStatusInterface.parameters.push({ paramName: '', paramValue: '', location: 'HEADER' })
+                            detailForm.pollStatusInterface.parameters.push({
+                              paramName: '',
+                              paramValue: '',
+                              location: 'HEADER'
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
-                        
+
                         {/* param list */}
-                        {detailForm.pollStatusInterface.parameters && detailForm.pollStatusInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NSelect
-                              v-model={[param.location, 'value']}
-                              options={[
-                                { label: 'Header', value: 'HEADER' },
-                                { label: 'Param', value: 'PARAM' }
-                              ]}
-                              placeholder={t('thirdparty_api_source.param_location_tips')}
-                              style={{ width: '120px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramName, 'value']}
-                              placeholder={t('thirdparty_api_source.param_name_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramValue, 'value']}
-                              placeholder={t('thirdparty_api_source.param_value_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.pollStatusInterface.parameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.pollStatusInterface?.parameters &&
+                          detailForm.pollStatusInterface.parameters.map(
+                            (
+                              param: {
+                                paramName: string
+                                paramValue: string
+                                location: string
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NSelect
+                                  value={param.location}
+                                  onUpdateValue={(value: string) =>
+                                    (param.location = value)
+                                  }
+                                  options={[
+                                    { label: 'Header', value: 'HEADER' },
+                                    { label: 'Param', value: 'PARAM' }
+                                  ]}
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_location_tips'
+                                  )}
+                                  style={{ width: '120px' }}
+                                />
+                                <NInput
+                                  value={param.paramName}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramName = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_name_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NInput
+                                  value={param.paramValue}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramValue = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_value_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.pollStatusInterface?.parameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
-                    {(detailForm.pollStatusInterface.method === 'POST' || detailForm.pollStatusInterface.method === 'PUT') && (
-                      <NFormItem label={t('thirdparty_api_source.request_body')}>
+                    {(detailForm.pollStatusInterface?.method === 'POST' ||
+                      detailForm.pollStatusInterface?.method === 'PUT') && (
+                      <NFormItem
+                        label={t('thirdparty_api_source.request_body')}
+                      >
                         <NInput
-                          v-model={[detailForm.pollStatusInterface.body, 'value']}
-                          type="textarea"
+                          value={detailForm.pollStatusInterface?.body || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.pollStatusInterface) {
+                              detailForm.pollStatusInterface.body = value
+                            }
+                          }}
+                          type='textarea'
                           autosize={{
                             minRows: 4,
                             maxRows: 10
                           }}
-                          placeholder="请输入JSON格式的请求体"
+                          placeholder='请输入JSON格式的请求体'
                         />
                       </NFormItem>
                     )}
-                    <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.extract_response_data')}
+                    >
                       <div style={{ width: '100%' }}>
                         {/* add button */}
                         <NButton
                           onClick={() => {
-                            if (!detailForm.pollStatusInterface.responseParameters) {
-                              detailForm.pollStatusInterface.responseParameters = []
+                            if (!detailForm.pollStatusInterface) {
+                              detailForm.pollStatusInterface = {
+                                url: '',
+                                method: 'GET',
+                                parameters: [],
+                                body: '',
+                                pollingSuccessConfig: {
+                                  successField: '',
+                                  successValue: ''
+                                },
+                                pollingFailureConfig: {
+                                  failureField: '',
+                                  failureValue: ''
+                                },
+                                responseParameters: []
+                              }
                             }
-                            detailForm.pollStatusInterface.responseParameters.push({ key: '', jsonPath: '', disabled: false })
+                            if (
+                              !detailForm.pollStatusInterface.responseParameters
+                            ) {
+                              detailForm.pollStatusInterface.responseParameters =
+                                []
+                            }
+                            detailForm.pollStatusInterface.responseParameters.push(
+                              { key: '', jsonPath: '', disabled: false }
+                            )
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
-                        
+
                         {/* param list */}
-                        {detailForm.pollStatusInterface.responseParameters && detailForm.pollStatusInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NInput
-                              v-model={[param.key, 'value']}
-                              placeholder={t('thirdparty_api_source.extract_field')}
-                              style={{ flex: 1 }}
-                              disabled={param.disabled}
-                            />
-                            <NInput
-                              v-model={[param.jsonPath, 'value']}
-                              placeholder={t('thirdparty_api_source.json_path')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.pollStatusInterface.responseParameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.pollStatusInterface?.responseParameters &&
+                          detailForm.pollStatusInterface.responseParameters.map(
+                            (
+                              param: {
+                                key: string
+                                jsonPath: string
+                                disabled?: boolean
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NInput
+                                  value={param.key}
+                                  onUpdateValue={(value: string) =>
+                                    (param.key = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.extract_field'
+                                  )}
+                                  style={{ flex: 1 }}
+                                  disabled={param.disabled}
+                                />
+                                <NInput
+                                  value={param.jsonPath}
+                                  onUpdateValue={(value: string) =>
+                                    (param.jsonPath = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.json_path'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.pollStatusInterface?.responseParameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
-                    <NFormItem label={t('thirdparty_api_source.success_condition')}>
-                      <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.success_condition')}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          width: '100%',
+                          alignItems: 'center'
+                        }}
+                      >
                         <NInput
-                          v-model={[detailForm.pollStatusInterface.pollingSuccessConfig.successField, 'value']}
-                          placeholder={t('thirdparty_api_source.success_field_tips')}
+                          value={
+                            detailForm.pollStatusInterface?.pollingSuccessConfig
+                              ?.successField || ''
+                          }
+                          onUpdateValue={(value: string) => {
+                            if (
+                              detailForm.pollStatusInterface
+                                ?.pollingSuccessConfig
+                            ) {
+                              detailForm.pollStatusInterface.pollingSuccessConfig.successField =
+                                value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.success_field_tips'
+                          )}
                           style={{ flex: 1 }}
                         />
                         <NInput
-                          v-model={[detailForm.pollStatusInterface.pollingSuccessConfig.successValue, 'value']}
-                          placeholder={t('thirdparty_api_source.success_value_tips')}
+                          value={
+                            detailForm.pollStatusInterface?.pollingSuccessConfig
+                              ?.successValue || ''
+                          }
+                          onUpdateValue={(value: string) => {
+                            if (
+                              detailForm.pollStatusInterface
+                                ?.pollingSuccessConfig
+                            ) {
+                              detailForm.pollStatusInterface.pollingSuccessConfig.successValue =
+                                value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.success_value_tips'
+                          )}
                           style={{ flex: 1, marginLeft: '10px' }}
                         />
                       </div>
                     </NFormItem>
-                    <NFormItem label={t('thirdparty_api_source.failure_condition')}>
-                      <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.failure_condition')}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          width: '100%',
+                          alignItems: 'center'
+                        }}
+                      >
                         <NInput
-                          v-model={[detailForm.pollStatusInterface.pollingFailureConfig.failureField, 'value']}
-                          placeholder={t('thirdparty_api_source.failure_field_tips')}
+                          value={
+                            detailForm.pollStatusInterface?.pollingFailureConfig
+                              ?.failureField || ''
+                          }
+                          onUpdateValue={(value: string) => {
+                            if (
+                              detailForm.pollStatusInterface
+                                ?.pollingFailureConfig
+                            ) {
+                              detailForm.pollStatusInterface.pollingFailureConfig.failureField =
+                                value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.failure_field_tips'
+                          )}
                           style={{ flex: 1 }}
                         />
                         <NInput
-                          v-model={[detailForm.pollStatusInterface.pollingFailureConfig.failureValue, 'value']}
-                          placeholder={t('thirdparty_api_source.failure_value_tips')}
+                          value={
+                            detailForm.pollStatusInterface?.pollingFailureConfig
+                              ?.failureValue || ''
+                          }
+                          onUpdateValue={(value: string) => {
+                            if (
+                              detailForm.pollStatusInterface
+                                ?.pollingFailureConfig
+                            ) {
+                              detailForm.pollStatusInterface.pollingFailureConfig.failureValue =
+                                value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.failure_value_tips'
+                          )}
                           style={{ flex: 1, marginLeft: '10px' }}
                         />
                       </div>
@@ -1420,19 +2018,46 @@ const DetailModal = defineComponent({
                       label={t('thirdparty_api_source.stop_interface')}
                       path='stopInterface.url'
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%'
+                        }}
+                      >
                         <NInput
                           allowInput={this.trim}
-                          v-model={[detailForm.stopInterface.url, 'value']}
-                          placeholder={t('thirdparty_api_source.stop_interface_tips')}
+                          value={detailForm.stopInterface?.url || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.stopInterface) {
+                              detailForm.stopInterface.url = value
+                            }
+                          }}
+                          placeholder={t(
+                            'thirdparty_api_source.stop_interface_tips'
+                          )}
                           style={{ flex: 1 }}
                         />
                         <NSelect
-                          v-model={[detailForm.stopInterface.method, 'value']}
+                          value={detailForm.stopInterface?.method || 'POST'}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.stopInterface) {
+                              detailForm.stopInterface.method = value
+                            }
+                          }}
                           options={[
-                            { label: t('thirdparty_api_source.get'), value: 'GET' },
-                            { label: t('thirdparty_api_source.post'), value: 'POST' },
-                            { label: t('thirdparty_api_source.put'), value: 'PUT' }
+                            {
+                              label: t('thirdparty_api_source.get'),
+                              value: 'GET'
+                            },
+                            {
+                              label: t('thirdparty_api_source.post'),
+                              value: 'POST'
+                            },
+                            {
+                              label: t('thirdparty_api_source.put'),
+                              value: 'PUT'
+                            }
                           ]}
                           style={{ width: '120px', marginLeft: '10px' }}
                         />
@@ -1443,108 +2068,205 @@ const DetailModal = defineComponent({
                         {/* add button */}
                         <NButton
                           onClick={() => {
+                            if (!detailForm.stopInterface) {
+                              detailForm.stopInterface = {
+                                url: '',
+                                method: 'POST',
+                                parameters: [],
+                                body: '',
+                                responseParameters: []
+                              }
+                            }
                             if (!detailForm.stopInterface.parameters) {
                               detailForm.stopInterface.parameters = []
                             }
-                            detailForm.stopInterface.parameters.push({ paramName: '', paramValue: '', location: 'HEADER' })
+                            detailForm.stopInterface.parameters.push({
+                              paramName: '',
+                              paramValue: '',
+                              location: 'HEADER'
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_param')}
                         </NButton>
-                        
+
                         {/* param list */}
-                        {detailForm.stopInterface.parameters && detailForm.stopInterface.parameters.map((param: { paramName: string; paramValue: string; location: string }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NSelect
-                              v-model={[param.location, 'value']}
-                              options={[
-                                { label: 'Header', value: 'HEADER' },
-                                { label: 'Param', value: 'PARAM' }
-                              ]}
-                              placeholder={t('thirdparty_api_source.param_location_tips')}
-                              style={{ width: '120px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramName, 'value']}
-                              placeholder={t('thirdparty_api_source.param_name_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NInput
-                              v-model={[param.paramValue, 'value']}
-                              placeholder={t('thirdparty_api_source.param_value_tips')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.stopInterface.parameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.stopInterface?.parameters &&
+                          detailForm.stopInterface.parameters.map(
+                            (
+                              param: {
+                                paramName: string
+                                paramValue: string
+                                location: string
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NSelect
+                                  value={param.location}
+                                  onUpdateValue={(value: string) =>
+                                    (param.location = value)
+                                  }
+                                  options={[
+                                    { label: 'Header', value: 'HEADER' },
+                                    { label: 'Param', value: 'PARAM' }
+                                  ]}
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_location_tips'
+                                  )}
+                                  style={{ width: '120px' }}
+                                />
+                                <NInput
+                                  value={param.paramName}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramName = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_name_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NInput
+                                  value={param.paramValue}
+                                  onUpdateValue={(value: string) =>
+                                    (param.paramValue = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.param_value_tips'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.stopInterface?.parameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
-                    {(detailForm.stopInterface.method === 'POST' || detailForm.stopInterface.method === 'PUT') && (
-                      <NFormItem label={t('thirdparty_api_source.request_body')}>
+                    {(detailForm.stopInterface?.method === 'POST' ||
+                      detailForm.stopInterface?.method === 'PUT') && (
+                      <NFormItem
+                        label={t('thirdparty_api_source.request_body')}
+                      >
                         <NInput
-                          v-model={[detailForm.stopInterface.body, 'value']}
-                          type="textarea"
+                          value={detailForm.stopInterface?.body || ''}
+                          onUpdateValue={(value: string) => {
+                            if (detailForm.stopInterface) {
+                              detailForm.stopInterface.body = value
+                            }
+                          }}
+                          type='textarea'
                           autosize={{
                             minRows: 4,
                             maxRows: 10
                           }}
-                          placeholder="请输入JSON格式的请求体"
+                          placeholder='请输入JSON格式的请求体'
                         />
                       </NFormItem>
                     )}
-                    <NFormItem label={t('thirdparty_api_source.extract_response_data')}>
+                    <NFormItem
+                      label={t('thirdparty_api_source.extract_response_data')}
+                    >
                       <div style={{ width: '100%' }}>
                         {/* add button */}
                         <NButton
                           onClick={() => {
+                            if (!detailForm.stopInterface) {
+                              detailForm.stopInterface = {
+                                url: '',
+                                method: 'POST',
+                                parameters: [],
+                                body: '',
+                                responseParameters: []
+                              }
+                            }
                             if (!detailForm.stopInterface.responseParameters) {
                               detailForm.stopInterface.responseParameters = []
                             }
-                            detailForm.stopInterface.responseParameters.push({ key: '', jsonPath: '', disabled: false })
+                            detailForm.stopInterface.responseParameters.push({
+                              key: '',
+                              jsonPath: '',
+                              disabled: false
+                            })
                           }}
                           style={{ marginBottom: '10px' }}
                         >
                           {t('thirdparty_api_source.add_extract_field')}
                         </NButton>
-                        
+
                         {/* param list */}
-                        {detailForm.stopInterface.responseParameters && detailForm.stopInterface.responseParameters.map((param: { key: string; jsonPath: string; disabled: boolean }, index: number) => (
-                          <div 
-                            key={index} 
-                            style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '10px' }}
-                          >
-                            <NInput
-                              v-model={[param.key, 'value']}
-                              placeholder={t('thirdparty_api_source.extract_field')}
-                              style={{ flex: 1 }}
-                              disabled={param.disabled}
-                            />
-                            <NInput
-                              v-model={[param.jsonPath, 'value']}
-                              placeholder={t('thirdparty_api_source.json_path')}
-                              style={{ flex: 1, marginLeft: '10px' }}
-                            />
-                            <NButton
-                              onClick={() => {
-                                detailForm.stopInterface.responseParameters.splice(index, 1)
-                              }}
-                              style={{ marginLeft: '10px' }}
-                            >
-                              {t('thirdparty_api_source.delete')}
-                            </NButton>
-                          </div>
-                        ))}
+                        {detailForm.stopInterface?.responseParameters &&
+                          detailForm.stopInterface.responseParameters.map(
+                            (
+                              param: {
+                                key: string
+                                jsonPath: string
+                                disabled?: boolean
+                              },
+                              index: number
+                            ) => (
+                              <div
+                                key={index}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  width: '100%',
+                                  marginBottom: '10px'
+                                }}
+                              >
+                                <NInput
+                                  value={param.key}
+                                  onUpdateValue={(value: string) =>
+                                    (param.key = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.extract_field'
+                                  )}
+                                  style={{ flex: 1 }}
+                                  disabled={param.disabled}
+                                />
+                                <NInput
+                                  value={param.jsonPath}
+                                  onUpdateValue={(value: string) =>
+                                    (param.jsonPath = value)
+                                  }
+                                  placeholder={t(
+                                    'thirdparty_api_source.json_path'
+                                  )}
+                                  style={{ flex: 1, marginLeft: '10px' }}
+                                />
+                                <NButton
+                                  onClick={() => {
+                                    detailForm.stopInterface?.responseParameters?.splice(
+                                      index,
+                                      1
+                                    )
+                                  }}
+                                  style={{ marginLeft: '10px' }}
+                                >
+                                  {t('thirdparty_api_source.delete')}
+                                </NButton>
+                              </div>
+                            )
+                          )}
                       </div>
                     </NFormItem>
                   </>
