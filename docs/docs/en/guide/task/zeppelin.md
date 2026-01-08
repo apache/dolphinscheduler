@@ -17,7 +17,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|           **Parameter**            | **Description**                                                                                                                    |
+|           **Parameter**            |                                                          **Description**                                                           |
 |------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | Zeppelin Note ID                   | The unique note id for a zeppelin notebook note.                                                                                   |
 | Zeppelin Paragraph ID              | The unique paragraph id for a zeppelin notebook paragraph. If you want to schedule a whole note at a time, leave this field blank. |
@@ -31,9 +31,9 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 ## Task Output Parameters
 
-| **Task Parameter** | **Description**                       |
-|--------------------|---------------------------------------|
-| result             | VARCHAR, zeppelin execute result      |
+| **Task Parameter** |         **Description**          |
+|--------------------|----------------------------------|
+| result             | VARCHAR, zeppelin execute result |
 
 Can use `${taskName.result}` to reference task output parameters in downstream tasks.
 

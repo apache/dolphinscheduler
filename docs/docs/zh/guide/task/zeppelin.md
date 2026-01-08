@@ -25,11 +25,11 @@
 | Zeppelin username                  | 您的Zeppelin服务的登陆用户名                                |
 | Zeppelin password                  | 您的Zeppelin服务的登陆密码                                 |
 | Zeppelin Production Note Directory | 生产模式下存放克隆note的目录                                  |
-| Zeppelin Parameters                | 用于传入Zeppelin Dynamic Form的参数，会替换脚本中以 ${变量} 的内容   |
+| Zeppelin Parameters                | 用于传入Zeppelin Dynamic Form的参数，会替换脚本中以 ${变量} 的内容    |
 
 ## 任务输出参数
 
-| **任务参数** | **描述**                |
+| **任务参数** |        **描述**         |
 |----------|-----------------------|
 | result   | VARCHAR, zeppelin执行结果 |
 

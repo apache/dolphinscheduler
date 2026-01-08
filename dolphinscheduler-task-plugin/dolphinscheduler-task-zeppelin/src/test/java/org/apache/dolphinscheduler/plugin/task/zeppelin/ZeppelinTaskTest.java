@@ -245,7 +245,6 @@ public class ZeppelinTaskTest {
         Assertions.assertEquals(response, property.getValue());
     }
 
-
     private String buildZeppelinTaskParameters() {
         ZeppelinParameters zeppelinParameters = new ZeppelinParameters();
         zeppelinParameters.setNoteId(MOCK_NOTE_ID);
