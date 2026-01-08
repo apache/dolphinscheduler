@@ -1452,6 +1452,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
@@ -1494,6 +1495,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
