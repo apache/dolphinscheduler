@@ -136,11 +136,11 @@ public class JavaTask extends AbstractTask {
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(Constants.SPACE)
+                .append(javaParameters.getJvmArgs().trim()).append(Constants.SPACE)
                 .append(buildResourcePath()).append(Constants.SPACE)
                 .append("-jar").append(Constants.SPACE)
                 .append(mainJarAbsolutePathInLocal).append(Constants.SPACE)
-                .append(javaParameters.getMainArgs().trim()).append(Constants.SPACE)
-                .append(javaParameters.getJvmArgs().trim());
+                .append(javaParameters.getMainArgs().trim());
         return builder.toString();
     }
 
@@ -165,10 +165,10 @@ public class JavaTask extends AbstractTask {
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(Constants.SPACE)
+                .append(javaParameters.getJvmArgs().trim()).append(Constants.SPACE)
                 .append(buildResourcePath()).append(Constants.SPACE)
                 .append(mainJarName).append(Constants.SPACE)
-                .append(javaParameters.getMainArgs().trim()).append(Constants.SPACE)
-                .append(javaParameters.getJvmArgs().trim());
+                .append(javaParameters.getMainArgs().trim());
         return builder.toString();
     }
 
