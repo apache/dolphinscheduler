@@ -16,6 +16,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [Python](../task/python.md)
 * [SubWorkflow](../task/sub-workflow.md)
 * [Kubernetes](../task/kubernetes.md)
+* [zeppelin](../task/zeppelin.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubWorkflow 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
 
@@ -137,3 +138,13 @@ Node_mysql 运行结果如下：
 ![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
 
 另外需要特别注意的是，并非总是可以收集pod日志，如果用户重定向日志输出流，我们既不能收集日志使用，也不能使用输出参数。
+
+#### Zeppelin 任务传递参数
+
+在自定义参数中，添加一个 IN 类型的 input 参数。
+
+如下图所示：
+
+![zeppelin_parameters](../../../../img/new_ui/dev/parameter/zeppelin_parameters01.png)
+
+注意：JSON 键名必须用双引号括起来。

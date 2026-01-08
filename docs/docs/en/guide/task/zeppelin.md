@@ -17,7 +17,7 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|           **Parameter**            |                                                          **Description**                                                           |
+|           **Parameter**            | **Description**                                                                                                                    |
 |------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | Zeppelin Note ID                   | The unique note id for a zeppelin notebook note.                                                                                   |
 | Zeppelin Paragraph ID              | The unique paragraph id for a zeppelin notebook paragraph. If you want to schedule a whole note at a time, leave this field blank. |
@@ -27,7 +27,17 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 | Zeppelin password                  | the login password of your zeppelin server .                                                                                       |
 |                                    |
 | Zeppelin Rest Endpoint             | The REST endpoint of your zeppelin server .                                                                                        |
-| Zeppelin Parameters                | Parameters in json format used for zeppelin dynamic form.                                                                          |
+| Zeppelin Parameters                | Parameters in json format used for zeppelin dynamic form, which will replace the content with `${variable}` in the script.         |
+
+## Task Output Parameters
+
+| **Task Parameter** | **Description**                       |
+|--------------------|---------------------------------------|
+| result             | VARCHAR, zeppelin execute result      |
+
+Can use `${taskName.result}` to reference task output parameters in downstream tasks.
+
+For example, if the current task1 is a zeppelin task, the downstream task can use `${task1.result}` to reference the output parameters of task1.
 
 ## Production (Clone) Mode
 
