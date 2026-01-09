@@ -27,17 +27,20 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -136,12 +139,12 @@ public class JavaTask extends AbstractTask {
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(Constants.SPACE)
+                .append(javaParameters.getJvmArgs().trim()).append(Constants.SPACE)
                 .append(buildResourcePath()).append(Constants.SPACE)
                 .append("-jar").append(Constants.SPACE)
                 .append(mainJarAbsolutePathInLocal).append(Constants.SPACE)
-                .append(javaParameters.getMainArgs().trim()).append(Constants.SPACE)
-                .append(javaParameters.getJvmArgs().trim());
-        return builder.toString();
+                .append(javaParameters.getMainArgs().trim());
+        return parseParameter(builder.toString());
     }
 
     /**
@@ -165,11 +168,11 @@ public class JavaTask extends AbstractTask {
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(Constants.SPACE)
+                .append(javaParameters.getJvmArgs().trim()).append(Constants.SPACE)
                 .append(buildResourcePath()).append(Constants.SPACE)
                 .append(mainJarName).append(Constants.SPACE)
-                .append(javaParameters.getMainArgs().trim()).append(Constants.SPACE)
-                .append(javaParameters.getJvmArgs().trim());
-        return builder.toString();
+                .append(javaParameters.getMainArgs().trim());
+        return parseParameter(builder.toString());
     }
 
     @Override
@@ -221,4 +224,8 @@ public class JavaTask extends AbstractTask {
         return JAVA_HOME_VAR + File.separator + "bin" + File.separator;
     }
 
+    private String parseParameter(String script) {
+        Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
+        return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
+    }
 }
