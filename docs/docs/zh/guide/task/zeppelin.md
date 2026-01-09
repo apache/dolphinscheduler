@@ -25,7 +25,17 @@
 | Zeppelin username                  | 您的Zeppelin服务的登陆用户名                                |
 | Zeppelin password                  | 您的Zeppelin服务的登陆密码                                 |
 | Zeppelin Production Note Directory | 生产模式下存放克隆note的目录                                  |
-| Zeppelin Parameters                | 用于传入Zeppelin Dynamic Form的参数                      |
+| Zeppelin Parameters                | 用于传入Zeppelin Dynamic Form的参数，会替换脚本中以 ${变量} 的内容    |
+
+## 任务输出参数
+
+| **任务参数** |        **描述**         |
+|----------|-----------------------|
+| result   | VARCHAR, zeppelin执行结果 |
+
+可以在下游任务中使用 ${taskName.result} 引用任务输出参数。
+
+如，当前task1为zeppelin任务, 下游任务可以使用 `${task1.result}` 引用task1的输出参数
 
 ## 生产（克隆）模式
 
