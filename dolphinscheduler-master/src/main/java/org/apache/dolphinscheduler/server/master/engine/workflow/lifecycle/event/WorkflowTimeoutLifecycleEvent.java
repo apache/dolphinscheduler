@@ -52,8 +52,6 @@ public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLife
         // Calculate remaining time until timeout: timeout - elapsed time
         long delayTime = TimeUnit.MINUTES.toMillis(timeout)
                 - (System.currentTimeMillis() - workflowInstance.getStartTime().getTime());
-        // Ensure delayTime is not negative (trigger immediately if already timeout)
-        delayTime = Math.max(0, delayTime);
         return new WorkflowTimeoutLifecycleEvent(workflowExecutionRunnable, delayTime);
     }
 
