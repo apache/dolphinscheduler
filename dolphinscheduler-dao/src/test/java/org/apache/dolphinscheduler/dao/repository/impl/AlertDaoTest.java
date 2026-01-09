@@ -90,7 +90,7 @@ class AlertDaoTest extends BaseDaoTest {
         projectUser.setProjectName("test-project");
         projectUser.setUserName("admin");
 
-        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser, "admin");
+        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser);
 
         List<Alert> alerts = alertDao.listPendingAlerts(-1);
         Assertions.assertNotNull(alerts);

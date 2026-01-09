@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -264,17 +263,8 @@ public class WorkflowAlertManager {
         alertDao.sendTaskTimeoutAlert(workflowInstance, taskInstance, projectUser);
     }
 
-    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
-        // Get workflow definition log for modifyBy
-        String modifyBy = queryWorkflowOperator(workflowInstance);
-        if (Objects.isNull(projectUser)) {
-            Project project = projectDao.queryByCode(workflowInstance.getProjectCode());
-            projectUser = new ProjectUser();
-            projectUser.setProjectCode(project.getCode());
-            projectUser.setProjectName(project.getName());
-            projectUser.setUserName(project.getUserName());
-        }
-
-        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser, modifyBy);
+    public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance) {
+        ProjectUser projectUser = projectDao.queryProjectWithUserByWorkflowInstanceId(workflowInstance.getId());
+        alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser);
     }
 }

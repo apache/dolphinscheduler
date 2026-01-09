@@ -78,7 +78,7 @@ class WorkflowTimeoutLifecycleEventHandlerTest {
 
         handler.handle(workflowStateAction, workflowExecutionRunnable, workflowTimeoutEvent);
 
-        verify(workflowAlertManager).sendWorkflowTimeoutAlert(eq(workflowInstance), eq(null));
+        verify(workflowAlertManager).sendWorkflowTimeoutAlert(eq(workflowInstance));
     }
 
     @Test
@@ -93,7 +93,7 @@ class WorkflowTimeoutLifecycleEventHandlerTest {
 
         handler.handle(workflowStateAction, workflowExecutionRunnable, workflowTimeoutEvent);
 
-        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any(), any());
+        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any());
     }
 
     @Test
@@ -108,7 +108,7 @@ class WorkflowTimeoutLifecycleEventHandlerTest {
 
         handler.handle(workflowStateAction, workflowExecutionRunnable, workflowTimeoutEvent);
 
-        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any(), any());
+        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any());
     }
 
     @Test
@@ -123,6 +123,22 @@ class WorkflowTimeoutLifecycleEventHandlerTest {
 
         handler.handle(workflowStateAction, workflowExecutionRunnable, workflowTimeoutEvent);
 
-        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any(), any());
+        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any());
+    }
+
+    @Test
+    void testHandleWorkflowTimeoutWithNullWarningGroupId() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setName("test-workflow");
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        workflowInstance.setWarningGroupId(null);
+
+        when(workflowExecutionRunnable.getWorkflowInstance()).thenReturn(workflowInstance);
+        when(workflowExecutionRunnable.getName()).thenReturn("test-workflow");
+
+        handler.handle(workflowStateAction, workflowExecutionRunnable, workflowTimeoutEvent);
+
+        verify(workflowAlertManager, never()).sendWorkflowTimeoutAlert(any());
     }
 }

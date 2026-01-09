@@ -56,13 +56,18 @@ public class WorkflowTimeoutLifecycleEventHandler
             return;
         }
 
+        // Check if warning group is configured
+        if (workflowInstance.getWarningGroupId() == null) {
+            log.info("Skipped sending timeout alert for workflow {} because warningGroupId is null.", workflowName);
+            return;
+        }
+
         log.info("The workflow {} has timeout, try to send a timeout alert.", workflowName);
         doWorkflowTimeoutAlert(workflowInstance);
     }
 
     private void doWorkflowTimeoutAlert(final WorkflowInstance workflowInstance) {
-        // ProjectUser will be built in WorkflowAlertManager
-        workflowAlertManager.sendWorkflowTimeoutAlert(workflowInstance, null);
+        workflowAlertManager.sendWorkflowTimeoutAlert(workflowInstance);
     }
 
     @Override
