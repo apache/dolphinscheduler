@@ -47,7 +47,7 @@ public class TaskKillStateAction extends AbstractTaskStateAction {
                              final TaskStartLifecycleEvent taskStartEvent) {
         throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainKill(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     @Override

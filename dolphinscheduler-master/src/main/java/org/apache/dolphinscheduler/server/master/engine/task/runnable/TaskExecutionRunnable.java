@@ -97,6 +97,11 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     }
 
     @Override
+    public boolean isFailure() {
+        return isTaskInstanceInitialized() && !isTaskInstanceCanRetry() && taskInstance.getState().isFailure();
+    }
+
+    @Override
     public void retry() {
         checkState(isTaskInstanceInitialized(), "The task instance is not initialized, can't initialize retry task.");
         this.taskInstance = applicationContext.getBean(TaskInstanceFactories.class)

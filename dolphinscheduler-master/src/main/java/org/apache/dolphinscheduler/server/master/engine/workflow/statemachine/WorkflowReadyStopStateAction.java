@@ -85,7 +85,7 @@ public class WorkflowReadyStopStateAction extends AbstractWorkflowStateAction {
     public void onStopEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                             final WorkflowStopLifecycleEvent workflowStopEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        super.killActiveTask(workflowExecutionRunnable);
+        workflowExecutionRunnable.killActiveTasks();
     }
 
     @Override
