@@ -26,7 +26,9 @@ import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecution
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -91,7 +93,7 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
                     workflowGraph,
                     workflowExecutionGraph,
                     workflowEventBus,
-                    workflowInstanceLifecycleListeners);
+                    Optional.ofNullable(workflowInstanceLifecycleListeners).orElse(Collections.emptyList()));
         }
     }
 

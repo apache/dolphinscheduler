@@ -136,7 +136,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstancePausedEventToDB(taskExecutionRunnable, taskPausedEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainPause(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstancePausedEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -153,7 +153,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceKilledEventToDB(taskExecutionRunnable, taskInstanceKillEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainKill(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstanceKilledEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -181,11 +181,12 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
         if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
             mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
-            publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+            publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
             return;
         }
+        // todo: Use Plugin to extend the act strategy on xxEvent.
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstanceFailedEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -203,7 +204,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceSuccessEventToDB(taskExecutionRunnable, taskSuccessEvent);
         mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     protected void mergeTaskVarPoolToWorkflow(final IWorkflowExecutionRunnable workflowExecutionRunnable,
@@ -244,9 +245,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         taskExecutionRunnable.getWorkflowEventBus().publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));
     }
 
-    protected void publishWorkflowInstanceTopologyLogicalTransitionEvent(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final Integer workflowInstanceId = taskExecutionRunnable.getWorkflowInstance().getId();
-        final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
+    protected void publishWorkflowInstanceTopologyLogicalTransitionEvent(
+                                                                         final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                                         final ITaskExecutionRunnable taskExecutionRunnable) {
         taskExecutionRunnable
                 .getWorkflowEventBus()
                 .publish(
