@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.authentication.aws.AwsConfigurationKey
 
 import java.util.Map;
 
-import com.amazonaws.auth.WebIdentityTokenCredentialsProvider;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +28,7 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.auth.WebIdentityTokenCredentialsProvider;
 
 @Slf4j
 @UtilityClass
