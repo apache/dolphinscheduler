@@ -1505,17 +1505,18 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
-
-                    Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
                 });
 
         masterContainer.assertAllResourceReleased();
