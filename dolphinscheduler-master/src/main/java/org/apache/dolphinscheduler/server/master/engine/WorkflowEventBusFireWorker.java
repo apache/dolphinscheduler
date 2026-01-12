@@ -132,9 +132,7 @@ public class WorkflowEventBusFireWorker {
                     return;
                 }
 
-                // If task initializeTaskExecutionContext before dispatch is failed
-                // construct and publish a dedicated TaskFatalLifecycleEvent
-                // so that the event will be handled by TaskFatalLifecycleEventHandler
+                // If task context init fails, publish a fatal error event
                 if (ExceptionUtils.isTaskExecutionContextCreateException(ex)) {
                     AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
                     final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()

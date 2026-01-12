@@ -30,7 +30,7 @@ workflows:
     code: 1
     version: 1
     projectCode: 1
-    description: This is a fake workflow with one condition task which has one predecessor fatal
+    description: This is a fake workflow with one condition task that has one predecessor that failed fatally
     releaseState: ONLINE
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00

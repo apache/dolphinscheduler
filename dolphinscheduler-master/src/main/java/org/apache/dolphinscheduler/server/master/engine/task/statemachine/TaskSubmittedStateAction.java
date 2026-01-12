@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -113,11 +114,15 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
 
         try {
             taskExecutionRunnable.initializeTaskExecutionContext();
+        } catch (DataAccessResourceFailureException ex) {
+            log.error("Database/resource failure during task context initialization, taskName: {}",
+                    taskInstance.getName(), ex);
+            throw ex;
         } catch (Exception ex) {
             log.error("Failed to initialize task execution context, taskName: {}", taskInstance.getName(), ex);
             throw new TaskExecutionContextCreateException(ex.getMessage());
-
         }
+
         workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, remainTimeMills);
     }
 

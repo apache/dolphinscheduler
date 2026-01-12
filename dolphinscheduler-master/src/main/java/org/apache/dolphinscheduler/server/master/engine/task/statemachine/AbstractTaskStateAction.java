@@ -117,11 +117,12 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
         if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
             mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
-            publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+            publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
             return;
         }
+
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstanceFatalEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
