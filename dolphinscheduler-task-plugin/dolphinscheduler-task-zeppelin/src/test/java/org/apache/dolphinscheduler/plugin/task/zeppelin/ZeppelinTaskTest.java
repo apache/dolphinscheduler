@@ -33,7 +33,10 @@ import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConn
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.zeppelin.client.NoteResult;
@@ -41,6 +44,7 @@ import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
@@ -225,6 +229,20 @@ public class ZeppelinTaskTest {
             Mockito.verify(this.zClient).deleteNote(MOCK_CLONE_NOTE_ID);
             Assertions.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
         }
+    }
+
+    @Test
+    public void testAddDefaultOutput() throws Exception {
+        String response = "zeppelin-result";
+        this.zeppelinTask.addDefaultOutput(response);
+
+        List<Property> varPool = this.zeppelinTask.getParameters().getVarPool();
+        Assertions.assertEquals(1, varPool.size());
+        Property property = varPool.get(0);
+        Assertions.assertEquals("null.result", property.getProp());
+        Assertions.assertEquals(Direct.OUT, property.getDirect());
+        Assertions.assertEquals(DataType.VARCHAR, property.getType());
+        Assertions.assertEquals(response, property.getValue());
     }
 
     private String buildZeppelinTaskParameters() {
