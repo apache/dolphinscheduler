@@ -40,6 +40,11 @@
 
         <dependency>
             <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sagemaker</artifactId>
         </dependency>
 

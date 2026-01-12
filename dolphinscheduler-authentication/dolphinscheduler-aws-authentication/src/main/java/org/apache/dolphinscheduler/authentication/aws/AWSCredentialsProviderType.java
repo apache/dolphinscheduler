@@ -26,6 +26,7 @@ public enum AWSCredentialsProviderType {
 
     STATIC_CREDENTIALS_PROVIDER("AWSStaticCredentialsProvider"),
     INSTANCE_PROFILE_CREDENTIALS_PROVIDER("InstanceProfileCredentialsProvider"),
+    WEB_IDENTITY_TOKEN_CREDENTIALS_PROVIDER("WebIdentityTokenCredentialsProvider"),
     ;
 
     private final String name;

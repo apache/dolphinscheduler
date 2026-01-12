@@ -17,9 +17,10 @@
 
 aws:
   s3:
-    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
     credentials.provider.type: AWSStaticCredentialsProvider
     access.key.id: accessKey123
     access.key.secret: secretKey123
@@ -27,36 +28,40 @@ aws:
     bucket.name: dolphinscheduler
     endpoint: http://s3:9000
   emr:
-    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
     credentials.provider.type: AWSStaticCredentialsProvider
     access.key.id: minioadmin
     access.key.secret: minioadmin
     region: cn-north-1
     endpoint: http://localhost:9000
   sagemaker:
-    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
     credentials.provider.type: AWSStaticCredentialsProvider
     access.key.id: minioadmin
     access.key.secret: minioadmin
     region: cn-north-1
     endpoint: http://localhost:9000
   dms:
-    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
     credentials.provider.type: AWSStaticCredentialsProvider
     access.key.id: minioadmin
     access.key.secret: minioadmin
     region: cn-north-1
     endpoint: http://localhost:9000
   datasync:
-    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
     credentials.provider.type: AWSStaticCredentialsProvider
     access.key.id: minioadmin
     access.key.secret: minioadmin

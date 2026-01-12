@@ -77,9 +77,10 @@ DolphinScheduler 在 启动DMS 任务后，会跟中DMS任务状态，直至DMS�
 
 ```yaml
 dms:
-  # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+  # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
   # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
   # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+  # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
   credentials.provider.type: AWSStaticCredentialsProvider
   access.key.id: <access.key.id>
   access.key.secret: <access.key.secret>

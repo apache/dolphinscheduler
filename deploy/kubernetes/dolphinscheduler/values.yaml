@@ -268,9 +268,10 @@ conf:
     # -- resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
     resource.storage.upload.base.path: /dolphinscheduler
 
-    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider, WebIdentityTokenCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    # WebIdentityTokenCredentialsProvider: use role_arn and web_identity_token_file to authenticate
     aws.credentials.provider.type: AWSStaticCredentialsProvider
 
     # -- The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required

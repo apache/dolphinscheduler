@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.authentication.aws.AwsConfigurationKey
 
 import java.util.Map;
 
+import com.amazonaws.auth.WebIdentityTokenCredentialsProvider;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,8 @@ public class AWSCredentialsProviderFactor {
                 return createAWSStaticCredentialsProvider(awsProperties);
             case INSTANCE_PROFILE_CREDENTIALS_PROVIDER:
                 return createInstanceProfileCredentialsProvider();
+            case WEB_IDENTITY_TOKEN_CREDENTIALS_PROVIDER:
+                return createWebIdentityTokenCredentialsProvider();
             default:
                 throw new IllegalArgumentException(
                         "The aws.credentials.provider.type: " + awsAuthenticationType + " is invalidated");
@@ -69,6 +72,13 @@ public class AWSCredentialsProviderFactor {
                 InstanceProfileCredentialsProvider.getInstance();
         log.info("InstanceProfileCredentialsProvider created successfully");
         return instanceProfileCredentialsProvider;
+    }
+
+    private static AWSCredentialsProvider createWebIdentityTokenCredentialsProvider() {
+        WebIdentityTokenCredentialsProvider webIdentityTokenCredentialsProvider =
+                WebIdentityTokenCredentialsProvider.create();
+        log.info("WebIdentityTokenCredentialsProvider created successfully");
+        return webIdentityTokenCredentialsProvider;
     }
 
 }
