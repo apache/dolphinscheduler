@@ -23,8 +23,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
+import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflowFailureStrategy;
+import org.apache.dolphinscheduler.server.master.engine.workflow.policy.WorkflowFailureStrategyFactory;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -39,9 +42,15 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Getter
     private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
 
+    @Getter
+    private final IWorkflowFailureStrategy workflowFailureStrategy;
+
     public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder) {
         this.workflowExecuteContext = workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder().build();
-        this.workflowInstanceLifecycleListeners = workflowExecuteContext.getWorkflowInstanceLifecycleListeners();
+        this.workflowInstanceLifecycleListeners =
+                new ArrayList<>(workflowExecuteContext.getWorkflowInstanceLifecycleListeners());
+        this.workflowFailureStrategy = WorkflowFailureStrategyFactory
+                .getStrategy(workflowExecuteContext.getWorkflowInstance().getFailureStrategy());
     }
 
     @Override

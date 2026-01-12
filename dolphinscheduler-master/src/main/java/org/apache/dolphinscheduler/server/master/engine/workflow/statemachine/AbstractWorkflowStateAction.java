@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflowFailureStrategy;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
@@ -103,18 +104,6 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
         }
     }
 
-    protected void killActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        try {
-            LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
-            workflowExecutionRunnable
-                    .getWorkflowExecutionGraph()
-                    .getActiveTaskExecutionRunnable()
-                    .forEach(ITaskExecutionRunnable::kill);
-        } finally {
-            LogUtils.removeWorkflowInstanceIdMDC();
-        }
-    }
-
     protected void pauseActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
         try {
             LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
@@ -129,21 +118,25 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     protected void tryToTriggerSuccessorsAfterTaskFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                                          final ITaskExecutionRunnable taskExecutionRunnable) {
+        successorFlowAdjuster.adjustSuccessorFlow(taskExecutionRunnable);
+
+        final IWorkflowFailureStrategy workflowFailureStrategy = workflowExecutionRunnable.getWorkflowFailureStrategy();
+        if (taskExecutionRunnable.isFailure()) {
+            workflowFailureStrategy.onTaskFailure(workflowExecutionRunnable, taskExecutionRunnable);
+        }
+
         final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
         if (workflowExecutionGraph.isEndOfTaskChain(taskExecutionRunnable)) {
             emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
             return;
         }
 
-        successorFlowAdjuster.adjustSuccessorFlow(taskExecutionRunnable);
-        final List<ITaskExecutionRunnable> successors = workflowExecutionGraph.getSuccessors(taskExecutionRunnable);
-        if (successors.isEmpty()) {
-            log.debug("The task: {} has no successor, try to emit workflow finished event",
-                    taskExecutionRunnable.getName());
+        if (!workflowFailureStrategy.canTriggerSuccessor(workflowExecutionRunnable, taskExecutionRunnable)) {
             emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
             return;
         }
-        triggerTasks(workflowExecutionRunnable, successors);
+
+        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
     }
 
     protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
