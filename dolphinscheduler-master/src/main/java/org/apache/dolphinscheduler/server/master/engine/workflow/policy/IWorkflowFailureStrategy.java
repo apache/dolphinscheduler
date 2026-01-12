@@ -15,26 +15,20 @@
  * limitations under the License.
  */
 
-export default {
-  task_state_statistics: '任务实例状态统计',
-  workflow_state_statistics: '工作流实例状态统计',
-  workflow_definition_statistics: '工作流定义统计',
-  number: '数量',
-  state: '状态',
-  submitted_success: '提交成功',
-  running_execution: '正在运行',
-  ready_pause: '准备暂停',
-  pause: '暂停',
-  ready_stop: '准备停止',
-  stop: '停止',
-  failure: '失败',
-  success: '成功',
-  need_fault_tolerance: '需要容错',
-  kill: 'KILL',
-  waiting_depend: '等待依赖完成',
-  delay_execution: '延时执行',
-  forced_success: '强制成功',
-  serial_wait: '串行等待',
-  dispatch: '派发',
-  failover: '恢复容错'
+package org.apache.dolphinscheduler.server.master.engine.workflow.policy;
+
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+
+/**
+ * Used to deal with {@link org.apache.dolphinscheduler.common.enums.FailureStrategy} when task failure occurs
+ */
+public interface IWorkflowFailureStrategy {
+
+    void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       ITaskExecutionRunnable taskExecutionRunnable);
+
+    boolean canTriggerSuccessor(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                ITaskExecutionRunnable taskExecutionRunnable);
+
 }

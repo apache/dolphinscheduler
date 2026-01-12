@@ -31,14 +31,10 @@ export default {
   success: 'SUCCESS',
   need_fault_tolerance: 'NEED_FAULT_TOLERANCE',
   kill: 'KILL',
-  waiting_thread: 'WAITING_THREAD',
   waiting_depend: 'WAITING_DEPEND',
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
   serial_wait: 'SERIAL_WAIT',
   dispatch: 'DISPATCH',
-  ready_block: 'READY_BLOCK',
-  block: 'BLOCK',
-  wait_to_run: 'WAIT_TO_RUN',
   failover: 'FAILOVER'
 }

@@ -20,7 +20,6 @@ export type ITaskState =
   | 'SUBMITTED_SUCCESS'
   | 'RUNNING_EXECUTION'
   | 'PAUSE'
-  | 'STOP'
   | 'FAILURE'
   | 'SUCCESS'
   | 'NEED_FAULT_TOLERANCE'
@@ -39,7 +38,7 @@ export type IWorkflowExecutionState =
   | 'FAILURE'
   | 'SUCCESS'
   | 'SERIAL_WAIT'
-  | 'WAIT_TO_RUN'
+  | 'FAILOVER'
 
 export type ITaskStateConfig = {
   [key in ITaskState]: {

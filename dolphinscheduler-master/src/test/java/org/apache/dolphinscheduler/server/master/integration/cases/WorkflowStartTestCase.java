@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.integration.cases;
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -245,6 +246,45 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .isEqualTo(WorkflowExecutionStatus.STOP);
                     assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
                             .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with three fake task(A) using end failure strategy")
+    public void testStartWorkflow_with_threeFakeTask_usingFailureStrategyEnd() {
+        final String yaml = "/it/start/workflow_with_three_parallel_fake_task_using_failure_strategy.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.END)
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                            .isEqualTo(WorkflowExecutionStatus.FAILURE);
+                    Assertions.assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(3)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("C");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            });
+
                 });
 
         masterContainer.assertAllResourceReleased();
