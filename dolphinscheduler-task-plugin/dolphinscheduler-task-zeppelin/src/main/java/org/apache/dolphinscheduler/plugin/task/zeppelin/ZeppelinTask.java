@@ -26,7 +26,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -107,10 +111,14 @@ public class ZeppelinTask extends AbstractRemoteTask {
             // noteId may be replaced with cloned noteId
             String noteId = this.zeppelinParameters.getNoteId();
             Map<String, String> zeppelinParamsMap = new HashMap<>();
-            if (parameters != null) {
+            if (StringUtils.isNotBlank(parameters)) {
+                Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+                String replacedParams =
+                        ParameterUtils.convertParameterPlaceholders(parameters, ParameterUtils.convert(paramsMap));
                 ObjectMapper mapper = new ObjectMapper();
-                zeppelinParamsMap = mapper.readValue(parameters, Map.class);
+                zeppelinParamsMap = mapper.readValue(replacedParams, Map.class);
             }
+            log.info("request zeppelin parameters:{}", JSONUtils.toPrettyJsonString(zeppelinParamsMap));
 
             // Submit zeppelin task
             String resultContent;
@@ -149,7 +157,8 @@ public class ZeppelinTask extends AbstractRemoteTask {
             if (productionNoteDirectory != null) {
                 this.zClient.deleteNote(noteId);
             }
-
+            // add response to out var poll
+            addDefaultOutput(resultContent);
             // Use noteId-paragraph-Id as app id
             final int exitStatusCode = mapStatusToExitCode(status);
             setAppIds(String.format("%s-%s", noteId, paragraphId));
@@ -243,6 +252,16 @@ public class ZeppelinTask extends AbstractRemoteTask {
     @Override
     public List<String> getApplicationIds() throws TaskException {
         return Collections.emptyList();
+    }
+
+    public void addDefaultOutput(String response) {
+        // put response in output
+        Property outputProperty = new Property();
+        outputProperty.setProp(String.format("%s.%s", taskExecutionContext.getTaskName(), "result"));
+        outputProperty.setDirect(Direct.OUT);
+        outputProperty.setType(DataType.VARCHAR);
+        outputProperty.setValue(response);
+        zeppelinParameters.addPropertyToValPool(outputProperty);
     }
 
 }
