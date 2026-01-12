@@ -1558,6 +1558,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
                             });
                 });
