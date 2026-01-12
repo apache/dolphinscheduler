@@ -125,19 +125,6 @@ public class BaseServiceImpl implements BaseService {
     }
 
     /**
-     * create tenant dir if not exists
-     *
-     * @param tenantCode tenant code
-     * @throws IOException if hdfs operation exception
-     */
-    // @Override
-    // public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-    // String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-    // // init resource path
-    // HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
-    // }
-
-    /**
      * Verify that the operator has permissions
      *
      * @param operateUser operate user
