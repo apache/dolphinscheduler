@@ -37,13 +37,13 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
+import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -114,11 +114,10 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
 
         try {
             taskExecutionRunnable.initializeTaskExecutionContext();
-        } catch (DataAccessResourceFailureException ex) {
-            log.error("Database/resource failure during task context initialization, taskName: {}",
-                    taskInstance.getName(), ex);
-            throw ex;
         } catch (Exception ex) {
+            if (ExceptionUtils.isDatabaseConnectedFailedException(ex)) {
+                throw ex;
+            }
             log.error("Failed to initialize task execution context, taskName: {}", taskInstance.getName(), ex);
             throw new TaskExecutionContextCreateException(ex.getMessage());
         }
