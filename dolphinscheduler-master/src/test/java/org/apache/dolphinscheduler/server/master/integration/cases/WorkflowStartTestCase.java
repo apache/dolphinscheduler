@@ -1589,7 +1589,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         // Observe the task over a reasonable period (e.g., 20 seconds)
         // It should reach a fail state because:
-        // - workerGroup "workerGroupNotFound" does not exist
+        // - no available worker
         // - and timeout detection is ON → fallback failure mechanism
         await()
                 .atMost(Duration.ofSeconds(30))
@@ -1633,7 +1633,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         // Observe the task over a reasonable period (e.g., 20 seconds)
         // It should NEVER reach a terminal state because:
-        // - workerGroup "workerGroupNotFound" does not exist
+        // - no available worker
         // - and timeout detection is OFF → no fallback failure mechanism
         await()
                 .atMost(Duration.ofSeconds(30))
