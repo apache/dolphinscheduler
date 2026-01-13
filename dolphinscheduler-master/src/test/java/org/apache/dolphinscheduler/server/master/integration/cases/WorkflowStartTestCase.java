@@ -1523,7 +1523,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
-    @DisplayName("Task with non-existent worker group remains running indefinitely when dispatch timeout is disabled")
+    @DisplayName("Task with non-existent worker group remains submit-success indefinitely when dispatch timeout is disabled")
     public void testTaskStaysRunning_whenWorkerGroupNotFoundAndTimeoutDisabled() {
         // Disable dispatch timeout: system will NOT auto-fail tasks that cannot be dispatched
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
@@ -1554,7 +1554,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
                                 assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUBMITTED_SUCCESS);
                             });
 
                     Assertions
@@ -1599,7 +1599,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
                             });
 
@@ -1613,7 +1613,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
-    @DisplayName("Task with no available worker remains running indefinitely when dispatch timeout is disabled")
+    @DisplayName("Task with no available worker remains submit-success indefinitely when dispatch timeout is disabled")
     public void testTaskStaysRunning_with_noAvailableWorkerAndTimeoutDisabled() {
         // Disable dispatch timeout: system will NOT auto-fail tasks that cannot be dispatched
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
@@ -1643,8 +1643,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUBMITTED_SUCCESS);
                             });
 
                     Assertions
