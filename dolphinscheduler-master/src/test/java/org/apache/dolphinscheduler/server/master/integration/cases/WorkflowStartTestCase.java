@@ -1479,7 +1479,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
     @Test
     @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is enabled")
-    public void testStartWorkflow_with_workerGroupNotFoundAndTimeoutEnabled() {
+    public void testTaskFail_with_workerGroupNotFoundAndTimeoutEnabled() {
         // Enable dispatch timeout to ensure tasks fail fast if worker group is missing
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
         taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
@@ -1497,7 +1497,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 20 seconds)
+        // Observe the task over a reasonable period (e.g., 30 seconds)
         // It should reach a fail state because:
         // - workerGroup "workerGroupNotFound" does not exist
         // - and timeout detection is ON → fallback failure mechanism
@@ -1523,9 +1523,10 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
-    @DisplayName("Task with non-existent worker group remains submit-success indefinitely when dispatch timeout is disabled")
-    public void testTaskStaysRunning_whenWorkerGroupNotFoundAndTimeoutDisabled() {
-        // Disable dispatch timeout: system will NOT auto-fail tasks that cannot be dispatched
+    @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is disabled")
+    public void testTaskRemainsSubmittedSuccess_with_workerGroupNotFoundAndTimeoutDisabled() {
+        // Disable dispatch timeout failure: tasks that cannot be dispatched (e.g., due to missing worker group)
+        // will not be automatically marked as failed, and will remain in SUBMITTED_SUCCESS indefinitely.
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
         policy.setDispatchTimeoutFailedEnabled(false);
         this.masterConfig.setTaskDispatchPolicy(policy);
@@ -1541,8 +1542,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 20 seconds)
-        // It should NEVER reach a terminal state because:
+        // Observe the task over a reasonable period (e.g., 30 seconds)
+        // the task is still stuck in SUBMITTED_SUCCESS state because:
         // - workerGroup "workerGroupNotFound" does not exist
         // - and timeout detection is OFF → no fallback failure mechanism
         await()
@@ -1564,12 +1565,14 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
                 });
 
-        masterContainer.assertAllResourceReleased();
+        // This test intentionally leaves the workflow running (non-existent worker group + timeout disabled),
+        // so we skip the resource cleanup check.
+        // masterContainer.assertAllResourceReleased();
     }
 
     @Test
-    @DisplayName("Test start a workflow whose task specifies a no available worker when dispatch timeout is enabled")
-    public void testStartWorkflow_with_noAvailableWorkerAndTimeoutEnabled() {
+    @DisplayName("Test start a workflow when no available worker and dispatch timeout is enabled")
+    public void testTaskFail_with_noAvailableWorkerAndTimeoutEnabled() {
         // Enable dispatch timeout to ensure tasks fail fast if no available worker
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
         taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
@@ -1587,7 +1590,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 20 seconds)
+        // Observe the task over a reasonable period (e.g., 30 seconds)
         // It should reach a fail state because:
         // - no available worker
         // - and timeout detection is ON → fallback failure mechanism
@@ -1613,9 +1616,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
-    @DisplayName("Task with no available worker remains submit-success indefinitely when dispatch timeout is disabled")
-    public void testTaskStaysRunning_with_noAvailableWorkerAndTimeoutDisabled() {
-        // Disable dispatch timeout: system will NOT auto-fail tasks that cannot be dispatched
+    @DisplayName("Test start a workflow when no available worker and dispatch timeout is disabled")
+    public void testTaskRemainsSubmittedSuccess_with_noAvailableWorkerAndTimeoutDisabled() {
+        // Disable dispatch timeout so tasks won't auto-fail due to unavailability
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
         policy.setDispatchTimeoutFailedEnabled(false);
         this.masterConfig.setTaskDispatchPolicy(policy);
@@ -1631,8 +1634,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 20 seconds)
-        // It should NEVER reach a terminal state because:
+        // Observe the task over a reasonable period (e.g., 30 seconds)
+        // the task is still stuck in SUBMITTED_SUCCESS state because:
         // - no available worker
         // - and timeout detection is OFF → no fallback failure mechanism
         await()
@@ -1653,6 +1656,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                     .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
                 });
 
-        masterContainer.assertAllResourceReleased();
+        // This test intentionally leaves the workflow running (no available worker + timeout disabled),
+        // so we skip the resource cleanup check.
+        // masterContainer.assertAllResourceReleased();
     }
+
 }
