@@ -89,11 +89,10 @@ class ProcedureTaskTest {
         when(mockTaskContext.getTaskParams()).thenReturn(validParamsJson);
         when(mockTaskContext.getResourceParametersHelper()).thenReturn(mockResourceHelper);
 
-        // Mock parameter validation to pass
         try (MockedStatic<JSONUtils> jsonUtilsMock = mockStatic(JSONUtils.class)) {
             jsonUtilsMock.when(() -> JSONUtils.parseObject(anyString(), eq(ProcedureParameters.class)))
                     .thenReturn(procedureParams);
-            doCallRealMethod().when(procedureParams).checkParameters(); // or stub as needed
+            doCallRealMethod().when(procedureParams).checkParameters();
             when(procedureParams.checkParameters()).thenReturn(true);
             when(procedureParams.generateExtendedContext(any())).thenReturn(mock(ProcedureTaskExecutionContext.class));
 
@@ -104,7 +103,6 @@ class ProcedureTaskTest {
 
     @Test
     void constructor_InvalidParameters_ThrowsTaskException() {
-        // Arrange: invalid JSON or checkParameters returns false
         String invalidParamsJson = "{}";
         when(mockTaskContext.getTaskParams()).thenReturn(invalidParamsJson);
 
@@ -114,7 +112,6 @@ class ProcedureTaskTest {
                     .thenReturn(badParams);
             when(badParams.checkParameters()).thenReturn(false);
 
-            // Act & Assert
             TaskException exception = assertThrows(TaskException.class,
                     () -> new ProcedureTask(mockTaskContext));
             assertTrue(exception.getMessage().contains("not valid"));
@@ -126,7 +123,6 @@ class ProcedureTaskTest {
         when(procedureParams.getType()).thenReturn("MYSQL");
         when(procedureParams.getMethod()).thenReturn("{call my_proc(?, ?)}");
 
-        // Arrange mocks
         Connection mockConn = mock(Connection.class);
         CallableStatement mockStmt = mock(CallableStatement.class);
 
@@ -145,15 +141,11 @@ class ProcedureTaskTest {
                     .thenReturn(mockConn);
 
             when(mockConn.prepareCall(anyString())).thenReturn(mockStmt);
-            when(mockStmt.executeUpdate()).thenReturn(1); // success
-
-            // Mock parameter maps to avoid NPE
+            when(mockStmt.executeUpdate()).thenReturn(1);
             when(mockTaskContext.getPrepareParamsMap()).thenReturn(new HashMap<>());
 
-            // Act
             procedureTask.handle(null);
 
-            // Assert
             assertEquals(TaskConstants.EXIT_CODE_SUCCESS, getField(procedureTask, "exitStatusCode"));
             verify(mockStmt).executeUpdate();
         }
@@ -164,7 +156,6 @@ class ProcedureTaskTest {
         when(procedureParams.getType()).thenReturn("MYSQL");
         when(procedureParams.getMethod()).thenReturn("{call my_proc(?, ?)}");
 
-        // Arrange
         Connection mockConn = mock(Connection.class);
         CallableStatement mockStmt = mock(CallableStatement.class);
 
@@ -187,7 +178,6 @@ class ProcedureTaskTest {
 
             when(mockTaskContext.getPrepareParamsMap()).thenReturn(new HashMap<>());
 
-            // Act & Assert
             TaskException exception = assertThrows(TaskException.class,
                     () -> procedureTask.handle(null));
             assertTrue(exception.getMessage().contains("failed"));
@@ -197,72 +187,55 @@ class ProcedureTaskTest {
 
     @Test
     void cancel_ActiveStatement_CancelsAndSetsKillCode() throws Exception {
-        // Arrange: simulate active statement
         CallableStatement mockStmt = mock(CallableStatement.class);
         setField(procedureTask, "sessionStatement", mockStmt);
 
-        // Act
         procedureTask.cancel();
 
-        // Assert
         verify(mockStmt).cancel();
         assertEquals(TaskConstants.EXIT_CODE_KILL, getField(procedureTask, "exitStatusCode"));
     }
 
     @Test
     void cancel_NoActiveStatement_LogsWarning() {
-        // sessionStatement is null by default after construction
         // We just call cancel and ensure no exception
         assertDoesNotThrow(() -> procedureTask.cancel());
-        // (In practice, you'd verify logger.warn was called — requires Logback/TestLogger setup)
     }
 
     @Test
     void cancel_whenStatementCancelThrowsSQLException_shouldLogWarningAndThrowTaskException() throws SQLException {
-        // Arrange: simulate active statement
         CallableStatement mockStmt = mock(CallableStatement.class);
         setField(procedureTask, "sessionStatement", mockStmt);
 
-        // Arrange
         SQLException sqlEx = new SQLException("Driver does not support cancel");
         doThrow(sqlEx).when(mockStmt).cancel();
 
-        // Act & Assert
         TaskException taskEx = assertThrows(TaskException.class, () -> {
             procedureTask.cancel();
         });
 
-        // Verify the cause is the original SQLException
         assertEquals(sqlEx, taskEx.getCause());
 
-        // Verify that exit status was NOT set (since stmt.cancel() threw before setExitStatusCode)
-        // You may need a getter or reflection to check internal state
         Integer exitCode = getPrivateField(procedureTask, "exitStatusCode");
         assertEquals(exitCode, TaskConstants.EXIT_CODE_KILL);
     }
 
     @Test
     void setTimeout_TaskHasTimeout_SetsQueryTimeoutOnStatement() throws SQLException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        // Arrange
         CallableStatement mockStmt = mock(CallableStatement.class);
         when(mockTaskContext.getTaskTimeoutStrategy()).thenReturn(TaskTimeoutStrategy.FAILED);
         when(mockTaskContext.getTaskTimeout()).thenReturn(30);
 
-        // Act
         setField(procedureTask, "sessionStatement", mockStmt);
-        // Call setTimeout via reflection or extract to package-private for test
-        // Here we assume setTimeout is called during handle(), but for isolation:
         Method setTimeoutMethod = ProcedureTask.class.getDeclaredMethod("setTimeout", CallableStatement.class);
         setTimeoutMethod.setAccessible(true);
         setTimeoutMethod.invoke(procedureTask, mockStmt);
 
-        // Assert
         verify(mockStmt).setQueryTimeout(30);
     }
 
     @Test
     void testFormatSql_withSqlParams_shouldReplaceWithQuestionMarks() throws Exception {
-        // Arrange
         String inputSql = "CALL proc(${name}, ${age})";
         String expected = "CALL proc(?, ?)";
 
@@ -272,23 +245,19 @@ class ProcedureTaskTest {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         Map<String, Property> paramsMap = new HashMap<>();
 
-        // Get the private method 'formatSql' and make it accessible
         Method formatSqlMethod = ProcedureTask.class.getDeclaredMethod(
                 "formatSql",
                 Map.class,
                 Map.class);
         formatSqlMethod.setAccessible(true);
 
-        // Act: invoke the private method
         String result = (String) formatSqlMethod.invoke(procedureTask, sqlParamsMap, paramsMap);
 
-        // Assert: verify the returned SQL string has placeholders replaced
         assertEquals(expected, result);
     }
 
     @Test
     void testFormatSql_noParams_shouldReturnOriginal() throws Exception {
-        // Arrange
         String inputSql = "CALL simple_proc()";
         when(procedureParams.getMethod()).thenReturn(inputSql);
         when(mockTaskContext.getTaskInstanceId()).thenReturn(1);
@@ -299,14 +268,12 @@ class ProcedureTaskTest {
         Method formatSqlMethod = ProcedureTask.class.getDeclaredMethod("formatSql", Map.class, Map.class);
         formatSqlMethod.setAccessible(true);
 
-        // Act
         String result = (String) formatSqlMethod.invoke(procedureTask, sqlParamsMap, paramsMap);
 
-        // Assert: original SQL should be returned unchanged
         assertEquals(inputSql, result);
     }
 
-    // --- Helper methods for reflection (if needed) ---
+    // Helper: get private field via reflection
     private Object getField(Object target, String fieldName) {
         try {
             Field field = target.getClass().getSuperclass().getDeclaredField(fieldName);
@@ -317,7 +284,7 @@ class ProcedureTaskTest {
         }
     }
 
-    // Helper: get private field via reflection
+    // Helper: set private field via reflection
     private void setField(Object target, String fieldName, Object value) {
         try {
             Field field = target.getClass().getDeclaredField(fieldName);
@@ -329,7 +296,6 @@ class ProcedureTaskTest {
     }
 
     // Helper: get private field via reflection
-    @SuppressWarnings("unchecked")
     private <T> T getPrivateField(Object target, String fieldName) {
         Class<?> clazz = target.getClass();
         while (clazz != null) {
@@ -338,7 +304,6 @@ class ProcedureTaskTest {
                 field.setAccessible(true);
                 return (T) field.get(target);
             } catch (NoSuchFieldException e) {
-                // Field not found in this class, continue to superclass
                 clazz = clazz.getSuperclass();
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Cannot access field: " + fieldName, e);

@@ -144,7 +144,7 @@ public class ProcedureTask extends AbstractTask {
                 stmt.cancel();
                 log.debug("this procedure task was canceled");
             } catch (SQLException ex) {
-                log.warn("Failed to cancel stored procedure (driver/DB may not support it)", ex);
+                log.warn("Failed to cancel procedure task (driver/DB may not support it)", ex);
                 throw new TaskException("Cancel procedure task failed", ex);
             }
         } else {
