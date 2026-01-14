@@ -94,19 +94,36 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return result;
         }
 
+        Project project = projectMapper.queryByCode(projectCode);
+        if (Objects.isNull(project)) {
+            putMsg(result, Status.PROJECT_NOT_EXIST);
+            return result;
+        }
+
+        /*
+         * Todo : For modification operations on projects, we should acquire project row locks. All project-related
+         * operations and modification/creation actions for workflows/task definitions within the project require
+         * acquiring row locks first
+         */
         if (CollectionUtils.isEmpty(workerGroups)) {
+            Set<String> projectWorkerGroupNames =
+                    projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
+            if (CollectionUtils.isNotEmpty(projectWorkerGroupNames)) {
+                Set<String> usedWorkerGroups = getAllUsedWorkerGroups(project);
+                if (CollectionUtils.isNotEmpty(usedWorkerGroups)) {
+                    Set<String> usedInProject = SetUtils.intersection(usedWorkerGroups, projectWorkerGroupNames);
+                    if (!usedInProject.isEmpty()) {
+                        throw new ServiceException(Status.USED_WORKER_GROUP_EXISTS, usedInProject);
+                    }
+                }
+            }
+
             boolean deleted = projectWorkerGroupDao.deleteByProjectCode(projectCode);
             if (deleted) {
                 putMsg(result, Status.SUCCESS);
             } else {
                 putMsg(result, Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR);
             }
-            return result;
-        }
-
-        Project project = projectMapper.queryByCode(projectCode);
-        if (Objects.isNull(project)) {
-            putMsg(result, Status.PROJECT_NOT_EXIST);
             return result;
         }
 
@@ -131,9 +148,11 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
 
         if (CollectionUtils.isNotEmpty(needDeletedWorkerGroups)) {
             Set<String> usedWorkerGroups = getAllUsedWorkerGroups(project);
-            if (CollectionUtils.isNotEmpty(usedWorkerGroups) && usedWorkerGroups.containsAll(needDeletedWorkerGroups)) {
-                throw new ServiceException(Status.USED_WORKER_GROUP_EXISTS,
-                        SetUtils.intersection(usedWorkerGroups, needDeletedWorkerGroups).toSet());
+            if (CollectionUtils.isNotEmpty(usedWorkerGroups) && CollectionUtils.isNotEmpty(needDeletedWorkerGroups)) {
+                Set<String> shouldNotDelete = SetUtils.intersection(usedWorkerGroups, needDeletedWorkerGroups);
+                if (CollectionUtils.isNotEmpty(shouldNotDelete)) {
+                    throw new ServiceException(Status.USED_WORKER_GROUP_EXISTS, shouldNotDelete);
+                }
             }
             boolean deleted =
                     projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(projectCode,
@@ -147,6 +166,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
                 throw new ServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR);
             }
         }
+
         Set<String> needAssignedWorkerGroups =
                 SetUtils.difference(unauthorizedWorkerGroupNames, projectWorkerGroupNames);
         if (CollectionUtils.isNotEmpty(needAssignedWorkerGroups)) {

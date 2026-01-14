@@ -138,6 +138,8 @@ public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
                                     @Param("originState") WorkflowExecutionStatus originState,
                                     @Param("targetState") WorkflowExecutionStatus targetState);
 
+    int forceUpdateWorkflowInstanceState(@Param("id") Integer id, @Param("status") WorkflowExecutionStatus status);
+
     /**
      * update workflow instance by tenantCode
      *

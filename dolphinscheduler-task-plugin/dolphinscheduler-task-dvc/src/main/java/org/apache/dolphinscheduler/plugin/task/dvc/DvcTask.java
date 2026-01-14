@@ -38,37 +38,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DvcTask extends AbstractTask {
 
-    /**
-     * dvc parameters
-     */
     private DvcParameters parameters;
 
-    /**
-     * shell command executor
-     */
-    private ShellCommandExecutor shellCommandExecutor;
+    private final ShellCommandExecutor shellCommandExecutor;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
-
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     public DvcTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-
-        this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
     public void init() {
 
-        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DvcParameters.class);
+        parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), DvcParameters.class);
         log.info("Initialize dvc task params {}", JSONUtils.toPrettyJsonString(parameters));
 
         if (parameters == null || !parameters.checkParameters()) {

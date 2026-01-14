@@ -18,6 +18,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDatasource, useResources } from '.'
 import type { IJsonItem } from '../types'
+import utils from '@/utils'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -175,7 +176,18 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
-        message: t('project.node.sql_empty_tips')
+        validator() {
+          if (
+            model.json === '' ||
+            model.json === undefined ||
+            model.json === null
+          ) {
+            return new Error(t('project.node.sql_empty_tips'))
+          }
+          if (!utils.isJson(model.json)) {
+            return new Error(t('project.node.json_format_tips'))
+          }
+        }
       }
     },
     useResources(useResourcesSpan),

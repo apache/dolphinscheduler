@@ -34,7 +34,6 @@ type Exec =
   | 'REPEAT_RUNNING'
   | 'PAUSE'
   | 'STOP'
-  | 'RECOVER_WAITING_THREAD'
 
 interface ExecuteReq {
   executeType: Execute
