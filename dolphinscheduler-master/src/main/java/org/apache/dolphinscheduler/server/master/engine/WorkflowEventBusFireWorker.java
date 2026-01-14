@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
@@ -32,6 +34,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -128,6 +131,17 @@ public class WorkflowEventBusFireWorker {
                     ThreadUtils.sleep(5_000);
                     return;
                 }
+
+                // If task context init fails, publish a fatal error event
+                if (ExceptionUtils.isTaskExecutionContextCreateException(ex)) {
+                    AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
+                    final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
+                            .taskExecutionRunnable(taskLifecycleEvent.getTaskExecutionRunnable())
+                            .endTime(new Date())
+                            .build();
+                    workflowEventBus.publish(taskFatalEvent);
+                }
+
                 workflowEventBus.getWorkflowEventBusSummary().decreaseFireSuccessEventCount();
                 workflowEventBus.getWorkflowEventBusSummary().increaseFireFailedEventCount();
                 throw new WorkflowEventFireException(lifecycleEvent, ex);
