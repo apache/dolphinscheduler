@@ -34,14 +34,19 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -109,13 +114,15 @@ public class RemoteExecutor implements AutoCloseable {
         do {
             pid = getTaskPid(taskId);
             String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
-            String logLine = runRemote(trackCommand);
-            if (StringUtils.isEmpty(logLine)) {
-                Thread.sleep(TRACK_INTERVAL);
+            int readLines = runRemoteAndProcessLines(trackCommand, line -> {
+                log.info(line);
+                taskOutputParameterParser.appendParseLog(line);
+            });
+            if (readLines > 0) {
+                logN += readLines;
+
             } else {
-                logN += logLine.split("\n").length;
-                log.info(logLine);
-                taskOutputParameterParser.appendParseLog(logLine);
+                Thread.sleep(TRACK_INTERVAL);
             }
         } while (StringUtils.isNotEmpty(pid));
         taskOutputParams.putAll(taskOutputParameterParser.getTaskOutputParams());
@@ -220,23 +227,33 @@ public class RemoteExecutor implements AutoCloseable {
     }
 
     public String runRemote(String command) throws IOException {
+        StringBuilder out = new StringBuilder();
+        runRemoteAndProcessLines(command, line -> out.append(line).append(System.lineSeparator()));
+        return out.toString();
+    }
+
+    private int runRemoteAndProcessLines(String command, Consumer<String> lineConsumer) throws IOException {
         try (
                 ChannelExec channel = getSession().createExecChannel(command);
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
                 ByteArrayOutputStream err = new ByteArrayOutputStream()) {
-
-            channel.setOut(System.out);
-            channel.setOut(out);
+            InputStream out = channel.getInvertedOut();
             channel.setErr(err);
             channel.open();
+            int readLines = 0;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(out, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    readLines++;
+                    lineConsumer.accept(line);
+                }
+            }
             channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0);
-            channel.close();
             Integer exitStatus = channel.getExitStatus();
             if (exitStatus == null || exitStatus != 0) {
                 throw new TaskException(
                         "Remote shell task error, exitStatus: " + exitStatus + " error message: " + err);
             }
-            return out.toString();
+            return readLines;
         }
     }
 

@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKilledLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRetryLifecycleEvent;
@@ -97,6 +98,39 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         if (taskGroupCoordinator.needToReleaseTaskGroupSlot(taskInstance)) {
             taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
         }
+    }
+
+    @Override
+    public void onFatalEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final ITaskExecutionRunnable taskExecutionRunnable,
+                             final TaskFatalLifecycleEvent taskFatalEvent) {
+        releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
+        persistentTaskInstanceFatalEventToDB(taskExecutionRunnable, taskFatalEvent);
+
+        if (taskExecutionRunnable.isTaskInstanceCanRetry()) {
+            taskExecutionRunnable.getWorkflowEventBus().publish(TaskRetryLifecycleEvent.of(taskExecutionRunnable));
+            return;
+        }
+
+        // If all successors are condition tasks, then the task will not be marked as failure.
+        // And the DAG will continue to execute.
+        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
+        if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
+            mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
+            publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
+            return;
+        }
+
+        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
+    }
+
+    private void persistentTaskInstanceFatalEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
+                                                      final TaskFatalLifecycleEvent taskFatalEvent) {
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        taskInstance.setState(TaskExecutionStatus.FAILURE);
+        taskInstance.setEndTime(taskFatalEvent.getEndTime());
+        taskInstanceDao.updateById(taskInstance);
     }
 
     @Override
