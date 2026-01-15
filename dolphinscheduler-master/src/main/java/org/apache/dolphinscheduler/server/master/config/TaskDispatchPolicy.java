@@ -23,7 +23,6 @@ import lombok.Data;
 
 /**
  * Configuration for the master's task dispatch policy.
- * <p>
  * When enabled, tasks that remain in the dispatch queue longer than
  * {@link #maxTaskDispatchDuration} will be marked as failed to prevent indefinite queuing.
  */
@@ -32,16 +31,12 @@ public class TaskDispatchPolicy {
 
     /**
      * Indicates whether the dispatch timeout checking mechanism is enabled.
-     * <p>
-     * If {@code true}, tasks exceeding the configured dispatch duration will be failed automatically.
      */
     private boolean dispatchTimeoutFailedEnabled = false;
 
     /**
      * The maximum allowed duration a task may wait in the dispatch queue before being assigned to a worker.
-     * <p>
      * Tasks that exceed this duration will be marked as failed.
-     * <p>
      * Examples: {@code "2m"}, {@code "5m"}, {@code "30m"}.
      */
     private Duration maxTaskDispatchDuration;

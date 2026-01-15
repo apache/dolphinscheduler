@@ -1597,13 +1597,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 30 seconds)
-        // It should reach a fail state because:
-        // - workerGroup "workerGroupNotFound" does not exist
-        // - and timeout detection is ON → fallback failure mechanism
         await()
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> {
@@ -1642,13 +1637,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 30 seconds)
-        // the task is still stuck in SUBMITTED_SUCCESS state because:
-        // - workerGroup "workerGroupNotFound" does not exist
-        // - and timeout detection is OFF → no fallback failure mechanism
         await()
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> {
@@ -1690,13 +1680,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 30 seconds)
-        // It should reach a fail state because:
-        // - no available worker
-        // - and timeout detection is ON → fallback failure mechanism
         await()
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> {
@@ -1734,13 +1719,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Observe the task over a reasonable period (e.g., 30 seconds)
-        // the task is still stuck in SUBMITTED_SUCCESS state because:
-        // - no available worker
-        // - and timeout detection is OFF → no fallback failure mechanism
         await()
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> {

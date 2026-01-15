@@ -29,10 +29,7 @@ class TaskDispatchPolicyTest {
     void defaultValuesShouldBeAsExpected() {
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
 
-        // By default, dispatch timeout failure is disabled
         assertThat(policy.isDispatchTimeoutFailedEnabled()).isFalse();
-
-        // maxTaskDispatchDuration is null by default (not set)
         assertThat(policy.getMaxTaskDispatchDuration()).isNull();
     }
 
