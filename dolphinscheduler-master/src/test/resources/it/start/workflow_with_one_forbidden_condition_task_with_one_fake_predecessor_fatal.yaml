@@ -24,17 +24,17 @@ project:
   userId: 1
   userName: admin
   createTime: 2024-08-12 00:00:00
-  updateTime: 2021-08-12 00:00:00
+  updateTime: 2024-08-12 00:00:00
 
 workflows:
-  - name: workflow_with_one_forbidden_condition_task_with_one_fake_predecessor_failed
+  - name: workflow_with_one_forbidden_condition_task_with_one_fake_predecessor_fatal
     code: 1
     version: 1
     projectCode: 1
-    description: This is a fake workflow with one condition task which is forbidden and has one predecessor failed
+    description: This is a fake workflow with one forbidden condition task that has one predecessor that failed fatally
     releaseState: ONLINE
     createTime: 2024-08-12 00:00:00
-    updateTime: 2021-08-12 00:00:00
+    updateTime: 2024-08-12 00:00:00
     userId: 1
     executionType: PARALLEL
 
@@ -45,10 +45,11 @@ tasks:
     projectCode: 1
     userId: 1
     taskType: LogicFakeTask
-    taskParams: '{"localParams":null,"varPool":[],"shellScript":"error"}'
+    taskParams: '{"localParams":null,"varPool":[],"shellScript":"echo success"}'
     workerGroup: default
+    environmentCode: 144873539254368
     createTime: 2024-08-12 00:00:00
-    updateTime: 2021-08-12 00:00:00
+    updateTime: 2024-08-12 00:00:00
     taskExecuteType: BATCH
   - name: B
     code: 2
@@ -59,7 +60,7 @@ tasks:
     taskParams: '{"localParams":[],"resourceList":[],"dependence":{"relation":"AND","dependTaskList":[{"relation":"AND","dependItemList":[{"depTaskCode":1,"status":"SUCCESS"}]}]},"conditionResult":{"successNode":[3],"failedNode":[4]}},'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
-    updateTime: 2021-08-12 00:00:00
+    updateTime: 2024-08-12 00:00:00
     taskExecuteType: BATCH
     flag: NO
   - name: C
@@ -71,7 +72,7 @@ tasks:
     taskParams: '{"localParams":null,"varPool":[],"shellScript":"echo success"}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
-    updateTime: 2021-08-12 00:00:00
+    updateTime: 2024-08-12 00:00:00
     taskExecuteType: BATCH
   - name: D
     code: 4
@@ -82,7 +83,7 @@ tasks:
     taskParams: '{"localParams":null,"varPool":[],"shellScript":"echo failed"}'
     workerGroup: default
     createTime: 2024-08-12 00:00:00
-    updateTime: 2021-08-12 00:00:00
+    updateTime: 2024-08-12 00:00:00
     taskExecuteType: BATCH
 
 taskRelations:

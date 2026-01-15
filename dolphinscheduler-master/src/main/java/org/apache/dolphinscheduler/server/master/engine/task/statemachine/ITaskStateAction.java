@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailoverLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKillLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKilledLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPauseLifecycleEvent;
@@ -90,6 +91,14 @@ public interface ITaskStateAction {
     void onDispatchEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                          final ITaskExecutionRunnable taskExecutionRunnable,
                          final TaskDispatchLifecycleEvent taskDispatchEvent);
+
+    /**
+     * Perform the necessary actions when the task in a certain state receive a {@link TaskFatalLifecycleEvent}.
+     * <p> This method is called when the task encounters catastrophic failure (e.g., initialization failure).
+     */
+    void onFatalEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                      final ITaskExecutionRunnable taskExecutionRunnable,
+                      final TaskFatalLifecycleEvent taskFatalEvent);
 
     /**
      * Perform the necessary actions when the task in a certain state receive a {@link TaskDispatchedLifecycleEvent}.
