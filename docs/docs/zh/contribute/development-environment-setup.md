@@ -8,7 +8,7 @@
 * [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
 * [Node](https://nodejs.org/en/download): v16.0+
-* [Pnpm](https://pnpm.io/installation): v8.0+ (请确保不同版本的pnpm与Node.js之间是相互兼容的，可参考：[Compatibility](https://pnpm.io/installation#compatibility))
+* [Pnpm](https://pnpm.io/installation): v7.0+ (请确保不同版本的pnpm与Node.js之间是相互兼容的，可参考：[Compatibility](https://pnpm.io/installation#compatibility))
 
 ### 克隆代码库
 
@@ -26,7 +26,7 @@ git clone git@github.com:apache/dolphinscheduler.git
 * MacOS
 * Linux
 
-运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
+运行 `mvn clean install -Pstaging -Dmaven.test.skip=true`
 
 ### 代码风格
 
@@ -147,8 +147,6 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 ### 启动前端
 
 安装前端依赖并运行前端组件
-
-> 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
 
 在运行前端组件前，如果你还没有安装`pnpm`，可以使用以下命令安装：
 
