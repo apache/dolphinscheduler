@@ -125,31 +125,30 @@ public class ProcedureTask extends AbstractTask {
             }
         } catch (Exception e) {
             if (exitStatusCode == TaskConstants.EXIT_CODE_KILL) {
-                log.info("procedure task has been killed");
+                log.info("This procedure task has been killed");
                 return;
             }
             setExitStatusCode(EXIT_CODE_FAILURE);
-            log.error("procedure task error", e);
+            log.error("Failed to execute this procedure task", e);
             throw new TaskException("Execute procedure task failed", e);
         }
     }
 
     @Override
     public void cancel() throws TaskException {
-        Statement stmt = this.sessionStatement;
-        if (stmt != null) {
+        if (sessionStatement != null) {
             try {
-                log.debug("Try to cancel this procedure task");
+                log.info("Try to cancel this procedure task");
+                sessionStatement.cancel();
                 setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
-                stmt.cancel();
-                log.debug("this procedure task was canceled");
-            } catch (SQLException ex) {
-                log.warn("Failed to cancel procedure task (driver/DB may not support it)", ex);
-                throw new TaskException("Cancel procedure task failed", ex);
+                log.info("This procedure task was canceled");
+            } catch (Exception ex) {
+                log.warn("Failed to cancel this procedure task", ex);
+                throw new TaskException("Cancel this procedure task failed", ex);
             }
         } else {
-            log.warn(
-                    "Attempted to cancel procedure task, but no active statement exists. Possible reasons: task not started, already completed, or canceled.");
+            log.info(
+                    "Attempted to cancel this procedure task, but no active statement exists. Possible reasons: task not started, already completed, or canceled.");
         }
     }
 
