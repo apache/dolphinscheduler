@@ -153,6 +153,8 @@ Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA a
 
 Install frontend dependencies and run it.
 
+> Note: You can see more detail about the frontend setting in [frontend development](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-ui/README.md).
+
 If you have not yet installed `pnpm`, you can install it using the following command before running the front-end component:
 
 ```shell
