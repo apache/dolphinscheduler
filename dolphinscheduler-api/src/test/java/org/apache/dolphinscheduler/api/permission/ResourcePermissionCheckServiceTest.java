@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ResourcePermissionCheckServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ResourcePermissionCheckServiceTest.class);
 
     @Mock
-    private ProcessService processService;
+    private UserDao userDao;
 
     @Mock
     private ProjectMapper projectMapper;
@@ -88,11 +88,11 @@ public class ResourcePermissionCheckServiceTest {
     public void testOperationPermissionCheck() {
         User user = getGeneralUser();
 
-        Mockito.when(processService.getUserById(user.getId())).thenReturn(null);
+        Mockito.when(userDao.queryById(user.getId())).thenReturn(null);
         Assertions.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 user.getId(), ApiFuncIdentificationConstant.PROJECT, logger));
 
-        Mockito.when(processService.getUserById(user.getId())).thenReturn(user);
+        Mockito.when(userDao.queryById(user.getId())).thenReturn(user);
         Assertions.assertTrue(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
                 user.getId(), ApiFuncIdentificationConstant.PROJECT, logger));
     }
@@ -100,20 +100,20 @@ public class ResourcePermissionCheckServiceTest {
     @Test
     public void testUserOwnedResourceIdsAcquisition() {
         User generalUser = getGeneralUser();
-        Mockito.when(processService.getUserById(generalUser.getId())).thenReturn(null);
+        Mockito.when(userDao.queryById(generalUser.getId())).thenReturn(null);
         Assertions.assertEquals(0, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, generalUser.getId(), logger).size());
 
         // GENERAL_USER
         List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
-        Mockito.when(processService.getUserById(generalUser.getId())).thenReturn(generalUser);
+        Mockito.when(userDao.queryById(generalUser.getId())).thenReturn(generalUser);
         Mockito.when(projectMapper.listAuthorizedProjects(generalUser.getId(), null)).thenReturn(projects);
         Assertions.assertEquals(3, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, generalUser.getId(), logger).size());
 
         // ADMIN_USER
         User adminUser = getAdminUser();
-        Mockito.when(processService.getUserById(adminUser.getId())).thenReturn(adminUser);
+        Mockito.when(userDao.queryById(adminUser.getId())).thenReturn(adminUser);
         Mockito.when(projectMapper.listAuthorizedProjects(0, null)).thenReturn(projects);
         Assertions.assertEquals(3, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, adminUser.getId(), logger).size());

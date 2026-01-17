@@ -61,31 +61,6 @@ public class PermissionCheck<T> {
      */
     private int userId;
 
-    /**
-     * permission check
-     *
-     * @param authorizationType authorization type
-     * @param processService process dao
-     */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-    }
-
-    /**
-     * permission check
-     */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
-                           int userId) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-        this.needChecks = needChecks;
-        this.userId = userId;
-    }
-
-    /**
-     * permission check
-     */
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
                            int userId, Logger logger) {
         this.authorizationType = authorizationType;
@@ -95,40 +70,12 @@ public class PermissionCheck<T> {
         this.logger = logger;
     }
 
-    /**
-     * permission check
-     */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService,
-                           List<ResourceInfo> resourceList, int userId, Logger logger) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-        this.resourceList = resourceList;
-        this.userId = userId;
-        this.logger = logger;
-    }
-
-    public AuthorizationType getAuthorizationType() {
-        return authorizationType;
-    }
-
-    public void setAuthorizationType(AuthorizationType authorizationType) {
-        this.authorizationType = authorizationType;
-    }
-
     public ProcessService getProcessService() {
         return processService;
     }
 
     public void setProcessService(ProcessService processService) {
         this.processService = processService;
-    }
-
-    public T[] getNeedChecks() {
-        return needChecks;
-    }
-
-    public void setNeedChecks(T[] needChecks) {
-        this.needChecks = needChecks;
     }
 
     public int getUserId() {
@@ -145,20 +92,6 @@ public class PermissionCheck<T> {
 
     public void setResourceList(List<ResourceInfo> resourceList) {
         this.resourceList = resourceList;
-    }
-
-    /**
-     * has permission
-     *
-     * @return true if has permission
-     */
-    public boolean hasPermission() {
-        try {
-            checkPermission();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**

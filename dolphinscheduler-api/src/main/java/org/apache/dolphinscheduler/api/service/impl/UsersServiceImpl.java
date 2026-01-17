@@ -142,10 +142,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED, msg);
-            return result;
-        }
 
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -315,10 +311,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
+
         if (!isAdmin(loginUser)) {
             log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
                     loginUser.getUserName());
@@ -367,9 +360,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            String queue,
                            int state,
                            String timeZone) {
-        if (resourcePermissionCheckService.functionDisabled()) {
-            throw new ServiceException(Status.FUNCTION_DISABLED);
-        }
+
         if (!canOperator(loginUser, userId)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -456,10 +447,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Transactional
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
+
         // only admin can operate
         if (!isAdmin(loginUser)) {
             log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
@@ -515,10 +503,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // 1. only admin can operate
         if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -559,11 +543,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
 
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
@@ -613,11 +592,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
@@ -666,11 +640,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
 
         // 1. check if user is existed
         User tempUser = this.userMapper.selectById(userId);
@@ -726,10 +695,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // 1. only admin can operate
         if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can revoke the project permission.");
@@ -772,10 +737,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // only admin can operate
         if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can grant namespaces.");
@@ -826,10 +787,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // only admin can operate
         if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can grant datasource.");
@@ -877,10 +834,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Map<String, Object> result = new HashMap<>();
 
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         User user = null;
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             user = loginUser;
@@ -928,10 +881,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can query all general users.");
@@ -997,10 +946,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
         Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can deauthorize user.");
@@ -1038,10 +983,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId) {
         Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         // only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can authorize user.");
@@ -1102,10 +1043,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         if (!StringUtils.isEmpty(msg)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
             return result;
@@ -1132,10 +1069,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> activateUser(User loginUser, String userName) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -1180,10 +1113,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
         Map<String, Object> result = new HashMap<>();
 
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
