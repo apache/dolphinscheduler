@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
+import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
+
 import org.springframework.dao.DataAccessResourceFailureException;
 
 public class ExceptionUtils {
@@ -25,4 +27,7 @@ public class ExceptionUtils {
         return e instanceof DataAccessResourceFailureException;
     }
 
+    public static boolean isTaskExecutionContextCreateException(Throwable e) {
+        return e instanceof TaskExecutionContextCreateException;
+    }
 }
