@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -248,9 +249,20 @@ public final class JSONUtils {
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {
+        Map<String, Object> map = parseObject(json, new TypeReference<Map<String, Object>>() {
         });
+
+        if (map == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, String> result = new HashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            result.put(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+        return result;
     }
+
 
     /**
      * from the key-value generated json  to get the str value no matter the real type of value
