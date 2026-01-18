@@ -428,6 +428,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     .parseObject(taskDefinitionLog.getTaskParams(), DependentParameters.class)
                     .getDependence().getDependTaskList()) {
                 for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
+                    // A Dependent node cannot rely on itself workflow
+                    if (dependentItem.getDefinitionCode() == workflowDefinitionCode) {
+                        throw new ServiceException(Status.WORKFLOW_NODE_HAS_CYCLE);
+                    }
                     WorkflowTaskLineage workflowTaskLineage = new WorkflowTaskLineage();
                     workflowTaskLineage.setWorkflowDefinitionCode(workflowDefinitionCode);
                     workflowTaskLineage.setWorkflowDefinitionVersion(workflowDefinitionVersion);
