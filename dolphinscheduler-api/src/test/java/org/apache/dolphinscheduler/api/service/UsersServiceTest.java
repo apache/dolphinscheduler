@@ -55,9 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -124,16 +122,6 @@ public class UsersServiceTest {
     private String queueName = "UsersServiceTestQueue";
 
     private static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
-
-    @BeforeEach
-    public void before() {
-        Mockito.when(resourcePermissionCheckService.functionDisabled()).thenReturn(false);
-    }
-
-    @AfterEach
-    public void after() {
-
-    }
 
     @Test
     public void testCreateUserForLdap() {
