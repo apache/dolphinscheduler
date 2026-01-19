@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
-import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -31,7 +30,6 @@ import org.apache.dolphinscheduler.service.ServiceConfiguration;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -48,9 +46,6 @@ import org.springframework.context.event.EventListener;
 @ServletComponentScan
 @SpringBootApplication
 public class ApiApplicationServer {
-
-    @Autowired
-    private PluginDao pluginDao;
 
     public static void main(String[] args) {
         ApiServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);

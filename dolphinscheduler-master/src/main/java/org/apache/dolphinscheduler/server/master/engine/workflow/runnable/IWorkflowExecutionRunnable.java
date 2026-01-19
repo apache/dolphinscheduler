@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
+import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflowFailureStrategy;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
 import java.util.List;
@@ -69,6 +71,13 @@ public interface IWorkflowExecutionRunnable {
     }
 
     /**
+     * Kill the active tasks of the WorkflowExecutionRunnable.
+     */
+    default void killActiveTasks() {
+        getWorkflowExecutionGraph().getActiveTaskExecutionRunnable().forEach(ITaskExecutionRunnable::kill);
+    }
+
+    /**
      * Get the WorkflowExecuteContext belongs to the WorkflowExecutionRunnable.
      */
     IWorkflowExecuteContext getWorkflowExecuteContext();
@@ -111,4 +120,5 @@ public interface IWorkflowExecutionRunnable {
      */
     void registerWorkflowInstanceLifecycleListener(IWorkflowLifecycleListener listener);
 
+    IWorkflowFailureStrategy getWorkflowFailureStrategy();
 }

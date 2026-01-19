@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.utils;
+package org.apache.dolphinscheduler.server.master.engine.workflow.policy;
 
-import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
+import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
-import org.springframework.dao.DataAccessResourceFailureException;
+/**
+ * Used to deal with {@link org.apache.dolphinscheduler.common.enums.FailureStrategy} when task failure occurs
+ */
+public interface IWorkflowFailureStrategy {
 
-public class ExceptionUtils {
+    void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       ITaskExecutionRunnable taskExecutionRunnable);
 
-    public static boolean isDatabaseConnectedFailedException(Throwable e) {
-        return e instanceof DataAccessResourceFailureException;
-    }
+    boolean canTriggerSuccessor(IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                ITaskExecutionRunnable taskExecutionRunnable);
 
-    public static boolean isTaskExecutionContextCreateException(Throwable e) {
-        return e instanceof TaskExecutionContextCreateException;
-    }
 }

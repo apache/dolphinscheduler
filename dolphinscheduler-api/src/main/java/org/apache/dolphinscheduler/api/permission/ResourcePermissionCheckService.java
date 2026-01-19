@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.permission;
 
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -50,13 +52,7 @@ public interface ResourcePermissionCheckService<T> {
      * @param logger
      * @return
      */
-    boolean operationPermissionCheck(Object authorizationType, Integer userId,
-                                     String permissionKey, Logger logger);
-
-    /**
-     * functionDisabled
-     * @return
-     */
-    boolean functionDisabled();
+    boolean operationPermissionCheck(AuthorizationType authorizationType, Integer userId, String permissionKey,
+                                     Logger logger);
 
 }
