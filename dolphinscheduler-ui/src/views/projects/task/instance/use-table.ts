@@ -23,12 +23,14 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
+import { queryTaskOutput } from '@/service/modules/log'
 import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
-  DownloadOutlined
+  DownloadOutlined,
+  ExportOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
@@ -67,10 +69,13 @@ export function useTable() {
     workflowInstanceName: ref(null),
     totalPage: ref(1),
     showModalRef: ref(false),
+    showOutputModalRef: ref(false),
     row: {},
     loadingRef: ref(false),
     logRef: '',
+    outputRef: '',
     logLoadingRef: ref(true),
+    outputLoadingRef: ref(true),
     skipLineNum: ref(0),
     limit: ref(1000)
   })
@@ -192,7 +197,7 @@ export function useTable() {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -263,6 +268,30 @@ export function useTable() {
                         type: 'info',
                         size: 'small',
                         disabled: !row.host,
+                        onClick: () => handleOutput(row)
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ExportOutlined)
+                          })
+                      }
+                    ),
+                  default: () => t('project.task.view_output')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        disabled: !row.host,
                         onClick: () => downloadLog(row.id)
                       },
                       {
@@ -285,6 +314,11 @@ export function useTable() {
 
   const handleLog = (row: any) => {
     variables.showModalRef = true
+    variables.row = row
+  }
+
+  const handleOutput = (row: any) => {
+    variables.showOutputModalRef = true
     variables.row = row
   }
 

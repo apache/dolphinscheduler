@@ -160,6 +160,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(taskRunningEvent.getStartTime());
         taskInstance.setLogPath(taskRunningEvent.getLogPath());
+        taskInstance.setTaskOutPutLogPath(taskRunningEvent.getTaskOutPutLogPath());
         taskInstanceDao.updateById(taskInstance);
     }
 

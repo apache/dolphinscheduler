@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -280,10 +281,25 @@ public class SqlTask extends AbstractTask {
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
                     : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, resultJSONArray.size());
-            log.info("display sql result {} rows as follows:", displayRows);
-            for (int i = 0; i < displayRows; i++) {
-                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                log.info("row {} : {}", i + 1, row);
+
+            // Set MDC to output log path for SQL result logging
+            String originalLogPath = LogUtils.getTaskInstanceLogFullPathMdc();
+            try {
+                if (taskExecutionContext.getTaskOutputLogPath() != null) {
+                    LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getTaskOutputLogPath());
+                }
+                log.info("display sql result {} rows as follows:", displayRows);
+                for (int i = 0; i < displayRows; i++) {
+                    String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+                    log.info("row {} : {}", i + 1, row);
+                }
+            } finally {
+                // Restore original log path
+                if (originalLogPath != null) {
+                    LogUtils.setTaskInstanceLogFullPathMDC(originalLogPath);
+                } else {
+                    LogUtils.removeTaskInstanceLogFullPathMDC();
+                }
             }
         }
 

@@ -16,11 +16,27 @@
  */
 
 import { axios } from '@/service/service'
-import { LogReq } from './types'
+import { IdReq, LogReq } from './types'
 
 export function queryLog(params: LogReq): any {
   return axios({
     url: '/log/detail',
+    method: 'get',
+    params
+  })
+}
+
+export function queryTaskOutput(params: LogReq): any {
+  return axios({
+    url: '/log/output_detail',
+    method: 'get',
+    params
+  })
+}
+
+export function downloadTaskLog(params: IdReq): any {
+  return axios({
+    url: '/log/download-log',
     method: 'get',
     params
   })

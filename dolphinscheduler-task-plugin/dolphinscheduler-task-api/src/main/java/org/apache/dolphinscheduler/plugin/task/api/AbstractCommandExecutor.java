@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
@@ -37,8 +36,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -223,22 +228,40 @@ public abstract class AbstractCommandExecutor {
         final CompletableFuture<Void> collectProcessLogFuture = CompletableFuture.runAsync(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
-                String line;
-                while ((line = inReader.readLine()) != null) {
-                    log.info(" -> {}", line);
-                    taskOutputParameterParser.appendParseLog(line);
+                if (StringUtils.isBlank(taskRequest.getTaskOutputLogPath())) {
+                    inReader.lines().forEach(taskOutputParameterParser::appendParseLog);
+                } else {
+                    try (
+                            BufferedWriter taskOutputLogWriter =
+                                    createTaskOutputLogWriter(taskRequest.getTaskOutputLogPath())) {
+                        for (String line : (Iterable<String>) inReader.lines()::iterator) {
+                            taskOutputLogWriter.write(line);
+                            taskOutputLogWriter.newLine();
+                            taskOutputLogWriter.flush();
+                            taskOutputParameterParser.appendParseLog(line);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 log.error("Parse var pool error", e);
-            } finally {
-                LogUtils.removeTaskInstanceLogFullPathMDC();
             }
             taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         }, collectProcessLogService);
 
         collectProcessLogService.shutdown();
         return collectProcessLogFuture;
+    }
+
+    private BufferedWriter createTaskOutputLogWriter(String taskOutputLogPath) throws Exception {
+        Path path = Paths.get(taskOutputLogPath);
+        Path parent = path.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+        return Files.newBufferedWriter(path,
+                StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND);
     }
 
     /**

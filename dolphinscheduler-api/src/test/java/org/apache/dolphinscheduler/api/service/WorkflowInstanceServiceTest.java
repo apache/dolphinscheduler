@@ -478,7 +478,7 @@ public class WorkflowInstanceServiceTest {
                 .thenReturn(Optional.of(workflowInstance));
         when(taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId()))
                 .thenReturn(taskInstanceList);
-        when(loggerService.queryLog(loginUser, taskInstance.getId(), 0, 4098)).thenReturn(res);
+        when(loggerService.queryLog(loginUser, taskInstance.getId(), 0, 4098, "log")).thenReturn(res);
         when(taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
                 ContextType.DEPENDENT_RESULT_CONTEXT))
                         .thenReturn(Lists.asList(taskInstanceContext, new TaskInstanceContext[0]));

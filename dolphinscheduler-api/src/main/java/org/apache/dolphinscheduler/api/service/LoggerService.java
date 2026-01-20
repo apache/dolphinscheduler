@@ -32,7 +32,7 @@ public interface LoggerService {
      * @param limit limit
      * @return log string data
      */
-    Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit);
+    Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit, String type);
 
     /**
      * get log size
@@ -53,7 +53,7 @@ public interface LoggerService {
      * @param limit       limit
      * @return log string data
      */
-    String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit);
+    String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit, String type);
 
     /**
      * get log bytes

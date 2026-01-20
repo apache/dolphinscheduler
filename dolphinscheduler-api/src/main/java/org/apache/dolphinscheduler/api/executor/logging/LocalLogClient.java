@@ -55,8 +55,13 @@ public class LocalLogClient {
      * @param limit The maximum number of lines to read, indicating the maximum number of lines to retrieve in this query.
      * @return The partial log query response, including log content within the specified range and metadata.
      */
+
     public TaskInstanceLogPageQueryResponse getPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
-        return getLocalPartLog(taskInstance, skipLineNum, limit);
+        return getLocalPartLog(taskInstance, skipLineNum, limit, "log");
+    }
+    public TaskInstanceLogPageQueryResponse getPartLog(TaskInstance taskInstance, int skipLineNum, int limit,
+                                                       String type) {
+        return getLocalPartLog(taskInstance, skipLineNum, limit, type);
     }
 
     private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
@@ -67,11 +72,12 @@ public class LocalLogClient {
     }
 
     private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
-                                                             int limit) {
+                                                             int limit, String type) {
+        String logFilePath = "log".equals(type) ? taskInstance.getLogPath() : taskInstance.getTaskOutPutLogPath();
         TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest
                 .builder()
                 .taskInstanceId(taskInstance.getId())
-                .taskInstanceLogAbsolutePath(taskInstance.getLogPath())
+                .taskInstanceLogAbsolutePath(logFilePath)
                 .skipLineNum(skipLineNum)
                 .limit(limit)
                 .build();

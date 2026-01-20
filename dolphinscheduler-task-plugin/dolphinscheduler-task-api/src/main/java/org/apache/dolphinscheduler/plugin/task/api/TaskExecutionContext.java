@@ -63,6 +63,8 @@ public class TaskExecutionContext implements Serializable {
 
     private String logPath;
 
+    private String taskOutputLogPath;
+
     private String appInfoPath;
 
     private int processId;

@@ -86,13 +86,13 @@ public class LogUtils {
      * @param taskExecutionContext task execution context.
      * @return task instance log full path.
      */
-    public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext) {
+    public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext, String logType) {
         return getTaskInstanceLogFullPath(
                 DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getWorkflowDefinitionCode(),
                 taskExecutionContext.getWorkflowDefinitionVersion(),
                 taskExecutionContext.getWorkflowInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.getTaskInstanceId(), logType);
     }
 
     /**
@@ -110,7 +110,8 @@ public class LogUtils {
                                                     Long workflowDefinitionCode,
                                                     int workflowDefinitionVersion,
                                                     int workflowInstanceId,
-                                                    int taskInstanceId) {
+                                                    int taskInstanceId,
+                                                    String logType) {
         if (TASK_INSTANCE_LOG_BASE_PATH == null) {
             throw new IllegalArgumentException(
                     "Cannot find the task instance log base path, please check your logback.xml file");
@@ -119,7 +120,7 @@ public class LogUtils {
                 String.valueOf(workflowDefinitionCode),
                 String.valueOf(workflowDefinitionVersion),
                 String.valueOf(workflowInstanceId),
-                String.format("%s.log", taskInstanceId)).toString();
+                String.format("%s.%s", taskInstanceId, logType)).toString();
         return TASK_INSTANCE_LOG_BASE_PATH
                 .resolve(DateUtils.format(taskFirstSubmitTime, DateConstants.YYYYMMDD, null))
                 .resolve(taskLogFileName)

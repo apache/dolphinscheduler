@@ -42,6 +42,7 @@ public class TaskExecutorStartedLifecycleEvent extends AbstractTaskExecutorLifec
     private long startTime;
 
     private String logPath;
+    private String taskOutputLogPath;
 
     private String executePath;
 
@@ -56,6 +57,7 @@ public class TaskExecutorStartedLifecycleEvent extends AbstractTaskExecutorLifec
                 .taskInstanceHost(taskExecutionContext.getHost())
                 .startTime(taskExecutor.getTaskExecutionContext().getStartTime())
                 .logPath(taskExecutionContext.getLogPath())
+                .taskOutputLogPath(taskExecutionContext.getTaskOutputLogPath())
                 .executePath(taskExecutionContext.getExecutePath())
                 .type(TaskExecutorLifecycleEventType.RUNNING)
                 .build();

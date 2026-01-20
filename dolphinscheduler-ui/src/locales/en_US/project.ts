@@ -292,6 +292,7 @@ export default {
     delete_confirm: 'Delete?',
     forced_success: 'Forced Success',
     view_log: 'View Log',
+    view_output: 'View Output',
     download_log: 'Download Log',
     refresh: 'Refresh',
     app_id: 'Application ID',

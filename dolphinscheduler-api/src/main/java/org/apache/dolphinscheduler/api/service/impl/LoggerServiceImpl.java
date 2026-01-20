@@ -79,7 +79,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit) {
+    public Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit, String type) {
 
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
 
@@ -93,7 +93,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
         projectService.checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
         Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        String log = queryLog(taskInstance, skipLineNum, limit);
+        String log = queryLog(taskInstance, skipLineNum, limit, type);
         int lineNum = log.split("\\r\\n").length;
         result.setData(new ResponseTaskLog(lineNum, log));
         return result;
@@ -129,7 +129,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
+    public String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit, String type) {
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
         // check whether the task instance can be found
@@ -142,7 +142,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
-        return queryLog(task, skipLineNum, limit);
+        return queryLog(task, skipLineNum, limit, type);
     }
 
     /**
@@ -179,8 +179,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @param limit        limit
      * @return log string data
      */
-    private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
-        final String logPath = taskInstance.getLogPath();
+    private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit, String type) {
+        String logPath = taskInstance.getLogPath();
+        if ("output".equals(type)) {
+            logPath = taskInstance.getTaskOutPutLogPath();
+        }
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",
                 taskInstance.getId(), taskInstance.getName(), taskInstance.getHost(), logPath);
         if (StringUtils.isBlank(logPath)) {
@@ -198,7 +201,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
 
         try {
-            String logContent = logClientDelegate.getPartLogString(taskInstance, skipLineNum, limit);
+            String logContent = logClientDelegate.getPartLogString(taskInstance, skipLineNum, limit, type);
             if (logContent != null) {
                 sb.append(logContent);
             }

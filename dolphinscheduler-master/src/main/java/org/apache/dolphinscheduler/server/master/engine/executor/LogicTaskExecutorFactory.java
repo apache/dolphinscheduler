@@ -49,7 +49,8 @@ public class LogicTaskExecutorFactory implements ITaskExecutorFactory {
     }
 
     private void assemblyTaskLogPath(final TaskExecutionContext taskExecutionContext) {
-        taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
+        taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext, "log"));
+        taskExecutionContext.setTaskOutputLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext, "out"));
     }
 
 }

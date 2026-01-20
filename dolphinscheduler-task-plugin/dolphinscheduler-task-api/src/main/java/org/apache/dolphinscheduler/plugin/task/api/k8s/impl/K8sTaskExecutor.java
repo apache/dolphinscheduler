@@ -268,7 +268,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
                     taskRequest.getTaskInstanceId());
-            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getTaskOutputLogPath());
             try (
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), containerName)) {

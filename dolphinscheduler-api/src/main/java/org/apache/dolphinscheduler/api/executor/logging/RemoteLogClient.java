@@ -45,10 +45,17 @@ public class RemoteLogClient {
      * @param limit The maximum number of lines to read.
      * @return Returns the specified part of the log content in string format.
      */
+
     public String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getPartLog(taskInstance, skipLineNum, limit, "log");
+    }
+
+    public String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit, String type) {
         // todo We can optimize requests by the actual range, reducing disk usage and network traffic.
         return LogUtils.rollViewLogLines(
-                LogUtils.readPartFileContentFromRemote(taskInstance.getLogPath(), skipLineNum, limit));
+                LogUtils.readPartFileContentFromRemote(
+                        "log".equals(type) ? taskInstance.getLogPath() : taskInstance.getTaskOutPutLogPath(),
+                        skipLineNum, limit));
     }
 
 }

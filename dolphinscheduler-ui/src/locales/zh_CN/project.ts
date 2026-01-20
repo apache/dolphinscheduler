@@ -287,6 +287,7 @@ export default {
     delete_confirm: '确定删除吗?',
     forced_success: '强制成功',
     view_log: '查看日志',
+    view_output: '查看输出',
     download_log: '下载日志',
     refresh: '刷新',
     app_id: 'Application ID',

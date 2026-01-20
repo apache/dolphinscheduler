@@ -27,6 +27,7 @@ import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
 import {
   AlignLeftOutlined,
   DownloadOutlined,
+  ExportOutlined,
   RetweetOutlined,
   SaveOutlined,
   StopOutlined
@@ -63,10 +64,13 @@ export function useTable() {
     workflowDefinitionName: null,
     totalPage: 1,
     showModalRef: false,
+    showOutputModalRef: false,
     row: {},
     loadingRef: false,
     logRef: '',
+    outputRef: '',
     logLoadingRef: true,
+    outputLoadingRef: true,
     skipLineNum: 0,
     limit: 1000
   })
@@ -144,7 +148,7 @@ export function useTable() {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](5),
+        ...COLUMN_WIDTH_CONFIG['operation'](6),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -231,6 +235,30 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        disabled: !row.host,
+                        onClick: () => handleOutput(row)
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, {
+                            default: () => h(ExportOutlined)
+                          })
+                      }
+                    ),
+                  default: () => t('project.task.view_output')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
                         onClick: () => downloadLog(row.id)
                       },
                       {
@@ -277,6 +305,11 @@ export function useTable() {
 
   const handleLog = (row: any) => {
     variables.showModalRef = true
+    variables.row = row
+  }
+
+  const handleOutput = (row: any) => {
+    variables.showOutputModalRef = true
     variables.row = row
   }
 

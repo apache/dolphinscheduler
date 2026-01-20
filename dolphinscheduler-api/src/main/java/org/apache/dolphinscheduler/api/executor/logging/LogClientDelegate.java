@@ -50,19 +50,25 @@ public class LogClientDelegate {
      * @param limit The maximum number of log lines to retrieve.
      * @return A string containing the specified portion of the log.
      */
+
     public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getPartLogString(taskInstance, skipLineNum, limit, "log");
+    }
+
+    public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit, String type) {
         checkArgs(taskInstance);
         if (checkNodeExists(taskInstance)) {
-            TaskInstanceLogPageQueryResponse response = localLogClient.getPartLog(taskInstance, skipLineNum, limit);
+            TaskInstanceLogPageQueryResponse response =
+                    localLogClient.getPartLog(taskInstance, skipLineNum, limit, type);
             if (response.getCode() == LogResponseStatus.SUCCESS) {
                 return response.getLogContent();
             } else {
                 log.warn("get part log string is not success for task instance {}; reason :{}",
                         taskInstance.getId(), response.getMessage());
-                return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
+                return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit, type);
             }
         } else {
-            return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
+            return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit, type);
         }
     }
 

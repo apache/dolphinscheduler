@@ -37,7 +37,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-stream-table'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
-import { queryLog } from '@/service/modules/log'
+import { queryLog, queryTaskOutput } from '@/service/modules/log'
 import { streamStateType } from '@/common/common'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
@@ -93,6 +93,10 @@ const BatchTaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
+    const onConfirmOutputModal = () => {
+      variables.showOutputModalRef = false
+    }
+
     const getLogs = (row: any) => {
       const { state } = useAsyncState(
         queryLog({
@@ -114,11 +118,39 @@ const BatchTaskInstance = defineComponent({
       return state
     }
 
+    const getOutputs = (row: any) => {
+      const { state } = useAsyncState(
+        queryTaskOutput({
+          taskInstanceId: Number(row.id),
+          limit: variables.limit,
+          skipLineNum: variables.skipLineNum
+        }).then((res: any) => {
+          variables.outputRef += res.message || ''
+          if (res && res.message !== '') {
+            variables.skipLineNum += res.lineNum
+            getOutputs(row)
+          } else {
+            variables.outputLoadingRef = false
+          }
+        }),
+        {}
+      )
+
+      return state
+    }
+
     const refreshLogs = (row: any) => {
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0
       getLogs(row)
+    }
+
+    const refreshOutputs = (row: any) => {
+      variables.outputRef = ''
+      variables.limit = 1000
+      variables.skipLineNum = 0
+      getOutputs(row)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -145,9 +177,22 @@ const BatchTaskInstance = defineComponent({
         if (variables.showModalRef) {
           getLogs(variables.row)
         } else {
-          variables.row = {}
           variables.logRef = ''
           variables.logLoadingRef = true
+          variables.skipLineNum = 0
+          variables.limit = 1000
+        }
+      }
+    )
+
+    watch(
+      () => variables.showOutputModalRef,
+      () => {
+        if (variables.showOutputModalRef) {
+          getOutputs(variables.row)
+        } else {
+          variables.outputRef = ''
+          variables.outputLoadingRef = true
           variables.skipLineNum = 0
           variables.limit = 1000
         }
@@ -167,7 +212,9 @@ const BatchTaskInstance = defineComponent({
       onClearSearchStateType,
       onClearSearchTime,
       onConfirmModal,
+      onConfirmOutputModal,
       refreshLogs,
+      refreshOutputs,
       trim
     }
   },
@@ -178,8 +225,10 @@ const BatchTaskInstance = defineComponent({
       onUpdatePageSize,
       onSearch,
       onConfirmModal,
+      onConfirmOutputModal,
       loadingRef,
-      refreshLogs
+      refreshLogs,
+      refreshOutputs
     } = this
 
     return (
@@ -273,6 +322,14 @@ const BatchTaskInstance = defineComponent({
           logLoadingRef={this.logLoadingRef}
           onConfirmModal={onConfirmModal}
           onRefreshLogs={refreshLogs}
+        />
+        <LogModal
+          showModalRef={this.showOutputModalRef}
+          logRef={this.outputRef}
+          row={this.row}
+          logLoadingRef={this.outputLoadingRef}
+          onConfirmModal={onConfirmOutputModal}
+          onRefreshLogs={refreshOutputs}
         />
       </NSpace>
     )
