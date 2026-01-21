@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,9 +69,9 @@ public class ResourcePermissionCheckServiceImpl
             ApplicationContextAware {
 
     @Autowired
-    private ProcessService processService;
+    private UserDao userDao;
 
-    public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP =
+    static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP =
             new ConcurrentHashMap<>();
 
     @Override
@@ -100,9 +99,9 @@ public class ResourcePermissionCheckServiceImpl
     }
 
     @Override
-    public boolean operationPermissionCheck(Object authorizationType, Integer userId,
-                                            String permissionKey, Logger logger) {
-        User user = processService.getUserById(userId);
+    public boolean operationPermissionCheck(AuthorizationType authorizationType, Integer userId, String permissionKey,
+                                            Logger logger) {
+        User user = userDao.queryById(userId);
         if (user == null) {
             logger.error("User does not exist, userId:{}.", userId);
             return false;
@@ -114,13 +113,8 @@ public class ResourcePermissionCheckServiceImpl
     }
 
     @Override
-    public boolean functionDisabled() {
-        return false;
-    }
-
-    @Override
     public Set<Object> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger) {
-        User user = processService.getUserById(userId);
+        User user = userDao.queryById(userId);
         if (user == null) {
             logger.error("User does not exist, userId:{}.", userId);
             return Collections.emptySet();

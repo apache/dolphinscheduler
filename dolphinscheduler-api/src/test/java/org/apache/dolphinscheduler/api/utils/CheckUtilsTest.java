@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.common.constants.Constants;
-
-import java.util.Map;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -46,16 +41,6 @@ public class CheckUtilsTest {
         Assertions.assertFalse(CheckUtils.checkEmail("test01@gmail"));
         Assertions.assertFalse(CheckUtils.checkEmail("test01@gmail."));
         Assertions.assertTrue(CheckUtils.checkEmail("test01@gmail.edu.cn"));
-    }
-
-    /**
-     * check desc
-     */
-    @Test
-    public void testCheckDesc() {
-        Map<String, Object> objectMap = CheckUtils.checkDesc("I am desc");
-        Status status = (Status) objectMap.get(Constants.STATUS);
-        Assertions.assertEquals(status.getCode(), Status.SUCCESS.getCode());
     }
 
     @Test

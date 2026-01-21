@@ -16,6 +16,7 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Python](../task/python.md)
 * [SubWorkflow](../task/sub-workflow.md)
 * [Kubernetes](../task/kubernetes.md)
+* [zeppelin](../task/zeppelin.md)
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a sub-workflow node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the sub-workflow.
 
@@ -140,3 +141,13 @@ For example
 ![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
 
 Another special consideration, not always can DolphinScheduler collect pod logs, if the user redirects the log output stream, DolphinScheduler can not collect logs for use and can not use the output parameter, either.
+
+#### Pass parameter from Zeppelin task to downstream
+
+In the custom parameters, add an `IN` type `input` parameter.
+
+For example
+
+![zeppelin_parameters](../../../../img/new_ui/dev/parameter/zeppelin_parameters01.png)
+
+Note: json key must be enclosed in " "

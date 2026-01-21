@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKilledLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRetryLifecycleEvent;
@@ -100,6 +101,39 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     }
 
     @Override
+    public void onFatalEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                             final ITaskExecutionRunnable taskExecutionRunnable,
+                             final TaskFatalLifecycleEvent taskFatalEvent) {
+        releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
+        persistentTaskInstanceFatalEventToDB(taskExecutionRunnable, taskFatalEvent);
+
+        if (taskExecutionRunnable.isTaskInstanceCanRetry()) {
+            taskExecutionRunnable.getWorkflowEventBus().publish(TaskRetryLifecycleEvent.of(taskExecutionRunnable));
+            return;
+        }
+
+        // If all successors are condition tasks, then the task will not be marked as failure.
+        // And the DAG will continue to execute.
+        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
+        if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
+            mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
+            publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
+            return;
+        }
+
+        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
+    }
+
+    private void persistentTaskInstanceFatalEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
+                                                      final TaskFatalLifecycleEvent taskFatalEvent) {
+        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        taskInstance.setState(TaskExecutionStatus.FAILURE);
+        taskInstance.setEndTime(taskFatalEvent.getEndTime());
+        taskInstanceDao.updateById(taskInstance);
+    }
+
+    @Override
     public void onDispatchedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                                   final ITaskExecutionRunnable taskExecutionRunnable,
                                   final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
@@ -136,7 +170,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstancePausedEventToDB(taskExecutionRunnable, taskPausedEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainPause(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstancePausedEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -153,7 +187,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceKilledEventToDB(taskExecutionRunnable, taskInstanceKillEvent);
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainKill(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstanceKilledEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -181,11 +215,12 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
         if (workflowExecutionGraph.isAllSuccessorsAreConditionTask(taskExecutionRunnable)) {
             mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
-            publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+            publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
             return;
         }
+        // todo: Use Plugin to extend the act strategy on xxEvent.
         taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainFailure(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     private void persistentTaskInstanceFailedEventToDB(final ITaskExecutionRunnable taskExecutionRunnable,
@@ -203,7 +238,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         releaseTaskInstanceResourcesIfNeeded(taskExecutionRunnable);
         persistentTaskInstanceSuccessEventToDB(taskExecutionRunnable, taskSuccessEvent);
         mergeTaskVarPoolToWorkflow(workflowExecutionRunnable, taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(taskExecutionRunnable);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
     }
 
     protected void mergeTaskVarPoolToWorkflow(final IWorkflowExecutionRunnable workflowExecutionRunnable,
@@ -244,9 +279,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
         taskExecutionRunnable.getWorkflowEventBus().publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));
     }
 
-    protected void publishWorkflowInstanceTopologyLogicalTransitionEvent(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final Integer workflowInstanceId = taskExecutionRunnable.getWorkflowInstance().getId();
-        final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
+    protected void publishWorkflowInstanceTopologyLogicalTransitionEvent(
+                                                                         final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                                         final ITaskExecutionRunnable taskExecutionRunnable) {
         taskExecutionRunnable
                 .getWorkflowEventBus()
                 .publish(

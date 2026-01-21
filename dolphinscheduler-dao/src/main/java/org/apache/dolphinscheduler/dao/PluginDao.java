@@ -88,13 +88,4 @@ public class PluginDao {
         return currPluginDefine.getId();
     }
 
-    /**
-     * query plugin define by id
-     *
-     * @param pluginDefineId plugin define id
-     * @return PluginDefine
-     */
-    public PluginDefine getPluginDefineById(int pluginDefineId) {
-        return pluginDefineMapper.selectById(pluginDefineId);
-    }
 }

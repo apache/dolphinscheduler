@@ -67,6 +67,8 @@ public interface ITaskExecutionRunnable
      */
     boolean isTaskInstanceCanRetry();
 
+    boolean isFailure();
+
     /**
      * Retry the TaskExecutionRunnable.
      * <p> Will create retry task instance and start it.
