@@ -95,6 +95,12 @@ public class DataxParameters extends AbstractParameters {
      */
     private int jobSpeedRecord;
 
+
+    /**
+     * datax channel
+     */
+    private int jobChannel;
+
     /**
      * Xms memory
      */
@@ -204,6 +210,14 @@ public class DataxParameters extends AbstractParameters {
 
     public void setJobSpeedRecord(int jobSpeedRecord) {
         this.jobSpeedRecord = jobSpeedRecord;
+    }
+
+    public int getJobChannel() {
+        return jobChannel;
+    }
+
+    public void setJobChannel(int jobChannel) {
+        this.jobChannel = jobChannel;
     }
 
     public int getXms() {
