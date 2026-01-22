@@ -105,7 +105,6 @@ public class MasterConfig implements Validator {
             errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }
 
-        // Validate task dispatch policy config
         TaskDispatchPolicy dispatchPolicy = masterConfig.getTaskDispatchPolicy();
         if (dispatchPolicy != null && dispatchPolicy.isDispatchTimeoutFailedEnabled()) {
             if (dispatchPolicy.getMaxTaskDispatchDuration() == null) {

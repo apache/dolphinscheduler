@@ -1583,7 +1583,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @Test
     @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is enabled")
     public void testTaskFail_with_workerGroupNotFoundAndTimeoutEnabled() {
-        // Enable dispatch timeout to ensure tasks fail fast if worker group is missing
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
         taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofSeconds(10));
@@ -1623,8 +1622,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @Test
     @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is disabled")
     public void testTaskRemainsSubmittedSuccess_with_workerGroupNotFoundAndTimeoutDisabled() {
-        // Disable dispatch timeout failure: tasks that cannot be dispatched (e.g., due to missing worker group)
-        // will not be automatically marked as failed, and will remain in SUBMITTED_SUCCESS indefinitely.
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
         policy.setDispatchTimeoutFailedEnabled(false);
         this.masterConfig.setTaskDispatchPolicy(policy);
@@ -1658,15 +1655,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
                 });
 
-        // This test intentionally leaves the workflow running (non-existent worker group + timeout disabled),
-        // so we skip the resource cleanup check.
+        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
         // masterContainer.assertAllResourceReleased();
     }
 
     @Test
     @DisplayName("Test start a workflow when no available worker and dispatch timeout is enabled")
     public void testTaskFail_with_noAvailableWorkerAndTimeoutEnabled() {
-        // Enable dispatch timeout to ensure tasks fail fast if no available worker
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
         taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofSeconds(10));
@@ -1706,7 +1701,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @Test
     @DisplayName("Test start a workflow when no available worker and dispatch timeout is disabled")
     public void testTaskRemainsSubmittedSuccess_with_noAvailableWorkerAndTimeoutDisabled() {
-        // Disable dispatch timeout so tasks won't auto-fail due to unavailability
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
         policy.setDispatchTimeoutFailedEnabled(false);
         this.masterConfig.setTaskDispatchPolicy(policy);
@@ -1739,8 +1733,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                     .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
                 });
 
-        // This test intentionally leaves the workflow running (no available worker + timeout disabled),
-        // so we skip the resource cleanup check.
+        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
         // masterContainer.assertAllResourceReleased();
     }
 
