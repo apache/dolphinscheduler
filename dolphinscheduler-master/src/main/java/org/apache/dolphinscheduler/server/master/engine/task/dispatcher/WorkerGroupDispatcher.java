@@ -126,13 +126,8 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     }
 
     /**
-     * Marks the specified task as fatally failed due to an unrecoverable dispatch error,such as timeout or persistent client failure.
+     * Marks the specified task as fatally failed due to an unrecoverable dispatch error,such as timeout
      * Once this method is called, the task is considered permanently failed and will not be retried.
-     *
-     * @param taskExecutionRunnable the task to mark as fatally failed; must not be null
-     * @param ex                    the dispatch exception that triggered this failure handling; must not be null
-     * @param elapsed               the time (in milliseconds) already spent attempting to dispatch the task
-     * @param timeoutMs             the configured dispatch timeout threshold (in milliseconds)
      */
     private void handleDispatchFailure(ITaskExecutionRunnable taskExecutionRunnable, Exception ex,
                                        long elapsed, long timeoutMs) {

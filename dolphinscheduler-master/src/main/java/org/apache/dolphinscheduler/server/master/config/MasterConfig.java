@@ -74,11 +74,6 @@ public class MasterConfig implements Validator {
      */
     private String masterRegistryPath;
 
-    /**
-     * Configuration for the master's task dispatch timeout check mechanism.
-     * This controls whether the system enforces a time limit for dispatching tasks to workers,
-     * and if so, how long to wait before marking a task as failed due to dispatch timeout.
-     */
     private TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
 
     @Override
