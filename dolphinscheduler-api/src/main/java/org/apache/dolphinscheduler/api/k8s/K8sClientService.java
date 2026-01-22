@@ -23,12 +23,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceList;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.client.KubernetesClient;
 
 /**
  * Encapsulates all client-related operations, not involving the db
@@ -36,7 +33,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 @Component
 public class K8sClientService {
 
-    private static Yaml yaml = new Yaml();
     @Autowired
     private K8sManager k8sManager;
 
@@ -46,20 +42,6 @@ public class K8sClientService {
                     "namespace %s does not exist in k8s cluster, please create namespace in k8s cluster first",
                     k8sNamespace.getNamespace()));
         }
-    }
-
-    public Optional<Namespace> deleteNamespaceToK8s(String name, Long clusterCode) {
-        Optional<Namespace> result = getNamespaceFromK8s(name, clusterCode);
-        if (result.isPresent()) {
-            KubernetesClient client = k8sManager.getK8sClient(clusterCode);
-            Namespace body = new Namespace();
-            ObjectMeta meta = new ObjectMeta();
-            meta.setNamespace(name);
-            meta.setName(name);
-            body.setMetadata(meta);
-            client.namespaces().delete(body);
-        }
-        return getNamespaceFromK8s(name, clusterCode);
     }
 
     private Optional<Namespace> getNamespaceFromK8s(String name, Long clusterCode) {

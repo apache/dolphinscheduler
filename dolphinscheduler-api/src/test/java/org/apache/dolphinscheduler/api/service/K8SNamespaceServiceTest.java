@@ -40,9 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -80,15 +78,6 @@ public class K8SNamespaceServiceTest {
 
     private String namespace = "default";
     private Long clusterCode = 100L;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        Mockito.when(k8sClientService.deleteNamespaceToK8s(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);
-    }
-
-    @AfterEach
-    public void tearDown() throws Exception {
-    }
 
     @Test
     public void queryListPaging() {
