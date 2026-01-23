@@ -101,13 +101,13 @@ public class MasterConfig implements Validator {
         }
 
         TaskDispatchPolicy dispatchPolicy = masterConfig.getTaskDispatchPolicy();
-        if (dispatchPolicy != null && dispatchPolicy.isDispatchTimeoutFailedEnabled()) {
+        if (dispatchPolicy.isDispatchTimeoutEnabled()) {
             if (dispatchPolicy.getMaxTaskDispatchDuration() == null) {
                 errors.rejectValue("dispatch-timeout-checker.max-task-dispatch-duration", null,
                         "must be specified when dispatch timeout checker is enabled");
             } else if (dispatchPolicy.getMaxTaskDispatchDuration().toMillis() <= 0) {
                 errors.rejectValue("dispatch-timeout-checker.max-task-dispatch-duration", null,
-                        "must be a positive duration (e.g., '2m', '5m', '30m')");
+                        "must be a positive duration (e.g., '10m', '30m', '1h')");
             }
         }
 

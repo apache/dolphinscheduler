@@ -80,7 +80,7 @@ public class MasterConfigTest {
         TaskDispatchPolicy policy = masterConfig.getTaskDispatchPolicy();
 
         assertThat(policy).isNotNull();
-        assertThat(policy.isDispatchTimeoutFailedEnabled()).isFalse();
+        assertThat(policy.isDispatchTimeoutEnabled()).isFalse();
         assertThat(policy.getMaxTaskDispatchDuration()).isEqualTo(Duration.ofMinutes(5));
     }
 }

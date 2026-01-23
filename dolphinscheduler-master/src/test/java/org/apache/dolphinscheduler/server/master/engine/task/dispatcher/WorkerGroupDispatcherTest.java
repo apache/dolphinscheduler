@@ -177,7 +177,7 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_WorkerGroupNotFound_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
@@ -204,7 +204,7 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_WorkerGroupNotFound_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMinutes(1));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
@@ -246,7 +246,7 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_NoAvailableWorker_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
@@ -273,7 +273,7 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_NoAvailableWorker_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMinutes(1));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
@@ -315,7 +315,7 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_GenericTaskDispatchException_TimeoutEnabledAndExceeded_ShouldPublishFailedEvent() throws TaskDispatchException {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);
@@ -342,7 +342,7 @@ class WorkerGroupDispatcherTest {
     @Test
     void dispatchTask_GenericTaskDispatchException_TimeoutEnabledButNotExceeded_ShouldNotPublishAnyFailureEvent() throws TaskDispatchException, InterruptedException {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofMinutes(1));
 
         dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, taskDispatchPolicy);

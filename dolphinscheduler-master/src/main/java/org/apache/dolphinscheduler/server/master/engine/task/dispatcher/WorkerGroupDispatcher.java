@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Date;
@@ -55,6 +54,8 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final TaskDispatchPolicy taskDispatchPolicy;
 
+    private final long maxTaskDispatchMillis;
+
     public WorkerGroupDispatcher(String workerGroupName, ITaskExecutorClient taskExecutorClient,
                                  TaskDispatchPolicy taskDispatchPolicy) {
         super("WorkerGroupTaskDispatcher-" + workerGroupName);
@@ -62,6 +63,11 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
         this.workerGroupEventBus = new TaskDispatchableEventBus<>();
         this.waitingDispatchTaskIds = ConcurrentHashMap.newKeySet();
         this.taskDispatchPolicy = taskDispatchPolicy;
+        if (taskDispatchPolicy.isDispatchTimeoutEnabled()) {
+            this.maxTaskDispatchMillis = taskDispatchPolicy.getMaxTaskDispatchDuration().toMillis();
+        } else {
+            this.maxTaskDispatchMillis = 0L;
+        }
         log.info("Initialize WorkerGroupDispatcher: {}", this.getName());
     }
 
@@ -104,12 +110,11 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
             }
             taskExecutorClient.dispatch(taskExecutionRunnable);
         } catch (Exception ex) {
-            if (taskDispatchPolicy.isDispatchTimeoutFailedEnabled()) {
+            if (taskDispatchPolicy.isDispatchTimeoutEnabled()) {
                 // If a dispatch timeout occurs, the task will not be put back into the queue.
-                long timeoutMs = this.taskDispatchPolicy.getMaxTaskDispatchDuration().toMillis();
                 long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchTime();
-                if (elapsed > timeoutMs) {
-                    handleDispatchFailure(taskExecutionRunnable, ex, elapsed, timeoutMs);
+                if (elapsed > maxTaskDispatchMillis) {
+                    onDispatchTimeout(taskExecutionRunnable, ex, elapsed, maxTaskDispatchMillis);
                     return;
                 }
             }
@@ -126,37 +131,20 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     }
 
     /**
-     * Marks the specified task as fatally failed due to an unrecoverable dispatch error,such as timeout
-     * Once this method is called, the task is considered permanently failed and will not be retried.
+     * Marks a task as permanently failed due to dispatch timeout.
+     * Once called, the task is considered permanently failed and will not be retried.
      */
-    private void handleDispatchFailure(ITaskExecutionRunnable taskExecutionRunnable, Exception ex,
-                                       long elapsed, long timeoutMs) {
-        final String taskName = taskExecutionRunnable.getName();
+    private void onDispatchTimeout(ITaskExecutionRunnable taskExecutionRunnable, Exception ex,
+                                   long elapsed, long timeout) {
+        String taskName = taskExecutionRunnable.getName();
+        log.error("Task: {} dispatch timeout after {}ms (limit: {}ms)",
+                taskName, elapsed, timeout, ex);
 
-        log.warn("Dispatch fail, taskName: {}, timed out after {} ms (limit: {} ms))", taskName, elapsed, timeoutMs);
-
-        if (ExceptionUtils.isWorkerGroupNotFoundException(ex)) {
-            log.error("Dispatch fail, taskName: {}, Worker group not found.", taskName, ex);
-            final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
-                    .taskExecutionRunnable(taskExecutionRunnable)
-                    .endTime(new Date())
-                    .build();
-            taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
-        } else if (ExceptionUtils.isNoAvailableWorkerException(ex)) {
-            log.error("Dispatch fail, taskName: {}, No available worker.", taskName, ex);
-            final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
-                    .taskExecutionRunnable(taskExecutionRunnable)
-                    .endTime(new Date())
-                    .build();
-            taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
-        } else {
-            log.error("Dispatch fail, taskName: {}, Unexpected dispatch error.", taskName, ex);
-            final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
-                    .taskExecutionRunnable(taskExecutionRunnable)
-                    .endTime(new Date())
-                    .build();
-            taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
-        }
+        final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
+                .taskExecutionRunnable(taskExecutionRunnable)
+                .endTime(new Date())
+                .build();
+        taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
     }
 
     /**

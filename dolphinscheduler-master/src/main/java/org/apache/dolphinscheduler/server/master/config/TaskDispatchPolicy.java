@@ -32,12 +32,12 @@ public class TaskDispatchPolicy {
     /**
      * Indicates whether the dispatch timeout checking mechanism is enabled.
      */
-    private boolean dispatchTimeoutFailedEnabled = false;
+    private boolean dispatchTimeoutEnabled = false;
 
     /**
      * The maximum allowed duration a task may wait in the dispatch queue before being assigned to a worker.
      * Tasks that exceed this duration will be marked as failed.
-     * Examples: {@code "2m"}, {@code "5m"}, {@code "30m"}.
+     * Examples: {@code "10m"}, {@code "30m"}, {@code "1h"}.
      */
     private Duration maxTaskDispatchDuration;
 }

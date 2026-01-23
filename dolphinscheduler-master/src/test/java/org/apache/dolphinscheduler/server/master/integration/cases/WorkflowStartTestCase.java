@@ -1584,7 +1584,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is enabled")
     public void testTaskFail_with_workerGroupNotFoundAndTimeoutEnabled() {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofSeconds(10));
         this.masterConfig.setTaskDispatchPolicy(taskDispatchPolicy);
 
@@ -1623,7 +1623,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is disabled")
     public void testTaskRemainsSubmittedSuccess_with_workerGroupNotFoundAndTimeoutDisabled() {
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
-        policy.setDispatchTimeoutFailedEnabled(false);
+        policy.setDispatchTimeoutEnabled(false);
         this.masterConfig.setTaskDispatchPolicy(policy);
 
         final String yaml = "/it/start/workflow_with_worker_group_not_found.yaml";
@@ -1663,7 +1663,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @DisplayName("Test start a workflow when no available worker and dispatch timeout is enabled")
     public void testTaskFail_with_noAvailableWorkerAndTimeoutEnabled() {
         TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
-        taskDispatchPolicy.setDispatchTimeoutFailedEnabled(true);
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
         taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofSeconds(10));
         this.masterConfig.setTaskDispatchPolicy(taskDispatchPolicy);
 
@@ -1702,7 +1702,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @DisplayName("Test start a workflow when no available worker and dispatch timeout is disabled")
     public void testTaskRemainsSubmittedSuccess_with_noAvailableWorkerAndTimeoutDisabled() {
         TaskDispatchPolicy policy = new TaskDispatchPolicy();
-        policy.setDispatchTimeoutFailedEnabled(false);
+        policy.setDispatchTimeoutEnabled(false);
         this.masterConfig.setTaskDispatchPolicy(policy);
 
         final String yaml = "/it/start/workflow_with_no_available_worker.yaml";
