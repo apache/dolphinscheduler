@@ -48,7 +48,6 @@ public class WorkflowTimeoutLifecycleEventHandler
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         final String workflowName = workflowExecutionRunnable.getName();
 
-        // Check if workflow is still active (not finished)
         if (workflowInstance.getState().isFinalState()) {
             log.info("The workflow {} has been finished with state: {}, skip timeout alert.",
                     workflowName,
