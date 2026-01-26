@@ -81,6 +81,6 @@ public class MasterConfigTest {
 
         assertThat(policy).isNotNull();
         assertThat(policy.isDispatchTimeoutEnabled()).isFalse();
-        assertThat(policy.getMaxTaskDispatchDuration()).isEqualTo(Duration.ofMinutes(5));
+        assertThat(policy.getMaxTaskDispatchDuration()).isEqualTo(Duration.ofHours(1));
     }
 }
