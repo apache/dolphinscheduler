@@ -44,7 +44,7 @@ export function useModal(
           ? (userStore.getUserInfo as UserInfoRes).id
           : null
       ),
-      expireTime: ref(Date.now()),
+      expireTime: ref(null),
       token: ref(''),
       generalOptions: []
     },
