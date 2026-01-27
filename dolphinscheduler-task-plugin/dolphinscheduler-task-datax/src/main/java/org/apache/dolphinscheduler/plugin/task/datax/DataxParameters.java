@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -94,7 +93,6 @@ public class DataxParameters extends AbstractParameters {
      * speed record count
      */
     private int jobSpeedRecord;
-
 
     /**
      * datax channel
@@ -263,23 +261,24 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "DataxParameters{"
-                + "customConfig=" + customConfig
-                + ", json='" + json + '\''
-                + ", dsType='" + dsType + '\''
-                + ", dataSource=" + dataSource
-                + ", dtType='" + dtType + '\''
-                + ", dataTarget=" + dataTarget
-                + ", sql='" + sql + '\''
-                + ", targetTable='" + targetTable + '\''
-                + ", preStatements=" + preStatements
-                + ", postStatements=" + postStatements
-                + ", jobSpeedByte=" + jobSpeedByte
-                + ", jobSpeedRecord=" + jobSpeedRecord
-                + ", xms=" + xms
-                + ", xmx=" + xmx
-                + ", resourceList=" + JSONUtils.toJsonString(resourceList)
-                + '}';
+        return "DataxParameters{" +
+                "customConfig=" + customConfig +
+                ", json='" + json + '\'' +
+                ", dsType='" + dsType + '\'' +
+                ", dataSource=" + dataSource +
+                ", dtType='" + dtType + '\'' +
+                ", dataTarget=" + dataTarget +
+                ", sql='" + sql + '\'' +
+                ", targetTable='" + targetTable + '\'' +
+                ", preStatements=" + preStatements +
+                ", postStatements=" + postStatements +
+                ", jobSpeedByte=" + jobSpeedByte +
+                ", jobSpeedRecord=" + jobSpeedRecord +
+                ", jobChannel=" + jobChannel +
+                ", xms=" + xms +
+                ", xmx=" + xmx +
+                ", resourceList=" + resourceList +
+                '}';
     }
 
     @Override
