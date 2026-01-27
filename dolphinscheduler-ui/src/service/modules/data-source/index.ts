@@ -168,13 +168,6 @@ export function getDatasourceTableColumnsById(
   })
 }
 
-export function queryExternalSystemList(): any {
-  return axios({
-    url: '/external-systems/queryExternalSystemList',
-    method: 'get'
-  })
-}
-
 export function queryExternalSystemTasks(externalSystemId: number): any {
   return axios({
     url: '/external-systems/queryExternalSystemTasks',

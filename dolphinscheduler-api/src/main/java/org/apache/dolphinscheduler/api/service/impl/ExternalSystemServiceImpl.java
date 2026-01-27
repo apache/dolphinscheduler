@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ExternalSystemTaskQuery;
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.AuthenticationUtils;
@@ -228,7 +227,7 @@ public class ExternalSystemServiceImpl extends BaseServiceImpl implements Extern
     }
 
     @Override
-    public List<ExternalSystemTaskQuery> queryExternalSystemTasks(User loginUser, int externalSystemId) {
+    public List<ExternalSystemTaskQuery> queryExternalSystemTasks(int externalSystemId) {
 
         DataSource dataSource = dataSourceMapper.selectById(externalSystemId);
         ThirdPartySystemConnectorConnectionParam baseExternalSystemParam =

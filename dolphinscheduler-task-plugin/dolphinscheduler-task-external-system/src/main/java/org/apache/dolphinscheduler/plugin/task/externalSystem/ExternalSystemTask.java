@@ -250,7 +250,8 @@ public class ExternalSystemTask extends AbstractTask {
             Object failureStatusObj = JsonPath.read(response.getBody(), failureField);
 
             log.info("PollTaskStatus successfully, external task instance success status: {}, failure status: {}",
-                    successStatusObj.toString(), failureStatusObj.toString());
+                    successStatusObj != null ? successStatusObj.toString() : "null",
+                    failureStatusObj != null ? failureStatusObj.toString() : "null");
 
             if (successStatusObj != null) {
                 return successStatusObj.toString();
@@ -426,7 +427,7 @@ public class ExternalSystemTask extends AbstractTask {
                 }
 
                 parameterMap.put(key, value.toString().replace("\"", ""));
-                log.info("Parsed parameter {}: {}", key, value.toString());
+                log.info("Parsed parameter {}: {}", key, value != null ? value.toString() : "null");
 
             }
         } catch (Exception e) {

@@ -18,8 +18,10 @@
 package org.apache.dolphinscheduler.plugin.datasource.thirdpartysystemconnector.param;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PollingInterfaceInfo extends InterfaceInfo {
 
     private PollingSuccessConfig pollingSuccessConfig;

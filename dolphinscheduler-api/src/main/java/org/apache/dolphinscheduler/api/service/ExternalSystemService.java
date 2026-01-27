@@ -18,12 +18,11 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.ExternalSystemTaskQuery;
-import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 
 public interface ExternalSystemService {
 
-    List<ExternalSystemTaskQuery> queryExternalSystemTasks(User loginUser, int externalSystemId);
+    List<ExternalSystemTaskQuery> queryExternalSystemTasks(int externalSystemId);
 
 }
