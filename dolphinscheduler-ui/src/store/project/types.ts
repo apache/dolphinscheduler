@@ -50,7 +50,6 @@ type TaskType =
   | 'CHUNJUN'
   | 'FLINK_STREAM'
   | 'EXTERNAL_SYSTEM'
-  | 'PYTORCH'
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'

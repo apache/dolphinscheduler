@@ -130,10 +130,6 @@ export const TASK_TYPES_MAP = {
     alias: 'EXTERNAL_SYSTEM',
     helperLinkDisable: true
   },
-  PYTORCH: {
-    alias: 'Pytorch',
-    helperLinkDisable: true
-  },
   HIVECLI: {
     alias: 'HIVECLI',
     helperLinkDisable: true
