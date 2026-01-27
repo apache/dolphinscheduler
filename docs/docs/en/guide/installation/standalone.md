@@ -30,7 +30,7 @@ useradd dolphinscheduler
 echo "dolphinscheduler" | passwd --stdin dolphinscheduler
 
 # Configure sudo without password
-sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
+sed -i '$dolphinscheduler  ALL=(ALL)  NOPASSWD: ALL' /etc/sudoers
 sed -i 's/Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
 
 # Modify directory permissions and grant permissions for user you created above
