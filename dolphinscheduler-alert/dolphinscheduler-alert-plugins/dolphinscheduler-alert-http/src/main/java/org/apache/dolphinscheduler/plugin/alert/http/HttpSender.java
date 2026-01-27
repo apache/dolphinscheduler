@@ -42,7 +42,7 @@ public final class HttpSender {
 
     private Map<String, String> headerParams;
     private OkHttpRequestHeaderContentType contentType;
-    private Map<String, String> bodyParams;
+    private Map<String, Object> bodyParams;
     private HttpRequestMethod requestType;
     private int timeout;
     private String url;
@@ -69,7 +69,7 @@ public final class HttpSender {
 
         String bodyParamsString = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
         if (StringUtils.isNotBlank(bodyParamsString)) {
-            bodyParams = JSONUtils.toMap(bodyParamsString);
+            bodyParams = JSONUtils.parseObject(bodyParamsString, new TypeReference<Map<String, Object>>() {});
             if (bodyParams == null) {
                 throw new IllegalArgumentException("bodyParams is not a valid json");
             }
@@ -215,6 +215,7 @@ public final class HttpSender {
         }
 
         bodyParams.forEach((key, value) -> {
+			String valueOf = String.valueOf(value);
             if (value.contains(HttpAlertConstants.MSG_PARAMS)) {
                 bodyParams.put(key, value.replace(HttpAlertConstants.MSG_PARAMS, msg));
             }
