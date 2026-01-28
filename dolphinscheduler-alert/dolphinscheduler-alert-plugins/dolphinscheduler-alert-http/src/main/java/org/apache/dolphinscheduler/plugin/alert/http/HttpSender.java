@@ -219,8 +219,8 @@ public final class HttpSender {
 
         bodyParams.forEach((key, value) -> {
             String valueOf = String.valueOf(value);
-            if (value.contains(HttpAlertConstants.MSG_PARAMS)) {
-                bodyParams.put(key, value.replace(HttpAlertConstants.MSG_PARAMS, msg));
+            if (valueOf.contains(HttpAlertConstants.MSG_PARAMS)) {
+                bodyParams.put(key, valueOf.replace(HttpAlertConstants.MSG_PARAMS, msg));
             }
         });
     }
