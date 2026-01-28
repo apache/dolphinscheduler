@@ -37,6 +37,8 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 @Slf4j
 public final class HttpSender {
 
