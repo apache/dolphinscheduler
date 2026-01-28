@@ -115,26 +115,26 @@ const DetailModal = defineComponent({
           ))
         props.show && props.id && setFieldsValue(await queryById(props.id))
       }
-    ),
-      // Monitor authType change, update headerPrefix
-      watch(
-        () => state.detailForm.authConfig?.authType,
-        (newAuthType) => {
-          if (
-            state.detailForm.type === 'THIRDPARTY_SYSTEM_CONNECTOR' &&
-            state.detailForm.authConfig
-          ) {
-            if (newAuthType === 'BASIC_AUTH') {
-              state.detailForm.authConfig.headerPrefix = 'Basic'
-            } else if (newAuthType === 'JWT' || newAuthType === 'OAUTH2') {
-              state.detailForm.authConfig.headerPrefix = 'Bearer'
-            } else {
-              state.detailForm.authConfig.headerPrefix = ''
-            }
+    )
+    // Monitor authType change, update headerPrefix
+    watch(
+      () => state.detailForm.authConfig?.authType,
+      (newAuthType) => {
+        if (
+          state.detailForm.type === 'THIRDPARTY_SYSTEM_CONNECTOR' &&
+          state.detailForm.authConfig
+        ) {
+          if (newAuthType === 'BASIC_AUTH') {
+            state.detailForm.authConfig.headerPrefix = 'Basic'
+          } else if (newAuthType === 'JWT' || newAuthType === 'OAUTH2') {
+            state.detailForm.authConfig.headerPrefix = 'Bearer'
+          } else {
+            state.detailForm.authConfig.headerPrefix = ''
           }
-        },
-        { immediate: true }
-      )
+        }
+      },
+      { immediate: true }
+    )
 
     watch(
       () => props.selectType,

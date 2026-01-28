@@ -112,9 +112,10 @@ public class ExternalSystemTask extends AbstractTask {
             submitExternalTask();
             TimeUnit.SECONDS.sleep(10);
             trackExternalTaskStatus();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TaskException("Task interrupted", e);
         } catch (Exception e) {
-            log.error("external system task error", e);
-            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("Execute external system task failed", e);
         }
     }
