@@ -16,6 +16,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [Python](../task/python.md)
 * [SubWorkflow](../task/sub-workflow.md)
 * [Kubernetes](../task/kubernetes.md)
+* [zeppelin](../task/zeppelin.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubWorkflow 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
 
@@ -23,7 +24,12 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 
 如果定义了同名的传递参数，上游节点的参数将被覆盖。
 
-> 注：若节点之间没有依赖关系，则局部参数无法通过上游传递。
+> 1. 参数传递的行为在3.3.x版本中发生了变化**
+>    在旧版本低于3.2.2中，下游节点B无需配置IN类型局部变量X即可获取上游节点A的out类型输出X；
+>    在版本高于3.3.0中修改领了局部变量的获取逻辑：只有下游节点B配置了IN类型的局部变量X，才可使用上游节点A的out类型输出X。
+>    详情参考下文的Node_B 和 Node_mysql 样例
+>
+> 2. 若节点之间没有依赖关系，则局部参数无法通过上游传递。
 
 ### 任务样例
 
@@ -46,11 +52,15 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 创建 Node_B 任务，主要用于测试输出上游任务 Node_A 传递的参数。
 
+在自定义参数中，添加IN类型的 value 参数 和 output 参数
+
 ![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
 #### 创建 SQL 任务并使用参数
 
 完成上述的 SHELL 任务之后，我们可以使用上游所传递的 output 作为 SQL 的查询对象。其中将所查询的 id 重命名为 ID，作为参数输出。
+
+在自定义参数中，添加OUT类型的 ID 参数 和 IN类型的 output 参数
 
 ![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
@@ -128,3 +138,13 @@ Node_mysql 运行结果如下：
 ![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
 
 另外需要特别注意的是，并非总是可以收集pod日志，如果用户重定向日志输出流，我们既不能收集日志使用，也不能使用输出参数。
+
+#### Zeppelin 任务传递参数
+
+在自定义参数中，添加一个 IN 类型的 input 参数。
+
+如下图所示：
+
+![zeppelin_parameters](../../../../img/new_ui/dev/parameter/zeppelin_parameters01.png)
+
+注意：JSON 键名必须用双引号括起来。

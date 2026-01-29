@@ -50,14 +50,11 @@ public class JupyterTask extends AbstractRemoteTask {
 
     private JupyterParameters jupyterParameters;
 
-    private TaskExecutionContext taskExecutionContext;
-
     private ShellCommandExecutor shellCommandExecutor;
 
     public JupyterTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
@@ -68,7 +65,7 @@ public class JupyterTask extends AbstractRemoteTask {
     @Override
     public void init() {
 
-        jupyterParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), JupyterParameters.class);
+        jupyterParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), JupyterParameters.class);
         log.info("Initialize jupyter task params {}", JSONUtils.toPrettyJsonString(jupyterParameters));
 
         if (null == jupyterParameters) {
@@ -86,7 +83,7 @@ public class JupyterTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
                     .appendScript(buildCommand());
 
             TaskResponse response = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);

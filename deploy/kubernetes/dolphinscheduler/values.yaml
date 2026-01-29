@@ -221,8 +221,8 @@ security:
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
-      # -- LDAP urls
-      urls: ldap://ldap.forumsys.com:389/
+      # -- LDAP url
+      url: ldap://ldap.forumsys.com:389/
       # -- LDAP base dn
       basedn: dc=example,dc=com
       # -- LDAP username
@@ -230,8 +230,10 @@ security:
       # -- LDAP password
       password: password
       user:
-        # -- Admin user account when you log-in with LDAP
-        admin: read-only-admin
+        # -- Any user matching this filter becomes an Admin. If set to `""`, ignore this option
+        adminuserfilter: (&(uid={0})(memberOf=cn=admin-group,ou=apps,dc=example,dc=com))
+        # -- Admin user account when you log-in with LDAP. If the filter doesn't match anything this also acts as fallback. Set to `""` to ignore this option if you want to use filter only
+        adminusername: read-only-admin
         # -- LDAP user identity attribute
         identityattribute: uid
         # -- LDAP user email attribute

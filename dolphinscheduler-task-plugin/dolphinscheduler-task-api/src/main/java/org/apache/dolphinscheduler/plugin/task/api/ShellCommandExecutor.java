@@ -17,14 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
-
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
-    public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                TaskExecutionContext taskRequest) {
-        super(logHandler, taskRequest);
+    public ShellCommandExecutor(TaskExecutionContext taskRequest) {
+        super(taskRequest);
     }
 
 }

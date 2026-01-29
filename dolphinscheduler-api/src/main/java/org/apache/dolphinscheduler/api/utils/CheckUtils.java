@@ -20,16 +20,12 @@ package org.apache.dolphinscheduler.api.utils;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER_PASSWORD_MAX_LENGTH;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER_PASSWORD_MIN_LENGTH;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
@@ -71,24 +67,6 @@ public class CheckUtils {
         int indexDomain = email.lastIndexOf("@");
         String domainString = email.substring(indexDomain);
         return domainString.contains(".");
-    }
-
-    /**
-     * check project description
-     *
-     * @param desc desc
-     * @return true if description regex valid, otherwise return false
-     */
-    public static Map<String, Object> checkDesc(String desc) {
-        Map<String, Object> result = new HashMap<>();
-        if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG,
-                    MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
-        } else {
-            result.put(Constants.STATUS, Status.SUCCESS);
-        }
-        return result;
     }
 
     /**

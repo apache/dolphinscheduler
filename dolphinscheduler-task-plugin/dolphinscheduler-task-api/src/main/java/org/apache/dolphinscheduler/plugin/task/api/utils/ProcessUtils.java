@@ -99,6 +99,10 @@ public final class ProcessUtils {
      */
     private static final Pattern PID_PATTERN = Pattern.compile("\\s+");
 
+    private static final String SIGINT = "2";
+    private static final String SIGTERM = "15";
+    private static final String SIGKILL = "9";
+
     /**
      * Terminate the task process, support multi-level signal processing and fallback strategy
      * @param request Task execution context
@@ -116,27 +120,28 @@ public final class ProcessUtils {
             // Get all child processes
             List<Integer> pidList = getPidList(processId);
 
-            // 1. Try to terminate gracefully (SIGINT)
-            boolean gracefulKillSuccess = sendKillSignal("SIGINT", pidList, request.getTenantCode());
+            // 1. Try to terminate gracefully `kill -2`
+            boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, request.getTenantCode());
             if (gracefulKillSuccess) {
-                log.info("Successfully killed process tree using SIGINT, processId: {}", processId);
+                log.info("Successfully killed process tree by SIGINT, processId: {}", processId);
                 return true;
             }
 
-            // 2. Try to terminate forcefully (SIGTERM)
-            boolean termKillSuccess = sendKillSignal("SIGTERM", pidList, request.getTenantCode());
+            // 2. Try to terminate gracefully `kill -15`
+            boolean termKillSuccess = sendKillSignal(SIGTERM, pidList, request.getTenantCode());
             if (termKillSuccess) {
-                log.info("Successfully killed process tree using SIGTERM, processId: {}", processId);
+                log.info("Successfully killed process tree by SIGTERM, processId: {}", processId);
                 return true;
             }
 
             // 3. As a last resort, use `kill -9`
-            log.warn("SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}", processId);
-            boolean forceKillSuccess = sendKillSignal("SIGKILL", pidList, request.getTenantCode());
+            log.warn("Killing process by SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}",
+                    processId);
+            boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, request.getTenantCode());
             if (forceKillSuccess) {
-                log.info("Successfully sent SIGKILL signal to process tree, processId: {}", processId);
+                log.info("Successfully killed process tree by SIGKILL, processId: {}", processId);
             } else {
-                log.error("Error sending SIGKILL signal to process tree, processId: {}", processId);
+                log.error("Error killing process tree by SIGKILL, processId: {}", processId);
             }
             return forceKillSuccess;
 
@@ -170,7 +175,7 @@ public final class ProcessUtils {
 
         try {
             // 1. Send the kill signal
-            String killCmd = String.format("kill -s %s %s", signal, pids);
+            String killCmd = String.format("kill -%s %s", signal, pids);
             killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
             log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);

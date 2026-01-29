@@ -65,13 +65,13 @@ public class JdbcRegistryProperties implements Validator {
         JdbcRegistryProperties jdbcRegistryProperties = (JdbcRegistryProperties) target;
         if (jdbcRegistryProperties.getHeartbeatRefreshInterval().compareTo(MIN_HEARTBEAT_REFRESH_INTERVAL) < 0) {
             errors.rejectValue("heartbeatRefreshInterval", "heartbeatRefreshInterval",
-                    "heartbeatRefreshInterval must be greater than 1s");
+                    "registry.heartbeatRefreshInterval must be greater than 1s");
         }
 
         if (jdbcRegistryProperties.getSessionTimeout().toMillis() < 3
                 * jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis()) {
             errors.rejectValue("sessionTimeout", "sessionTimeout",
-                    "sessionTimeout must be greater than 3 * heartbeatRefreshInterval");
+                    "registry.sessionTimeout must be greater than 3 * heartbeatRefreshInterval");
         }
         if (StringUtils.isEmpty(jdbcRegistryClientName)) {
             jdbcRegistryClientName = NetUtils.getHost() + ":" + serverPort;
@@ -86,7 +86,6 @@ public class JdbcRegistryProperties implements Validator {
                         "\n  jdbcRegistryClientName -> " + jdbcRegistryClientName +
                         "\n  heartbeatRefreshInterval -> " + heartbeatRefreshInterval +
                         "\n  sessionTimeout -> " + sessionTimeout +
-                        "\n  hikariConfig -> " + hikariConfig +
                         "\n****************************JdbcRegistryProperties**************************************";
         log.info(config);
     }

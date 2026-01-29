@@ -122,8 +122,16 @@ public class ProcessUtilsTest {
         Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
 
         // Mock getPidsStr
-        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345")))
-                .thenReturn("sudo(12345)---86.sh(1234)");
+        String pstreeCmd;
+        String pstreeOutput;
+        if (SystemUtils.IS_OS_MAC) {
+            pstreeCmd = "pstree -sp 12345";
+            pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh";
+        } else {
+            pstreeCmd = "pstree -p 12345";
+            pstreeOutput = "sudo(12345)---86.sh(1234)";
+        }
+        mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
 
         // Mock kill -0
         mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
@@ -138,9 +146,9 @@ public class ProcessUtilsTest {
         Assertions.assertTrue(result);
 
         // Verify SIGINT, SIGTERM, SIGKILL never called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.never());
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.never());
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
     }
 
     @Test
@@ -151,17 +159,26 @@ public class ProcessUtilsTest {
         Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
 
         // Mock getPidsStr
-        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345")))
-                .thenReturn("sudo(12345)---86.sh(1234)");
+        String pstreeCmd;
+        String pstreeOutput;
+        if (SystemUtils.IS_OS_MAC) {
+            pstreeCmd = "pstree -sp 12345";
+            pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh";
+        } else {
+            pstreeCmd = "pstree -p 12345";
+            pstreeOutput = "sudo(12345)---86.sh(1234)";
+        }
+        mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
 
         // Mock SIGINT command
-        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGINT.*")))
-                .thenReturn("kill -s SIGINT 12345");
-        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGINT 12345")).thenReturn("");
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -2.*")))
+                .thenReturn("kill -2 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -2 12345 1234")).thenReturn("");
 
         // Mock kill -0
         mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
-                .thenReturn("kill -0 12345");
+                .thenReturn("kill -0 12345")
+                .thenReturn("kill -0 1234");
         // Mock the static method OSUtils.exeCmd that matches "kill -0" command
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
                 .thenReturn("") // First invocation succeeds (process is alive)
@@ -176,10 +193,10 @@ public class ProcessUtilsTest {
         Assertions.assertTrue(result);
 
         // Verify SIGINT was called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.times(1));
         // Verify SIGTERM,SIGKILL was never called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.never());
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
     }
 
     @Test
@@ -190,27 +207,36 @@ public class ProcessUtilsTest {
         Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
 
         // Mock getPidsStr
-        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*pstree.*12345")))
-                .thenReturn("sudo(12345)---86.sh(1234)");
+        String pstreeCmd;
+        String pstreeOutput;
+        if (SystemUtils.IS_OS_MAC) {
+            pstreeCmd = "pstree -sp 12345";
+            pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh";
+        } else {
+            pstreeCmd = "pstree -p 12345";
+            pstreeOutput = "sudo(12345)---86.sh(1234)";
+        }
+        mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
 
         // Mock SIGINT command
-        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGINT.*")))
-                .thenReturn("kill -s SIGINT 12345");
-        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGINT 12345")).thenReturn("");
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -2.*")))
+                .thenReturn("kill -2 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -2 12345 1234")).thenReturn("");
 
         // Mock SIGTERM command
-        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGTERM.*")))
-                .thenReturn("kill -s SIGTERM 12345");
-        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGTERM 12345")).thenReturn("");
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -15.*")))
+                .thenReturn("kill -15 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -15 12345 1234")).thenReturn("");
 
         // Mock SIGKILL command
-        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -s SIGKILL.*")))
-                .thenReturn("kill -s SIGKILL 12345");
-        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -s SIGKILL 12345")).thenReturn("");
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -9.*")))
+                .thenReturn("kill -9 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -9 12345 1234")).thenReturn("");
 
         // Mock kill -0
         mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
-                .thenReturn("kill -0 12345");
+                .thenReturn("kill -0 12345")
+                .thenReturn("kill -0 1234");
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*"))).thenReturn("");
 
         // Act
@@ -220,9 +246,9 @@ public class ProcessUtilsTest {
         Assertions.assertFalse(result);
 
         // Verify SIGINT, SIGTERM, SIGKILL was called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGINT 12345"), Mockito.times(1));
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGTERM 12345"), Mockito.times(1));
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -s SIGKILL 12345"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.times(1));
     }
 
     @Test

@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,9 +44,6 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
     private MasterConfig masterConfig;

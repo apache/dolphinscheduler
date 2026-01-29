@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.metrics;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
@@ -25,7 +24,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Timer;
 
 @UtilityClass
 public class ApiServerMetrics {
@@ -75,13 +73,6 @@ public class ApiServerMetrics {
                     .description("size of download resource files on api")
                     .register(Metrics.globalRegistry);
 
-    static {
-        Timer.builder("ds.api.response.time")
-                .tag("user.id", "dummy")
-                .description("response time on api")
-                .register(Metrics.globalRegistry);
-    }
-
     public void incApiRequestCount() {
         apiRequestCounter.increment();
     }
@@ -108,12 +99,6 @@ public class ApiServerMetrics {
 
     public void recordApiResourceDownloadSize(final long size) {
         apiResourceDownloadSizeDistribution.record(size);
-    }
-
-    public void recordApiResponseTime(final long milliseconds, final int userId) {
-        Metrics.globalRegistry.timer(
-                "ds.api.response.time",
-                "user.id", String.valueOf(userId)).record(milliseconds, TimeUnit.MILLISECONDS);
     }
 
     public void cleanUpApiResponseTimeMetricsByUserId(final int userId) {

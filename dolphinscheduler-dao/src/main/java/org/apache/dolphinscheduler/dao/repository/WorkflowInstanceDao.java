@@ -39,12 +39,7 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
                                      WorkflowExecutionStatus originState,
                                      WorkflowExecutionStatus targetState);
 
-    /**
-     * performs an "upsert" operation (update or insert) on a WorkflowInstance object within a new transaction
-     *
-     * @param workflowInstance workflowInstance
-     */
-    void performTransactionalUpsert(WorkflowInstance workflowInstance);
+    void forceUpdateWorkflowInstanceState(Integer id, WorkflowExecutionStatus status);
 
     /**
      * find last scheduler workflow instance in the date interval

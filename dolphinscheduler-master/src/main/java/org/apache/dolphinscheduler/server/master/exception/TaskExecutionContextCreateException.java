@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.exception;
 
-public class TaskExecutionContextCreateException extends MasterException {
+public class TaskExecutionContextCreateException extends RuntimeException {
 
     public TaskExecutionContextCreateException(String message) {
         super(message);
