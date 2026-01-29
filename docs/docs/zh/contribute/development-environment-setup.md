@@ -28,10 +28,10 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 运行 `mvn clean install -Pstaging -Dmaven.test.skip=true`
 
-### 代码风格
+### 后端代码风格
 
-DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
-您可以执行如下的命令，`Spotless`将会为您自动检查并修复代码风格和格式问题。
+DolphinScheduler使用`Spotless`检查并修复后端代码风格和格式问题。
+您可以执行如下的命令，`Spotless`将会为您自动检查并修复后端代码风格和格式问题。
 
 ```shell
 ./mvnw spotless:apply
@@ -50,6 +50,27 @@ pre-commit install
 ```
 
 现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
+
+### 前端代码风格
+
+DolphinScheduler使用`pnpm`检查并修复前端代码风格和格式问题。
+首先，进入前端项目文件夹：
+
+```shell
+cd dolphinscheduler-ui
+```
+
+然后，使用`pnpm run lint`检查并修复前端代码风格和格式问题。
+
+```shell
+pnpm run lint
+```
+
+最后，可以运行`pnpm run build:prod`来执行完整的 TypeScript 类型检查，确保只有类型正确的代码才能被提交。
+
+```shell
+pnpm run build:prod
+```
 
 ### Helm 模板规范
 
