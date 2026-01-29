@@ -1,0 +1,82 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Don't show interactive progress bar while checking links.
+no_progress = false
+
+# Only test links with the given schemes (e.g. https).
+# Omit to check links with any other scheme.
+# At the moment, we support http, https, file, and mailto.
+scheme = ["https", "http", "file"]
+
+# Exclude URLs and mail addresses from checking. The values are treated as regular expressions
+exclude = [
+    '^http://localhost',
+    'http://localhost(:\d+)?',
+    '^https://img\.shields\.io/badge',
+    'dolphinscheduler\.apache\.org',
+    '^http://ds1',
+    '^http://ds1(:\d+)?',
+    '^http://minio',
+    '^http://minio(:\d+)?',
+    '^https://github\.com/apache/dolphinscheduler/blob/[^/]+/script/env/dolphinscheduler_env\.sh',
+    '^http://who-t\.blogspot\.com/2009/12/on-commit-messages\.html',
+    '^https://openmldb\.ai',
+    '^https://archive\.apache\.org/dist',
+    '^https://www\.bilibili\.com/video/BV1d64y1s7eZ',
+    '^https://www\.mysql\.com',
+    '^https://dev\.mysql\.com/downloads/mysql',
+]
+
+# Exclude paths from getting checked. The values are treated as regular expressions
+exclude_path = [
+    "docs/docs/en/history-versions.md",
+    "docs/docs/zh/history-versions.md",
+    "docs/docs/en/faq.md",
+    "docs/docs/zh/faq.md",
+]
+
+# Proceed for server connections considered insecure (invalid TLS).
+insecure = true
+
+# Comma-separated list of accepted status codes for valid links.
+accept = ["200", "401", "403"]
+
+# Maximum number of allowed retries before a link is declared dead.
+max_retries = 3
+
+# Minimum wait time in seconds between retries of failed requests.
+retry_wait_time = 10
+
+# Website timeout from connect to response finished.
+timeout = 60
+
+# When links are available using HTTPS, treat HTTP links as errors.
+require_https = false
+
+# Check mail addresses
+include_mail = false
+
+# Check links inside `<code>` and `<pre>` blocks as well as Markdown code
+# blocks.
+include_verbatim = false
+
+# Enable the checking of fragments in links.
+include_fragments = false
+
+# User agent to send with each request.
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"

@@ -1,0 +1,90 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if and .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-api
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  {{- if .Values.api.service.annotations }}
+  annotations: {{- toYaml .Values.api.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.api.service.type }}
+  {{- if and (eq .Values.api.service.type "ClusterIP") .Values.api.service.clusterIP }}
+  clusterIP: {{ .Values.api.service.clusterIP }}
+  {{- end }}
+  ports:
+    - port: 12345
+      targetPort: api-port
+      {{- if and (eq .Values.api.service.type "NodePort") .Values.api.service.nodePort }}
+      nodePort: {{ .Values.api.service.nodePort }}
+      {{- end }}
+      protocol: TCP
+      name: api-port
+    - port: 25333
+      targetPort: python-api-port
+      {{- if and (eq .Values.api.service.type "NodePort") .Values.api.service.pythonNodePort }}
+      nodePort: {{ .Values.api.service.pythonNodePort }}
+      {{- end }}
+      protocol: TCP
+      name: python-api-port
+  {{- if .Values.api.service.externalIPs }}
+  externalIPs:
+    {{- toYaml .Values.api.service.externalIPs | nindent 4 }}
+  {{- end }}
+  {{- if and (eq .Values.api.service.type "ExternalName") .Values.api.service.externalName }}
+  externalName: {{ .Values.api.service.externalName }}
+  {{- end }}
+  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.api.service.loadBalancerIP }}
+  {{- end }}
+  selector:
+    {{- include "dolphinscheduler.api.labels" . | nindent 4 }}
+
+---
+{{- if .Values.api.service.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+    {{- if .Values.api.service.serviceMonitor.labels }}
+    {{- toYaml .Values.api.service.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.api.service.serviceMonitor.annotations }}
+  annotations: {{- toYaml .Values.api.service.serviceMonitor.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.api.service.serviceMonitor.namespace | default .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+      {{- include "dolphinscheduler.common.labels" . | nindent 6 }}
+  endpoints:
+  - scheme: http
+    targetPort: api-port
+    path: {{ .Values.api.service.serviceMonitor.path }}
+    interval: {{ .Values.api.service.serviceMonitor.interval }}
+{{- end }}
+{{- end }}

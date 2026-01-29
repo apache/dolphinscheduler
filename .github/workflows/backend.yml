@@ -1,0 +1,184 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Backend
+
+on:
+  push:
+    branches:
+      - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
+  pull_request:
+
+concurrency:
+  group: backend-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paths-filter:
+    name: Backend-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+      db-schema: ${{ steps.filter.outputs.db-schema }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
+            db-schema:
+              - 'dolphinscheduler-dao/src/main/resources/sql/**'
+  build:
+    name: Backend-Build
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 28672
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Build and Package on ${{ matrix.java }}
+        run: |
+          ./mvnw -B clean install \
+                 -Pstaging \
+                 -Dmaven.test.skip=true \
+                 -Dspotless.skip=true \
+                 -Danalyze.skip=true
+      - name: Check dependency license
+        run: tools/dependencies/check-LICENSE.sh
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.java == '8' }}
+        name: Upload Binary Package
+        with:
+          name: binary-package-${{ matrix.java }}
+          path: ./dolphinscheduler-dist/target/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz
+          retention-days: 1
+  cluster-test:
+    name: ${{ matrix.case.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        case:
+          - name: cluster-test-mysql-with-zookeeper-registry
+            script: .github/workflows/cluster-test/mysql_with_zookeeper_registry/start-job.sh
+          - name: cluster-test-mysql-with-mysql-registry
+            script: .github/workflows/cluster-test/mysql_with_mysql_registry/start-job.sh
+          - name: cluster-test-postgresql-zookeeper-registry
+            script: .github/workflows/cluster-test/postgresql_with_zookeeper_registry/start-job.sh
+          - name: cluster-test-postgresql-with-postgresql-registry
+            script: .github/workflows/cluster-test/postgresql_with_postgresql_registry/start-job.sh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
+      - uses: actions/download-artifact@v4
+        name: Download Binary Package
+        with:
+          # Only run cluster test on jdk8
+          name: binary-package-8
+          path: ./
+      - name: Running cluster test
+        run: |
+          /bin/bash ${{ matrix.case.script }}
+  schema-check:
+    name: ${{ matrix.case.name }}-${{ matrix.version }}
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["3.1.9", "3.2.0", "3.3.1"]
+        case:
+          - name: schema-check-with-mysql
+            script: .github/workflows/schema-check/mysql/start-job.sh
+          - name: schema-check-with-postgresql
+            script: .github/workflows/schema-check/postgresql/start-job.sh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
+      - name: Download Binary Package
+        uses: actions/download-artifact@v4
+        with:
+          name: binary-package-8
+          path: ds_schema_check_test/dev
+      - name: Running Schema Check
+        run: |
+          /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
+  result:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ build, paths-filter, cluster-test, schema-check ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ needs.paths-filter.outputs.db-schema }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip Build!"
+            exit 0
+          fi
+          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' || ${{ needs.schema-check.result }} != 'success' ]]; then
+            echo "Build Failed!"
+            exit -1
+          fi

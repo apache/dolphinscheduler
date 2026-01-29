@@ -1,0 +1,135 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+    <id>bin</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>${project.build.finalName}-bin</baseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
+            <outputDirectory>alert-server</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
+            <outputDirectory>api-server</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
+            <outputDirectory>master-server</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
+            <outputDirectory>worker-server</outputDirectory>
+        </fileSet>
+
+        <!-- plugins -->
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-plugins</directory>
+            <includes>
+                <include>dolphinscheduler-alert-*/target/dolphinscheduler-alert-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/alert-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-datasource-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-datasource-*/target/dolphinscheduler-datasource-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/datasource-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-task-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-task-*/target/dolphinscheduler-task-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/task-plugins</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-storage-plugin</directory>
+            <includes>
+                <include>dolphinscheduler-storage-*/target/dolphinscheduler-storage-*-shade.jar</include>
+            </includes>
+            <outputDirectory>plugins/storage-plugins</outputDirectory>
+        </fileSet>
+        <!-- plugins -->
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
+            <outputDirectory>standalone-server</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-tools/target/tools</directory>
+            <outputDirectory>tools</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-dist/target/dolphinscheduler-dist-${project.version}</directory>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
+            <outputDirectory>./ui</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../script</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../config</directory>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/.././</directory>
+            <includes>
+                <include>mvnw</include>
+                <include>mvnw.cmd</include>
+            </includes>
+            <fileMode>0755</fileMode>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../.mvn/</directory>
+            <outputDirectory>.mvn</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/release-docs</directory>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

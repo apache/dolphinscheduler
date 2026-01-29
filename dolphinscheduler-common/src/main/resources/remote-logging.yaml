@@ -1,0 +1,55 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+remote.logging:
+  # if remote.logging.enable = true, set the target of remote logging
+  target: OSS
+  # if remote.logging.enable = true, set the log base directory
+  base.dir: logs
+  # if remote.logging.enable = true, set the number of threads to send logs to remote storage
+  thread.pool.size: 10
+  # required if you set remote.logging.target=OSS
+  oss:
+    # oss access key id, required if you set remote.logging.target=OSS
+    access.key.id: <access.key.id>
+    # oss access key secret, required if you set remote.logging.target=OSS
+    access.key.secret: <access.key.secret>
+    # oss bucket name, required if you set remote.logging.target=OSS
+    bucket.name: <bucket.name>
+    # oss endpoint, required if you set remote.logging.target=OSS
+    endpoint: <endpoint>
+  google.cloud.storage:
+    # the location of the google cloud credential, required if you set remote.logging.target=GCS
+    credential: /path/to/credential
+    # gcs bucket name, required if you set remote.logging.target=GCS
+    bucket.name: <your-bucket>
+  abs:
+    # abs account name, required if you set resource.storage.type=ABS
+    account.name: <your-account-name>
+    # abs account key, required if you set resource.storage.type=ABS
+    account.key: <your-account-key>
+    # abs container name, required if you set resource.storage.type=ABS
+    container.name: <your-container-name>
+  cos:
+    # cos access key id, required if you set remote-logging.target=COS
+    access.key.id: <access.key.id>
+    # cos access key secret, required if you set remote-logging.target=COS
+    access.key.secret: <access.key.secret>
+    # cos bucket name, required if you set remote-logging.target=COS
+    bucket.name: <bucket.name>
+    # cos region, required if you set remote-logging.target=COS
+    region: <region>

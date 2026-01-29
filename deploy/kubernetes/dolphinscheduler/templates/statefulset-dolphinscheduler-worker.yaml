@@ -1,0 +1,262 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if and .Values.worker.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  labels:
+    {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
+spec:
+  podManagementPolicy: {{ .Values.worker.podManagementPolicy }}
+  updateStrategy: {{- include "dolphinscheduler.tplvalues.render" (dict "value" .Values.worker.updateStrategy "context" $ ) | nindent 4 }}
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      {{- include "dolphinscheduler.worker.labels" . | nindent 6 }}
+  serviceName: {{ template "dolphinscheduler.fullname" . }}-worker-headless
+  template:
+    metadata:
+      labels:
+        {{- include "dolphinscheduler.worker.labels" . | nindent 8 }}
+      {{- if or .Values.worker.annotations .Values.conf.auto }}
+      annotations:
+        {{- if .Values.conf.auto }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.worker.annotations }}
+        {{- toYaml .Values.worker.annotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
+      {{- if .Values.worker.affinity }}
+      affinity:
+        {{- toYaml .Values.worker.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.worker.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml .Values.worker.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecret }}
+      {{- end }}
+      {{- if .Values.worker.initContainers }}
+      initContainers:
+        {{- toYaml .Values.worker.initContainers | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker
+          image: {{ include "dolphinscheduler.image.fullname.worker" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 1234
+              name: "worker-port"
+            - containerPort: 1235
+              name: "actuator-port"
+          env:
+            - name: TZ
+              value: {{ .Values.timezone }}
+            - name: SPRING_JACKSON_TIME_ZONE
+              value: {{ .Values.timezone }}
+            {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
+            {{ range $key, $value :=  .Values.worker.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{ end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "dolphinscheduler.fullname" . }}-common
+            {{- if .Values.worker.envFromSecret }}
+            - secretRef:
+                name: {{ .Values.worker.envFromSecret }}
+            {{- end }}
+            {{- if .Values.worker.envFromSecrets }}
+            {{- range .Values.worker.envFromSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+          {{- if .Values.worker.resources }}
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.worker.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                  {{- $excludeStr := .Values.common.configmap.MANAGEMENT_SECURITY_EXCLUDE | default "health,metrics" }}
+                  {{- $rawList := split "," $excludeStr }}
+                  {{- $cleanList := list }}
+                  {{- range $item := $rawList }}
+                    {{- $trimmed := trim $item }}
+                    {{- if $trimmed }}
+                      {{- $cleanList = append $cleanList $trimmed }}
+                    {{- end }}
+                  {{- end }}
+                  {{- $shouldPermitAll := has "health" $cleanList }}
+                  {{- $cmd := "curl -s http://localhost:1235/actuator/health/liveness" }}
+                  {{- if (and $enableSecurity (not $shouldPermitAll)) }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
+            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.worker.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.worker.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                   {{- $excludeStr := .Values.common.configmap.MANAGEMENT_SECURITY_EXCLUDE | default "health,metrics" }}
+                   {{- $rawList := split "," $excludeStr }}
+                   {{- $cleanList := list }}
+                   {{- range $item := $rawList }}
+                     {{- $trimmed := trim $item }}
+                     {{- if $trimmed }}
+                       {{- $cleanList = append $cleanList $trimmed }}
+                     {{- end }}
+                   {{- end }}
+                   {{- $shouldPermitAll := has "health" $cleanList }}
+                  {{- $cmd := "curl -s http://localhost:1235/actuator/health/readiness" }}
+                  {{- if (and $enableSecurity (not $shouldPermitAll)) }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
+            initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.worker.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: {{ default "/tmp/dolphinscheduler" .Values.common.configmap.DATA_BASEDIR_PATH | quote }}
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+            - mountPath: "/opt/dolphinscheduler/logs"
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+            {{- if .Values.worker.enableCustomizedConfig }}
+            - name: worker-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
+            {{- end }}
+            - name: config-volume
+              mountPath: /opt/dolphinscheduler/worker-server/conf/common.properties
+              subPath: common.properties
+            {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
+            {{- if .Values.worker.extraVolumeMounts }}
+            {{- toYaml .Values.worker.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if .Values.worker.persistentVolumeClaim.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- else }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          emptyDir: {}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.worker.enableCustomizedConfig }}
+        - name: worker-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-worker
+        {{- end }}
+        - name: config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
+        {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
+        {{- if .Values.worker.extraVolumes }}
+        {{- toYaml .Values.worker.extraVolumes | nindent 8 }}
+        {{- end }}
+  {{- if .Values.worker.persistentVolumeClaim.enabled }}
+  volumeClaimTemplates:
+    {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
+    - metadata:
+        name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+        labels:
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
+      spec:
+        accessModes:
+        {{- range .Values.worker.persistentVolumeClaim.dataPersistentVolume.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        storageClassName: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storage | quote }}
+    {{- end }}
+    {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
+    - metadata:
+        name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+        labels:
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
+      spec:
+        accessModes:
+        {{- range .Values.worker.persistentVolumeClaim.logsPersistentVolume.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        storageClassName: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storage | quote }}
+    {{- end }}
+  {{- end }}
+{{- end }}
