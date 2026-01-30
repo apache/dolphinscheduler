@@ -63,16 +63,17 @@ First, navigate to the frontend project directory:
 cd dolphinscheduler-ui
 ```
 
-Then, run `pnpm run lint` to check and fix frontend code style and formatting issues:
+Then, run the following commands to automatically fix ESLint-fixable issues and format the code:
 
 ```shell
-pnpm run lint
+pnpm run lint      # Fix ESLint issues
+pnpm run prettier  # Format code
 ```
 
-Finally, you can run `pnpm run build:prod` to perform a full TypeScript type check, ensuring that only type-safe code is committed.
+Finally, you can run the following command to perform a full TypeScript type check and catch type-related errors early:
 
 ```shell
-pnpm run build:prod
+pnpm exec vue-tsc --noEmit  # Type check
 ```
 
 ### Helm Template Guidelines

@@ -60,16 +60,17 @@ DolphinScheduler使用`pnpm`检查并修复前端代码风格和格式问题。
 cd dolphinscheduler-ui
 ```
 
-然后，使用`pnpm run lint`检查并修复前端代码风格和格式问题。
+然后，运行以下命令来自动修复 ESLint 可修复的问题，并格式化代码。
 
 ```shell
-pnpm run lint
+pnpm run lint      # 修复 ESLint 问题
+pnpm run prettier  # 格式化代码
 ```
 
-最后，可以运行`pnpm run build:prod`来执行完整的 TypeScript 类型检查，确保只有类型正确的代码才能被提交。
+最后，可以运行以下命令来执行完整的 TypeScript 类型检查，提前发现类型异常。
 
 ```shell
-pnpm run build:prod
+pnpm exec vue-tsc --noEmit  # 类型检查
 ```
 
 ### Helm 模板规范
