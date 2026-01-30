@@ -153,16 +153,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Maximize runner space
-        uses: ./.github/actions/maximize-build-space
-        with:
-          root-reserve-mb: 28672
-          temp-reserve-mb: 10240
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
+#      - name: Maximize runner space
+#        uses: ./.github/actions/maximize-build-space
+#        with:
+#          root-reserve-mb: 28672
+#          temp-reserve-mb: 10240
+#          remove-dotnet: 'true'
+#          remove-android: 'true'
+#          remove-haskell: 'true'
+#          remove-codeql: 'true'
+#          remove-docker-images: 'true'
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -189,6 +189,8 @@ jobs:
       - name: Load Docker Images
         run: |
           docker load -i /tmp/standalone-image.tar
+      - name: df -h
+        run: df -h
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
