@@ -59,16 +59,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Maximize runner space
-        uses: ./.github/actions/maximize-build-space
-        with:
-          root-reserve-mb: 28672
-          temp-reserve-mb: 20240
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -86,6 +76,8 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
+      - name: df -h
+        run: df -h
       - name: Build and Package on ${{ matrix.java }}
         run: |
           ./mvnw -B clean install \
