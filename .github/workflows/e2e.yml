@@ -56,9 +56,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:
