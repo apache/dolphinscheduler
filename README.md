@@ -4,7 +4,6 @@
 ![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 [![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule) <!-- markdown-link-check-disable-line -->
-[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://s.apache.org/dolphinscheduler-slack)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
 ## About
@@ -64,7 +63,7 @@ Check out good first issue in [here](https://github.com/apache/dolphinscheduler/
 
 Welcome to join the Apache DolphinScheduler community by:
 
-- Join the [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack) to keep in touch with the community
+- Use [GitHub Issues](https://github.com/apache/dolphinscheduler/issues) for questions, discussions, and bug reports
 - Follow the [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) and get the latest news <!-- markdown-link-check-disable-line -->
 - Subscribe DolphinScheduler mail list, [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) for users and [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org) for developers
 
