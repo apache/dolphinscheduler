@@ -33,7 +33,7 @@ public class RemoteLogClient {
      * @return Returns the log content in byte array format.
      */
     public byte[] getWholeLog(TaskInstance taskInstance) {
-        return LogUtils.getFileContentBytesFromRemote(taskInstance.getLogPath());
+        return LogUtils.getFileContentBytesWithRollingLogs(taskInstance.getLogPath());
     }
 
     /**

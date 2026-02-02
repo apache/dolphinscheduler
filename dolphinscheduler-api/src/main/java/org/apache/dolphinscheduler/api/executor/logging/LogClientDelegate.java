@@ -78,7 +78,15 @@ public class LogClientDelegate {
         if (checkNodeExists(taskInstance)) {
             TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
             if (response.getCode() == LogResponseStatus.SUCCESS) {
-                return response.getLogBytes();
+                // For local logs, also get rolling log files if they exist
+                String logPath = taskInstance.getLogPath();
+                java.io.File logFile = new java.io.File(logPath);
+                if (logFile.exists()) {
+                    return org.apache.dolphinscheduler.common.utils.LogUtils
+                            .getFileContentBytesWithRollingLogs(logPath);
+                } else {
+                    return response.getLogBytes();
+                }
             } else {
                 log.warn("get whole log bytes is not success for task instance {}; reason :{}", taskInstance.getId(),
                         response.getMessage());

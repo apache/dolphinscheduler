@@ -29,7 +29,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,11 +82,21 @@ public class LogUtils {
                                                             int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
-            try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-                return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-            } catch (IOException e) {
-                log.error("read file error", e);
-                throw new RuntimeException(String.format("Read file: %s error", filePath), e);
+            log.info("readPartFileContentFromLocal Reading log file");
+            // Check if there are rolling log files
+            List<File> logFiles = getRollingLogFiles(filePath);
+
+            if (logFiles.size() > 1) {
+                // Handle rolling log files
+                return readFromRollingLogFiles(logFiles, skipLine, limit);
+            } else {
+                // Handle single log file
+                try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
+                    return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
+                } catch (IOException e) {
+                    log.error("read file error", e);
+                    throw new RuntimeException(String.format("Read file: %s error", filePath), e);
+                }
             }
         } else {
             throw new RuntimeException("The file path: " + filePath + " not exists");
@@ -169,4 +182,148 @@ public class LogUtils {
         return loggerContext.getProperty("log.base.ctx");
     }
 
+    /**
+     * Get all rolling log files for a given base file path.
+     * Returns a sorted list containing the base file and its rolled versions (e.g., .1, .2, etc.)
+     * ordered from newest to oldest (base file first, then .1, .2, etc.)
+     */
+    private static List<File> getRollingLogFiles(String basePath) {
+        List<File> allFiles = new ArrayList<>();
+
+        File baseFile = new File(basePath);
+        File parentDir = baseFile.getParentFile();
+        String fileName = baseFile.getName();
+
+        // Add the base file if it exists
+        if (baseFile.exists()) {
+            allFiles.add(baseFile);
+        }
+
+        // Look for rolling files with pattern: basePath.N
+        if (parentDir != null) {
+            File[] files = parentDir.listFiles((dir, name) -> name.startsWith(fileName + ".") &&
+                    Pattern.matches(Pattern.quote(fileName) + "\\.\\d+", name));
+
+            if (files != null) {
+                allFiles.addAll(Arrays.asList(files));
+            }
+        }
+
+        // Sort all files in reverse order based on rolling number
+        // Base file (without number) is treated as having number 0, so it comes last
+        // descending order (larger numbers first)
+        allFiles.sort((file1, file2) -> {
+            int num1 = isRollingFile(file1) ? extractRollingNumber(file1) : 0;
+            int num2 = isRollingFile(file2) ? extractRollingNumber(file2) : 0;
+            return Integer.compare(num2, num1);
+        });
+
+        return allFiles;
+    }
+
+    /**
+     * Extract the rolling number from a file name (e.g., from "xxx.log.3" extract 3)
+     */
+    private static int extractRollingNumber(File file) {
+        String fileName = file.getName();
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex != -1 && lastDotIndex < fileName.length() - 1) {
+            try {
+                return Integer.parseInt(fileName.substring(lastDotIndex + 1));
+            } catch (NumberFormatException e) {
+                return Integer.MAX_VALUE; // Put invalid files at the end
+            }
+        }
+        return Integer.MAX_VALUE;
+    }
+
+    /**
+     * Check if the file is a rolling file (has a number suffix like .1, .2, etc.)
+     */
+    private static boolean isRollingFile(File file) {
+        String fileName = file.getName();
+        // Check if the filename matches the pattern of a rolling file (basename.number)
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex != -1 && lastDotIndex < fileName.length() - 1) {
+            String suffix = fileName.substring(lastDotIndex + 1);
+            return suffix.matches("\\d+");
+        }
+        return false;
+    }
+
+    /**
+     * Read lines from multiple rolling log files in order
+     */
+    private static List<String> readFromRollingLogFiles(List<File> logFiles, int skipLine, int limit) {
+        List<String> allLines = new ArrayList<>();
+
+        // Read all lines from all log files in order
+        for (File file : logFiles) {
+            log.info("Reading log file: {}", file.getAbsolutePath());
+            try (Stream<String> stream = Files.lines(file.toPath())) {
+                List<String> fileLines = stream.collect(Collectors.toList());
+                allLines.addAll(fileLines);
+            } catch (IOException e) {
+                log.error("Error reading file: " + file.getAbsolutePath(), e);
+                throw new RuntimeException(String.format("Read file: %s error", file.getAbsolutePath()), e);
+            }
+        }
+
+        // Apply skip and limit
+        int startIndex = Math.min(skipLine, allLines.size());
+        int endIndex = Math.min(startIndex + limit, allLines.size());
+
+        return allLines.subList(startIndex, endIndex);
+    }
+
+    /**
+     * Get content of multiple log files (including rolling log files) as byte array
+     * Reads files in reverse order (xxx.log.n, xxx.log.n-1, ..., xxx.log)
+     *
+     * @param filePath base file path
+     * @return byte array of all log files content
+     */
+    public static byte[] getFileContentBytesWithRollingLogs(String filePath) {
+        File file = new File(filePath);
+        if (file.exists() && file.isFile()) {
+            // Check if there are rolling log files
+            List<File> logFiles = getRollingLogFiles(filePath);
+
+            if (logFiles.size() > 1) {
+                // Handle multiple log files (base file + rolling files)
+                return getBytesFromMultipleLogFiles(logFiles);
+            } else {
+                // Handle single log file
+                return getFileContentBytesFromLocal(filePath);
+            }
+        } else {
+            throw new RuntimeException("The file path: " + filePath + " not exists");
+        }
+    }
+
+    /**
+     * Read bytes from multiple log files in order
+     */
+    private static byte[] getBytesFromMultipleLogFiles(List<File> logFiles) {
+        List<byte[]> allBytes = new ArrayList<>();
+
+        // Read all bytes from all log files in order
+        for (File file : logFiles) {
+            log.info("Reading log file for download: {}", file.getAbsolutePath());
+            byte[] fileBytes = getFileContentBytesFromLocal(file.getAbsolutePath());
+            allBytes.add(fileBytes);
+        }
+
+        // Combine all bytes
+        int totalLength = allBytes.stream().mapToInt(bytes -> bytes.length).sum();
+        byte[] result = new byte[totalLength];
+        int position = 0;
+
+        for (byte[] bytes : allBytes) {
+            System.arraycopy(bytes, 0, result, position, bytes.length);
+            position += bytes.length;
+        }
+
+        return result;
+    }
 }

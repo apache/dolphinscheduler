@@ -1,0 +1,12 @@
+	11
+	12
+	13
+	14
+	15
+	===============end===============
+2026-01-29 15:10:58.538 INFO  - process has exited. execute path:/data01/dolphinscheduler/exec/process/730, processId:1167097 ,exitStatusCode:0 ,processWaitForStatus:true ,processExitValue:0
+2026-01-29 15:10:58.668 INFO  - 🐬 Finalize Task Instance
+2026-01-29 15:10:58.669 INFO  - Clearing task execution path: /data01/dolphinscheduler/exec/process/730
+2026-01-29 15:10:58.669 INFO  - Successfully cleared task execution path: /data01/dolphinscheduler/exec/process/730
+2026-01-29 15:10:58.669 INFO  - FINALIZE_SESSION
+2026-01-29 15:10:58.670 INFO  - Deleted task exec directory: /data01/dolphinscheduler/exec/process/730
