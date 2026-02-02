@@ -91,9 +91,9 @@ public final class HttpSender {
             throw new IllegalArgumentException("contentType is not a valid value");
         }
 
-        timeout = StringUtils.isNotBlank(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+        timeout = (StringUtils.isNotBlank(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
                 ? Integer.parseInt(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
-                : HttpAlertConstants.DEFAULT_TIMEOUT * 1000;
+                : HttpAlertConstants.DEFAULT_TIMEOUT) * 1000;
     }
 
     public AlertResult send(String msg) {
