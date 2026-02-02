@@ -39,15 +39,23 @@
             <logBase>${log.base}</logBase>
         </Discriminator>
         <sift>
-            <appender name="FILE-${taskInstanceLogFullPath}" class="ch.qos.logback.core.FileAppender">
+            <appender name="FILE-${taskInstanceLogFullPath}" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${taskInstanceLogFullPath}</file>
+
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                    <fileNamePattern>${taskInstanceLogFullPath}.%i</fileNamePattern>
+                    <minIndex>1</minIndex>
+                    <maxIndex>1</maxIndex>
+                </rollingPolicy>
+
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <maxFileSize>100MB</maxFileSize>
+                </triggeringPolicy>
+
                 <encoder>
-                    <pattern>
-                        %date{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %message%n
-                    </pattern>
+                    <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %message%n</pattern>
                     <charset>UTF-8</charset>
                 </encoder>
-                <append>true</append>
             </appender>
         </sift>
     </appender>

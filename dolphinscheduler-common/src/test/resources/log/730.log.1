@@ -1,0 +1,44 @@
+2026-01-29 15:10:39.274 INFO  - 🐬 Initialize Task Context
+2026-01-29 15:10:39.278 INFO  - Current tenant is default tenant, will use bootstrap user: dolphinscheduler to execute the task
+2026-01-29 15:10:39.278 INFO  - TenantCode: dolphinscheduler check successfully
+2026-01-29 15:10:39.278 INFO  - TaskInstance working directory: /data01/dolphinscheduler/exec/process/730 create successfully
+2026-01-29 15:10:39.279 INFO  - Download resources successfully: 
+ResourceContext(resourceItemMap={})
+2026-01-29 15:10:39.280 INFO  - 🐬 Load Task Instance Plugin
+2026-01-29 15:10:39.280 INFO  - Initialized physicalTask: SHELL successfully
+2026-01-29 15:10:39.280 INFO  - Initialize shell task params {
+  "localParams" : [ ],
+  "varPool" : [ ],
+  "rawScript" : "echo \"===============start===============\"\r\nfor i in {1..15}; do\r\n    echo \"$i\" \r\n   done\r\necho \"===============end===============\"\r\n",
+  "resourceList" : [ ]
+}
+2026-01-29 15:10:39.280 INFO  - Set taskVarPool: null successfully
+2026-01-29 15:10:39.280 INFO  - 🐬 Execute Task Instance
+2026-01-29 15:10:39.281 INFO  - Final Script Content:
+====================
+#!/bin/bash
+BASEDIR=$(cd `dirname $0`; pwd)
+cd $BASEDIR
+source /usr/local/dolphinscheduler/bin/env/dolphinscheduler_env.sh
+kinit -kt /etc/security/keytabs/dolphinscheduler.keytab dolphinscheduler@BIGDATA.CHINATELECOM.CN
+echo "===============start==============="
+for i in {1..15}; do
+    echo "$i"
+done
+echo "===============end==============="
+
+====================
+2026-01-29 15:10:39.281 INFO  - Executing shell command : sudo -u dolphinscheduler -i /data01/dolphinscheduler/exec/process/730/730.sh
+2026-01-29 15:10:39.284 INFO  - process start, process id is: 1167097
+2026-01-29 15:10:40.285 INFO  -  -> 
+	===============start===============
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
