@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.executor;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
@@ -25,8 +26,8 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.server.worker.alert.AlertService;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
@@ -34,7 +35,6 @@ import org.apache.dolphinscheduler.task.executor.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorStateMappings;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorResultAlertLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
 import java.util.ArrayList;
@@ -54,12 +54,16 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     private final PhysicalTaskPluginFactory physicalTaskPluginFactory;
 
-    public PhysicalTaskExecutor(final PhysicalTaskExecutorBuilder physicalTaskExecutorBuilder) {
+    private final AlertService alertService;
+
+    public PhysicalTaskExecutor(final PhysicalTaskExecutorBuilder physicalTaskExecutorBuilder,
+                                AlertService alertService) {
         super(physicalTaskExecutorBuilder.getTaskExecutionContext(),
                 physicalTaskExecutorBuilder.getTaskExecutorEventBus());
         this.workerConfig = physicalTaskExecutorBuilder.getWorkerConfig();
         this.storageOperator = physicalTaskExecutorBuilder.getStorageOperator();
         this.physicalTaskPluginFactory = physicalTaskExecutorBuilder.getPhysicalTaskPluginFactory();
+        this.alertService = alertService;
     }
 
     @Override
@@ -90,9 +94,8 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
             }
 
             @Override
-            public void reportTaskResultAlertInfo(TaskResultAlertInfo taskResultAlertInfo) {
-                taskExecutorEventBus
-                        .publish(TaskExecutorResultAlertLifecycleEvent.of(taskExecutor, taskResultAlertInfo));
+            public void sendAlert(int groupId, String title, String content, AlertType alertType) {
+                alertService.sentAlert(groupId, title, content, alertType);
             }
         });
     }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -154,12 +155,13 @@ public class SqlTask extends AbstractTask {
             // execute sql task
             executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds);
 
-            setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
-
             if (this.getNeedAlert()) {
-                // callback to report taskResult alert
-                taskCallBack.reportTaskResultAlertInfo(this.getTaskResultAlertInfo());
+                log.info("Begin to send sql result alert");
+                taskCallBack.sendAlert(taskResultAlertInfo.getAlertGroupId(), taskResultAlertInfo.getTitle(),
+                        taskResultAlertInfo.getContent(), taskResultAlertInfo.getAlertType());
             }
+
+            setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
 
         } catch (Exception e) {
             if (exitStatusCode == TaskConstants.EXIT_CODE_KILL) {
@@ -288,10 +290,29 @@ public class SqlTask extends AbstractTask {
                 : JSONUtils.toJsonString(resultJSONArray);
 
         if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
-            sendTaskResultAlert(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                    ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", result);
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            String alertContent;
+            if (resultJSONArray.size() > displayRows) {
+                ArrayNode truncatedArray = JSONUtils.createArrayNode();
+                for (int i = 0; i < Math.min(displayRows, resultJSONArray.size()); i++) {
+                    truncatedArray.add(resultJSONArray.get(i));
+                }
+                alertContent = JSONUtils.toJsonString(truncatedArray);
+                log.debug("Alert content truncated to {} rows", displayRows);
+            } else {
+                alertContent = result;
+            }
+
+            setNeedAlert(true);
+            TaskResultAlertInfo taskResultAlertInfo = new TaskResultAlertInfo(sqlParameters.getGroupId(),
+                    StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle()
+                            : taskExecutionContext.getTaskName() + " query result sets",
+                    alertContent,
+                    AlertType.TASK_RESULT);
+            setTaskResultAlertInfo(taskResultAlertInfo);
         }
+
         log.debug("execute sql result : {}", result);
         return result;
     }
@@ -314,24 +335,6 @@ public class SqlTask extends AbstractTask {
         }
         resultJSONArray.add(emptyOfColValues);
         return resultJSONArray;
-    }
-
-    /**
-     * send alert
-     *
-     * @param title   title
-     * @param content content
-     */
-    private void sendTaskResultAlert(int groupId, String title, String content) {
-        setNeedAlert(Boolean.TRUE);
-        TaskResultAlertInfo taskAlertInfo = new TaskResultAlertInfo();
-        taskAlertInfo.setAlertGroupId(groupId);
-        taskAlertInfo.setContent(content);
-        taskAlertInfo.setTitle(title);
-        taskAlertInfo.setWorkflowDefinitionCode(this.taskExecutionContext.getWorkflowDefinitionCode());
-        taskAlertInfo.setWorkflowInstanceId(this.taskExecutionContext.getWorkflowInstanceId());
-        taskAlertInfo.setTaskInstanceId(this.taskExecutionContext.getTaskInstanceId());
-        setTaskResultAlertInfo(taskAlertInfo);
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {

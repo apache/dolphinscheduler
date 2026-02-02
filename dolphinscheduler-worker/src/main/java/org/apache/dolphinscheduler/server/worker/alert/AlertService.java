@@ -15,16 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master;
+package org.apache.dolphinscheduler.server.worker.alert;
 
-import org.apache.dolphinscheduler.extract.base.RpcMethod;
-import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskResultAlertRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskResultAlertResponse;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 
-@RpcService
-public interface ITaskResultAlertService {
+public interface AlertService {
 
-    @RpcMethod
-    TaskResultAlertResponse reportTaskResultAlertToMaster(TaskResultAlertRequest taskResultAlertRequest);
+    void sentAlert(int groupId, String title, String content, AlertType alertType);
+
 }

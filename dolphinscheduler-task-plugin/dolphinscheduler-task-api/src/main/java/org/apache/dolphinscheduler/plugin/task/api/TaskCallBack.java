@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 
 public interface TaskCallBack {
 
@@ -28,5 +28,5 @@ public interface TaskCallBack {
     @Deprecated
     void updateTaskInstanceInfo(int taskInstanceId);
 
-    void reportTaskResultAlertInfo(TaskResultAlertInfo taskResultAlertInfo);
+    void sendAlert(int groupId, String title, String content, AlertType alertType);
 }

@@ -18,16 +18,12 @@
 package org.apache.dolphinscheduler.extract.master;
 
 import org.apache.dolphinscheduler.extract.base.client.Clients;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskResultAlertRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskResultAlertResponse;
-import org.apache.dolphinscheduler.plugin.task.api.model.TaskResultAlertInfo;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorEventRemoteReporterClient;
 import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPausedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorResultAlertLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorSuccessLifecycleEvent;
@@ -70,10 +66,6 @@ public class TaskExecutorEventRemoteReporterClient implements ITaskExecutorEvent
                 case SUCCESS:
                     reportTaskSuccessEventToMaster(masterAddress,
                             (TaskExecutorSuccessLifecycleEvent) taskExecutorLifecycleEvent);
-                    break;
-                case RESULT_ALERT:
-                    reportTaskResultAlertEventToMaster(masterAddress,
-                            (TaskExecutorResultAlertLifecycleEvent) taskExecutorLifecycleEvent);
                     break;
                 default:
                     log.warn("Unsupported TaskExecutionEvent: {}", taskExecutorLifecycleEvent);
@@ -138,34 +130,5 @@ public class TaskExecutorEventRemoteReporterClient implements ITaskExecutorEvent
                 .withService(ITaskExecutorEventListener.class)
                 .withHost(masterAddress)
                 .onTaskExecutorSuccess(taskExecutionSuccessEvent);
-    }
-
-    private static void reportTaskResultAlertEventToMaster(final String masterAddress,
-                                                           final TaskExecutorResultAlertLifecycleEvent taskExecutionResultAlertEvent) {
-        TaskResultAlertInfo taskResultAlertInfo = taskExecutionResultAlertEvent.getTaskResultAlertInfo();
-        TaskResultAlertRequest taskResultAlertRequest =
-                TaskResultAlertRequest.builder()
-                        .alertGroupId(taskResultAlertInfo.getAlertGroupId())
-                        .title(taskResultAlertInfo.getTitle())
-                        .content(taskResultAlertInfo.getContent())
-                        .workflowDefinitionCode(taskResultAlertInfo.getWorkflowDefinitionCode())
-                        .workflowInstanceId(taskResultAlertInfo.getWorkflowInstanceId())
-                        .taskInstanceId(taskResultAlertInfo.getTaskInstanceId())
-                        .build();
-
-        TaskResultAlertResponse taskResultAlertResponse = Clients.withService(ITaskResultAlertService.class)
-                .withHost(masterAddress)
-                .reportTaskResultAlertToMaster(taskResultAlertRequest);
-
-        if (taskResultAlertResponse != null && taskResultAlertResponse.isSuccess()) {
-            log.info(
-                    "Successfully reported task result alert to master. TaskInstanceId: {}, Title: '{}', MasterAddress: {}",
-                    taskResultAlertInfo.getTaskInstanceId(), taskResultAlertInfo.getTitle(), masterAddress);
-        } else {
-            log.warn(
-                    "Failed to report task result alert to master. TaskInstanceId: {}, Title: '{}', MasterAddress: {}, Reason: {}",
-                    taskResultAlertInfo.getTaskInstanceId(), taskResultAlertInfo.getTitle(), masterAddress,
-                    taskResultAlertResponse != null ? taskResultAlertResponse.getMessage() : "response is null");
-        }
     }
 }

@@ -17,21 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class TaskResultAlertInfo {
+
+    private Integer alertGroupId;
 
     private String title;
 
     private String content;
 
-    private Integer alertGroupId;
-
-    private Long workflowDefinitionCode;
-
-    private Integer workflowInstanceId;
-
-    private int taskInstanceId;
+    private AlertType alertType;
 
 }

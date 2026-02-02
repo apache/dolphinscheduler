@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.executor;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.server.worker.alert.AlertService;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutorFactory;
@@ -38,12 +39,16 @@ public class PhysicalTaskExecutorFactory implements ITaskExecutorFactory {
 
     private final StorageOperator storageOperator;
 
+    private final AlertService alertService;
+
     public PhysicalTaskExecutorFactory(final WorkerConfig workerConfig,
                                        final PhysicalTaskPluginFactory physicalTaskPluginFactory,
-                                       final StorageOperator storageOperator) {
+                                       final StorageOperator storageOperator,
+                                       final AlertService alertService) {
         this.workerConfig = workerConfig;
         this.physicalTaskPluginFactory = physicalTaskPluginFactory;
         this.storageOperator = storageOperator;
+        this.alertService = alertService;
     }
 
     @Override
@@ -56,7 +61,7 @@ public class PhysicalTaskExecutorFactory implements ITaskExecutorFactory {
                 .storageOperator(storageOperator)
                 .physicalTaskPluginFactory(physicalTaskPluginFactory)
                 .build();
-        return new PhysicalTaskExecutor(physicalTaskExecutorBuilder);
+        return new PhysicalTaskExecutor(physicalTaskExecutorBuilder, alertService);
     }
 
     private void assemblyTaskLogPath(final TaskExecutionContext taskExecutionContext) {
