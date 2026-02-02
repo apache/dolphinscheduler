@@ -291,6 +291,8 @@ Location: `master-server/conf/application.yaml`
 | master.command-fetch-strategy.type                                          | ID_SLOT_BASED                | The command fetch strategy, only support `ID_SLOT_BASED`                                                                                                 |
 | master.command-fetch-strategy.config.id-step                                | 1                            | The id auto incremental step of t_ds_command in db                                                                                                       |
 | master.command-fetch-strategy.config.fetch-size                             | 10                           | The number of commands fetched by master                                                                                                                 |
+| master.task-dispatch-policy.dispatch-timeout-enabled                        | false                        | Indicates whether the dispatch timeout checking mechanism is enabled                                                                                     |
+| master.task-dispatch-policy.max-task-dispatch-duration                      | 1h                           | The maximum allowed duration a task may wait in the dispatch queue before being assigned to a worker                                                     |
 
 ### Worker Server related configuration
 

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
@@ -41,8 +42,11 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
 
     private final ConcurrentHashMap<String, WorkerGroupDispatcher> workerGroupDispatcherMap;
 
-    public WorkerGroupDispatcherCoordinator() {
+    private final MasterConfig masterConfig;
+
+    public WorkerGroupDispatcherCoordinator(final MasterConfig masterConfig) {
         workerGroupDispatcherMap = new ConcurrentHashMap<>();
+        this.masterConfig = masterConfig;
     }
 
     public void start() {
@@ -99,7 +103,8 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
 
     private WorkerGroupDispatcher getOrCreateWorkerGroupDispatcher(String workerGroup) {
         return workerGroupDispatcherMap.computeIfAbsent(workerGroup, wg -> {
-            WorkerGroupDispatcher workerGroupDispatcher = new WorkerGroupDispatcher(wg, taskExecutorClient);
+            WorkerGroupDispatcher workerGroupDispatcher =
+                    new WorkerGroupDispatcher(wg, taskExecutorClient, masterConfig.getTaskDispatchPolicy());
             workerGroupDispatcher.start();
             return workerGroupDispatcher;
         });
