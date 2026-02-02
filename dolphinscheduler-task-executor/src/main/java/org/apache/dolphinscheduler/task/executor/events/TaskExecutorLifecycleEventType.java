@@ -37,8 +37,6 @@ public enum TaskExecutorLifecycleEventType {
 
     FAILED,
 
-    RESULT_ALERT,
-
     FINALIZE,
     ;
 

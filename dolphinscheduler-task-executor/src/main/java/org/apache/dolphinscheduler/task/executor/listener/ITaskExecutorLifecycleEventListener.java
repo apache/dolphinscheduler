@@ -50,5 +50,4 @@ public interface ITaskExecutorLifecycleEventListener {
 
     void onTaskExecutorFinalizeLifecycleEvent(final TaskExecutorFinalizeLifecycleEvent event);
 
-    void onTaskExecutorResultAlertLifecycleEvent(final TaskExecutorResultAlertLifecycleEvent event);
 }

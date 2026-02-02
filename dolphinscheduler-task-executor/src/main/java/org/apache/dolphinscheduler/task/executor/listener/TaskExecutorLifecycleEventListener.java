@@ -114,11 +114,6 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
         executorContainer.finalize(taskExecutor);
     }
 
-    @Override
-    public void onTaskExecutorResultAlertLifecycleEvent(TaskExecutorResultAlertLifecycleEvent event) {
-        reportTaskExecutorLifecycleEventToMaster(event);
-    }
-
     private void reportTaskExecutorLifecycleEventToMaster(IReportableTaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
         taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(taskExecutorLifecycleEvent);
     }
