@@ -340,19 +340,19 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 默认配置如下：
 
-|                                   参数                                    |                       默认值                       |
-|-------------------------------------------------------------------------|-------------------------------------------------|
-| spring.quartz.properties.org.quartz.jobStore.isClustered                | true                                            |
-| spring.quartz.properties.org.quartz.jobStore.class                      | org.quartz.impl.jdbcjobstore.JobStoreTX         |
-| spring.quartz.properties.org.quartz.scheduler.instanceId                | AUTO                                            |
-| spring.quartz.properties.org.quartz.jobStore.tablePrefix                | QRTZ_                                           |
-| spring.quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock  | true                                            |
-| spring.quartz.properties.org.quartz.scheduler.instanceName              | DolphinScheduler                                |
-| spring.quartz.properties.org.quartz.jobStore.useProperties              | false                                           |
-| spring.quartz.properties.org.quartz.jobStore.misfireThreshold           | 60000                                           |
-| spring.quartz.properties.org.quartz.scheduler.makeSchedulerThreadDaemon | true                                            |
-| spring.quartz.properties.org.quartz.jobStore.driverDelegateClass        | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate |
-| spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval     | 5000                                            |
+|                                   参数                                    |                              默认值                              |
+|-------------------------------------------------------------------------|---------------------------------------------------------------|
+| spring.quartz.properties.org.quartz.jobStore.isClustered                | true                                                          |
+| spring.quartz.properties.org.quartz.jobStore.class                      | org.springframework.scheduling.quartz.LocalDataSourceJobStore |
+| spring.quartz.properties.org.quartz.scheduler.instanceId                | AUTO                                                          |
+| spring.quartz.properties.org.quartz.jobStore.tablePrefix                | QRTZ_                                                         |
+| spring.quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock  | true                                                          |
+| spring.quartz.properties.org.quartz.scheduler.instanceName              | DolphinScheduler                                              |
+| spring.quartz.properties.org.quartz.jobStore.useProperties              | false                                                         |
+| spring.quartz.properties.org.quartz.jobStore.misfireThreshold           | 60000                                                         |
+| spring.quartz.properties.org.quartz.scheduler.makeSchedulerThreadDaemon | true                                                          |
+| spring.quartz.properties.org.quartz.jobStore.driverDelegateClass        | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate               |
+| spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval     | 5000                                                          |
 
 上述配置项在*Master Server* 和 *Api Server*是相同的，但他们的Quartz线程池配置部分却是不一样的。
 *Master Server* 的Quartz线程池默认配置如下：
