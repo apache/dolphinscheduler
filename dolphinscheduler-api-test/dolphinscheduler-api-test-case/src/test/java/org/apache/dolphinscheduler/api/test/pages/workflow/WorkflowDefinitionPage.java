@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
