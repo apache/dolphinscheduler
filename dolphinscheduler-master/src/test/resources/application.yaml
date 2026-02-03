@@ -73,6 +73,11 @@ master:
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 30
   worker-group-refresh-interval: 5m
+  # Task dispatch timeout check (currently disabled).
+  # When enabled, tasks not dispatched within this duration are marked as failed.
+  task-dispatch-policy:
+    dispatch-timeout-enabled: false
+    max-task-dispatch-duration: 1h
   command-fetch-strategy:
     type: ID_SLOT_BASED
     config:
