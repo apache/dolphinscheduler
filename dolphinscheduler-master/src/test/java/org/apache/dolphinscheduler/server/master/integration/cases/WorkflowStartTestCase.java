@@ -1530,7 +1530,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .assertThatThrownBy(() -> workflowOperator.manualTriggerWorkflow(workflowTriggerDTO))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Dependency validation failed")
-                .hasMessageContaining("task code 999 not found in current workflow");
+                .hasMessageContaining("task 999 not found or skipped in current workflow");
 
     }
 

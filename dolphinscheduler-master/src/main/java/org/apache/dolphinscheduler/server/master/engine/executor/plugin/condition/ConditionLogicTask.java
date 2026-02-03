@@ -95,10 +95,10 @@ public class ConditionLogicTask extends AbstractLogicTask<ConditionsParameters> 
     private DependResult getDependResultForItem(ConditionDependentItem item, Map<Long, TaskInstance> taskInstanceMap) {
         TaskInstance taskInstance = taskInstanceMap.get(item.getDepTaskCode());
         if (taskInstance == null) {
-            // Dependent task not found – likely misconfigured task code
-            log.error("Dependent task definition missing, depTaskCode: {}", item.getDepTaskCode());
+            log.error("Dependent task is not found or skipped in current workflow, depTaskCode: {}",
+                    item.getDepTaskCode());
             throw new RuntimeException(String.format(
-                    "Dependency validation failed: task code %d not found in current workflow. Check dependency config: %s",
+                    "Dependency validation failed: task %d not found or skipped in current workflow. Check dependency config: %s",
                     item.getDepTaskCode(), item));
         }
 
