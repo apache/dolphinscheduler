@@ -269,9 +269,15 @@ public class LogUtils {
             }
         }
 
-        // Apply skip and limit
+        // Apply skip and limit with overflow protection
         int startIndex = Math.min(skipLine, allLines.size());
-        int endIndex = Math.min(startIndex + limit, allLines.size());
+        // Prevent integer overflow when calculating end index
+        int endIndex;
+        if (limit > allLines.size() - startIndex) {
+            endIndex = allLines.size();
+        } else {
+            endIndex = startIndex + limit;
+        }
 
         return allLines.subList(startIndex, endIndex);
     }
