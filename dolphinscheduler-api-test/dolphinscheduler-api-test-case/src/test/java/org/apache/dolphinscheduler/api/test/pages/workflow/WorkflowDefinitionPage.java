@@ -38,16 +38,6 @@ public class WorkflowDefinitionPage {
 
     private String sessionId;
 
-    public CloseableHttpResponse importWorkflowDefinition(User loginUser, long projectCode, File file) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("loginUser", loginUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.SESSION_ID_KEY, sessionId);
-        RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/workflow-definition/import", projectCode);
-        return requestClient.postWithFile(url, headers, params, file);
-    }
-
     public HttpResponse queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
