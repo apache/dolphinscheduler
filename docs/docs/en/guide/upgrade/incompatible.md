@@ -39,4 +39,5 @@ This document records the incompatible updates between each version. You need to
 * Remove the default value of `python-gateway.auth-token` at `api-server/application.yaml`. ([#17801])(https://github.com/apache/dolphinscheduler/pull/17801)
 * Refactor the task plugins which use ShellCommandExecutor ([#17790])(https://github.com/apache/dolphinscheduler/pull/17790)
 * Remove the `Pytorch` from the `Task Plugin` ([#17808])(https://github.com/apache/dolphinscheduler/pull/17808), if you are still using this task type, please delete the data with `task_type = 'PYTORCH'` in `t_ds_task_definition` and `t_ds_task_definition_log` before upgrading.
+* Remove import and export of workflow definition. ([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
 
