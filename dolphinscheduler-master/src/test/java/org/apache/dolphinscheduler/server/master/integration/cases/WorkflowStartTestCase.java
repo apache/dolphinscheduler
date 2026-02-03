@@ -1515,6 +1515,26 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test workflow fails fast when condition task depends on a non-existent task (invalid depTaskCode)")
+    void testStartWorkflow_with_oneConditionTaskWithDependentOnNonexistentTask() {
+        final String yaml = "/it/start/workflow_with_one_condition_task_with_dependent_on_nonexistent_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+
+        Assertions
+                .assertThatThrownBy(() -> workflowOperator.manualTriggerWorkflow(workflowTriggerDTO))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Dependency validation failed")
+                .hasMessageContaining("task code 999 not found in current workflow");
+
+    }
+
+    @Test
     @DisplayName("Test start a workflow with one condition task(B) which is forbidden when one fake predecessor task(A) run failed")
     void testStartWorkflow_with_oneForbiddenConditionTaskWithOneFakePredecessor_runFailed() {
         final String yaml =
