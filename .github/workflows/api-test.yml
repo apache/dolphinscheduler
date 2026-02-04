@@ -103,6 +103,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.WorkerGroupAPITest
           - name: ProjectAPITest
             class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
+          - name: WorkflowDefinitionAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.WorkflowDefinitionAPITest
           - name: SchedulerAPITest
             class: org.apache.dolphinscheduler.api.test.cases.SchedulerAPITest
           - name: ExecutorAPITest

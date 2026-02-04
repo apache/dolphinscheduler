@@ -31,9 +31,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,6 +70,8 @@ public class GrpcTaskAPITest {
 
     private static List<Integer> workflowInstanceIds;
 
+    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
+
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
@@ -106,10 +105,9 @@ public class GrpcTaskAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcFailedWorkflow.json").getFile());
-            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
-                    .importWorkflowDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
-            Assertions.assertTrue(data.contains("\"success\":true"));
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
             // get workflow definition code
             HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
@@ -155,10 +153,9 @@ public class GrpcTaskAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcSuccessWorkflow.json").getFile());
-            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
-                    .importWorkflowDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
-            Assertions.assertTrue(data.contains("\"success\":true"));
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
             // get workflow definition code
             HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
