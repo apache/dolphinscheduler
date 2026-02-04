@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.cases;
+package org.apache.dolphinscheduler.api.test.cases.tasks;
 
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
@@ -70,8 +71,6 @@ public class GrpcTaskAPITest {
 
     private static List<Integer> workflowInstanceIds;
 
-    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
-
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
@@ -93,8 +92,10 @@ public class GrpcTaskAPITest {
     }
 
     @Test
+    @Order(1)
     public void testGrpcFailedWorkflowInstance() {
         try {
+            String workflowDefinitionName = "test_failed" + System.currentTimeMillis();
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
@@ -141,8 +142,10 @@ public class GrpcTaskAPITest {
     }
 
     @Test
+    @Order(10)
     public void testGrpcSuccessWorkflowInstance() {
         try {
+            String workflowDefinitionName = "test_success" + System.currentTimeMillis();
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
