@@ -169,6 +169,8 @@ const DetailModal = defineComponent({
       showPrivateKey,
       showNamespace,
       showKubeConfig,
+      showDriverJarName,
+      driverJarOptions,
       modeOptions,
       redShiftModeOptions,
       sagemakerModeOption,
@@ -716,6 +718,19 @@ const DetailModal = defineComponent({
                     type='text'
                     maxlength={60}
                     placeholder={t('datasource.compatible_mode_tips')}
+                  />
+                </NFormItem>
+                {/* 驱动包选择 */}
+                <NFormItem
+                  v-show={showDriverJarName}
+                  label={t('datasource.driver_jar_name')}
+                  path='driverJarName'
+                >
+                  <NSelect
+                    v-model={[detailForm.driverJarName, 'value']}
+                    options={driverJarOptions}
+                    placeholder={t('datasource.driver_jar_name_tips')}
+                    clearable
                   />
                 </NFormItem>
                 <NFormItem

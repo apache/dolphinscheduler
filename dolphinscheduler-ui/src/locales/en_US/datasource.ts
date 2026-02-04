@@ -105,5 +105,7 @@ export default {
   region_id: 'Region Id',
   region_id_tips: 'Please enter Region Id',
   endpoint: 'Endpoint',
-  endpoint_tips: 'Please enter endpoint'
+  endpoint_tips: 'Please enter endpoint',
+  driver_jar_name: 'Driver Jar',
+  driver_jar_name_tips: 'Please select driver jar'
 }

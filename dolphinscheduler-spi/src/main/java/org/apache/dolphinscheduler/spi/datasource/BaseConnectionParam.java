@@ -46,6 +46,8 @@ public abstract class BaseConnectionParam implements ConnectionParam {
 
     protected String compatibleMode;
 
+    protected String driverJarName;
+
     protected Map<String, String> other;
 
 }

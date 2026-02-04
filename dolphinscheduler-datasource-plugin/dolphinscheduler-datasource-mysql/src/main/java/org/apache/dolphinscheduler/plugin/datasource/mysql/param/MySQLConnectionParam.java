@@ -31,6 +31,7 @@ public class MySQLConnectionParam extends BaseConnectionParam {
                 + ", jdbcUrl='" + jdbcUrl + '\''
                 + ", driverLocation='" + driverLocation + '\''
                 + ", driverClassName='" + driverClassName + '\''
+                + ", driverJarName='" + driverJarName + '\''
                 + ", validationQuery='" + validationQuery + '\''
                 + ", other='" + other + '\''
                 + '}';

@@ -148,6 +148,13 @@ public interface DataSourceService {
     List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName);
 
     /**
+     * query driver jar list by type
+     * @param type data source type
+     * @return driver jar name list
+     */
+    List<String> queryDriverJarList(Integer type);
+
+    /**
      * get databases
      * @param datasourceId
      * @return

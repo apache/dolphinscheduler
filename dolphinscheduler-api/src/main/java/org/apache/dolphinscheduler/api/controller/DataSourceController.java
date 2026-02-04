@@ -378,4 +378,43 @@ public class DataSourceController extends BaseController {
         List<ParamsOptions> options = dataSourceService.getDatabases(datasourceId);
         return Result.success(options);
     }
+
+    /**
+     * query driver jar list by type
+     *
+     * @param type data source type
+     * @return driver jar list
+     */
+    @Operation(summary = "queryDriverJarList", description = "QUERY_DRIVER_JAR_LIST_NOTES")
+    @Parameters({
+            @Parameter(name = "type", description = "DATA_SOURCE_TYPE", required = true, schema = @Schema(implementation = String.class, example = "MYSQL"))
+    })
+    @GetMapping(value = "/driver-jars")
+    @ResponseStatus(HttpStatus.OK)
+    public Result<Object> queryDriverJarList(@RequestParam("type") String type) {
+        // Convert string type to integer type
+        Integer typeValue = convertDbTypeToInt(type);
+        List<String> driverJarList = dataSourceService.queryDriverJarList(typeValue);
+        return Result.success(driverJarList);
+    }
+
+    /**
+     * Convert database type string to integer value
+     * @param dbType database type string
+     * @return integer value of database type
+     */
+    private Integer convertDbTypeToInt(String dbType) {
+        switch (dbType.toUpperCase()) {
+            case "MYSQL":
+                return 0;
+            case "POSTGRESQL":
+                return 1;
+            case "HIVE":
+                return 2;
+            case "SPARK":
+                return 3;
+            default:
+                return -1; // Unknown type
+        }
+    }
 }

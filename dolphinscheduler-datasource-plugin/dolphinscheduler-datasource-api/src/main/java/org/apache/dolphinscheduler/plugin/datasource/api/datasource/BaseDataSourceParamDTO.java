@@ -45,7 +45,17 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected String password;
 
+    protected String driverJarName;
+
     protected Map<String, String> other;
+
+    public String getDriverJarName() {
+        return driverJarName;
+    }
+
+    public void setDriverJarName(String driverJarName) {
+        this.driverJarName = driverJarName;
+    }
 
     public Integer getId() {
         return id;

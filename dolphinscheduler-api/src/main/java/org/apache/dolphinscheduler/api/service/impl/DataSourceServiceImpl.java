@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -571,6 +572,53 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return options;
     }
 
+    @Override
+    public List<String> queryDriverJarList(Integer type) {
+        List<String> driverJarList = new ArrayList<>();
+
+        // 根据类型获取数据源名称
+        String dataSourceType = getDataSourceTypeName(type);
+        if (dataSourceType == null) {
+            return driverJarList;
+        }
+
+        // 构建插件路径
+        String driverBasePath = "plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
+        File driverDir = new File(driverBasePath);
+
+        if (!driverDir.exists() || !driverDir.isDirectory()) {
+            return driverJarList;
+        }
+
+        // 查找目录中的所有jar文件
+        File[] jarFiles = driverDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".jar"));
+        if (jarFiles != null) {
+            for (File jarFile : jarFiles) {
+                driverJarList.add(jarFile.getName());
+            }
+        }
+
+        return driverJarList;
+    }
+
+    /**
+     * 根据类型获取数据源名称
+     */
+    private String getDataSourceTypeName(Integer type) {
+        switch (type) {
+            case 0:
+                return "mysql";
+            case 1:
+                return "postgresql";
+            case 2:
+                return "hive";
+            case 3:
+                return "spark";
+            default:
+                return null;
+        }
+    }
+
     private List<ParamsOptions> getParamsOptions(List<String> columnList) {
         List<ParamsOptions> options = null;
         if (CollectionUtils.isNotEmpty(columnList)) {
@@ -625,7 +673,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
         }
     }
-
     private static void closeResult(ResultSet rs) {
         if (rs != null) {
             try {

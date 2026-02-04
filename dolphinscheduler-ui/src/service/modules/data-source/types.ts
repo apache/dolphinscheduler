@@ -101,6 +101,7 @@ interface IDataSource {
   accessKeySecret?: string
   regionId?: string
   endpoint?: string
+  driverJarName?: string
 }
 
 interface ListReq {

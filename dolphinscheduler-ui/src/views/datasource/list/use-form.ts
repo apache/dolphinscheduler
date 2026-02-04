@@ -17,7 +17,7 @@
 
 import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getKerberosStartupState } from '@/service/modules/data-source'
+import { getKerberosStartupState, queryDriverJarList } from '@/service/modules/data-source'
 import type { FormRules } from 'naive-ui'
 import type {
   IDataSourceDetail,
@@ -51,7 +51,8 @@ export function useForm(id?: number) {
     endpoint: '',
     MSIClientId: '',
     dbUser: '',
-    datawarehouse: ''
+    datawarehouse: '',
+    driverJarName: ''
   } as IDataSourceDetail
 
   const state = reactive({
@@ -75,6 +76,8 @@ export function useForm(id?: number) {
     showAccessKeySecret: false,
     showRegionId: false,
     showEndpoint: false,
+    showDriverJarName: false,
+    driverJarOptions: [] as any[],
     rules: {
       name: {
         trigger: ['input'],
@@ -249,6 +252,28 @@ export function useForm(id?: number) {
   const changeType = async (type: IDataBase, options: IDataBaseOption) => {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
+
+    // 设置是否显示驱动包选择框（仅对支持驱动版本配置的数据源类型显示）
+    state.showDriverJarName = ['MYSQL', 'POSTGRESQL', 'HIVE', 'SPARK'].includes(type)
+    
+    // 如果支持驱动包选择，则获取驱动包列表
+    if (state.showDriverJarName) {
+      try {
+        const response = await queryDriverJarList(type)
+        if (response.data && response.data.data) {
+          state.driverJarOptions = response.data.data.map((item: any) => ({
+            label: item.driverJarName,
+            value: item.driverJarName
+          }))
+        }
+      } catch (error) {
+        console.error('Failed to fetch driver jar list:', error)
+        state.driverJarOptions = []
+      }
+    } else {
+      state.driverJarOptions = []
+      state.detailForm.driverJarName = ''
+    }
 
     state.requiredDataBase =
       type !== 'POSTGRESQL' && type !== 'ATHENA' && type !== 'DOLPHINDB'

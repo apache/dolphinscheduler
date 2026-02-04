@@ -167,3 +167,13 @@ export function getDatasourceTableColumnsById(
     }
   })
 }
+
+export function queryDriverJarList(type: string): any {
+  return axios({
+    url: '/datasources/driver-jars',
+    method: 'get',
+    params: {
+      type
+    }
+  })
+}

@@ -102,5 +102,7 @@ export default {
   region_id: 'Region Id',
   region_id_tips: '请输入Region Id',
   endpoint: 'endpoint',
-  endpoint_tips: '请输入endpoint'
+  endpoint_tips: '请输入endpoint',
+  driver_jar_name: '驱动包',
+  driver_jar_name_tips: '请选择驱动包'
 }
