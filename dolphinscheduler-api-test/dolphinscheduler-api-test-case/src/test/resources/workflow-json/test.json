@@ -11,7 +11,7 @@
       "name": "test1",
       "taskParams": {
         "localParams": [],
-        "rawScript": "hello world",
+        "rawScript": "echo 'hello world'",
         "resourceList": []
       },
       "taskPriority": "MEDIUM",
