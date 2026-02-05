@@ -98,23 +98,29 @@ export default defineComponent({
       },
       globalParams: {
         validator() {
-          const props = new Set()
+          const globalParams = formValue.value.globalParams || []
 
-          const keys = formValue.value.globalParams.map((item) => item.key)
-          const keysSet = new Set(keys)
-          if (keysSet.size !== keys.length) {
-            return new Error(t('project.dag.prop_repeat'))
+          if (!globalParams || globalParams.length === 0) return true
+
+          const keys = globalParams.map((item) => item.key)
+          const uniqueKeys = new Set(keys)
+          if (uniqueKeys.size !== keys.length) {
+            return new Error(t('project.dag.prop_key_repeat'))
           }
 
-          for (const param of formValue.value.globalParams) {
-            const prop = param.value
-            const direct = param.direct
-            if (direct === 'IN' && !prop) {
-              return new Error(t('project.dag.prop_empty'))
+          for (const param of globalParams) {
+            if (!param.key || param.key.trim() === '') {
+              return new Error(t('project.dag.prop_key_empty'))
             }
 
-            props.add(prop)
+            if (
+              param.direct === 'IN' &&
+              (!param.value || param.value.trim() === '')
+            ) {
+              return new Error(t('project.dag.prop_value_empty'))
+            }
           }
+          return true
         }
       }
     }
