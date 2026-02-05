@@ -321,7 +321,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     mybatis-plus-extension 3.5.2: https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-extension/3.5.2, Apache 2.0
     mybatis-spring 2.0.7: https://mvnrepository.com/artifact/org.mybatis/mybatis-spring/2.0.7, Apache 2.0
     netty 3.10.6.Final: https://github.com/netty/netty, Apache 2.0
-    netty 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
+    netty 4.1.100.Final: https://github.com/netty/netty/blob/netty-4.1.100.Final/LICENSE.txt, Apache 2.0
     nimbus-jose-jwt 9.8.1: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.8.1, Apache 2.0
     okhttp 4.12.0: https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/4.12.0, Apache 2.0
     quartz 2.3.2: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz/2.3.2, Apache 2.0
@@ -458,7 +458,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     netty-codec-http 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http/4.1.53.Final, Apache 2.0
     netty-codec-http2 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http2/4.1.53.Final, Apache 2.0
     netty-nio-client 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/netty-nio-client/2.17.282, Apache 2.0
-    netty-transport-classes-epoll 4.1.91.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-classes-epoll/4.1.91.Final, Apache 2.0
+    netty-transport-classes-epoll 4.1.100.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-classes-epoll/4.1.100.Final, Apache 2.0
     profiles 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/profiles/2.17.282, Apache 2.0
     protocol-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/protocol-core/2.17.282, Apache 2.0
     regions 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/regions/2.17.282, Apache 2.0
@@ -473,7 +473,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     netty-handler-proxy 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-handler-proxy/4.1.53.Final, Apache 2.0
     netty-resolver-dns 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-resolver-dns/4.1.53.Final, Apache 2.0
     netty-resolver-dns-native-macos 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-resolver-dns-native-macos/4.1.53.Final, Apache 2.0
-    netty-tcnative-boringssl-static 2.0.59.Final: https://mvnrepository.com/artifact/io.netty/netty-tcnative-boringssl-static/2.0.59.Final, Apache 2.0
+    netty-tcnative-boringssl-static 2.0.61.Final: https://mvnrepository.com/artifact/io.netty/netty-tcnative-boringssl-static/2.0.61.Final, Apache 2.0
     netty-transport-native-epoll 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll/4.1.53.Final, Apache 2.0
     netty-transport-native-kqueue 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-transport-native-kqueue/4.1.53.Final, Apache 2.0
     oauth2-oidc-sdk 9.35: https://mvnrepository.com/artifact/com.nimbusds/oauth2-oidc-sdk/9.35, Apache 2.0
