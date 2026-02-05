@@ -80,10 +80,11 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
      * Initialize the workflow execution graph using the assembler.
      * This method should be called when the workflow is ready to start execution,
      * typically during the handling of WorkflowStartLifecycleEvent.
-     *
-     * @throws IllegalStateException if the execution graph is already initialized
-     *         or no assembler is available
+     * <p>
+     * If the execution graph is already initialized or no assembler is available,
+     * this method returns without making any changes.
      */
+    @Override
     public void initializeWorkflowExecutionGraph() {
         if (workflowExecutionGraph != null) {
             return;
@@ -101,6 +102,7 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
     /**
      * Check if the workflow execution graph has been initialized.
      */
+    @Override
     public boolean isWorkflowExecutionGraphInitialized() {
         return workflowExecutionGraph != null;
     }

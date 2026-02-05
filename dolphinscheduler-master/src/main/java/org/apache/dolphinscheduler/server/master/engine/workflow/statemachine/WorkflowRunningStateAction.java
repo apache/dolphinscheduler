@@ -49,7 +49,15 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
 
         // Initialize the workflow execution graph if not already initialized
         // This is deferred from command handling to reduce transaction time
-        workflowExecutionRunnable.getWorkflowExecuteContext().initializeWorkflowExecutionGraph();
+        try {
+            workflowExecutionRunnable.getWorkflowExecuteContext().initializeWorkflowExecutionGraph();
+        } catch (Exception e) {
+            log.error("Failed to initialize workflow execution graph", e);
+            final WorkflowEventBus workflowEventBus =
+                    workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowEventBus();
+            workflowEventBus.publish(WorkflowFailedLifecycleEvent.of(workflowExecutionRunnable));
+            return;
+        }
 
         final IWorkflowExecutionGraph workflowExecutionGraph =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
