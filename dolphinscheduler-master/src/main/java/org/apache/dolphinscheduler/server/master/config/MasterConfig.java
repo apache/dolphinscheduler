@@ -74,6 +74,8 @@ public class MasterConfig implements Validator {
      */
     private String masterRegistryPath;
 
+    private TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+
     @Override
     public boolean supports(Class<?> clazz) {
         return MasterConfig.class.isAssignableFrom(clazz);
@@ -97,6 +99,18 @@ public class MasterConfig implements Validator {
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
             errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }
+
+        TaskDispatchPolicy dispatchPolicy = masterConfig.getTaskDispatchPolicy();
+        if (dispatchPolicy.isDispatchTimeoutEnabled()) {
+            if (dispatchPolicy.getMaxTaskDispatchDuration() == null) {
+                errors.rejectValue("dispatch-timeout-checker.max-task-dispatch-duration", null,
+                        "must be specified when dispatch timeout checker is enabled");
+            } else if (dispatchPolicy.getMaxTaskDispatchDuration().toMillis() <= 0) {
+                errors.rejectValue("dispatch-timeout-checker.max-task-dispatch-duration", null,
+                        "must be a positive duration (e.g., '10m', '30m', '1h')");
+            }
+        }
+
         if (StringUtils.isEmpty(masterConfig.getMasterAddress())) {
             masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         }
@@ -122,6 +136,7 @@ public class MasterConfig implements Validator {
                         "\n  command-fetch-strategy: " + commandFetchStrategy +
                         "\n  worker-load-balancer-configuration-properties: "
                         + workerLoadBalancerConfigurationProperties +
+                        "\n  taskDispatchPolicy: " + taskDispatchPolicy +
                         "\n****************************Master Configuration**************************************";
         log.info(config);
     }

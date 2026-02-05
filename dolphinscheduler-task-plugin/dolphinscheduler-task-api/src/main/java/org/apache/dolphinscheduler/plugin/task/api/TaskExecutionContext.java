@@ -126,6 +126,8 @@ public class TaskExecutionContext implements Serializable {
 
     private boolean failover;
 
+    private final long firstDispatchTime = System.currentTimeMillis();
+
     public int increaseDispatchFailTimes() {
         return ++dispatchFailTimes;
     }
