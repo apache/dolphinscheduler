@@ -23,12 +23,20 @@ import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.druid.util.StringUtils;
 
 @Slf4j
 @Component
@@ -39,6 +47,11 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
 
     @Override
     public TriggerWorkflowDTO transform(WorkflowTriggerRequest workflowTriggerRequest) {
+        List<Property> startParamList =
+                PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList());
+
+        validateStartParamList(startParamList);
+
         TriggerWorkflowDTO triggerWorkflowDTO = TriggerWorkflowDTO.builder()
                 .loginUser(workflowTriggerRequest.getLoginUser())
                 .startNodes(WorkflowUtils.parseStartNodeList(workflowTriggerRequest.getStartNodes()))
@@ -51,8 +64,7 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
                 .workerGroup(workflowTriggerRequest.getWorkerGroup())
                 .tenantCode(workflowTriggerRequest.getTenantCode())
                 .environmentCode(workflowTriggerRequest.getEnvironmentCode())
-                .startParamList(
-                        PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList()))
+                .startParamList(startParamList)
                 .dryRun(workflowTriggerRequest.getDryRun())
                 .build();
 
@@ -63,5 +75,31 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
 
         triggerWorkflowDTO.setWorkflowDefinition(workflowDefinition);
         return triggerWorkflowDTO;
+    }
+
+    private void validateStartParamList(List<Property> startParamList) {
+        if (startParamList == null || startParamList.isEmpty()) {
+            return;
+        }
+
+        Set<String> keys = new HashSet<>();
+        for (Property param : startParamList) {
+            // null key
+            if (StringUtils.isEmpty(param.getProp())) {
+                throw new ServiceException("Parameter key cannot be empty");
+            }
+
+            String key = param.getProp().trim();
+            // duplicate keys
+            if (keys.contains(key)) {
+                throw new ServiceException("Duplicate parameter key: " + key);
+            }
+            keys.add(key);
+
+            // IN-type params require a non-empty value
+            if (Direct.IN.equals(param.getDirect()) && StringUtils.isEmpty(param.getValue())) {
+                throw new ServiceException("IN parameter value cannot be empty for key: " + key);
+            }
+        }
     }
 }
