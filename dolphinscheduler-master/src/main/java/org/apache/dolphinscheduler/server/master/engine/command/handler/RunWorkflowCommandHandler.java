@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
@@ -81,36 +82,44 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
     }
 
     @Override
-    protected void assembleWorkflowExecutionGraph(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+    protected IWorkflowExecutionGraphAssembler createWorkflowExecutionGraphAssembler(
+                                                                                     final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        // Capture the context needed for deferred graph assembly
         final IWorkflowGraph workflowGraph = workflowExecuteContextBuilder.getWorkflowGraph();
-        final WorkflowExecutionGraph workflowExecutionGraph = new WorkflowExecutionGraph();
-        final BiConsumer<String, Set<String>> taskExecutionRunnableCreator = (task, successors) -> {
-            final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder =
-                    TaskExecutionRunnableBuilder
-                            .builder()
-                            .workflowExecutionGraph(workflowExecutionGraph)
-                            .workflowDefinition(workflowExecuteContextBuilder.getWorkflowDefinition())
-                            .project(workflowExecuteContextBuilder.getProject())
-                            .workflowInstance(workflowExecuteContextBuilder.getWorkflowInstance())
-                            .taskDefinition(workflowGraph.getTaskNodeByName(task))
-                            .workflowEventBus(workflowExecuteContextBuilder.getWorkflowEventBus())
-                            .applicationContext(applicationContext)
+        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
+        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
+        final List<String> startNodes = parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder);
+
+        return () -> {
+            final WorkflowExecutionGraph workflowExecutionGraph = new WorkflowExecutionGraph();
+            final BiConsumer<String, Set<String>> taskExecutionRunnableCreator = (task, successors) -> {
+                final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder =
+                        TaskExecutionRunnableBuilder
+                                .builder()
+                                .workflowExecutionGraph(workflowExecutionGraph)
+                                .workflowDefinition(workflowDefinition)
+                                .project(workflowExecuteContextBuilder.getProject())
+                                .workflowInstance(workflowInstance)
+                                .taskDefinition(workflowGraph.getTaskNodeByName(task))
+                                .workflowEventBus(workflowExecuteContextBuilder.getWorkflowEventBus())
+                                .applicationContext(applicationContext)
+                                .build();
+                workflowExecutionGraph.addNode(new TaskExecutionRunnable(taskExecutionRunnableBuilder));
+                workflowExecutionGraph.addEdge(task, successors);
+            };
+
+            final WorkflowGraphTopologyLogicalVisitor workflowGraphTopologyLogicalVisitor =
+                    WorkflowGraphTopologyLogicalVisitor.builder()
+                            .taskDependType(workflowInstance.getTaskDependType())
+                            .onWorkflowGraph(workflowGraph)
+                            .fromTask(startNodes)
+                            .doVisitFunction(taskExecutionRunnableCreator)
                             .build();
-            workflowExecutionGraph.addNode(new TaskExecutionRunnable(taskExecutionRunnableBuilder));
-            workflowExecutionGraph.addEdge(task, successors);
+            workflowGraphTopologyLogicalVisitor.visit();
+            workflowExecutionGraph.removeUnReachableEdge();
+
+            return workflowExecutionGraph;
         };
-
-        final WorkflowGraphTopologyLogicalVisitor workflowGraphTopologyLogicalVisitor =
-                WorkflowGraphTopologyLogicalVisitor.builder()
-                        .taskDependType(workflowExecuteContextBuilder.getWorkflowInstance().getTaskDependType())
-                        .onWorkflowGraph(workflowGraph)
-                        .fromTask(parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder))
-                        .doVisitFunction(taskExecutionRunnableCreator)
-                        .build();
-        workflowGraphTopologyLogicalVisitor.visit();
-        workflowExecutionGraph.removeUnReachableEdge();
-
-        workflowExecuteContextBuilder.setWorkflowExecutionGraph(workflowExecutionGraph);
     }
 
     /**

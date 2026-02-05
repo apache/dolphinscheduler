@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 
@@ -30,13 +31,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
     private final Command command;
@@ -49,11 +48,62 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
     private final IWorkflowGraph workflowGraph;
 
-    private final IWorkflowExecutionGraph workflowExecutionGraph;
+    private volatile IWorkflowExecutionGraph workflowExecutionGraph;
+
+    private final IWorkflowExecutionGraphAssembler workflowExecutionGraphAssembler;
 
     private final WorkflowEventBus workflowEventBus;
 
     private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
+
+    public WorkflowExecuteContext(Command command,
+                                  WorkflowDefinition workflowDefinition,
+                                  Project project,
+                                  WorkflowInstance workflowInstance,
+                                  IWorkflowGraph workflowGraph,
+                                  IWorkflowExecutionGraph workflowExecutionGraph,
+                                  IWorkflowExecutionGraphAssembler workflowExecutionGraphAssembler,
+                                  WorkflowEventBus workflowEventBus,
+                                  List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners) {
+        this.command = command;
+        this.workflowDefinition = workflowDefinition;
+        this.project = project;
+        this.workflowInstance = workflowInstance;
+        this.workflowGraph = workflowGraph;
+        this.workflowExecutionGraph = workflowExecutionGraph;
+        this.workflowExecutionGraphAssembler = workflowExecutionGraphAssembler;
+        this.workflowEventBus = workflowEventBus;
+        this.workflowInstanceLifecycleListeners = workflowInstanceLifecycleListeners;
+    }
+
+    /**
+     * Initialize the workflow execution graph using the assembler.
+     * This method should be called when the workflow is ready to start execution,
+     * typically during the handling of WorkflowStartLifecycleEvent.
+     *
+     * @throws IllegalStateException if the execution graph is already initialized
+     *         or no assembler is available
+     */
+    public void initializeWorkflowExecutionGraph() {
+        if (workflowExecutionGraph != null) {
+            return;
+        }
+        if (workflowExecutionGraphAssembler == null) {
+            return;
+        }
+        synchronized (this) {
+            if (workflowExecutionGraph == null) {
+                workflowExecutionGraph = workflowExecutionGraphAssembler.assemble();
+            }
+        }
+    }
+
+    /**
+     * Check if the workflow execution graph has been initialized.
+     */
+    public boolean isWorkflowExecutionGraphInitialized() {
+        return workflowExecutionGraph != null;
+    }
 
     public static WorkflowExecuteContextBuilder builder() {
         return new WorkflowExecuteContextBuilder();
@@ -72,6 +122,8 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
         private IWorkflowGraph workflowGraph;
 
         private IWorkflowExecutionGraph workflowExecutionGraph;
+
+        private IWorkflowExecutionGraphAssembler workflowExecutionGraphAssembler;
 
         private WorkflowEventBus workflowEventBus;
 
@@ -92,6 +144,7 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
                     workflowInstance,
                     workflowGraph,
                     workflowExecutionGraph,
+                    workflowExecutionGraphAssembler,
                     workflowEventBus,
                     Optional.ofNullable(workflowInstanceLifecycleListeners).orElse(Collections.emptyList()));
         }

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import java.util.Date;
@@ -79,20 +80,20 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
 
-    /**
-     * Generate the workflow execution graph.
-     * <p> Will clear the history task instance and assembly the start tasks into the WorkflowExecutionGraph.
-     */
     @Override
-    protected void assembleWorkflowExecutionGraph(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        markAllTaskInstanceInvalid(workflowExecuteContextBuilder);
-        super.assembleWorkflowExecutionGraph(workflowExecuteContextBuilder);
-    }
-
-    private void markAllTaskInstanceInvalid(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+    protected IWorkflowExecutionGraphAssembler createWorkflowExecutionGraphAssembler(
+                                                                                     final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        // Capture parent assembler
+        final IWorkflowExecutionGraphAssembler parentAssembler =
+                super.createWorkflowExecutionGraphAssembler(workflowExecuteContextBuilder);
         final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
-        final List<TaskInstance> taskInstances = getValidTaskInstance(workflowInstance);
-        taskInstanceDao.markTaskInstanceInvalid(taskInstances);
+
+        return () -> {
+            // Mark all task instances as invalid before creating the new graph
+            final List<TaskInstance> taskInstances = getValidTaskInstance(workflowInstance);
+            taskInstanceDao.markTaskInstanceInvalid(taskInstances);
+            return parentAssembler.assemble();
+        };
     }
 
     @Override

@@ -46,8 +46,18 @@ public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
     public void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                              final WorkflowStartLifecycleEvent workflowStartEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
+
+        // Initialize the workflow execution graph if not already initialized
+        // This is deferred from command handling to reduce transaction time
+        workflowExecutionRunnable.getWorkflowExecuteContext().initializeWorkflowExecutionGraph();
+
         final IWorkflowExecutionGraph workflowExecutionGraph =
                 workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph();
+        if (workflowExecutionGraph == null) {
+            log.info("Workflow execution graph is null, try to emit workflow finished event");
+            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+            return;
+        }
         final List<ITaskExecutionRunnable> startNodes = workflowExecutionGraph.getStartNodes();
         if (startNodes.isEmpty()) {
             log.info("Workflow start node is empty, try to emit workflow finished event");

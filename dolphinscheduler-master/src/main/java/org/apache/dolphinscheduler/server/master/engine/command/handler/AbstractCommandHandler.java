@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphFactory;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
@@ -80,7 +81,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         assembleWorkflowInstance(workflowExecuteContextBuilder);
         assembleWorkflowInstanceLifecycleListeners(workflowExecuteContextBuilder);
         assembleWorkflowEventBus(workflowExecuteContextBuilder);
-        assembleWorkflowExecutionGraph(workflowExecuteContextBuilder);
+        assembleWorkflowExecutionGraphAssembler(workflowExecuteContextBuilder);
 
         final WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder = WorkflowExecutionRunnableBuilder
                 .builder()
@@ -125,8 +126,31 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
     protected abstract void assembleWorkflowInstance(
                                                      final WorkflowExecuteContextBuilder workflowExecuteContextBuilder);
 
-    protected abstract void assembleWorkflowExecutionGraph(
-                                                           final WorkflowExecuteContextBuilder workflowExecuteContextBuilder);
+    /**
+     * Assemble the workflow execution graph assembler.
+     * <p>
+     * The assembler is used to defer the initialization of the WorkflowExecutionGraph
+     * until the WorkflowStartLifecycleEvent is fired. This reduces transaction time
+     * during command processing.
+     */
+    protected void assembleWorkflowExecutionGraphAssembler(
+                                                           final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        final IWorkflowExecutionGraphAssembler assembler = createWorkflowExecutionGraphAssembler(
+                workflowExecuteContextBuilder);
+        workflowExecuteContextBuilder.setWorkflowExecutionGraphAssembler(assembler);
+    }
+
+    /**
+     * Create the workflow execution graph assembler.
+     * <p>
+     * Subclasses should implement this method to provide the logic for building
+     * the WorkflowExecutionGraph. The returned assembler will be invoked when
+     * the WorkflowStartLifecycleEvent is fired.
+     *
+     * @return the assembler for creating the WorkflowExecutionGraph, or null if no graph is needed
+     */
+    protected abstract IWorkflowExecutionGraphAssembler createWorkflowExecutionGraphAssembler(
+                                                                                              final WorkflowExecuteContextBuilder workflowExecuteContextBuilder);
 
     protected List<String> parseStartNodesFromWorkflowInstance(
                                                                final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
@@ -158,5 +182,4 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         checkArgument(project != null, "Cannot find the project code: " + workflowDefinition.getProjectCode());
         workflowExecuteContextBuilder.setProject(project);
     }
-
 }

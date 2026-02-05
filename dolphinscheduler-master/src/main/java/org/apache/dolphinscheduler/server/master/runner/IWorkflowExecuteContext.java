@@ -43,4 +43,16 @@ public interface IWorkflowExecuteContext {
 
     List<IWorkflowLifecycleListener> getWorkflowInstanceLifecycleListeners();
 
+    /**
+     * Initialize the workflow execution graph.
+     * This method should be called when the workflow is ready to start execution,
+     * typically during the handling of WorkflowStartLifecycleEvent.
+     */
+    void initializeWorkflowExecutionGraph();
+
+    /**
+     * Check if the workflow execution graph has been initialized.
+     */
+    boolean isWorkflowExecutionGraphInitialized();
+
 }
