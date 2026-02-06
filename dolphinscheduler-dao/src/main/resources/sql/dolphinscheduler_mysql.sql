@@ -1049,6 +1049,7 @@ CREATE TABLE `t_ds_worker_group` (
 -- ----------------------------
 -- Records of t_ds_worker_group
 -- ----------------------------
+INSERT INTO `t_ds_worker_group` (name, addr_list, create_time, update_time, description) VALUES ('default', NULL, current_timestamp, current_timestamp, 'default worker group');
 
 -- ----------------------------
 -- Table structure for t_ds_version
