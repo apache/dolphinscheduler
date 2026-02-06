@@ -25,7 +25,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKFLOW_DEFIN
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKFLOW_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_WORKFLOW_DEFINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_WORKFLOW_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINITION_ALL_VARIABLES_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINITION_LIST;
@@ -52,8 +51,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,10 +63,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -654,32 +649,6 @@ public class WorkflowDefinitionController extends BaseController {
     }
 
     /**
-     * batch export workflow definition by codes
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param codes       workflow definition codes
-     * @param response    response
-     */
-    @Operation(summary = "batchExportByCodes", description = "BATCH_EXPORT_WORKFLOW_DEFINITION_BY_CODES_NOTES")
-    @Parameters({
-            @Parameter(name = "codes", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = String.class))
-    })
-    @PostMapping(value = "/batch-export")
-    @ResponseBody
-    @OperatorLog(auditType = AuditType.WORKFLOW_EXPORT)
-    public void batchExportWorkflowDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                     @RequestParam("codes") String codes,
-                                                     HttpServletResponse response) {
-        try {
-            workflowDefinitionService.batchExportWorkflowDefinitionByCodes(loginUser, projectCode, codes, response);
-        } catch (Exception e) {
-            log.error(Status.BATCH_EXPORT_WORKFLOW_DEFINE_BY_IDS_ERROR.getMsg(), e);
-        }
-    }
-
-    /**
      * query all workflow definition by project code
      *
      * @param loginUser   login user
@@ -694,33 +663,6 @@ public class WorkflowDefinitionController extends BaseController {
                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result =
                 workflowDefinitionService.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
-        return returnDataList(result);
-    }
-
-    /**
-     * import workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param file        resource file
-     * @return import result code
-     */
-    @Operation(summary = "importWorkflowDefinition", description = "IMPORT_WORKFLOW_DEFINITION_NOTES")
-    @Parameters({
-            @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))
-    })
-    @PostMapping(value = "/import")
-    @ApiException(IMPORT_WORKFLOW_DEFINE_ERROR)
-    @OperatorLog(auditType = AuditType.WORKFLOW_IMPORT)
-    public Result importWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam("file") MultipartFile file) {
-        Map<String, Object> result;
-        if ("application/zip".equals(file.getContentType())) {
-            result = workflowDefinitionService.importSqlWorkflowDefinition(loginUser, projectCode, file);
-        } else {
-            result = workflowDefinitionService.importWorkflowDefinition(loginUser, projectCode, file);
-        }
         return returnDataList(result);
     }
 
