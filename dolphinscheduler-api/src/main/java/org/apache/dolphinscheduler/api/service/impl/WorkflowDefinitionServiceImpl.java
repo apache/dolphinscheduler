@@ -109,6 +109,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -291,6 +292,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     definition.getName(), definition.getCode());
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
         }
+
+        try {
+            validateGlobalParams(globalParams);
+        } catch (ServiceException ex) {
+            log.warn("Invalid globalParams: {}", ex.getMessage());
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, ex.getMessage());
+            return result;
+        }
+
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
@@ -811,6 +821,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
+
+        try {
+            validateGlobalParams(globalParams);
+        } catch (ServiceException ex) {
+            log.warn("Invalid globalParams: {}", ex.getMessage());
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, ex.getMessage());
+            return result;
+        }
+
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
@@ -845,6 +864,42 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         result = updateDagDefine(loginUser, taskRelationList, workflowDefinition, workflowDefinitionDeepCopy,
                 taskDefinitionLogs);
         return result;
+    }
+
+    /**
+     * Validates global parameters: non-empty keys, no duplicates, and required values for IN-type params.
+     */
+    private void validateGlobalParams(String globalParams) {
+        if (StringUtils.isBlank(globalParams)) {
+            return;
+        }
+
+        List<Property> params;
+        try {
+            params = JSONUtils.toList(globalParams, Property.class);
+        } catch (Exception e) {
+            throw new ServiceException("Invalid globalParams");
+        }
+
+        if (params == null || params.isEmpty()) {
+            return;
+        }
+
+        Set<String> keys = new HashSet<>();
+        for (Property p : params) {
+            if (StringUtils.isEmpty(p.getProp())) {
+                throw new ServiceException("Global param key cannot be empty");
+            }
+
+            String key = p.getProp().trim();
+            if (!keys.add(key)) {
+                throw new ServiceException("Duplicate global param key: " + key);
+            }
+
+            if (Direct.IN.equals(p.getDirect()) && StringUtils.isEmpty(p.getValue())) {
+                throw new ServiceException("IN param value required for key: " + key);
+            }
+        }
     }
 
     /**
