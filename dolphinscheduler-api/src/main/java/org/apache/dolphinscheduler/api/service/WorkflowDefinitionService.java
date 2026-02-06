@@ -31,10 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.multipart.MultipartFile;
-
 public interface WorkflowDefinitionService {
 
     /**
@@ -244,43 +240,6 @@ public interface WorkflowDefinitionService {
                                                              String codes);
 
     void deleteWorkflowDefinitionByCode(User loginUser, long workflowDefinitionCode);
-
-    /**
-     * batch export workflow definition by codes
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param codes       workflow definition codes
-     * @param response    http servlet response
-     */
-    void batchExportWorkflowDefinitionByCodes(User loginUser,
-                                              long projectCode,
-                                              String codes,
-                                              HttpServletResponse response);
-
-    /**
-     * import workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param file        workflow metadata json file
-     * @return import workflow
-     */
-    Map<String, Object> importWorkflowDefinition(User loginUser,
-                                                 long projectCode,
-                                                 MultipartFile file);
-
-    /**
-     * import sql workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param file        sql file, zip
-     * @return import workflow
-     */
-    Map<String, Object> importSqlWorkflowDefinition(User loginUser,
-                                                    long projectCode,
-                                                    MultipartFile file);
 
     /**
      * check the workflow task relation json
