@@ -249,7 +249,7 @@ export default defineComponent({
              * @see https://github.com/apache/dolphinscheduler/issues/17948
              */}
             {showSkeleton ? (
-              <NSkeleton height="400px" repeat={skeletonRepeat} sharp={false} />
+              <NSkeleton height='400px' repeat={skeletonRepeat} sharp={false} />
             ) : (
               <NDataTable
                 loading={false}
