@@ -28,12 +28,6 @@ import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
-import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,11 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,9 +53,6 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
     @Autowired
     private MasterConfig masterConfig;
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     /**
      * Will generate a new workflow instance based on the command.
      */
@@ -79,47 +67,6 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
         workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
         workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
-    }
-
-    @Override
-    protected IWorkflowExecutionGraphAssembler createWorkflowExecutionGraphAssembler(
-                                                                                     final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        // Capture the context needed for deferred graph assembly
-        final IWorkflowGraph workflowGraph = workflowExecuteContextBuilder.getWorkflowGraph();
-        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
-        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
-        final List<String> startNodes = parseStartNodesFromWorkflowInstance(workflowExecuteContextBuilder);
-
-        return () -> {
-            final WorkflowExecutionGraph workflowExecutionGraph = new WorkflowExecutionGraph();
-            final BiConsumer<String, Set<String>> taskExecutionRunnableCreator = (task, successors) -> {
-                final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder =
-                        TaskExecutionRunnableBuilder
-                                .builder()
-                                .workflowExecutionGraph(workflowExecutionGraph)
-                                .workflowDefinition(workflowDefinition)
-                                .project(workflowExecuteContextBuilder.getProject())
-                                .workflowInstance(workflowInstance)
-                                .taskDefinition(workflowGraph.getTaskNodeByName(task))
-                                .workflowEventBus(workflowExecuteContextBuilder.getWorkflowEventBus())
-                                .applicationContext(applicationContext)
-                                .build();
-                workflowExecutionGraph.addNode(new TaskExecutionRunnable(taskExecutionRunnableBuilder));
-                workflowExecutionGraph.addEdge(task, successors);
-            };
-
-            final WorkflowGraphTopologyLogicalVisitor workflowGraphTopologyLogicalVisitor =
-                    WorkflowGraphTopologyLogicalVisitor.builder()
-                            .taskDependType(workflowInstance.getTaskDependType())
-                            .onWorkflowGraph(workflowGraph)
-                            .fromTask(startNodes)
-                            .doVisitFunction(taskExecutionRunnableCreator)
-                            .build();
-            workflowGraphTopologyLogicalVisitor.visit();
-            workflowExecutionGraph.removeUnReachableEdge();
-
-            return workflowExecutionGraph;
-        };
     }
 
     /**

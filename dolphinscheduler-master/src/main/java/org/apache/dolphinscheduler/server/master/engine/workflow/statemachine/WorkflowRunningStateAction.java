@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.statemachine;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
+import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraphFactory;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
@@ -36,21 +37,28 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class WorkflowRunningStateAction extends AbstractWorkflowStateAction {
 
+    @Autowired
+    private WorkflowExecutionGraphFactory workflowExecutionGraphFactory;
+
     @Override
     public void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
                              final WorkflowStartLifecycleEvent workflowStartEvent) {
         throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
 
-        // Initialize the workflow execution graph if not already initialized
+        // Initialize the workflow execution graph using the factory
         // This is deferred from command handling to reduce transaction time
         try {
-            workflowExecutionRunnable.getWorkflowExecuteContext().initializeWorkflowExecutionGraph();
+            final IWorkflowExecutionGraph workflowExecutionGraph =
+                    workflowExecutionGraphFactory.createWorkflowExecutionGraph(
+                            workflowExecutionRunnable.getWorkflowExecuteContext());
+            workflowExecutionRunnable.getWorkflowExecuteContext().setWorkflowExecutionGraph(workflowExecutionGraph);
         } catch (Exception e) {
             log.error("Failed to initialize workflow execution graph", e);
             final WorkflowEventBus workflowEventBus =

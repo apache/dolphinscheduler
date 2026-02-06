@@ -20,16 +20,12 @@ package org.apache.dolphinscheduler.server.master.engine.command.handler;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,9 +38,6 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
 
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
-
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
 
     @Autowired
     private MasterConfig masterConfig;
@@ -78,22 +71,6 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
-    }
-
-    @Override
-    protected IWorkflowExecutionGraphAssembler createWorkflowExecutionGraphAssembler(
-                                                                                     final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        // Capture parent assembler
-        final IWorkflowExecutionGraphAssembler parentAssembler =
-                super.createWorkflowExecutionGraphAssembler(workflowExecuteContextBuilder);
-        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
-
-        return () -> {
-            // Mark all task instances as invalid before creating the new graph
-            final List<TaskInstance> taskInstances = getValidTaskInstance(workflowInstance);
-            taskInstanceDao.markTaskInstanceInvalid(taskInstances);
-            return parentAssembler.assemble();
-        };
     }
 
     @Override

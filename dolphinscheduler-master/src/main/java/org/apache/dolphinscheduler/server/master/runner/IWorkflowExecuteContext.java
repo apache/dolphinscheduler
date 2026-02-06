@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
@@ -35,6 +36,8 @@ public interface IWorkflowExecuteContext {
 
     WorkflowInstance getWorkflowInstance();
 
+    Project getProject();
+
     IWorkflowGraph getWorkflowGraph();
 
     IWorkflowExecutionGraph getWorkflowExecutionGraph();
@@ -44,11 +47,13 @@ public interface IWorkflowExecuteContext {
     List<IWorkflowLifecycleListener> getWorkflowInstanceLifecycleListeners();
 
     /**
-     * Initialize the workflow execution graph.
+     * Set the workflow execution graph.
      * This method should be called when the workflow is ready to start execution,
      * typically during the handling of WorkflowStartLifecycleEvent.
+     *
+     * @param workflowExecutionGraph the workflow execution graph to set
      */
-    void initializeWorkflowExecutionGraph();
+    void setWorkflowExecutionGraph(IWorkflowExecutionGraph workflowExecutionGraph);
 
     /**
      * Check if the workflow execution graph has been initialized.

@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraphAssembler;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +47,6 @@ public class RecoverSerialWaitCommandHandler extends AbstractCommandHandler {
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstanceDao.updateById(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
-    }
-
-    @Override
-    protected IWorkflowExecutionGraphAssembler createWorkflowExecutionGraphAssembler(
-                                                                                     WorkflowExecuteContext.WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
-        // No execution graph needed for serial wait recovery
-        return null;
     }
 
     @Override
