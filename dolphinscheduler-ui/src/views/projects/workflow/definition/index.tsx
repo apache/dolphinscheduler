@@ -38,7 +38,6 @@ import { useTable } from './use-table'
 import { useRouter, useRoute } from 'vue-router'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
-import ImportModal from './components/import-modal'
 import StartModal from './components/start-modal'
 import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
@@ -62,7 +61,6 @@ export default defineComponent({
       createColumns,
       getTableData,
       batchDeleteWorkflow,
-      batchExportWorkflow,
       batchCopyWorkflow
     } = useTable()
 
@@ -137,7 +135,6 @@ export default defineComponent({
       createDefinitionDynamic,
       handleChangePageSize,
       batchDeleteWorkflow,
-      batchExportWorkflow,
       batchCopyWorkflow,
       handleCopyUpdateList,
       ...toRefs(variables),
@@ -197,14 +194,6 @@ export default defineComponent({
                   {t('project.workflow.create_workflow_dynamic')}
                 </NButton>
               )}
-              <NButton
-                strong
-                secondary
-                size='small'
-                onClick={() => (this.showRef = true)}
-              >
-                {t('project.workflow.import_workflow')}
-              </NButton>
             </NSpace>
             <NSpace>
               <Search
@@ -289,23 +278,6 @@ export default defineComponent({
                 </NTooltip>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.batch_export'),
-                    trigger: () => (
-                      <NButton
-                        tag='div'
-                        size='small'
-                        type='primary'
-                        disabled={this.checkedRowKeys.length <= 0}
-                        onClick={this.batchExportWorkflow}
-                        class='btn-delete-all'
-                      >
-                        {t('project.workflow.batch_export')}
-                      </NButton>
-                    )
-                  }}
-                </NTooltip>
-                <NTooltip>
-                  {{
                     default: () => t('project.workflow.batch_copy'),
                     trigger: () => (
                       <NButton
@@ -336,10 +308,6 @@ export default defineComponent({
             </NSpace>
           </NSpace>
         </Card>
-        <ImportModal
-          v-model:show={this.showRef}
-          onUpdateList={this.handleUpdateList}
-        />
         <StartModal
           v-model:row={this.row}
           v-model:show={this.startShowRef}
