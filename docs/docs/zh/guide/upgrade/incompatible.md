@@ -44,3 +44,7 @@
 * 重构使用 ShellCommandExecutor 的任务插件 ([#17790])(https://github.com/apache/dolphinscheduler/pull/17790)
 * 从 `任务插件` 中移除 `Pytorch` 类型 ([#17808])(https://github.com/apache/dolphinscheduler/pull/17808)，如果您仍在使用该任务类型，请在升级前删除 `t_ds_task_definition` 和 `t_ds_task_definition_log` 中 `task_type = 'PYTORCH'` 的数据。
 
+## 3.4.1
+
+* 移除导入导出工作流([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
+
