@@ -1,58 +1,14 @@
-[ {
-  "workflowDefinition": {
-    "id": 1,
-    "code": 152040369702560,
-    "name": "grpcSuccessWorkflow",
-    "version": 1,
-    "releaseState": "OFFLINE",
-    "projectCode": 152040056703648,
-    "description": "",
-    "globalParams": "[]",
-    "globalParamList": [],
-    "globalParamMap": {},
-    "createTime": "2025-09-15 12:35:23",
-    "updateTime": "2025-09-15 12:35:23",
-    "flag": "YES",
-    "userId": 1,
-    "userName": null,
-    "projectName": null,
-    "locations": "[{\"taskCode\":152040321402528,\"x\":369,\"y\":264}]",
-    "scheduleReleaseState": null,
-    "schedule": null,
-    "timeout": 0,
-    "modifyBy": null,
-    "warningGroupId": null,
-    "executionType": "PARALLEL"
-  },
-  "workflowTaskRelationList": [
+{
+  "taskDefinitionJson": [
     {
-      "id": 1,
-      "name": "",
-      "workflowDefinitionVersion": 1,
-      "projectCode": 152040056703648,
-      "workflowDefinitionCode": 152040369702560,
-      "preTaskCode": 0,
-      "preTaskVersion": 0,
-      "postTaskCode": 152040321402528,
-      "postTaskVersion": 1,
-      "conditionType": "NONE",
-      "conditionParams": {},
-      "createTime": "2025-09-15 12:35:23",
-      "updateTime": "2025-09-15 12:35:23",
-      "operator": 1,
-      "operateTime": "2025-09-15 12:35:23"
-    }
-  ],
-  "taskDefinitionList": [
-    {
-      "id": 1,
       "code": 152040321402528,
-      "name": "grpc_example",
-      "version": 1,
+      "delayTime": "0",
       "description": "",
-      "projectCode": 152040056703648,
-      "userId": 1,
-      "taskType": "GRPC",
+      "environmentCode": -1,
+      "failRetryInterval": "1",
+      "failRetryTimes": "0",
+      "flag": "YES",
+      "name": "grpc_example",
       "taskParams": {
         "localParams": [],
         "resourceList": [],
@@ -66,31 +22,31 @@
         "grpcConnectTimeoutMs": 60000,
         "socketTimeout": 60000
       },
-      "taskParamList": [],
-      "taskParamMap": null,
-      "flag": "YES",
       "taskPriority": "MEDIUM",
-      "userName": null,
-      "projectName": null,
-      "workerGroup": "default",
-      "environmentCode": -1,
-      "failRetryTimes": 0,
-      "failRetryInterval": 1,
-      "timeoutFlag": "CLOSE",
-      "timeoutNotifyStrategy": null,
+      "taskType": "GRPC",
       "timeout": 0,
-      "delayTime": 0,
-      "resourceIds": null,
-      "createTime": "2025-09-15 12:35:23",
-      "updateTime": "2025-09-15 12:35:23",
-      "modifyBy": null,
-      "taskGroupId": 0,
-      "taskGroupPriority": 0,
+      "timeoutFlag": "CLOSE",
+      "timeoutNotifyStrategy": "",
+      "workerGroup": "default",
       "cpuQuota": -1,
       "memoryMax": -1,
-      "taskExecuteType": "BATCH",
-      "operator": 1,
-      "operateTime": "2025-09-15 12:35:23"
+      "taskExecuteType": "BATCH"
     }
-  ]
-} ]
+  ],
+  "taskRelationJson": [
+    {
+      "name": "",
+      "preTaskCode": 0,
+      "preTaskVersion": 0,
+      "postTaskCode": 152040321402528,
+      "postTaskVersion": 1,
+      "conditionType": "NONE",
+      "conditionParams": {}
+    }
+  ],
+  "name": "grpcSuccessWorkflow",
+  "executionType": "PARALLEL",
+  "description": "",
+  "globalParams": [],
+  "timeout": 0
+}

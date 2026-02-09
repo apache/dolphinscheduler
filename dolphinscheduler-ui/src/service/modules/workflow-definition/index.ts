@@ -73,15 +73,6 @@ export function batchDeleteByCodes(data: CodesReq, code: number): any {
   })
 }
 
-export function batchExportByCodes(data: CodesReq, code: number): any {
-  return axios({
-    url: `/projects/${code}/workflow-definition/batch-export`,
-    method: 'post',
-    responseType: 'blob',
-    data
-  })
-}
-
 export function batchMoveByCodes(
   data: TargetCodeReq & CodesReq,
   code: CodeReq
@@ -101,14 +92,6 @@ export function getTaskListByDefinitionCodes(
     url: `/projects/${code}/workflow-definition/batch-query-tasks`,
     method: 'get',
     params
-  })
-}
-
-export function importWorkflowDefinition(data: FormData, code: number): any {
-  return axios({
-    url: `/projects/${code}/workflow-definition/import`,
-    method: 'post',
-    data
   })
 }
 
