@@ -15,28 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository.impl;
+package org.apache.dolphinscheduler.api.validator;
 
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
-import lombok.NonNull;
+import org.springframework.stereotype.Component;
 
-import org.springframework.stereotype.Repository;
+/**
+ * This validator is used to validate whether the tenant exists.
+ * <p> If the tenant does not exist, an {@link IllegalArgumentException} will be thrown. </p>
+ */
+@Slf4j
+@Component
+public class TenantExistValidator implements IValidator<String> {
 
-@Repository
-public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements TenantDao {
+    private final TenantDao tenantDao;
 
-    public TenantDaoImpl(@NonNull TenantMapper tenantMapper) {
-        super(tenantMapper);
+    public TenantExistValidator(TenantDao tenantDao) {
+        this.tenantDao = tenantDao;
     }
 
     @Override
-    public Optional<Tenant> queryByCode(String tenantCode) {
-        return Optional.ofNullable(mybatisMapper.queryByTenantCode(tenantCode));
+    public void validate(String tenantCode) {
+        if (!tenantDao.queryByCode(tenantCode).isPresent()) {
+            throw new IllegalArgumentException(String.format("Tenant: [%s] not exists", tenantCode));
+        }
     }
 }
