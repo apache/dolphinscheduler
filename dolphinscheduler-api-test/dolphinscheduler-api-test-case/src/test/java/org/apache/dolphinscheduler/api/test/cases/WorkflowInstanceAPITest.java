@@ -35,9 +35,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -83,6 +80,10 @@ public class WorkflowInstanceAPITest {
 
     private static int workflowInstanceId;
 
+    private static String projectName = "project-test" + System.currentTimeMillis();
+
+    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
+
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
@@ -109,7 +110,7 @@ public class WorkflowInstanceAPITest {
     public void testQueryWorkflowInstancesByWorkflowInstanceId() {
         try {
             // create test project
-            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
+            HttpResponse createProjectResponse = projectPage.createProject(loginUser, projectName);
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
             assertTrue(queryAllProjectListResponse.getBody().getSuccess());
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
@@ -118,10 +119,9 @@ public class WorkflowInstanceAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
-                    .importWorkflowDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
-            assertTrue(data.contains("\"success\":true"));
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
             // get workflow definition code
             HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
@@ -176,7 +176,7 @@ public class WorkflowInstanceAPITest {
         HttpResponse queryWorkflowInstanceListResponse =
                 workflowInstancePage.queryWorkflowInstanceList(loginUser, projectCode, 1, 10);
         assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
-        assertTrue(queryWorkflowInstanceListResponse.getBody().getData().toString().contains("test_import"));
+        assertTrue(queryWorkflowInstanceListResponse.getBody().getData().toString().contains(workflowDefinitionName));
     }
 
     @Test
@@ -185,7 +185,8 @@ public class WorkflowInstanceAPITest {
         HttpResponse queryTaskListByWorkflowInstanceIdResponse =
                 workflowInstancePage.queryTaskListByWorkflowInstanceId(loginUser, projectCode, workflowInstanceId);
         assertTrue(queryTaskListByWorkflowInstanceIdResponse.getBody().getSuccess());
-        assertTrue(queryTaskListByWorkflowInstanceIdResponse.getBody().getData().toString().contains("test_import"));
+        assertTrue(queryTaskListByWorkflowInstanceIdResponse.getBody().getData().toString()
+                .contains(workflowDefinitionName));
     }
 
     @Test
@@ -194,7 +195,7 @@ public class WorkflowInstanceAPITest {
         HttpResponse queryWorkflowInstanceByIdResponse =
                 workflowInstancePage.queryWorkflowInstanceById(loginUser, projectCode, workflowInstanceId);
         assertTrue(queryWorkflowInstanceByIdResponse.getBody().getSuccess());
-        assertTrue(queryWorkflowInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
+        assertTrue(queryWorkflowInstanceByIdResponse.getBody().getData().toString().contains(workflowDefinitionName));
     }
 
     @Test
@@ -208,7 +209,8 @@ public class WorkflowInstanceAPITest {
                 workflowInstancePage.queryWorkflowInstanceList(loginUser, projectCode, 1, 10);
         assertTrue(queryWorkflowInstanceListResponse.getBody().getSuccess());
         Assertions
-                .assertFalse(queryWorkflowInstanceListResponse.getBody().getData().toString().contains("test_import"));
+                .assertFalse(queryWorkflowInstanceListResponse.getBody().getData().toString()
+                        .contains(workflowDefinitionName));
     }
 
 }
