@@ -17,8 +17,6 @@
 
 import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useForm } from './use-form'
-import { useModal } from './use-modal'
 import { useTable } from './use-table'
 import { NDataTable, NPagination, NSpace } from 'naive-ui'
 import Modal from '@/components/modal'
@@ -45,8 +43,6 @@ export default defineComponent({
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
     const { variables, createColumns, getTableData } = useTable(ctx)
-    const { importState } = useForm()
-    const { handleImportDefinition } = useModal(importState, ctx)
 
     const requestData = () => {
       if (props.show && props.row?.code) {
@@ -56,15 +52,6 @@ export default defineComponent({
 
     const hideModal = () => {
       ctx.emit('update:show')
-    }
-
-    const handleImport = () => {
-      handleImportDefinition()
-    }
-
-    const customRequest = ({ file }: any) => {
-      importState.importForm.name = file.name
-      importState.importForm.file = file.file
     }
 
     watch(
@@ -81,8 +68,6 @@ export default defineComponent({
 
     return {
       hideModal,
-      handleImport,
-      customRequest,
       requestData,
       ...toRefs(variables)
     }

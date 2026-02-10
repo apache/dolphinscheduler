@@ -188,6 +188,3 @@ Description of workflow operating parameters:
 - View the Schedule Timing：After the scheduled time goes online, you can check the current timing situation through the "Timing" button<img src="../../../../img/timing.png" width="35"/>. But it cannot be modified, as shown in the below figure.
   ![workflow-time04](../../../../img/new_ui/dev/project/workflow-time04.png)
 
-## Import Workflow
-
-Click `Project Management -> Workflow -> Workflow Definition` to enter the workflow definition page, click the `Import Workflow` button to import the local workflow file, the workflow definition list displays the imported workflow and the status is offline.

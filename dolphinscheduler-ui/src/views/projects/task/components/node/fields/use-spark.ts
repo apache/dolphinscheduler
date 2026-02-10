@@ -37,10 +37,6 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
 
-  const masterSpan = computed(() =>
-    model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
-  )
-
   const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
 
   const rawScriptSpan = computed(() =>
@@ -145,23 +141,14 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'master',
-      span: masterSpan,
+      span: 24,
       name: t('project.node.master'),
       props: {
         placeholder: t('project.node.master_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: false,
-        validator(validate: any, value: string) {
-          if (
-            model.programType !== 'PYTHON' &&
-            !value &&
-            model.programType !== 'SQL'
-          ) {
-            return new Error(t('project.node.master_tips'))
-          }
-        }
+        required: false
       }
     },
     useDeployMode(24, ref(true), showCluster),
