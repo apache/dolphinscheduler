@@ -144,33 +144,10 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-    // Extract reactive variables for efficient access and cleaner code
-    const { loadingRef, tableData, pageSize } = this
+    const { loadingRef } = this
 
-    /**
-     * Determine if skeleton placeholder should be displayed.
-     * Show skeleton when:
-     * - Data is being loaded (loadingRef === true)
-     * - AND no data exists yet (tableData is null/undefined or empty array)
-     *
-     * This covers scenarios:
-     * - Initial page load
-     * - Search/filter operations that return no results
-     * - Pagination changes when moving to empty pages
-     *
-     * Note: We use skeleton only when no data exists to avoid flickering.
-     * When data exists and is refreshing, we show the existing data (no loading overlay)
-     * to prevent triggering global loading indicators in other components.
-     */
-    const showSkeleton = loadingRef && (!tableData || tableData.length === 0)
-
-    /**
-     * Skeleton repeat count matches the current page size for visual consistency.
-     * This ensures the skeleton placeholder matches the expected number of table rows,
-     * providing a more accurate preview of the final content layout.
-     * Defaults to 10 if pageSize is not available.
-     */
-    const skeletonRepeat = pageSize || 10
+    const showSkeleton =
+      loadingRef && (!this.tableData || this.tableData.length === 0)
 
     return (
       <NSpace vertical>
@@ -212,39 +189,18 @@ export default defineComponent({
         </Card>
         <Card title={t('project.workflow.workflow_definition')}>
           <NSpace vertical>
-            {/**
-             * Conditional rendering: Skeleton placeholder vs Data table
-             *
-             * Implementation details:
-             * - Skeleton is shown during initial load or when no data exists during loading
-             * - Empty array fallback ensures table always receives valid data structure
-             * - Table loading prop is always false to prevent triggering global loading indicators
-             *
-             * Benefits:
-             * - Improved perceived performance (users see immediate feedback)
-             * - Better UX during slow network connections
-             * - Clear distinction between loading, empty, and error states
-             * - Follows modern web application UX patterns
-             * - Isolated loading state (doesn't affect other components like navbar or global loading indicators)
-             *
-             * Technical notes:
-             * - NSkeleton uses Naive UI component with animated shimmer effect
-             * - Height of 400px provides adequate space for multiple skeleton rows
-             * - sharp={false} creates rounded skeleton blocks for modern appearance
-             * - repeat prop dynamically matches page size for visual consistency
-             * - Table loading prop is explicitly set to false to prevent global loading indicators
-             *
-             * Related to issue #17948
-             * @see https://github.com/apache/dolphinscheduler/issues/17948
-             */}
             {showSkeleton ? (
-              <NSkeleton height='400px' repeat={skeletonRepeat} sharp={false} />
+              <NSkeleton
+                height='400px'
+                repeat={this.pageSize || 10}
+                sharp={false}
+              />
             ) : (
               <NDataTable
                 loading={false}
                 rowKey={(row: IDefinitionData) => row.code}
                 columns={this.columns}
-                data={tableData || []}
+                data={this.tableData}
                 striped
                 v-model:checked-row-keys={this.checkedRowKeys}
                 row-class-name='items'
