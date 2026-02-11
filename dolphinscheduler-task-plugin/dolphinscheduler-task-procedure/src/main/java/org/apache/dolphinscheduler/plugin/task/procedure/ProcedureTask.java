@@ -121,6 +121,8 @@ public class ProcedureTask extends AbstractTask {
                 // print the output parameters to the log
                 printOutParameter(tmpStatement, outParameterMap);
 
+                // set varPool
+                taskExecutionContext.setVarPool(procedureParameters.getVarPool());
                 setExitStatusCode(EXIT_CODE_SUCCESS);
             }
         } catch (Exception e) {
