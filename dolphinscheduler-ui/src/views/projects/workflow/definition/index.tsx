@@ -191,13 +191,13 @@ export default defineComponent({
           <NSpace vertical>
             {showSkeleton ? (
               <NSkeleton
-                height='400px'
-                repeat={this.pageSize || 10}
+                height='40px'
+                repeat={Math.min(this.pageSize || 10, 10)}
                 sharp={false}
               />
             ) : (
               <NDataTable
-                loading={false}
+                loading={loadingRef}
                 rowKey={(row: IDefinitionData) => row.code}
                 columns={this.columns}
                 data={this.tableData}
