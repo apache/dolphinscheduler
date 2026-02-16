@@ -30,18 +30,15 @@ import javax.management.timer.Timer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class DateUtilsTest {
 
-    @BeforeEach
-    public void before() {
-        ThreadLocalContext.removeTimezone();
-    }
+    private final TimeZone defaultTimeZone = TimeZone.getDefault();
 
     @AfterEach
-    public void after() {
+    public void rollbackTimeZone() {
+        TimeZone.setDefault(defaultTimeZone);
         ThreadLocalContext.removeTimezone();
     }
 
