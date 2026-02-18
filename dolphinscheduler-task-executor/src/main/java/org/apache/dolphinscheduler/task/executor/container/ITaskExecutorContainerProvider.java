@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.task.executor.container;
 
-public interface ITaskExecutorContainerProvider {
+public interface ITaskExecutorContainerProvider<T extends ITaskExecutorContainer> {
 
-    ITaskExecutorContainer getExecutorContainer();
+    T getExecutorContainer();
 
 }
