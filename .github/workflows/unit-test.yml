@@ -57,7 +57,7 @@ jobs:
     strategy:
       matrix:
         java: ['8', '11']
-    timeout-minutes: 120
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:

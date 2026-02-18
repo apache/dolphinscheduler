@@ -58,7 +58,6 @@ public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCas
     @Test
     @DisplayName("Test scheduling a workflow with one fake task(A) success")
     public void testSchedulingWorkflow_with_oneSuccessTask() {
-        log.info("TimeZone: {}", SystemConstants.DEFAULT_TIME_ZONE);
         final String yaml = "/it/scheduling/workflow_with_one_fake_task_success.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
