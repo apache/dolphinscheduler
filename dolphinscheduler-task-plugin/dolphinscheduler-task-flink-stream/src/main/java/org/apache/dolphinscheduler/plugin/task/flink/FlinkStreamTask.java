@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -28,6 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +52,25 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void init() {
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
+        // ==================== DS 变量替换（支持 ${system.biz.date}、自定义参数等） ====================
+        if (flinkParameters != null) {
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            if (paramsMap != null && !paramsMap.isEmpty()) {
+                Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
+
+                if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
+                    flinkParameters.setInitScript(
+                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams)
+                    );
+                }
+                if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
+                    flinkParameters.setRawScript(
+                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams)
+                    );
+                }
+            }
+        }
+        // =====================================================================
         log.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
@@ -112,3 +135,4 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         processBuilder.start();
     }
 }
+

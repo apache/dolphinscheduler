@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -24,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -57,6 +61,26 @@ public class FlinkTask extends AbstractYarnTask {
     public void init() {
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
+        // ==================== DS 变量替换（支持 ${system.biz.date}、自定义参数等） ====================
+        if (flinkParameters != null) {
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            if (paramsMap != null && !paramsMap.isEmpty()) {
+                Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
+
+                if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
+                    flinkParameters.setInitScript(
+                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams)
+                    );
+                }
+                if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
+                    flinkParameters.setRawScript(
+                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams)
+                    );
+                }
+            }
+        }
+        // =====================================================================
+
         log.info("Initialize flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
