@@ -52,25 +52,22 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void init() {
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
-        // ==================== DS 变量替换（支持 ${system.biz.date}、自定义参数等） ====================
+        // Replace parameter placeholders (e.g. ${system.biz.date}, $[yyyyMMdd]) in init script and main script
         if (flinkParameters != null) {
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-            if (paramsMap != null && !paramsMap.isEmpty()) {
-                Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
+            Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
 
-                if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
-                    flinkParameters.setInitScript(
-                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams)
-                    );
-                }
-                if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
-                    flinkParameters.setRawScript(
-                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams)
-                    );
-                }
+            if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
+                flinkParameters.setInitScript(
+                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams)
+                );
+            }
+            if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
+                flinkParameters.setRawScript(
+                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams)
+                );
             }
         }
-        // =====================================================================
         log.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
