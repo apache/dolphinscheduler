@@ -59,8 +59,6 @@ class FlinkStreamTaskTest {
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
         when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/flink-stream");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("stream-001");
 
         try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
             fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
@@ -92,8 +90,6 @@ class FlinkStreamTaskTest {
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
         when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/flink-stream");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("stream-002");
 
         try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
             fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);

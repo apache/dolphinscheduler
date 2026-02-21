@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -68,13 +69,11 @@ public class FlinkTask extends AbstractYarnTask {
 
             if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
                 flinkParameters.setInitScript(
-                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams)
-                );
+                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams));
             }
             if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
                 flinkParameters.setRawScript(
-                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams)
-                );
+                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams));
             }
         }
 

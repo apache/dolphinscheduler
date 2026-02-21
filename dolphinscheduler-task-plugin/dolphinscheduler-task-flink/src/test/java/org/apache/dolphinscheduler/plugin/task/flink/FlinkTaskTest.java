@@ -59,8 +59,6 @@ class FlinkTaskTest {
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
         when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/flink");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("task-001");
 
         try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
             fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
@@ -92,8 +90,6 @@ class FlinkTaskTest {
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
         when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/flink");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("task-002");
 
         try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
             fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
@@ -120,8 +116,6 @@ class FlinkTaskTest {
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
         when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
-        when(taskExecutionContext.getExecutePath()).thenReturn("/tmp/flink");
-        when(taskExecutionContext.getTaskAppId()).thenReturn("task-003");
 
         try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
             fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
@@ -133,9 +127,9 @@ class FlinkTaskTest {
             // Even with empty paramsMap, time placeholders $[yyyyMMdd] should still be replaced
             // (using current date/time)
             String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-            Assertions.assertTrue(flinkParams.getInitScript().contains(today) || 
+            Assertions.assertTrue(flinkParams.getInitScript().contains(today) ||
                     flinkParams.getInitScript().matches("SET dt = '\\d{8}';"));
-            Assertions.assertTrue(flinkParams.getRawScript().contains(today) || 
+            Assertions.assertTrue(flinkParams.getRawScript().contains(today) ||
                     flinkParams.getRawScript().matches("SELECT \\* FROM t WHERE dt = '\\d{8}'"));
         }
     }
