@@ -506,15 +506,27 @@ export function useTable() {
   const getTableData = (params: IDefinitionParam) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    const { state } = useAsyncState(
-      queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
+    // Always release loading lock, even when request fails.
+    const queryStatePromise = queryListPaging(
+      { ...params },
+      variables.projectCode
+    )
+      .then((res: any) => {
         variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+      })
+      .catch((err: Error) => {
+        window.$message.error(err?.message || 'Request failed')
+      })
+      .finally(() => {
         variables.loadingRef = false
-      }),
+      })
+
+    const { state } = useAsyncState(
+      queryStatePromise,
       { total: 0, table: [] }
     )
     return state
