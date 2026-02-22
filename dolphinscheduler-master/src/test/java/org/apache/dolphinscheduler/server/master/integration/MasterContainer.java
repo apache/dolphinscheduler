@@ -27,9 +27,9 @@ import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskExecut
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskExecutorRepository;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
-import org.apache.dolphinscheduler.task.executor.container.AbstractTaskExecutorContainer;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
+import org.apache.dolphinscheduler.task.executor.container.SharedThreadTaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.TaskExecutorAssignmentTable;
-import org.apache.dolphinscheduler.task.executor.worker.TaskExecutorWorkers;
 
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +57,9 @@ public class MasterContainer {
     @Autowired
     private LogicTaskExecutorLifecycleEventReporter logicTaskExecutorLifecycleEventReporter;
 
+    @Autowired
+    private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
+
     public void assertAllResourceReleased() {
         await()
                 .atMost(10, TimeUnit.SECONDS)
@@ -64,24 +67,49 @@ public class MasterContainer {
     }
 
     private void doAssertAllResourceReleased() {
+        assertWorkflowReleased();
+        assertWorkflowEventBusReleased();
+
+        assertSystemEventBusReleased();
+
+        assertLogicTaskEngineReleased();
+
+        assertWorkerGroupDispatcherReleased();
+    }
+
+    private void assertWorkflowReleased() {
         assertThat(workflowRepository.getAll()).isEmpty();
-
         assertThat(workflowEventBusFireWorkers.getWorkers())
-                .allMatch(workflowEventBusFireWorker -> workflowEventBusFireWorker
-                        .getRegisteredWorkflowExecuteRunnableSize() == 0);
-        assertThat(systemEventBus).matches(AbstractDelayEventBus::isEmpty);
+                .allMatch(worker -> worker.getRegisteredWorkflowExecuteRunnableSize() == 0);
+    }
 
+    private void assertWorkflowEventBusReleased() {
+        assertThat(workflowEventBusFireWorkers.getWorkers())
+                .allMatch(worker -> worker.getRegisteredWorkflowExecuteRunnableSize() == 0);
+    }
+
+    private void assertSystemEventBusReleased() {
+        assertThat(systemEventBus).matches(AbstractDelayEventBus::isEmpty);
+    }
+
+    private void assertLogicTaskEngineReleased() {
         assertThat(logicTaskExecutorRepository.getAll()).isEmpty();
 
-        final AbstractTaskExecutorContainer executorContainer =
-                (AbstractTaskExecutorContainer) logicTaskExecutorContainerProvider.getExecutorContainer();
+        final SharedThreadTaskExecutorContainer executorContainer =
+                logicTaskExecutorContainerProvider.getExecutorContainer();
         assertThat(executorContainer.getTaskExecutorAssignmentTable()).matches(TaskExecutorAssignmentTable::isEmpty);
 
-        final TaskExecutorWorkers taskExecutorWorkers = executorContainer.getTaskExecutorWorkers();
-        assertThat(taskExecutorWorkers.getWorkers())
+        assertThat(executorContainer.getTaskExecutorWorkers().getWorkers())
                 .allMatch(taskExecutorWorker -> taskExecutorWorker.getRegisteredTaskExecutorSize() == 0)
                 .allMatch(taskExecutorWorker -> taskExecutorWorker.getFiredTaskExecutorSize() == 0);
 
         assertThat(logicTaskExecutorLifecycleEventReporter.getEventChannels()).isEmpty();
     }
+
+    private void assertWorkerGroupDispatcherReleased() {
+        assertThat(workerGroupDispatcherCoordinator.workerGroupDispatchers().values())
+                .allMatch(dispatcher -> dispatcher.dispatchEventCount() == 0)
+                .allMatch(dispatcher -> dispatcher.waitingDispatchTaskCount() == 0);
+    }
+
 }
