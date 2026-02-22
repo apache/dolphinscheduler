@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.validator.workflow;
 
 import org.apache.dolphinscheduler.api.validator.IValidator;
+import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 
@@ -28,6 +29,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDTO> {
+
+    private final TenantExistValidator tenantExistValidator;
+
+    public TriggerWorkflowDTOValidator(TenantExistValidator tenantExistValidator) {
+        this.tenantExistValidator = tenantExistValidator;
+    }
 
     @Override
     public void validate(final TriggerWorkflowDTO triggerWorkflowDTO) {
@@ -40,5 +47,6 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
         if (triggerWorkflowDTO.getWorkflowDefinition().getReleaseState() != ReleaseState.ONLINE) {
             throw new IllegalStateException("The workflowDefinition should be online");
         }
+        tenantExistValidator.validate(triggerWorkflowDTO.getTenantCode());
     }
 }
