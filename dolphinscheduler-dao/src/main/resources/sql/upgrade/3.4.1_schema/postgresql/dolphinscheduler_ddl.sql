@@ -19,6 +19,3 @@ CREATE SEQUENCE IF NOT EXISTS t_ds_task_instance_context_id_seq;
 ALTER TABLE t_ds_task_instance_context
 ALTER COLUMN id SET DEFAULT nextval('t_ds_task_instance_context_id_seq'::regclass);
 
--- Change column type to BIGint
-ALTER TABLE t_ds_serial_command
-    ALTER COLUMN workflow_definition_code TYPE BIGINT;
