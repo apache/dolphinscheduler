@@ -525,10 +525,7 @@ export function useTable() {
         variables.loadingRef = false
       })
 
-    const { state } = useAsyncState(
-      queryStatePromise,
-      { total: 0, table: [] }
-    )
+    const { state } = useAsyncState(queryStatePromise, { total: 0, table: [] })
     return state
   }
 
