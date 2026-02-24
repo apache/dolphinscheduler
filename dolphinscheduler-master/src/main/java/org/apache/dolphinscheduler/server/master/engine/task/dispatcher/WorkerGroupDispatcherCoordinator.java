@@ -21,12 +21,15 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * WorkerGroupTaskDispatcherManager is responsible for managing the task dispatching for worker groups.
@@ -40,12 +43,12 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
     @Autowired
     private ITaskExecutorClient taskExecutorClient;
 
-    private final ConcurrentHashMap<String, WorkerGroupDispatcher> workerGroupDispatcherMap;
+    private final Map<String, WorkerGroupDispatcher> workerGroupDispatchers;
 
     private final MasterConfig masterConfig;
 
     public WorkerGroupDispatcherCoordinator(final MasterConfig masterConfig) {
-        workerGroupDispatcherMap = new ConcurrentHashMap<>();
+        workerGroupDispatchers = new ConcurrentHashMap<>();
         this.masterConfig = masterConfig;
     }
 
@@ -82,7 +85,12 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
     }
 
     public boolean existWorkerGroup(String workerGroup) {
-        return workerGroupDispatcherMap.containsKey(workerGroup);
+        return workerGroupDispatchers.containsKey(workerGroup);
+    }
+
+    @VisibleForTesting
+    public Map<String, WorkerGroupDispatcher> workerGroupDispatchers() {
+        return workerGroupDispatchers;
     }
 
     /**
@@ -91,7 +99,7 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
     @Override
     public void close() throws Exception {
         log.info("WorkerGroupDispatcherCoordinator closing");
-        for (WorkerGroupDispatcher workerGroupDispatcher : workerGroupDispatcherMap.values()) {
+        for (WorkerGroupDispatcher workerGroupDispatcher : workerGroupDispatchers.values()) {
             try {
                 workerGroupDispatcher.close();
             } catch (Exception e) {
@@ -102,7 +110,7 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
     }
 
     private WorkerGroupDispatcher getOrCreateWorkerGroupDispatcher(String workerGroup) {
-        return workerGroupDispatcherMap.computeIfAbsent(workerGroup, wg -> {
+        return workerGroupDispatchers.computeIfAbsent(workerGroup, wg -> {
             WorkerGroupDispatcher workerGroupDispatcher =
                     new WorkerGroupDispatcher(wg, taskExecutorClient, masterConfig.getTaskDispatchPolicy());
             workerGroupDispatcher.start();
