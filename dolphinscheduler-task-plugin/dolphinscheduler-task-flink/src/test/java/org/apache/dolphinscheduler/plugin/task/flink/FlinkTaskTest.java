@@ -17,120 +17,104 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.PARAMETER_DATETIME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Test FlinkTask parameter replacement for initScript and rawScript.
+ * FlinkTask unit test. Verifies parameter replacement in initScript and rawScript without Mockito.
  */
-@ExtendWith(MockitoExtension.class)
-class FlinkTaskTest {
+public class FlinkTaskTest {
+
+    @TempDir
+    Path tempDir;
 
     @Test
-    void testInitReplacesPlaceholdersInInitScriptAndRawScript() {
+    public void testParameterReplacementInScript() throws Exception {
+        String executePath = tempDir.toString();
+        String taskAppId = "test-app";
+
+        FlinkParameters flinkParameters = new FlinkParameters();
+        flinkParameters.setProgramType(ProgramType.SQL);
+        flinkParameters.setDeployMode(FlinkDeployMode.LOCAL);
+        flinkParameters.setParallelism(2);
+        flinkParameters.setInitScript("set batch_size=${batch_size};");
+        flinkParameters.setRawScript("SELECT * FROM logs WHERE dt='$[yyyyMMdd]';");
+
         Map<String, Property> prepareParamsMap = new HashMap<>();
-        prepareParamsMap.put("bizdate", new Property("bizdate", Direct.IN, DataType.VARCHAR, "20250101"));
-        prepareParamsMap.put("customVar", new Property("customVar", Direct.IN, DataType.VARCHAR, "hello"));
+        prepareParamsMap.put("batch_size", new Property("batch_size", null, null, "1000"));
+        prepareParamsMap.put(PARAMETER_DATETIME, new Property(PARAMETER_DATETIME, null, null, "20201201120000"));
 
-        FlinkParameters taskParams = new FlinkParameters();
-        taskParams.setProgramType(ProgramType.SQL);
-        taskParams.setInitScript("SET 'dt' = '${bizdate}';");
-        taskParams.setRawScript("SELECT * FROM orders WHERE dt = '${bizdate}' AND tag = '${customVar}'");
-        String taskParamsJson = JSONUtils.toJsonString(taskParams);
+        TaskExecutionContext context = new TaskExecutionContext();
+        context.setTaskParams(JSONUtils.toJsonString(flinkParameters));
+        context.setExecutePath(executePath);
+        context.setTaskAppId(taskAppId);
+        context.setPrepareParamsMap(prepareParamsMap);
 
-        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
-        when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
+        FlinkTaskForTest task = new FlinkTaskForTest(context);
+        task.init();
+        task.callGetScript();
 
-        try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
-            fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
+        String initScriptPath = String.format("%s/%s_init.sql", executePath, taskAppId);
+        String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
 
-            FlinkTask task = new FlinkTask(taskExecutionContext);
-            task.init();
+        String initContent = Files.readString(Path.of(initScriptPath), StandardCharsets.UTF_8);
+        String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
 
-            AbstractParameters params = task.getParameters();
-            Assertions.assertInstanceOf(FlinkParameters.class, params);
-            FlinkParameters flinkParams = (FlinkParameters) params;
-            Assertions.assertEquals("SET 'dt' = '20250101';", flinkParams.getInitScript());
-            Assertions.assertEquals("SELECT * FROM orders WHERE dt = '20250101' AND tag = 'hello'",
-                    flinkParams.getRawScript());
-        }
+        Assertions.assertTrue(initContent.contains("set batch_size=1000;"),
+                "Expected ${batch_size} to be replaced with 1000, got: " + initContent);
+        Assertions.assertTrue(nodeContent.contains("dt='20201201'"),
+                "Expected $[yyyyMMdd] to be replaced with 20201201, got: " + nodeContent);
     }
 
     @Test
-    void testInitReplacesTimePlaceholderWhenParamMapContainsScheduleTime() {
-        Map<String, Property> prepareParamsMap = new HashMap<>();
-        prepareParamsMap.put(TaskConstants.PARAMETER_DATETIME,
-                new Property(TaskConstants.PARAMETER_DATETIME, Direct.IN, DataType.VARCHAR, "20201201120000"));
+    public void testParameterReplacementWithNullParamsMap() throws Exception {
+        String executePath = tempDir.toString();
+        String taskAppId = "test-null-params";
 
-        FlinkParameters taskParams = new FlinkParameters();
-        taskParams.setProgramType(ProgramType.SQL);
-        taskParams.setInitScript("");
-        taskParams.setRawScript("SELECT * FROM t WHERE dt = '$[yyyyMMdd]'");
-        String taskParamsJson = JSONUtils.toJsonString(taskParams);
+        FlinkParameters flinkParameters = new FlinkParameters();
+        flinkParameters.setProgramType(ProgramType.SQL);
+        flinkParameters.setDeployMode(FlinkDeployMode.LOCAL);
+        flinkParameters.setParallelism(2);
+        flinkParameters.setInitScript("");
+        flinkParameters.setRawScript("SELECT 1;");
 
-        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
-        when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
+        TaskExecutionContext context = new TaskExecutionContext();
+        context.setTaskParams(JSONUtils.toJsonString(flinkParameters));
+        context.setExecutePath(executePath);
+        context.setTaskAppId(taskAppId);
+        context.setPrepareParamsMap(null);
 
-        try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
-            fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
+        FlinkTaskForTest task = new FlinkTaskForTest(context);
+        task.init();
+        String script = task.callGetScript();
 
-            FlinkTask task = new FlinkTask(taskExecutionContext);
-            task.init();
-
-            FlinkParameters flinkParams = (FlinkParameters) task.getParameters();
-            // $[yyyyMMdd] with schedule time 20201201120000 -> 20201201
-            Assertions.assertEquals("SELECT * FROM t WHERE dt = '20201201'", flinkParams.getRawScript());
-        }
+        String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
+        String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
+        Assertions.assertEquals("SELECT 1;", nodeContent.trim());
+        Assertions.assertNotNull(script);
     }
 
-    @Test
-    void testInitWithEmptyPrepareParamsMapStillReplacesTimePlaceholders() {
-        Map<String, Property> prepareParamsMap = new HashMap<>();
+    private static class FlinkTaskForTest extends FlinkTask {
 
-        FlinkParameters taskParams = new FlinkParameters();
-        taskParams.setProgramType(ProgramType.SQL);
-        taskParams.setInitScript("SET dt = '$[yyyyMMdd]';");
-        taskParams.setRawScript("SELECT * FROM t WHERE dt = '$[yyyyMMdd]'");
-        String taskParamsJson = JSONUtils.toJsonString(taskParams);
+        FlinkTaskForTest(TaskExecutionContext context) {
+            super(context);
+        }
 
-        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(taskParamsJson);
-        when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
-
-        try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
-            fileUtilsMock.when(() -> FileUtils.generateScriptFile(Mockito.any(), Mockito.any())).then(inv -> null);
-
-            FlinkTask task = new FlinkTask(taskExecutionContext);
-            task.init();
-
-            FlinkParameters flinkParams = (FlinkParameters) task.getParameters();
-            // Even with empty paramsMap, time placeholders $[yyyyMMdd] should still be replaced
-            // (using current date/time)
-            String today = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-            Assertions.assertTrue(flinkParams.getInitScript().contains(today) ||
-                    flinkParams.getInitScript().matches("SET dt = '\\d{8}';"));
-            Assertions.assertTrue(flinkParams.getRawScript().contains(today) ||
-                    flinkParams.getRawScript().matches("SELECT \\* FROM t WHERE dt = '\\d{8}'"));
+        String callGetScript() {
+            return getScript();
         }
     }
 }

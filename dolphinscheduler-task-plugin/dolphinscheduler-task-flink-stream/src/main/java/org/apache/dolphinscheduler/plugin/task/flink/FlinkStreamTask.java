@@ -52,27 +52,11 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void init() {
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
-        // Replace parameter placeholders (e.g. ${system.biz.date}, $[yyyyMMdd]) in init script and main script
-        if (flinkParameters != null) {
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-            Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
-
-            if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
-                flinkParameters.setInitScript(
-                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams));
-            }
-            if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
-                flinkParameters.setRawScript(
-                        ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams));
-            }
-        }
         log.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-
-        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
 
     /**
@@ -82,6 +66,20 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
      */
     @Override
     protected String getScript() {
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
+
+        if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
+            flinkParameters.setInitScript(
+                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams));
+        }
+        if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
+            flinkParameters.setRawScript(
+                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams));
+        }
+
+        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
+
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
         List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
         return args.stream().collect(Collectors.joining(" "));
