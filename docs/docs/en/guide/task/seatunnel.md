@@ -2,7 +2,7 @@
 
 ## Overview
 
-`SeaTunnel` task type for creating and executing `SeaTunnel` tasks. When the worker executes this task, it will parse the config file through the `start-seatunnel-spark.sh` , `start-seatunnel-flink.sh` or `seatunnel.sh` command.
+`SeaTunnel` task type for creating and executing `SeaTunnel` tasks. When the worker executes this task, it will parse and run the config file through the startup scripts under `${SEATUNNEL_HOME}/bin/` (such as `seatunnel.sh` / `start-seatunnel-*-connector-v2.sh`).
 Click [here](https://seatunnel.apache.org/) for more information about `Apache SeaTunnel`.
 
 ## Create Task
@@ -16,7 +16,7 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 [//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
-- Startup script: Select script name to start the task, including `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
+- Startup script: Select script name to start the task (it may vary across SeaTunnel distributions, please check `${SEATUNNEL_HOME}/bin/`), including `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-20-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - Run model: supports `run` and `run-application` modes
 - Option parameters: used to add the parameters of the Flink engine, such as `-m yarn-cluster -ynm seatunnel`
@@ -26,16 +26,16 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 - SEATUNNEL_ENGINE
 - Deployment mode: specify the deployment mode, `cluster` `local`
 
-  > Click [here](https://seatunnel.apache.org/docs/2.3.3/command/usage) for more information on the usage of Apache SeaTunnel command`
+  > Click [here](https://seatunnel.apache.org/docs/2.3.12/command/usage) for more information on the usage of Apache SeaTunnel command`
 
 - Custom Configuration: Supports custom configuration or select configuration file from Resource Center
 
-  > Click [here](https://seatunnel.apache.org/docs/2.3.3/concept/config) for more information about `Apache SeaTunnel config` file
+  > Click [here](https://seatunnel.apache.org/docs/2.3.12/concept/config) for more information about `Apache SeaTunnel config` file
 
 - Script: Customize configuration information on the task node, including four parts: `env` `source` `transform` `sink`
 - Custom Parameters/Global Parameters: When custom parameters/global parameters are defined, the parameters will be passed to the SeaTunnel task, and the parameter value can be dynamically replaced during task execution by referencing the parameter with `${}` in the SeaTunnel task.
 
-  > Click [here](https://seatunnel.apache.org/docs/2.3.3/concept/config/#config-variable-substitution) for more information on `Apache SeaTunnel variable substitution`
+  > Click [here](https://seatunnel.apache.org/docs/2.3.12/concept/config/#config-variable-substitution) for more information on `Apache SeaTunnel variable substitution`
 
 ## Task Example
 
@@ -82,7 +82,7 @@ sink {
 
 ### Support SeaTunnel Version
 
-- v2.3.1
-- v2.3.2
-- v2.3.3
+- The examples in this doc are based on the `2.3.x` CLI options and startup scripts
+- Verified: v2.3.1, v2.3.2, v2.3.3
+- Other versions: this task type is essentially a wrapper of SeaTunnel CLI. Newer versions usually work as long as the startup scripts and CLI options are compatible (please run regression tests after upgrading).
 
