@@ -67,10 +67,12 @@ public class WorkflowOperator {
                 .dryRun(workflowTriggerDTO.getDryRun())
                 .taskDependType(workflowTriggerDTO.getTaskDependType())
                 .failureStrategy(workflowTriggerDTO.getFailureStrategy())
+                .warningType(workflowTriggerDTO.getWarningType())
+                .warningGroupId(workflowTriggerDTO.getWarningGroupId())
                 .build();
 
-        final WorkflowManualTriggerResponse manualTriggerWorkflowResponse =
-                workflowInstanceController.manualTriggerWorkflow(workflowManualTriggerRequest);
+        final WorkflowManualTriggerResponse manualTriggerWorkflowResponse = workflowInstanceController
+                .manualTriggerWorkflow(workflowManualTriggerRequest);
         Assertions.assertThat(manualTriggerWorkflowResponse.isSuccess()).isTrue();
 
         return manualTriggerWorkflowResponse.getWorkflowInstanceId();
@@ -114,32 +116,32 @@ public class WorkflowOperator {
     }
 
     public void recoverFailureTasks(final Integer workflowInstanceId) {
-        final WorkflowInstanceRecoverFailureTasksRequest recoverFailureTasksRequest =
-                WorkflowInstanceRecoverFailureTasksRequest.builder()
-                        .workflowInstanceId(workflowInstanceId)
-                        .userId(1)
-                        .build();
+        final WorkflowInstanceRecoverFailureTasksRequest recoverFailureTasksRequest = WorkflowInstanceRecoverFailureTasksRequest
+                .builder()
+                .workflowInstanceId(workflowInstanceId)
+                .userId(1)
+                .build();
         workflowInstanceController.triggerFromFailureTasks(recoverFailureTasksRequest);
     }
 
     public WorkflowInstancePauseResponse pauseWorkflowInstance(Integer workflowInstanceId) {
-        final WorkflowInstancePauseRequest workflowInstancePauseRequest =
-                new WorkflowInstancePauseRequest(workflowInstanceId);
+        final WorkflowInstancePauseRequest workflowInstancePauseRequest = new WorkflowInstancePauseRequest(
+                workflowInstanceId);
         return workflowInstanceController.pauseWorkflowInstance(workflowInstancePauseRequest);
     }
 
     public WorkflowInstanceRecoverSuspendTasksResponse recoverSuspendWorkflowInstance(Integer workflowInstanceId) {
-        final WorkflowInstanceRecoverSuspendTasksRequest workflowInstancePauseRequest =
-                WorkflowInstanceRecoverSuspendTasksRequest.builder()
-                        .workflowInstanceId(workflowInstanceId)
-                        .userId(1)
-                        .build();
+        final WorkflowInstanceRecoverSuspendTasksRequest workflowInstancePauseRequest = WorkflowInstanceRecoverSuspendTasksRequest
+                .builder()
+                .workflowInstanceId(workflowInstanceId)
+                .userId(1)
+                .build();
         return workflowInstanceController.triggerFromSuspendTasks(workflowInstancePauseRequest);
     }
 
     public WorkflowInstanceStopResponse stopWorkflowInstance(Integer workflowInstanceId) {
-        final WorkflowInstanceStopRequest workflowInstanceStopRequest =
-                new WorkflowInstanceStopRequest(workflowInstanceId);
+        final WorkflowInstanceStopRequest workflowInstanceStopRequest = new WorkflowInstanceStopRequest(
+                workflowInstanceId);
         return workflowInstanceController.stopWorkflowInstance(workflowInstanceStopRequest);
     }
 
@@ -160,6 +162,12 @@ public class WorkflowOperator {
 
         @Builder.Default
         private FailureStrategy failureStrategy = FailureStrategy.CONTINUE;
+
+        @Builder.Default
+        private org.apache.dolphinscheduler.common.enums.WarningType warningType = org.apache.dolphinscheduler.common.enums.WarningType.NONE;
+
+        @Builder.Default
+        private Integer warningGroupId = 0;
     }
 
     @Data
