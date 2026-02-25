@@ -52,7 +52,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,7 +87,8 @@ public class TaskExecutionContextFactory {
         final Project project = request.getProject();
 
         final List<Property> varPools =
-                generateTaskInstanceVarPool(request.getTaskDefinition(), request.getWorkflowExecutionGraph());
+                generateTaskInstanceVarPool(workflowInstance, request.getTaskDefinition(),
+                        request.getWorkflowExecutionGraph());
         taskInstance.setVarPool(VarPoolUtils.serializeVarPool(varPools));
 
         return TaskExecutionContextBuilder.get()
@@ -192,20 +193,27 @@ public class TaskExecutionContextFactory {
         return Optional.ofNullable(environmentOptional.get().getConfig());
     }
 
-    // The successors of the task instance will be used to generate the var pool
-    // All out varPool from the successors will be merged into the var pool of the task instance
-    private List<Property> generateTaskInstanceVarPool(TaskDefinition taskDefinition,
+    // The predecessors of the task instance will be used to generate the var pool.
+    // In execute-task(TASK_ONLY) scenario, the predecessor might be outside current execution sub-graph.
+    // For this case, fallback to workflow varPool to keep compatibility with historical behavior.
+    private List<Property> generateTaskInstanceVarPool(WorkflowInstance workflowInstance,
+                                                       TaskDefinition taskDefinition,
                                                        IWorkflowExecutionGraph workflowExecutionGraph) {
         List<ITaskExecutionRunnable> predecessors = workflowExecutionGraph.getPredecessors(taskDefinition.getName());
         if (CollectionUtils.isEmpty(predecessors)) {
-            return Collections.emptyList();
+            return VarPoolUtils.deserializeVarPool(workflowInstance.getVarPool());
         }
         List<String> varPoolsFromPredecessors = predecessors
                 .stream()
                 .filter(ITaskExecutionRunnable::isTaskInstanceInitialized)
                 .map(ITaskExecutionRunnable::getTaskInstance)
+                .sorted(Comparator.comparing(TaskInstance::getEndTime, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(TaskInstance::getVarPool)
+                .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(varPoolsFromPredecessors)) {
+            return VarPoolUtils.deserializeVarPool(workflowInstance.getVarPool());
+        }
         return VarPoolUtils.mergeVarPoolJsonString(varPoolsFromPredecessors);
     }
 
