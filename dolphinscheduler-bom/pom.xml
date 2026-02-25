@@ -1048,7 +1048,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <zookeeper.version>3.8.0</zookeeper.version>
+                <zookeeper.version>3.8.3</zookeeper.version>
                 <curator.version>5.5.0</curator.version>
             </properties>
         </profile>
