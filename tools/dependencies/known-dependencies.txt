@@ -200,7 +200,6 @@ netty-common-4.1.53.Final.jar
 netty-handler-4.1.53.Final.jar
 netty-nio-client-2.17.282.jar
 netty-resolver-4.1.53.Final.jar
-netty-tcnative-2.0.48.Final.jar
 netty-tcnative-classes-2.0.59.Final.jar
 netty-transport-4.1.53.Final.jar
 netty-transport-classes-epoll-4.1.91.Final.jar
@@ -305,8 +304,8 @@ protobuf-java-3.17.2.jar
 protobuf-java-util-3.17.2.jar
 webjars-locator-core-0.50.jar
 zjsonpatch-0.3.0.jar
-zookeeper-3.8.0.jar
-zookeeper-jute-3.8.0.jar
+zookeeper-3.8.3.jar
+zookeeper-jute-3.8.3.jar
 aliyun-java-sdk-core-4.5.10.jar
 aliyun-java-sdk-kms-2.11.0.jar
 aliyun-java-sdk-ram-3.1.0.jar
