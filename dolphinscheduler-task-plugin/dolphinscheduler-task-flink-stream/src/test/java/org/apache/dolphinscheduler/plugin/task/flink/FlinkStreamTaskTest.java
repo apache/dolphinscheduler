@@ -63,9 +63,9 @@ public class FlinkStreamTaskTest {
         context.setTaskAppId(taskAppId);
         context.setPrepareParamsMap(prepareParamsMap);
 
-        FlinkStreamTaskForTest task = new FlinkStreamTaskForTest(context);
+        FlinkStreamTask task = new FlinkStreamTask(context);
         task.init();
-        task.callGetScript();
+        task.getScript();
 
         String initScriptPath = String.format("%s/%s_init.sql", executePath, taskAppId);
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
@@ -102,25 +102,14 @@ public class FlinkStreamTaskTest {
         context.setTaskAppId(taskAppId);
         context.setPrepareParamsMap(prepareParamsMap);
 
-        FlinkStreamTaskForTest task = new FlinkStreamTaskForTest(context);
+        FlinkStreamTask task = new FlinkStreamTask(context);
         task.init();
-        task.callGetScript();
+        task.getScript();
 
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
         String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
 
         Assertions.assertTrue(nodeContent.contains("dt = '20210815'"),
                 "Expected $[yyyyMMdd] to be replaced with 20210815, got: " + nodeContent);
-    }
-
-    private static class FlinkStreamTaskForTest extends FlinkStreamTask {
-
-        FlinkStreamTaskForTest(TaskExecutionContext context) {
-            super(context);
-        }
-
-        String callGetScript() {
-            return getScript();
-        }
     }
 }

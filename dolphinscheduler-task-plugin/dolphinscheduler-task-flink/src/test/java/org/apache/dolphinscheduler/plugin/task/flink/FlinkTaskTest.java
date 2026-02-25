@@ -63,9 +63,9 @@ public class FlinkTaskTest {
         context.setTaskAppId(taskAppId);
         context.setPrepareParamsMap(prepareParamsMap);
 
-        FlinkTaskForTest task = new FlinkTaskForTest(context);
+        FlinkTask task = new FlinkTask(context);
         task.init();
-        task.callGetScript();
+        task.getScript();
 
         String initScriptPath = String.format("%s/%s_init.sql", executePath, taskAppId);
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
@@ -97,24 +97,13 @@ public class FlinkTaskTest {
         context.setTaskAppId(taskAppId);
         context.setPrepareParamsMap(null);
 
-        FlinkTaskForTest task = new FlinkTaskForTest(context);
+        FlinkTask task = new FlinkTask(context);
         task.init();
-        String script = task.callGetScript();
+        String script = task.getScript();
 
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
         String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
         Assertions.assertEquals("SELECT 1;", nodeContent.trim());
         Assertions.assertNotNull(script);
-    }
-
-    private static class FlinkTaskForTest extends FlinkTask {
-
-        FlinkTaskForTest(TaskExecutionContext context) {
-            super(context);
-        }
-
-        String callGetScript() {
-            return getScript();
-        }
     }
 }
