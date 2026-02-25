@@ -33,9 +33,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/**
- * FlinkTask unit test. Verifies parameter replacement in initScript and rawScript without Mockito.
- */
 public class FlinkTaskTest {
 
     @TempDir
@@ -73,10 +70,10 @@ public class FlinkTaskTest {
         String initContent = Files.readString(Path.of(initScriptPath), StandardCharsets.UTF_8);
         String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
 
-        Assertions.assertTrue(initContent.contains("set batch_size=1000;"),
-                "Expected ${batch_size} to be replaced with 1000, got: " + initContent);
-        Assertions.assertTrue(nodeContent.contains("dt='20201201'"),
-                "Expected $[yyyyMMdd] to be replaced with 20201201, got: " + nodeContent);
+        String expectedInitOptions = String.join(FlinkConstants.FLINK_SQL_NEWLINE,
+                FlinkArgsUtils.buildInitOptionsForSql(flinkParameters)).concat(FlinkConstants.FLINK_SQL_NEWLINE);
+        Assertions.assertEquals(expectedInitOptions + "set batch_size=1000;", initContent);
+        Assertions.assertEquals("SELECT * FROM logs WHERE dt='20201201';", nodeContent.trim());
     }
 
     @Test

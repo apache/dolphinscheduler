@@ -33,9 +33,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-/**
- * FlinkStreamTask unit test. Verifies parameter replacement in initScript and rawScript without Mockito.
- */
 public class FlinkStreamTaskTest {
 
     @TempDir
@@ -73,12 +70,10 @@ public class FlinkStreamTaskTest {
         String initContent = Files.readString(Path.of(initScriptPath), StandardCharsets.UTF_8);
         String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
 
-        Assertions.assertTrue(initContent.contains("SET 'date' = '20250601';"),
-                "Expected ${bizdate} to be replaced, got: " + initContent);
-        Assertions.assertTrue(nodeContent.contains("dt = '20250601'"),
-                "Expected ${bizdate} to be replaced, got: " + nodeContent);
-        Assertions.assertTrue(nodeContent.contains("env = 'prod'"),
-                "Expected ${env} to be replaced, got: " + nodeContent);
+        String expectedInitOptions = String.join(FlinkConstants.FLINK_SQL_NEWLINE,
+                FlinkArgsUtils.buildInitOptionsForSql(flinkParameters)).concat(FlinkConstants.FLINK_SQL_NEWLINE);
+        Assertions.assertEquals(expectedInitOptions + "SET 'date' = '20250601';", initContent);
+        Assertions.assertEquals("SELECT * FROM logs WHERE dt = '20250601' AND env = 'prod'", nodeContent.trim());
     }
 
     @Test
@@ -109,7 +104,6 @@ public class FlinkStreamTaskTest {
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
         String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
 
-        Assertions.assertTrue(nodeContent.contains("dt = '20210815'"),
-                "Expected $[yyyyMMdd] to be replaced with 20210815, got: " + nodeContent);
+        Assertions.assertEquals("INSERT INTO t SELECT * FROM s WHERE dt = '20210815'", nodeContent.trim());
     }
 }
