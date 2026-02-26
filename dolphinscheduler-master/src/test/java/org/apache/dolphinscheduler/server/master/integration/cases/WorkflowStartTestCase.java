@@ -52,8 +52,11 @@ import com.google.common.collect.Lists;
 
 /**
  * The integration test for starting a workflow from workflow definition.
- * <p> In each test method, will create different workflow from yaml, and then trigger it, and do assertions.
- * <p> The method name should be clear to describe the test scenario.
+ * <p>
+ * In each test method, will create different workflow from yaml, and then
+ * trigger it, and do assertions.
+ * <p>
+ * The method name should be clear to describe the test scenario.
  */
 public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
@@ -64,7 +67,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -74,17 +78,23 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getDryRun() == Flag.NO.getCode());
+                                    workflowInstance -> workflowInstance
+                                            .getDryRun() == Flag.NO
+                                                    .getCode());
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getDryRun()).isEqualTo(Flag.NO.getCode());
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getDryRun())
+                                        .isEqualTo(Flag.NO.getCode());
                             });
                 });
 
@@ -98,7 +108,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .dryRun(Flag.YES)
@@ -109,17 +120,23 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getDryRun() == Flag.YES.getCode());
+                                    workflowInstance -> workflowInstance
+                                            .getDryRun() == Flag.YES
+                                                    .getCode());
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getDryRun())
+                                        .isEqualTo(Flag.YES.getCode());
                             });
                 });
 
@@ -133,7 +150,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -157,7 +175,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -179,16 +198,24 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
-                    final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
-                    final WorkflowInstance workflowInstance3 = repository.queryWorkflowInstance(workflowInstanceId3);
-                    assertThat(workflowInstance1.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                    assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    final WorkflowInstance workflowInstance1 = repository
+                            .queryWorkflowInstance(workflowInstanceId1);
+                    final WorkflowInstance workflowInstance2 = repository
+                            .queryWorkflowInstance(workflowInstanceId2);
+                    final WorkflowInstance workflowInstance3 = repository
+                            .queryWorkflowInstance(workflowInstanceId3);
+                    assertThat(workflowInstance1.getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance2.getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
                     assertThat(workflowInstance2.getEndTime())
-                            .isAtLeast(DateUtils.addSeconds(workflowInstance1.getEndTime(), 5));
-                    assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                            .isAtLeast(DateUtils.addSeconds(workflowInstance1.getEndTime(),
+                                    5));
+                    assertThat(workflowInstance3.getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
                     assertThat(workflowInstance3.getEndTime())
-                            .isAtLeast(DateUtils.addSeconds(workflowInstance2.getEndTime(), 5));
+                            .isAtLeast(DateUtils.addSeconds(workflowInstance2.getEndTime(),
+                                    5));
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -201,7 +228,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -230,7 +258,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -259,7 +288,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .failureStrategy(FailureStrategy.END)
@@ -275,15 +305,18 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.KILL);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.KILL);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
 
                 });
@@ -298,7 +331,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -313,8 +347,11 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     Assertions
                             .assertThat(taskInstances)
                             .hasSize(2)
-                            .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS.equals(taskInstance.getState()) &&
-                                    taskInstance.getTaskGroupId() == context.getTaskGroups().get(0).getId());
+                            .allMatch(taskInstance -> TaskExecutionStatus.SUCCESS
+                                    .equals(taskInstance.getState()) &&
+                                    taskInstance.getTaskGroupId() == context
+                                            .getTaskGroups().get(0)
+                                            .getId());
 
                     final TaskInstance taskA = taskInstances.stream()
                             .filter(t -> "A".equals(t.getName()))
@@ -338,7 +375,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -349,13 +387,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS);
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
 
@@ -369,7 +410,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -380,24 +422,33 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO)
+                                    workflowInstance -> workflowInstance
+                                            .getIsSubWorkflow() == Flag.NO)
                             .matches(
-                                    workflowInstance -> workflowInstance.getDryRun() == Flag.NO.getCode());
+                                    workflowInstance -> workflowInstance
+                                            .getDryRun() == Flag.NO
+                                                    .getCode());
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("switch_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("switch_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("success_branch");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("success_branch");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
 
                 });
@@ -412,7 +463,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -423,24 +475,33 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO)
+                                    workflowInstance -> workflowInstance
+                                            .getIsSubWorkflow() == Flag.NO)
                             .matches(
-                                    workflowInstance -> workflowInstance.getDryRun() == Flag.NO.getCode());
+                                    workflowInstance -> workflowInstance
+                                            .getDryRun() == Flag.NO
+                                                    .getCode());
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("switch_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("switch_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("default_branch");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("default_branch");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
 
                 });
@@ -455,7 +516,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -466,37 +528,50 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO)
+                                    workflowInstance -> workflowInstance
+                                            .getIsSubWorkflow() == Flag.NO)
                             .matches(
-                                    workflowInstance -> workflowInstance.getDryRun() == Flag.NO.getCode());
+                                    workflowInstance -> workflowInstance
+                                            .getDryRun() == Flag.NO
+                                                    .getCode());
 
-                    final List<WorkflowInstance> subWorkflowInstance =
-                            repository.queryWorkflowInstance(context.getWorkflows().get(1));
+                    final List<WorkflowInstance> subWorkflowInstance = repository
+                            .queryWorkflowInstance(context.getWorkflows().get(1));
                     Assertions
                             .assertThat(subWorkflowInstance)
                             .hasSize(1)
                             .satisfiesExactly(workflowInstance -> {
-                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
-                                assertThat(workflowInstance.getDryRun()).isEqualTo(Flag.NO.getCode());
+                                assertThat(workflowInstance.getState()).isEqualTo(
+                                        WorkflowExecutionStatus.SUCCESS);
+                                assertThat(workflowInstance.getIsSubWorkflow())
+                                        .isEqualTo(Flag.YES);
+                                assertThat(workflowInstance.getDryRun())
+                                        .isEqualTo(Flag.NO.getCode());
                             });
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("sub_logic_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
 
                     Assertions
-                            .assertThat(repository.queryTaskInstance(subWorkflowInstance.get(0).getId()))
+                            .assertThat(repository.queryTaskInstance(
+                                    subWorkflowInstance.get(0).getId()))
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("fake_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("fake_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
 
@@ -510,7 +585,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .dryRun(Flag.YES)
@@ -522,16 +598,21 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO)
+                                    workflowInstance -> workflowInstance
+                                            .getIsSubWorkflow() == Flag.NO)
                             .matches(
-                                    workflowInstance -> workflowInstance.getDryRun() == Flag.YES.getCode());
+                                    workflowInstance -> workflowInstance
+                                            .getDryRun() == Flag.YES
+                                                    .getCode());
 
-                    final List<WorkflowInstance> subWorkflowInstance =
-                            repository.queryWorkflowInstance(context.getWorkflows().get(1));
+                    final List<WorkflowInstance> subWorkflowInstance = repository
+                            .queryWorkflowInstance(context.getWorkflows().get(1));
                     Assertions
                             .assertThat(subWorkflowInstance)
                             .isEmpty();
@@ -539,9 +620,12 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
-                                assertThat(taskInstance.getDryRun()).isEqualTo(Flag.YES.getCode());
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("sub_logic_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getDryRun())
+                                        .isEqualTo(Flag.YES.getCode());
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -554,7 +638,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -564,28 +649,34 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(4)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("D");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -598,7 +689,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -608,24 +700,29 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.FAILURE);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -638,7 +735,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -649,34 +747,44 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.FAILURE)
                             .matches(
-                                    workflowInstance -> workflowInstance.getIsSubWorkflow() == Flag.NO);
+                                    workflowInstance -> workflowInstance
+                                            .getIsSubWorkflow() == Flag.NO);
 
-                    final List<WorkflowInstance> subWorkflowInstance =
-                            repository.queryWorkflowInstance(context.getWorkflows().get(1));
+                    final List<WorkflowInstance> subWorkflowInstance = repository
+                            .queryWorkflowInstance(context.getWorkflows().get(1));
                     Assertions
                             .assertThat(subWorkflowInstance)
                             .hasSize(1)
                             .satisfiesExactly(workflowInstance -> {
-                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.FAILURE);
-                                assertThat(workflowInstance.getIsSubWorkflow()).isEqualTo(Flag.YES);
+                                assertThat(workflowInstance.getState()).isEqualTo(
+                                        WorkflowExecutionStatus.FAILURE);
+                                assertThat(workflowInstance.getIsSubWorkflow())
+                                        .isEqualTo(Flag.YES);
                             });
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("sub_logic_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("sub_logic_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
 
                     Assertions
-                            .assertThat(repository.queryTaskInstance(subWorkflowInstance.get(0).getId()))
+                            .assertThat(repository.queryTaskInstance(
+                                    subWorkflowInstance.get(0).getId()))
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("fake_task");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("fake_task");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
 
@@ -690,7 +798,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -701,18 +810,21 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
 
@@ -735,7 +847,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                         .build()))
                 .build();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
@@ -746,18 +859,21 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -773,44 +889,54 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .build();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         List<Property> assertVarPools = Lists.newArrayList(
-                Property.builder().prop("output").direct(Direct.OUT).type(DataType.VARCHAR).value("1").build());
+                Property.builder().prop("output").direct(Direct.OUT).type(DataType.VARCHAR).value("1")
+                        .build());
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .satisfiesExactly(workflowInstance -> {
-                                assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                                assertThat(VarPoolUtils.deserializeVarPool(workflowInstance.getVarPool()))
-                                        .isEqualTo(assertVarPools);
+                                assertThat(workflowInstance.getState()).isEqualTo(
+                                        WorkflowExecutionStatus.SUCCESS);
+                                assertThat(VarPoolUtils.deserializeVarPool(
+                                        workflowInstance.getVarPool()))
+                                                .isEqualTo(assertVarPools);
                             });
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
-                                        .isEqualTo(assertVarPools);
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(VarPoolUtils.deserializeVarPool(
+                                        taskInstance.getVarPool()))
+                                                .isEqualTo(assertVarPools);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
-                                        .isEqualTo(assertVarPools);
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(VarPoolUtils.deserializeVarPool(
+                                        taskInstance.getVarPool()))
+                                                .isEqualTo(assertVarPools);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
-                                assertThat(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()))
-                                        .isEqualTo(assertVarPools);
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(VarPoolUtils.deserializeVarPool(
+                                        taskInstance.getVarPool()))
+                                                .isEqualTo(assertVarPools);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -832,7 +958,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                         .build()))
                 .build();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
@@ -843,18 +970,21 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.SUCCESS));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -867,7 +997,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -878,13 +1009,15 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -897,7 +1030,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -908,13 +1042,15 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -927,7 +1063,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -938,15 +1075,17 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
                     Assertions
                             .assertThat(taskInstances)
                             .allSatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             })
                             .hasSize(2);
 
@@ -963,11 +1102,14 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .matches(task -> task.getRetryTimes() == 1)
                             .matches(task -> task.getFlag() == Flag.YES)
                             .isNotNull();
-                    assertThat(latestTaskInstance.getFirstSubmitTime()).isEqualTo(taskInstance.getFirstSubmitTime());
+                    assertThat(latestTaskInstance.getFirstSubmitTime())
+                            .isEqualTo(taskInstance.getFirstSubmitTime());
                     assertThat(latestTaskInstance.getSubmitTime())
-                            .isAtLeast(DateUtils.addSeconds(taskInstance.getSubmitTime(), -65));
+                            .isAtLeast(DateUtils.addSeconds(taskInstance.getSubmitTime(),
+                                    -65));
                     assertThat(latestTaskInstance.getSubmitTime())
-                            .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(), 65));
+                            .isAtMost(DateUtils.addMinutes(taskInstance.getSubmitTime(),
+                                    65));
                 });
         masterContainer.assertAllResourceReleased();
     }
@@ -979,7 +1121,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -990,8 +1133,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS))
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.SUCCESS))
                             .hasSize(1);
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
@@ -1000,11 +1144,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1017,7 +1163,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1028,13 +1175,15 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1047,7 +1196,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1058,8 +1208,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.SUCCESS));
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
                     Assertions
@@ -1067,11 +1218,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1084,7 +1237,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1096,7 +1250,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .filteredOn(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.FAILURE)
                             .hasSize(1);
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
@@ -1105,11 +1260,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1122,7 +1279,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1134,7 +1292,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .filteredOn(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .hasSize(1);
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
@@ -1143,39 +1302,48 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(9)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A1");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A2");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A3");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B1");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B2");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B3");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C1");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C2");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C3");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1191,7 +1359,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .startNodes(Lists.newArrayList(6L))
                 .build();
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(runWorkflowCommandParam)
                 .build();
@@ -1203,7 +1372,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .filteredOn(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS)
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS)
                             .hasSize(1);
 
                     final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflow);
@@ -1212,11 +1382,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C2");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C3");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1229,7 +1401,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1240,18 +1413,21 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.SUCCESS));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(2)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1264,7 +1440,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_kill_task");
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1275,14 +1452,17 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.STOP));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.STOP));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("dep_task_with_timeout_killed");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                                assertThat(taskInstance.getName()).isEqualTo(
+                                        "dep_task_with_timeout_killed");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.KILL);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1297,7 +1477,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_kill_task");
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1308,14 +1489,17 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.STOP));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.STOP));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo("dep_task_with_timeout_killed");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                                assertThat(taskInstance.getName()).isEqualTo(
+                                        "dep_task_with_timeout_killed");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.KILL);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1328,9 +1512,11 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
-                .runWorkflowCommandParam(new RunWorkflowCommandParam().withStartNodes(Lists.newArrayList(1L)))
+                .runWorkflowCommandParam(
+                        new RunWorkflowCommandParam().withStartNodes(Lists.newArrayList(1L)))
                 .taskDependType(TaskDependType.TASK_ONLY)
                 .build();
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
@@ -1340,14 +1526,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.SUCCESS));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1360,7 +1548,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1371,17 +1560,20 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .untilAsserted(() -> {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.SUCCESS));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.SUCCESS));
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(2)
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             }, (Consumer<TaskInstance>) taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C1");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1394,7 +1586,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1404,24 +1597,29 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1435,7 +1633,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1445,23 +1644,28 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS);
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("D");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1474,7 +1678,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1484,24 +1689,29 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("D");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1514,7 +1724,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1524,24 +1735,29 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.SUCCESS);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(3)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("B");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("D");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1555,7 +1771,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1565,16 +1782,19 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.FAILURE);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1583,12 +1803,12 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @Test
     @DisplayName("Test start a workflow with one condition task(B) which is forbidden when one fake predecessor task(A) run fatal")
     void testStartWorkflow_with_oneForbiddenConditionTaskWithOneFakePredecessor_runFatal() {
-        final String yaml =
-                "/it/start/workflow_with_one_forbidden_condition_task_with_one_fake_predecessor_fatal.yaml";
+        final String yaml = "/it/start/workflow_with_one_forbidden_condition_task_with_one_fake_predecessor_fatal.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1598,16 +1818,19 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .assertThat(repository
+                                    .queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE);
+                                    workflowInstance -> workflowInstance
+                                            .getState() == WorkflowExecutionStatus.FAILURE);
 
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflowInstanceId))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
         masterContainer.assertAllResourceReleased();
@@ -1625,7 +1848,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1639,14 +1863,17 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getWorkerGroup())
+                                        .isEqualTo("workerGroupNotFound");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
 
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -1663,7 +1890,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1677,18 +1905,22 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUBMITTED_SUCCESS);
+                                assertThat(taskInstance.getWorkerGroup())
+                                        .isEqualTo("workerGroupNotFound");
+                                assertThat(taskInstance.getState()).isEqualTo(
+                                        TaskExecutionStatus.SUBMITTED_SUCCESS);
                             });
 
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
 
                 });
 
-        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
+        // This test intentionally leaves the workflow running, so we skip the resource
+        // cleanup check.
         // masterContainer.assertAllResourceReleased();
     }
 
@@ -1704,7 +1936,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1718,14 +1951,17 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(taskInstance.getWorkerGroup())
+                                        .isEqualTo("default");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
 
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -1742,7 +1978,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
 
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
@@ -1756,17 +1993,21 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .hasSize(1)
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("A");
-                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
-                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUBMITTED_SUCCESS);
+                                assertThat(taskInstance.getWorkerGroup())
+                                        .isEqualTo("default");
+                                assertThat(taskInstance.getState()).isEqualTo(
+                                        TaskExecutionStatus.SUBMITTED_SUCCESS);
                             });
 
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
                 });
 
-        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
+        // This test intentionally leaves the workflow running, so we skip the resource
+        // cleanup check.
         // masterContainer.assertAllResourceReleased();
     }
 
@@ -1802,7 +2043,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                         .isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
                             });
                 });
-        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
+        // This test intentionally leaves the workflow running, so we skip the resource
+        // cleanup check.
         // masterContainer.assertAllResourceReleased();
     }
 
@@ -1827,7 +2069,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .satisfiesExactly(workflowInstance -> assertThat(
                                     workflowInstance.getState())
-                                            .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                                            .isEqualTo(WorkflowExecutionStatus.STOP));
+
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
@@ -1838,6 +2081,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                         .isEqualTo(TaskExecutionStatus.FAILURE);
                             });
                 });
+
         masterContainer.assertAllResourceReleased();
     }
 }
