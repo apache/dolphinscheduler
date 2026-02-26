@@ -20,12 +20,11 @@ package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,12 +74,7 @@ public class DataSourceUtils {
     }
 
     public static DataSourceProcessor getDatasourceProcessor(DbType dbType) {
-        Map<String, DataSourceProcessor> dataSourceProcessorMap =
-                DataSourceProcessorProvider.getDataSourceProcessorMap();
-        if (!dataSourceProcessorMap.containsKey(dbType.name())) {
-            throw new IllegalArgumentException("illegal datasource type");
-        }
-        return dataSourceProcessorMap.get(dbType.name());
+        return DataSourcePluginManager.getDataSourceProcessor(dbType);
     }
 
     /**

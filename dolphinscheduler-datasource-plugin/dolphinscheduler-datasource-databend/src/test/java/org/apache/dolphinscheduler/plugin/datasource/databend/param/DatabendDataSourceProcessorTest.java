@@ -30,15 +30,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 public class DatabendDataSourceProcessorTest {
 
-    private DatabendDataSourceProcessor databendDataSourceProcessor = new DatabendDataSourceProcessor();
+    private final DatabendDataSourceProcessor databendDataSourceProcessor = new DatabendDataSourceProcessor();
 
     @Test
     public void testCheckDatasourceParam() {
