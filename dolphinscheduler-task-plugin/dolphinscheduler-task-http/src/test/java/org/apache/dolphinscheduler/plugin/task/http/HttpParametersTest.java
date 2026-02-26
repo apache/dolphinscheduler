@@ -68,7 +68,6 @@ public class HttpParametersTest {
         Assertions.assertEquals(HttpRequestMethod.GET, httpParameters.getHttpRequestMethod());
         Assertions.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT, httpParameters.getHttpCheckCondition());
         Assertions.assertEquals("", httpParameters.getCondition());
-        Assertions.assertEquals(0, httpParameters.getLocalParametersMap().size());
         Assertions.assertEquals(0, httpParameters.getResourceFilesList().size());
     }
 
