@@ -26,7 +26,7 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 | 容器执行命令   | 容器执行命令（yaml格式数组），例如：["printenv"]                                                                                                                                                    |
 | 执行命令参数   | 执行命令参数（yaml格式数组），例如：["HOSTNAME", "KUBERNETES_PORT"]                                                                                                                                 |
 | 自定义标签    | 作业自定义标签                                                                                                                                                                             |
-| 节点选择器    | 定义Pod在kubernetes集群上运行的标签选择器，值集中不同表达式值使用逗号分割，例如：`value1,value2`，不同操作符配置方式可参考：https://kubernetes.io/zh-cn/docs/reference/kubernetes-api/common-definitions/node-selector-requirement/ |
+| 节点选择器    | 定义Pod在kubernetes集群上运行的标签选择器，值集中不同表达式值使用逗号分割，例如：`value1,value2`，不同操作符配置方式可参考：https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/node-selector-requirement/ |
 | 自定义参数    | kubernetes任务局部的用户自定义参数，自定义参数最终会通过环境变量形式存在于容器中，提供给kubernetes任务使用                                                                                                                     |
 
 ## 任务样例
