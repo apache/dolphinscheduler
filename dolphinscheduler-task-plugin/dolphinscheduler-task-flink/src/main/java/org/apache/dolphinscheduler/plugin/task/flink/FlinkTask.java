@@ -76,22 +76,31 @@ public class FlinkTask extends AbstractYarnTask {
      */
     @Override
     protected String getScript() {
+        return buildScriptWithParameterReplacement(flinkParameters);
+    }
+
+    /**
+     * Apply parameter replacement to initScript/rawScript, generate script files and build run command.
+     *
+     * @param params flink parameters
+     * @return run command string
+     */
+    protected String buildScriptWithParameterReplacement(FlinkParameters params) {
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
 
-        if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
-            flinkParameters.setInitScript(
-                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams));
+        if (StringUtils.isNotBlank(params.getInitScript())) {
+            params.setInitScript(
+                    ParameterUtils.convertParameterPlaceholders(params.getInitScript(), stringParams));
         }
-        if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
-            flinkParameters.setRawScript(
-                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams));
+        if (StringUtils.isNotBlank(params.getRawScript())) {
+            params.setRawScript(
+                    ParameterUtils.convertParameterPlaceholders(params.getRawScript(), stringParams));
         }
 
-        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
+        FileUtils.generateScriptFile(taskExecutionContext, params);
 
-        // flink run/run-application [OPTIONS] <jar-file> <arguments>
-        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
+        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, params);
         return args.stream().collect(Collectors.joining(" "));
     }
 

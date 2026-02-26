@@ -21,18 +21,13 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,30 +54,9 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         }
     }
 
-    /**
-     * create command
-     *
-     * @return command
-     */
     @Override
     protected String getScript() {
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
-
-        if (StringUtils.isNotBlank(flinkParameters.getInitScript())) {
-            flinkParameters.setInitScript(
-                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getInitScript(), stringParams));
-        }
-        if (StringUtils.isNotBlank(flinkParameters.getRawScript())) {
-            flinkParameters.setRawScript(
-                    ParameterUtils.convertParameterPlaceholders(flinkParameters.getRawScript(), stringParams));
-        }
-
-        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
-
-        // flink run/run-application [OPTIONS] <jar-file> <arguments>
-        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
-        return args.stream().collect(Collectors.joining(" "));
+        return buildScriptWithParameterReplacement(flinkParameters);
     }
 
     @Override
