@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,8 +68,8 @@ public class FlinkStreamTaskTest {
         String initScriptPath = String.format("%s/%s_init.sql", executePath, taskAppId);
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
 
-        String initContent = Files.readString(Path.of(initScriptPath), StandardCharsets.UTF_8);
-        String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
+        String initContent = new String(Files.readAllBytes(Paths.get(initScriptPath)), StandardCharsets.UTF_8);
+        String nodeContent = new String(Files.readAllBytes(Paths.get(nodeScriptPath)), StandardCharsets.UTF_8);
 
         String expectedInitOptions = String.join(FlinkConstants.FLINK_SQL_NEWLINE,
                 FlinkArgsUtils.buildInitOptionsForSql(flinkParameters)).concat(FlinkConstants.FLINK_SQL_NEWLINE);
@@ -102,7 +103,7 @@ public class FlinkStreamTaskTest {
         task.getScript();
 
         String nodeScriptPath = String.format("%s/%s_node.sql", executePath, taskAppId);
-        String nodeContent = Files.readString(Path.of(nodeScriptPath), StandardCharsets.UTF_8);
+        String nodeContent = new String(Files.readAllBytes(Paths.get(nodeScriptPath)), StandardCharsets.UTF_8);
 
         Assertions.assertEquals("INSERT INTO t SELECT * FROM s WHERE dt = '20210815'", nodeContent.trim());
     }
