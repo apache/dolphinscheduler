@@ -519,7 +519,9 @@ export function useTable() {
         })
       })
       .catch((err: Error) => {
-        window.$message.error(err?.message || 'Request failed')
+        window.$message.error(
+          err?.message || t('project.workflow.request_failed')
+        )
       })
       .finally(() => {
         variables.loadingRef = false
