@@ -199,11 +199,14 @@ public class TaskExecutionContextFactory {
     private List<Property> generateTaskInstanceVarPool(WorkflowInstance workflowInstance,
                                                        TaskDefinition taskDefinition,
                                                        IWorkflowExecutionGraph workflowExecutionGraph) {
-        List<ITaskExecutionRunnable> predecessors = workflowExecutionGraph.getPredecessors(taskDefinition.getName());
-        if (CollectionUtils.isEmpty(predecessors)) {
+        final boolean isStartNode = workflowExecutionGraph.getStartNodes()
+                .stream()
+                .anyMatch(node -> node.getTaskDefinition().getCode() == taskDefinition.getCode());
+        if (isStartNode) {
             return VarPoolUtils.deserializeVarPool(workflowInstance.getVarPool());
         }
-        List<String> varPoolsFromPredecessors = predecessors
+
+        List<String> varPoolsFromPredecessors = workflowExecutionGraph.getPredecessors(taskDefinition.getName())
                 .stream()
                 .filter(ITaskExecutionRunnable::isTaskInstanceInitialized)
                 .map(ITaskExecutionRunnable::getTaskInstance)
@@ -211,9 +214,6 @@ public class TaskExecutionContextFactory {
                 .map(TaskInstance::getVarPool)
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(varPoolsFromPredecessors)) {
-            return VarPoolUtils.deserializeVarPool(workflowInstance.getVarPool());
-        }
         return VarPoolUtils.mergeVarPoolJsonString(varPoolsFromPredecessors);
     }
 
