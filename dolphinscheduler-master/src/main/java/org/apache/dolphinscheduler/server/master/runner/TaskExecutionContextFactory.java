@@ -49,7 +49,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecut
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Comparator;
