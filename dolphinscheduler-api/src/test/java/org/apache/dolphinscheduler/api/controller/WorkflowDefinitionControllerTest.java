@@ -37,8 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +45,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * process definition controller test
@@ -383,17 +380,6 @@ public class WorkflowDefinitionControllerTest {
                 .queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize);
 
         Assertions.assertTrue(response != null && response.isSuccess());
-    }
-
-    @Test
-    public void testBatchExportWorkflowDefinitionByCodes() {
-        String processDefinitionIds = "1,2";
-        long projectCode = 1L;
-        HttpServletResponse response = new MockHttpServletResponse();
-        doNothing().when(this.processDefinitionService).batchExportWorkflowDefinitionByCodes(user, projectCode,
-                processDefinitionIds, response);
-        workflowDefinitionController.batchExportWorkflowDefinitionByCodes(user, projectCode, processDefinitionIds,
-                response);
     }
 
     @Test

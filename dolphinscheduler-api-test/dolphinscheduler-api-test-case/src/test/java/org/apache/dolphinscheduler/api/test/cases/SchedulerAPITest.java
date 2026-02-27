@@ -67,6 +67,8 @@ public class SchedulerAPITest {
 
     private static int scheduleId;
 
+    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
+
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
@@ -98,7 +100,7 @@ public class SchedulerAPITest {
                 .getBody().getData()).get(0)).get("code");
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-        workflowDefinitionPage.importWorkflowDefinition(loginUser, projectCode, file);
+        workflowDefinitionPage.createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
         HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
                 workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
         Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
