@@ -1770,7 +1770,6 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         // masterContainer.assertAllResourceReleased();
     }
 
-
     @Test
     @DisplayName("Test start a workflow which contains a dep task with timeout warn strategy")
     public void testStartWorkflow_withTimeoutWarnTask() {
