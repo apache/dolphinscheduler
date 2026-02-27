@@ -114,6 +114,7 @@ public class MasterConfig implements Validator {
         if (StringUtils.isEmpty(masterConfig.getMasterAddress())) {
             masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         }
+        serverLoadProtection.validate(errors);
         commandFetchStrategy.validate(errors);
         workerLoadBalancerConfigurationProperties.validate(errors);
 

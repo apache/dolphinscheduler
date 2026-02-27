@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
+import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Environment;
@@ -36,11 +37,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,15 +62,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private SchedulerServiceImpl schedulerService;
 
     @Mock
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
-
-    @Mock
-    private MonitorService monitorService;
-
-    @Mock
-    private ProcessService processService;
-
-    @Mock
     private ScheduleMapper scheduleMapper;
 
     @Mock
@@ -94,7 +83,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private EnvironmentMapper environmentMapper;
 
     @Mock
-    private TenantMapper tenantMapper;
+    private TenantExistValidator tenantExistValidator;
 
     protected static User user;
     protected Exception exception;
@@ -128,6 +117,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         scheduleCreateRequest.setWorkflowDefinitionCode(processDefinitionCode);
         scheduleCreateRequest.setEnvironmentCode(environmentCode);
         scheduleCreateRequest.setTenantCode(Constants.DEFAULT);
+        scheduleCreateRequest.setStartTime(startTime);
 
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,

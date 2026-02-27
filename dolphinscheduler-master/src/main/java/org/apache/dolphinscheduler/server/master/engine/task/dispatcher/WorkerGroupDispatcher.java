@@ -34,6 +34,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * WorkerGroupTaskDispatcher is responsible for dispatching tasks from the task queue.
  * The main responsibilities include:
@@ -179,7 +181,13 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
         }
     }
 
-    int queueSize() {
+    @VisibleForTesting
+    public int dispatchEventCount() {
         return this.workerGroupEventBus.size();
+    }
+
+    @VisibleForTesting
+    public int waitingDispatchTaskCount() {
+        return this.waitingDispatchTaskIds.size();
     }
 }

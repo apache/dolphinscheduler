@@ -19,16 +19,17 @@ package org.apache.dolphinscheduler.server.worker.executor;
 
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.task.executor.container.ExclusiveThreadTaskExecutorContainer;
-import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
 import org.apache.dolphinscheduler.task.executor.container.TaskExecutorContainerConfig;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class PhysicalTaskExecutorContainerProvider implements ITaskExecutorContainerProvider {
+public class PhysicalTaskExecutorContainerProvider
+        implements
+            ITaskExecutorContainerProvider<ExclusiveThreadTaskExecutorContainer> {
 
-    private final ITaskExecutorContainer taskExecutorContainer;
+    private final ExclusiveThreadTaskExecutorContainer taskExecutorContainer;
 
     public PhysicalTaskExecutorContainerProvider(final WorkerConfig workerConfig) {
         final TaskExecutorContainerConfig containerConfig = TaskExecutorContainerConfig.builder()
@@ -39,7 +40,7 @@ public class PhysicalTaskExecutorContainerProvider implements ITaskExecutorConta
     }
 
     @Override
-    public ITaskExecutorContainer getExecutorContainer() {
+    public ExclusiveThreadTaskExecutorContainer getExecutorContainer() {
         return taskExecutorContainer;
     }
 }
