@@ -29,11 +29,11 @@ Supporting system:
 
 Run `./mvnw clean install -Prelease -Dmaven.test.skip=true`
 
-### Code Style
+### Backend Code Style
 
-DolphinScheduler uses `Spotless` for code style and formatting checks.
+DolphinScheduler uses `Spotless` for backend code style and formatting checks.
 You could run the following command and `Spotless` will automatically fix
-the code style and formatting errors for you:
+the backend code style and formatting errors for you:
 
 ```shell
 ./mvnw spotless:apply
@@ -53,6 +53,28 @@ pre-commit install
 ```
 
 Now, every time you commit your code, `pre-commit` will automatically run `Spotless` to check the code style and formatting.
+
+### Frontend Code Style
+
+DolphinScheduler uses `pnpm` to check and automatically fix frontend code style and formatting issues.
+First, navigate to the frontend project directory:
+
+```shell
+cd dolphinscheduler-ui
+```
+
+Then, run the following commands to automatically fix ESLint-fixable issues and format the code:
+
+```shell
+pnpm run lint      # Fix ESLint issues
+pnpm run prettier  # Format code
+```
+
+Finally, you can run the following command to perform a full TypeScript type check and catch type-related errors early:
+
+```shell
+pnpm exec vue-tsc --noEmit  # Type check
+```
 
 ### Helm Template Guidelines
 

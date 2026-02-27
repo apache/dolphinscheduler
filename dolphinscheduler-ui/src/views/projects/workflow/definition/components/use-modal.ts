@@ -23,7 +23,6 @@ import type { Router } from 'vue-router'
 import { format } from 'date-fns'
 import {
   batchCopyByCodes,
-  importWorkflowDefinition,
   queryWorkflowDefinitionByCode
 } from '@/service/modules/workflow-definition'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
@@ -60,31 +59,6 @@ export function useModal(
 
   const cachedStartParams = {} as {
     [key: string]: { prop: string; value: string }[]
-  }
-
-  const resetImportForm = () => {
-    state.importForm.name = ''
-    state.importForm.file = ''
-  }
-
-  const handleImportDefinition = async () => {
-    await state.importFormRef.validate()
-
-    if (state.saving) return
-    state.saving = true
-    try {
-      const formData = new FormData()
-      formData.append('file', state.importForm.file)
-      const code = Number(router.currentRoute.value.params.projectCode)
-      await importWorkflowDefinition(formData, code)
-      window.$message.success(t('project.workflow.success'))
-      state.saving = false
-      ctx.emit('updateList')
-      ctx.emit('update:show')
-      resetImportForm()
-    } catch (err) {
-      state.saving = false
-    }
   }
 
   const handleStartDefinition = async (code: number, version: number) => {
@@ -300,7 +274,6 @@ export function useModal(
 
   return {
     variables,
-    handleImportDefinition,
     handleStartDefinition,
     handleCreateTiming,
     handleUpdateTiming,

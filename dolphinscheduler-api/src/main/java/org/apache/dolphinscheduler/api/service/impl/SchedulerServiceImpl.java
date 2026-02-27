@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -43,13 +44,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -107,7 +106,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private EnvironmentMapper environmentMapper;
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantExistValidator tenantExistValidator;
 
     /**
      * save schedule
@@ -166,7 +165,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
 
-        checkValidTenant(tenantCode);
+        tenantExistValidator.validate(tenantCode);
 
         scheduleObj.setTenantCode(tenantCode);
         scheduleObj.setProjectName(project.getName());
@@ -276,7 +275,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     scheduleExists.getId());
         }
 
-        checkValidTenant(scheduleCreateRequest.getTenantCode());
+        tenantExistValidator.validate(scheduleCreateRequest.getTenantCode());
 
         Schedule schedule = scheduleCreateRequest.convert2Schedule();
         Environment environment = environmentMapper.queryByEnvironmentCode(schedule.getEnvironmentCode());
@@ -759,7 +758,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Date now = new Date();
 
-        checkValidTenant(tenantCode);
+        tenantExistValidator.validate(tenantCode);
         schedule.setTenantCode(tenantCode);
 
         // updateWorkflowInstance param
@@ -818,17 +817,4 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         putMsg(result, Status.SUCCESS);
     }
 
-    /**
-     * check valid tenant
-     *
-     * @param tenantCode
-     */
-    private void checkValidTenant(String tenantCode) {
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                throw new ServiceException(Status.TENANT_NOT_EXIST, tenantCode);
-            }
-        }
-    }
 }

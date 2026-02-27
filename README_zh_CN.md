@@ -1,7 +1,7 @@
-# Apache Dolphinscheduler
+# Apache DolphinScheduler
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)]()
+[![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/dolphinscheduler)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 [![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule) <!-- markdown-link-check-disable-line -->
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
@@ -12,8 +12,8 @@
 
 DolphinScheduler 的主要特性如下：
 
-- 易于部署，提供四种部署方式，包括Standalone、Cluster、Docker和Kubernetes
-- 易于使用，可以通过四种方式创建和管理工作流，包括Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/main/index.html)和Open API
+- 易于部署，提供四种部署方式，包括 Standalone、Cluster、Docker 和 Kubernetes
+- 易于使用，可以通过多种方式创建和管理工作流，包括 Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) 和 Open API
 - 高可靠高可用，多主多从的去中心化架构，原生支持横向扩展
 - 高性能，性能比其他编排平台快N倍，每天可支持千万级任务
 - Cloud Native，DolphinScheduler支持编排多云/数据中心工作流，支持自定义任务类型
@@ -57,7 +57,7 @@ DolphinScheduler 的主要特性如下：
 
 ## 社区
 
-欢迎通过以方式加入社区：
+欢迎通过以下方式加入社区：
 
 - 讨论和提问请通过 [GitHub Issues](https://github.com/apache/dolphinscheduler/issues)
 - 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息 <!-- markdown-link-check-disable-line -->

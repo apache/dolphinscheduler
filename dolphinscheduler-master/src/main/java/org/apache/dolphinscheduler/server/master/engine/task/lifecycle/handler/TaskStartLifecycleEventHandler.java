@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskStartLifecycleEvent;
@@ -28,11 +30,15 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class TaskStartLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskStartLifecycleEvent> {
+
+    @Autowired
+    private MasterConfig masterConfig;
 
     @Override
     public void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable,
@@ -63,13 +69,20 @@ public class TaskStartLifecycleEventHandler extends AbstractTaskLifecycleEventHa
 
     private void taskTimeoutMonitor(final ITaskExecutionRunnable taskExecutionRunnable) {
         final TaskDefinition taskDefinition = taskExecutionRunnable.getTaskDefinition();
-        if (taskDefinition.getTimeout() <= 0) {
+        int taskTimeout = taskDefinition.getTimeout();
+        if (taskTimeout > 0 && taskDefinition.getTimeoutNotifyStrategy() != null) {
             log.debug("The task {} timeout {} is invalided, so the timeout monitor will not be started.",
                     taskDefinition.getName(),
                     taskDefinition.getTimeout());
-            return;
+            taskExecutionRunnable.getWorkflowEventBus().publish(TaskTimeoutLifecycleEvent.of(
+                    taskExecutionRunnable, taskDefinition.getTimeoutNotifyStrategy(), taskTimeout));
         }
-        taskExecutionRunnable.getWorkflowEventBus().publish(TaskTimeoutLifecycleEvent.of(taskExecutionRunnable));
+
+        int systemTimeout = (int) masterConfig.getServerLoadProtection().getMaxTaskInstanceRuntime().toMinutes();
+        if (systemTimeout > 0) {
+            taskExecutionRunnable.getWorkflowEventBus().publish(TaskTimeoutLifecycleEvent.of(
+                    taskExecutionRunnable, TaskTimeoutStrategy.FAILED, systemTimeout));
+        }
     }
 
 }
