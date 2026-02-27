@@ -426,7 +426,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            return false;
+            return true;
         }
 
         @Override
