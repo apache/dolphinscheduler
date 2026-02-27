@@ -169,6 +169,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         Assertions.assertEquals(ComplementDependentMode.ALL_DEPENDENT, capturedParams.getBackfillDependentMode());
         Assertions.assertTrue(capturedParams.isAllLevelDependent());
         Assertions.assertEquals(backfillTimeList.size(), capturedParams.getBackfillDateList().size());
+        Assertions.assertNull(captured.getStartNodes());
     }
 
     @Test
@@ -232,5 +233,83 @@ public class BackfillWorkflowExecutorDelegateTest {
         Assertions.assertEquals(ComplementDependentMode.OFF_MODE, capturedParams.getBackfillDependentMode());
         Assertions.assertFalse(capturedParams.isAllLevelDependent());
         Assertions.assertEquals(backfillTimeList.size(), capturedParams.getBackfillDateList().size());
+        Assertions.assertNull(captured.getStartNodes());
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_SkipWorkflowNotFound() throws Exception {
+        long upstreamCode = 1000L;
+        long downstreamCode = 2000L;
+
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.<ZonedDateTime>emptyList())
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO dto = BackfillWorkflowDTO.builder()
+                .workflowDefinition(upstreamWorkflow)
+                .backfillParams(params)
+                .build();
+
+        DependentWorkflowDefinition dep = new DependentWorkflowDefinition();
+        dep.setWorkflowDefinitionCode(downstreamCode);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Collections.singletonList(dep));
+        when(workflowDefinitionDao.queryByCode(downstreamCode)).thenReturn(Optional.empty());
+
+        Method method = BackfillWorkflowExecutorDelegate.class.getDeclaredMethod(
+                "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class);
+        method.setAccessible(true);
+
+        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"));
+
+        verify(backfillWorkflowExecutorDelegate, never()).execute(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_SkipOfflineWorkflow() throws Exception {
+        long upstreamCode = 3000L;
+        long downstreamCode = 4000L;
+
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
+
+        WorkflowDefinition offlineDownstream =
+                WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.OFFLINE).build();
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.<ZonedDateTime>emptyList())
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO dto = BackfillWorkflowDTO.builder()
+                .workflowDefinition(upstreamWorkflow)
+                .backfillParams(params)
+                .build();
+
+        DependentWorkflowDefinition dep = new DependentWorkflowDefinition();
+        dep.setWorkflowDefinitionCode(downstreamCode);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Collections.singletonList(dep));
+        when(workflowDefinitionDao.queryByCode(downstreamCode)).thenReturn(Optional.of(offlineDownstream));
+
+        Method method = BackfillWorkflowExecutorDelegate.class.getDeclaredMethod(
+                "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class);
+        method.setAccessible(true);
+
+        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"));
+
+        verify(backfillWorkflowExecutorDelegate, never()).execute(org.mockito.ArgumentMatchers.any());
     }
 }
