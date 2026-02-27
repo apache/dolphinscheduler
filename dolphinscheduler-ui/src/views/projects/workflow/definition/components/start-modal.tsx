@@ -291,9 +291,7 @@ export default defineComponent({
     )
 
     const formModel = computed(() => ({
-      // UI configuration state from form management hook
       ...startState.startForm,
-       // Business data injected from modal operations hook
       startParamsList: variables.startParamsList
     }))
 
