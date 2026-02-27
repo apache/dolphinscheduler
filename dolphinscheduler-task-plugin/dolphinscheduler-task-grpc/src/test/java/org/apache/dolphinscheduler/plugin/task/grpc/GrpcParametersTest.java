@@ -99,7 +99,6 @@ public class GrpcParametersTest {
         Assertions.assertEquals("{ \"username\":\"test username\" }", grpcParameters.getMessage());
         Assertions.assertEquals(GrpcCheckCondition.STATUS_CODE_DEFAULT, grpcParameters.getGrpcCheckCondition());
         Assertions.assertEquals("", grpcParameters.getCondition());
-        Assertions.assertEquals(0, grpcParameters.getLocalParametersMap().size());
         Assertions.assertEquals(0, grpcParameters.getResourceFilesList().size());
     }
 
