@@ -66,11 +66,6 @@ public class SqlParameters extends AbstractParameters {
     private int sqlType;
 
     /**
-     * send alert
-     */
-    private Boolean sendAlert;
-
-    /**
      * display rows
      */
     private int displayRows;
@@ -96,6 +91,10 @@ public class SqlParameters extends AbstractParameters {
      */
     private List<String> postStatements;
 
+    /**
+     * send alert
+     */
+    private Boolean sendAlert;
     /**
      * groupId
      */

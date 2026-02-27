@@ -14,3 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+UPDATE t_ds_task_definition
+SET task_params = (
+    (task_params::jsonb - 'sendEmail')
+    || jsonb_build_object('sendAlert', task_params::jsonb->'sendEmail')
+)::text
+WHERE jsonb_path_exists(task_params::jsonb, '$.sendEmail');
+
+UPDATE t_ds_task_definition_log
+SET task_params = (
+    (task_params::jsonb - 'sendEmail')
+    || jsonb_build_object('sendAlert', task_params::jsonb->'sendEmail')
+)::text
+WHERE jsonb_path_exists(task_params::jsonb, '$.sendEmail');

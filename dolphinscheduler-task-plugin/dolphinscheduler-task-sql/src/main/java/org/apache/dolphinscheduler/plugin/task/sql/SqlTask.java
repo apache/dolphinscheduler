@@ -92,6 +92,10 @@ public class SqlTask extends AbstractTask {
     private Connection sessionConnection;
     private Statement sessionStatement;
 
+    private boolean needAlert = false;
+
+    private TaskResultAlertInfo taskResultAlertInfo;
+
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
@@ -305,12 +309,12 @@ public class SqlTask extends AbstractTask {
             }
 
             setNeedAlert(true);
-            TaskResultAlertInfo taskResultAlertInfo = new TaskResultAlertInfo(sqlParameters.getGroupId(),
+            TaskResultAlertInfo resultAlertInfo = new TaskResultAlertInfo(sqlParameters.getGroupId(),
                     StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle()
                             : taskExecutionContext.getTaskName() + " query result sets",
                     alertContent,
                     AlertType.TASK_RESULT);
-            setTaskResultAlertInfo(taskResultAlertInfo);
+            setTaskResultAlertInfo(resultAlertInfo);
         }
 
         log.debug("execute sql result : {}", result);
@@ -470,6 +474,18 @@ public class SqlTask extends AbstractTask {
             content = m.replaceFirst(paramValue);
         }
         return content;
+    }
+
+    public boolean getNeedAlert() {
+        return needAlert;
+    }
+
+    public void setNeedAlert(boolean needAlert) {
+        this.needAlert = needAlert;
+    }
+
+    public void setTaskResultAlertInfo(TaskResultAlertInfo taskResultAlertInfo) {
+        this.taskResultAlertInfo = taskResultAlertInfo;
     }
 
 }
