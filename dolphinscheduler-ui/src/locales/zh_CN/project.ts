@@ -239,6 +239,7 @@ export default {
       '下游存在依赖，你不能删除该任务.',
     warning_delete_scheduler_dependent_tasks_desc:
       '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
+    request_failed: '请求失败，请重试',
     warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.'
   },
   task: {
@@ -425,7 +426,7 @@ export default {
     script: '脚本',
     script_tips: '请输入脚本（必填）',
     master: 'Master',
-    master_tips: '请输入master url（必填）',
+    master_tips: '请输入master url（选填）',
     init_script: '初始化脚本',
     init_script_tips: '请输入初始化脚本',
     resources: '资源',
@@ -449,7 +450,7 @@ export default {
     pre_tasks: '前置任务',
     program_type: '程序类型',
     main_class: '主类名',
-    main_class_tips: '请填写完整主类名(可选)',
+    main_class_tips: '请填写完整主类名(必填)',
     main_class_invalid: '主类名不合法',
     main_package: '主程序包',
     main_package_tips: '请选择主程序包',

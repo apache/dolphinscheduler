@@ -242,6 +242,7 @@ export default {
       'The downstream dependent tasks exists. You can not delete the task.',
     warning_delete_scheduler_dependent_tasks_desc:
       'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
+    request_failed: 'Request failed, please retry',
     warning_too_large_parallelism_number:
       'The parallelism number is too large. It is better not to be over 10.'
   },
@@ -437,7 +438,7 @@ export default {
     script: 'Script',
     script_tips: 'Please enter script(required)',
     master: 'Master',
-    master_tips: 'Please enter master url(required)',
+    master_tips: 'Please enter master url(optional)',
     init_script: 'Initialization script',
     init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
@@ -462,7 +463,7 @@ export default {
     pre_tasks: 'Pre tasks',
     program_type: 'Program Type',
     main_class: 'Main Class Name',
-    main_class_tips: 'Please enter the full main class name (optional)',
+    main_class_tips: 'Please enter the full main class name (required)',
     main_class_invalid: 'Invalid main class name',
     main_package: 'Main Package',
     main_package_tips: 'Please enter main package',

@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,9 +33,6 @@ import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * k8s task parameters
- */
 @Data
 @Slf4j
 public class K8sTaskParameters extends AbstractParameters {
@@ -66,5 +65,22 @@ public class K8sTaskParameters extends AbstractParameters {
         ResourceParametersHelper resources = super.getResources();
         resources.put(ResourceType.DATASOURCE, datasource);
         return resources;
+    }
+
+    public K8sTaskExecutionContext generateK8sTaskExecutionContext(
+                                                                   ResourceParametersHelper parametersHelper,
+                                                                   int datasource) {
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper
+                        .getResourceParameters(ResourceType.DATASOURCE, datasource);
+
+        String connectionParams = null;
+        if (dataSourceParameters != null) {
+            connectionParams = dataSourceParameters.getConnectionParams();
+        }
+
+        return K8sTaskExecutionContext.builder()
+                .connectionParams(connectionParams)
+                .build();
     }
 }
