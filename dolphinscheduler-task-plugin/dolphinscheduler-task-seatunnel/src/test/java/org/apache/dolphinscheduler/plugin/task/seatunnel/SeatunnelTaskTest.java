@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import org.apache.commons.io.FileUtils;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -131,6 +132,20 @@ public class SeatunnelTaskTest {
         String command = String.join(" ", seatunnelTask.buildOptions());
         String expectedCommand = String.format("--config %s/seatunnel_%s.conf -i key1='value1'", EXECUTE_PATH, taskId);
         Assertions.assertEquals(expectedCommand, command);
+    }
+
+    @Test
+    public void testQuoteForBash() throws Exception {
+        Assertions.assertEquals("'value'", invokeQuoteForBash("value"));
+        Assertions.assertEquals("'abc'\"'\"'def'", invokeQuoteForBash("abc'def"));
+        Assertions.assertEquals("''", invokeQuoteForBash(null));
+        Assertions.assertEquals("'$(rm -rf /)'", invokeQuoteForBash("$(rm -rf /)"));
+    }
+
+    private String invokeQuoteForBash(String value) throws Exception {
+        Method quoteForBash = SeatunnelTask.class.getDeclaredMethod("quoteForBash", String.class);
+        quoteForBash.setAccessible(true);
+        return (String) quoteForBash.invoke(null, value);
     }
 
     private static final String RAW_SCRIPT = "env {\n" +
