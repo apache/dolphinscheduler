@@ -225,7 +225,7 @@ security:
           iconUri: ""
           provider: google
     oidc:
-      enable: true
+      enable: false
       providers:
         # registrationId used in URLs and internal mapping
         keycloak:
