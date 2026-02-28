@@ -52,7 +52,8 @@ export function useForm(id?: number) {
     MSIClientId: '',
     dbUser: '',
     datawarehouse: '',
-    driverJarName: undefined
+    driverJarName: undefined,
+    driverClassName: ''
   } as IDataSourceDetail
 
   const state = reactive({
@@ -77,6 +78,7 @@ export function useForm(id?: number) {
     showRegionId: false,
     showEndpoint: false,
     showDriverJarName: true,
+    showDriverClassName: true,
     driverJarOptions: [] as any[],
     rules: {
       name: {
@@ -207,6 +209,13 @@ export function useForm(id?: number) {
           return true
         }
       },
+      driverClassName: {
+        trigger: ['blur', 'change'],
+        validator() {
+          // 驱动类名是可选的，不需要强制验证
+          return true
+        }
+      },
       // databaseUserName: {
       //   trigger: ['input'],
       //   validator() {
@@ -260,8 +269,9 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
-    // 设置是否显示驱动包选择框（对所有数据源类型都显示）
+    // 设置是否显示驱动包和驱动类名选择框（对所有数据源类型都显示）
     state.showDriverJarName = true
+    state.showDriverClassName = true
 
     // 获取驱动包列表（对所有数据源类型都获取）
     try {

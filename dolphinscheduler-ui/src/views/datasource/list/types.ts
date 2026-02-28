@@ -25,6 +25,7 @@ import type { SelectBaseOption } from 'naive-ui/es/select/src/interface'
 interface IDataSourceDetail extends Omit<IDataSource, 'other'> {
   other?: string
   driverJarName?: string
+  driverClassName?: string
 }
 
 interface IDataBaseOption extends SelectBaseOption {

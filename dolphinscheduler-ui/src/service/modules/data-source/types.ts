@@ -102,6 +102,7 @@ interface IDataSource {
   regionId?: string
   endpoint?: string
   driverJarName?: string
+  driverClassName?: string
 }
 
 interface ListReq {

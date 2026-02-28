@@ -22,16 +22,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class MySQLDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    private String driverJarName;
-
-    public String getDriverJarName() {
-        return driverJarName;
-    }
-
-    public void setDriverJarName(String driverJarName) {
-        this.driverJarName = driverJarName;
-    }
-
     @Override
     public String toString() {
         return "MySQLDataSourceParamDTO{"

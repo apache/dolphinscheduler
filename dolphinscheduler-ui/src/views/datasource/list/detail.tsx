@@ -188,6 +188,7 @@ const DetailModal = defineComponent({
       showNamespace,
       showKubeConfig,
       showDriverJarName,
+      showDriverClassName,
       driverJarOptions,
       modeOptions,
       redShiftModeOptions,
@@ -751,6 +752,20 @@ const DetailModal = defineComponent({
                     show-arrow
                     style={{width: '100%'}}
                     disabled={false}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showDriverClassName}
+                  label={t('datasource.driver_class_name')}
+                  path='driverClassName'
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-driver-class-name'
+                    v-model={[detailForm.driverClassName, 'value']}
+                    type='text'
+                    maxlength={255}
+                    placeholder={t('datasource.driver_class_name_tips')}
                   />
                 </NFormItem>
                 <NFormItem

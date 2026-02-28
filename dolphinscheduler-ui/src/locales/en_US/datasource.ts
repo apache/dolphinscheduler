@@ -107,5 +107,7 @@ export default {
   endpoint: 'Endpoint',
   endpoint_tips: 'Please enter endpoint',
   driver_jar_name: 'Driver Jar',
-  driver_jar_name_tips: 'Please select driver jar'
+  driver_jar_name_tips: 'Please select driver jar',
+  driver_class_name: 'Driver Class Name',
+  driver_class_name_tips: 'Please enter driver class name'
 }

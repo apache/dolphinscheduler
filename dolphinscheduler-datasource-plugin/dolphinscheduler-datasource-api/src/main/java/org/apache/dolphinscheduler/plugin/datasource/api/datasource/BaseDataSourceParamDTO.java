@@ -47,6 +47,8 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected String driverJarName;
 
+    protected String driverClassName;
+
     protected Map<String, String> other;
 
     public String getDriverJarName() {
@@ -55,6 +57,14 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     public void setDriverJarName(String driverJarName) {
         this.driverJarName = driverJarName;
+    }
+
+    public String getDriverClassName() {
+        return driverClassName;
+    }
+
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
     }
 
     public Integer getId() {

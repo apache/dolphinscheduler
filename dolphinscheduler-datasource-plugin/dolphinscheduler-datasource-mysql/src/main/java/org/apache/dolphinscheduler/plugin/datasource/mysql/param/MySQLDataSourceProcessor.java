@@ -69,6 +69,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
         mysqlDatasourceParamDTO.setUserName(connectionParams.getUser());
         mysqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
+        mysqlDatasourceParamDTO.setDriverClassName(connectionParams.getDriverClassName());
         mysqlDatasourceParamDTO.setDriverJarName(connectionParams.getDriverJarName());
         mysqlDatasourceParamDTO.setOther(connectionParams.getOther());
 
@@ -94,7 +95,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         mysqlConnectionParam.setAddress(address);
         mysqlConnectionParam.setUser(mysqlDatasourceParam.getUserName());
         mysqlConnectionParam.setPassword(PasswordUtils.encodePassword(mysqlDatasourceParam.getPassword()));
-        mysqlConnectionParam.setDriverClassName(getDatasourceDriver());
+        mysqlConnectionParam.setDriverClassName(mysqlDatasourceParam.getDriverClassName());
         mysqlConnectionParam.setDriverJarName(mysqlDatasourceParam.getDriverJarName());
         mysqlConnectionParam.setValidationQuery(getValidationQuery());
         mysqlConnectionParam.setOther(mysqlDatasourceParam.getOther());

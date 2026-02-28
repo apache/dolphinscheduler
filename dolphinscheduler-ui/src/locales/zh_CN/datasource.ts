@@ -104,5 +104,7 @@ export default {
   endpoint: 'endpoint',
   endpoint_tips: '请输入endpoint',
   driver_jar_name: '驱动包',
-  driver_jar_name_tips: '请选择驱动包'
+  driver_jar_name_tips: '请选择驱动包',
+  driver_class_name: '驱动类名',
+  driver_class_name_tips: '请输入驱动类名'
 }
