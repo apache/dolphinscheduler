@@ -18,6 +18,7 @@
 import {
   defineComponent,
   getCurrentInstance,
+  onMounted,
   PropType,
   toRefs,
   watch
@@ -38,6 +39,7 @@ import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import { useForm, datasourceType } from './use-form'
 import { useDetail } from './use-detail'
+import type { IDataBase } from './types'
 import styles from './index.module.scss'
 
 const props = {
@@ -69,6 +71,13 @@ const DetailModal = defineComponent({
       setFieldsValue,
       getFieldsValue
     } = useForm(props.id)
+
+    // 在组件挂载后立即加载驱动包数据
+    onMounted(() => {
+      // 如果没有传入 selectType，使用默认的 MYSQL 类型
+      const initType = (props.selectType || 'MYSQL') as IDataBase
+      changeType(initType, datasourceType[initType])
+    })
 
     const { status, queryById, testConnect, createOrUpdate } =
       useDetail(getFieldsValue)
@@ -129,6 +138,15 @@ const DetailModal = defineComponent({
             datasourceType[state.detailForm.type]
           ))
       }
+    )
+
+    // 监听 driverJarOptions 变化，确保模板响应式更新
+    watch(
+      () => state.driverJarOptions,
+      () => {
+        // Driver jar options changed
+      },
+      { deep: true }
     )
 
     return {
@@ -720,17 +738,19 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.compatible_mode_tips')}
                   />
                 </NFormItem>
-                {/* 驱动包选择 */}
                 <NFormItem
-                  v-show={showDriverJarName}
                   label={t('datasource.driver_jar_name')}
                   path='driverJarName'
                 >
                   <NSelect
-                    v-model={[detailForm.driverJarName, 'value']}
-                    options={driverJarOptions}
                     placeholder={t('datasource.driver_jar_name_tips')}
+                    options={driverJarOptions}
+                    v-model:value={detailForm.driverJarName}
                     clearable
+                    filterable
+                    show-arrow
+                    style={{width: '100%'}}
+                    disabled={false}
                   />
                 </NFormItem>
                 <NFormItem

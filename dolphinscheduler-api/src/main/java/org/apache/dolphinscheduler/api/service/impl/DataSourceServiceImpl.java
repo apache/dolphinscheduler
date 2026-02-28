@@ -583,7 +583,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         // 构建插件路径
-        String driverBasePath = "plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
+        String driverBasePath = System.getProperty("user.dir") + "/plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
         File driverDir = new File(driverBasePath);
 
         if (!driverDir.exists() || !driverDir.isDirectory()) {

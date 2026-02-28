@@ -52,7 +52,7 @@ export function useForm(id?: number) {
     MSIClientId: '',
     dbUser: '',
     datawarehouse: '',
-    driverJarName: ''
+    driverJarName: undefined
   } as IDataSourceDetail
 
   const state = reactive({
@@ -76,7 +76,7 @@ export function useForm(id?: number) {
     showAccessKeySecret: false,
     showRegionId: false,
     showEndpoint: false,
-    showDriverJarName: false,
+    showDriverJarName: true,
     driverJarOptions: [] as any[],
     rules: {
       name: {
@@ -199,7 +199,14 @@ export function useForm(id?: number) {
             return new Error(t('datasource.IAM-accessKey'))
           }
         }
-      }
+      },
+      driverJarName: {
+        trigger: ['blur', 'change'],
+        validator() {
+          // 驱动包名称是可选的，不需要强制验证
+          return true
+        }
+      },
       // databaseUserName: {
       //   trigger: ['input'],
       //   validator() {
@@ -253,26 +260,48 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
-    // 设置是否显示驱动包选择框（仅对支持驱动版本配置的数据源类型显示）
-    state.showDriverJarName = ['MYSQL', 'POSTGRESQL', 'HIVE', 'SPARK'].includes(type)
-    
-    // 如果支持驱动包选择，则获取驱动包列表
-    if (state.showDriverJarName) {
-      try {
-        const response = await queryDriverJarList(type)
-        if (response.data && response.data.data) {
-          state.driverJarOptions = response.data.data.map((item: any) => ({
-            label: item.driverJarName,
-            value: item.driverJarName
-          }))
+    // 设置是否显示驱动包选择框（对所有数据源类型都显示）
+    state.showDriverJarName = true
+
+    // 获取驱动包列表（对所有数据源类型都获取）
+    try {
+      const response = await queryDriverJarList(type)
+
+      // 检查响应结构，确保正确获取数据
+      let driverData = []
+
+      // 简化响应格式处理逻辑
+      if (response) {
+        if (Array.isArray(response)) {
+          driverData = response
         }
-      } catch (error) {
-        console.error('Failed to fetch driver jar list:', error)
+      }
+
+      if (driverData.length > 0) {
+        // 处理各种可能的数据格式
+        const newOptions = driverData.map((item: any) => {
+          // 如果是字符串，直接使用
+          if (typeof item === 'string') {
+            return {
+              label: item,
+              value: item
+            }
+          }
+          // 如果不是字符串，返回null，后续过滤掉
+          return null
+        }).filter(Boolean)
+
+        // 使用赋值方式更新，确保响应式
+        state.driverJarOptions = newOptions
+      } else {
+        // 没有驱动包数据时，保持空数组
         state.driverJarOptions = []
       }
-    } else {
+      state.detailForm.driverJarName = undefined
+    } catch (error) {
+      console.error('Failed to fetch driver jar list:', error)
       state.driverJarOptions = []
-      state.detailForm.driverJarName = ''
+      state.detailForm.driverJarName = undefined
     }
 
     state.requiredDataBase =
