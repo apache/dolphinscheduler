@@ -28,7 +28,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,20 +52,11 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-
-        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
 
-    /**
-     * create command
-     *
-     * @return command
-     */
     @Override
     protected String getScript() {
-        // flink run/run-application [OPTIONS] <jar-file> <arguments>
-        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
-        return args.stream().collect(Collectors.joining(" "));
+        return buildScriptWithParameterReplacement(flinkParameters);
     }
 
     @Override
