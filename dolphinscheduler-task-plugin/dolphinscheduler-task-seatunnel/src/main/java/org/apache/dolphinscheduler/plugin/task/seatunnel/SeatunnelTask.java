@@ -178,9 +178,17 @@ public class SeatunnelTask extends AbstractRemoteTask {
         List<String> parameters = new ArrayList<>();
         variables.forEach((k, v) -> {
             parameters.add("-i");
-            parameters.add(String.format("%s='%s'", k, v));
+            parameters.add(String.format("%s=%s", k, quoteForBash(v)));
         });
         return parameters;
+    }
+
+    private static String quoteForBash(String value) {
+        if (value == null) {
+            return "''";
+        }
+        // Escape single quotes in a bash-safe way: abc'def -> 'abc'"'"'def'
+        return "'" + value.replace("'", "'\"'\"'") + "'";
     }
 
     private String buildCustomConfigContent() {
