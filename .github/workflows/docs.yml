@@ -108,6 +108,8 @@ jobs:
     needs:
       - style
       - img-check
+      - dead-link
+      - helm-doc
     if: always()
     steps:
       - name: Status
