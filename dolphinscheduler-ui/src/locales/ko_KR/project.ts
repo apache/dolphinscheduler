@@ -15,10 +15,5 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
-}
-
-export { LocalesStore, Locales }
+// TODO: 프로젝트/워크플로우/태스크/노드 등 대량 문구는 단계적으로 한글화 예정. 당분간 zh_CN과 동일 구조 사용.
+export { default } from '../zh_CN/project'

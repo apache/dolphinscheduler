@@ -18,6 +18,7 @@
 import { createI18n } from 'vue-i18n'
 import zh_CN from './zh_CN'
 import en_US from './en_US'
+import ko_KR from './ko_KR'
 
 const i18n = createI18n({
   legacy: false,
@@ -25,7 +26,8 @@ const i18n = createI18n({
   locale: 'zh_CN',
   messages: {
     zh_CN,
-    en_US
+    en_US,
+    ko_KR
   }
 })
 

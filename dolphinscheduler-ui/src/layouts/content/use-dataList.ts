@@ -68,6 +68,10 @@ export function useDataList() {
     {
       label: '中文',
       key: 'zh_CN'
+    },
+    {
+      label: '한국어',
+      key: 'ko_KR'
     }
   ]
 

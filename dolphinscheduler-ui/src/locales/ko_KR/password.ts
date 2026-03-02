@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
+export default {
+  edit_password: '비밀번호 변경',
+  password: '비밀번호',
+  confirm_password: '비밀번호 확인',
+  password_tips: '비밀번호를 입력하세요',
+  confirm_password_tips: '비밀번호 확인을 입력하세요',
+  two_password_entries_are_inconsistent: '두 비밀번호가 일치하지 않습니다',
+  submit: '제출'
 }
-
-export { LocalesStore, Locales }

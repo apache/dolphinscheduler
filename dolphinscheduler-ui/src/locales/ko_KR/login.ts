@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
+export default {
+  test: '테스트',
+  userName: '사용자명',
+  userName_tips: '사용자명을 입력하세요',
+  userPassword: '비밀번호',
+  userPassword_tips: '비밀번호를 입력하세요',
+  login: '로그인',
+  loginWithOAuth2: 'OAuth2로 로그인',
+  ssoLogin: '싱글 사인온'
 }
-
-export { LocalesStore, Locales }

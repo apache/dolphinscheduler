@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
+export default {
+  refresh_time: '자동 새로고침 시간',
+  experimental_feature: '실험적 기능',
+  request_settings: '요청 설정',
+  dynamic_task_component: '동적 태스크 컴포넌트',
+  api_timeout: 'API 타임아웃',
+  millisecond: '밀리초'
 }
-
-export { LocalesStore, Locales }

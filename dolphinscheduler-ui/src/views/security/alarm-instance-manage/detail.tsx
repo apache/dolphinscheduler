@@ -115,6 +115,8 @@ const DetailModal = defineComponent({
         props.placeholder = msgMap.zhMsg
       } else if (locale.value === 'en_US') {
         props.placeholder = msgMap.enMsg
+      } else if (locale.value === 'ko_KR') {
+        props.placeholder = msgMap.koMsg || msgMap.enMsg
       }
     }
 

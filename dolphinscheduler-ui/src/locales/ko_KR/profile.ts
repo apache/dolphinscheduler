@@ -15,10 +15,26 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
+export default {
+  profile: '사용자 정보',
+  edit: '편집',
+  username: '사용자명',
+  email: '이메일',
+  phone: '연락처',
+  state: '상태',
+  permission: '권한',
+  create_time: '생성 시간',
+  update_time: '수정 시간',
+  administrator: '관리자',
+  ordinary_user: '일반 사용자',
+  edit_profile: '사용자 편집',
+  username_tips: '사용자명을 입력하세요',
+  email_tips: '이메일을 입력하세요',
+  email_correct_tips: '올바른 이메일 형식을 입력하세요',
+  phone_tips: '연락처를 입력하세요',
+  state_tips: '상태를 선택하세요',
+  enable: '활성화',
+  disable: '비활성화',
+  timezone_success: '타임존이 업데이트되었습니다',
+  please_select_timezone: '타임존을 선택하세요'
 }
-
-export { LocalesStore, Locales }

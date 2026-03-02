@@ -15,10 +15,7 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
+export default {
+  about: '제품 정보',
+  about_version: '제품 버전'
 }
-
-export { LocalesStore, Locales }

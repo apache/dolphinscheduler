@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-type Locales = 'zh_CN' | 'en_US' | 'ko_KR'
-
-interface LocalesStore {
-  locales: Locales
+export default {
+  placeholder: '검색어를 입력하세요'
 }
-
-export { LocalesStore, Locales }
