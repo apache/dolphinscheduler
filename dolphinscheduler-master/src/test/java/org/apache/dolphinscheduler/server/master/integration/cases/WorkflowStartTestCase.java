@@ -1801,6 +1801,11 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getState())
                                         .isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
                             });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
                 });
         // This test intentionally leaves the workflow running, so we skip the resource
         // cleanup check.
@@ -1837,8 +1842,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                                 assertThat(taskInstance.getName()).isEqualTo(
                                         "dep_task_with_timeout_warnfailed");
                                 assertThat(taskInstance.getState())
-                                        .isEqualTo(TaskExecutionStatus.FAILURE);
+                                        .isEqualTo(TaskExecutionStatus.KILL);
                             });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.STOP));
                 });
 
         masterContainer.assertAllResourceReleased();
