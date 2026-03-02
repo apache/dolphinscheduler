@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master.utils;
 
 import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.NoAvailableWorkerException;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
 
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -29,5 +31,13 @@ public class ExceptionUtils {
 
     public static boolean isTaskExecutionContextCreateException(Throwable e) {
         return e instanceof TaskExecutionContextCreateException;
+    }
+
+    public static boolean isWorkerGroupNotFoundException(Throwable e) {
+        return e instanceof WorkerGroupNotFoundException;
+    }
+
+    public static boolean isNoAvailableWorkerException(Throwable e) {
+        return e instanceof NoAvailableWorkerException;
     }
 }

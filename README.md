@@ -4,23 +4,22 @@
 ![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 [![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule) <!-- markdown-link-check-disable-line -->
-[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://s.apache.org/dolphinscheduler-slack)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
 ## About
 
 Apache DolphinScheduler is a modern data orchestration platform that empowers agile, low-code development of high-performance workflows.
-It is dedicated to handling complex task dependencies in data pipelines, and provides a wide range of built-in job types ** out of the box**
+It is dedicated to handling complex task dependencies in data pipelines and provides a wide range of built-in job types **out of the box**.
 
 Key features for DolphinScheduler are as follows:
 
-- Easy to deploy, provides four deployment modes including Standalone, Cluster, Docker and Kubernetes.
+- Easy to deploy, providing four deployment modes including Standalone, Cluster, Docker, and Kubernetes.
 - Easy to use, workflows can be created and managed via Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) or Open API
-- Highly reliable and high availability, with a decentralized, multi-master and multi-worker architecture and native supports for horizontal scaling.
+- Highly reliable and high availability, with a decentralized, multi-master and multi-worker architecture and native support for horizontal scaling.
 - High performance, its performance is several times faster than other orchestration platforms, and it is capable of handling tens of millions of tasks per day
-- Cloud Native, DolphinScheduler supports orchestrating workflows cross multiple clouds and data centers, and allows custom task types
+- Cloud Native, DolphinScheduler supports orchestrating workflows across multiple clouds and data centers, and allows custom task types
 - Workflow Versioning, provides version control for both workflows and individual workflow instances, including tasks.
-- Flexible state control of workflows and tasks, supports pause/stop/recover them in any time
+- Flexible state control of workflows and tasks, supports pausing, stopping, and recovering them at any time.
 - Multi-tenancy support
 - Additional features, backfill support(Web UI native), permission control including project and data source etc.
 
@@ -48,7 +47,7 @@ Key features for DolphinScheduler are as follows:
 * **Data source:** Supports multiple external data sources, provides unified data access capabilities for MySQL, PostgreSQL, Hive, Trino, etc.
 ![data-source](images/data-source.png)
 
-* **Monitor:** View the status of the master, worker and database in real time, including server resource usage and load, do quick health check without logging in to the server.
+* **Monitor:** View the status of the master, worker and database in real time, including server resource usage and load, do a quick health check without logging in to the server.
 ![monitor](images/monitor.png)
 
 ## Suggestions & Bug Reports
@@ -58,13 +57,13 @@ Follow [this guide](https://github.com/apache/dolphinscheduler/issues/new/choose
 ## Contributing
 
 The community welcomes contributions from everyone. Please refer to this page to find out more details: [How to contribute](docs/docs/en/contribute/join/contribute.md).
-Check out good first issue in [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
+Check out good first issues [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
 
 ## Community
 
 Welcome to join the Apache DolphinScheduler community by:
 
-- Join the [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack) to keep in touch with the community
+- Use [GitHub Issues](https://github.com/apache/dolphinscheduler/issues) for questions, discussions, and bug reports
 - Follow the [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) and get the latest news <!-- markdown-link-check-disable-line -->
 - Subscribe DolphinScheduler mail list, [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) for users and [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org) for developers
 
