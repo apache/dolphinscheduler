@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -277,7 +278,7 @@ public class DataxParameters extends AbstractParameters {
                 ", jobChannel=" + jobChannel +
                 ", xms=" + xms +
                 ", xmx=" + xmx +
-                ", resourceList=" + resourceList +
+                ", resourceList=" + JSONUtils.toJsonString(resourceList) +
                 '}';
     }
 
