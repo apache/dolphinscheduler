@@ -265,13 +265,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
         }
 
-        try {
-            validateGlobalParams(globalParams);
-        } catch (ServiceException ex) {
-            log.warn("Invalid globalParams: {}", ex.getMessage());
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, ex.getMessage());
-            return result;
-        }
+        validateGlobalParams(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
@@ -794,13 +788,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        try {
-            validateGlobalParams(globalParams);
-        } catch (ServiceException ex) {
-            log.warn("Invalid globalParams: {}", ex.getMessage());
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, ex.getMessage());
-            return result;
-        }
+        validateGlobalParams(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
@@ -866,10 +854,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             String key = p.getProp().trim();
             if (!keys.add(key)) {
                 throw new ServiceException("Duplicate global param key: " + key);
-            }
-
-            if (Direct.IN.equals(p.getDirect()) && StringUtils.isEmpty(p.getValue())) {
-                throw new ServiceException("IN param value required for key: " + key);
             }
         }
     }
