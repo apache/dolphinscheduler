@@ -356,7 +356,7 @@ CREATE TABLE `t_ds_command` (
 DROP TABLE IF EXISTS `t_ds_serial_command`;
 CREATE TABLE `t_ds_serial_command` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-  `workflow_definition_code` int(11) NOT NULL COMMENT 'workflow definition code',
+  `workflow_definition_code` bigint(20) NOT NULL COMMENT 'workflow definition code',
   `workflow_definition_version` int(11) NOT NULL COMMENT 'workflow definition version',
   `workflow_instance_id` bigint(20) NOT NULL COMMENT 'workflow instance id',
   `state` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'state of the serial queue: 0 waiting, 1 fired',

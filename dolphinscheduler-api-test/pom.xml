@@ -37,7 +37,7 @@
 
         <junit.version>5.7.2</junit.version>
         <selenium.version>4.21.0</selenium.version>
-        <testcontainers.version>1.19.8</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <lombok.version>1.18.24</lombok.version>
         <assertj-core.version>3.23.1</assertj-core.version>
         <awaitility.version>4.1.0</awaitility.version>
