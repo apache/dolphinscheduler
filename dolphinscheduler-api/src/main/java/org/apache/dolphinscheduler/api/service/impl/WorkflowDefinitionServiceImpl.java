@@ -827,7 +827,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * Validates global parameters: non-empty keys, no duplicates, and required values for IN-type params.
+     * Validates global parameters: non-empty keys, no duplicates
      */
     private void validateGlobalParams(String globalParams) {
         if (StringUtils.isBlank(globalParams)) {
