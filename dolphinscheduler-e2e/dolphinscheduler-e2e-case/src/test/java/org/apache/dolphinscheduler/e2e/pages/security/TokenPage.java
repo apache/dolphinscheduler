@@ -69,6 +69,7 @@ public final class TokenPage extends NavBarPage implements Tab {
 
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
+        setExpireTime(30);
         createTokenForm().selectUserNameDropdown().click();
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
@@ -160,5 +161,28 @@ public final class TokenPage extends NavBarPage implements Tab {
         @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
 
+    }
+
+    private void setExpireTime(int daysAfter) {
+        try {
+            WebElement datePickerInput = driver.findElement(By.cssSelector(".n-date-picker input"));
+
+            LocalDateTime futureDate = LocalDateTime.now().plusDays(daysAfter);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String futureDateStr = futureDate.format(formatter);
+
+            datePickerInput.clear();
+            datePickerInput.sendKeys(futureDateStr.substring(0, 10));
+
+            Thread.sleep(100);
+            WebElement timeInput = driver.findElement(By.cssSelector(".n-time-picker input"));
+            timeInput.clear();
+            timeInput.sendKeys(futureDateStr.substring(11));
+            timeInput.sendKeys(Keys.ENTER);
+
+            Thread.sleep(100);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set expire time", e);
+        }
     }
 }
