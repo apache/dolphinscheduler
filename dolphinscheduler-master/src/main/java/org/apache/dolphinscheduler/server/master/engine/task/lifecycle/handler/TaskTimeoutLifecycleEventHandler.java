@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -55,9 +54,8 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
             // The task instance is not active, means it is already finished.
             return;
         }
-        final TaskDefinition taskDefinition = taskExecutionRunnable.getTaskDefinition();
         final String taskName = taskExecutionRunnable.getName();
-        final TaskTimeoutStrategy timeoutNotifyStrategy = taskDefinition.getTimeoutNotifyStrategy();
+        final TaskTimeoutStrategy timeoutNotifyStrategy = taskTimeoutLifecycleEvent.getTimeoutStrategy();
         if (timeoutNotifyStrategy == null) {
             log.info("The task {} TimeoutStrategy is null.", taskName);
             return;

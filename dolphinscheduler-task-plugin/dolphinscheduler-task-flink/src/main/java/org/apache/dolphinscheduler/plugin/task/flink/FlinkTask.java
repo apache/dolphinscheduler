@@ -21,9 +21,14 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -62,8 +67,6 @@ public class FlinkTask extends AbstractYarnTask {
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-
-        FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
 
     /**
@@ -73,8 +76,31 @@ public class FlinkTask extends AbstractYarnTask {
      */
     @Override
     protected String getScript() {
-        // flink run/run-application [OPTIONS] <jar-file> <arguments>
-        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
+        return buildScriptWithParameterReplacement(flinkParameters);
+    }
+
+    /**
+     * Apply parameter replacement to initScript/rawScript, generate script files and build run command.
+     *
+     * @param params flink parameters
+     * @return run command string
+     */
+    protected String buildScriptWithParameterReplacement(FlinkParameters params) {
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, String> stringParams = ParameterUtils.convert(paramsMap);
+
+        if (StringUtils.isNotBlank(params.getInitScript())) {
+            params.setInitScript(
+                    ParameterUtils.convertParameterPlaceholders(params.getInitScript(), stringParams));
+        }
+        if (StringUtils.isNotBlank(params.getRawScript())) {
+            params.setRawScript(
+                    ParameterUtils.convertParameterPlaceholders(params.getRawScript(), stringParams));
+        }
+
+        FileUtils.generateScriptFile(taskExecutionContext, params);
+
+        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, params);
         return args.stream().collect(Collectors.joining(" "));
     }
 

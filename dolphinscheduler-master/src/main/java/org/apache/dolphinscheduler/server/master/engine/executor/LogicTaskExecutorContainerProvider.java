@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.engine.executor;
 
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
 import org.apache.dolphinscheduler.task.executor.container.SharedThreadTaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.TaskExecutorContainerConfig;
@@ -26,9 +25,11 @@ import org.apache.dolphinscheduler.task.executor.container.TaskExecutorContainer
 import org.springframework.stereotype.Component;
 
 @Component
-public class LogicTaskExecutorContainerProvider implements ITaskExecutorContainerProvider {
+public class LogicTaskExecutorContainerProvider
+        implements
+            ITaskExecutorContainerProvider<SharedThreadTaskExecutorContainer> {
 
-    private final ITaskExecutorContainer taskExecutorContainer;
+    private final SharedThreadTaskExecutorContainer taskExecutorContainer;
 
     public LogicTaskExecutorContainerProvider(final MasterConfig masterConfig) {
         final TaskExecutorContainerConfig containerConfig = TaskExecutorContainerConfig.builder()
@@ -39,7 +40,7 @@ public class LogicTaskExecutorContainerProvider implements ITaskExecutorContaine
     }
 
     @Override
-    public ITaskExecutorContainer getExecutorContainer() {
+    public SharedThreadTaskExecutorContainer getExecutorContainer() {
         return taskExecutorContainer;
     }
 }
