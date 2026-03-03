@@ -2,7 +2,7 @@
 
 ## 综述
 
-`SeaTunnel` 任务类型，用于创建并执行 `SeaTunnel` 类型任务。worker 执行该任务的时候，会通过 `start-seatunnel-spark.sh` 、 `start-seatunnel-flink.sh` 和 `seatunnel.sh` 命令解析 config 文件。
+`SeaTunnel` 任务类型，用于创建并执行 `SeaTunnel` 类型任务。worker 执行该任务的时候，会通过 `${SEATUNNEL_HOME}/bin/` 下的启动脚本（如 `seatunnel.sh` / `start-seatunnel-*-connector-v2.sh`）解析并执行 config 文件。
 点击 [这里](https://seatunnel.apache.org/) 获取更多关于 `Apache SeaTunnel` 的信息。
 
 ## 创建任务
@@ -16,7 +16,7 @@
 [//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
-- 启动脚本：选择你想要运行任务的启动脚本，包括 `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
+- 启动脚本：选择你想要运行任务的启动脚本（不同 SeaTunnel 发行包可能存在差异，以实际 `${SEATUNNEL_HOME}/bin/` 为准），包括 `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - 运行模型：支持 `run` 和 `run-application` 两种模式
 - 选项参数：用于添加 Flink 引擎本身参数，例如 `-m yarn-cluster -ynm seatunnel`
@@ -82,7 +82,7 @@ sink {
 
 ### 支持 SeaTunnel 版本
 
-- 2.3.1
-- 2.3.2
-- 2.3.3
+- 文档示例基于 `2.3.x` 版本的命令行参数与启动脚本
+- 已验证：2.3.1、2.3.2、2.3.3
+- 其他版本：该任务类型本质是对 SeaTunnel CLI 的封装，如 SeaTunnel 启动脚本与命令行参数保持兼容，通常可直接使用更高版本（建议升级后先做回归验证）
 
