@@ -1772,7 +1772,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
     @Test
     @DisplayName("Test start a workflow which contains a dep task with timeout warn strategy")
-    void testStartWorkflow_withTimeoutWarnTask() {
+    public void testStartWorkflow_withTimeoutWarnTask() {
         final String yaml = "/it/start/workflow_with_timeout_warn_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warn_task");
@@ -1809,11 +1809,12 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 });
         // This test intentionally leaves the workflow running, so we skip the resource
         // cleanup check.
+        // masterContainer.assertAllResourceReleased();
     }
 
     @Test
     @DisplayName("Test start a workflow which contains a dep task with timeout warn failed strategy")
-    void testStartWorkflow_withTimeoutWarnFailedTask() {
+    public void testStartWorkflow_withTimeoutWarnFailedTask() {
         final String yaml = "/it/start/workflow_with_timeout_warnfailed_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warnfailed_task");
