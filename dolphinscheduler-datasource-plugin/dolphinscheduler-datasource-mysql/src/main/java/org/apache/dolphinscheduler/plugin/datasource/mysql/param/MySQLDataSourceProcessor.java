@@ -131,20 +131,20 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
 
-        // 使用默认的驱动加载方式
+        // Use default driver loading method
         String driverClassName = mysqlConnectionParam.getDriverClassName();
         if (driverClassName == null || driverClassName.trim().isEmpty()) {
             driverClassName = getDatasourceDriver();
         }
 
-        // 检查是否有指定的驱动JAR名称，如果有则使用动态驱动加载
+        // Check if custom driver JAR is specified, use dynamic driver loading if available
         String driverJarName = mysqlConnectionParam.getDriverJarName();
         if (driverJarName != null && !driverJarName.trim().isEmpty()) {
             try {
-                // 构建驱动JAR文件路径
+                // Build driver JAR file path
                 String driverJarPath = getDriverJarPath(driverJarName, DbType.MYSQL.name());
 
-                // 动态加载驱动
+                // Dynamically load driver
                 Driver driver = DynamicDriverLoader.loadDriver(driverJarPath, driverClassName);
 
                 log.info("Using custom driver JAR: className={}, jarName={}", driverClassName, driverJarName);
@@ -162,13 +162,13 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
                 Properties connectionProperties = getConnectionProperties(mysqlConnectionParam, user, password);
 
-                // 使用动态加载的驱动创建连接
+                // Create connection using dynamically loaded driver
                 return driver.connect(getJdbcUrl(connectionParam), connectionProperties);
 
             } catch (Exception e) {
                 log.warn("Failed to load custom driver JAR {}, falling back to default driver loading", driverJarName,
                         e);
-                // 降级到默认驱动加载方式
+                // Fallback to default driver loading method
             }
         }
 
@@ -243,29 +243,29 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     /**
-     * 获取驱动JAR文件路径
-     * @param jarFileName JAR文件名
-     * @param dataSourceType 数据源类型
-     * @return 完整的JAR文件路径
+     * Get driver JAR file path
+     * @param jarFileName JAR file name
+     * @param dataSourceType Data source type
+     * @return Complete JAR file path
      */
     private String getDriverJarPath(String jarFileName, String dataSourceType) {
-        // 根据数据源类型构建驱动目录路径
+        // Build driver directory path based on data source type
         String driverBasePath = "plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
 
-        // 优先检查driver/{datasource_type}目录（构建时打包的驱动）
+        // First check driver/{datasource_type} directory (drivers packaged during build)
         File libDriverDir = new File(driverBasePath);
         if (libDriverDir.exists() && libDriverDir.isDirectory()) {
-            // 直接查找指定的JAR文件
+            // Directly search for the specified JAR file
             File jarFile = new File(libDriverDir, jarFileName);
             if (jarFile.exists()) {
                 log.info("Found driver JAR in {}: {}", driverBasePath, jarFileName);
                 return jarFile.getAbsolutePath();
             }
 
-            // 如果精确匹配失败，尝试在目录中查找包含指定文件名的JAR
+            // If exact match fails, try to find JAR containing the specified filename in the directory
             File[] jarFiles = libDriverDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".jar"));
             if (jarFiles != null) {
-                // 首先尝试精确匹配（不区分大小写）
+                // First try exact match (case-insensitive)
                 for (File file : jarFiles) {
                     if (file.getName().equalsIgnoreCase(jarFileName)) {
                         log.info("Found driver JAR (case-insensitive) in {}: {}", driverBasePath, file.getName());
@@ -273,7 +273,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
                     }
                 }
 
-                // 然后尝试包含匹配
+                // Then try contains match
                 for (File file : jarFiles) {
                     if (file.getName().toLowerCase().contains(jarFileName.toLowerCase().replace(".jar", ""))) {
                         log.info("Found approximate match for {} in {}: {}", jarFileName, driverBasePath,

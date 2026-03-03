@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 动态驱动加载器，支持隔离加载不同版本的MySQL驱动
+ * Dynamic driver loader supporting isolated loading of different MySQL driver versions
  */
 @Slf4j
 public class DynamicDriverLoader {
@@ -36,16 +36,16 @@ public class DynamicDriverLoader {
     private static final Map<String, ClassLoader> CLASSLOADER_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * 根据驱动JAR路径和类名动态加载驱动
-     * @param driverJarPath 驱动JAR文件路径
-     * @param driverClassName 驱动类名
-     * @return 驱动实例
-     * @throws Exception 加载异常
+     * Dynamically load driver based on JAR path and class name
+     * @param driverJarPath Driver JAR file path
+     * @param driverClassName Driver class name
+     * @return Driver instance
+     * @throws Exception Loading exception
      */
     public static Driver loadDriver(String driverJarPath, String driverClassName) throws Exception {
         String cacheKey = driverJarPath + "::" + driverClassName;
 
-        // 检查缓存
+        // Check cache
         if (DRIVER_CACHE.containsKey(cacheKey)) {
             return DRIVER_CACHE.get(cacheKey);
         }
@@ -55,18 +55,18 @@ public class DynamicDriverLoader {
             throw new RuntimeException("Driver JAR file not found: " + driverJarPath);
         }
 
-        // 创建独立的类加载器
+        // Create isolated class loader
         URLClassLoader classLoader = new URLClassLoader(
                 new URL[]{jarFile.toURI().toURL()},
-                null // 使用null作为父类加载器，实现完全隔离
+                null // Use null as parent classloader for complete isolation
         );
 
         try {
-            // 加载驱动类
+            // Load driver class
             Class<?> driverClass = classLoader.loadClass(driverClassName);
             Driver driver = (Driver) driverClass.getDeclaredConstructor().newInstance();
 
-            // 缓存驱动和类加载器
+            // Cache driver and classloader
             DRIVER_CACHE.put(cacheKey, driver);
             CLASSLOADER_CACHE.put(cacheKey, classLoader);
 

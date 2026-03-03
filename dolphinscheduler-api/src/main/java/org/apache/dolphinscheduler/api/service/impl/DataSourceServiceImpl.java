@@ -573,24 +573,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<String> queryDriverJarList(Integer type) {
+    public List<String> queryDriverJarList(DbType type) {
         List<String> driverJarList = new ArrayList<>();
 
-        // 根据类型获取数据源名称
-        String dataSourceType = getDataSourceTypeName(type);
-        if (dataSourceType == null) {
-            return driverJarList;
-        }
-
-        // 构建插件路径
-        String driverBasePath = System.getProperty("user.dir") + "/plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
+        // Build plugin path
+        String driverBasePath =
+                System.getProperty("user.dir") + "/plugins/datasource-plugins/driver/" + type.getName().toLowerCase();
         File driverDir = new File(driverBasePath);
 
         if (!driverDir.exists() || !driverDir.isDirectory()) {
             return driverJarList;
         }
 
-        // 查找目录中的所有jar文件
+        // Find all JAR files in the directory
         File[] jarFiles = driverDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".jar"));
         if (jarFiles != null) {
             for (File jarFile : jarFiles) {
@@ -599,24 +594,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         return driverJarList;
-    }
-
-    /**
-     * 根据类型获取数据源名称
-     */
-    private String getDataSourceTypeName(Integer type) {
-        switch (type) {
-            case 0:
-                return "mysql";
-            case 1:
-                return "postgresql";
-            case 2:
-                return "hive";
-            case 3:
-                return "spark";
-            default:
-                return null;
-        }
     }
 
     private List<ParamsOptions> getParamsOptions(List<String> columnList) {

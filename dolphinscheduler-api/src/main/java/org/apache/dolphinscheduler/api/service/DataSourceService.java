@@ -152,7 +152,7 @@ public interface DataSourceService {
      * @param type data source type
      * @return driver jar name list
      */
-    List<String> queryDriverJarList(Integer type);
+    List<String> queryDriverJarList(DbType type);
 
     /**
      * get databases
