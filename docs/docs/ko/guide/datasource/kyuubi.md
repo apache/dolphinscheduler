@@ -1,0 +1,31 @@
+# 규비
+
+## HiveServer2 사용
+
+![큐우비](../../../../img/new_ui/dev/datasource/kyoubi.png)
+
+## 데이터 소스 매개변수
+
+|**데이터 소스** |**설명** |
+|---------------|-----------------------------------------------|
+|데이터 소스 |큐비를 선택하세요.|
+|데이터 소스 이름 |DataSource의 이름을 입력합니다.|
+|설명 |DataSource에 대한 설명을 입력합니다.|
+|IP/호스트 이름 |KYUUBI 서비스 IP를 입력하세요.|
+|포트 |KYUUBI 서비스 포트를 입력하세요.|
+|사용자 이름 |KYUUBI 연결을 위한 사용자 이름을 설정합니다.|
+|비밀번호 |KYUUBI 연결을 위한 비밀번호를 설정하세요.|
+|데이터베이스 이름 |KYUUBI 연결의 데이터베이스 이름을 입력합니다.|
+|Jdbc 연결 매개변수 |KYUUBI 연결을 위한 매개변수 설정(JSON 형식)|```Kerberos Authentication
+just simply configure them in the connection parameters if kerberos authentication is required.
+
+clientKeytab: path of Kerberos keytab file for client authentication
+
+clientPrincipal: Kerberos principal for client authentication
+
+serverPrincipal: Kerberos principal configured by kyuubi.kinit.principal at the server side.
+````
+
+## 네이티브 지원
+
+- 아니요, 이 데이터 소스를 활성화하려면 [pseudo-cluster](../installation/pseudo-cluster.md) `플러그인 종속성 다운로드` 섹션의 섹션 예를 읽어보세요.

@@ -13,42 +13,69 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# 기동 명령어
+# $> podman compose --profile schema up -d
+#  --profile schema : profiles: ["schema"] 라고 설정된 서비스만 골라서 실행한다.
+#  up -d : 컨테이너를 생성하고 백그라운드 -d(detached mode)로 실행한다. 
+#
+# $> podman-compose --profile all up -d
+#
 
 version: "3.8"
 
 services:
   dolphinscheduler-postgresql:
-    image: bitnami/postgresql:15.2.0
+    #image: bitnami/postgresql:15.2.0
+    image: postgres:15.2
     ports:
       - "5432:5432"
     profiles: ["all", "schema"]
     environment:
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      #POSTGRESQL_USERNAME: root
+      #POSTGRESQL_PASSWORD: root
+      #POSTGRESQL_DATABASE: dolphinscheduler
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=dolphinscheduler
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8
+      - POSTGRES_INITDB_SKIP_CHOWN=yes
+    userns_mode: "keep-id"  # 호스트 사용자의 ID를 컨테이너 내부와 매핑
     volumes:
       - dolphinscheduler-postgresql:/bitnami/postgresql
+      # 볼륨을 마운트할 때 경로 뒤에 :Z 옵션을 붙이면 Podman이 자동으로 보안 컨텍스트와 권한을 조정해 줍니다.
+      #- dolphinscheduler-postgresql:/var/lib/postgresql/data:Z
+      #- ${MOUNT_PATH}/db-data:/var/lib/postgresql/data:Z
     healthcheck:
-      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/5432"]
+      #test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/5432"]
+      #interval: 5s
+      #timeout: 60s
+      #retries: 120
+      test: ["CMD-SHELL", "pg_isready -U root -d dolphinscheduler"]
       interval: 5s
-      timeout: 60s
-      retries: 120
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     networks:
       - dolphinscheduler
 
   dolphinscheduler-zookeeper:
-    image: bitnami/zookeeper:3.7.1
+    #image: bitnami/zookeeper:3.7.1
+    image: zookeeper:3.9.2
     profiles: ["all"]
     environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
+      #ALLOW_ANONYMOUS_LOGIN: "yes"
       ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
-      - dolphinscheduler-zookeeper:/bitnami/zookeeper
+      #- dolphinscheduler-zookeeper:/bitnami/zookeeper  
+      - dolphinscheduler-zookeeper-data:/data
+      - dolphinscheduler-zookeeper-log:/datalog
     healthcheck:
-      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181"]
+      #test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181"]
+      test: ["CMD", "zkServer.sh", "status"]
       interval: 5s
-      timeout: 60s
-      retries: 120
+      timeout: 5s
+      retries: 20
     networks:
       - dolphinscheduler
 
@@ -150,8 +177,63 @@ networks:
 
 volumes:
   dolphinscheduler-postgresql:
-  dolphinscheduler-zookeeper:
+  # dolphinscheduler-zookeeper:
+  # dolphinscheduler-zookeeper-data:
+  # dolphinscheduler-zookeeper-log:
+  # dolphinscheduler-worker-data:
+  # dolphinscheduler-logs:
+  # dolphinscheduler-shared-local:
+  # dolphinscheduler-resource-local:
+  # postsql data 퍼미션 문제 발생
+  # [에러]
+  # initdb: error: could not change permissions of directory "/var/lib/postgresql/data": Operation not permitted
+  # fixing permissions on existing directory /var/lib/postgresql/data ... 
+  #
+  # podman unshare chown -R 999:999 C:/devtools/workspace-dolphin/data/compose/db-data
+  # [에러]
+  # Error: cannot use command "podman unshare" with the remote podman client
+  # 윈도우 터미널이 아니라, 실제 리눅스가 돌아가는 가상 머신 안으로 들어가서 직접 명령어 실행ㅔㅈㅇ
+  # $> podman machine ssh
+  # $> sudo chown -R 999:999 /mnt/c/devtools/workspace-dolphin/data/compose/db-data
+  #dolphinscheduler-postgresql:
+  #    driver: local
+  #    driver_opts:
+  #      type: none
+  #      o: bind
+  #      device: ${MOUNT_PATH}/db-data  # ${MOUNT_PATH}는 현재 파일 경로를 의미합니다.
+  dolphinscheduler-zookeeper-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MOUNT_PATH}/zookeeper-data
+  dolphinscheduler-zookeeper-log:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MOUNT_PATH}/zookeeper-log
   dolphinscheduler-worker-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MOUNT_PATH}/worker-data
   dolphinscheduler-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MOUNT_PATH}/scheduler-log
   dolphinscheduler-shared-local:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MOUNT_PATH}/shared-local
   dolphinscheduler-resource-local:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MOUNT_PATH}/resource-local

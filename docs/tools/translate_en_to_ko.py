@@ -187,7 +187,18 @@ def _translate_chunks_googletrans(
             continue
         # Be gentle to avoid temporary bans / 429s
         time.sleep(cfg.sleep_seconds_googletrans)
-        out.append(translator.translate(c, src="en", dest="ko").text)
+        # out.append(translator.translate(c, src="en", dest="ko").text)
+        try:
+            result = translator.translate(c, src="en", dest="ko")
+            text = getattr(result, "text", None)
+            if not isinstance(text, str):
+                raise TypeError("googletrans returned empty text")
+            out.append(text)
+        except Exception as e:  # pragma: no cover
+            # googletrans가 종종 응답 포맷을 바꾸거나 None을 반환해서
+            # JSON 파싱 오류가 날 수 있으므로, 오류 시에는 원문을 그대로 유지한다.
+            print(f"[googletrans] 번역 실패, 원문 유지: {e}")
+            out.append(c)
     return out
 
 
