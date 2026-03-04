@@ -19,47 +19,74 @@ package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
 import static java.lang.String.format;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DataSourcePluginManager {
 
-    private final Map<String, DataSourceChannel> datasourceChannelMap = new ConcurrentHashMap<>();
+    private static final Map<String, DataSourceChannel> datasourceChannelMap = new ConcurrentHashMap<>();
 
-    public DataSourceChannel getDataSourceChannel(final DbType dbType) {
+    private static final Map<String, DataSourceProcessor> dataSourceProcessorMap = new ConcurrentHashMap<>();
+
+    static {
+        loadDataSourcePlugin();
+    }
+
+    public static DataSourceChannel getDataSourceChannel(@NonNull DbType dbType) {
         return datasourceChannelMap.get(dbType.getName());
     }
 
-    public void installPlugin() {
+    public static DataSourceProcessor getDataSourceProcessor(@NonNull DbType dbType) {
+        return dataSourceProcessorMap.get(dbType.getName());
+    }
 
-        PrioritySPIFactory<DataSourceChannelFactory> prioritySPIFactory =
-                new PrioritySPIFactory<>(DataSourceChannelFactory.class);
-        for (Map.Entry<String, DataSourceChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
-            final DataSourceChannelFactory factory = entry.getValue();
-            final String name = entry.getKey();
+    public static void loadDataSourcePlugin() {
+        initializeDataSourceChannel();
+        initializeDataSourceProcessor();
+    }
 
-            log.info("Registering datasource plugin: {}", name);
-
-            if (datasourceChannelMap.containsKey(name)) {
-                throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
-            }
-
-            loadDatasourceClient(factory);
-
-            log.info("Registered datasource plugin: {}", name);
+    private static synchronized void initializeDataSourceChannel() {
+        if (MapUtils.isNotEmpty(datasourceChannelMap)) {
+            return;
         }
+        new PrioritySPIFactory<>(DataSourceChannelFactory.class).getSPIMap().forEach(
+                (dataSourceChannelName, dataSourceChannelFactory) -> {
+                    if (datasourceChannelMap.containsKey(dataSourceChannelName)) {
+                        throw new IllegalStateException(
+                                format("Duplicate datasource channel named '%s'", dataSourceChannelName));
+                    }
+                    datasourceChannelMap.put(dataSourceChannelName, dataSourceChannelFactory.create());
+                    log.info("Registered datasource channel: {}", dataSourceChannelName);
+                });
     }
 
-    private void loadDatasourceClient(DataSourceChannelFactory datasourceChannelFactory) {
-        DataSourceChannel datasourceChannel = datasourceChannelFactory.create();
-        datasourceChannelMap.put(datasourceChannelFactory.getName(), datasourceChannel);
+    private static synchronized void initializeDataSourceProcessor() {
+        if (MapUtils.isNotEmpty(dataSourceProcessorMap)) {
+            return;
+        }
+
+        ServiceLoader.load(DataSourceProcessor.class).forEach(factory -> {
+            final String name = factory.getDbType().getName();
+            if (dataSourceProcessorMap.containsKey(name)) {
+                throw new IllegalStateException(format("Duplicate datasource processor named '%s'", name));
+            }
+            DataSourceProcessor dataSourceProcessor = factory.create();
+            dataSourceProcessorMap.put(name, dataSourceProcessor);
+            log.info("Success register datasource processor -> {}", name);
+        });
     }
+
 }

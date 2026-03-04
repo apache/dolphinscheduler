@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.cases;
+package org.apache.dolphinscheduler.api.test.cases.tasks;
 
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
@@ -31,9 +31,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
@@ -94,8 +92,10 @@ public class GrpcTaskAPITest {
     }
 
     @Test
+    @Order(1)
     public void testGrpcFailedWorkflowInstance() {
         try {
+            String workflowDefinitionName = "test_failed" + System.currentTimeMillis();
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
@@ -106,10 +106,9 @@ public class GrpcTaskAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcFailedWorkflow.json").getFile());
-            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
-                    .importWorkflowDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
-            Assertions.assertTrue(data.contains("\"success\":true"));
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
             // get workflow definition code
             HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
@@ -143,8 +142,10 @@ public class GrpcTaskAPITest {
     }
 
     @Test
+    @Order(10)
     public void testGrpcSuccessWorkflowInstance() {
         try {
+            String workflowDefinitionName = "test_success" + System.currentTimeMillis();
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
@@ -155,10 +156,9 @@ public class GrpcTaskAPITest {
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcSuccessWorkflow.json").getFile());
-            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
-                    .importWorkflowDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
-            Assertions.assertTrue(data.contains("\"success\":true"));
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
             // get workflow definition code
             HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =

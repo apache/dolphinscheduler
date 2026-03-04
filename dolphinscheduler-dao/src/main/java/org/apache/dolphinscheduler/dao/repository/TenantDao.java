@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 
+import java.util.Optional;
+
 public interface TenantDao extends IDao<Tenant> {
+
+    Optional<Tenant> queryByCode(String tenantCode);
 
 }

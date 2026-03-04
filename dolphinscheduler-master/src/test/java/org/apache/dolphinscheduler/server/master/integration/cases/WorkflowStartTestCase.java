@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
+import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
 
@@ -1288,6 +1289,39 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow which contains a dep task will be kill by system timeout")
+    public void testStartWorkflow_withSystemTimeoutKillTask() {
+        masterConfig.getServerLoadProtection().setMaxTaskInstanceRuntime(Duration.ofMinutes(1));
+
+        final String yaml = "/it/start/workflow_with_system_timeout_kill_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_kill_task");
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.STOP));
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("dep_task_with_timeout_killed");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.KILL);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with task depend type TASK_ONLY")
     public void testStartWorkflow_withTaskOnlyStrategy() {
         final String yaml = "/it/start/workflow_with_task_only_strategy.yaml";
@@ -1578,4 +1612,162 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 });
         masterContainer.assertAllResourceReleased();
     }
+
+    @Test
+    @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is enabled")
+    public void testTaskFail_with_workerGroupNotFoundAndTimeoutEnabled() {
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofSeconds(10));
+        this.masterConfig.setTaskDispatchPolicy(taskDispatchPolicy);
+
+        final String yaml = "/it/start/workflow_with_worker_group_not_found.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow whose task specifies a non-existent worker group when dispatch timeout is disabled")
+    public void testTaskRemainsSubmittedSuccess_with_workerGroupNotFoundAndTimeoutDisabled() {
+        TaskDispatchPolicy policy = new TaskDispatchPolicy();
+        policy.setDispatchTimeoutEnabled(false);
+        this.masterConfig.setTaskDispatchPolicy(policy);
+
+        final String yaml = "/it/start/workflow_with_worker_group_not_found.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("workerGroupNotFound");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUBMITTED_SUCCESS);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+
+                });
+
+        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
+        // masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow when no available worker and dispatch timeout is enabled")
+    public void testTaskFail_with_noAvailableWorkerAndTimeoutEnabled() {
+        TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+        taskDispatchPolicy.setDispatchTimeoutEnabled(true);
+        taskDispatchPolicy.setMaxTaskDispatchDuration(Duration.ofSeconds(10));
+        this.masterConfig.setTaskDispatchPolicy(taskDispatchPolicy);
+
+        final String yaml = "/it/start/workflow_with_no_available_worker.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.FAILURE));
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow when no available worker and dispatch timeout is disabled")
+    public void testTaskRemainsSubmittedSuccess_with_noAvailableWorkerAndTimeoutDisabled() {
+        TaskDispatchPolicy policy = new TaskDispatchPolicy();
+        policy.setDispatchTimeoutEnabled(false);
+        this.masterConfig.setTaskDispatchPolicy(policy);
+
+        final String yaml = "/it/start/workflow_with_no_available_worker.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUBMITTED_SUCCESS);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
+                                    .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+                });
+
+        // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
+        // masterContainer.assertAllResourceReleased();
+    }
+
 }

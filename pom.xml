@@ -607,6 +607,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skip>${skipUT}</skip>
+                    <skipAfterFailureCount>1</skipAfterFailureCount>
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>

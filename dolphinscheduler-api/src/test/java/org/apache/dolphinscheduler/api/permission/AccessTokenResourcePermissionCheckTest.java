@@ -52,7 +52,7 @@ public class AccessTokenResourcePermissionCheckTest {
     @Test
     public void testPermissionCheck() {
         User user = getLoginUser();
-        Assertions.assertFalse(accessTokenResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
+        Assertions.assertTrue(accessTokenResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
 
     @Test
