@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
+import java.util.Optional;
+
 import lombok.NonNull;
 
 import org.springframework.stereotype.Repository;
@@ -33,4 +35,8 @@ public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements Tena
         super(tenantMapper);
     }
 
+    @Override
+    public Optional<Tenant> queryByCode(String tenantCode) {
+        return Optional.ofNullable(mybatisMapper.queryByTenantCode(tenantCode));
+    }
 }

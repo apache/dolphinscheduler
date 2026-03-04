@@ -298,27 +298,31 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | master.command-fetch-strategy.type                                          | ID_SLOT_BASED                | Command拉取策略, 目前仅支持 `ID_SLOT_BASED`                                                      |
 | master.command-fetch-strategy.config.id-step                                | 1                            | 数据库中t_ds_command的id自增步长                                                                 |
 | master.command-fetch-strategy.config.fetch-size                             | 10                           | master拉取command数量                                                                       |
+| master.task-dispatch-policy.dispatch-timeout-enabled                        | false                        | 是否开启master分派超时检测功能                                                                      |
+| master.task-dispatch-policy.max-task-dispatch-duration                      | 1h                           | master分派检测的超时时长，默认为一小时                                                                  |
 
 ## Worker Server相关配置
 
 位置：`worker-server/conf/application.yaml`
 
-|                                     参数                                      |    默认值    |                                           描述                                            |
-|-----------------------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------|
-| worker.listen-port                                                          | 1234      | worker监听端口                                                                              |
-| worker.max-heartbeat-interval                                               | 10s       | worker最大心跳间隔                                                                            |
-| worker.host-weight                                                          | 100       | 派发任务时，worker主机的权重                                                                       |
-| worker.tenant-auto-create                                                   | true      | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
-| worker.server-load-protection.enabled                                       | true      | 是否开启系统保护策略                                                                              |
-| worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.8       | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统CPU       |
-| worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.8       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的JVM CPU |
-| worker.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.8       | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统内存          |
-| worker.server-load-protection.max-disk-usage-percentage-thresholds          | 0.8       | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统磁盘空间         |
-| worker.alert-listen-host                                                    | localhost | alert监听host                                                                             |
-| worker.alert-listen-port                                                    | 50052     | alert监听端口                                                                               |
-| worker.physical-task-config.task-executor-thread-size                       | 100       | Worker中任务最大并发度                                                                          |
-| worker.tenant-config.auto-create-tenant-enabled                             | true      | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
-| worker.tenant-config.default-tenant-enabled                                 | false     | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                             |
+|    默认值    |                                     参数                                      |                                           描述                                            |
+|-----------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| 1234      | worker.listen-port                                                          | worker监听端口                                                                              |
+| 10s       | worker.max-heartbeat-interval                                               | worker最大心跳间隔                                                                            |
+| 100       | worker.host-weight                                                          | 派发任务时，worker主机的权重                                                                       |
+| true      | worker.tenant-auto-create                                                   | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
+| true      | worker.server-load-protection.enabled                                       | 是否开启系统保护策略                                                                              |
+| 0.8       | worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统CPU       |
+| 0.8       | worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的JVM CPU |
+| 0.8       | worker.server-load-protection.max-system-memory-usage-percentage-thresholds | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统内存          |
+| 0.8       | worker.server-load-protection.max-disk-usage-percentage-thresholds          | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统磁盘空间         |
+| 0m        | master.server-load-protection.max-workflow-instance-runtime                 | 一个工作流实例最大的运行时间，如果超过这个时间，实例会被kill。 默认值为 0d 表示没有限制, 最小值为1分钟。                              |
+| 0m        | master.server-load-protection.max-task-instance-runtime                     | 一个任务实例最大的运行时间，如果超过这个时间，实例会被kill。 默认值为 0d 表示没有限制, 最小值为1分钟。                               |
+| localhost | worker.alert-listen-host                                                    | alert监听host                                                                             |
+| 50052     | worker.alert-listen-port                                                    | alert监听端口                                                                               |
+| 100       | worker.physical-task-config.task-executor-thread-size                       | Worker中任务最大并发度                                                                          |
+| true      | worker.tenant-config.auto-create-tenant-enabled                             | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
+| false     | worker.tenant-config.default-tenant-enabled                                 | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                             |
 
 ## Alert Server相关配置
 

@@ -86,7 +86,6 @@
         <jsr305.version>3.0.0</jsr305.version>
         <commons-compress.version>1.27.1</commons-compress.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
         <aws-sdk.version>1.12.300</aws-sdk.version>
         <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
@@ -119,7 +118,7 @@
         <qcloud-cos.version>5.6.231</qcloud-cos.version>
         <system-lambda.version>1.2.1</system-lambda.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
-        <testcontainer.version>1.19.3</testcontainer.version>
+        <testcontainer.version>1.21.4</testcontainer.version>
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
@@ -152,16 +151,6 @@
                 <version>${io.grpc.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-api</artifactId>
-                <version>${io.grpc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-core</artifactId>
-                <version>${io.grpc.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>
@@ -742,11 +731,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>${jsr305.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${commons-compress.version}</version>
@@ -755,11 +739,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
                 <version>${commons-math3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_annotations</artifactId>
-                <version>${error_prone_annotations.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
@@ -938,12 +917,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobuf.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.huaweicloud</groupId>
                 <artifactId>esdk-obs-java-bundle</artifactId>
                 <version>${esdk-obs.version}</version>
@@ -1066,7 +1039,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <zookeeper.version>3.8.0</zookeeper.version>
+                <zookeeper.version>3.8.3</zookeeper.version>
                 <curator.version>5.5.0</curator.version>
             </properties>
         </profile>

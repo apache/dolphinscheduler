@@ -2,7 +2,7 @@
 
 ## Overview
 
-`SeaTunnel` task type for creating and executing `SeaTunnel` tasks. When the worker executes this task, it will parse the config file through the `start-seatunnel-spark.sh` , `start-seatunnel-flink.sh` or `seatunnel.sh` command.
+`SeaTunnel` task type for creating and executing `SeaTunnel` tasks. When the worker executes this task, it will parse and run the config file through the startup scripts under `${SEATUNNEL_HOME}/bin/` (such as `seatunnel.sh` / `start-seatunnel-*-connector-v2.sh`).
 Click [here](https://seatunnel.apache.org/) for more information about `Apache SeaTunnel`.
 
 ## Create Task
@@ -16,7 +16,7 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 [//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
-- Startup script: Select script name to start the task, including `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
+- Startup script: Select script name to start the task (it may vary across SeaTunnel distributions, please check `${SEATUNNEL_HOME}/bin/`), including `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - Run model: supports `run` and `run-application` modes
 - Option parameters: used to add the parameters of the Flink engine, such as `-m yarn-cluster -ynm seatunnel`
@@ -82,7 +82,7 @@ sink {
 
 ### Support SeaTunnel Version
 
-- v2.3.1
-- v2.3.2
-- v2.3.3
+- The examples in this doc are based on the `2.3.x` CLI options and startup scripts
+- Verified: v2.3.1, v2.3.2, v2.3.3
+- Other versions: this task type is essentially a wrapper of SeaTunnel CLI. Newer versions usually work as long as the startup scripts and CLI options are compatible (please run regression tests after upgrading).
 

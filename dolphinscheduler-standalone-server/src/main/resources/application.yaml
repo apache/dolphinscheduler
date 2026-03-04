@@ -142,6 +142,29 @@ security:
           callbackUrl: "http://127.0.0.1:5173/login"
           iconUri: ""
           provider: gitee
+    oidc:
+      enable: false
+      providers:
+        # registrationId used in URLs and internal mapping
+        keycloak:
+          display-name: "Login with Keycloak" # Text for UI Button
+          issuer-uri: http://keycloak:8080/realms/dolphinscheduler
+          icon-uri: "/images/providers-icon/keycloak.png"
+          client-id: dolphinscheduler-client
+          client-secret: dolphinscheduler-client-secret
+          # Optional: Specify client auth method (e.g., client_secret_basic, client_secret_post). Defaults if omitted.
+          # client-authentication-method: client_secret_basic
+          scope: openid, profile, email, groups # Default: openid, profile, email
+          user-name-attribute: preferred_username # Claim to use as username (e.g., email, preferred_username)
+          groups-claim: groups # Optional: Claim containing user groups/roles
+        # Add more providers here (e.g., okta, azure, google)
+        # okta: ....
+      user: # Settings for auto-provisioning OIDC users
+        auto-create: false # Create a DS user if not found? Default: false
+        default-tenant-code: "default" # Tenant code for auto-created users
+        default-queue: "default" # Queue for auto-created users (if needed by permissions)
+        admin-group-mapping: # Groups that map to an administrator role
+          - dolphinscheduler-admins
 
 casdoor:
   # Your Casdoor server url
