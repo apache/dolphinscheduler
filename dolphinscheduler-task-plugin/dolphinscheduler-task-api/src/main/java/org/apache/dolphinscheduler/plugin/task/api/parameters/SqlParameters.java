@@ -59,6 +59,18 @@ public class SqlParameters extends AbstractParameters {
     private String sql;
 
     /**
+     * sql source
+     * SCRIPT: inline sql text
+     * FILE: sql from resource center file
+     */
+    private String sqlSource;
+
+    /**
+     * sql resource file path in resource center
+     */
+    private String sqlResource;
+
+    /**
      * sql type
      * 0 query
      * 1 NON_QUERY
@@ -139,6 +151,22 @@ public class SqlParameters extends AbstractParameters {
         this.sql = sql;
     }
 
+    public String getSqlSource() {
+        return sqlSource;
+    }
+
+    public void setSqlSource(String sqlSource) {
+        this.sqlSource = sqlSource;
+    }
+
+    public String getSqlResource() {
+        return sqlResource;
+    }
+
+    public void setSqlResource(String sqlResource) {
+        this.sqlResource = sqlResource;
+    }
+
     public int getSqlType() {
         return sqlType;
     }
@@ -213,12 +241,25 @@ public class SqlParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
+        if (datasource == 0 || StringUtils.isEmpty(type)) {
+            return false;
+        }
+        // support both inline sql and sql from resource file
+        if (StringUtils.isNotEmpty(sql)) {
+            return true;
+        }
+        return StringUtils.isNotEmpty(sqlResource);
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        return new ArrayList<>();
+        List<ResourceInfo> resourceFiles = new ArrayList<>();
+        if (StringUtils.isNotEmpty(sqlResource)) {
+            ResourceInfo resourceInfo = new ResourceInfo();
+            resourceInfo.setResourceName(sqlResource);
+            resourceFiles.add(resourceInfo);
+        }
+        return resourceFiles;
     }
 
     public void dealOutParam(String result) {
@@ -272,6 +313,8 @@ public class SqlParameters extends AbstractParameters {
                 + "type='" + type + '\''
                 + ", datasource=" + datasource
                 + ", sql='" + sql + '\''
+                + ", sqlSource='" + sqlSource + '\''
+                + ", sqlResource='" + sqlResource + '\''
                 + ", sqlType=" + sqlType
                 + ", sendEmail=" + sendEmail
                 + ", displayRows=" + displayRows

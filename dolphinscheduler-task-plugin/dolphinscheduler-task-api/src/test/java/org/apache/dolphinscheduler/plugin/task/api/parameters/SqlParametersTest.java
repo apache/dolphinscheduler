@@ -87,5 +87,10 @@ public class SqlParametersTest {
         sqlParameters.setLocalParams(properties);
         sqlParameters.dealOutParam(sqlResult);
         Assertions.assertNotNull(sqlParameters.getVarPool().get(0));
+
+        // resource files list should contain sqlResource when it is set
+        sqlParameters.setSql(null);
+        sqlParameters.setSqlResource("/sql/demo.sql");
+        Assertions.assertFalse(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
     }
 }
