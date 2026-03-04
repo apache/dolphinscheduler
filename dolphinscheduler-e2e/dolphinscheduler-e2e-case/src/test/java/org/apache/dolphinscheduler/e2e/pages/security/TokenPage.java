@@ -165,24 +165,22 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     private void setExpireTime(int daysAfter) {
         try {
-            WebElement datePickerInput = driver.findElement(By.cssSelector(".n-date-picker input"));
+            By dateTimePickerInputLocator = By.cssSelector(".n-date-picker input[type='text']");
+            WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver);
+            WebElement dateTimeInput = wait.until(ExpectedConditions.elementToBeClickable(dateTimePickerInputLocator));
 
-            LocalDateTime futureDate = LocalDateTime.now().plusDays(daysAfter);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String futureDateStr = futureDate.format(formatter);
+            LocalDateTime futureDateTime = LocalDateTime.now().plusDays(daysAfter);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String futureDateTimeStr = futureDateTime.format(dateTimeFormatter);
 
-            datePickerInput.clear();
-            datePickerInput.sendKeys(futureDateStr.substring(0, 10));
-
-            Thread.sleep(100);
-            WebElement timeInput = driver.findElement(By.cssSelector(".n-time-picker input"));
-            timeInput.clear();
-            timeInput.sendKeys(futureDateStr.substring(11));
-            timeInput.sendKeys(Keys.ENTER);
-
-            Thread.sleep(100);
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].value = arguments[1]; " +
+                            "arguments[0].dispatchEvent(new Event('input')); " +
+                            "arguments[0].dispatchEvent(new Event('change')); ",
+                    dateTimeInput, futureDateTimeStr);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to set expire time", e);
+            throw new RuntimeException(
+                    "Failed to set expire time after " + daysAfter + " days. Error: " + e.getMessage(), e);
         }
     }
 }
