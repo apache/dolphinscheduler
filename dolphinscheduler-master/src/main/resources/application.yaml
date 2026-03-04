@@ -110,6 +110,10 @@ master:
     max-disk-usage-percentage-thresholds: 0.8
     # Master max concurrent workflow instances, when the master's workflow instance count exceeds this value, master server will be marked as busy.
     max-concurrent-workflow-instances: 2147483647
+    # Maximum allowed running time for a workflow instance. If the running duration exceeds this value, the instance will be kill. The default value of 0d indicates no limit, the min value is 1m.
+    max-workflow-instance-runtime: 0d
+    # Maximum allowed running time for a task instance. If the running duration exceeds this value, the instance will be kill. The default value of 0d indicates no limit, the min value is 1m.
+    max-task-instance-runtime: 0d
   worker-group-refresh-interval: 5m
   # Task dispatch timeout check (currently disabled).
   # When enabled, tasks not dispatched within this duration are marked as failed.

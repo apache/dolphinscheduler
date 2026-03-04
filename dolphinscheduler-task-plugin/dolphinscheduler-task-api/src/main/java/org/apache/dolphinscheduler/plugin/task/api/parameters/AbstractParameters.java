@@ -18,12 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
@@ -31,10 +28,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -52,6 +47,7 @@ public abstract class AbstractParameters implements IParameters {
     @Setter
     public List<Property> localParams;
 
+    @Setter
     public List<Property> varPool = new ArrayList<>();
 
     @Override
@@ -62,59 +58,16 @@ public abstract class AbstractParameters implements IParameters {
         return new ArrayList<>();
     }
 
-    public Map<String, Property> getLocalParametersMap() {
-        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
-        if (localParams != null) {
-            for (Property property : localParams) {
-                localParametersMaps.put(property.getProp(), property);
-            }
-        }
-        return localParametersMaps;
-    }
-
-    public K8sTaskExecutionContext generateK8sTaskExecutionContext(ResourceParametersHelper parametersHelper,
-                                                                   int datasource) {
-        DataSourceParameters dataSourceParameters =
-                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
-        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
-        k8sTaskExecutionContext.setConnectionParams(
-                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
-        return k8sTaskExecutionContext;
-    }
-
-    /**
-     * get input local parameters map if the param direct is IN
-     *
-     * @return parameters map
-     */
-    public Map<String, Property> getInputLocalParametersMap() {
-        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
-        if (localParams != null) {
-            for (Property property : localParams) {
-                // The direct of some tasks is empty, default IN
-                if (property.getDirect() == null || Objects.equals(Direct.IN, property.getDirect())) {
-                    localParametersMaps.put(property.getProp(), property);
-                }
-            }
-        }
-        return localParametersMaps;
-    }
-
-    public void setVarPool(List<Property> varPool) {
-        this.varPool = varPool;
-    }
-
     public void dealOutParam(Map<String, String> taskOutputParams) {
         List<Property> outProperty = getOutProperty(localParams);
         if (CollectionUtils.isEmpty(outProperty)) {
             return;
         }
-        if (CollectionUtils.isNotEmpty(outProperty) && MapUtils.isNotEmpty(taskOutputParams)) {
+        if (MapUtils.isNotEmpty(taskOutputParams)) {
             // Inject the value
             for (Property info : outProperty) {
-                String value = taskOutputParams.get(info.getProp());
-                if (value != null) {
-                    info.setValue(value);
+                if (taskOutputParams.containsKey(info.getProp())) {
+                    info.setValue(taskOutputParams.get(info.getProp()));
                 }
             }
         }
