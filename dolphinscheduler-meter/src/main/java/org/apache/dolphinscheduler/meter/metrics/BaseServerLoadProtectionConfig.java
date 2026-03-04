@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.meter.metrics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -30,6 +33,24 @@ public abstract class BaseServerLoadProtectionConfig {
 
     protected double maxSystemMemoryUsagePercentageThresholds = 0.7;
 
+    /**
+     * @deprecated Use {@link #maxDiskUsagePercentageThresholdsRules} instead.
+     * This configuration is kept for backward compatibility.
+     */
+    @Deprecated
     protected double maxDiskUsagePercentageThresholds = 0.7;
+
+    /**
+     * List of disk usage threshold rules for monitoring multiple paths.
+     * Example configuration:
+     * <pre>
+     * max-disk-usage-percentage-thresholds-rules:
+     *   - disk-path: /data1
+     *     usage-percentage-thresholds: 0.9
+     *   - disk-path: /data2
+     *     usage-percentage-thresholds: 0.8
+     * </pre>
+     */
+    protected List<DiskUsageThresholdRule> maxDiskUsagePercentageThresholdsRules = new ArrayList<>();
 
 }

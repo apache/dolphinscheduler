@@ -26,6 +26,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class WorkerServerLoadProtectionConfig extends BaseServerLoadProtectionConfig {
 
-    private double maxDataBasedirDiskUsagePercentageThresholds = 0.7;
+    // Disk usage threshold rules are now inherited from BaseServerLoadProtectionConfig
 
 }

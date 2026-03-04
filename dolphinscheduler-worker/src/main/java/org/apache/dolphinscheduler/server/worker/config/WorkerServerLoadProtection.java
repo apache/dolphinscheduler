@@ -50,15 +50,6 @@ public class WorkerServerLoadProtection extends BaseServerLoadProtection {
             return true;
         }
 
-        if (systemMetrics.getDataBasedirPathUsedPercentage() > workerServerLoadProtectionConfig
-                .getMaxDataBasedirDiskUsagePercentageThresholds()) {
-            log.info(
-                    "OverLoad: the DataBasedirPathDiskUsagePercentage: {} is over then the maxDataBasedirDiskUsagePercentageThresholds {}",
-                    systemMetrics.getDataBasedirPathUsedPercentage(),
-                    workerServerLoadProtectionConfig.getMaxDataBasedirDiskUsagePercentageThresholds());
-            return true;
-        }
-
         if (physicalTaskExecutorContainerDelegator.getExecutorContainer().slotUsage() == 1) {
             log.info("OverLoad: the TaskExecutorContainer slot usage is 1");
             return true;

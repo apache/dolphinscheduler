@@ -324,7 +324,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_HOST_WEIGHT | string | `"100"` | Worker host weight to dispatch tasks |
 | worker.env.WORKER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Worker heartbeat interval |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open worker overload protection |
-| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_DATA_BASEDIR_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max data basedir disk usage, when the worker's data basedir disk usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max jvm cpu usage, when the worker's jvm cpu usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks. |
