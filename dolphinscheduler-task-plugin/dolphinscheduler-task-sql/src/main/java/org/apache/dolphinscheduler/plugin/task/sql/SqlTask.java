@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -54,6 +53,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -435,8 +435,6 @@ public class SqlTask extends AbstractTask {
                     e);
         }
     }
-        log.info("Sql Params are {}", logPrint);
-    }
 
     /**
      * ready to execute SQL and parameter entity Map
@@ -453,17 +451,20 @@ public class SqlTask extends AbstractTask {
 
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
+        Map<String, String> placeholderParamsMap = paramsMap == null
+                ? Collections.emptyMap()
+                : ParameterUtils.convert(paramsMap);
+
+        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
+            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(), placeholderParamsMap);
+            log.info("SQL title : {}", title);
+            sqlParameters.setTitle(title);
+        }
+
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
             sqlBuilder.append(sql);
             return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-        }
-
-        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
-                    ParameterUtils.convert(paramsMap));
-            log.info("SQL title : {}", title);
-            sqlParameters.setTitle(title);
         }
 
         // special characters need to be escaped, ${} needs to be escaped
