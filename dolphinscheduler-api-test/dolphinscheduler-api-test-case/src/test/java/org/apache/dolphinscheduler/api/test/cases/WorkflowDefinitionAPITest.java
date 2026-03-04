@@ -28,9 +28,6 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
-
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,7 +62,9 @@ public class WorkflowDefinitionAPITest {
 
     private static long workflowDefinitionCode;
 
-    private static String workflowDefinitionName;
+    private static String projectName = "project-test" + System.currentTimeMillis();
+
+    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
 
     @BeforeAll
     public static void setup() {
@@ -87,9 +86,9 @@ public class WorkflowDefinitionAPITest {
 
     @Test
     @Order(1)
-    public void testImportWorkflowDefinition() {
+    public void testCreateWorkflowDefinition() {
         try {
-            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
+            projectPage.createProject(loginUser, projectName);
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
             Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
 
@@ -97,10 +96,10 @@ public class WorkflowDefinitionAPITest {
                     .getBody().getData()).get(0)).get("code");
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-            CloseableHttpResponse importWorkflowDefinitionResponse = workflowDefinitionPage
-                    .importWorkflowDefinition(loginUser, projectCode, file);
-            String data = EntityUtils.toString(importWorkflowDefinitionResponse.getEntity());
-            Assertions.assertTrue(data.contains("\"success\":true"));
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Boolean successFlag = createWorkflowDefinitionResponse.getBody().getSuccess();
+            Assertions.assertTrue(successFlag);
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
@@ -141,7 +140,7 @@ public class WorkflowDefinitionAPITest {
         Assertions.assertTrue(getWorkflowListByProjectCodeResponse.getBody().getSuccess());
         Assertions
                 .assertTrue(
-                        getWorkflowListByProjectCodeResponse.getBody().getData().toString().contains("test_import"));
+                        getWorkflowListByProjectCodeResponse.getBody().getData().toString().contains("test"));
     }
 
     @Test
@@ -151,7 +150,7 @@ public class WorkflowDefinitionAPITest {
                 workflowDefinitionPage.queryWorkflowDefinitionByName(loginUser, projectCode, workflowDefinitionName);
         Assertions.assertTrue(queryWorkflowDefinitionByNameResponse.getBody().getSuccess());
         Assertions.assertTrue(
-                queryWorkflowDefinitionByNameResponse.getBody().getData().toString().contains("hello world"));
+                queryWorkflowDefinitionByNameResponse.getBody().getData().toString().contains(workflowDefinitionName));
     }
 
     @Test

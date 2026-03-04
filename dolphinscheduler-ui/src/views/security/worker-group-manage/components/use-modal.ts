@@ -47,15 +47,6 @@ export function useModal(
             return new Error(t('security.worker_group.group_name_tips'))
           }
         }
-      },
-      addrList: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (variables.model.addrList.length < 1) {
-            return new Error(t('security.worker_group.worker_addresses_tips'))
-          }
-        }
       }
     }
   })

@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
 import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerType;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -71,5 +73,14 @@ public class MasterConfigTest {
         assertThat(dynamicWeightConfigProperties.getMemoryUsageWeight()).isEqualTo(40);
         assertThat(dynamicWeightConfigProperties.getCpuUsageWeight()).isEqualTo(30);
         assertThat(dynamicWeightConfigProperties.getTaskThreadPoolUsageWeight()).isEqualTo(30);
+    }
+
+    @Test
+    public void getTaskDispatchPolicy() {
+        TaskDispatchPolicy policy = masterConfig.getTaskDispatchPolicy();
+
+        assertThat(policy).isNotNull();
+        assertThat(policy.isDispatchTimeoutEnabled()).isFalse();
+        assertThat(policy.getMaxTaskDispatchDuration()).isEqualTo(Duration.ofHours(1));
     }
 }

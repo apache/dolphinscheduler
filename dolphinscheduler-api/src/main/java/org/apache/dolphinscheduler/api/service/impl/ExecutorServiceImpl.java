@@ -163,6 +163,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Transactional
     public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
         final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
+        // todo: use validator chain
         triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
         return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
     }

@@ -57,18 +57,13 @@ public class DataSourceClientProvider {
                     })
                     .maximumSize(100)
                     .build();
-    private static final DataSourcePluginManager dataSourcePluginManager = new DataSourcePluginManager();
-
-    static {
-        dataSourcePluginManager.installPlugin();
-    }
 
     public static DataSourceClient getPooledDataSourceClient(DbType dbType,
                                                              ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         return POOLED_DATASOURCE_CLIENT_CACHE.get(datasourceUniqueId, () -> {
-            DataSourceChannel dataSourceChannel = dataSourcePluginManager.getDataSourceChannel(dbType);
+            DataSourceChannel dataSourceChannel = DataSourcePluginManager.getDataSourceChannel(dbType);
             if (null == dataSourceChannel) {
                 throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getName()));
             }
@@ -83,7 +78,7 @@ public class DataSourceClientProvider {
 
     public static AdHocDataSourceClient getAdHocDataSourceClient(DbType dbType, ConnectionParam connectionParam) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
-        DataSourceChannel dataSourceChannel = dataSourcePluginManager.getDataSourceChannel(dbType);
+        DataSourceChannel dataSourceChannel = DataSourcePluginManager.getDataSourceChannel(dbType);
         if (null == dataSourceChannel) {
             throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getName()));
         }
