@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.worker.config;
 import org.apache.dolphinscheduler.meter.metrics.DiskUsageThresholdRule;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 class WorkerServerLoadProtectionTest {
 
