@@ -22,6 +22,9 @@ import type { IJsonItem } from '../types'
 export function useSql(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const hiveSpan = computed(() => (model.type === 'HIVE' ? 24 : 0))
+  const showScriptEditor = computed(
+    () => model.sqlSource === 'SCRIPT' || !model.sqlSource
+  )
 
   return [
     {
@@ -35,9 +38,26 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       span: hiveSpan
     },
     {
+      type: 'radio',
+      field: 'sqlSource',
+      name: t('project.node.sql_source'),
+      options: [
+        {
+          label: t('project.node.sql_source_script'),
+          value: 'SCRIPT'
+        },
+        {
+          label: t('project.node.sql_source_file'),
+          value: 'FILE'
+        }
+      ],
+      span: 24
+    },
+    {
       type: 'editor',
       field: 'sql',
       name: t('project.node.sql_statement'),
+      if: showScriptEditor,
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
@@ -45,6 +65,22 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       },
       props: {
         language: 'sql'
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'sqlResource',
+      name: t('project.node.sql_resource_file'),
+      span: 24,
+      if: () => model.sqlSource === 'FILE',
+      props: {
+        placeholder: t('project.node.resources_tips'),
+        keyField: 'fullName',
+        labelField: 'name',
+        disabledField: 'disable'
+      },
+      slots: {
+        // 这里占位，真正的资源数据从全局资源 store 中获取，保持与 use-resources 一致行为
       }
     },
     ...useCustomParams({
