@@ -112,6 +112,7 @@ const docsSource = {
   '3.3.1': docs331Config,
   '3.3.2': docs332Config,
   '3.4.0': docs340Config,
+  '3.4.1': docs341Config,
   dev: docsDevConfig,
 };
 
