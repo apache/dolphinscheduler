@@ -79,9 +79,7 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
         labelField: 'name',
         disabledField: 'disable'
       },
-      slots: {
-        // 这里占位，真正的资源数据从全局资源 store 中获取，保持与 use-resources 一致行为
-      }
+      slots: {}
     },
     ...useCustomParams({
       model,

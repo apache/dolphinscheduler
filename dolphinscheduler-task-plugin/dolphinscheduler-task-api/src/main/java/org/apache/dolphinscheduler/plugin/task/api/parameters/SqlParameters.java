@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -60,10 +61,8 @@ public class SqlParameters extends AbstractParameters {
 
     /**
      * sql source
-     * SCRIPT: inline sql text
-     * FILE: sql from resource center file
      */
-    private String sqlSource;
+    private SqlSourceType sqlSource;
 
     /**
      * sql resource file path in resource center
@@ -151,11 +150,11 @@ public class SqlParameters extends AbstractParameters {
         this.sql = sql;
     }
 
-    public String getSqlSource() {
+    public SqlSourceType getSqlSource() {
         return sqlSource;
     }
 
-    public void setSqlSource(String sqlSource) {
+    public void setSqlSource(SqlSourceType sqlSource) {
         this.sqlSource = sqlSource;
     }
 

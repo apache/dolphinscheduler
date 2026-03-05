@@ -410,6 +410,7 @@ public class SqlTask extends AbstractTask {
                         .append(")");
             }
         }
+    }
 
     private void ensureSqlContent() {
         if (StringUtils.isNotEmpty(sqlParameters.getSql())) {
