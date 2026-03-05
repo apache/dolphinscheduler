@@ -40,7 +40,6 @@ exclude = [
     '^https://www\.bilibili\.com/video/BV1d64y1s7eZ',
     '^https://www\.mysql\.com',
     '^https://dev\.mysql\.com/downloads/mysql',
-    '^https://www\.aliyun\.com/product/oss',
 ]
 
 # Exclude paths from getting checked. The values are treated as regular expressions
