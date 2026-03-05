@@ -35,6 +35,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -243,13 +245,37 @@ public final class JSONUtils {
 
     /**
      * json to map
+     * <p>
+     * Converts a JSON object string to a {@code Map<String, String>}.
+     * String values are returned as-is; non-string values (arrays, objects,
+     * numbers, booleans) are serialized back to their JSON string representation.
      *
      * @param json json
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {
-        });
+        if (Strings.isNullOrEmpty(json)) {
+            return null;
+        }
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            if (!rootNode.isObject()) {
+                throw new IllegalArgumentException(
+                        "Parse json: " + json + " to Map<String, String> failed, root element is not a JSON object");
+            }
+            Map<String, String> result = new HashMap<>();
+            Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> entry = fields.next();
+                JsonNode valueNode = entry.getValue();
+                result.put(entry.getKey(), valueNode.isTextual() ? valueNode.asText() : valueNode.toString());
+            }
+            return result;
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Parse json: " + json + " to Map<String, String> failed", e);
+        }
     }
 
     /**

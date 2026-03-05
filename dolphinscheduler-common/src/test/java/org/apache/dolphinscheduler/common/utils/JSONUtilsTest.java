@@ -134,6 +134,17 @@ public class JSONUtilsTest {
         String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
         Map<String, String> m = JSONUtils.toMap(str);
         Assertions.assertNotNull(m);
+
+        // issue #17389: toMap should handle non-string values (arrays, objects, numbers)
+        // without throwing MismatchedInputException
+        String jsonWithArray =
+                "{\"applyId\":\"CA2024011800236476\",\"featureSourceDataList\":[{\"data\":\"test\",\"dataType\":\"TEST\"}],\"params\":{}}";
+        Map<String, String> mapWithArray = JSONUtils.toMap(jsonWithArray);
+        Assertions.assertNotNull(mapWithArray);
+        Assertions.assertEquals("CA2024011800236476", mapWithArray.get("applyId"));
+        Assertions.assertEquals("[{\"data\":\"test\",\"dataType\":\"TEST\"}]",
+                mapWithArray.get("featureSourceDataList"));
+        Assertions.assertEquals("{}", mapWithArray.get("params"));
     }
 
     @Test
