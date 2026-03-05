@@ -1782,7 +1782,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofSeconds(90))
@@ -1792,12 +1793,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .satisfiesExactly(workflowInstance -> assertThat(
                                     workflowInstance.getState())
                                             .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo(
-                                        "dep_task_with_timeout_warn");
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("dep_task_with_timeout_warn");
                                 assertThat(taskInstance.getState())
                                         .isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
                             });
@@ -1807,9 +1809,13 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
                                     .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
                 });
-        // This test intentionally leaves the workflow running, so we skip the resource
-        // cleanup check.
-        // masterContainer.assertAllResourceReleased();
+
+        workflowOperator.stopWorkflowInstance(workflowInstanceId);
+        await()
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> Assertions.assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                        .matches(w -> w.getState() == WorkflowExecutionStatus.STOP));
+        masterContainer.assertAllResourceReleased();
     }
 
     @Test
@@ -1824,6 +1830,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
+
         workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
@@ -1839,8 +1846,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .assertThat(repository.queryTaskInstance(workflow))
                             .hasSize(1)
                             .satisfiesExactly(taskInstance -> {
-                                assertThat(taskInstance.getName()).isEqualTo(
-                                        "dep_task_with_timeout_warnfailed");
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("dep_task_with_timeout_warnfailed");
                                 assertThat(taskInstance.getState())
                                         .isEqualTo(TaskExecutionStatus.KILL);
                             });
