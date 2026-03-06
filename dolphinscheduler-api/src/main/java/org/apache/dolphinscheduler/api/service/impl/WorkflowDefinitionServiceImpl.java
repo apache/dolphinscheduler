@@ -57,6 +57,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -218,6 +219,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
 
+    @Autowired
+    private GlobalParamsValidator globalParamsValidator;
+
     /**
      * create workflow definition
      *
@@ -265,7 +269,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
         }
 
-        validateGlobalParams(globalParams);
+        globalParamsValidator.validate(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
@@ -788,7 +792,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return result;
         }
 
-        validateGlobalParams(globalParams);
+        globalParamsValidator.validate(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
@@ -824,38 +828,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         result = updateDagDefine(loginUser, taskRelationList, workflowDefinition, workflowDefinitionDeepCopy,
                 taskDefinitionLogs);
         return result;
-    }
-
-    /**
-     * Validates global parameters: non-empty keys, no duplicates
-     */
-    private void validateGlobalParams(String globalParams) {
-        if (StringUtils.isBlank(globalParams)) {
-            return;
-        }
-
-        List<Property> params;
-        try {
-            params = JSONUtils.toList(globalParams, Property.class);
-        } catch (Exception e) {
-            throw new ServiceException("Invalid globalParams");
-        }
-
-        if (params == null || params.isEmpty()) {
-            return;
-        }
-
-        Set<String> keys = new HashSet<>();
-        for (Property p : params) {
-            if (StringUtils.isEmpty(p.getProp())) {
-                throw new ServiceException("Global param key cannot be empty");
-            }
-
-            String key = p.getProp().trim();
-            if (!keys.add(key)) {
-                throw new ServiceException("Duplicate global param key: " + key);
-            }
-        }
     }
 
     /**
