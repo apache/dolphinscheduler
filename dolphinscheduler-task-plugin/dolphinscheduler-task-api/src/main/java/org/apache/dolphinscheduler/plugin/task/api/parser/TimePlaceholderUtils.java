@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api.parser;
 
 import static org.apache.commons.lang3.time.DateUtils.addWeeks;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.addDays;
-import static org.apache.dolphinscheduler.common.utils.DateUtils.addMinutes;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.addMonths;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_MONTHS;
@@ -528,7 +527,7 @@ public class TimePlaceholderUtils {
                 break;
             case THIS_DAY:
                 dataFormat = expression.substring(THIS_DAY.length() + 1, expression.length() - 1);
-                targetDate = addDays(date, 0);
+                targetDate = date;
                 break;
             case LAST_DAY:
                 dataFormat = expression.substring(LAST_DAY.length() + 1, expression.length() - 1);
@@ -649,9 +648,10 @@ public class TimePlaceholderUtils {
         if (expression.contains("+")) {
             int index = expression.lastIndexOf('+');
 
-            if (Character.isDigit(expression.charAt(index + 1))) {
-                String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));
+            if (index + 1 < expression.length() && Character.isDigit(expression.charAt(index + 1))) {
+                String addDayExpr = expression.substring(index + 1);
+                int days = Integer.parseInt(addDayExpr);
+                Date targetDate = addDays(date, days);
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -659,9 +659,10 @@ public class TimePlaceholderUtils {
         } else if (expression.contains("-")) {
             int index = expression.lastIndexOf('-');
 
-            if (Character.isDigit(expression.charAt(index + 1))) {
-                String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));
+            if (index + 1 < expression.length() && Character.isDigit(expression.charAt(index + 1))) {
+                String addDayExpr = expression.substring(index + 1);
+                int days = Integer.parseInt(addDayExpr);
+                Date targetDate = addDays(date, -days);
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
