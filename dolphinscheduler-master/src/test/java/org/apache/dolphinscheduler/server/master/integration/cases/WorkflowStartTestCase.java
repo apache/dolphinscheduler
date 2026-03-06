@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.integration.cases;
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -1811,7 +1812,11 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
                     Assertions
                             .assertThat(repository.queryAlert(workflowInstanceId))
-                            .hasSize(1);
+                            .hasSize(1)
+                            .satisfiesExactly(alert -> {
+                                assertThat(alert.getAlertType())
+                                        .isEqualTo(AlertType.TASK_TIMEOUT);
+                            });
                 });
 
         workflowOperator.stopWorkflowInstance(workflowInstanceId);
@@ -1863,7 +1868,11 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
                     Assertions
                             .assertThat(repository.queryAlert(workflowInstanceId))
-                            .hasSize(1);
+                            .hasSize(1)
+                            .satisfiesExactly(alert -> {
+                                assertThat(alert.getAlertType())
+                                        .isEqualTo(AlertType.TASK_TIMEOUT);
+                            });
                 });
 
         masterContainer.assertAllResourceReleased();
