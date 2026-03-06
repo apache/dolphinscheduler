@@ -324,7 +324,7 @@ public class WorkflowInstanceServiceTest {
         Map<String, Object> proejctAuthFailMap =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
         Assertions.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailMap.get(Constants.STATUS));
-        // project auth sucess
+        // project auth success
         putMsg(result, Status.SUCCESS, projectCode);
         when(workflowInstanceMapper.queryByTriggerCode(projectCode)).thenReturn(new ArrayList());
         proejctAuthFailMap =
