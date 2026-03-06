@@ -271,7 +271,19 @@ export default defineComponent({
                 onPositiveClick={this.handleDeleteWorkflow}
               >
                 {{
-                  default: () => t('project.workflow.delete_confirm'),
+                  default: () => (
+                    <div style={{ maxWidth: 360 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                        {`${t('project.workflow.delete_confirm')} "${
+                          this.row?.name || ''
+                        }"`}
+                      </div>
+                      <div style={{ color: '#ff4d4f' }}>
+                        {t('project.workflow.delete_irreversible') ||
+                          'This action cannot be undone. The workflow and its associated data will be permanently deleted.'}
+                      </div>
+                    </div>
+                  ),
                   trigger: () => (
                     <NButton
                       size='small'
