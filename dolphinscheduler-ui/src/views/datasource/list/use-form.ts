@@ -205,14 +205,14 @@ export function useForm(id?: number) {
       driverJarName: {
         trigger: ['blur', 'change'],
         validator() {
-          // 驱动包名称是可选的，不需要强制验证
+          // Driver package name is optional, no mandatory validation required
           return true
         }
       },
       driverClassName: {
         trigger: ['blur', 'change'],
         validator() {
-          // 驱动类名是可选的，不需要强制验证
+          // Driver class name is optional, no mandatory validation required
           return true
         }
       },
@@ -269,18 +269,18 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
-    // 设置是否显示驱动包和驱动类名选择框（对所有数据源类型都显示）
+    // Set whether to show driver package and driver class name selection boxes (shown for all data source types)
     state.showDriverJarName = true
     state.showDriverClassName = true
 
-    // 获取驱动包列表（对所有数据源类型都获取）
+    // Get driver package list (for all data source types)
     try {
       const response = await queryDriverJarList(type)
 
-      // 检查响应结构，确保正确获取数据
+      // Check response structure to ensure correct data retrieval
       let driverData = []
 
-      // 简化响应格式处理逻辑
+      // Simplify response format processing logic
       if (response) {
         if (Array.isArray(response)) {
           driverData = response
@@ -288,23 +288,23 @@ export function useForm(id?: number) {
       }
 
       if (driverData.length > 0) {
-        // 处理各种可能的数据格式
+        // Process various possible data formats
         const newOptions = driverData.map((item: any) => {
-          // 如果是字符串，直接使用
+          // If it's a string, use it directly
           if (typeof item === 'string') {
             return {
               label: item,
               value: item
             }
           }
-          // 如果不是字符串，返回null，后续过滤掉
+          // If not a string, return null and filter out later
           return null
         }).filter(Boolean)
 
-        // 使用赋值方式更新，确保响应式
+        // Use assignment method to update, ensuring reactivity
         state.driverJarOptions = newOptions
       } else {
-        // 没有驱动包数据时，保持空数组
+        // Keep empty array when no driver package data
         state.driverJarOptions = []
       }
       state.detailForm.driverJarName = undefined

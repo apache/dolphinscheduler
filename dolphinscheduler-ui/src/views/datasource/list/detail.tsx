@@ -72,9 +72,9 @@ const DetailModal = defineComponent({
       getFieldsValue
     } = useForm(props.id)
 
-    // 在组件挂载后立即加载驱动包数据
+    // Load driver package data immediately after component mount
     onMounted(() => {
-      // 如果没有传入 selectType，使用默认的 MYSQL 类型
+      // Use default MYSQL type if selectType is not provided
       const initType = (props.selectType || 'MYSQL') as IDataBase
       changeType(initType, datasourceType[initType])
     })
@@ -140,7 +140,7 @@ const DetailModal = defineComponent({
       }
     )
 
-    // 监听 driverJarOptions 变化，确保模板响应式更新
+    // Watch driverJarOptions changes to ensure template reactive updates
     watch(
       () => state.driverJarOptions,
       () => {
@@ -396,7 +396,7 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.krb5_conf_tips')}
                   />
                 </NFormItem>
-                {/* 验证条件选择 */}
+                {/* Validation condition selection */}
                 <NFormItem
                   v-show={showMode}
                   label={t('datasource.validation')}
