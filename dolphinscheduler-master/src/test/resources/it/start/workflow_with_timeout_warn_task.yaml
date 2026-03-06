@@ -31,6 +31,7 @@ workflows:
     projectCode: 1
     description: This is a fake workflow with single timeout warn task
     releaseState: ONLINE
+    warningGroupId: 1
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
     userId: 1

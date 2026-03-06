@@ -1808,6 +1808,10 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
                                     .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .hasSize(1);
                 });
 
         workflowOperator.stopWorkflowInstance(workflowInstanceId);
@@ -1831,7 +1835,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
                 .build();
 
-        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
                 .atMost(Duration.ofSeconds(90))
@@ -1856,6 +1860,10 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             .assertThat(repository.queryWorkflowInstance(workflow))
                             .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
                                     .isEqualTo(WorkflowExecutionStatus.STOP));
+
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .hasSize(1);
                 });
 
         masterContainer.assertAllResourceReleased();

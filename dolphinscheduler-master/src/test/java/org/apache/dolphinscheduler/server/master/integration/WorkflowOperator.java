@@ -67,6 +67,8 @@ public class WorkflowOperator {
                 .dryRun(workflowTriggerDTO.getDryRun())
                 .taskDependType(workflowTriggerDTO.getTaskDependType())
                 .failureStrategy(workflowTriggerDTO.getFailureStrategy())
+                .warningGroupId(workflowTriggerDTO.workflowDefinition.getWarningGroupId() == null ? 0
+                        : workflowTriggerDTO.workflowDefinition.getWarningGroupId())
                 .build();
 
         final WorkflowManualTriggerResponse manualTriggerWorkflowResponse =
