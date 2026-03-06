@@ -577,8 +577,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         List<String> driverJarList = new ArrayList<>();
 
         // Build plugin path
-        String driverBasePath =
-                System.getProperty("user.dir") + "/plugins/datasource-plugins/driver/" + type.getName().toLowerCase();
+        String userDir = System.getProperty("user.dir");
+        File userDirFile = new File(userDir);
+        String parentPath = userDirFile.getParent();
+        if (parentPath == null) {
+            parentPath = userDir;
+        }
+        String driverBasePath = parentPath + "/plugins/datasource-plugins/driver/" + type.getName().toLowerCase();
+        log.info("driverBasePath: {}", driverBasePath);
         File driverDir = new File(driverBasePath);
 
         if (!driverDir.exists() || !driverDir.isDirectory()) {

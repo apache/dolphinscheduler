@@ -250,7 +250,15 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
      */
     private String getDriverJarPath(String jarFileName, String dataSourceType) {
         // Build driver directory path based on data source type
-        String driverBasePath = "plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
+        // Build plugin path
+        String userDir = System.getProperty("user.dir");
+        File userDirFile = new File(userDir);
+        String parentPath = userDirFile.getParent();
+        if (parentPath == null) {
+            parentPath = userDir;
+        }
+        String driverBasePath = parentPath + "/plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
+        log.info("Searching for driver JAR in: {}", driverBasePath);
 
         // First check driver/{datasource_type} directory (drivers packaged during build)
         File libDriverDir = new File(driverBasePath);
@@ -285,7 +293,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         }
 
         throw new RuntimeException("Driver JAR file not found: " + jarFileName
-                + ". Please ensure the driver JAR is placed in one of the following locations: " +
-                "driver/mysql/ directory");
+                + ". Please ensure the driver JAR is placed in one of the following locations: " + driverBasePath
+                + " directory");
     }
 }
