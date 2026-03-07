@@ -29,21 +29,37 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-alert/dolphinscheduler-alert-server/target/alert-server</directory>
             <outputDirectory>alert-server</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-api/target/api-server</directory>
             <outputDirectory>api-server</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-master/target/master-server</directory>
             <outputDirectory>master-server</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-worker/target/worker-server</directory>
             <outputDirectory>worker-server</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <!-- plugins -->
@@ -53,6 +69,10 @@
                 <include>dolphinscheduler-alert-*/target/dolphinscheduler-alert-*-shade.jar</include>
             </includes>
             <outputDirectory>plugins/alert-plugins</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
@@ -61,6 +81,10 @@
                 <include>dolphinscheduler-datasource-*/target/dolphinscheduler-datasource-*-shade.jar</include>
             </includes>
             <outputDirectory>plugins/datasource-plugins</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
@@ -69,6 +93,10 @@
                 <include>dolphinscheduler-task-*/target/dolphinscheduler-task-*-shade.jar</include>
             </includes>
             <outputDirectory>plugins/task-plugins</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
@@ -77,27 +105,47 @@
                 <include>dolphinscheduler-storage-*/target/dolphinscheduler-storage-*-shade.jar</include>
             </includes>
             <outputDirectory>plugins/storage-plugins</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
         <!-- plugins -->
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-standalone-server/target/standalone-server</directory>
             <outputDirectory>standalone-server</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-tools/target/tools</directory>
             <outputDirectory>tools</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-dist/target/dolphinscheduler-dist-${project.version}</directory>
             <outputDirectory>.</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
             <outputDirectory>./ui</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
@@ -105,11 +153,19 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../config</directory>
             <outputDirectory>conf</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
@@ -120,16 +176,28 @@
             </includes>
             <fileMode>0755</fileMode>
             <outputDirectory>.</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../.mvn/</directory>
             <outputDirectory>.mvn</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/release-docs</directory>
             <outputDirectory>.</outputDirectory>
+            <excludes>
+                <exclude>**/._*</exclude>
+                <exclude>**/.DS_Store</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>

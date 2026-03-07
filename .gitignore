@@ -4,6 +4,7 @@
 .zip
 .gz
 .DS_Store
+._*
 .target
 .idea/
 !.idea/icon.png
