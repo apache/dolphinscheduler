@@ -243,7 +243,6 @@ public class SqlParameters extends AbstractParameters {
         if (datasource == 0 || StringUtils.isEmpty(type)) {
             return false;
         }
-        // support both inline sql and sql from resource file
         if (StringUtils.isNotEmpty(sql)) {
             return true;
         }
