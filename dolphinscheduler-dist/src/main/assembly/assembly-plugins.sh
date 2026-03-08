@@ -77,20 +77,8 @@ done
 # create symbolic link for standalone-server
 cd $BIN_DIR/standalone-server && ln -s ../tools/sql/sql sql
 
-# remove macOS junk so Linux extraction is clean
-find "$BIN_DIR" -name '._*' -delete
-find "$BIN_DIR" -name '.DS_Store' -delete
-if [ "$(uname -s)" = "Darwin" ]; then
-  xattr -cr "$BIN_DIR"
-fi
-
-# repack bin tar
+# repack bin tar (exclude macOS junk so extraction on Linux is clean)
 BIN_TAR_FILE_NAME=$(basename $BIN_TAR_FILE)
-cd $DIST_DIR
-if [ "$(uname -s)" = "Darwin" ]; then
-  COPYFILE_DISABLE=1 tar --no-xattrs -zcf $BIN_TAR_FILE_NAME apache-dolphinscheduler-*-bin
-else
-  tar -zcf $BIN_TAR_FILE_NAME apache-dolphinscheduler-*-bin
-fi
+cd $DIST_DIR && tar -zcf $BIN_TAR_FILE_NAME --exclude='._*' --exclude='.DS_Store' apache-dolphinscheduler-*-bin
 
 echo "assembly-plugins.sh done"
