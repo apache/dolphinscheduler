@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, PropType, toRefs } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon, NPopconfirm } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NIcon, NPopconfirm, NText } from 'naive-ui'
 import {
   DeleteOutlined,
   DownloadOutlined,
@@ -274,14 +274,22 @@ export default defineComponent({
                   default: () => (
                     <div style={{ maxWidth: 360 }}>
                       <div style={{ fontWeight: 600, marginBottom: 6 }}>
-                        {`${t('project.workflow.delete_confirm')} "${
-                          this.row?.name || ''
-                        }"`}
+                        {(() => {
+                          const workflowName = (this.row?.name || '').trim()
+                          if (!workflowName) {
+                            return t('project.workflow.delete_confirm')
+                          }
+                          return t(
+                            'project.workflow.delete_confirm_with_name',
+                            {
+                              name: workflowName
+                            }
+                          )
+                        })()}
                       </div>
-                      <div style={{ color: '#ff4d4f' }}>
-                        {t('project.workflow.delete_irreversible') ||
-                          'This action cannot be undone. The workflow and its associated data will be permanently deleted.'}
-                      </div>
+                      <NText type='error'>
+                        {t('project.workflow.delete_irreversible')}
+                      </NText>
                     </div>
                   ),
                   trigger: () => (
