@@ -60,9 +60,21 @@ class StartParamListValidatorTest {
     }
 
     @Test
-    void testValidate_emptyKey() {
+    void testValidate_rejectsBlankOrEmptyKeys() {
+        assertThrowsIllegalArgument("");
+
+        assertThrowsIllegalArgument("   ");
+
+        assertThrowsIllegalArgument("\t");
+
+        assertThrowsIllegalArgument("\n");
+
+        assertThrowsIllegalArgument("  \t\n  ");
+    }
+
+    private void assertThrowsIllegalArgument(String propValue) {
         List<Property> params = Collections.singletonList(
-                new Property("", Direct.IN, DataType.VARCHAR, "value"));
+                new Property(propValue, Direct.IN, DataType.VARCHAR, "dummyValue"));
 
         assertThatThrownBy(() -> startParamListValidator.validate(params))
                 .isInstanceOf(IllegalArgumentException.class)

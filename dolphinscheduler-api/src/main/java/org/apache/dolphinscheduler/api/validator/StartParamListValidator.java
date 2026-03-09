@@ -46,7 +46,7 @@ public class StartParamListValidator implements IValidator<List<Property>> {
 
         Set<String> keys = new HashSet<>();
         for (Property param : startParamList) {
-            if (StringUtils.isEmpty(param.getProp())) {
+            if (StringUtils.isBlank(param.getProp())) {
                 throw new IllegalArgumentException("Parameter key cannot be empty");
             }
 
