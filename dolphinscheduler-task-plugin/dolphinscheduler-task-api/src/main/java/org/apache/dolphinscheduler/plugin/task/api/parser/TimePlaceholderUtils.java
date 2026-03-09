@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
 import static org.apache.commons.lang3.time.DateUtils.addWeeks;
-import static org.apache.dolphinscheduler.common.utils.DateUtils.addDays;
 import static org.apache.dolphinscheduler.common.utils.DateUtils.addMonths;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_MONTHS;
@@ -61,6 +60,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -650,8 +652,20 @@ public class TimePlaceholderUtils {
 
             if (index + 1 < expression.length() && Character.isDigit(expression.charAt(index + 1))) {
                 String addDayExpr = expression.substring(index + 1);
-                int days = Integer.parseInt(addDayExpr);
-                Date targetDate = addDays(date, days);
+                int days;
+            try {
+                days = Integer.parseInt(addDayExpr);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+                LocalDate localDate = date.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .plusDays(days);
+
+                Date targetDate = Date.from(
+                        localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                );
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -661,8 +675,20 @@ public class TimePlaceholderUtils {
 
             if (index + 1 < expression.length() && Character.isDigit(expression.charAt(index + 1))) {
                 String addDayExpr = expression.substring(index + 1);
-                int days = Integer.parseInt(addDayExpr);
-                Date targetDate = addDays(date, -days);
+                int days;
+                try {
+                     days = Integer.parseInt(addDayExpr);
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+                LocalDate localDate = date.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .minusDays(days);
+
+                Date targetDate = Date.from(
+                        localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                );
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
