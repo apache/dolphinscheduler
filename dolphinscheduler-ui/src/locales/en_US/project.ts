@@ -352,7 +352,6 @@ export default {
     positive_integer: 'Please enter a positive integer greater than 0',
     prop_key_repeat: 'prop key is repeat',
     prop_key_empty: 'prop key is empty',
-    prop_value_empty: 'prop value is empty',
     node_not_created: 'Failed to save node not created',
     copy_name: 'Copy Name',
     view_variables: 'View Variables',

@@ -92,13 +92,12 @@ class StartParamListValidatorTest {
     }
 
     @Test
-    void testValidate_inTypeEmptyValue() {
+    void testValidate_inTypeEmptyValueAllowed() {
         List<Property> params = Collections.singletonList(
-                new Property("config_path", Direct.IN, DataType.VARCHAR, ""));
+                new Property("input_var", Direct.IN, DataType.VARCHAR, ""));
 
-        assertThatThrownBy(() -> startParamListValidator.validate(params))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("IN parameter value cannot be empty for key: config_path");
+        assertThatCode(() -> startParamListValidator.validate(params))
+                .doesNotThrowAnyException();
     }
 
     @Test

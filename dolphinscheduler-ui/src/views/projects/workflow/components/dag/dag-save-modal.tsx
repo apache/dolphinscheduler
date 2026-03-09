@@ -102,24 +102,18 @@ export default defineComponent({
 
           if (!globalParams || globalParams.length === 0) return true
 
-          const keys = globalParams.map((item) => item.key)
+          for (const param of globalParams) {
+            if (!param.key || param.key.trim() === '') {
+              return new Error(t('project.dag.prop_key_empty'))
+            }
+          }
+
+          const keys = globalParams.map((item) => (item.key || '').trim())
           const uniqueKeys = new Set(keys)
           if (uniqueKeys.size !== keys.length) {
             return new Error(t('project.dag.prop_key_repeat'))
           }
 
-          for (const param of globalParams) {
-            if (!param.key || param.key.trim() === '') {
-              return new Error(t('project.dag.prop_key_empty'))
-            }
-
-            if (
-              param.direct === 'IN' &&
-              (!param.value || param.value.trim() === '')
-            ) {
-              return new Error(t('project.dag.prop_value_empty'))
-            }
-          }
           return true
         }
       }

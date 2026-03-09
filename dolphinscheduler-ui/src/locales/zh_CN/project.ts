@@ -347,7 +347,6 @@ export default {
     positive_integer: '请输入大于 0 的正整数',
     prop_key_repeat: '自定义参数prop中key有重复',
     prop_key_empty: '自定义参数prop中key不能为空',
-    prop_value_empty: '自定义参数prop中value不能为空',
     node_not_created: '未创建节点保存失败',
     copy_name: '复制名称',
     view_variables: '查看变量',

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.validator;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -56,10 +55,6 @@ public class StartParamListValidator implements IValidator<List<Property>> {
                 throw new IllegalArgumentException("Duplicate parameter key: " + key);
             }
             keys.add(key);
-
-            if (Direct.IN.equals(param.getDirect()) && StringUtils.isEmpty(param.getValue())) {
-                throw new IllegalArgumentException("IN parameter value cannot be empty for key: " + key);
-            }
         }
     }
 }

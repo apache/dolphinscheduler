@@ -109,24 +109,18 @@ export const useForm = () => {
 
           if (!params || params.length === 0) return true
 
-          const keys = params.map((item) => item.prop)
+          for (const param of params) {
+            if (!param.prop || param.prop.trim() === '') {
+              return new Error(t('project.dag.prop_key_empty'))
+            }
+          }
+
+          const keys = params.map((item) => (item.prop || '').trim())
           const uniqueKeys = new Set(keys)
           if (uniqueKeys.size !== keys.length) {
             return new Error(t('project.dag.prop_key_repeat'))
           }
 
-          for (const param of params) {
-            if (!param.prop || param.prop.trim() === '') {
-              return new Error(t('project.dag.prop_key_empty'))
-            }
-
-            if (
-              param.direct === 'IN' &&
-              (!param.value || param.value.trim() === '')
-            ) {
-              return new Error(t('project.dag.prop_value_empty'))
-            }
-          }
           return true
         }
       }
