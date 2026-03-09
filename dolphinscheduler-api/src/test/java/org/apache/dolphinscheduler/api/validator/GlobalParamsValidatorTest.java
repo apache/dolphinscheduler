@@ -71,15 +71,11 @@ class GlobalParamsValidatorTest {
 
     @Test
     void testValidate_emptyKey() {
-        String jsonEmptyKey = "[{\"prop\":\" \",\"value\":\"test\"}]";
-
+        String jsonEmptyKey = "[{\"prop\":\"\",\"value\":\"test\"}]";
         assertThatThrownBy(() -> globalParamsValidator.validate(jsonEmptyKey))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Global param key cannot be empty");
-    }
 
-    @Test
-    void testValidate_whitespaceChars() {
         String jsonTab = "[{\"prop\":\"\\t\",\"value\":\"test\"}]";
         assertThatThrownBy(() -> globalParamsValidator.validate(jsonTab))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -109,7 +105,9 @@ class GlobalParamsValidatorTest {
     void testValidate_validParameters() {
         String validJson = "[" +
                 "{\"prop\":\"workflow_id\",\"value\":\"1001\",\"direct\":\"IN\"}," +
-                "{\"prop\":\"env\",\"value\":\"prod\",\"direct\":\"IN\"}" +
+                "{\"prop\":\"env\",\"value\":\"\",\"direct\":\"IN\"}," +
+                "{\"prop\":\"env2\",\"value\":\"  \",\"direct\":\"IN\"}," +
+                "{\"prop\":\"env3\",\"value\":\"  \",\"direct\":\"OUT\"}" +
                 "]";
 
         globalParamsValidator.validate(validJson);
