@@ -57,7 +57,7 @@ public class GlobalParamsValidator implements IValidator<String> {
 
         Set<String> keys = new HashSet<>();
         for (Property p : params) {
-            if (StringUtils.isEmpty(p.getProp())) {
+            if (StringUtils.isBlank(p.getProp())) {
                 throw new IllegalArgumentException("Global param key cannot be empty");
             }
 

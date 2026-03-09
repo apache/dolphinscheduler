@@ -71,9 +71,27 @@ class GlobalParamsValidatorTest {
 
     @Test
     void testValidate_emptyKey() {
-        String jsonEmptyKey = "[{\"prop\":\"\",\"value\":\"test\"}]";
+        String jsonEmptyKey = "[{\"prop\":\" \",\"value\":\"test\"}]";
 
         assertThatThrownBy(() -> globalParamsValidator.validate(jsonEmptyKey))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Global param key cannot be empty");
+    }
+
+    @Test
+    void testValidate_whitespaceChars() {
+        String jsonTab = "[{\"prop\":\"\\t\",\"value\":\"test\"}]";
+        assertThatThrownBy(() -> globalParamsValidator.validate(jsonTab))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Global param key cannot be empty");
+
+        String jsonNewLine = "[{\"prop\":\"\\n\",\"value\":\"test\"}]";
+        assertThatThrownBy(() -> globalParamsValidator.validate(jsonNewLine))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Global param key cannot be empty");
+
+        String jsonMixed = "[{\"prop\":\"  \\t  \",\"value\":\"test\"}]";
+        assertThatThrownBy(() -> globalParamsValidator.validate(jsonMixed))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Global param key cannot be empty");
     }
