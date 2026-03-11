@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.validator;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,7 +46,7 @@ public class GlobalParamsValidator implements IValidator<String> {
 
         List<Property> params;
         try {
-            params = JSONUtils.toList(globalParams, Property.class);
+            params = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid globalParams");
         }
