@@ -18,9 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
-import org.apache.dolphinscheduler.api.dto.DefineUserDto;
-import org.apache.dolphinscheduler.api.dto.TaskCountDto;
-import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
@@ -60,18 +57,6 @@ public interface DataAnalysisService {
     WorkflowDefinitionCountVO getAllWorkflowDefinitionCount(User loginUser);
 
     /**
-     * statistics the workflow quantities of certain user
-     * <p>
-     * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
-     *
-     * @param loginUser   login user
-     * @param userId userId
-     * @param releaseState releaseState
-     * @return workflow count data
-     */
-    DefineUserDto countDefinitionByUserV2(User loginUser, Integer userId, Integer releaseState);
-
-    /**
      * statistical command status data
      *
      * @param loginUser login user
@@ -86,39 +71,6 @@ public interface DataAnalysisService {
      * @return queue state count data
      */
     Map<String, Integer> countQueueState(User loginUser);
-
-    /**
-     * query all workflow states count
-     * @param loginUser login user
-     * @param statisticsStateRequest statisticsStateRequest
-     * @return workflow states count
-     */
-    TaskCountDto countWorkflowStates(User loginUser,
-                                     StatisticsStateRequest statisticsStateRequest);
-
-    /**
-     * query one workflow states count
-     * @param loginUser login user
-     * @param workflowCode workflowCode
-     * @return workflow states count
-     */
-    TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode);
-
-    /**
-     * query all task states count
-     * @param loginUser login user
-     * @param statisticsStateRequest statisticsStateRequest
-     * @return tasks states count
-     */
-    TaskCountDto countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest);
-
-    /**
-     * query one task states count
-     * @param loginUser login user
-     * @param taskCode taskCode
-     * @return tasks states count
-     */
-    TaskCountDto countOneTaskStates(User loginUser, Long taskCode);
 
     PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
 
