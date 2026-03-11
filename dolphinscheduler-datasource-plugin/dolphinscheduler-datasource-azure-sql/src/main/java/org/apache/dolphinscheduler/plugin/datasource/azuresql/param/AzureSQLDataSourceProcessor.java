@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -33,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,16 +147,20 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         AzureSQLConnectionParam azureSQLConnectionParam = (AzureSQLConnectionParam) connectionParam;
         // token access way
         if (azureSQLConnectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
             return tokenGetConnection(azureSQLConnectionParam);
         }
         // normal way
-        Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), azureSQLConnectionParam.getUser(),
-                PasswordUtils.decodePassword(azureSQLConnectionParam.getPassword()));
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(azureSQLConnectionParam))
+                .username(azureSQLConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(azureSQLConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override
@@ -255,6 +259,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     /**
      * by default, add {"trustServerCertificate":true} to other to deal with SSL trust issue
+     *
      * @param paramDTO
      */
     private void checkTrustServerCertificate(BaseDataSourceParamDTO paramDTO) {
