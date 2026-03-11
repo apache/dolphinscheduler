@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -33,7 +34,6 @@ import org.apache.commons.collections4.MapUtils;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +127,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         }
         return mysqlConnectionParam.getJdbcUrl();
     }
+
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
@@ -160,8 +161,9 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
                     password = password.replace(AUTO_DESERIALIZE, "");
                 }
 
-                Properties connectionProperties = getConnectionProperties(mysqlConnectionParam, user, password);
-
+                Properties connectionProperties = getConnectionProperties(mysqlConnectionParam);
+                connectionProperties.setProperty("user", user);
+                connectionProperties.setProperty("password", password);
                 // Create connection using dynamically loaded driver
                 return driver.connect(getJdbcUrl(connectionParam), connectionProperties);
 
@@ -182,17 +184,18 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
             log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
             password = password.replace(AUTO_DESERIALIZE, "");
         }
-
-        Properties connectionProperties = getConnectionProperties(mysqlConnectionParam, user, password);
-
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), connectionProperties);
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(mysqlConnectionParam))
+                .username(user)
+                .password(PasswordUtils.decodePassword(password))
+                .properties(getConnectionProperties(mysqlConnectionParam))
+                .build()
+                .getConnection();
     }
 
-    private Properties getConnectionProperties(MySQLConnectionParam mysqlConnectionParam, String user,
-                                               String password) {
+    private Properties getConnectionProperties(MySQLConnectionParam mysqlConnectionParam) {
         Properties connectionProperties = new Properties();
-        connectionProperties.put("user", user);
-        connectionProperties.put("password", password);
         Map<String, String> paramMap = mysqlConnectionParam.getOther();
         if (MapUtils.isNotEmpty(paramMap)) {
             paramMap.forEach((k, v) -> {
