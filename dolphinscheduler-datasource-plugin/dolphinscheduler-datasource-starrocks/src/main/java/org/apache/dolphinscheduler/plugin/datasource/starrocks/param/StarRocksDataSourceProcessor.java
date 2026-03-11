@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,9 +127,8 @@ public class StarRocksDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         StarRocksConnectionParam starRocksConnectionParam = (StarRocksConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
         String user = starRocksConnectionParam.getUser();
         if (user.contains(AUTO_DESERIALIZE)) {
             log.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
@@ -140,7 +139,13 @@ public class StarRocksDataSourceProcessor extends AbstractDataSourceProcessor {
             log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
             password = password.replace(AUTO_DESERIALIZE, "");
         }
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), user, password);
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(starRocksConnectionParam))
+                .username(user)
+                .password(PasswordUtils.decodePassword(password))
+                .build()
+                .getConnection();
     }
 
     @Override
