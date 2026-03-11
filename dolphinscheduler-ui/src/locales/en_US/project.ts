@@ -150,6 +150,9 @@ export default {
     end_time: 'End Time',
     crontab: 'Crontab',
     delete_confirm: 'Delete?',
+    delete_confirm_with_name: 'Delete "{name}"?',
+    delete_irreversible:
+      'This action cannot be undone. The workflow and its associated data will be permanently deleted.',
     enter_name_tips: 'Please enter name',
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
