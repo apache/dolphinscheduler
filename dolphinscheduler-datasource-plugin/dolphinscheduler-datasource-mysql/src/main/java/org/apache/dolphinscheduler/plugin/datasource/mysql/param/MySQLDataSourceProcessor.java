@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -31,14 +30,11 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
 
-import java.io.File;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,14 +44,6 @@ import com.google.auto.service.AutoService;
 @AutoService(DataSourceProcessor.class)
 @Slf4j
 public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
-
-    private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
-
-    private static final String AUTO_DESERIALIZE = "autoDeserialize";
-
-    private static final String ALLOW_LOCAL_IN_FILE_NAME = "allowLocalInfile";
-
-    private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -130,87 +118,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
-        MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
-
-        // Use default driver loading method
-        String driverClassName = mysqlConnectionParam.getDriverClassName();
-        if (driverClassName == null || driverClassName.trim().isEmpty()) {
-            driverClassName = getDatasourceDriver();
-        }
-
-        // Check if custom driver JAR is specified, use dynamic driver loading if available
-        String driverJarName = mysqlConnectionParam.getDriverJarName();
-        if (driverJarName != null && !driverJarName.trim().isEmpty()) {
-            try {
-                // Build driver JAR file path
-                String driverJarPath = getDriverJarPath(driverJarName, DbType.MYSQL.name());
-
-                // Dynamically load driver
-                Driver driver = DynamicDriverLoader.loadDriver(driverJarPath, driverClassName);
-
-                log.info("Using custom driver JAR: className={}, jarName={}", driverClassName, driverJarName);
-
-                String user = mysqlConnectionParam.getUser();
-                if (user.contains(AUTO_DESERIALIZE)) {
-                    log.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
-                    user = user.replace(AUTO_DESERIALIZE, "");
-                }
-                String password = PasswordUtils.decodePassword(mysqlConnectionParam.getPassword());
-                if (password.contains(AUTO_DESERIALIZE)) {
-                    log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
-                    password = password.replace(AUTO_DESERIALIZE, "");
-                }
-
-                Properties connectionProperties = getConnectionProperties(mysqlConnectionParam);
-                connectionProperties.setProperty("user", user);
-                connectionProperties.setProperty("password", password);
-                // Create connection using dynamically loaded driver
-                return driver.connect(getJdbcUrl(connectionParam), connectionProperties);
-
-            } catch (Exception e) {
-                log.warn("Failed to load custom driver JAR {}, falling back to default driver loading", driverJarName,
-                        e);
-                // Fallback to default driver loading method
-            }
-        }
-
-        String user = mysqlConnectionParam.getUser();
-        if (user.contains(AUTO_DESERIALIZE)) {
-            log.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
-            user = user.replace(AUTO_DESERIALIZE, "");
-        }
-        String password = PasswordUtils.decodePassword(mysqlConnectionParam.getPassword());
-        if (password.contains(AUTO_DESERIALIZE)) {
-            log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
-            password = password.replace(AUTO_DESERIALIZE, "");
-        }
-        return JdbcDriverConnectionProvider.builder()
-                .jdbcDriverClassName(getDatasourceDriver())
-                .jdbcUrl(getJdbcUrl(mysqlConnectionParam))
-                .username(user)
-                .password(PasswordUtils.decodePassword(password))
-                .properties(getConnectionProperties(mysqlConnectionParam))
-                .build()
-                .getConnection();
-    }
-
-    private Properties getConnectionProperties(MySQLConnectionParam mysqlConnectionParam) {
-        Properties connectionProperties = new Properties();
-        Map<String, String> paramMap = mysqlConnectionParam.getOther();
-        if (MapUtils.isNotEmpty(paramMap)) {
-            paramMap.forEach((k, v) -> {
-                if (!checkKeyIsLegitimate(k)) {
-                    log.info("Key `{}` is not legitimate for security reason", k);
-                    return;
-                }
-                connectionProperties.put(k, v);
-            });
-        }
-        connectionProperties.put(AUTO_DESERIALIZE, "false");
-        connectionProperties.put(ALLOW_LOAD_LOCAL_IN_FILE_NAME, "false");
-        connectionProperties.put(ALLOW_LOCAL_IN_FILE_NAME, "false");
-        connectionProperties.put(ALLOW_URL_IN_LOCAL_IN_FILE_NAME, "false");
-        return connectionProperties;
+        return getConnectionWithDriver(connectionParam, getDatasourceDriver());
     }
 
     @Override
@@ -229,13 +137,6 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.mysql);
     }
 
-    private static boolean checkKeyIsLegitimate(String key) {
-        return !key.contains(ALLOW_LOAD_LOCAL_IN_FILE_NAME)
-                && !key.contains(AUTO_DESERIALIZE)
-                && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
-                && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
-    }
-
     private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isNotEmpty(otherMap)) {
             List<String> list = new ArrayList<>(otherMap.size());
@@ -245,58 +146,4 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return null;
     }
 
-    /**
-     * Get driver JAR file path
-     * @param jarFileName JAR file name
-     * @param dataSourceType Data source type
-     * @return Complete JAR file path
-     */
-    private String getDriverJarPath(String jarFileName, String dataSourceType) {
-        // Build driver directory path based on data source type
-        // Build plugin path
-        String userDir = System.getProperty("user.dir");
-        File userDirFile = new File(userDir);
-        String parentPath = userDirFile.getParent();
-        if (parentPath == null) {
-            parentPath = userDir;
-        }
-        String driverBasePath = parentPath + "/plugins/datasource-plugins/driver/" + dataSourceType.toLowerCase();
-        log.info("Searching for driver JAR in: {}", driverBasePath);
-
-        // First check driver/{datasource_type} directory (drivers packaged during build)
-        File libDriverDir = new File(driverBasePath);
-        if (libDriverDir.exists() && libDriverDir.isDirectory()) {
-            // Directly search for the specified JAR file
-            File jarFile = new File(libDriverDir, jarFileName);
-            if (jarFile.exists()) {
-                log.info("Found driver JAR in {}: {}", driverBasePath, jarFileName);
-                return jarFile.getAbsolutePath();
-            }
-
-            // If exact match fails, try to find JAR containing the specified filename in the directory
-            File[] jarFiles = libDriverDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".jar"));
-            if (jarFiles != null) {
-                // First try exact match (case-insensitive)
-                for (File file : jarFiles) {
-                    if (file.getName().equalsIgnoreCase(jarFileName)) {
-                        log.info("Found driver JAR (case-insensitive) in {}: {}", driverBasePath, file.getName());
-                        return file.getAbsolutePath();
-                    }
-                }
-
-                // Then try contains match
-                for (File file : jarFiles) {
-                    if (file.getName().toLowerCase().contains(jarFileName.toLowerCase().replace(".jar", ""))) {
-                        log.info("Found approximate match for {} in {}: {}", jarFileName, driverBasePath,
-                                file.getName());
-                        return file.getAbsolutePath();
-                    }
-                }
-            }
-        }
-
-        throw new RuntimeException("Driver JAR file not found: " + jarFileName
-                + ". Please ensure the driver JAR is placed in one of the following locations: " + driverBasePath
-                + " directory");
-    }
 }

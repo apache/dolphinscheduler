@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DynamicDriverLoader;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -27,10 +28,13 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -52,6 +56,14 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.\\:]+$");
 
     private static final Set<String> POSSIBLE_MALICIOUS_KEYS = Sets.newHashSet("allowLoadLocalInfile");
+
+    private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
+
+    private static final String AUTO_DESERIALIZE = "autoDeserialize";
+
+    private static final String ALLOW_LOCAL_IN_FILE_NAME = "allowLocalInfile";
+
+    private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
@@ -136,5 +148,118 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     public List<String> splitAndRemoveComment(String sql) {
         String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.other);
         return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.other);
+    }
+
+    /**
+     * Unified method to get connection with dynamic driver loading support
+     * This method provides centralized driver loading logic for all data source plugins
+     *
+     * @param connectionParam Connection parameters
+     * @param defaultDriverClassName Default driver class name if not specified in connection param
+     * @return Database connection
+     * @throws SQLException If connection fails
+     */
+    protected Connection getConnectionWithDriver(ConnectionParam connectionParam,
+                                                 String defaultDriverClassName) throws SQLException {
+        BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
+
+        // Use custom driver class name if specified, otherwise use default
+        String driverClassName = baseConnectionParam.getDriverClassName();
+        if (driverClassName == null || driverClassName.trim().isEmpty()) {
+            driverClassName = defaultDriverClassName;
+        }
+
+        // Check if custom driver JAR is specified, use dynamic driver loading if available
+        String driverJarName = baseConnectionParam.getDriverJarName();
+        if (driverJarName != null && !driverJarName.trim().isEmpty()) {
+            try {
+                // Build driver JAR file path
+                String driverJarPath = DynamicDriverLoader.getDriverJarPath(driverJarName, getDbType().name());
+
+                // Dynamically load driver
+                Driver driver = DynamicDriverLoader.loadDriver(driverJarPath, driverClassName);
+
+                log.info("Using custom driver JAR: className={}, jarName={}", driverClassName, driverJarName);
+
+                // Filter sensitive parameters
+                String user = filterSensitiveParams(baseConnectionParam.getUser());
+                String password =
+                        PasswordUtils.decodePassword(filterSensitiveParams(baseConnectionParam.getPassword()));
+
+                Properties connectionProperties = getConnectionProperties(baseConnectionParam);
+                connectionProperties.setProperty("user", user);
+                connectionProperties.setProperty("password", password);
+
+                // Create connection using dynamically loaded driver
+                return driver.connect(getJdbcUrl(connectionParam), connectionProperties);
+
+            } catch (Exception e) {
+                log.warn("Failed to load custom driver JAR {}, falling back to default driver loading", driverJarName,
+                        e);
+                // Fallback to default driver loading method
+            }
+        }
+
+        // Use default driver loading method
+        String user = filterSensitiveParams(baseConnectionParam.getUser());
+        String password = PasswordUtils.decodePassword(filterSensitiveParams(baseConnectionParam.getPassword()));
+
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(defaultDriverClassName)
+                .jdbcUrl(getJdbcUrl(baseConnectionParam))
+                .username(user)
+                .password(password)
+                .properties(getConnectionProperties(baseConnectionParam))
+                .build()
+                .getConnection();
+    }
+
+    /**
+     * Filter sensitive parameters from user input
+     * @param value Input value
+     * @return Filtered value
+     */
+    private String filterSensitiveParams(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        final String AUTO_DESERIALIZE = "autoDeserialize";
+        if (value.contains(AUTO_DESERIALIZE)) {
+            log.warn("sensitive param : {} in field is filtered", AUTO_DESERIALIZE);
+            return value.replace(AUTO_DESERIALIZE, "");
+        }
+        return value;
+    }
+
+    private static boolean checkKeyIsLegitimate(String key) {
+        return !key.contains(ALLOW_LOAD_LOCAL_IN_FILE_NAME)
+                && !key.contains(AUTO_DESERIALIZE)
+                && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
+                && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
+    }
+
+    /**
+     * Get connection properties from connection parameters
+     * @param baseConnectionParam Connection parameters
+     * @return Properties object
+     */
+    protected Properties getConnectionProperties(BaseConnectionParam baseConnectionParam) {
+        Properties connectionProperties = new Properties();
+        Map<String, String> paramMap = baseConnectionParam.getOther();
+        if (MapUtils.isNotEmpty(paramMap)) {
+            paramMap.forEach((k, v) -> {
+                if (!checkKeyIsLegitimate(k)) {
+                    log.info("Key `{}` is not legitimate for security reason", k);
+                    return;
+                }
+                connectionProperties.put(k, v);
+            });
+        }
+        connectionProperties.put(AUTO_DESERIALIZE, "false");
+        connectionProperties.put(ALLOW_LOAD_LOCAL_IN_FILE_NAME, "false");
+        connectionProperties.put(ALLOW_LOCAL_IN_FILE_NAME, "false");
+        connectionProperties.put(ALLOW_URL_IN_LOCAL_IN_FILE_NAME, "false");
+        return connectionProperties;
     }
 }
