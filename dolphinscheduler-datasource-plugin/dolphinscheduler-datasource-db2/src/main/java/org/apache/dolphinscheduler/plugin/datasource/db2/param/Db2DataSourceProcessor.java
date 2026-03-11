@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,11 +105,15 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(db2ConnectionParam),
-                db2ConnectionParam.getUser(), PasswordUtils.decodePassword(db2ConnectionParam.getPassword()));
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(db2ConnectionParam))
+                .username(db2ConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(db2ConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override
