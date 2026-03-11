@@ -241,7 +241,7 @@
         </include>
         from t_ds_task_instance instance
         join (
-        select task_code, max(end_time) as max_end_time
+        select task_code, max(end_time) as max_end_time, workflow_instance_id
         from t_ds_task_instance
         where 1=1
         and workflow_instance_id = #{workflowInstanceId}
