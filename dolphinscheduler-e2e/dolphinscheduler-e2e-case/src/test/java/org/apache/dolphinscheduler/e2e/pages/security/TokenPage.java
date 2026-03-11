@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage.Tab;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import lombok.Getter;
@@ -33,6 +35,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Strings;
 
@@ -69,6 +72,7 @@ public final class TokenPage extends NavBarPage implements Tab {
 
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
+        setExpireTime(30);
         createTokenForm().selectUserNameDropdown().click();
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
@@ -160,5 +164,26 @@ public final class TokenPage extends NavBarPage implements Tab {
         @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
 
+    }
+
+    private void setExpireTime(int daysAfter) {
+        try {
+            By dateTimePickerInputLocator = By.cssSelector(".n-date-picker input[type='text']");
+            WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver);
+            WebElement dateTimeInput = wait.until(ExpectedConditions.elementToBeClickable(dateTimePickerInputLocator));
+
+            LocalDateTime futureDateTime = LocalDateTime.now().plusDays(daysAfter);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String futureDateTimeStr = futureDateTime.format(dateTimeFormatter);
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].value = arguments[1]; " +
+                            "arguments[0].dispatchEvent(new Event('input')); " +
+                            "arguments[0].dispatchEvent(new Event('change')); ",
+                    dateTimeInput, futureDateTimeStr);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to set expire time after " + daysAfter + " days. Error: " + e.getMessage(), e);
+        }
     }
 }
