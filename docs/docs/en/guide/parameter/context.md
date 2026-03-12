@@ -30,7 +30,6 @@ Upstream parameter will be override when defining parameter with the same name i
 > 1. Parameter passing behavior has changed in version 3.3.x**
 >    In legacy versions (3.2.2 and earlier), downstream node B could obtain the OUT type output X of upstream node A without configuring an IN type local variable X.
 >    In new versions (3.3.0 and later), the logic for obtaining local variables has been modified: downstream node B can only use the OUT type output X of upstream node A if it has configured an IN type local variable X.
->    In all versions, for Switch nodes, there is no need to configure an IN type local variable X; you can directly use the OUT type output X from the upstream node A.
 >    See the Node_B and Node_mysql examples below for details.
 >
 > 2. If there are no dependencies between nodes, local parameters cannot be passed upstream.
