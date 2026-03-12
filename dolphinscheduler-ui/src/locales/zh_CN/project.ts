@@ -149,6 +149,8 @@ export default {
     end_time: '结束时间',
     crontab: 'Crontab',
     delete_confirm: '确定删除吗?',
+    delete_confirm_with_name: '确定删除“{name}”吗?',
+    delete_irreversible: '此操作不可撤销。工作流及其关联数据将被永久删除。',
     enter_name_tips: '请输入名称',
     switch_version: '切换到该版本',
     confirm_switch_version: '确定切换到该版本吗?',
