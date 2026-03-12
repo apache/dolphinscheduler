@@ -21,6 +21,13 @@ import org.apache.dolphinscheduler.alert.api.ShowType;
 
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class WechatAppChatMessage {
 
     private String chatid;
@@ -28,49 +35,6 @@ public class WechatAppChatMessage {
     private Map<String, String> text;
     private Map<String, String> markdown;
     private Integer safe;
-
-    public String getChatid() {
-        return chatid;
-    }
-
-    public void setChatid(String chatid) {
-        this.chatid = chatid;
-    }
-
-    public String getMsgtype() {
-        return msgtype;
-    }
-
-    public void setMsgtype(String msgtype) {
-        this.msgtype = msgtype;
-    }
-
-    public Map<String, String> getText() {
-        return text;
-    }
-
-    public void setText(Map<String, String> text) {
-        this.text = text;
-    }
-
-    public Integer getSafe() {
-        return safe;
-    }
-
-    public void setSafe(Integer safe) {
-        this.safe = safe;
-    }
-
-    public Map<String, String> getMarkdown() {
-        return markdown;
-    }
-
-    public void setMarkdown(Map<String, String> markdown) {
-        this.markdown = markdown;
-    }
-
-    public WechatAppChatMessage() {
-    }
 
     public WechatAppChatMessage(String chatid, String msgtype, Map<String, String> contentMap, Integer safe) {
         this.chatid = chatid;
