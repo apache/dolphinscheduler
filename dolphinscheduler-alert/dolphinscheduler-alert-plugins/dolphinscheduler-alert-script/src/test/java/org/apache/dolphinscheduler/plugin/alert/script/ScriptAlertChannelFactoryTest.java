@@ -34,7 +34,7 @@ public class ScriptAlertChannelFactoryTest {
     public void testGetParams() {
         ScriptAlertChannelFactory scriptAlertChannelFactory = new ScriptAlertChannelFactory();
         List<PluginParams> params = scriptAlertChannelFactory.params();
-        Assertions.assertEquals(3, params.size());
+        Assertions.assertEquals(4, params.size());
     }
 
     @Test

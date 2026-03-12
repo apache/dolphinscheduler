@@ -27,6 +27,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /**
  * ScriptSenderTest
@@ -35,17 +37,18 @@ public class ScriptSenderTest {
 
     private static final String rootPath = System.getProperty("user.dir");
     private static final String shellFilPath = rootPath + "/src/test/script/shell/scriptExample.sh";
-    private static Map<String, String> scriptConfig = new HashMap<>();
+    private Map<String, String> scriptConfig;
 
     @BeforeEach
     public void initScriptConfig() {
-
+        scriptConfig = new HashMap<>();
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getDescp()));
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "userParams");
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, shellFilPath);
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testScriptSenderTest() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
@@ -56,6 +59,7 @@ public class ScriptSenderTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testScriptSenderInjectionTest() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "' ; calc.exe ; '");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
@@ -64,6 +68,7 @@ public class ScriptSenderTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testUserParamsNPE() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, null);
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
@@ -82,6 +87,7 @@ public class ScriptSenderTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testPathError() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, "/usr/sbin/abc");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
@@ -98,6 +104,32 @@ public class ScriptSenderTest {
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test type is error", "test content");
         assertFalse(alertResult.isSuccess());
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    public void testDefaultTimeout() {
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
+        Assertions.assertTrue(alertResult.isSuccess());
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    public void testCustomTimeout() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT, "30");
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
+        Assertions.assertTrue(alertResult.isSuccess());
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    public void testInvalidTimeoutFallsBackToDefault() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT, "notANumber");
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
 }

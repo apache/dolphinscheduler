@@ -21,10 +21,12 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
 import java.util.Arrays;
@@ -66,7 +68,18 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
-        return Arrays.asList(scriptUserParam, scriptPathParam, scriptTypeParams);
+        InputNumberParam scriptTimeoutParam =
+                InputNumberParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT,
+                        ScriptParamsConstants.SCRIPT_TIMEOUT)
+                        .setValue(ScriptParamsConstants.DEFAULT_SCRIPT_TIMEOUT)
+                        .addValidate(Validate.newBuilder()
+                                .setType(DataType.NUMBER.getDataType())
+                                .setRequired(false)
+                                .setMin(0D)
+                                .build())
+                        .build();
+
+        return Arrays.asList(scriptUserParam, scriptPathParam, scriptTypeParams, scriptTimeoutParam);
     }
 
     @Override

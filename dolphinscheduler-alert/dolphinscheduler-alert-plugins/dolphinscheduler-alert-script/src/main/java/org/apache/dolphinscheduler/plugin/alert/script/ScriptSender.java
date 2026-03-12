@@ -36,6 +36,7 @@ public final class ScriptSender {
     private final String scriptPath;
     private final String scriptType;
     private final String userParams;
+    private final long timeout;
 
     ScriptSender(Map<String, String> config) {
         scriptPath = StringUtils.isNotBlank(config.get(ScriptParamsConstants.NAME_SCRIPT_PATH))
@@ -47,6 +48,19 @@ public final class ScriptSender {
         userParams = StringUtils.isNotBlank(config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS))
                 ? config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS)
                 : "";
+        String timeoutConfig = config.get(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT);
+        if (StringUtils.isNotBlank(timeoutConfig)) {
+            long parsedTimeout = ScriptParamsConstants.DEFAULT_SCRIPT_TIMEOUT;
+            try {
+                parsedTimeout = Long.parseLong(timeoutConfig);
+            } catch (NumberFormatException ex) {
+                log.warn("Invalid script timeout config value: '{}', using default: {}",
+                        timeoutConfig, ScriptParamsConstants.DEFAULT_SCRIPT_TIMEOUT, ex);
+            }
+            timeout = parsedTimeout;
+        } else {
+            timeout = ScriptParamsConstants.DEFAULT_SCRIPT_TIMEOUT;
+        }
     }
 
     AlertResult sendScriptAlert(String title, String content) {
@@ -108,11 +122,17 @@ public final class ScriptSender {
 
         String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION
                 + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
-        int exitCode = ProcessUtils.executeScript(cmd);
+        int exitCode = ProcessUtils.executeScript(timeout, cmd);
 
         if (exitCode == 0) {
             alertResult.setSuccess(true);
             alertResult.setMessage("send script alert msg success");
+            return alertResult;
+        }
+        if (exitCode == -2) {
+            alertResult.setMessage("send script alert msg error, script execution timed out after " + timeout
+                    + " seconds");
+            log.error("send script alert msg error, script execution timed out after {} seconds", timeout);
             return alertResult;
         }
         alertResult.setMessage("send script alert msg error,exitCode is " + exitCode);

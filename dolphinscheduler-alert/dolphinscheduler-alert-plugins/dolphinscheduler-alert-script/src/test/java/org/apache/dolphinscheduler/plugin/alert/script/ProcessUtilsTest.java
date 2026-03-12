@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 /**
  * ProcessUtilsTest
@@ -32,8 +35,17 @@ public class ProcessUtilsTest {
     private String[] cmd = {"/bin/sh", "-c", shellFilPath + " -t 1"};
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     public void testExecuteScript() {
-        int code = ProcessUtils.executeScript(cmd);
-        assert code != -1;
+        int code = ProcessUtils.executeScript(60, cmd);
+        Assertions.assertNotEquals(-1, code);
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    public void testExecuteScriptTimeout() {
+        String[] sleepCmd = {"/bin/sh", "-c", "sleep 30"};
+        int code = ProcessUtils.executeScript(2, sleepCmd);
+        Assertions.assertEquals(-2, code);
     }
 }

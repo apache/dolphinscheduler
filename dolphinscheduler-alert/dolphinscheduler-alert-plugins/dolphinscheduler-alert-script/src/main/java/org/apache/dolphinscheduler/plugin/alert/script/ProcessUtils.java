@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,12 +30,13 @@ public final class ProcessUtils {
     }
 
     /**
-     * executeScript
+     * executeScript with timeout
      *
+     * @param timeoutSeconds timeout in seconds, if <= 0 waits indefinitely
      * @param cmd cmd params
-     * @return exit code
+     * @return exit code, -1 if error, -2 if timeout
      */
-    static Integer executeScript(String... cmd) {
+    static Integer executeScript(long timeoutSeconds, String... cmd) {
 
         int exitCode = -1;
 
@@ -46,12 +48,53 @@ public final class ProcessUtils {
 
             inputStreamGobbler.start();
             errorStreamGobbler.start();
-            return process.waitFor();
-        } catch (IOException | InterruptedException e) {
-            log.error("execute alert script error {}", e.getMessage());
+
+            if (timeoutSeconds > 0) {
+                boolean finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
+                if (!finished) {
+                    log.error("script execution timed out after {} seconds, destroying process", timeoutSeconds);
+                    process.destroyForcibly();
+                    closeProcessStreams(process);
+                    joinGobbler(inputStreamGobbler);
+                    joinGobbler(errorStreamGobbler);
+                    return -2;
+                }
+            } else {
+                process.waitFor();
+            }
+            int processExitCode = process.exitValue();
+            joinGobbler(inputStreamGobbler);
+            joinGobbler(errorStreamGobbler);
+            return processExitCode;
+        } catch (InterruptedException e) {
+            log.error("execute alert script interrupted {}", e.getMessage());
             Thread.currentThread().interrupt();
+        } catch (IOException e) {
+            log.error("execute alert script error {}", e.getMessage());
         }
 
         return exitCode;
+    }
+
+    private static void closeProcessStreams(Process process) {
+        try {
+            process.getInputStream().close();
+        } catch (IOException e) {
+            log.warn("Failed to close process input stream after timeout", e);
+        }
+        try {
+            process.getErrorStream().close();
+        } catch (IOException e) {
+            log.warn("Failed to close process error stream after timeout", e);
+        }
+    }
+
+    private static void joinGobbler(StreamGobbler gobbler) {
+        try {
+            gobbler.interrupt();
+            gobbler.join(TimeUnit.SECONDS.toMillis(1));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

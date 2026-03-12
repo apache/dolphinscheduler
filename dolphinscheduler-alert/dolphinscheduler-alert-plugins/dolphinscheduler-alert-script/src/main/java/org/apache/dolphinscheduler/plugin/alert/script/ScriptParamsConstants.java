@@ -31,6 +31,12 @@ public final class ScriptParamsConstants {
 
     static final String NAME_SCRIPT_USER_PARAMS = "userParams";
 
+    static final String SCRIPT_TIMEOUT = "$t('timeout')";
+
+    static final String NAME_SCRIPT_TIMEOUT = "timeout";
+
+    static final int DEFAULT_SCRIPT_TIMEOUT = 60;
+
     private ScriptParamsConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
