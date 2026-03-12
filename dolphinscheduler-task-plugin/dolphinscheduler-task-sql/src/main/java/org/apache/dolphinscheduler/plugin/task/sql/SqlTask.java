@@ -410,6 +410,7 @@ public class SqlTask extends AbstractTask {
                         .append(")");
             }
         }
+        log.info("Sql Params are {}", logPrint);
     }
 
     private void ensureSqlContent() {
