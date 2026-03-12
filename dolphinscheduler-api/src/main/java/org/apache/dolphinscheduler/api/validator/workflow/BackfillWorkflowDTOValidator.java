@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.validator.workflow;
 
 import org.apache.dolphinscheduler.api.validator.IValidator;
+import org.apache.dolphinscheduler.api.validator.StartParamListValidator;
 import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -34,8 +35,12 @@ public class BackfillWorkflowDTOValidator implements IValidator<BackfillWorkflow
 
     private final TenantExistValidator tenantExistValidator;
 
-    public BackfillWorkflowDTOValidator(TenantExistValidator tenantExistValidator) {
+    private final StartParamListValidator startParamListValidator;
+
+    public BackfillWorkflowDTOValidator(TenantExistValidator tenantExistValidator,
+                                        StartParamListValidator startParamListValidator) {
         this.tenantExistValidator = tenantExistValidator;
+        this.startParamListValidator = startParamListValidator;
     }
 
     @Override
@@ -59,6 +64,9 @@ public class BackfillWorkflowDTOValidator implements IValidator<BackfillWorkflow
         if (backfillWorkflowDTO.getWorkflowDefinition().getReleaseState() != ReleaseState.ONLINE) {
             throw new IllegalStateException("The workflowDefinition should be online");
         }
+
         tenantExistValidator.validate(backfillWorkflowDTO.getTenantCode());
+
+        startParamListValidator.validate(backfillWorkflowDTO.getStartParamList());
     }
 }
