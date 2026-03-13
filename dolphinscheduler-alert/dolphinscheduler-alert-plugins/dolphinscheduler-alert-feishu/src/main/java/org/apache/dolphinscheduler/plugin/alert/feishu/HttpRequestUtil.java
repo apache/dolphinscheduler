@@ -36,8 +36,8 @@ public final class HttpRequestUtil {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static CloseableHttpClient getHttpClient(boolean enableProxy, String proxy, Integer port, String user,
-                                                    String password) {
+    static CloseableHttpClient getHttpClient(boolean enableProxy, String proxy, Integer port, String user,
+                                             String password) {
         if (enableProxy) {
             HttpHost httpProxy = new HttpHost(proxy, port);
             CredentialsProvider provider = new BasicCredentialsProvider();
@@ -49,7 +49,7 @@ public final class HttpRequestUtil {
         }
     }
 
-    public static HttpPost constructHttpPost(String url, String msg) {
+    static HttpPost constructHttpPost(String url, String msg) {
         HttpPost post = new HttpPost(url);
         StringEntity entity = new StringEntity(msg, ContentType.APPLICATION_JSON);
         post.setEntity(entity);
