@@ -207,9 +207,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private WorkflowLineageService workflowLineageService;
 
     @Autowired
-    private MetricsCleanUpService metricsCleanUpService;
-
-    @Autowired
     private GlobalParamsValidator globalParamsValidator;
 
     /**
