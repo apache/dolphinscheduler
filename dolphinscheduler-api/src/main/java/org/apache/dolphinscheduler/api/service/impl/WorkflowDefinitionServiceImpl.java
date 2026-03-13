@@ -41,12 +41,8 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.chec
 import org.apache.dolphinscheduler.api.dto.TaskCodeVersionDto;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
@@ -83,7 +79,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -148,8 +143,6 @@ import com.google.common.collect.Lists;
 @Slf4j
 public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements WorkflowDefinitionService {
 
-    private static final String RELEASESTATE = "releaseState";
-
     @Autowired
     private ProjectMapper projectMapper;
 
@@ -210,13 +203,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private SchedulerService schedulerService;
 
     @Autowired
-    private DataSourceMapper dataSourceMapper;
-
-    @Autowired
     private WorkflowLineageService workflowLineageService;
-
-    @Autowired
-    private MetricsCleanUpService metricsCleanUpService;
 
     /**
      * create workflow definition
@@ -305,31 +292,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result <= 0) {
             throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_LOG_ERROR);
         }
-    }
-
-    /**
-     * create single workflow definition
-     *
-     * @param loginUser             login user
-     * @param workflowCreateRequest the new workflow object will be created
-     * @return New WorkflowDefinition object created just now
-     */
-    @Override
-    @Transactional
-    public WorkflowDefinition createSingleWorkflowDefinition(User loginUser,
-                                                             WorkflowCreateRequest workflowCreateRequest) {
-        WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2WorkflowDefinition();
-        this.createWorkflowValid(loginUser, workflowDefinition);
-
-        workflowDefinition.setCode(CodeGenerateUtils.genCode());
-        workflowDefinition.setUserId(loginUser.getId());
-
-        int create = workflowDefinitionMapper.insert(workflowDefinition);
-        if (create <= 0) {
-            throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_ERROR);
-        }
-        this.syncObj2Log(loginUser, workflowDefinition);
-        return workflowDefinition;
     }
 
     protected Map<String, Object> createDagDefine(User loginUser,
@@ -612,46 +574,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * Filter resource workflow definitions
-     *
-     * @param loginUser             login user
-     * @param workflowFilterRequest workflow filter requests
-     * @return List workflow definition
-     */
-    @Override
-    public PageInfo<WorkflowDefinition> filterWorkflowDefinition(User loginUser,
-                                                                 WorkflowFilterRequest workflowFilterRequest) {
-        WorkflowDefinition workflowDefinition = workflowFilterRequest.convert2WorkflowDefinition();
-        if (workflowFilterRequest.getProjectName() != null) {
-            Project project = projectMapper.queryByName(workflowFilterRequest.getProjectName());
-            // check user access for project
-            projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
-            workflowDefinition.setProjectCode(project.getCode());
-        }
-
-        Page<WorkflowDefinition> page =
-                new Page<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
-        IPage<WorkflowDefinition> workflowDefinitionIPage =
-                workflowDefinitionMapper.filterWorkflowDefinition(page, workflowDefinition);
-
-        List<WorkflowDefinition> records = workflowDefinitionIPage.getRecords();
-        for (WorkflowDefinition pd : records) {
-            WorkflowDefinitionLog workflowDefinitionLog =
-                    workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(workflowDefinitionLog.getOperator());
-            pd.setModifyBy(user.getUserName());
-        }
-
-        workflowDefinitionIPage.setRecords(records);
-        PageInfo<WorkflowDefinition> pageInfo =
-                new PageInfo<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
-        pageInfo.setTotal((int) workflowDefinitionIPage.getTotal());
-        pageInfo.setTotalList(workflowDefinitionIPage.getRecords());
-
-        return pageInfo;
-    }
-
-    /**
      * query detail of workflow definition
      *
      * @param loginUser   login user
@@ -679,27 +601,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.SUCCESS);
         }
         return result;
-    }
-
-    /**
-     * query detail of workflow definition
-     *
-     * @param loginUser login user
-     * @param code      workflow definition code
-     * @return workflow definition detail
-     */
-    @Override
-    public WorkflowDefinition getWorkflowDefinition(User loginUser, long code) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
-        if (workflowDefinition == null) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
-        }
-
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
-
-        return workflowDefinition;
     }
 
     @Override
@@ -999,7 +900,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         for (WorkflowDefinition workflowDefinition : workflowDefinitionList) {
             try {
                 this.deleteWorkflowDefinitionByCode(loginUser, workflowDefinition.getCode());
-                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(workflowDefinition.getCode());
             } catch (Exception e) {
                 throw new ServiceException(Status.DELETE_WORKFLOW_DEFINE_ERROR, workflowDefinition.getName(),
                         e.getMessage());
@@ -1082,7 +982,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // we delete the workflow definition at last to avoid using transaction here.
         // If delete error, we can call this interface again.
         workflowDefinitionDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
-        metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
 
         // delete workflow lineage (lineage data only keeps one record per workflow code)
         // It's safe to return 0 if no lineage exists (idempotent)
@@ -1929,51 +1828,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, newWorkflowDefinition.getName());
             }
         }
-    }
-
-    /**
-     * update single resource workflow
-     *
-     * @param loginUser             login user
-     * @param workflowCode          workflow resource code want to update
-     * @param workflowUpdateRequest workflow update resource object
-     * @return workflow definition
-     */
-    @Override
-    @Transactional
-    public WorkflowDefinition updateSingleWorkflowDefinition(User loginUser,
-                                                             long workflowCode,
-                                                             WorkflowUpdateRequest workflowUpdateRequest) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowCode);
-        // check workflow definition exists
-        if (workflowDefinition == null) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowCode);
-        }
-
-        WorkflowDefinition workflowDefinitionUpdate =
-                workflowUpdateRequest.mergeIntoWorkflowDefinition(workflowDefinition);
-        this.updateWorkflowValid(loginUser, workflowDefinition, workflowDefinitionUpdate);
-
-        int insertVersion = this.saveWorkflowDefine(loginUser, workflowDefinitionUpdate);
-        if (insertVersion == 0) {
-            log.error("Update workflow definition error, projectCode:{}, workflowDefinitionName:{}.",
-                    workflowDefinitionUpdate.getCode(),
-                    workflowDefinitionUpdate.getName());
-            throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
-        }
-
-        int insertRelationVersion = this.saveTaskRelation(loginUser, workflowDefinitionUpdate, insertVersion);
-        if (insertRelationVersion != Constants.EXIT_CODE_SUCCESS) {
-            log.error(
-                    "Save workflow task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
-                    workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-            throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_ERROR);
-        }
-        log.info(
-                "Save workflow task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
-                workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-        workflowDefinitionUpdate.setVersion(insertVersion);
-        return workflowDefinitionUpdate;
     }
 
     public int saveWorkflowDefine(User loginUser, WorkflowDefinition workflowDefinition) {
