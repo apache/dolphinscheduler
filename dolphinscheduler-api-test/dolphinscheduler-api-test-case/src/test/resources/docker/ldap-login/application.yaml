@@ -201,7 +201,9 @@ worker:
     # Worker max System memory usage , when the worker's system memory usage is smaller then this value, worker server can be dispatched tasks.
     max-system-memory-usage-percentage-thresholds: 0.9
     # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+    # Deprecated: Use max-disk-usage-percentage-thresholds-rules instead
     max-disk-usage-percentage-thresholds: 0.9
+    max-disk-usage-percentage-thresholds-rules: []
   task-execute-threads-full-policy: REJECT
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.

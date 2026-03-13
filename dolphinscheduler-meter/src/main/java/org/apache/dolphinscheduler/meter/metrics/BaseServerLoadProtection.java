@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.meter.metrics;
 
+import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -49,11 +52,7 @@ public class BaseServerLoadProtection implements ServerLoadProtection {
                     baseServerLoadProtectionConfig.getMaxJvmCpuUsagePercentageThresholds());
             return true;
         }
-        if (systemMetrics.getDiskUsedPercentage() > baseServerLoadProtectionConfig
-                .getMaxDiskUsagePercentageThresholds()) {
-            log.info("OverLoad: the DiskUsedPercentage: {} is over then the maxDiskUsagePercentageThresholds {}",
-                    systemMetrics.getDiskUsedPercentage(),
-                    baseServerLoadProtectionConfig.getMaxDiskUsagePercentageThresholds());
+        if (isDiskOverload(systemMetrics)) {
             return true;
         }
         if (systemMetrics.getSystemMemoryUsedPercentage() > baseServerLoadProtectionConfig
@@ -62,6 +61,52 @@ public class BaseServerLoadProtection implements ServerLoadProtection {
                     "OverLoad: the SystemMemoryUsedPercentage: {} is over then the maxSystemMemoryUsagePercentageThresholds {}",
                     systemMetrics.getSystemMemoryUsedPercentage(),
                     baseServerLoadProtectionConfig.getMaxSystemMemoryUsagePercentageThresholds());
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean isDiskOverload(SystemMetrics systemMetrics) {
+        final List<DiskUsagePercentageThresholdsRule> rules =
+                baseServerLoadProtectionConfig.getMaxDiskUsagePercentageThresholdsRules();
+
+        if (rules != null && !rules.isEmpty()) {
+            boolean hasValidRule = false;
+            for (DiskUsagePercentageThresholdsRule rule : rules) {
+                if (rule == null) {
+                    continue;
+                }
+                final String diskPath = rule.getDiskPath();
+                final double thresholds = rule.getUsagePercentageThresholds();
+                if (diskPath == null || diskPath.trim().isEmpty()) {
+                    continue;
+                }
+                hasValidRule = true;
+                final Optional<DiskUsageUtils.DiskUsage> diskUsageOpt = DiskUsageUtils.getDiskUsage(diskPath);
+                if (!diskUsageOpt.isPresent()) {
+                    continue;
+                }
+                final DiskUsageUtils.DiskUsage diskUsage = diskUsageOpt.get();
+                if (diskUsage.getUsedPercentage() > thresholds) {
+                    log.info(
+                            "OverLoad: disk path {} usedPercentage {} is over then thresholds {}",
+                            diskUsage.getDiskPath(),
+                            diskUsage.getUsedPercentage(),
+                            thresholds);
+                    return true;
+                }
+            }
+            // If rules exist but none of them is valid, fallback to legacy global threshold.
+            if (hasValidRule) {
+                return false;
+            }
+        }
+
+        if (systemMetrics.getDiskUsedPercentage() > baseServerLoadProtectionConfig
+                .getMaxDiskUsagePercentageThresholds()) {
+            log.info("OverLoad: the DiskUsedPercentage: {} is over then the maxDiskUsagePercentageThresholds {}",
+                    systemMetrics.getDiskUsedPercentage(),
+                    baseServerLoadProtectionConfig.getMaxDiskUsagePercentageThresholds());
             return true;
         }
         return false;

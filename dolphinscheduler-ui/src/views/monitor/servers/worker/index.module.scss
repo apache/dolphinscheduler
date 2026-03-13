@@ -27,6 +27,37 @@
   @include base;
 }
 
+.metricCard {
+  font-size: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 220px;
+}
+
+.metricCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.metricAction {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+}
+
+.metricTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .link-btn {
   color: var(--n-color-target);
   cursor: pointer;

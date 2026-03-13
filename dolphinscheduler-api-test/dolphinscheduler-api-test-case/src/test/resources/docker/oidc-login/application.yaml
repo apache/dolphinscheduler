@@ -147,7 +147,9 @@ worker:
     max-system-cpu-usage-percentage-thresholds: 1
     max-jvm-cpu-usage-percentage-thresholds: 0.9
     max-system-memory-usage-percentage-thresholds: 0.9
+    # Deprecated: Use max-disk-usage-percentage-thresholds-rules instead
     max-disk-usage-percentage-thresholds: 0.9
+    max-disk-usage-percentage-thresholds-rules: []
   task-execute-threads-full-policy: REJECT
   tenant-config:
     auto-create-tenant-enabled: true

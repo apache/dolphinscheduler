@@ -20,10 +20,14 @@ package org.apache.dolphinscheduler.server.worker.task;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
+import org.apache.dolphinscheduler.common.model.DiskUsageDetail;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.meter.metrics.DiskUsagePercentageThresholdsRule;
+import org.apache.dolphinscheduler.meter.metrics.DiskUsageUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -32,6 +36,11 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +76,8 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
     public WorkerHeartBeat getHeartBeat() {
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
 
+        final List<DiskUsageDetail> diskUsageDetails = buildDiskUsageDetails();
+
         return WorkerHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())
@@ -79,6 +90,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .jvmNonHeapMax(systemMetrics.getJvmNonHeapMax())
                 .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
                 .diskUsage(systemMetrics.getDiskUsedPercentage())
+                .diskUsageDetails(diskUsageDetails)
                 .processId(processId)
                 .workerHostWeight(workerConfig.getHostWeight())
                 .threadPoolUsage(taskExecutorContainer.slotUsage())
@@ -88,6 +100,37 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .port(workerConfig.getListenPort())
                 .workerGroup(workerConfig.getGroup())
                 .build();
+    }
+
+    private List<DiskUsageDetail> buildDiskUsageDetails() {
+        final Set<String> monitoredPaths = new HashSet<>();
+        // Always monitor data basedir path.
+        monitoredPaths.add(FileUtils.DATA_BASEDIR);
+
+        final List<DiskUsagePercentageThresholdsRule> rules =
+                workerConfig.getServerLoadProtection().getMaxDiskUsagePercentageThresholdsRules();
+        if (rules != null) {
+            for (DiskUsagePercentageThresholdsRule rule : rules) {
+                if (rule == null) {
+                    continue;
+                }
+                if (rule.getDiskPath() == null || rule.getDiskPath().trim().isEmpty()) {
+                    continue;
+                }
+                monitoredPaths.add(rule.getDiskPath().trim());
+            }
+        }
+
+        final List<DiskUsageDetail> details = new ArrayList<>();
+        for (String path : monitoredPaths) {
+            DiskUsageUtils.getDiskUsage(path).ifPresent(diskUsage -> details.add(DiskUsageDetail.builder()
+                    .diskPath(diskUsage.getDiskPath())
+                    .usedBytes(diskUsage.getUsedBytes())
+                    .totalBytes(diskUsage.getTotalBytes())
+                    .usedPercentage(diskUsage.getUsedPercentage())
+                    .build()));
+        }
+        return details;
     }
 
     @Override
