@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -100,9 +99,6 @@ public class UsersServiceTest {
 
     @Mock
     private ProjectUserMapper projectUserMapper;
-
-    @Mock
-    private MetricsCleanUpService metricsCleanUpService;
 
     @Mock
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -375,11 +371,9 @@ public class UsersServiceTest {
 
             // success
             Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(null);
-            Mockito.doNothing().when(metricsCleanUpService).cleanUpApiResponseTimeMetricsByUserId(Mockito.anyInt());
             result = usersService.deleteUserById(loginUser, 1);
             logger.info(result.toString());
             Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-            Mockito.verify(metricsCleanUpService, times(1)).cleanUpApiResponseTimeMetricsByUserId(Mockito.anyInt());
         } catch (Exception e) {
             logger.error("delete user error", e);
             Assertions.assertTrue(false);
