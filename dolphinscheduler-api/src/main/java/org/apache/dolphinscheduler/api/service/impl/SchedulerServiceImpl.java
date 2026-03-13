@@ -21,9 +21,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
-import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
-import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
-import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -41,7 +38,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -57,7 +53,6 @@ import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -248,58 +243,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     /**
-     * save schedule V2, will also change workflow definition's warningGroupId if schedule's warningGroupId be set
-     *
-     * @param loginUser               login user
-     * @param scheduleCreateRequest   schedule create object
-     * @return Schedule object just be created
-     */
-    @Override
-    @Transactional
-    public Schedule createSchedulesV2(User loginUser,
-                                      ScheduleCreateRequest scheduleCreateRequest) {
-        this.projectPermCheckByWorkflowCode(loginUser, scheduleCreateRequest.getWorkflowDefinitionCode());
-
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(scheduleCreateRequest.getWorkflowDefinitionCode());
-
-        // check workflow define release state
-        executorService.checkWorkflowDefinitionValid(workflowDefinition.getProjectCode(), workflowDefinition,
-                workflowDefinition.getCode(), workflowDefinition.getVersion());
-
-        Schedule scheduleExists =
-                scheduleMapper.queryByWorkflowDefinitionCode(scheduleCreateRequest.getWorkflowDefinitionCode());
-        if (scheduleExists != null) {
-            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS,
-                    scheduleCreateRequest.getWorkflowDefinitionCode(),
-                    scheduleExists.getId());
-        }
-
-        tenantExistValidator.validate(scheduleCreateRequest.getTenantCode());
-
-        Schedule schedule = scheduleCreateRequest.convert2Schedule();
-        Environment environment = environmentMapper.queryByEnvironmentCode(schedule.getEnvironmentCode());
-        if (environment == null) {
-            throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, schedule.getEnvironmentCode());
-        }
-
-        schedule.setUserId(loginUser.getId());
-        // give more detail when return schedule object
-        schedule.setUserName(loginUser.getUserName());
-        schedule.setWorkflowDefinitionName(workflowDefinition.getName());
-
-        this.scheduleParamCheck(scheduleCreateRequest.getScheduleParam());
-        int create = scheduleMapper.insert(schedule);
-        if (create <= 0) {
-            throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
-        }
-        // updateWorkflowInstance receivers and cc by workflow definition id
-        workflowDefinition.setWarningGroupId(schedule.getWarningGroupId());
-        workflowDefinitionMapper.updateById(workflowDefinition);
-        return schedule;
-    }
-
-    /**
      * updateWorkflowInstance schedule
      *
      * @param loginUser               login user
@@ -362,69 +305,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     /**
-     * update schedule object V2
-     *
-     * @param loginUser login user
-     * @param scheduleId scheduler id
-     * @param scheduleUpdateRequest the schedule object will be updated
-     * @return Schedule object
-     */
-    @Override
-    @Transactional
-    public Schedule updateSchedulesV2(User loginUser,
-                                      Integer scheduleId,
-                                      ScheduleUpdateRequest scheduleUpdateRequest) {
-        Schedule schedule = scheduleMapper.selectById(scheduleId);
-        if (schedule == null) {
-            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
-        }
-
-        Schedule scheduleUpdate;
-        try {
-            scheduleUpdate = scheduleUpdateRequest.mergeIntoSchedule(schedule);
-            // check update params
-            this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
-        } catch (InvocationTargetException | IllegalAccessException | InstantiationException
-                | NoSuchMethodException e) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleUpdateRequest.toString());
-        }
-        // check update params
-        this.projectPermCheckByWorkflowCode(loginUser, scheduleUpdate.getWorkflowDefinitionCode());
-
-        if (scheduleUpdate.getEnvironmentCode() != null) {
-            Environment environment = environmentMapper.queryByEnvironmentCode(scheduleUpdate.getEnvironmentCode());
-            if (environment == null) {
-                throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, scheduleUpdate.getEnvironmentCode());
-            }
-        }
-
-        int update = scheduleMapper.updateById(scheduleUpdate);
-        if (update <= 0) {
-            throw new ServiceException(Status.UPDATE_SCHEDULE_ERROR);
-        }
-        return scheduleUpdate;
-    }
-
-    /**
-     * get schedule object
-     *
-     * @param loginUser login user
-     * @param scheduleId scheduler id
-     * @return Schedule object
-     */
-    @Override
-    @Transactional
-    public Schedule getSchedule(User loginUser,
-                                Integer scheduleId) {
-        Schedule schedule = scheduleMapper.selectById(scheduleId);
-        if (schedule == null) {
-            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
-        }
-        this.projectPermCheckByWorkflowCode(loginUser, schedule.getWorkflowDefinitionCode());
-        return schedule;
-    }
-
-    /**
      * query schedule
      *
      * @param loginUser         login user
@@ -481,33 +361,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return Collections.emptyList();
         }
         return scheduleMapper.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodes);
-    }
-
-    /**
-     * query schedule
-     *
-     * @param loginUser login user
-     * @param scheduleFilterRequest schedule filter request
-     * @return schedule list page
-     */
-    @Override
-    @Transactional
-    public PageInfo<Schedule> filterSchedules(User loginUser,
-                                              ScheduleFilterRequest scheduleFilterRequest) {
-        if (scheduleFilterRequest.getProjectName() != null) {
-            Project project = projectMapper.queryByName(scheduleFilterRequest.getProjectName());
-            // check project auth
-            projectService.checkProjectAndAuthThrowException(loginUser, project, null);
-        }
-        Page<Schedule> page = new Page<>(scheduleFilterRequest.getPageNo(), scheduleFilterRequest.getPageSize());
-        IPage<Schedule> scheduleIPage = scheduleMapper.filterSchedules(page, scheduleFilterRequest.convert2Schedule());
-
-        PageInfo<Schedule> pageInfo =
-                new PageInfo<>(scheduleFilterRequest.getPageNo(), scheduleFilterRequest.getPageSize());
-        pageInfo.setTotal((int) scheduleIPage.getTotal());
-        pageInfo.setTotalList(scheduleIPage.getRecords());
-
-        return pageInfo;
     }
 
     /**
