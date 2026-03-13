@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -108,9 +107,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
-
-    @Autowired
-    private MetricsCleanUpService metricsCleanUpService;
 
     @Autowired
     private SessionService sessionService;
@@ -478,7 +474,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         sessionService.expireSession(id);
 
         if (userMapper.deleteById(id) > 0) {
-            metricsCleanUpService.cleanUpApiResponseTimeMetricsByUserId(id);
             log.info("User is deleted and id is :{}.", id);
             putMsg(result, Status.SUCCESS);
             return result;

@@ -80,7 +80,7 @@ public final class MailSender {
     private final String mustNotNull = " must not be null";
     private String xlsFilePath;
 
-    public MailSender(Map<String, String> config) {
+    MailSender(Map<String, String> config) {
         String receiversConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS);
         if (receiversConfig == null || "".equals(receiversConfig)) {
             throw new AlertEmailException(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS + mustNotNull);
@@ -140,7 +140,7 @@ public final class MailSender {
      * @param title title
      * @param content content
      */
-    public AlertResult sendMails(String title, String content) {
+    AlertResult sendMails(String title, String content) {
         return sendMails(this.receivers, this.receiverCcs, title, content);
     }
 
@@ -152,7 +152,7 @@ public final class MailSender {
      * @param title title
      * @param content content
      */
-    public AlertResult sendMails(List<String> receivers, List<String> receiverCcs, String title, String content) {
+    private AlertResult sendMails(List<String> receivers, List<String> receiverCcs, String title, String content) {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
 
@@ -390,7 +390,7 @@ public final class MailSender {
      *
      * @param file the file to delete
      */
-    public void deleteFile(File file) {
+    private void deleteFile(File file) {
         if (file.exists()) {
             if (file.delete()) {
                 log.info("delete success: {}", file.getAbsolutePath());
