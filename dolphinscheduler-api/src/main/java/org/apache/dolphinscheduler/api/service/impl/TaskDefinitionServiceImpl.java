@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.chec
 
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
@@ -164,13 +163,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         return workflowTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(user, taskCode, Boolean.FALSE,
                 taskRelationUpdateUpstreamRequest);
-    }
-
-    private WorkflowDefinition updateWorkflowLocation(User user, WorkflowDefinition workflowDefinition) {
-        WorkflowUpdateRequest workflowUpdateRequest = new WorkflowUpdateRequest();
-        workflowUpdateRequest.setLocation(null);
-        return workflowDefinitionService.updateSingleWorkflowDefinition(user, workflowDefinition.getCode(),
-                workflowUpdateRequest);
     }
 
     /**

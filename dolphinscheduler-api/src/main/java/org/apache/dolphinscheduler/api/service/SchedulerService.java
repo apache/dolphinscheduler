@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
-import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
-import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -62,16 +58,6 @@ public interface SchedulerService {
                                        Long environmentCode);
 
     /**
-     * save schedule V2
-     *
-     * @param loginUser             login user
-     * @param scheduleCreateRequest the new schedule object will be created
-     * @return Schedule object
-     */
-    Schedule createSchedulesV2(User loginUser,
-                               ScheduleCreateRequest scheduleCreateRequest);
-
-    /**
      * updateWorkflowInstance schedule
      *
      * @param loginUser login user
@@ -100,28 +86,6 @@ public interface SchedulerService {
                                        Long environmentCode);
 
     /**
-     * update schedule object V2
-     *
-     * @param loginUser login user
-     * @param scheduleId scheduler id
-     * @param scheduleUpdateRequest the schedule object will be updated
-     * @return Schedule object
-     */
-    Schedule updateSchedulesV2(User loginUser,
-                               Integer scheduleId,
-                               ScheduleUpdateRequest scheduleUpdateRequest);
-
-    /**
-     * get schedule object
-     *
-     * @param loginUser login user
-     * @param scheduleId scheduler id
-     * @return Schedule object
-     */
-    Schedule getSchedule(User loginUser,
-                         Integer scheduleId);
-
-    /**
      * query schedule
      *
      * @param loginUser login user
@@ -136,16 +100,6 @@ public interface SchedulerService {
                          Integer pageNo, Integer pageSize);
 
     List<Schedule> queryScheduleByWorkflowDefinitionCodes(List<Long> workflowDefinitionCodes);
-
-    /**
-     * query schedule V2
-     *
-     * @param loginUser login user
-     * @param scheduleFilterRequest schedule filter request
-     * @return schedule list page
-     */
-    PageInfo<Schedule> filterSchedules(User loginUser,
-                                       ScheduleFilterRequest scheduleFilterRequest);
 
     /**
      * query schedule list
