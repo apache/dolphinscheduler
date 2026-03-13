@@ -819,27 +819,29 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(workflowInstance.getCmdTypeIfComplement(),
                         workflowInstance.getScheduleTime(), timezone);
-        String userDefinedParams = workflowInstance.getGlobalParams();
+
         // global params
-        List<Property> globalParams = new ArrayList<>();
+        String globalParamsJson = workflowInstance.getGlobalParams();
+        List<Property> finalGlobalParams = new ArrayList<>();
 
-        // global param string
-        String globalParamStr =
-                ParameterUtils.convertParameterPlaceholders(JSONUtils.toJsonString(globalParams), timeParams);
-        globalParams = JSONUtils.toList(globalParamStr, Property.class);
-        for (Property property : globalParams) {
-            timeParams.put(property.getProp(), property.getValue());
-        }
+        if (StringUtils.isNotEmpty(globalParamsJson)) {
+            String replacedJsonStr = ParameterUtils.convertParameterPlaceholders(globalParamsJson, timeParams);
+            finalGlobalParams = JSONUtils.toList(replacedJsonStr, Property.class);
 
-        if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
+            if (finalGlobalParams != null) {
+                for (Property property : finalGlobalParams) {
+                    if (property.getProp() != null && property.getValue() != null) {
+                        timeParams.put(property.getProp(), property.getValue());
+                    }
+                }
+            }
         }
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(workflowInstance, timeParams);
 
         Map<String, Object> resultMap = new HashMap<>();
 
-        resultMap.put(GLOBAL_PARAMS, globalParams);
+        resultMap.put(GLOBAL_PARAMS, finalGlobalParams);
         resultMap.put(LOCAL_PARAMS, localUserDefParams);
 
         result.put(DATA_LIST, resultMap);

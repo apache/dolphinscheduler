@@ -81,6 +81,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -788,6 +789,89 @@ public class WorkflowInstanceServiceTest {
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
         Map<String, Object> processNotExist = workflowInstanceService.viewVariables(1L, 1);
         Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testViewVariables_WithTimePlaceholders() {
+        String globalParamsJson = "[{\"prop\":\"biz_date\",\"value\":\"$[yyyyMMdd]\",\"type\":\"VARCHAR\"}," +
+                "{\"prop\":\"env\",\"value\":\"${ENV_TYPE}\",\"type\":\"VARCHAR\"}]";
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setCommandType(CommandType.SCHEDULER);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2026, Calendar.MARCH, 13, 10, 0, 0);
+        workflowInstance.setScheduleTime(calendar.getTime());
+        workflowInstance.setGlobalParams(globalParamsJson);
+        workflowInstance.setWorkflowDefinitionCode(100L);
+
+        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(100L);
+        workflowDefinition.setProjectCode(1L);
+        when(workflowDefinitionMapper.queryByCode(100L)).thenReturn(workflowDefinition);
+
+        Map<String, Object> result = workflowInstanceService.viewVariables(1L, 1);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Map<String, Object> dataList = (Map<String, Object>) result.get(Constants.DATA_LIST);
+        Assertions.assertNotNull(dataList);
+
+        List<Property> globalParams = (List<Property>) dataList.get(Constants.GLOBAL_PARAMS);
+        Assertions.assertNotNull(globalParams);
+        Assertions.assertEquals(2, globalParams.size());
+
+        Property dateParam = globalParams.stream()
+                .filter(p -> "biz_date".equals(p.getProp()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(dateParam);
+        Assertions.assertEquals("20260313", dateParam.getValue(),
+                "Time placeholder $[yyyyMMdd] should be replaced with schedule time");
+
+        Property envParam = globalParams.stream()
+                .filter(p -> "env".equals(p.getProp()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(envParam);
+    }
+
+    @Test
+    public void testViewVariables_InstanceNotFound() {
+        when(workflowInstanceMapper.queryDetailById(999)).thenReturn(null);
+
+        Map<String, Object> result = workflowInstanceService.viewVariables(1L, 999);
+
+        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertNull(result.get(Constants.DATA_LIST));
+    }
+
+    @Test
+    public void testViewVariables_EmptyGlobalParams() {
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(2);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setScheduleTime(new Date());
+        workflowInstance.setGlobalParams("");
+        workflowInstance.setWorkflowDefinitionCode(101L);
+
+        when(workflowInstanceMapper.queryDetailById(2)).thenReturn(workflowInstance);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(101L);
+        workflowDefinition.setProjectCode(1L);
+        when(workflowDefinitionMapper.queryByCode(101L)).thenReturn(workflowDefinition);
+
+        Map<String, Object> result = workflowInstanceService.viewVariables(1L, 2);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Map<String, Object> dataList = (Map<String, Object>) result.get(Constants.DATA_LIST);
+        List<Property> globalParams = (List<Property>) dataList.get(Constants.GLOBAL_PARAMS);
+        Assertions.assertTrue(globalParams.isEmpty(), "Global params list should be empty when input is empty string");
     }
 
     @Test
