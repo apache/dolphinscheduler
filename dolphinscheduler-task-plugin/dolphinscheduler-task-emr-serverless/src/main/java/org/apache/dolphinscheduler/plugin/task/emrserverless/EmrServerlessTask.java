@@ -304,12 +304,11 @@ public class EmrServerlessTask extends AbstractRemoteTask {
         builder.withCredentials(credentialsProvider);
 
         String region = awsProperties.get(AwsConfigurationKeys.AWS_REGION);
-        String endpoint = awsProperties.get(AwsConfigurationKeys.AWS_ENDPOINT);
 
-        if (StringUtils.isNotEmpty(endpoint) && StringUtils.isNotEmpty(region)) {
-            builder.withEndpointConfiguration(
-                    new com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration(endpoint, region));
-        } else if (StringUtils.isNotEmpty(region)) {
+        // Note: unlike S3, EMR Serverless has no local emulator, so we ignore
+        // the endpoint configuration (which may point to a local MinIO/S3 mock)
+        // and always use the standard AWS EMR Serverless endpoint resolved by region.
+        if (StringUtils.isNotEmpty(region)) {
             builder.withRegion(region);
         }
 
