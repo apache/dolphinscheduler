@@ -25,20 +25,6 @@ export function queryDatabaseState(): any {
   })
 }
 
-export function listMaster(): any {
-  return axios({
-    url: '/monitor/masters',
-    method: 'get'
-  })
-}
-
-export function listWorker(): any {
-  return axios({
-    url: '/monitor/workers',
-    method: 'get'
-  })
-}
-
 export function listMonitorServerNode(nodeType: ServerNodeType): any {
   return axios({
     url: `/monitor/${nodeType}`,
