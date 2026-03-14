@@ -13,8 +13,7 @@ Amazon EMR Serverless 任务类型，用于向 [Amazon EMR Serverless](https://d
 - 点击 `项目管理 -> 项目名称 -> 工作流定义`，点击 `创建工作流` 按钮进入 DAG 编辑页面。
 - 从工具栏中拖拽 `AmazonEMRServerless` 任务到画布中完成创建。
 
-<!-- TODO: 截图 — 从工具栏拖拽 EMR Serverless 节点到画布上的操作截图 -->
-<!-- 截图存放路径: docs/img/tasks/demo/emr_serverless_create.png -->
+
 
 ## 任务参数
 
@@ -30,8 +29,8 @@ Amazon EMR Serverless 任务类型，用于向 [Amazon EMR Serverless](https://d
 | Job Name                 | 作业名称（可选），用于在 EMR Serverless 控制台中标识作业                                                                                                                                                                                                          |
 | StartJobRunRequest JSON  | [StartJobRunRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/emrserverless/model/StartJobRunRequest.html) 中 `JobDriver` 和 `ConfigurationOverrides` 部分对应的 JSON，详细定义见下方示例。**注意**：`ApplicationId` 和 `ExecutionRoleArn` 无需在 JSON 中重复填写，系统会自动从上方参数注入 |
 
-<!-- TODO: 截图 — EMR Serverless 任务参数配置界面截图，展示 Application Id、Execution Role Arn、Job Name、JSON 编辑器 -->
-<!-- 截图存放路径: docs/img/tasks/demo/emr_serverless_task_params.png -->
+![RUN_JOB_FLOW](../../../../img/tasks/demo/emr_serverless_create.png)
+
 
 ## 任务样例
 
@@ -39,8 +38,6 @@ Amazon EMR Serverless 任务类型，用于向 [Amazon EMR Serverless](https://d
 
 该样例展示了如何创建 `EMR_SERVERLESS` 任务节点来提交一个 Spark 作业到 EMR Serverless 应用程序。
 
-<!-- TODO: 截图 — 完整的 Spark 作业配置截图，包含填写好的 Application Id、Role Arn 和 JSON -->
-<!-- 截图存放路径: docs/img/tasks/demo/emr_serverless_spark.png -->
 
 StartJobRunRequest JSON 参数样例（Spark）：
 

@@ -13,8 +13,6 @@ and submit it to AWS via the [StartJobRun API](https://docs.aws.amazon.com/emr-s
 - Click `Project Management -> Project Name -> Workflow Definition`, click the `Create Workflow` button to enter the DAG editing page.
 - Drag `AmazonEMRServerless` task from the toolbar to the artboard to complete the creation.
 
-<!-- TODO: Screenshot — Dragging the EMR Serverless node from the toolbar onto the canvas -->
-<!-- Screenshot path: docs/img/tasks/demo/emr_serverless_create.png -->
 
 ## Task Parameters
 
@@ -30,17 +28,13 @@ and submit it to AWS via the [StartJobRun API](https://docs.aws.amazon.com/emr-s
 | Job Name                      | Job name (optional), used to identify the job in the EMR Serverless console                                                                                                                                                                             |
 | StartJobRunRequest JSON       | JSON corresponding to the `JobDriver` and `ConfigurationOverrides` portions of the [StartJobRunRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/emrserverless/model/StartJobRunRequest.html), see examples below. **Note**: `ApplicationId` and `ExecutionRoleArn` do not need to be included in the JSON as they are automatically injected from the form parameters above |
 
-<!-- TODO: Screenshot — EMR Serverless task parameter configuration UI showing Application Id, Execution Role Arn, Job Name, and JSON editor -->
-<!-- Screenshot path: docs/img/tasks/demo/emr_serverless_task_params.png -->
+![RUN_JOB_FLOW](../../../../img/tasks/demo/emr_serverless_create.png)
 
 ## Task Example
 
 ### Submit a Spark Job
 
 This example shows how to create an `EMR_SERVERLESS` task node to submit a Spark job to an EMR Serverless application.
-
-<!-- TODO: Screenshot — Complete Spark job configuration with filled Application Id, Role Arn, and JSON -->
-<!-- Screenshot path: docs/img/tasks/demo/emr_serverless_spark.png -->
 
 StartJobRunRequest JSON example (Spark):
 
