@@ -32,6 +32,7 @@ export type TaskType =
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'
+  | 'EMR_SERVERLESS'
   | 'ZEPPELIN'
   | 'K8S'
   | 'JUPYTER'
@@ -112,6 +113,10 @@ export const TASK_TYPES_MAP = {
   },
   EMR: {
     alias: 'AmazonEMR',
+    helperLinkDisable: true
+  },
+  EMR_SERVERLESS: {
+    alias: 'AmazonEMRServerless',
     helperLinkDisable: true
   },
   ZEPPELIN: {
