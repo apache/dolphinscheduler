@@ -13,7 +13,6 @@ and submit it to AWS via the [StartJobRun API](https://docs.aws.amazon.com/emr-s
 - Click `Project Management -> Project Name -> Workflow Definition`, click the `Create Workflow` button to enter the DAG editing page.
 - Drag `AmazonEMRServerless` task from the toolbar to the artboard to complete the creation.
 
-
 ## Task Parameters
 
 [//]: # (TODO: use the commented anchor below once our website template supports this syntax)
@@ -21,12 +20,12 @@ and submit it to AWS via the [StartJobRun API](https://docs.aws.amazon.com/emr-s
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|         **Parameter**         |                                                                                                                    **Description**                                                                                                                     |
-|-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Application Id                | EMR Serverless application ID (e.g. `00fkht2eodujab09`), obtainable from the [EMR Serverless Console](https://console.aws.amazon.com/emr/home#/serverless)                                                                                             |
-| Execution Role Arn            | ARN of the IAM role for job execution (e.g. `arn:aws:iam::123456789012:role/EMRServerlessRole`), this role needs permissions to access S3, Glue, and other services                                                                                     |
-| Job Name                      | Job name (optional), used to identify the job in the EMR Serverless console                                                                                                                                                                             |
-| StartJobRunRequest JSON       | JSON corresponding to the `JobDriver` and `ConfigurationOverrides` portions of the [StartJobRunRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/emrserverless/model/StartJobRunRequest.html), see examples below. **Note**: `ApplicationId` and `ExecutionRoleArn` do not need to be included in the JSON as they are automatically injected from the form parameters above |
+|      **Parameter**      |                                                                                                                                                                                                 **Description**                                                                                                                                                                                                  |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Application Id          | EMR Serverless application ID (e.g. `00fkht2eodujab09`), obtainable from the [EMR Serverless Console](https://console.aws.amazon.com/emr/home#/serverless)                                                                                                                                                                                                                                                       |
+| Execution Role Arn      | ARN of the IAM role for job execution (e.g. `arn:aws:iam::123456789012:role/EMRServerlessRole`), this role needs permissions to access S3, Glue, and other services                                                                                                                                                                                                                                              |
+| Job Name                | Job name (optional), used to identify the job in the EMR Serverless console                                                                                                                                                                                                                                                                                                                                      |
+| StartJobRunRequest JSON | JSON corresponding to the `JobDriver` and `ConfigurationOverrides` portions of the [StartJobRunRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/emrserverless/model/StartJobRunRequest.html), see examples below. **Note**: `ApplicationId` and `ExecutionRoleArn` do not need to be included in the JSON as they are automatically injected from the form parameters above |
 
 ![RUN_JOB_FLOW](../../../../img/tasks/demo/emr_serverless_create.png)
 
@@ -142,3 +141,4 @@ SUBMITTED → PENDING → SCHEDULED → RUNNING → SUCCESS
 - The **Execution Role** requires the following minimum permissions: `emr-serverless:StartJobRun`, `emr-serverless:GetJobRun`, `emr-serverless:CancelJobRun`, plus S3, Glue and other data access permissions required by the job
 - `StartJobRunRequest JSON` should NOT include `ApplicationId` or `ExecutionRoleArn` fields — they are automatically injected from the form parameters
 - EMR Serverless task supports failover: when a Worker node fails, a new Worker can recover tracking of running jobs through `appIds` (the `jobRunId`)
+

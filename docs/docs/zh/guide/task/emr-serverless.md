@@ -13,8 +13,6 @@ Amazon EMR Serverless 任务类型，用于向 [Amazon EMR Serverless](https://d
 - 点击 `项目管理 -> 项目名称 -> 工作流定义`，点击 `创建工作流` 按钮进入 DAG 编辑页面。
 - 从工具栏中拖拽 `AmazonEMRServerless` 任务到画布中完成创建。
 
-
-
 ## 任务参数
 
 [//]: # (TODO: use the commented anchor below once our website template supports this syntax)
@@ -22,22 +20,20 @@ Amazon EMR Serverless 任务类型，用于向 [Amazon EMR Serverless](https://d
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
-|         **任务参数**          |                                                                                                                    **描述**                                                                                                                     |
-|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Application Id           | EMR Serverless 应用程序 ID（格式如 `00fkht2eodujab09`），可在 [EMR Serverless 控制台](https://console.aws.amazon.com/emr/home#/serverless) 获取                                                                                                              |
-| Execution Role Arn       | 作业执行 IAM 角色的 ARN（格式如 `arn:aws:iam::123456789012:role/EMRServerlessRole`），该角色需要有访问 S3、Glue 等服务的权限                                                                                                                                               |
-| Job Name                 | 作业名称（可选），用于在 EMR Serverless 控制台中标识作业                                                                                                                                                                                                          |
-| StartJobRunRequest JSON  | [StartJobRunRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/emrserverless/model/StartJobRunRequest.html) 中 `JobDriver` 和 `ConfigurationOverrides` 部分对应的 JSON，详细定义见下方示例。**注意**：`ApplicationId` 和 `ExecutionRoleArn` 无需在 JSON 中重复填写，系统会自动从上方参数注入 |
+|        **任务参数**         |                                                                                                                                        **描述**                                                                                                                                        |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Application Id          | EMR Serverless 应用程序 ID（格式如 `00fkht2eodujab09`），可在 [EMR Serverless 控制台](https://console.aws.amazon.com/emr/home#/serverless) 获取                                                                                                                                                       |
+| Execution Role Arn      | 作业执行 IAM 角色的 ARN（格式如 `arn:aws:iam::123456789012:role/EMRServerlessRole`），该角色需要有访问 S3、Glue 等服务的权限                                                                                                                                                                                     |
+| Job Name                | 作业名称（可选），用于在 EMR Serverless 控制台中标识作业                                                                                                                                                                                                                                                 |
+| StartJobRunRequest JSON | [StartJobRunRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/emrserverless/model/StartJobRunRequest.html) 中 `JobDriver` 和 `ConfigurationOverrides` 部分对应的 JSON，详细定义见下方示例。**注意**：`ApplicationId` 和 `ExecutionRoleArn` 无需在 JSON 中重复填写，系统会自动从上方参数注入 |
 
 ![RUN_JOB_FLOW](../../../../img/tasks/demo/emr_serverless_create.png)
-
 
 ## 任务样例
 
 ### 提交 Spark 作业
 
 该样例展示了如何创建 `EMR_SERVERLESS` 任务节点来提交一个 Spark 作业到 EMR Serverless 应用程序。
-
 
 StartJobRunRequest JSON 参数样例（Spark）：
 
@@ -145,3 +141,4 @@ SUBMITTED → PENDING → SCHEDULED → RUNNING → SUCCESS
 - **Execution Role** 需要有以下最小权限：`emr-serverless:StartJobRun`、`emr-serverless:GetJobRun`、`emr-serverless:CancelJobRun`，以及作业所需的 S3、Glue 等数据访问权限
 - `StartJobRunRequest JSON` 中无需填写 `ApplicationId` 和 `ExecutionRoleArn` 字段，系统会自动从表单参数注入
 - EMR Serverless 任务支持故障转移（Failover）：当 Worker 节点发生故障时，新的 Worker 可以通过 `appIds`（即 `jobRunId`）恢复对正在运行作业的跟踪
+
