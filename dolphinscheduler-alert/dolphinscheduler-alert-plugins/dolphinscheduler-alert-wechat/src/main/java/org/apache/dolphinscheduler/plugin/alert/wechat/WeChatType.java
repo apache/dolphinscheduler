@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum WeChatType {
 
     APP(1, "APP/应用"),
@@ -25,17 +30,4 @@ public enum WeChatType {
 
     private final int code;
     private final String descp;
-
-    WeChatType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }
