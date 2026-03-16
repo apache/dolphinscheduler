@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, PropType, toRefs } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon, NPopconfirm } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NIcon, NPopconfirm, NText } from 'naive-ui'
 import {
   DeleteOutlined,
   DownloadOutlined,
@@ -25,7 +25,6 @@ import {
   PlayCircleOutlined,
   ClockCircleOutlined,
   CopyOutlined,
-  ExportOutlined,
   ApartmentOutlined,
   UploadOutlined,
   ArrowUpOutlined,
@@ -53,7 +52,6 @@ export default defineComponent({
     'releaseWorkflow',
     'releaseScheduler',
     'copyWorkflow',
-    'exportWorkflow',
     'gotoWorkflowTree'
   ],
   setup(props, ctx) {
@@ -85,10 +83,6 @@ export default defineComponent({
       ctx.emit('copyWorkflow')
     }
 
-    const handleExportWorkflow = () => {
-      ctx.emit('exportWorkflow')
-    }
-
     const handleGotoWorkflowTree = () => {
       ctx.emit('gotoWorkflowTree')
     }
@@ -105,7 +99,6 @@ export default defineComponent({
       handleDeleteWorkflow,
       handleReleaseWorkflow,
       handleCopyWorkflow,
-      handleExportWorkflow,
       handleGotoWorkflowTree,
       handleReleaseScheduler,
       ...toRefs(props)
@@ -278,7 +271,27 @@ export default defineComponent({
                 onPositiveClick={this.handleDeleteWorkflow}
               >
                 {{
-                  default: () => t('project.workflow.delete_confirm'),
+                  default: () => (
+                    <div style={{ maxWidth: 360 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                        {(() => {
+                          const workflowName = (this.row?.name || '').trim()
+                          if (!workflowName) {
+                            return t('project.workflow.delete_confirm')
+                          }
+                          return t(
+                            'project.workflow.delete_confirm_with_name',
+                            {
+                              name: workflowName
+                            }
+                          )
+                        })()}
+                      </div>
+                      <NText type='error'>
+                        {t('project.workflow.delete_irreversible')}
+                      </NText>
+                    </div>
+                  ),
                   trigger: () => (
                     <NButton
                       size='small'
@@ -311,24 +324,6 @@ export default defineComponent({
               >
                 <NIcon>
                   <ApartmentOutlined />
-                </NIcon>
-              </NButton>
-            )
-          }}
-        </NTooltip>
-        <NTooltip trigger={'hover'}>
-          {{
-            default: () => t('project.workflow.export'),
-            trigger: () => (
-              <NButton
-                size='small'
-                type='info'
-                tag='div'
-                circle
-                onClick={this.handleExportWorkflow}
-              >
-                <NIcon>
-                  <ExportOutlined />
                 </NIcon>
               </NButton>
             )

@@ -19,18 +19,23 @@ package org.apache.dolphinscheduler.api.test.pages.workflow;
 
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
+import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @Slf4j
 @AllArgsConstructor
@@ -38,14 +43,34 @@ public class WorkflowDefinitionPage {
 
     private String sessionId;
 
-    public CloseableHttpResponse importWorkflowDefinition(User loginUser, long projectCode, File file) {
+    @SneakyThrows
+    public HttpResponse createWorkflowDefinition(User loginUser,
+                                                 long projectCode,
+                                                 File file,
+                                                 String workflowDefinitionName) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
+
+        String fileContent = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        Map<String, Object> fileContentMap = JSONUtils.parseObject(fileContent, new TypeReference<>() {
+        });
+        if (fileContentMap == null) {
+            throw new RuntimeException("file content parse error");
+        }
+        fileContentMap.replaceAll((key, value) -> {
+            if (value instanceof List) {
+                return JSONUtils.toJsonString(value);
+            }
+            return value;
+        });
+        params.putAll(fileContentMap);
+        params.put("name", workflowDefinitionName);
+
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/workflow-definition/import", projectCode);
-        return requestClient.postWithFile(url, headers, params, file);
+        String url = String.format("/projects/%s/workflow-definition", projectCode);
+        return requestClient.post(url, headers, params);
     }
 
     public HttpResponse queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode) {

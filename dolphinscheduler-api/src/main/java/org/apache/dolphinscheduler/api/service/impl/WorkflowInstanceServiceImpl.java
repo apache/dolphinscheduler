@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -366,69 +365,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             User executor = idToUserMap.get(workflowInstance.getExecutorId());
             if (null != executor) {
                 workflowInstance.setExecutorName(executor.getUserName());
-            }
-        }
-
-        pageInfo.setTotal((int) workflowInstanceList.getTotal());
-        pageInfo.setTotalList(workflowInstances);
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, process status
-     *
-     * @param loginUser                    login user
-     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
-     * @return workflow instance list
-     */
-    @Override
-    public Result queryWorkflowInstanceList(User loginUser, WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
-        Result result = new Result();
-        WorkflowInstance workflowInstance = workflowInstanceQueryRequest.convert2WorkflowInstance();
-        String projectName = workflowInstanceQueryRequest.getProjectName();
-        if (!StringUtils.isBlank(projectName)) {
-            Project project = projectMapper.queryByName(projectName);
-            projectService.checkProjectAndAuthThrowException(loginUser, project,
-                    ApiFuncIdentificationConstant.WORKFLOW_DEFINITION);
-            WorkflowDefinition workflowDefinition =
-                    workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowInstance.getName());
-            workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
-            workflowInstance.setProjectCode(project.getCode());
-        }
-
-        Page<WorkflowInstance> page =
-                new Page<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-        PageInfo<WorkflowInstance> pageInfo =
-                new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListV2Paging(
-                page,
-                workflowInstance.getProjectCode(),
-                workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getName(),
-                workflowInstanceQueryRequest.getStartTime(),
-                workflowInstanceQueryRequest.getEndTime(),
-                workflowInstanceQueryRequest.getState(),
-                workflowInstance.getHost());
-
-        List<WorkflowInstance> workflowInstances = workflowInstanceList.getRecords();
-        List<Integer> userIds = Collections.emptyList();
-        if (CollectionUtils.isNotEmpty(workflowInstances)) {
-            userIds = workflowInstances.stream().map(WorkflowInstance::getExecutorId).collect(Collectors.toList());
-        }
-        List<User> users = usersService.queryUser(userIds);
-        Map<Integer, User> idToUserMap = Collections.emptyMap();
-        if (CollectionUtils.isNotEmpty(users)) {
-            idToUserMap = users.stream().collect(Collectors.toMap(User::getId, Function.identity()));
-        }
-
-        for (WorkflowInstance Instance : workflowInstances) {
-            Instance.setDuration(WorkflowUtils.getWorkflowInstanceDuration(Instance));
-            User executor = idToUserMap.get(Instance.getExecutorId());
-            if (null != executor) {
-                Instance.setExecutorName(executor.getUserName());
             }
         }
 

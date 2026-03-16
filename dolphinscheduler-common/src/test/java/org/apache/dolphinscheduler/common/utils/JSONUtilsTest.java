@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,6 +41,14 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JSONUtilsTest {
+
+    private final TimeZone defaultTimeZone = TimeZone.getDefault();
+
+    @AfterEach
+    public void rollbackTimeZone() {
+        TimeZone.setDefault(defaultTimeZone);
+        JSONUtils.setTimeZone(defaultTimeZone);
+    }
 
     @Test
     public void createObjectNodeTest() {

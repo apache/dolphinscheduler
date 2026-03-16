@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -34,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -140,13 +140,19 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws IOException, SQLException {
         SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
-        CommonUtils.loadKerberosConf(sparkConnectionParam.getJavaSecurityKrb5Conf(),
-                sparkConnectionParam.getLoginUserKeytabUsername(), sparkConnectionParam.getLoginUserKeytabPath());
-        Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(sparkConnectionParam),
-                sparkConnectionParam.getUser(), PasswordUtils.decodePassword(sparkConnectionParam.getPassword()));
+        CommonUtils.loadKerberosConf(
+                sparkConnectionParam.getJavaSecurityKrb5Conf(),
+                sparkConnectionParam.getLoginUserKeytabUsername(),
+                sparkConnectionParam.getLoginUserKeytabPath());
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(sparkConnectionParam))
+                .username(sparkConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(sparkConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override

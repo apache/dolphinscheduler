@@ -22,8 +22,13 @@ import static java.util.stream.Collectors.toMap;
 import java.util.Arrays;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import com.google.common.base.Functions;
 
+@AllArgsConstructor
+@Getter
 public enum WebexTeamsDestination {
 
     /**
@@ -37,19 +42,6 @@ public enum WebexTeamsDestination {
 
     private final int code;
     private final String descp;
-
-    WebexTeamsDestination(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 
     private static final Map<String, WebexTeamsDestination> WEBEX_TEAMS_DESTINATION_MAP =
             Arrays.stream(WebexTeamsDestination.values())

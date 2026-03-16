@@ -16,7 +16,8 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Python](../task/python.md)
 * [SubWorkflow](../task/sub-workflow.md)
 * [Kubernetes](../task/kubernetes.md)
-* [zeppelin](../task/zeppelin.md)
+* [Zeppelin](../task/zeppelin.md)
+* [Http](../task/http.md)
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a sub-workflow node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the sub-workflow.
 
@@ -27,8 +28,8 @@ Upstream parameter will be override when defining parameter with the same name i
 > Note:
 >
 > 1. Parameter passing behavior has changed in version 3.3.x**
->    In older version before 3.2.2, downstream node B could obtain the out type output X of upstream node A without configuring an IN type local variable X.
->    In the new version after 3.3.0, the logic for obtaining local variables has been modified: downstream node B can only use the out type output X of upstream node A if it has configured an IN type local variable X.
+>    In legacy versions (3.2.2 and earlier), downstream node B could obtain the OUT type output X of upstream node A without configuring an IN type local variable X.
+>    In new versions (3.3.0 and later), the logic for obtaining local variables has been modified: downstream node B can only use the OUT type output X of upstream node A if it has configured an IN type local variable X.
 >    See the Node_B and Node_mysql examples below for details.
 >
 > 2. If there are no dependencies between nodes, local parameters cannot be passed upstream.

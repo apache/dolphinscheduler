@@ -44,6 +44,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -97,7 +98,7 @@ public final class TelegramSender {
      * @return alert result
      * @see <a href="https://core.telegram.org/bots/api#sendmessage">telegram bot api</a>
      */
-    public AlertResult sendMessage(AlertData alertData) {
+    AlertResult sendMessage(AlertData alertData) {
         AlertResult result;
         try {
             String resp = sendInvoke(alertData.getTitle(), alertData.getContent());
@@ -179,6 +180,7 @@ public final class TelegramSender {
         return null == parseMode || TelegramAlertConstants.PARSE_MODE_TXT.equals(parseMode);
     }
 
+    @Data
     static class TelegramSendMsgResponse {
 
         @JsonProperty("ok")
@@ -192,42 +194,6 @@ public final class TelegramSender {
 
         public boolean isOk() {
             return null != ok && ok;
-        }
-
-        public Boolean getOk() {
-            return ok;
-        }
-
-        @JsonProperty("ok")
-        public void setOk(Boolean ok) {
-            this.ok = ok;
-        }
-
-        @JsonProperty("error_code")
-        public void setErrorCode(Integer errorCode) {
-            this.errorCode = errorCode;
-        }
-
-        public Integer getErrorCode() {
-            return errorCode;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        @JsonProperty("description")
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public Object getResult() {
-            return result;
-        }
-
-        @JsonProperty("result")
-        public void setResult(Object result) {
-            this.result = result;
         }
     }
 

@@ -15,20 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.project;
+package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
-import lombok.Data;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-/**
- * project create request
- */
-@Data
-public class ProjectCreateRequest {
+public interface JdbcConnectionProvider {
 
-    @Schema(example = "pro123", required = true)
-    private String projectName;
+    Connection getConnection() throws SQLException;
 
-    @Schema(example = "this is a project")
-    private String description;
 }

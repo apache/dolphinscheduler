@@ -15,25 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.project;
+package org.apache.dolphinscheduler.api.validator;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
-import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.stereotype.Component;
 
 /**
- * project update response
+ * This validator is used to validate whether the tenant exists.
+ * <p> If the tenant does not exist, an {@link IllegalArgumentException} will be thrown. </p>
  */
-@Data
-public class ProjectUpdateResponse extends Result {
+@Slf4j
+@Component
+public class TenantExistValidator implements IValidator<String> {
 
-    private Project data;
+    private final TenantDao tenantDao;
 
-    public ProjectUpdateResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((Project) result.getData());
+    public TenantExistValidator(TenantDao tenantDao) {
+        this.tenantDao = tenantDao;
+    }
+
+    @Override
+    public void validate(String tenantCode) {
+        if (!tenantDao.queryByCode(tenantCode).isPresent()) {
+            throw new IllegalArgumentException(String.format("Tenant: [%s] not exists", tenantCode));
+        }
     }
 }

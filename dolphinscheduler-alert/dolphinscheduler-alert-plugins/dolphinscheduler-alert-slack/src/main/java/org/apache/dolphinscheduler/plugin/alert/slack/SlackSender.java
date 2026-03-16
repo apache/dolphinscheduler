@@ -50,7 +50,7 @@ public final class SlackSender {
     private final String webHookUrl;
     private final String botName;
 
-    public SlackSender(Map<String, String> slackAlertParam) {
+    SlackSender(Map<String, String> slackAlertParam) {
         webHookUrl = slackAlertParam.get(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME);
         botName = slackAlertParam.get(SlackParamsConstants.SLACK_BOT_NAME);
         Preconditions.checkArgument(!Objects.isNull(webHookUrl), "SlackWebHookURL can not be null");
@@ -66,7 +66,7 @@ public final class SlackSender {
      * @param content content
      * @return slack response
      */
-    public String sendMessage(String title, String content) {
+    String sendMessage(String title, String content) {
         try (
                 CloseableHttpClient httpClient =
                         HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {

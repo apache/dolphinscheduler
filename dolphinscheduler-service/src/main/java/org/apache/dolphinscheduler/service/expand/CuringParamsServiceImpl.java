@@ -198,7 +198,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         String timeZone = commandParam.getTimeZone();
 
         // 1. Built-in parameters (lowest precedence)
-        Map<String, String> builtInParams = setBuiltInParamsMap(
+        Map<String, String> builtInParams = parseBuiltInParamsMap(
                 taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
         safePutAll(prepareParamsMap, ParameterUtils.getUserDefParamsMap(builtInParams));
 
@@ -211,7 +211,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         safePutAll(prepareParamsMap, globalParams);
 
         // 4. Task-local parameters
-        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
+        Map<String, Property> localParams = parseLocalParamsMap(parameters);
         safePutAll(prepareParamsMap, localParams);
 
         // 5. Command-line / complement parameters
@@ -293,11 +293,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * @param projectName
      * @param workflowDefinitionName
      */
-    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
-                                                    WorkflowInstance workflowInstance,
-                                                    String timeZone,
-                                                    String projectName,
-                                                    String workflowDefinitionName) {
+    private Map<String, String> parseBuiltInParamsMap(@NonNull TaskInstance taskInstance,
+                                                      WorkflowInstance workflowInstance,
+                                                      String timeZone,
+                                                      String projectName,
+                                                      String workflowDefinitionName) {
         CommandType commandType = workflowInstance.getCmdTypeIfComplement();
         Date scheduleTime = workflowInstance.getScheduleTime();
 
@@ -315,6 +315,15 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         params.put(PARAMETER_PROJECT_NAME, projectName);
         params.put(PARAMETER_PROJECT_CODE, Long.toString(workflowInstance.getProjectCode()));
         return params;
+    }
+
+    private Map<String, Property> parseLocalParamsMap(AbstractParameters parameters) {
+        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
+        if (CollectionUtils.isNotEmpty(parameters.getLocalParams())) {
+            parameters.getLocalParams()
+                    .forEach(localParam -> localParametersMaps.put(localParam.getProp(), localParam));
+        }
+        return localParametersMaps;
     }
 
     private Map<String, Property> parseGlobalParamsMap(WorkflowInstance workflowInstance) {
