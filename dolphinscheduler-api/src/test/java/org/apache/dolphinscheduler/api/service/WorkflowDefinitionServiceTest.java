@@ -23,21 +23,15 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
-import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -171,9 +165,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private WorkflowLineageService workflowLineageService;
-
-    @Mock
-    private MetricsCleanUpService metricsCleanUpService;
 
     @Mock
     private TaskDefinitionService taskDefinitionService;
@@ -557,7 +548,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void deleteWorkflowDefinitionByCodeTest() {
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(46L);
 
         Project project = getProject(projectCode);
 
@@ -609,7 +599,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(Optional.empty());
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
         processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L);
-        Mockito.verify(metricsCleanUpService, times(1)).cleanUpWorkflowMetricsByDefinitionCode(46L);
 
         // scheduler online
         Schedule schedule = getSchedule();
@@ -635,13 +624,11 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(Optional.empty());
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
-        Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(46L);
 
         // delete success with no lineage (deleteWorkflowLineageResult == 0)
         // This tests the new logic that handles idempotent deletion gracefully
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
-        Mockito.verify(metricsCleanUpService, times(3)).cleanUpWorkflowMetricsByDefinitionCode(46L);
         Mockito.verify(workflowLineageService, times(3)).deleteWorkflowLineage(anyList());
     }
 
@@ -691,11 +678,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowLineageService.taskDependentMsg(project.getCode(), process.getCode(), 0))
                 .thenReturn(Optional.empty());
         putMsg(result, Status.SUCCESS, projectCode);
-        doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(11L);
         Map<String, Object> deleteSuccess =
                 processDefinitionService.batchDeleteWorkflowDefinitionByCodes(user, projectCode, singleCodes);
         Assertions.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
-        Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(11L);
     }
 
     @Test
@@ -890,198 +875,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         String processName3 = "test_import_" + DateUtils.getCurrentTimeStamp();
         final String newName3 = processDefinitionService.getNewName(processName3, Constants.IMPORT_SUFFIX);
         Assertions.assertEquals(2, newName3.split(Constants.IMPORT_SUFFIX).length);
-    }
-
-    @Test
-    public void testCreateWorkflowDefinitionV2() {
-        Project project = this.getProject(projectCode);
-
-        WorkflowCreateRequest workflowCreateRequest = new WorkflowCreateRequest();
-        workflowCreateRequest.setName(name);
-        workflowCreateRequest.setProjectCode(projectCode);
-
-        // project not exists
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
-
-        // project permission error
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
-                .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // description too long
-        workflowCreateRequest.setDescription(taskDefinitionJson);
-        doThrow(new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
-                .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getCode(), ((ServiceException) exception).getCode());
-        workflowCreateRequest.setDescription(EMPTY_STRING);
-
-        // duplicate process definition name
-        doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
-        when(workflowDefinitionMapper.verifyByDefineName(project.getCode(), name))
-                .thenReturn(this.getWorkflowDefinition());
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NAME_EXIST.getCode(),
-                ((ServiceException) exception).getCode());
-
-        when(workflowDefinitionMapper.verifyByDefineName(project.getCode(), name)).thenReturn(null);
-
-        // test success
-        workflowCreateRequest.setDescription(description);
-        workflowCreateRequest.setTimeout(timeout);
-        workflowCreateRequest.setReleaseState(releaseState);
-        workflowCreateRequest.setWarningGroupId(warningGroupId);
-        workflowCreateRequest.setExecutionType(executionType);
-        when(workflowDefinitionLogMapper.insert(any())).thenReturn(1);
-        when(workflowDefinitionMapper.insert(any())).thenReturn(1);
-        WorkflowDefinition workflowDefinition =
-                processDefinitionService.createSingleWorkflowDefinition(user, workflowCreateRequest);
-
-        Assertions.assertTrue(workflowDefinition.getCode() > 0L);
-        Assertions.assertEquals(workflowCreateRequest.getName(), workflowDefinition.getName());
-        Assertions.assertEquals(workflowCreateRequest.getDescription(), workflowDefinition.getDescription());
-        Assertions.assertTrue(StringUtils.endsWithIgnoreCase(workflowCreateRequest.getReleaseState(),
-                workflowDefinition.getReleaseState().getDescp()));
-        Assertions.assertEquals(workflowCreateRequest.getTimeout(), workflowDefinition.getTimeout());
-        Assertions.assertTrue(StringUtils.endsWithIgnoreCase(workflowCreateRequest.getExecutionType(),
-                workflowDefinition.getExecutionType().getDescp()));
-    }
-
-    @Test
-    public void testFilterWorkflowDefinition() {
-        Project project = this.getProject(projectCode);
-        WorkflowFilterRequest workflowFilterRequest = new WorkflowFilterRequest();
-        workflowFilterRequest.setProjectName(project.getName());
-
-        // project permission error
-        when(projectMapper.queryByName(project.getName())).thenReturn(project);
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
-                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.filterWorkflowDefinition(user, workflowFilterRequest));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
-                ((ServiceException) exception).getCode());
-    }
-
-    @Test
-    public void testGetWorkflowDefinition() {
-        // process definition not exists
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.getWorkflowDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // project permission error
-        when(workflowDefinitionMapper.queryByCode(processDefinitionCode))
-                .thenReturn(this.getWorkflowDefinition());
-        when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject(projectCode));
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
-                .when(projectService)
-                .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.getWorkflowDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // success
-        doNothing().when(projectService).checkProjectAndAuthThrowException(user, this.getProject(projectCode),
-                WORKFLOW_DEFINITION);
-        WorkflowDefinition workflowDefinition =
-                processDefinitionService.getWorkflowDefinition(user, processDefinitionCode);
-        Assertions.assertEquals(this.getWorkflowDefinition(), workflowDefinition);
-    }
-
-    @Test
-    public void testUpdateWorkflowDefinitionV2() {
-        WorkflowDefinition workflowDefinition;
-
-        WorkflowUpdateRequest workflowUpdateRequest = new WorkflowUpdateRequest();
-        workflowUpdateRequest.setName(name);
-
-        // error process definition not exists
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.getWorkflowDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // error old process definition in release state
-        workflowDefinition = this.getWorkflowDefinition();
-        workflowDefinition.setReleaseState(ReleaseState.ONLINE);
-        when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
-        exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
-                .updateSingleWorkflowDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_ALLOWED_EDIT.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // error project permission
-        workflowDefinition = this.getWorkflowDefinition();
-        when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject(projectCode));
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
-                .when(projectService)
-                .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.getWorkflowDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // error description too long
-        workflowUpdateRequest.setDescription(taskDefinitionJson);
-        doThrow(new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
-                .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_UPDATE);
-        exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
-                .updateSingleWorkflowDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getCode(), ((ServiceException) exception).getCode());
-        workflowUpdateRequest.setDescription(EMPTY_STRING);
-
-        // error new definition name already exists
-        doNothing().when(projectService).checkProjectAndAuthThrowException(user, this.getProject(projectCode),
-                WORKFLOW_UPDATE);
-        when(workflowDefinitionMapper.verifyByDefineName(projectCode, workflowUpdateRequest.getName()))
-                .thenReturn(this.getWorkflowDefinition());
-        exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
-                .updateSingleWorkflowDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NAME_EXIST.getCode(),
-                ((ServiceException) exception).getCode());
-
-        when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
-        when(workflowDefinitionMapper.verifyByDefineName(projectCode, workflowUpdateRequest.getName()))
-                .thenReturn(null);
-        // error update process definition mapper
-        workflowUpdateRequest.setName(name);
-        when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
-        when(workflowDefinitionLogMapper.insert(any())).thenReturn(1);
-        exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
-                .updateSingleWorkflowDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.UPDATE_WORKFLOW_DEFINITION_ERROR.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // success
-        when(workflowDefinitionLogMapper.queryMaxVersionForDefinition(workflowDefinition.getCode()))
-                .thenReturn(workflowDefinition.getVersion());
-        when(workflowDefinitionMapper.updateById(isA(WorkflowDefinition.class))).thenReturn(1);
-        WorkflowDefinition workflowDefinitionUpdate =
-                processDefinitionService.updateSingleWorkflowDefinition(user, processDefinitionCode,
-                        workflowUpdateRequest);
-        Assertions.assertNotNull(workflowDefinitionUpdate);
-
-        // check version
-        Assertions.assertEquals(workflowDefinition.getVersion() + 1, workflowDefinitionUpdate.getVersion());
-    }
-
-    @Test
-    public void testCheckVersion() {
-        WorkflowFilterRequest workflowFilterRequest = new WorkflowFilterRequest();
-        workflowFilterRequest.setWorkflowName(name);
-
     }
 
     @Test

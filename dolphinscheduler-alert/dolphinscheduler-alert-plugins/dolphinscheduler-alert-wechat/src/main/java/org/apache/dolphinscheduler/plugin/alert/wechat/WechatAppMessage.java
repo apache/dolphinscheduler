@@ -21,6 +21,13 @@ import org.apache.dolphinscheduler.alert.api.ShowType;
 
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class WechatAppMessage {
 
     private String touser;
@@ -31,73 +38,6 @@ public class WechatAppMessage {
     private Integer safe;
     private Integer enable_id_trans;
     private Integer enable_duplicate_check;
-
-    public String getTouser() {
-        return touser;
-    }
-
-    public void setTouser(String touser) {
-        this.touser = touser;
-    }
-
-    public String getMsgtype() {
-        return msgtype;
-    }
-
-    public void setMsgtype(String msgtype) {
-        this.msgtype = msgtype;
-    }
-
-    public Integer getAgentid() {
-        return agentid;
-    }
-
-    public void setAgentid(Integer agentid) {
-        this.agentid = agentid;
-    }
-
-    public Map<String, String> getText() {
-        return text;
-    }
-
-    public void setText(Map<String, String> text) {
-        this.text = text;
-    }
-
-    public Integer getSafe() {
-        return safe;
-    }
-
-    public void setSafe(Integer safe) {
-        this.safe = safe;
-    }
-
-    public Integer getEnable_id_trans() {
-        return enable_id_trans;
-    }
-
-    public void setEnable_id_trans(Integer enable_id_trans) {
-        this.enable_id_trans = enable_id_trans;
-    }
-
-    public Integer getEnable_duplicate_check() {
-        return enable_duplicate_check;
-    }
-
-    public void setEnable_duplicate_check(Integer enable_duplicate_check) {
-        this.enable_duplicate_check = enable_duplicate_check;
-    }
-
-    public Map<String, String> getMarkdown() {
-        return markdown;
-    }
-
-    public void setMarkdown(Map<String, String> markdown) {
-        this.markdown = markdown;
-    }
-
-    public WechatAppMessage() {
-    }
 
     public WechatAppMessage(String touser, String msgtype, Integer agentid, Map<String, String> contentMap,
                             Integer safe, Integer enableIdTrans, Integer enableDuplicateCheck) {

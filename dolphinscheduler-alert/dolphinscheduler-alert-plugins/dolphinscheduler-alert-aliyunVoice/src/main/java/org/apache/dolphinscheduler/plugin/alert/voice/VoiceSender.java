@@ -40,11 +40,11 @@ public final class VoiceSender {
      * @return Client
      * @throws Exception
      */
-    public VoiceSender(VoiceParam voiceParam) {
+    VoiceSender(VoiceParam voiceParam) {
         this.voiceParam = voiceParam;
     }
 
-    public AlertResult send() {
+    AlertResult send() {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
         try {
@@ -91,11 +91,4 @@ public final class VoiceSender {
         return new com.aliyun.dyvmsapi20170525.Client(config);
     }
 
-    public VoiceParam getVoidcePara() {
-        return voiceParam;
-    }
-
-    public void setVoidcePara(VoiceParam voidcePara) {
-        this.voiceParam = voidcePara;
-    }
 }

@@ -40,6 +40,7 @@ The switch task needs to be connected with the downstream task to configure the 
 
 Configure the conditions and default branches. If the conditions are met, the specified branch will be taken. If the conditions are not met, the default branch will be taken.
 In the figure, if the value of the variable is "A", the branch taskA is executed, if the value of the variable is "B", the branch taskB is executed, and default is executed if both are not satisfied.
+Since the switch task type does not support configuring custom parameters, there is no need to define an IN-type local variable X. You can directly use the OUT-type output X from the upstream node. For more details, please refer to [Parameter Context](../parameter/context.md).
 
 ![switch_02](../../../../img/tasks/demo/switch_02.png)
 
