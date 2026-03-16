@@ -32,7 +32,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -106,59 +105,4 @@ public class LoggerController extends BaseController {
                 .body(logBytes);
     }
 
-    /**
-     * query task log in specified project
-     *
-     * @param loginUser      login user
-     * @param projectCode project code
-     * @param taskInstanceId task instance id
-     * @param skipNum        skip number
-     * @param limit          limit
-     * @return task log content
-     */
-    @Operation(summary = "queryLogInSpecifiedProject", description = "QUERY_TASK_INSTANCE_LOG_IN_SPECIFIED_PROJECT_NOTES")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "taskInstanceId", description = "TASK_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/{projectCode}/detail")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
-    public Result<String> queryLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
-                                   @RequestParam(value = "skipLineNum") int skipNum,
-                                   @RequestParam(value = "limit") int limit) {
-        String log = loggerService.queryLog(loginUser, projectCode, taskInstanceId, skipNum, limit);
-        return Result.success(log);
-    }
-
-    /**
-     * download log file
-     *
-     * @param loginUser      login user
-     * @param projectCode    project code
-     * @param taskInstanceId task instance id
-     * @return log file content
-     */
-    @Operation(summary = "downloadTaskLogInSpecifiedProject", description = "DOWNLOAD_TASK_INSTANCE_LOG_IN_SPECIFIED_PROJECT_NOTES")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "taskInstanceId", description = "TASK_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/{projectCode}/download-log")
-    @ResponseBody
-    @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
-    public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
-        byte[] logBytes = loggerService.getLogBytes(loginUser, projectCode, taskInstanceId);
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
-                .body(logBytes);
-    }
 }

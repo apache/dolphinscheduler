@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -92,16 +91,6 @@ public interface WorkflowInstanceService {
                                                                  String otherParamsJson,
                                                                  Integer pageNo,
                                                                  Integer pageSize);
-
-    /**
-     * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, workflow status
-     *
-     * @param loginUser                    login user
-     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
-     * @return workflow instance list
-     */
-    Result queryWorkflowInstanceList(User loginUser,
-                                     WorkflowInstanceQueryRequest workflowInstanceQueryRequest);
 
     /**
      * query task list by workflow instance id

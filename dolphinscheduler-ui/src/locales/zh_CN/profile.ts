@@ -32,9 +32,5 @@ export default {
   email_tips: '请输入邮箱',
   email_correct_tips: '请输入正确格式的邮箱',
   phone_tips: '请输入手机号',
-  state_tips: '请选择状态',
-  enable: '启用',
-  disable: '禁用',
-  timezone_success: '时区更新成功',
   please_select_timezone: '请选择时区'
 }

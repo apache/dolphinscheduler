@@ -32,9 +32,5 @@ export default {
   email_tips: 'Please enter your email',
   email_correct_tips: 'Please enter your email in the correct format',
   phone_tips: 'Please enter your phone',
-  state_tips: 'Please choose your state',
-  enable: 'Enable',
-  disable: 'Disable',
-  timezone_success: 'Time zone updated successful',
   please_select_timezone: 'Choose timeZone'
 }
