@@ -87,6 +87,7 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
                 taskExecutorEventBus.publish(TaskExecutorRuntimeContextChangedLifecycleEvent.of(taskExecutor));
             }
         });
+        this.getTaskExecutionContext().setVarPool(this.physicalTask.getParameters().getVarPool());
     }
 
     @Override
