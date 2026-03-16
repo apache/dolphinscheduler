@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import com.google.auto.service.AutoService;
@@ -107,12 +107,15 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
-        HanaConnectionParam mysqlConnectionParam = (HanaConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
-        String user = mysqlConnectionParam.getUser();
-        String password = PasswordUtils.decodePassword(mysqlConnectionParam.getPassword());
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), user, password);
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
+        HanaConnectionParam hanaConnectionParam = (HanaConnectionParam) connectionParam;
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(hanaConnectionParam))
+                .username(hanaConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(hanaConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override

@@ -321,15 +321,15 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> proejctAuthFailMap =
+        Map<String, Object> projectAuthFailMap =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailMap.get(Constants.STATUS));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailMap.get(Constants.STATUS));
         // project auth success
         putMsg(result, Status.SUCCESS, projectCode);
         when(workflowInstanceMapper.queryByTriggerCode(projectCode)).thenReturn(new ArrayList());
-        proejctAuthFailMap =
+        projectAuthFailMap =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.SUCCESS, proejctAuthFailMap.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, projectAuthFailMap.get(Constants.STATUS));
     }
 
     @Test

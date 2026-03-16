@@ -101,6 +101,28 @@ export const useForm = () => {
             return new Error(t('project.workflow.warning_group_tip'))
           }
         }
+      },
+      startParamsList: {
+        trigger: ['input', 'blur'],
+        validator: (rule: any, value: Array<any>) => {
+          const params = value || []
+
+          if (!params || params.length === 0) return true
+
+          for (const param of params) {
+            if (!param.prop || param.prop.trim() === '') {
+              return new Error(t('project.dag.prop_key_empty'))
+            }
+          }
+
+          const keys = params.map((item) => (item.prop || '').trim())
+          const uniqueKeys = new Set(keys)
+          if (uniqueKeys.size !== keys.length) {
+            return new Error(t('project.dag.prop_key_repeat'))
+          }
+
+          return true
+        }
       }
     }
   })
