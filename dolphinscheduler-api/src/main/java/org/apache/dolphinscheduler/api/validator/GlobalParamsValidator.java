@@ -47,8 +47,8 @@ public class GlobalParamsValidator implements IValidator<String> {
         List<Property> params;
         try {
             params = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid globalParams");
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Invalid globalParams", ex);
         }
 
         if (params == null || params.isEmpty()) {

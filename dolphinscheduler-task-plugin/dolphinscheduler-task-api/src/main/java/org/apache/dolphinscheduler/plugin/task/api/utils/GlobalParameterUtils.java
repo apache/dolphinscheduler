@@ -27,6 +27,8 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 @Slf4j
 @UtilityClass
 public class GlobalParameterUtils {
@@ -39,7 +41,8 @@ public class GlobalParameterUtils {
     }
 
     public List<Property> deserializeGlobalParameter(String globalParams) {
-        return JSONUtils.toList(globalParams, Property.class);
+        return JSONUtils.parseObject(globalParams, new TypeReference<List<Property>>() {
+        });
     }
 
 }

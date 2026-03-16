@@ -43,15 +43,13 @@ class GlobalParameterUtilsTest {
     @Test
     void testDeserializeWithNullString() {
         List<Property> result = GlobalParameterUtils.deserializeGlobalParameter(null);
-        Assertions.assertNotNull(result, "Deserialization of null string should not return null");
-        Assertions.assertTrue(result.isEmpty(), "Deserialization of null string should return an empty list");
+        Assertions.assertNull(result, "Deserialization of null string should return null");
     }
 
     @Test
     void testDeserializeWithEmptyString() {
         List<Property> result = GlobalParameterUtils.deserializeGlobalParameter("");
-        Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.isEmpty());
+        Assertions.assertNull(result);
     }
 
     @Test
