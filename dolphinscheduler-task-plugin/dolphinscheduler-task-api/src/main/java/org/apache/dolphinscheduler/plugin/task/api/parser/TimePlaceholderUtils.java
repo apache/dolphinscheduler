@@ -655,7 +655,7 @@ public class TimePlaceholderUtils {
                 try {
                     days = Integer.parseInt(addDayExpr);
                 } catch (NumberFormatException e) {
-                    return null;
+                    throw new IllegalArgumentException("Invalid minute expression: " + expression, e);
                 }
                 LocalDate localDate = date.toInstant()
                         .atZone(ZoneId.systemDefault())
@@ -677,7 +677,7 @@ public class TimePlaceholderUtils {
                 try {
                     days = Integer.parseInt(addDayExpr);
                 } catch (NumberFormatException e) {
-                    return null;
+                    throw new IllegalArgumentException("Invalid minute expression: " + expression, e);
                 }
                 LocalDate localDate = date.toInstant()
                         .atZone(ZoneId.systemDefault())
