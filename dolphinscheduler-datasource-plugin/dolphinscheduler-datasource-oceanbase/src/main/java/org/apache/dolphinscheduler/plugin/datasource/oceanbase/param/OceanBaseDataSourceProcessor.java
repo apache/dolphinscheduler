@@ -23,15 +23,14 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,9 +163,8 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         OceanBaseConnectionParam obConnectionParam = (OceanBaseConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
         String user = obConnectionParam.getUser();
         if (user.contains(AUTO_DESERIALIZE)) {
             log.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
@@ -177,7 +175,13 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
             log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
             password = password.replace(AUTO_DESERIALIZE, "");
         }
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), user, password);
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(obConnectionParam))
+                .username(user)
+                .password(PasswordUtils.decodePassword(password))
+                .build()
+                .getConnection();
     }
 
     @Override

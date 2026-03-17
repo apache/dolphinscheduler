@@ -159,6 +159,8 @@ public class ZeppelinTask extends AbstractRemoteTask {
             }
             // add response to out var poll
             addDefaultOutput(resultContent);
+            // setVarPool
+            taskExecutionContext.setVarPool(zeppelinParameters.getVarPool());
             // Use noteId-paragraph-Id as app id
             final int exitStatusCode = mapStatusToExitCode(status);
             setAppIds(String.format("%s-%s", noteId, paragraphId));

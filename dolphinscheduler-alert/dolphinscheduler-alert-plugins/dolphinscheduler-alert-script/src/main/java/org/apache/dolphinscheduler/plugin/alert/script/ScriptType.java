@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum ScriptType {
 
     SHELL(0, "SHELL"),
@@ -24,17 +29,4 @@ public enum ScriptType {
 
     private final int code;
     private final String descp;
-    ScriptType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
-
 }

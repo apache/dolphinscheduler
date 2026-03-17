@@ -290,6 +290,11 @@ export default defineComponent({
       }
     )
 
+    const formModel = computed(() => ({
+      ...startState.startForm,
+      startParamsList: variables.startParamsList
+    }))
+
     return {
       t,
       showTaskDependType,
@@ -302,6 +307,7 @@ export default defineComponent({
       removeStartParams,
       addStartParams,
       updateParamsList,
+      formModel,
       ...toRefs(variables),
       ...toRefs(startState),
       ...toRefs(props),
@@ -319,7 +325,7 @@ export default defineComponent({
         onConfirm={this.handleStart}
         confirmLoading={this.saving}
       >
-        <NForm ref='startFormRef' model={this.startForm} rules={this.rules}>
+        <NForm ref='startFormRef' model={this.formModel} rules={this.rules}>
           <NFormItem
             label={t('project.workflow.workflow_name')}
             path='workflow_name'
@@ -577,13 +583,13 @@ export default defineComponent({
             )}
           <NFormItem
             label={t('project.workflow.startup_parameter')}
-            path='startup_parameter'
+            path='startParamsList'
           >
             <NDynamicInput
               v-model:value={this.startParamsList}
               onCreate={() => {
                 return {
-                  key: '',
+                  prop: '',
                   direct: 'IN',
                   type: 'VARCHAR',
                   value: ''
