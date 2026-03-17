@@ -648,6 +648,7 @@ export default {
     datax_job_speed_byte_info: '(0 means unlimited)',
     datax_job_speed_record: 'Speed(Record count)',
     datax_job_speed_record_info: '(0 means unlimited)',
+    datax_job_channel: 'datax channel',
     datax_job_runtime_memory: 'Runtime Memory Limits',
     datax_job_runtime_memory_xms: 'Low Limit Value',
     datax_job_runtime_memory_xmx: 'High Limit Value',

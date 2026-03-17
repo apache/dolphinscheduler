@@ -22,12 +22,11 @@ import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
@@ -77,7 +76,8 @@ class SubWorkflowInstanceGlobalParamsInheritanceTestCase extends AbstractMasterI
 
                                 Assertions
                                         .assertThat(
-                                                JSONUtils.toList(workflowInstance.getGlobalParams(), Property.class))
+                                                GlobalParameterUtils
+                                                        .deserializeGlobalParameter(workflowInstance.getGlobalParams()))
                                         .hasSize(1)
                                         .anySatisfy(property -> {
                                             assertThat(property.getProp()).isEqualTo("parentWorkflowParam");
@@ -96,7 +96,8 @@ class SubWorkflowInstanceGlobalParamsInheritanceTestCase extends AbstractMasterI
 
                                 Assertions
                                         .assertThat(
-                                                JSONUtils.toList(workflowInstance.getGlobalParams(), Property.class))
+                                                GlobalParameterUtils
+                                                        .deserializeGlobalParameter(workflowInstance.getGlobalParams()))
                                         .hasSize(2)
                                         .anySatisfy(property -> {
                                             assertThat(property.getProp()).isEqualTo("parentWorkflowParam");
