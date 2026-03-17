@@ -132,25 +132,31 @@ public interface DataSourceService {
 
     /**
      * get tables
+     *
+     * @param loginUser login user
      * @param datasourceId
      * @param database
      * @return
      */
-    List<ParamsOptions> getTables(Integer datasourceId, String database);
+    List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database);
 
     /**
      * get table columns
+     *
+     * @param loginUser login user
      * @param datasourceId
      * @param database
      * @param tableName
      * @return
      */
-    List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName);
+    List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName);
 
     /**
      * get databases
+     *
+     * @param loginUser login user
      * @param datasourceId
      * @return
      */
-    List<ParamsOptions> getDatabases(Integer datasourceId);
+    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
 }
