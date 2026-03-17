@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
@@ -41,8 +42,9 @@ public class GlobalParameterUtils {
     }
 
     public List<Property> deserializeGlobalParameter(String globalParams) {
-        return JSONUtils.parseObject(globalParams, new TypeReference<List<Property>>() {
+        List<Property> result = JSONUtils.parseObject(globalParams, new TypeReference<List<Property>>() {
         });
+        return result == null ? Collections.emptyList() : result;
     }
 
 }

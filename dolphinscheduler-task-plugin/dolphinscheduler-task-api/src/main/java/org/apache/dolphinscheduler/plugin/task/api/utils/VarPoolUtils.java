@@ -48,8 +48,9 @@ public class VarPoolUtils {
     }
 
     public List<Property> deserializeVarPool(String varPoolJson) {
-        return JSONUtils.parseObject(varPoolJson, new TypeReference<List<Property>>() {
+        List<Property> result = JSONUtils.parseObject(varPoolJson, new TypeReference<List<Property>>() {
         });
+        return result == null ? Collections.emptyList() : result;
     }
 
     public List<Property> mergeVarPoolJsonString(String... varPoolJsons) {
