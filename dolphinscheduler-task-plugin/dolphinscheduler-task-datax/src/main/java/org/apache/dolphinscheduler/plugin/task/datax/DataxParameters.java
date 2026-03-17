@@ -96,6 +96,11 @@ public class DataxParameters extends AbstractParameters {
     private int jobSpeedRecord;
 
     /**
+     * datax channel
+     */
+    private int jobChannel;
+
+    /**
      * Xms memory
      */
     private int xms;
@@ -206,6 +211,14 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
+    public int getJobChannel() {
+        return jobChannel;
+    }
+
+    public void setJobChannel(int jobChannel) {
+        this.jobChannel = jobChannel;
+    }
+
     public int getXms() {
         return xms;
     }
@@ -249,23 +262,24 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "DataxParameters{"
-                + "customConfig=" + customConfig
-                + ", json='" + json + '\''
-                + ", dsType='" + dsType + '\''
-                + ", dataSource=" + dataSource
-                + ", dtType='" + dtType + '\''
-                + ", dataTarget=" + dataTarget
-                + ", sql='" + sql + '\''
-                + ", targetTable='" + targetTable + '\''
-                + ", preStatements=" + preStatements
-                + ", postStatements=" + postStatements
-                + ", jobSpeedByte=" + jobSpeedByte
-                + ", jobSpeedRecord=" + jobSpeedRecord
-                + ", xms=" + xms
-                + ", xmx=" + xmx
-                + ", resourceList=" + JSONUtils.toJsonString(resourceList)
-                + '}';
+        return "DataxParameters{" +
+                "customConfig=" + customConfig +
+                ", json='" + json + '\'' +
+                ", dsType='" + dsType + '\'' +
+                ", dataSource=" + dataSource +
+                ", dtType='" + dtType + '\'' +
+                ", dataTarget=" + dataTarget +
+                ", sql='" + sql + '\'' +
+                ", targetTable='" + targetTable + '\'' +
+                ", preStatements=" + preStatements +
+                ", postStatements=" + postStatements +
+                ", jobSpeedByte=" + jobSpeedByte +
+                ", jobSpeedRecord=" + jobSpeedRecord +
+                ", jobChannel=" + jobChannel +
+                ", xms=" + xms +
+                ", xmx=" + xmx +
+                ", resourceList=" + JSONUtils.toJsonString(resourceList) +
+                '}';
     }
 
     @Override
