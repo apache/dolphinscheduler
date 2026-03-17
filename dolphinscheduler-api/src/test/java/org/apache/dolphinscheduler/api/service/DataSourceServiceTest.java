@@ -605,13 +605,15 @@ public class DataSourceServiceTest {
 
     @Test
     public void testGetDatabases() throws SQLException {
+        User loginUser = getAdminUser();
+
         DataSource dataSource = getOracleDataSource();
         int datasourceId = 1;
         dataSource.setId(datasourceId);
         when(dataSourceMapper.selectById(datasourceId)).thenReturn(null);
 
         try {
-            dataSourceService.getDatabases(datasourceId);
+            dataSourceService.getDatabases(loginUser, datasourceId);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(Status.QUERY_DATASOURCE_ERROR.getMsg()));
         }
@@ -623,9 +625,10 @@ public class DataSourceServiceTest {
         dataSourceUtils.when(() -> DataSourceUtils.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
         dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
                 .thenReturn(connectionParam);
+        passResourcePermissionCheckService();
 
         try {
-            dataSourceService.getDatabases(datasourceId);
+            dataSourceService.getDatabases(loginUser, datasourceId);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(Status.GET_DATASOURCE_TABLES_ERROR.getMsg()));
         }
@@ -634,7 +637,7 @@ public class DataSourceServiceTest {
                 .thenReturn(null);
 
         try {
-            dataSourceService.getDatabases(datasourceId);
+            dataSourceService.getDatabases(loginUser, datasourceId);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(Status.DATASOURCE_CONNECT_FAILED.getMsg()));
         }
