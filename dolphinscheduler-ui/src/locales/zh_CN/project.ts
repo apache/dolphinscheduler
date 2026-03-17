@@ -731,7 +731,8 @@ export default {
     emr_serverless_job_name: '作业名称',
     emr_serverless_job_name_tips: '可选，为空时默认使用任务名称',
     emr_serverless_start_job_run_json: 'StartJobRun JSON',
-    emr_serverless_start_job_run_json_tips: '请输入 StartJobRun 请求 JSON（jobDriver、configurationOverrides 等）',
+    emr_serverless_start_job_run_json_tips:
+      '请输入 StartJobRun 请求 JSON（jobDriver、configurationOverrides 等）',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: '请输入zeppelin note id',
     zeppelin_paragraph_id: 'zeppelinParagraphId',
