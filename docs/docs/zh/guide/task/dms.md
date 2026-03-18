@@ -47,8 +47,6 @@ DolphinScheduler 在 启动DMS 任务后，会跟中DMS任务状态，直至DMS�
 
 ### 首先介绍一些DS通用参数
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 

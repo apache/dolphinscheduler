@@ -12,7 +12,6 @@ This node is used to execute gRPC tasks and supports checking gRPC status codes,
 
 ## Task Parameters
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
 [//]: # (- For default parameter descriptions, please refer to [DolphinScheduler Task Parameter Appendix]&#40;appendix.md#默认任务参数&#41; under `Default Task Parameters`.)
 
 - For default parameter descriptions, please refer to [DolphinScheduler Task Parameter Appendix](appendix.md) under `Default Task Parameters`.

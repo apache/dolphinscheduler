@@ -13,8 +13,6 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
 ## 任务参数
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
