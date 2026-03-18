@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -231,8 +232,9 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CONNECTION_TEST_FAILURE)
-    public Result<Boolean> connectionTest(@PathVariable("id") int id) {
-        dataSourceService.connectionTest(id);
+    public Result<Boolean> connectionTest(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @PathVariable("id") int id) {
+        dataSourceService.connectionTest(loginUser, id);
         return Result.success(true);
     }
 
@@ -261,7 +263,7 @@ public class DataSourceController extends BaseController {
      * verify datasource name
      *
      * @param name data source name
-     * @return true if data source name not exists, otherwise return false
+     * @return true if data source name not exists, otherwise throw a {@link ServiceException}
      */
     @Operation(summary = "verifyDataSourceName", description = "VERIFY_DATA_SOURCE_NOTES")
     @Parameters({
