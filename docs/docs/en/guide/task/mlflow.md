@@ -28,7 +28,6 @@ The MLflow plugin currently supports and will support the following:
 
 ## Task Parameters and Example
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |       **Parameter**        |                                                                    **Description**                                                                     |

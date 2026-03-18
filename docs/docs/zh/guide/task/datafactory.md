@@ -51,7 +51,6 @@ resource.azure.tenant.id=minioadmin
 
 ## 任务样例
 
-
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 ### 独有参数

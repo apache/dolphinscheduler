@@ -11,7 +11,6 @@ RemoteShell 任务类型，用于在远程服务器上执行命令。
 
 ## 任务参数
 
-
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 - SSH Data Source: 选择SSH 数据源。
 

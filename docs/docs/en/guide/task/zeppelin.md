@@ -12,7 +12,6 @@ it will call `Zeppelin Client API` to trigger zeppelin notebook paragraph. Click
 
 ## Task Parameters
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |           **Parameter**            |                                                          **Description**                                                           |

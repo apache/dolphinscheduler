@@ -47,7 +47,6 @@ The task plugin picture is as follows
 
 ### First, introduce some general parameters of DolphinScheduler
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 ### Here are some specific parameters for the DMS plugin

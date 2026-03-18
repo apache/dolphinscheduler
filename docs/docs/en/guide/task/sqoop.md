@@ -11,7 +11,6 @@ Sqoop task type for executing Sqoop application. The workers run `sqoop` to exec
 
 ## Task Parameters
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |            **Parameter**            |                                                                              **Description**                                                                               |

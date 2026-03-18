@@ -15,7 +15,6 @@ The switch is a conditional judgment node, decide the branch executes according 
 
 ## Task Parameters
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 | **Parameter** |                                                                                                **Description**                                                                                                |

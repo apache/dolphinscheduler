@@ -13,7 +13,6 @@ OpenMLDB任务组件可以连接OpenMLDB集群执行任务。
 
 ## 任务样例
 
-
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 |  **任务参数**   |                      **描述**                      |

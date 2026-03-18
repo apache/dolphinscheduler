@@ -12,7 +12,6 @@ RemoteShell task type is used to execute commands on remote servers.
 
 ## Task Parameters
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 - SSH Data Source: Select SSH data source.
 

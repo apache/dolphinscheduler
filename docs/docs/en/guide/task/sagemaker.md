@@ -20,7 +20,6 @@ DolphinScheduler SageMaker task plugin features are as follows:
 
 ## Task Example
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 Here are some specific parameters for the SagaMaker plugin:

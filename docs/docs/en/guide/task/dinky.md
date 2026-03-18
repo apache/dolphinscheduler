@@ -12,7 +12,6 @@ it will call `Dinky API` to trigger dinky task. Click [here](https://www.dinky.o
 
 ## Task Parameter
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |   **Parameter**   |                                                                                                                    **Description**                                                                                                                     |

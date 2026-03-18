@@ -15,7 +15,6 @@ Spark task type for executing Spark application. When executing the Spark task, 
 
 ## Task Parameters
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |       **Parameter**        |                                                          **Description**                                                           |

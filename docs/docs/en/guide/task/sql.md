@@ -15,7 +15,6 @@ Refer to [datasource-setting](../installation/datasource-setting.md) `DataSource
 
 ## Task Parameter
 
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |   **Parameter**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |

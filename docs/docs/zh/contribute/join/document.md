@@ -17,11 +17,10 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler
 1. 在根目录中运行 `yarn` 以安装依赖项。
 
 2. 运行命令收集资源：
+
    - 运行 `export PROTOCOL_MODE=ssh` 告诉 Git 通过 SSH 协议而不是 HTTPS 协议克隆资源
    - 运行 `./scripts/prepare_docs.sh` 准备所有相关资源
-
 3. 在根目录下运行 `yarn generate` 来格式化和准备数据。
-
 4. 在根目录下运行 `yarn dev` 启动本地服务器，你可以在 http://localhost:3000 查看网站。
 
 ```
