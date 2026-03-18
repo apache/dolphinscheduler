@@ -825,20 +825,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         String globalParamsJson = workflowInstance.getGlobalParams();
         List<Property> finalGlobalParams = new ArrayList<>();
 
-        // global param string
-        String globalParamStr =
-                ParameterUtils.convertParameterPlaceholders(GlobalParameterUtils.serializeGlobalParameter(globalParams),
-                        timeParams);
-        globalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParamStr);
-        for (Property property : globalParams) {
-            timeParams.put(property.getProp(), property.getValue());
-        }
-
-        if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = GlobalParameterUtils.deserializeGlobalParameter(userDefinedParams);
         if (StringUtils.isNotEmpty(globalParamsJson)) {
             String replacedJsonStr = ParameterUtils.convertParameterPlaceholders(globalParamsJson, timeParams);
-            finalGlobalParams = JSONUtils.toList(replacedJsonStr, Property.class);
+            finalGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(replacedJsonStr);
 
             if (finalGlobalParams != null) {
                 for (Property property : finalGlobalParams) {
