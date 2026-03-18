@@ -268,9 +268,11 @@ public class DataSourceServiceTest {
 
     @Test
     public void testConnectionTest() {
+        User loginUser = getAdminUser();
         int dataSourceId = -1;
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
-        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST, () -> dataSourceService.connectionTest(dataSourceId));
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST,
+                () -> dataSourceService.connectionTest(loginUser, dataSourceId));
 
         try (
                 MockedStatic<DataSourceUtils> ignored =
@@ -281,11 +283,12 @@ public class DataSourceServiceTest {
 
             when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
-            assertDoesNotThrow(() -> dataSourceService.connectionTest(dataSource.getId()));
+            passResourcePermissionCheckService();
+            assertDoesNotThrow(() -> dataSourceService.connectionTest(loginUser, dataSource.getId()));
 
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
             assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
-                    () -> dataSourceService.connectionTest(dataSource.getId()));
+                    () -> dataSourceService.connectionTest(loginUser, dataSource.getId()));
         }
 
     }
