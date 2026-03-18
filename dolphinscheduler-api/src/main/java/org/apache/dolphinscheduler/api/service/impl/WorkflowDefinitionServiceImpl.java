@@ -53,6 +53,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -211,6 +212,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Autowired
     private WorkflowLineageService workflowLineageService;
 
+    @Autowired
+    private GlobalParamsValidator globalParamsValidator;
+
     /**
      * create workflow definition
      *
@@ -257,6 +261,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     definition.getName(), definition.getCode());
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
         }
+
+        globalParamsValidator.validate(globalParams);
+
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
@@ -691,6 +698,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
+
+        globalParamsValidator.validate(globalParams);
+
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 

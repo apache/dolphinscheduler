@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentPa
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -41,6 +40,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -299,7 +299,7 @@ public class DependentExecute {
      * @param endTime
      */
     private void addItemVarPool(String varPoolStr, Long endTime) {
-        List<Property> varPool = new ArrayList<>(JSONUtils.toList(varPoolStr, Property.class));
+        List<Property> varPool = new ArrayList<>(VarPoolUtils.deserializeVarPool(varPoolStr));
         if (!varPool.isEmpty()) {
             Map<String, Property> varPoolPropertyMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
                     .collect(Collectors.toMap(Property::getProp, Function.identity()));
