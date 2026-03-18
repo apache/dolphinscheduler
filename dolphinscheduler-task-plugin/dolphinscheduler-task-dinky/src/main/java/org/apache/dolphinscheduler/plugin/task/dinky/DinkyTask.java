@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -339,24 +337,22 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private Map<String, String> generateVariables() {
         Map<String, String> variables = new ConcurrentHashMap<>();
-        List<Property> propertyList =
-                GlobalParameterUtils.deserializeGlobalParameter(taskExecutionContext.getGlobalParams());
-        if (propertyList != null && !propertyList.isEmpty()) {
-            for (Property property : propertyList) {
-                variables.put(property.getProp(), property.getValue());
+        Map<String, Property> prepareParamsMap = taskExecutionContext.getPrepareParamsMap();
+        prepareParamsMap.forEach((key, property) -> {
+            if (property != null && property.getValue() != null) {
+                variables.put(key, property.getValue().trim());
+            }
+        });
+        List<Property> localParams = this.dinkyParameters.getLocalParams();
+        if (localParams != null) {
+            for (Property property : localParams) {
+                String value = ParameterUtils.convertParameterPlaceholders(property.getValue(), variables);
+                if (value != null && !value.isEmpty()) {
+                    variables.put(property.getProp(), value.trim());
+                }
             }
         }
-        List<Property> localParams = this.dinkyParameters.getLocalParams();
-        Map<String, Property> prepareParamsMap = taskExecutionContext.getPrepareParamsMap();
-        if (localParams == null || localParams.isEmpty()) {
-            return variables;
-        }
-        Map<String, String> convertMap = ParameterUtils.convert(prepareParamsMap);
-        for (Property property : localParams) {
-            String propertyValue = property.getValue();
-            String value = PlaceholderUtils.replacePlaceholders(propertyValue, convertMap, true);
-            variables.put(property.getProp(), value);
-        }
+        log.info("sending variables to dinky: {}", variables);
         return variables;
     }
 
