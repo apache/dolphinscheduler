@@ -81,6 +81,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -700,7 +701,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             schedule = DateUtils.stringToDate(scheduleTime);
         }
         workflowInstance.setScheduleTime(schedule);
-        List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);
+        List<Property> globalParamList = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
         Map<String, String> globalParamMap =
                 globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         globalParams = curingGlobalParamsService.curingGlobalParams(workflowInstance.getId(), globalParamMap,
@@ -824,6 +825,17 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         String globalParamsJson = workflowInstance.getGlobalParams();
         List<Property> finalGlobalParams = new ArrayList<>();
 
+        // global param string
+        String globalParamStr =
+                ParameterUtils.convertParameterPlaceholders(GlobalParameterUtils.serializeGlobalParameter(globalParams),
+                        timeParams);
+        globalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParamStr);
+        for (Property property : globalParams) {
+            timeParams.put(property.getProp(), property.getValue());
+        }
+
+        if (userDefinedParams != null && userDefinedParams.length() > 0) {
+            globalParams = GlobalParameterUtils.deserializeGlobalParameter(userDefinedParams);
         if (StringUtils.isNotEmpty(globalParamsJson)) {
             String replacedJsonStr = ParameterUtils.convertParameterPlaceholders(globalParamsJson, timeParams);
             finalGlobalParams = JSONUtils.toList(replacedJsonStr, Property.class);

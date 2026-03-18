@@ -340,6 +340,7 @@ interface ITaskParams {
   targetTable?: string
   jobSpeedByte?: number
   jobSpeedRecord?: number
+  jobChannel?: number
   xms?: number
   xmx?: number
   sparkParameters?: ISparkParameters
