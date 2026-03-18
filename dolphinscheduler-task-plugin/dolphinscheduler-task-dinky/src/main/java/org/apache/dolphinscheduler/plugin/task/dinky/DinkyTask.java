@@ -129,7 +129,7 @@ public class DinkyTask extends AbstractRemoteTask {
                 status = result.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean();
                 if (result.get(apiResultDatasKey).has(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID)
                         && !(result.get(apiResultDatasKey)
-                        .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {
+                                .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {
                     jobInstanceId =
                             result.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();
                 }
@@ -155,7 +155,7 @@ public class DinkyTask extends AbstractRemoteTask {
                 status = result.get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean();
                 if (result.get(apiResultDataKey).has(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID)
                         && !(result.get(apiResultDataKey)
-                        .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {
+                                .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {
                     jobInstanceId =
                             result.get(apiResultDataKey).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();
                 }
