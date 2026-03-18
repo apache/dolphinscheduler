@@ -70,6 +70,7 @@ public class DataxParametersTest {
         dataxParameters.setDtType("MYSQL");
         dataxParameters.setJobSpeedByte(1);
         dataxParameters.setJobSpeedRecord(1);
+        dataxParameters.setJobChannel(1);
         dataxParameters.setJson("json");
         dataxParameters.setResourceList(resourceInfoList);
 
@@ -87,6 +88,7 @@ public class DataxParametersTest {
                 + "postStatements=null, "
                 + "jobSpeedByte=1, "
                 + "jobSpeedRecord=1, "
+                + "jobChannel=1, "
                 + "xms=0, "
                 + "xmx=-100, "
                 + "resourceList=[{\"id\":null,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"

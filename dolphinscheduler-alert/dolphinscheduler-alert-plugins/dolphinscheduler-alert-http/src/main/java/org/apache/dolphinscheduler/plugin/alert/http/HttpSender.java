@@ -49,7 +49,7 @@ public final class HttpSender {
     private int timeout;
     private String url;
 
-    public HttpSender(Map<String, String> paramsMap) {
+    HttpSender(Map<String, String> paramsMap) {
         paramsValidator(paramsMap);
     }
 
@@ -96,7 +96,7 @@ public final class HttpSender {
                 : HttpAlertConstants.DEFAULT_TIMEOUT) * 1000;
     }
 
-    public AlertResult send(String msg) {
+    AlertResult send(String msg) {
 
         AlertResult alertResult = new AlertResult();
         OkHttpResponse okHttpResponse;

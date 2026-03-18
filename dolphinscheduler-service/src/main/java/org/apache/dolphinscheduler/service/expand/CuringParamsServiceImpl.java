@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
@@ -134,7 +135,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 property.setValue(val);
             }
         }
-        return JSONUtils.toJsonString(globalParamList);
+        return GlobalParameterUtils.serializeGlobalParameter(globalParamList);
     }
 
     @Override
@@ -329,7 +330,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     private Map<String, Property> parseGlobalParamsMap(WorkflowInstance workflowInstance) {
         final Map<String, Property> globalParametersMaps = new LinkedHashMap<>();
         if (StringUtils.isNotEmpty(workflowInstance.getGlobalParams())) {
-            JSONUtils.toList(workflowInstance.getGlobalParams(), Property.class)
+            GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams())
                     .forEach(property -> globalParametersMaps.put(property.getProp(), property));
         }
         return globalParametersMaps;

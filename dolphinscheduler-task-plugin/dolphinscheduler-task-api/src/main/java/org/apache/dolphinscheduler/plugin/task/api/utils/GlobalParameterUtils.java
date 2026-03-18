@@ -15,28 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.user;
+package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Collections;
 import java.util.List;
 
-import lombok.Data;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * user List response
- */
-@Data
-public class UserListResponse extends Result {
+import com.fasterxml.jackson.core.type.TypeReference;
 
-    private List<User> data;
+@Slf4j
+@UtilityClass
+public class GlobalParameterUtils {
 
-    public UserListResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData(JSONUtils.toList(JSONUtils.toJsonString(result.getData()), User.class));
+    public String serializeGlobalParameter(List<Property> globalParams) {
+        if (CollectionUtils.isEmpty(globalParams)) {
+            return null;
+        }
+        return JSONUtils.toJsonString(globalParams);
     }
+
+    public List<Property> deserializeGlobalParameter(String globalParams) {
+        List<Property> result = JSONUtils.parseObject(globalParams, new TypeReference<List<Property>>() {
+        });
+        return result == null ? Collections.emptyList() : result;
+    }
+
 }

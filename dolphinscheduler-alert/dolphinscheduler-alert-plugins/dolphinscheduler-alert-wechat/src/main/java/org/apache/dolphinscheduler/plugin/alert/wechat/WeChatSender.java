@@ -46,8 +46,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -205,7 +204,7 @@ public final class WeChatSender {
      *
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      */
-    public AlertResult sendEnterpriseWeChat(String title, String content) {
+    AlertResult sendEnterpriseWeChat(String title, String content) {
         AlertResult alertResult;
         String data = markdownByAlert(title, content);
         if (null == weChatToken) {
@@ -261,50 +260,10 @@ public final class WeChatSender {
         return null;
     }
 
-    @Getter
-    @Setter
+    @Data
     static final class WeChatSendMsgResponse {
 
         private Integer errcode;
         private String errmsg;
-
-        public WeChatSendMsgResponse() {
-        }
-
-        public boolean equals(final Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (!(o instanceof WeChatSendMsgResponse)) {
-                return false;
-            }
-            final WeChatSendMsgResponse other = (WeChatSendMsgResponse) o;
-            final Object this$errcode = this.getErrcode();
-            final Object other$errcode = other.getErrcode();
-            if (this$errcode == null ? other$errcode != null : !this$errcode.equals(other$errcode)) {
-                return false;
-            }
-            final Object this$errmsg = this.getErrmsg();
-            final Object other$errmsg = other.getErrmsg();
-            if (this$errmsg == null ? other$errmsg != null : !this$errmsg.equals(other$errmsg)) {
-                return false;
-            }
-            return true;
-        }
-
-        public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            final Object $errcode = this.getErrcode();
-            result = result * PRIME + ($errcode == null ? 43 : $errcode.hashCode());
-            final Object $errmsg = this.getErrmsg();
-            result = result * PRIME + ($errmsg == null ? 43 : $errmsg.hashCode());
-            return result;
-        }
-
-        public String toString() {
-            return "WeChatSender.WeChatSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg()
-                    + ")";
-        }
     }
 }
