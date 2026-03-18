@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
@@ -82,6 +83,7 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
                 // todo: call api to stop the workflow instance
                 final Integer workflowInstanceId = serialCommand.getWorkflowInstanceId();
                 final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(workflowInstanceId);
+                workflowInstance.setEndTime(DateUtils.getCurrentDate());
                 workflowInstance.setState(WorkflowExecutionStatus.STOP);
                 workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
                 return null;
