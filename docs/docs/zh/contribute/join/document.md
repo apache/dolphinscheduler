@@ -60,7 +60,7 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
 * `*.md`
 * `blog.js or docs.js or site.js`
 
-3. 向 **dev** 分支提交 Pull Request。
+3. 向 **master** 分支提交 Pull Request。
 
 ### 参考文档
 
