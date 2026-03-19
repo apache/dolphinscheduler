@@ -212,12 +212,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
-                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
+                    final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
+                    final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
+                    final WorkflowInstance workflowInstance3 = repository.queryWorkflowInstance(workflowInstanceId3);
+                    assertThat(workflowInstance1.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance2.getEndTime()).isNotNull();
+                    assertThat(workflowInstance2.getEndTime()).isAtLeast(workflowInstance2.getStartTime());
+                    assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance3.getEndTime()).isNotNull();
+                    assertThat(workflowInstance3.getEndTime()).isAtLeast(workflowInstance3.getStartTime());
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -241,12 +245,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
-                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
+                    final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
+                    final WorkflowInstance workflowInstance3 = repository.queryWorkflowInstance(workflowInstanceId3);
+                    assertThat(workflowInstance1.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance1.getEndTime()).isNotNull();
+                    assertThat(workflowInstance1.getEndTime()).isAtLeast(workflowInstance1.getStartTime());
+                    assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance2.getEndTime()).isNotNull();
+                    assertThat(workflowInstance2.getEndTime()).isAtLeast(workflowInstance2.getStartTime());
+                    assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
                 });
 
         masterContainer.assertAllResourceReleased();
