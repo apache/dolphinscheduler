@@ -49,12 +49,14 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 @DisableIfTestFails
 class WorkflowSwitchE2ETest {
 
-    private static final String project = "test-workflow-1";
-    private static final String workflow = "test-workflow-1";
+    private static final String testSuffix = String.valueOf(System.currentTimeMillis());
+
+    private static final String project = "test-workflow-switch-" + testSuffix;
+    private static final String workflow = "test-workflow-switch-main-" + testSuffix;
     private static final String ifBranchName = "key==1";
     private static final String elseBranchName = "key!=1";
 
-    private static final String tenant = System.getProperty("user.name");
+    private static final String tenant = System.getProperty("user.name") + "_switch_" + testSuffix;
 
     private static RemoteWebDriver browser;
 

@@ -28,8 +28,10 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,11 +51,17 @@ public class WorkerGroupAPITest {
 
     private static final String password = "dolphinscheduler123";
 
+    private static final String workerGroupName = "test_worker_group_" + UUID.randomUUID().toString().replace("-", "");
+
+    private static final String workerAddress = "10.5.0.5:1234";
+
     private static String sessionId;
 
     private static User loginUser;
 
     private static WorkerGroupPage workerGroupPage;
+
+    private static Integer workerGroupId;
 
     @BeforeAll
     public static void setup() {
@@ -78,26 +86,27 @@ public class WorkerGroupAPITest {
         HttpResponse saveWorkerGroupHttpResponse = workerGroupPage.saveWorkerGroup(
                 loginUser,
                 0,
-                "test_worker_group",
-                "10.5.0.5:1234",
+                workerGroupName,
+                workerAddress,
                 "test");
         Assertions.assertTrue(saveWorkerGroupHttpResponse.getBody().getSuccess());
 
+        workerGroupId = resolveWorkerGroupId();
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
         List<String> workerGroupsList = (List<String>) queryAllWorkerGroupsResponse.getBody().getData();
         Set<String> workerGroupsActual = new HashSet<>(workerGroupsList);
-        Set<String> workerGroupsExpected = new HashSet<>(Arrays.asList("test_worker_group", "default"));
-        Assertions.assertEquals(workerGroupsExpected, workerGroupsActual);
+        Set<String> workerGroupsExpected = new HashSet<>(Arrays.asList(workerGroupName, "default"));
+        Assertions.assertTrue(workerGroupsActual.containsAll(workerGroupsExpected));
     }
 
     @Test
     @Order(2)
     public void testQueryAllWorkerGroupsPaging() {
         HttpResponse queryAllWorkerGroupsPagingResponse =
-                workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 2, null);
+                workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 100, workerGroupName);
         Assertions.assertTrue(queryAllWorkerGroupsPagingResponse.getBody().getSuccess());
         String workerGroupPageInfoData = queryAllWorkerGroupsPagingResponse.getBody().getData().toString();
-        Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
+        Assertions.assertTrue(workerGroupPageInfoData.contains(workerGroupName));
     }
 
     @Test
@@ -107,7 +116,7 @@ public class WorkerGroupAPITest {
         Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
 
         String workerGroupPageInfoData = queryAllWorkerGroupsResponse.getBody().getData().toString();
-        Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
+        Assertions.assertTrue(workerGroupPageInfoData.contains(workerGroupName));
     }
 
     @Test
@@ -115,7 +124,7 @@ public class WorkerGroupAPITest {
     public void queryWorkerAddressList() {
         HttpResponse queryWorkerAddressListResponse = workerGroupPage.queryWorkerAddressList(loginUser);
         Assertions.assertTrue(queryWorkerAddressListResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryWorkerAddressListResponse.getBody().getData().toString().contains("10.5.0.5:1234"));
+        Assertions.assertTrue(queryWorkerAddressListResponse.getBody().getData().toString().contains(workerAddress));
     }
 
     @Test
@@ -124,13 +133,35 @@ public class WorkerGroupAPITest {
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
         String workerGroupsBeforeDelete = queryAllWorkerGroupsResponse.getBody().getData().toString();
         Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
-        Assertions.assertTrue(workerGroupsBeforeDelete.contains("test_worker_group"));
+        Assertions.assertTrue(workerGroupsBeforeDelete.contains(workerGroupName));
 
-        HttpResponse deleteWorkerGroupResponse = workerGroupPage.deleteWorkerGroupById(loginUser, 1);
+        HttpResponse deleteWorkerGroupResponse = workerGroupPage.deleteWorkerGroupById(loginUser, resolveWorkerGroupId());
         Assertions.assertTrue(deleteWorkerGroupResponse.getBody().getSuccess());
 
         queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
         String workerGroupsAfterDelete = queryAllWorkerGroupsResponse.getBody().getData().toString();
-        Assertions.assertTrue(!workerGroupsAfterDelete.contains("test_worker_group"));
+        Assertions.assertFalse(workerGroupsAfterDelete.contains(workerGroupName));
+    }
+
+    private Integer resolveWorkerGroupId() {
+        if (workerGroupId != null) {
+            return workerGroupId;
+        }
+
+        HttpResponse queryAllWorkerGroupsPagingResponse =
+                workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 100, workerGroupName);
+        Assertions.assertTrue(queryAllWorkerGroupsPagingResponse.getBody().getSuccess());
+
+        LinkedHashMap<String, Object> pageInfo =
+                JSONUtils.convertValue(queryAllWorkerGroupsPagingResponse.getBody().getData(), LinkedHashMap.class);
+        List<LinkedHashMap<String, Object>> workerGroups =
+                JSONUtils.convertValue(pageInfo.get("totalList"), List.class);
+
+        workerGroupId = workerGroups.stream()
+                .filter(it -> workerGroupName.equals(it.get("name")))
+                .findFirst()
+                .map(it -> ((Number) it.get("id")).intValue())
+                .orElseThrow(() -> new AssertionError("Cannot find worker group: " + workerGroupName));
+        return workerGroupId;
     }
 }

@@ -23,29 +23,23 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import java.util.List;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.platform.commons.util.StringUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 @Slf4j
 public final class CodeEditor {
 
-    @FindBys({
-            @FindBy(className = "monaco-editor"),
-            @FindBy(className = "view-line"),
-    })
-    private List<WebElement> editor;
+    private static final By EDITOR_LINE_LOCATOR = By.cssSelector(".monaco-editor .view-line");
 
     @FindBy(className = "pre-tasks-model")
     private WebElement scrollBar;
@@ -57,13 +51,11 @@ public final class CodeEditor {
         this.driver = driver;
     }
 
-    @SneakyThrows
     public CodeEditor content(String content) {
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editor.get(0)));
-
+        waitForLineCountAtLeast(1);
         Actions actions = new Actions(this.driver);
 
-        List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
+        List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR, -1));
 
         try {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBar);
@@ -72,51 +64,57 @@ public final class CodeEditor {
         }
 
         for (int i = 0; i < contentList.size(); i++) {
+            waitForLineCountAtLeast(i + 1);
+            WebElement editorLine = editorLine(i);
             String editorLineText;
             String inputContent = contentList.get(i);
+            boolean hasNextLine = i < contentList.size() - 1;
             if (i == 0) {
-                actions.moveToElement(editor.get(i))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
+                typeLine(actions, editorLine, inputContent, hasNextLine);
+                waitForLineContent(i, inputContent);
+                if (hasNextLine) {
+                    waitForLineCountAtLeast(i + 2);
+                }
                 continue;
             } else {
-                editorLineText = editor.get(i).getText();
+                editorLineText = editorLine.getText();
             }
 
             if (StringUtils.isNotBlank(inputContent)) {
                 if (editorLineText.isEmpty()) {
-                    actions.moveToElement(editor.get(i))
-                            .click()
-                            .sendKeys(inputContent)
-                            .sendKeys(Constants.LINE_SEPARATOR)
-                            .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+                    typeLine(actions, editorLine, inputContent, hasNextLine);
                 } else {
                     for (int p = 0; p < editorLineText.strip().length(); p++) {
-                        clearLine(actions, editor.get(i));
+                        clearLine(actions, editorLine);
                     }
                     if (!editorLineText.isEmpty()) {
-                        clearLine(actions, editor.get(i));
+                        clearLine(actions, editorLine);
                     }
-                    actions.moveToElement(editor.get(i))
-                            .click()
-                            .sendKeys(inputContent)
-                            .sendKeys(Constants.LINE_SEPARATOR)
-                            .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+                    typeLine(actions, editorLine, inputContent, hasNextLine);
                 }
+                waitForLineContent(i, inputContent);
             } else {
-                actions.moveToElement(editor.get(i))
-                        .click()
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+                typeLine(actions, editorLine, inputContent, hasNextLine);
+            }
+
+            if (hasNextLine) {
+                waitForLineCountAtLeast(i + 2);
             }
         }
 
         return this;
+    }
+
+    private void typeLine(Actions actions, WebElement element, String content, boolean appendNewLine) {
+        actions.moveToElement(element)
+                .click()
+                .sendKeys(content)
+                .perform();
+
+        if (appendNewLine) {
+            actions.sendKeys(Constants.LINE_SEPARATOR)
+                    .perform();
+        }
     }
 
     private void clearLine(Actions actions, WebElement element) {
@@ -124,5 +122,27 @@ public final class CodeEditor {
                 .click()
                 .sendKeys(Keys.BACK_SPACE)
                 .perform();
+    }
+
+    private void waitForLineCountAtLeast(int expectedLineCount) {
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(it -> editorLines().size() >= expectedLineCount);
+    }
+
+    private void waitForLineContent(int lineIndex, String expectedContent) {
+        if (StringUtils.isBlank(expectedContent)) {
+            return;
+        }
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(it -> editorLines().size() > lineIndex
+                        && editorLine(lineIndex).getText().contains(expectedContent));
+    }
+
+    private WebElement editorLine(int index) {
+        return editorLines().get(index);
+    }
+
+    private List<WebElement> editorLines() {
+        return driver.findElements(EDITOR_LINE_LOCATOR);
     }
 }

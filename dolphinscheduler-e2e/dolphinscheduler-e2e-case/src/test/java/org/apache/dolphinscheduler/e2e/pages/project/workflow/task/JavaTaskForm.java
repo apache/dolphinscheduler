@@ -77,14 +77,10 @@ public class JavaTaskForm extends TaskNodeForm {
         final By optionsLocator = By.className("n-tree-node-content__text");
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
-        wait.until(s -> {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            return true;
-        });
+        wait.until(s -> parent().driver()
+                .findElements(optionsLocator)
+                .stream()
+                .anyMatch(it -> it.getText().startsWith(resourceName)));
         parent().driver()
                 .findElements(optionsLocator)
                 .stream()

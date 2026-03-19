@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterAll;
@@ -40,7 +42,7 @@ import org.junitpioneer.jupiter.DisableIfTestFails;
 @DisableIfTestFails
 public class TenantAPITest {
 
-    private static final String tenant = System.getProperty("user.name");
+    private static final String tenant = "tenant_" + UUID.randomUUID().toString().replace("-", "");
 
     private static final String user = "admin";
 
@@ -89,7 +91,7 @@ public class TenantAPITest {
     public void testGetTenantListPaging() {
         TenantPage tenantPage = new TenantPage();
 
-        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
+        HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 100, tenant);
         boolean result = false;
 
         for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils

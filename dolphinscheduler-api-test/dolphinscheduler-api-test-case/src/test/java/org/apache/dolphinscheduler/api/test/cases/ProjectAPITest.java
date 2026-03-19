@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,11 +50,17 @@ public class ProjectAPITest {
 
     private static final String password = "dolphinscheduler123";
 
+    private static final String projectName = "project-test-" + UUID.randomUUID().toString().replace("-", "");
+
+    private static final String renamedProjectName = projectName + "-renamed";
+
     private static String sessionId;
 
     private static User loginUser;
 
     private static ProjectPage projectPage;
+
+    private static Long projectCode;
 
     @BeforeAll
     public static void setup() {
@@ -79,67 +86,62 @@ public class ProjectAPITest {
         HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
         Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
         List<Project> projects = (List<Project>) queryAllProjectListResponse.getBody().getData();
-        Assertions.assertEquals(projects.size(), 0);
+        Assertions.assertTrue(projects.stream().noneMatch(it -> projectName.equals(it.getName())));
+        Assertions.assertTrue(projects.stream().noneMatch(it -> renamedProjectName.equals(it.getName())));
     }
 
     @Test
     @Order(2)
     public void testCreateProject() {
-        HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
+        HttpResponse createProjectResponse = projectPage.createProject(loginUser, projectName);
         Assertions.assertTrue(createProjectResponse.getBody().getSuccess());
 
-        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-        Assertions.assertTrue(queryAllProjectListResponse.getBody().getData().toString().contains("project-test"));
+        projectCode = resolveProjectCode(projectName);
     }
 
     @Test
     @Order(3)
     public void testUpdateProject() {
-        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-        List<LinkedHashMap> projects = (List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData();
-        Long code = (Long) projects.get(0).get("code");
-
         HttpResponse updateProjectResponse =
-                projectPage.updateProject(loginUser, code, "project-new", loginUser.getUserName());
+                projectPage.updateProject(loginUser, resolveProjectCode(projectName), renamedProjectName,
+                        loginUser.getUserName());
         Assertions.assertTrue(updateProjectResponse.getBody().getSuccess());
 
-        queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-        Assertions.assertFalse(queryAllProjectListResponse.getBody().getData().toString().contains("project-test"));
-        Assertions.assertTrue(queryAllProjectListResponse.getBody().getData().toString().contains("project-new"));
+        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+        String projectList = queryAllProjectListResponse.getBody().getData().toString();
+        Assertions.assertFalse(projectList.contains(projectName));
+        Assertions.assertTrue(projectList.contains(renamedProjectName));
     }
 
     @Test
     @Order(4)
     public void testQueryProjectByCode() {
-        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-        List<LinkedHashMap> projects = (List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData();
-        Long code = (Long) projects.get(0).get("code");
-        String projectNameExpected = (String) projects.get(0).get("name");
+        Long code = resolveProjectCode(renamedProjectName);
 
         HttpResponse queryProjectByCodeResponse = projectPage.queryProjectByCode(loginUser, code);
         Assertions.assertTrue(queryProjectByCodeResponse.getBody().getSuccess());
 
         LinkedHashMap<String, Object> project = (LinkedHashMap) queryProjectByCodeResponse.getBody().getData();
         String projectNameActual = (String) project.get("name");
-        Assertions.assertEquals(projectNameExpected, projectNameActual);
+        Assertions.assertEquals(renamedProjectName, projectNameActual);
     }
 
     @Test
     @Order(5)
     public void testQueryProjectListPaging() {
-        HttpResponse queryProjectListPagingResponse = projectPage.queryProjectListPaging(loginUser, 1, 1);
+        HttpResponse queryProjectListPagingResponse = projectPage.queryProjectListPaging(loginUser, 100, 1);
         Assertions.assertTrue(queryProjectListPagingResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryProjectListPagingResponse.getBody().getData().toString().contains("project-new"));
+        Assertions.assertTrue(queryProjectListPagingResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
     @Order(6)
     public void testQueryProjectWithAuthorizedLevelListPaging() {
         HttpResponse queryProjectWithAuthorizedLevelListPagingResponse =
-                projectPage.queryProjectWithAuthorizedLevelListPaging(loginUser, loginUser.getId(), 1, 1);
+                projectPage.queryProjectWithAuthorizedLevelListPaging(loginUser, loginUser.getId(), 100, 1);
         Assertions.assertTrue(queryProjectWithAuthorizedLevelListPagingResponse.getBody().getSuccess());
         Assertions.assertTrue(queryProjectWithAuthorizedLevelListPagingResponse.getBody().getData().toString()
-                .contains("project-new"));
+                .contains(renamedProjectName));
     }
 
     @Test
@@ -148,9 +150,9 @@ public class ProjectAPITest {
         HttpResponse queryUnauthorizedProjectResponse =
                 projectPage.queryUnauthorizedProject(loginUser, loginUser.getId());
         Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getSuccess());
-        // project-new was created by instead of authorized to this user, therefore, it should be in the unauthorized
-        // list
-        Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getData().toString().contains("project-new"));
+        // The test project was created by instead of authorized to this user, therefore, it should be in the
+        // unauthorized list.
+        Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
@@ -158,9 +160,9 @@ public class ProjectAPITest {
     public void testQueryAuthorizedProject() {
         HttpResponse queryAuthorizedProjectResponse = projectPage.queryAuthorizedProject(loginUser, loginUser.getId());
         Assertions.assertTrue(queryAuthorizedProjectResponse.getBody().getSuccess());
-        // project-new was created by instead of authorized to this user, therefore, it should not be in the authorized
-        // list
-        Assertions.assertFalse(queryAuthorizedProjectResponse.getBody().getData().toString().contains("project-new"));
+        // The test project was created by instead of authorized to this user, therefore, it should not be in the
+        // authorized list.
+        Assertions.assertFalse(queryAuthorizedProjectResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
@@ -172,16 +174,14 @@ public class ProjectAPITest {
         // queryProjectWithAuthorizedLevel api returns a joint-set of projects both created by and authorized to the
         // user
         Assertions.assertTrue(
-                queryProjectWithAuthorizedLevelResponse.getBody().getData().toString().contains("project-new"));
+                queryProjectWithAuthorizedLevelResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
     @Order(10)
     public void testQueryAuthorizedUser() {
-        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-        List<LinkedHashMap> projects = (List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData();
-        Long code = (Long) projects.get(0).get("code");
-        HttpResponse queryAuthorizedUserResponse = projectPage.queryAuthorizedUser(loginUser, code);
+        HttpResponse queryAuthorizedUserResponse =
+                projectPage.queryAuthorizedUser(loginUser, resolveProjectCode(renamedProjectName));
         List<LinkedHashMap> users = (List<LinkedHashMap>) queryAuthorizedUserResponse.getBody().getData();
         Assertions.assertTrue(queryAuthorizedUserResponse.getBody().getSuccess());
         // admin has not authorized this project to any other users, therefore, the authorized user list should be empty
@@ -197,7 +197,7 @@ public class ProjectAPITest {
         // queryProjectCreatedAndAuthorizedByUser api returns a joint-set of projects both created by and authorized to
         // the user
         Assertions.assertTrue(
-                queryProjectCreatedAndAuthorizedByUserResponse.getBody().getData().toString().contains("project-new"));
+                queryProjectCreatedAndAuthorizedByUserResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
@@ -206,18 +206,37 @@ public class ProjectAPITest {
         HttpResponse queryAllProjectListForDependentResponse = projectPage.queryAllProjectListForDependent(loginUser);
         Assertions.assertTrue(queryAllProjectListForDependentResponse.getBody().getSuccess());
         Assertions.assertTrue(
-                queryAllProjectListForDependentResponse.getBody().getData().toString().contains("project-new"));
+                queryAllProjectListForDependentResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
     @Order(13)
     public void testDeleteProject() {
+        HttpResponse deleteProjectResponse = projectPage.deleteProject(loginUser, resolveProjectCode(renamedProjectName));
+        Assertions.assertTrue(deleteProjectResponse.getBody().getSuccess());
+
         HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+        Assertions.assertFalse(queryAllProjectListResponse.getBody().getData().toString().contains(renamedProjectName));
+    }
+
+    private static Long resolveProjectCode(String expectedProjectName) {
+        if (projectCode != null && renamedProjectName.equals(expectedProjectName)) {
+            return projectCode;
+        }
+
+        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+        Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+
         List<LinkedHashMap> projects = (List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData();
-        Long code = (Long) projects.get(0).get("code");
-        HttpResponse queryAllProjectListForDependentResponse = projectPage.deleteProject(loginUser, code);
-        Assertions.assertTrue(queryAllProjectListForDependentResponse.getBody().getSuccess());
-        Assertions.assertFalse(
-                queryAllProjectListForDependentResponse.getBody().getData().toString().contains("project-new"));
+        Long resolvedCode = projects.stream()
+                .filter(it -> expectedProjectName.equals(it.get("name")))
+                .findFirst()
+                .map(it -> ((Number) it.get("code")).longValue())
+                .orElseThrow(() -> new AssertionError("Cannot find project: " + expectedProjectName));
+
+        if (renamedProjectName.equals(expectedProjectName)) {
+            projectCode = resolvedCode;
+        }
+        return resolvedCode;
     }
 }

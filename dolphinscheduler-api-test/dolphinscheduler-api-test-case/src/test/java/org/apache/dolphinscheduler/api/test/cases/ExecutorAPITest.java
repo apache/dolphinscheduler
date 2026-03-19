@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,7 +73,9 @@ public class ExecutorAPITest {
 
     private static List<Integer> workflowInstanceIds;
 
-    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
+    private static final String projectName = "project-test-" + UUID.randomUUID().toString().replace("-", "");
+
+    private static final String workflowDefinitionName = "test-" + UUID.randomUUID().toString().replace("-", "");
 
     @BeforeAll
     public static void setup() {
@@ -99,11 +102,9 @@ public class ExecutorAPITest {
     public void testStartWorkflowInstance() {
         try {
             // create test project
-            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
-            HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-            Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
-            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
-                    .getBody().getData()).get(0)).get("code");
+            HttpResponse createProjectResponse = projectPage.createProject(loginUser, projectName);
+            Assertions.assertTrue(createProjectResponse.getBody().getSuccess());
+            projectCode = resolveProjectCode(projectName);
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
@@ -118,9 +119,7 @@ public class ExecutorAPITest {
             Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
             Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
                     .contains("hello world"));
-            workflowDefinitionCode =
-                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
-                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+            workflowDefinitionCode = resolveWorkflowDefinitionCode(projectCode, workflowDefinitionName);
 
             // release test workflow
             HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
@@ -141,6 +140,36 @@ public class ExecutorAPITest {
             log.error("failed", e);
             Assertions.fail();
         }
+    }
+
+    private static long resolveProjectCode(String expectedProjectName) {
+        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+        Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+
+        List<LinkedHashMap<String, Object>> projects =
+                (List<LinkedHashMap<String, Object>>) queryAllProjectListResponse.getBody().getData();
+        return projects.stream()
+                .filter(it -> expectedProjectName.equals(it.get("name")))
+                .findFirst()
+                .map(it -> ((Number) it.get("code")).longValue())
+                .orElseThrow(() -> new AssertionError("Cannot find project: " + expectedProjectName));
+    }
+
+    private static long resolveWorkflowDefinitionCode(long projectCode, String expectedWorkflowDefinitionName) {
+        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+
+        List<LinkedHashMap<String, Object>> workflows =
+                (List<LinkedHashMap<String, Object>>) queryAllWorkflowDefinitionByProjectCodeResponse.getBody()
+                        .getData();
+        return workflows.stream()
+                .map(it -> (LinkedHashMap<String, Object>) it.get("workflowDefinition"))
+                .filter(it -> expectedWorkflowDefinitionName.equals(it.get("name")))
+                .findFirst()
+                .map(it -> ((Number) it.get("code")).longValue())
+                .orElseThrow(
+                        () -> new AssertionError("Cannot find workflow definition: " + expectedWorkflowDefinitionName));
     }
 
 }

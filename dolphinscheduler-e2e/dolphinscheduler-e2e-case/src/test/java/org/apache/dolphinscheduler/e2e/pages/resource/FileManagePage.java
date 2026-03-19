@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
+import java.nio.file.Path;
 
 import lombok.Getter;
 
@@ -221,14 +222,11 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         driver.setFileDetector(new LocalFileDetector());
 
         uploadFileBox().buttonUpload().sendKeys(filePath);
-        WebDriverWaitFactory.createWebDriverWait(driver).until(s -> {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            return true;
-        });
+        final String expectedFileName = Path.of(filePath).getFileName().toString();
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(s -> expectedFileName.equals(uploadFileBox().inputFileName().getAttribute("value")));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(uploadFileBox().buttonSubmit()));
         uploadFileBox().buttonSubmit().click();
 
         return this;
@@ -342,6 +340,12 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(tagName = "input"),
         })
         private WebElement buttonUpload;
+
+        @FindBys({
+                @FindBy(className = "input-file-name"),
+                @FindBy(tagName = "input"),
+        })
+        private WebElement inputFileName;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;

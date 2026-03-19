@@ -49,9 +49,11 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 @DisableIfTestFails
 class WorkflowE2ETest {
 
-    private static final String project = "test-workflow-1";
+    private static final String testSuffix = String.valueOf(System.currentTimeMillis());
 
-    private static final String workflow = "test-workflow-1";
+    private static final String project = "test-workflow-" + testSuffix;
+
+    private static final String workflow = "test-workflow-main-" + testSuffix;
 
     private static final String user = "admin";
 
@@ -61,7 +63,7 @@ class WorkflowE2ETest {
 
     private static final String phone = "15800000000";
 
-    private static final String tenant = System.getProperty("user.name");
+    private static final String tenant = System.getProperty("user.name") + "_wf_" + testSuffix;
 
     private static RemoteWebDriver browser;
 
@@ -89,7 +91,8 @@ class WorkflowE2ETest {
                 .goToNav(ProjectPage.class)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class)
-                .delete(workflow);
+                .cancelPublishAll()
+                .deleteAll();
 
         new NavBarPage(browser)
                 .goToNav(ProjectPage.class)
@@ -135,7 +138,7 @@ class WorkflowE2ETest {
     @Test
     @Order(10)
     void testCreateSubWorkflow() {
-        final String workflow = "test-sub-workflow-1";
+        final String subWorkflow = "test-sub-workflow-" + testSuffix;
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -146,18 +149,18 @@ class WorkflowE2ETest {
                 .createSubWorkflowTask()
 
                 .<SubWorkflowTaskForm>addTask(TaskType.SUB_WORKFLOW)
-                .childNode("test-workflow-1")
+                .childNode(workflow)
                 .name("test-sub-1")
                 .submit()
 
                 .submit()
-                .name(workflow)
+                .name(subWorkflow)
                 .addGlobalParam("global_param", "hello world")
                 .submit();
 
         Awaitility.await().untilAsserted(() -> assertThat(
-                workflowDefinitionPage.workflowList()).anyMatch(it -> it.getText().contains(workflow)));
-        workflowDefinitionPage.publish(workflow);
+                workflowDefinitionPage.workflowList()).anyMatch(it -> it.getText().contains(subWorkflow)));
+        workflowDefinitionPage.publish(subWorkflow);
     }
 
     @Test

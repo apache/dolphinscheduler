@@ -102,7 +102,10 @@ public class OidcLoginAPITest {
         List<Map<String, String>> providers = (List<Map<String, String>>) response.getBody().getData();
         Assertions.assertNotNull(providers);
         Assertions.assertFalse(providers.isEmpty());
-        Map<String, String> provider = providers.get(0);
+        Map<String, String> provider = providers.stream()
+                .filter(it -> PROVIDER_ID.equals(it.get("id")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Cannot find provider: " + PROVIDER_ID));
         Assertions.assertEquals(PROVIDER_ID, provider.get("id"));
         Assertions.assertEquals("Login with Keycloak", provider.get("displayName"));
         Assertions.assertTrue(provider.containsKey("iconUri"));

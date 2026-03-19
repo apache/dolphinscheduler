@@ -47,9 +47,11 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 @DisableIfTestFails
 public class WorkflowHttpTaskE2ETest {
 
-    private static final String project = "test-workflow-1";
+    private static final String testSuffix = String.valueOf(System.currentTimeMillis());
 
-    private static final String workflow = "test-workflow-1";
+    private static final String project = "test-workflow-" + testSuffix;
+
+    private static final String workflow = "test-workflow-http-" + testSuffix;
 
     private static final String user = "admin";
 
@@ -59,7 +61,7 @@ public class WorkflowHttpTaskE2ETest {
 
     private static final String phone = "15800000000";
 
-    private static final String tenant = System.getProperty("user.name");
+    private static final String tenant = System.getProperty("user.name") + "_http_" + testSuffix;
 
     private static final String mockServerUrl = "http://mockServer:1080/test";
 
@@ -89,7 +91,8 @@ public class WorkflowHttpTaskE2ETest {
                 .goToNav(ProjectPage.class)
                 .goTo(project)
                 .goToTab(WorkflowDefinitionTab.class)
-                .delete(workflow);
+                .cancelPublishAll()
+                .deleteAll();
 
         new NavBarPage(browser)
                 .goToNav(ProjectPage.class)

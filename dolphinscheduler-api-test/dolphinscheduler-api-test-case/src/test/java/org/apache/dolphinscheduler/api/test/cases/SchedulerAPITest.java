@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,7 +68,9 @@ public class SchedulerAPITest {
 
     private static int scheduleId;
 
-    private static String workflowDefinitionName = "test" + System.currentTimeMillis();
+    private static final String projectName = "project-test-" + UUID.randomUUID().toString().replace("-", "");
+
+    private static final String workflowDefinitionName = "test-" + UUID.randomUUID().toString().replace("-", "");
 
     @BeforeAll
     public static void setup() {
@@ -92,21 +95,16 @@ public class SchedulerAPITest {
     @Test
     @Order(1)
     public void testCreateSchedule() {
-        projectPage.createProject(loginUser, "project-test");
-        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-        Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+        HttpResponse createProjectResponse = projectPage.createProject(loginUser, projectName);
+        Assertions.assertTrue(createProjectResponse.getBody().getSuccess());
+        projectCode = resolveProjectCode(projectName);
 
-        projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
-                .getBody().getData()).get(0)).get("code");
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-        workflowDefinitionPage.createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
-        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
-                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
-        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
-        workflowDefinitionCode =
-                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
-                        .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+        HttpResponse createWorkflowDefinitionResponse =
+                workflowDefinitionPage.createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+        Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
+        workflowDefinitionCode = resolveWorkflowDefinitionCode(projectCode, workflowDefinitionName);
 
         workflowDefinitionPage.releaseWorkflowDefinition(loginUser, projectCode, workflowDefinitionCode,
                 ReleaseState.ONLINE);
@@ -124,8 +122,7 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("2019-08-08"));
-        scheduleId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryScheduleListResponse.getBody()
-                .getData()).get(0)).get("id");
+        scheduleId = resolveScheduleId(queryScheduleListResponse, "2019-08-08");
     }
 
     @Test
@@ -175,5 +172,45 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertFalse(queryScheduleListResponse.getBody().getData().toString().contains("1996-08-08"));
+    }
+
+    private static long resolveProjectCode(String expectedProjectName) {
+        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+        Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+
+        List<LinkedHashMap<String, Object>> projects =
+                (List<LinkedHashMap<String, Object>>) queryAllProjectListResponse.getBody().getData();
+        return projects.stream()
+                .filter(it -> expectedProjectName.equals(it.get("name")))
+                .findFirst()
+                .map(it -> ((Number) it.get("code")).longValue())
+                .orElseThrow(() -> new AssertionError("Cannot find project: " + expectedProjectName));
+    }
+
+    private static long resolveWorkflowDefinitionCode(long projectCode, String expectedWorkflowDefinitionName) {
+        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+
+        List<LinkedHashMap<String, Object>> workflows =
+                (List<LinkedHashMap<String, Object>>) queryAllWorkflowDefinitionByProjectCodeResponse.getBody()
+                        .getData();
+        return workflows.stream()
+                .map(it -> (LinkedHashMap<String, Object>) it.get("workflowDefinition"))
+                .filter(it -> expectedWorkflowDefinitionName.equals(it.get("name")))
+                .findFirst()
+                .map(it -> ((Number) it.get("code")).longValue())
+                .orElseThrow(
+                        () -> new AssertionError("Cannot find workflow definition: " + expectedWorkflowDefinitionName));
+    }
+
+    private static int resolveScheduleId(HttpResponse queryScheduleListResponse, String expectedScheduleMarker) {
+        List<LinkedHashMap<String, Object>> schedules =
+                (List<LinkedHashMap<String, Object>>) queryScheduleListResponse.getBody().getData();
+        return schedules.stream()
+                .filter(it -> it.toString().contains(expectedScheduleMarker))
+                .findFirst()
+                .map(it -> ((Number) it.get("id")).intValue())
+                .orElseThrow(() -> new AssertionError("Cannot find schedule marker: " + expectedScheduleMarker));
     }
 }
