@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -203,6 +202,7 @@ public class DataSourceController extends BaseController {
     /**
      * connect datasource
      *
+     * @param loginUser login user
      * @param jsonStr   datasource param
      *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
      * @return connect result code
@@ -211,7 +211,8 @@ public class DataSourceController extends BaseController {
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CONNECT_DATASOURCE_FAILURE)
-    public Result<Boolean> connectDataSource(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
+    public Result<Boolean> connectDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
         DataSourceUtils.checkDatasourceParam(dataSourceParam);
         ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
@@ -222,8 +223,9 @@ public class DataSourceController extends BaseController {
     /**
      * connection test
      *
+     * @param loginUser login user
      * @param id data source id
-     * @return connect result code
+     * @return A Result object containing true if the connection is successful, false otherwise.
      */
     @Operation(summary = "connectionTest", description = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @Parameters({
@@ -262,8 +264,9 @@ public class DataSourceController extends BaseController {
     /**
      * verify datasource name
      *
+     * @param loginUser login user
      * @param name data source name
-     * @return true if data source name not exists, otherwise throw a {@link ServiceException}
+     * @return true if data source name not exists, otherwise return false
      */
     @Operation(summary = "verifyDataSourceName", description = "VERIFY_DATA_SOURCE_NOTES")
     @Parameters({
@@ -272,7 +275,8 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_DATASOURCE_NAME_FAILURE)
-    public Result<Boolean> verifyDataSourceName(@RequestParam(value = "name") String name) {
+    public Result<Boolean> verifyDataSourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam(value = "name") String name) {
         dataSourceService.verifyDataSourceName(name);
         return Result.success(true);
     }
@@ -319,15 +323,16 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * Checks the startup status of Kerberos authentication.
+     * get user info
      *
-     * @return a boolean indicating whether Kerberos is currently active
+     * @param loginUser login user
+     * @return user info data
      */
-    @Operation(summary = "getKerberosStartupState", description = "GET_KERBEROS_STARTUP_STATE")
+    @Operation(summary = "getKerberosStartupState", description = "GET_USER_INFO_NOTES")
     @GetMapping(value = "/kerberos-startup-state")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(KERBEROS_STARTUP_STATE)
-    public Result<Object> getKerberosStartupState() {
+    public Result<Object> getKerberosStartupState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }

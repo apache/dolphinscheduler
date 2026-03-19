@@ -34,31 +34,28 @@ import java.util.List;
 public interface DataSourceService {
 
     /**
-     * create a new data source.
+     * create data source
      *
      * @param loginUser login user
-     * @param datasourceParam data source configuration DTO
-     * @return created {@link DataSource} entity (sensitive fields masked)
-     * @throws ServiceException if permission denied, security check fails, or connection test fails
+     * @param datasourceParam datasource parameter
+     * @return create result code
      */
     DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
     /**
-     * update datasource
+     * updateWorkflowInstance datasource
      *
      * @param loginUser login user
      * @param dataSourceParam data source params
-     * @return updated {@link DataSource} entity (sensitive fields masked)
-     * @throws ServiceException if permission denied, security check fails, or connection test fails
+     * @return update result code
      */
     DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
-     * query datasource
+     * updateWorkflowInstance datasource
      *
-     * @param loginUser login user
      * @param id datasource id
-     * @return a {@link DataSource} entity (sensitive fields masked)
+     * @return data source detail
      */
     BaseDataSourceParamDTO queryDataSource(int id, User loginUser);
 
@@ -83,28 +80,21 @@ public interface DataSourceService {
     List<DataSource> queryDataSourceList(User loginUser, Integer type);
 
     /**
-     * verify whether a data source name already exists.
-     * <p>
-     * If the name already exists, a {@link ServiceException} is thrown.
-     * If the name is available (does not exist), the method completes successfully without returning a value.
+     * verify datasource exists
      *
-     * @param name the data source name to verify
-     * @throws ServiceException if the data source name already exists (Status.DATASOURCE_EXIST)
+     * @param name      datasource name
+     * @return true if data datasource not exists, otherwise return false
      */
     void verifyDataSourceName(String name);
 
     /**
-     * Checks the connectivity of a data source based on the provided type and parameters.
-     * <p>
-     * This method attempts to establish a connection.
-     * - If the connection is successful, the method returns normally (void).
-     * - If the connection fails, a {@link ServiceException} is thrown.
+     * check connection
      *
-     * @param type            the type of the data source (e.g., MYSQL, POSTGRESQL)
-     * @param connectionParam the connection parameters containing host, port, credentials, etc.
-     * @throws ServiceException if the connection test fails (Status.CONNECTION_TEST_FAILURE)
+     * @param type      data source type
+     * @param parameter data source parameters
+     * @return true if connect successfully, otherwise false
      */
-    void checkConnection(DbType type, ConnectionParam connectionParam);
+    void checkConnection(DbType type, ConnectionParam parameter);
 
     /**
      * Tests the connectivity of a specific data source.
@@ -116,11 +106,11 @@ public interface DataSourceService {
     void connectionTest(User loginUser, int id);
 
     /**
-     * delete a data source by ID.
+     * delete datasource
      *
-     * @param loginUser    the current logged-in user
-     * @param datasourceId the unique identifier of the data source to delete
-     * @throws ServiceException if checks fail or deletion encounters an error
+     * @param loginUser    login user
+     * @param datasourceId data source id
+     * @return delete result code
      */
     void delete(User loginUser, int datasourceId);
 
@@ -129,7 +119,7 @@ public interface DataSourceService {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return a list of {@link DataSource} objects that are available to be authorized to the target user
+     * @return unauthed data source result code
      */
     List<DataSource> unAuthDatasource(User loginUser, Integer userId);
 
@@ -138,9 +128,19 @@ public interface DataSourceService {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return a list of {@link DataSource} objects that are authorized to the target user
+     * @return authorized result code
      */
     List<DataSource> authedDatasource(User loginUser, Integer userId);
+
+    /**
+     * Retrieves the list of databases (or schemas) available in a specific data source.
+     *
+     * @param loginUser    current logged-in user
+     * @param datasourceId ID of the data source
+     * @return list of {@link ParamsOptions} representing database/schema names
+     * @throws ServiceException if permission denied, resource not found, or connection fails
+     */
+    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
 
     /**
      * Retrieves the list of tables from a specific database within a data source.
@@ -165,13 +165,4 @@ public interface DataSourceService {
      */
     List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName);
 
-    /**
-     * Retrieves the list of databases (or schemas) available in a specific data source.
-     *
-     * @param loginUser    current logged-in user
-     * @param datasourceId ID of the data source
-     * @return list of {@link ParamsOptions} representing database/schema names
-     * @throws ServiceException if permission denied, resource not found, or connection fails
-     */
-    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
 }
