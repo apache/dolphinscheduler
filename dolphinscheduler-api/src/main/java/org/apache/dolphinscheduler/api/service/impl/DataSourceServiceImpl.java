@@ -281,19 +281,18 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         throw new ServiceException(Status.CONNECTION_TEST_FAILURE);
     }
 
+    /**
+     * test connection
+     *
+     * @param id datasource id
+     * @return connect result code
+     */
     @Override
-    public void connectionTest(User loginUser, int id) {
+    public void connectionTest(int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
-
         if (dataSource == null) {
             throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
-
-        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
         checkConnection(dataSource.getType(),
                 DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
     }
@@ -351,17 +350,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database) {
+    public List<ParamsOptions> getTables(Integer datasourceId, String database) {
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-
-        if (dataSource == null) {
-            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
-        }
-
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
 
         List<String> tableList;
         BaseConnectionParam connectionParam =
@@ -420,19 +410,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database,
-                                               String tableName) {
+    public List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName) {
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-
-        if (dataSource == null) {
-            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
-        }
-
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                         dataSource.getType(),
@@ -477,17 +456,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId) {
+    public List<ParamsOptions> getDatabases(Integer datasourceId) {
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
 
         if (dataSource == null) {
             throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
-        }
-
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         List<String> tableList;
