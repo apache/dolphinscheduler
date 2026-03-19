@@ -4,7 +4,7 @@
 
 ### 获取文档项目
 
-DolphinScheduler 项目的文档维护在主仓库的 `docs` 目录中。
+DolphinScheduler 项目的文档维护在独立的 [git 仓库](https://github.com/apache/dolphinscheduler-website)中。
 
 首先你需要先将主项目 fork 到自己的 GitHub 仓库中，然后将 fork 的项目克隆到本地计算机中。
 
