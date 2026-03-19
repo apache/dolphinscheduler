@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandPara
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import java.time.Duration;
 
@@ -45,10 +46,12 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
         final long workflowDefinitionCode = workflow.getCode();
+        WorkflowInstanceMetrics.cleanUpWorkflowInstanceCountMetricsByDefinitionCode(workflowDefinitionCode);
 
-        final double submitBefore = workflowInstanceCount("submit", workflowDefinitionCode);
-        final double finishBefore = workflowInstanceCount("finish", workflowDefinitionCode);
-        final double successBefore = workflowInstanceCount("success", workflowDefinitionCode);
+        final double submitBefore = workflowInstanceCount(WorkflowExecutionStatus.SUBMITTED_SUCCESS.name(),
+                workflowDefinitionCode);
+        final double successBefore = workflowInstanceCount(WorkflowExecutionStatus.SUCCESS.name(),
+                workflowDefinitionCode);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -61,9 +64,9 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
                 .untilAsserted(() -> {
                     assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
                             .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                    assertThat(workflowInstanceCount("submit", workflowDefinitionCode)).isEqualTo(submitBefore + 1.0d);
-                    assertThat(workflowInstanceCount("finish", workflowDefinitionCode)).isEqualTo(finishBefore + 1.0d);
-                    assertThat(workflowInstanceCount("success", workflowDefinitionCode))
+                    assertThat(workflowInstanceCount(WorkflowExecutionStatus.SUBMITTED_SUCCESS.name(),
+                            workflowDefinitionCode)).isEqualTo(submitBefore + 1.0d);
+                    assertThat(workflowInstanceCount(WorkflowExecutionStatus.SUCCESS.name(), workflowDefinitionCode))
                             .isEqualTo(successBefore + 1.0d);
                 });
 
@@ -77,11 +80,14 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
         final long workflowDefinitionCode = workflow.getCode();
+        WorkflowInstanceMetrics.cleanUpWorkflowInstanceCountMetricsByDefinitionCode(workflowDefinitionCode);
 
-        final double submitBefore = workflowInstanceCount("submit", workflowDefinitionCode);
-        final double finishBefore = workflowInstanceCount("finish", workflowDefinitionCode);
-        final double successBefore = workflowInstanceCount("success", workflowDefinitionCode);
-        final double stopBefore = workflowInstanceCount("stop", workflowDefinitionCode);
+        final double submitBefore = workflowInstanceCount(WorkflowExecutionStatus.SUBMITTED_SUCCESS.name(),
+                workflowDefinitionCode);
+        final double successBefore = workflowInstanceCount(WorkflowExecutionStatus.SUCCESS.name(),
+                workflowDefinitionCode);
+        final double stopBefore = workflowInstanceCount(WorkflowExecutionStatus.STOP.name(),
+                workflowDefinitionCode);
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
@@ -101,11 +107,12 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
                     assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
                     assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
 
-                    assertThat(workflowInstanceCount("submit", workflowDefinitionCode)).isEqualTo(submitBefore + 1.0d);
-                    assertThat(workflowInstanceCount("finish", workflowDefinitionCode)).isEqualTo(finishBefore + 3.0d);
-                    assertThat(workflowInstanceCount("success", workflowDefinitionCode))
+                    assertThat(workflowInstanceCount(WorkflowExecutionStatus.SUBMITTED_SUCCESS.name(),
+                            workflowDefinitionCode)).isEqualTo(submitBefore + 1.0d);
+                    assertThat(workflowInstanceCount(WorkflowExecutionStatus.SUCCESS.name(), workflowDefinitionCode))
                             .isEqualTo(successBefore + 1.0d);
-                    assertThat(workflowInstanceCount("stop", workflowDefinitionCode)).isEqualTo(stopBefore + 2.0d);
+                    assertThat(workflowInstanceCount(WorkflowExecutionStatus.STOP.name(), workflowDefinitionCode))
+                            .isEqualTo(stopBefore + 2.0d);
                 });
 
         masterContainer.assertAllResourceReleased();

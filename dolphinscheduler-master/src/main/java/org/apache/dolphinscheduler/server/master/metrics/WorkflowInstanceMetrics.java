@@ -38,7 +38,16 @@ import io.micrometer.core.instrument.Timer;
 public class WorkflowInstanceMetrics {
 
     private final Set<String> workflowInstanceStates = ImmutableSet.of(
-            "submit", "timeout", "finish", "failover", "success", "fail", "stop");
+            WorkflowExecutionStatus.SUBMITTED_SUCCESS.name(),
+            WorkflowExecutionStatus.RUNNING_EXECUTION.name(),
+            WorkflowExecutionStatus.READY_PAUSE.name(),
+            WorkflowExecutionStatus.PAUSE.name(),
+            WorkflowExecutionStatus.READY_STOP.name(),
+            WorkflowExecutionStatus.FAILOVER.name(),
+            WorkflowExecutionStatus.SUCCESS.name(),
+            WorkflowExecutionStatus.FAILURE.name(),
+            WorkflowExecutionStatus.STOP.name(),
+            WorkflowExecutionStatus.SERIAL_WAIT.name());
 
     static {
         for (final String state : workflowInstanceStates) {
@@ -80,28 +89,28 @@ public class WorkflowInstanceMetrics {
                 .register(Metrics.globalRegistry);
     }
 
-    public void incWorkflowInstanceByStateAndWorkflowDefinitionCode(final String state,
+    public void incWorkflowInstanceByStateAndWorkflowDefinitionCode(final WorkflowExecutionStatus state,
                                                                     final String workflowDefinitionCode) {
         // When tags need to be determined from local context,
         // you have no choice but to construct or lookup the Meter inside your method body.
         // The lookup cost is just a single hash lookup, so it is acceptable for most use cases.
         Metrics.globalRegistry.counter(
                 "ds.workflow.instance.count",
-                "state", state,
+                "state", state.name(),
                 "workflow.definition.code", workflowDefinitionCode)
                 .increment();
     }
 
     public void recordWorkflowInstanceSubmit(final Long workflowDefinitionCode) {
-        incWorkflowInstanceByStateAndWorkflowDefinitionCode("submit", String.valueOf(workflowDefinitionCode));
-    }
-
-    public void recordWorkflowInstanceTimeout(final Long workflowDefinitionCode) {
-        incWorkflowInstanceByStateAndWorkflowDefinitionCode("timeout", String.valueOf(workflowDefinitionCode));
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode(
+                WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                String.valueOf(workflowDefinitionCode));
     }
 
     public void recordWorkflowInstanceFailover(final Long workflowDefinitionCode) {
-        incWorkflowInstanceByStateAndWorkflowDefinitionCode("failover", String.valueOf(workflowDefinitionCode));
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode(
+                WorkflowExecutionStatus.FAILOVER,
+                String.valueOf(workflowDefinitionCode));
     }
 
     public void recordWorkflowInstanceFinish(final WorkflowExecutionStatus workflowExecutionStatus,
@@ -109,20 +118,8 @@ public class WorkflowInstanceMetrics {
         if (workflowExecutionStatus == null || !workflowExecutionStatus.isFinalState()) {
             return;
         }
-        incWorkflowInstanceByStateAndWorkflowDefinitionCode("finish", String.valueOf(workflowDefinitionCode));
-        switch (workflowExecutionStatus) {
-            case SUCCESS:
-                incWorkflowInstanceByStateAndWorkflowDefinitionCode("success", String.valueOf(workflowDefinitionCode));
-                break;
-            case FAILURE:
-                incWorkflowInstanceByStateAndWorkflowDefinitionCode("fail", String.valueOf(workflowDefinitionCode));
-                break;
-            case STOP:
-                incWorkflowInstanceByStateAndWorkflowDefinitionCode("stop", String.valueOf(workflowDefinitionCode));
-                break;
-            default:
-                break;
-        }
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode(workflowExecutionStatus,
+                String.valueOf(workflowDefinitionCode));
     }
 
     public void cleanUpWorkflowInstanceCountMetricsByDefinitionCode(final Long workflowDefinitionCode) {

@@ -87,9 +87,13 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
                 workflowInstance.setEndTime(DateUtils.getCurrentDate());
                 workflowInstance.setState(WorkflowExecutionStatus.STOP);
                 workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
+                final Long workflowDefinitionCode =
+                        serialCommand.getWorkflowDefinitionCode() != null
+                                ? serialCommand.getWorkflowDefinitionCode()
+                                : workflowInstance.getWorkflowDefinitionCode();
                 WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
                         WorkflowExecutionStatus.STOP,
-                        workflowInstance.getWorkflowDefinitionCode());
+                        workflowDefinitionCode);
                 return null;
             }
         });
