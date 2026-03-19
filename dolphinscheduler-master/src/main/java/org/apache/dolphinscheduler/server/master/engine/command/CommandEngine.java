@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnableFactory;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -177,6 +178,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
             return CompletableFuture.completedFuture(null);
         }
 
+        WorkflowInstanceMetrics.recordWorkflowInstanceSubmit(workflowInstance.getWorkflowDefinitionCode());
         workflowRepository.put(workflowExecutionRunnable);
         workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecutionRunnable);
         workflowExecutionRunnable.getWorkflowEventBus()
@@ -203,6 +205,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
             final int workflowInstanceId = command.getWorkflowInstanceId();
 
             workflowInstanceDao.forceUpdateWorkflowInstanceState(workflowInstanceId, WorkflowExecutionStatus.FAILURE);
+            WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
+                    WorkflowExecutionStatus.FAILURE,
+                    command.getWorkflowDefinitionCode());
             log.info("Set workflow instance {} state to FAILURE", workflowInstanceId);
 
             commandService.moveToErrorCommand(command, ExceptionUtils.getStackTrace(throwable));

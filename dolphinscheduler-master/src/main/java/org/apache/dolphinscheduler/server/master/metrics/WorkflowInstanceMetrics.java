@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -88,6 +90,39 @@ public class WorkflowInstanceMetrics {
                 "state", state,
                 "workflow.definition.code", workflowDefinitionCode)
                 .increment();
+    }
+
+    public void recordWorkflowInstanceSubmit(final Long workflowDefinitionCode) {
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode("submit", String.valueOf(workflowDefinitionCode));
+    }
+
+    public void recordWorkflowInstanceTimeout(final Long workflowDefinitionCode) {
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode("timeout", String.valueOf(workflowDefinitionCode));
+    }
+
+    public void recordWorkflowInstanceFailover(final Long workflowDefinitionCode) {
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode("failover", String.valueOf(workflowDefinitionCode));
+    }
+
+    public void recordWorkflowInstanceFinish(final WorkflowExecutionStatus workflowExecutionStatus,
+                                             final Long workflowDefinitionCode) {
+        if (workflowExecutionStatus == null || !workflowExecutionStatus.isFinalState()) {
+            return;
+        }
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode("finish", String.valueOf(workflowDefinitionCode));
+        switch (workflowExecutionStatus) {
+            case SUCCESS:
+                incWorkflowInstanceByStateAndWorkflowDefinitionCode("success", String.valueOf(workflowDefinitionCode));
+                break;
+            case FAILURE:
+                incWorkflowInstanceByStateAndWorkflowDefinitionCode("fail", String.valueOf(workflowDefinitionCode));
+                break;
+            case STOP:
+                incWorkflowInstanceByStateAndWorkflowDefinitionCode("stop", String.valueOf(workflowDefinitionCode));
+                break;
+            default:
+                break;
+        }
     }
 
     public void cleanUpWorkflowInstanceCountMetricsByDefinitionCode(final Long workflowDefinitionCode) {
