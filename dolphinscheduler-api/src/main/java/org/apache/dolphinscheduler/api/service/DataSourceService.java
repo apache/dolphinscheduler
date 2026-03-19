@@ -29,15 +29,15 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import java.util.List;
 
 /**
- * data source service
+ * datasource service
  */
 public interface DataSourceService {
 
     /**
-     * create a new data source.
+     * create a new datasource.
      *
      * @param loginUser login user
-     * @param datasourceParam data source configuration DTO
+     * @param datasourceParam datasource configuration DTO
      * @return created {@link DataSource} entity (sensitive fields masked)
      * @throws ServiceException if permission denied, security check fails, or connection test fails
      */
@@ -47,7 +47,7 @@ public interface DataSourceService {
      * update datasource
      *
      * @param loginUser login user
-     * @param dataSourceParam data source params
+     * @param dataSourceParam datasource params
      * @return updated {@link DataSource} entity (sensitive fields masked)
      * @throws ServiceException if permission denied, security check fails, or connection test fails
      */
@@ -58,7 +58,7 @@ public interface DataSourceService {
      *
      * @param loginUser login user
      * @param id datasource id
-     * @return a {@link DataSource} entity (sensitive fields masked)
+     * @return a {@link BaseDataSourceParamDTO} entity (sensitive fields masked)
      */
     BaseDataSourceParamDTO queryDataSource(int id, User loginUser);
 
@@ -69,7 +69,7 @@ public interface DataSourceService {
      * @param searchVal search value
      * @param pageNo    page number
      * @param pageSize  page size
-     * @return data source list page
+     * @return datasource list page
      */
     PageInfo<DataSource> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
@@ -77,30 +77,30 @@ public interface DataSourceService {
      * query data resource list
      *
      * @param loginUser login user
-     * @param type      data source type
-     * @return data source list page
+     * @param type      datasource type
+     * @return datasource list
      */
     List<DataSource> queryDataSourceList(User loginUser, Integer type);
 
     /**
-     * verify whether a data source name already exists.
+     * verify whether a datasource name already exists.
      * <p>
      * If the name already exists, a {@link ServiceException} is thrown.
      * If the name is available (does not exist), the method completes successfully without returning a value.
      *
-     * @param name the data source name to verify
-     * @throws ServiceException if the data source name already exists (Status.DATASOURCE_EXIST)
+     * @param name the datasource name to verify
+     * @throws ServiceException if the datasource name already exists (Status.DATASOURCE_EXIST)
      */
     void verifyDataSourceName(String name);
 
     /**
-     * Checks the connectivity of a data source based on the provided type and parameters.
+     * Checks the connectivity of a datasource based on the provided type and parameters.
      * <p>
      * This method attempts to establish a connection.
      * - If the connection is successful, the method returns normally (void).
      * - If the connection fails, a {@link ServiceException} is thrown.
      *
-     * @param type            the type of the data source (e.g., MYSQL, POSTGRESQL)
+     * @param type            the type of the datasource (e.g., MYSQL, POSTGRESQL)
      * @param connectionParam the connection parameters containing host, port, credentials, etc.
      * @throws ServiceException if the connection test fails (Status.CONNECTION_TEST_FAILURE)
      */
@@ -115,10 +115,10 @@ public interface DataSourceService {
     void connectionTest(int id);
 
     /**
-     * delete a data source by ID.
+     * delete a datasource by ID.
      *
      * @param loginUser    the current logged-in user
-     * @param datasourceId the unique identifier of the data source to delete
+     * @param datasourceId the unique identifier of the datasource to delete
      * @throws ServiceException if checks fail or deletion encounters an error
      */
     void delete(User loginUser, int datasourceId);
