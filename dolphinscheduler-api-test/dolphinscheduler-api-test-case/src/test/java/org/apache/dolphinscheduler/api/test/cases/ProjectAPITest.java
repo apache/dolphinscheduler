@@ -131,7 +131,8 @@ public class ProjectAPITest {
     public void testQueryProjectListPaging() {
         HttpResponse queryProjectListPagingResponse = projectPage.queryProjectListPaging(loginUser, 100, 1);
         Assertions.assertTrue(queryProjectListPagingResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryProjectListPagingResponse.getBody().getData().toString().contains(renamedProjectName));
+        Assertions
+                .assertTrue(queryProjectListPagingResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
@@ -152,7 +153,8 @@ public class ProjectAPITest {
         Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getSuccess());
         // The test project was created by instead of authorized to this user, therefore, it should be in the
         // unauthorized list.
-        Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getData().toString().contains(renamedProjectName));
+        Assertions.assertTrue(
+                queryUnauthorizedProjectResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
@@ -162,7 +164,8 @@ public class ProjectAPITest {
         Assertions.assertTrue(queryAuthorizedProjectResponse.getBody().getSuccess());
         // The test project was created by instead of authorized to this user, therefore, it should not be in the
         // authorized list.
-        Assertions.assertFalse(queryAuthorizedProjectResponse.getBody().getData().toString().contains(renamedProjectName));
+        Assertions.assertFalse(
+                queryAuthorizedProjectResponse.getBody().getData().toString().contains(renamedProjectName));
     }
 
     @Test
@@ -197,7 +200,8 @@ public class ProjectAPITest {
         // queryProjectCreatedAndAuthorizedByUser api returns a joint-set of projects both created by and authorized to
         // the user
         Assertions.assertTrue(
-                queryProjectCreatedAndAuthorizedByUserResponse.getBody().getData().toString().contains(renamedProjectName));
+                queryProjectCreatedAndAuthorizedByUserResponse.getBody().getData().toString()
+                        .contains(renamedProjectName));
     }
 
     @Test
@@ -212,7 +216,8 @@ public class ProjectAPITest {
     @Test
     @Order(13)
     public void testDeleteProject() {
-        HttpResponse deleteProjectResponse = projectPage.deleteProject(loginUser, resolveProjectCode(renamedProjectName));
+        HttpResponse deleteProjectResponse =
+                projectPage.deleteProject(loginUser, resolveProjectCode(renamedProjectName));
         Assertions.assertTrue(deleteProjectResponse.getBody().getSuccess());
 
         HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);

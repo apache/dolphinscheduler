@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
-import java.util.List;
 import java.nio.file.Path;
+import java.util.List;
 
 import lombok.Getter;
 
