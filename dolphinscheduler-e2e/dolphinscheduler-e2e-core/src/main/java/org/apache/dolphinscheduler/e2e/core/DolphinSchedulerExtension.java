@@ -66,10 +66,6 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     private final int DOCKER_PORT = 12345;
 
-    private final Duration implicitWaitTimeout = parseDurationFromProperty("e2e.implicit.wait.seconds", 3);
-
-    private final Duration pageLoadTimeout = parseDurationFromProperty("e2e.page.load.timeout.seconds", 20);
-
     private RemoteWebDriver driver;
     private ComposeContainer compose;
     private BrowserWebDriverContainer<?> browser;
@@ -108,8 +104,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver = new RemoteWebDriver(browser.getSeleniumAddress(), chromeOptions);
 
         driver.manage().timeouts()
-                .implicitlyWait(implicitWaitTimeout)
-                .pageLoadTimeout(pageLoadTimeout);
+                .implicitlyWait(Duration.ofSeconds(1))
+                .pageLoadTimeout(Duration.ofSeconds(5));
         driver.manage().window()
                 .maximize();
 
@@ -234,23 +230,5 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;
-    }
-
-    private Duration parseDurationFromProperty(String propertyName, long defaultSeconds) {
-        String rawValue = System.getProperty(propertyName);
-        if (Strings.isNullOrEmpty(rawValue)) {
-            return Duration.ofSeconds(defaultSeconds);
-        }
-        try {
-            long parsed = Long.parseLong(rawValue);
-            if (parsed <= 0) {
-                log.warn("Property {} should be greater than 0, fallback to {} seconds", propertyName, defaultSeconds);
-                return Duration.ofSeconds(defaultSeconds);
-            }
-            return Duration.ofSeconds(parsed);
-        } catch (NumberFormatException ex) {
-            log.warn("Invalid property {}={}, fallback to {} seconds", propertyName, rawValue, defaultSeconds);
-            return Duration.ofSeconds(defaultSeconds);
-        }
     }
 }
