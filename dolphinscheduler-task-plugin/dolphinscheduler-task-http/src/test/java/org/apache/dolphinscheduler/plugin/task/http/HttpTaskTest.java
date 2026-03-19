@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -142,6 +143,30 @@ public class HttpTaskTest {
                 null, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, httpResponse);
         httpTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testHandleWithComplexHttpBody() throws Exception {
+        String httpBody = "{\"name\":\"tom\",\"scores\":[100,98],\"metadata\":{\"grade\":\"A\"}}";
+        String httpResponse = "{\"status\": \"success\"}";
+
+        MockWebServer server = new MockWebServer();
+        mockWebServers.add(server);
+        server.start();
+        server.setDispatcher(generateMockDispatcher(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, httpResponse));
+
+        String paramData = generateHttpParameters(server.url(DEFAULT_MOCK_PATH).toString(), HttpRequestMethod.POST,
+                httpBody, new ArrayList<>(), HttpCheckCondition.STATUS_CODE_DEFAULT, "");
+        HttpTask httpTask = generateHttpTaskFromParamData(paramData, null);
+
+        httpTask.handle(null);
+
+        RecordedRequest recordedRequest = server.takeRequest(1, TimeUnit.SECONDS);
+        Assertions.assertNotNull(recordedRequest);
+        String actualRequestBody = recordedRequest.getBody().readUtf8();
+        Assertions.assertTrue(actualRequestBody.contains("\"scores\":[100,98]"));
+        Assertions.assertTrue(actualRequestBody.contains("\"metadata\":{\"grade\":\"A\"}"));
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
