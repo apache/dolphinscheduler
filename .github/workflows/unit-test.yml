@@ -28,9 +28,6 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+-release'
       - 'dev'
 
-env:
-  LOG_DIR: /tmp/dolphinscheduler
-
 concurrency:
   group: unit-test-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -50,37 +47,50 @@ jobs:
             not-ignore:
               - '!(docs/**)'
 
+  generate-matrix:
+    name: Generate Module Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse modules from pom.xml
+        id: set-matrix
+        run: |
+          # Extract sub-modules from root pom.xml <modules> section,
+          # excluding modules that have no unit tests
+          MODULES=$(python3 - <<'EOF'
+          import xml.etree.ElementTree as ET, json, re
+
+          tree = ET.parse('pom.xml')
+          ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+          root = tree.getroot()
+
+          # Support both namespaced and non-namespaced pom.xml
+          modules = root.findall('.//m:modules/m:module', ns)
+          if not modules:
+              modules = root.findall('.//modules/module')
+
+          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
+          result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
+          print(json.dumps(result))
+          EOF
+          )
+
+          echo "matrix={\"module\":$MODULES}" >> "$GITHUB_OUTPUT"
+          echo "Discovered modules: $MODULES"
+
   unit-test:
-    name: Unit-Test (Java ${{ matrix.java }} | ${{ matrix.shard.name }})
-    needs: paths-filter
+    name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
+    needs: [ paths-filter, generate-matrix ]
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         java: [ '8', '11' ]
-        shard:
-          - name: spi-common-eventbus
-            modules: "dolphinscheduler-spi,dolphinscheduler-common,dolphinscheduler-eventbus,dolphinscheduler-meter,dolphinscheduler-authentication"
-
-          - name: dao-registry
-            modules: "dolphinscheduler-dao,dolphinscheduler-dao-plugin,dolphinscheduler-registry"
-
-          - name: service-api
-            modules: "dolphinscheduler-service,dolphinscheduler-api,dolphinscheduler-yarn-aop"
-
-          - name: alert-scheduler
-            modules: "dolphinscheduler-alert,dolphinscheduler-scheduler-plugin"
-
-          - name: task-datasource-storage
-            modules: "dolphinscheduler-task-plugin,dolphinscheduler-datasource-plugin,dolphinscheduler-storage-plugin"
-
-          - name: master-worker-extract
-            modules: "dolphinscheduler-extract,dolphinscheduler-master,dolphinscheduler-worker,dolphinscheduler-task-executor"
-
-          - name: tools-standalone
-            modules: "dolphinscheduler-tools,dolphinscheduler-standalone-server"
-
+        module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -109,13 +119,22 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      - name: Run Unit Tests (${{ matrix.shard.name }})
+      # Install all modules into local Maven repository (skip tests) first,
+      # so each shard can run tests independently without -am pulling in
+      # unrelated modules from aggregator parents
+      - name: Install all modules (skip tests)
+        run: |
+          export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m"
+          ./mvnw install -B \
+            -DskipTests \
+            -Dspotless.skip=true \
+            -Danalyze.skip=true
+
+      - name: Run Unit Tests (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
-          MODULES=$(echo "${{ matrix.shard.modules }}" | tr -d ' ')
-          ./mvnw clean verify -B \
-            -pl "$MODULES" \
-            -am \
+          ./mvnw verify -B \
+            -pl "${{ matrix.module }}" \
             -Dmaven.test.skip=false \
             -Dspotless.skip=true \
             -DskipUT=false \
@@ -131,7 +150,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: jacoco-exec-java${{ matrix.java }}-${{ matrix.shard.name }}
+          name: jacoco-exec-java${{ matrix.java }}-${{ matrix.module }}
           path: /tmp/jacoco-exec/
           retention-days: 1
 
@@ -139,7 +158,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: surefire-java${{ matrix.java }}-${{ matrix.shard.name }}
+          name: surefire-java${{ matrix.java }}-${{ matrix.module }}
           path: '**/target/surefire-reports/'
           retention-days: 7
 
