@@ -52,7 +52,7 @@ public class WorkflowStartLifecycleEventHandler
     private void workflowTimeoutMonitor(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         if (workflowInstance.getTimeout() <= 0) {
-            log.debug("The workflow {} timeout {} is invalided, so the timeout monitor will not be started.",
+            log.debug("The workflow {} timeout {} is not configured or invalid, skip timeout monitor.",
                     workflowInstance.getName(),
                     workflowInstance.getTimeout());
             return;

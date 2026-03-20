@@ -45,12 +45,12 @@ public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLife
 
     public static WorkflowTimeoutLifecycleEvent of(IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        checkState(workflowInstance != null, "The workflow instance must be initialized before retrying.");
+        checkState(workflowInstance != null, "The workflow instance must be initialized.");
 
         final int timeout = workflowInstance.getTimeout();
         checkState(timeout > 0, "The workflow timeout: %s must > 0 minutes", timeout);
 
-        long delayTime = System.currentTimeMillis() - workflowInstance.getStartTime().getTime()
+        long delayTime = System.currentTimeMillis() - workflowInstance.getRestartTime().getTime()
                 + TimeUnit.MINUTES.toMillis(timeout);
         return new WorkflowTimeoutLifecycleEvent(workflowExecutionRunnable, delayTime);
     }
