@@ -133,16 +133,6 @@ public interface DataSourceService {
     List<DataSource> authedDatasource(User loginUser, Integer userId);
 
     /**
-     * Retrieves the list of databases (or schemas) available in a specific data source.
-     *
-     * @param loginUser    current logged-in user
-     * @param datasourceId ID of the data source
-     * @return list of {@link ParamsOptions} representing database/schema names
-     * @throws ServiceException if permission denied, resource not found, or connection fails
-     */
-    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
-
-    /**
      * Retrieves the list of tables from a specific database within a data source.
      *
      * @param loginUser    the current logged-in user (required for permission check)
@@ -164,5 +154,15 @@ public interface DataSourceService {
      * @throws ServiceException if permission denied, resource not found, or connection fails
      */
     List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName);
+
+    /**
+     * Retrieves the list of databases (or schemas) available in a specific data source.
+     *
+     * @param loginUser    current logged-in user
+     * @param datasourceId ID of the data source
+     * @return list of {@link ParamsOptions} representing database/schema names
+     * @throws ServiceException if permission denied, resource not found, or connection fails
+     */
+    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
 
 }

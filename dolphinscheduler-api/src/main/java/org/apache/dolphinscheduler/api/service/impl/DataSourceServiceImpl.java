@@ -418,60 +418,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId) {
-
-        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-
-        if (dataSource == null) {
-            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
-        }
-
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
-        List<String> tableList;
-        BaseConnectionParam connectionParam =
-                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        dataSource.getType(),
-                        dataSource.getConnectionParams());
-
-        if (null == connectionParam) {
-            throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
-        }
-
-        Connection connection =
-                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
-        ResultSet rs = null;
-
-        try {
-            if (null == connection) {
-                throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
-            }
-            if (dataSource.getType() == DbType.POSTGRESQL) {
-                rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY_PG);
-            } else {
-                rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY);
-            }
-            tableList = new ArrayList<>();
-            while (rs.next()) {
-                String name = rs.getString(1);
-                tableList.add(name);
-            }
-        } catch (Exception e) {
-            log.error("Get databases error, datasourceId:{}.", datasourceId, e);
-            throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
-        } finally {
-            closeResult(rs);
-            releaseConnection(connection);
-        }
-
-        List<ParamsOptions> options = getParamsOptions(tableList);
-        return options;
-    }
-
-    @Override
     public List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database) {
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
 
@@ -594,6 +540,60 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         List<ParamsOptions> options = getParamsOptions(columnList);
+        return options;
+    }
+
+    @Override
+    public List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId) {
+
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+
+        if (dataSource == null) {
+            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
+        }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        List<String> tableList;
+        BaseConnectionParam connectionParam =
+                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataSource.getType(),
+                        dataSource.getConnectionParams());
+
+        if (null == connectionParam) {
+            throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
+        }
+
+        Connection connection =
+                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        ResultSet rs = null;
+
+        try {
+            if (null == connection) {
+                throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
+            }
+            if (dataSource.getType() == DbType.POSTGRESQL) {
+                rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY_PG);
+            } else {
+                rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY);
+            }
+            tableList = new ArrayList<>();
+            while (rs.next()) {
+                String name = rs.getString(1);
+                tableList.add(name);
+            }
+        } catch (Exception e) {
+            log.error("Get databases error, datasourceId:{}.", datasourceId, e);
+            throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
+        } finally {
+            closeResult(rs);
+            releaseConnection(connection);
+        }
+
+        List<ParamsOptions> options = getParamsOptions(tableList);
         return options;
     }
 
