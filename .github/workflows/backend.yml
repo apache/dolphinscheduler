@@ -83,7 +83,7 @@ jobs:
                  -Danalyze.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.java == '8' }}
         name: Upload Binary Package
         with:
@@ -121,7 +121,7 @@ jobs:
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@v4
         name: Download Binary Package
         with:
           # Only run cluster test on jdk8
@@ -153,7 +153,7 @@ jobs:
         with:
           comment_on_pr: false
       - name: Download Binary Package
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev
