@@ -65,10 +65,12 @@ jobs:
           ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
           root = tree.getroot()
 
+          # Support both namespaced and non-namespaced pom.xml
           modules = root.findall('.//m:modules/m:module', ns)
           if not modules:
               modules = root.findall('.//modules/module')
 
+          # Exclude aggregator-only or non-testable modules
           exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
           result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
           print(json.dumps(result))
@@ -116,6 +118,10 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
+      # Use -am (--also-make) so Maven automatically builds all upstream
+      # dependency modules before running tests in the target module.
+      # -DskipTests=true skips tests in dependency modules; only the
+      # target module (-pl) runs its unit tests via verify.
       - name: Run Unit Tests (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
@@ -186,8 +192,10 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      # 用 jacococli.jar 替代 jacoco:merge，直接传入目录下所有 .exec 文件
-      # jacoco:merge 的 fileSets 无法通过命令行 -D 传入，只能用 CLI 工具
+      # Use jacococli.jar instead of jacoco:merge Maven goal.
+      # The 'fileSets' parameter of jacoco:merge cannot be passed via -D on
+      # the command line; it must be declared in pom.xml <configuration>.
+      # jacococli.jar merge accepts file paths directly, no XML config needed.
       - name: Download jacococli.jar
         run: |
           JACOCO_VERSION=$(./mvnw help:evaluate -Dexpression=jacoco.version -q -DforceStdout 2>/dev/null || echo "0.8.14")
@@ -196,7 +204,7 @@ jobs:
             -Dartifact=org.jacoco:org.jacoco.cli:${JACOCO_VERSION}:jar:nodeps \
             -Ddest=/tmp/jacococli.jar \
             -q
-          # fallback: copy from local .m2 cache
+          # Fallback: copy from local .m2 cache if dependency:get did not place it at -Ddest
           find ~/.m2 -name "org.jacoco.cli-*-nodeps.jar" | head -1 | xargs -I{} cp {} /tmp/jacococli.jar || true
 
       - name: Merge JaCoCo exec files via jacococli
