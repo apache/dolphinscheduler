@@ -37,7 +37,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
@@ -56,11 +56,11 @@ jobs:
         java: [ '8', '11' ]
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
@@ -114,7 +114,7 @@ jobs:
           sudo docker image prune --all --force
           sudo docker builder prune -a
       - run: df -h
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Collect Workflow Telemetry
@@ -145,7 +145,7 @@ jobs:
           - name: schema-check-with-postgresql
             script: .github/workflows/schema-check/postgresql/start-job.sh
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Collect Workflow Telemetry

@@ -28,9 +28,6 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+-release'
       - 'dev'
 
-env:
-  LOG_DIR: /tmp/dolphinscheduler
-
 concurrency:
   group: unit-test-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -42,56 +39,190 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
           filters: |
             not-ignore:
               - '!(docs/**)'
+
+  generate-matrix:
+    name: Generate Module Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Parse modules from pom.xml
+        id: set-matrix
+        run: |
+          MODULES=$(python3 - <<'EOF'
+          import xml.etree.ElementTree as ET, json, re
+
+          tree = ET.parse('pom.xml')
+          ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+          root = tree.getroot()
+
+          # Support both namespaced and non-namespaced pom.xml
+          modules = root.findall('.//m:modules/m:module', ns)
+          if not modules:
+              modules = root.findall('.//modules/module')
+
+          # Exclude aggregator-only or non-testable modules
+          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
+          result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
+          print(json.dumps(result))
+          EOF
+          )
+
+          echo "matrix={\"module\":$MODULES}" >> "$GITHUB_OUTPUT"
+          echo "Discovered modules: $MODULES"
+
   unit-test:
-    name: Unit-Test
-    needs: paths-filter
+    name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
+    needs: [ paths-filter, generate-matrix ]
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        java: ['8', '11']
+        java: [ '8', '11' ]
+        module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
+
       - name: Collect Workflow Telemetry
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
+
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
+
       - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
-      - name: Run Unit tests
-        run: export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m" && ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true
-      - name: Upload coverage report to codecov
+
+      # Use -am (--also-make) so Maven automatically builds all upstream
+      # dependency modules before running tests in the target module.
+      # -DskipTests=true skips tests in dependency modules; only the
+      # target module (-pl) runs its unit tests via verify.
+      - name: Run Unit Tests (${{ matrix.module }})
+        run: |
+          export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          ./mvnw verify -B \
+            -pl "${{ matrix.module }}" \
+            -am \
+            -DskipTests=true \
+            -Dmaven.test.skip=false \
+            -pl "${{ matrix.module }}" \
+            -Dspotless.skip=true \
+            -DskipUT=false \
+            -Danalyze.skip=true
+
+      - name: Collect jacoco exec files
+        if: always()
+        run: |
+          mkdir -p /tmp/jacoco-exec
+          find . -name "jacoco.exec" -exec cp --backup=numbered {} /tmp/jacoco-exec/ \;
+
+      - name: Upload jacoco exec
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: jacoco-exec-java${{ matrix.java }}-${{ matrix.module }}
+          path: /tmp/jacoco-exec/
+          retention-days: 1
+
+      - name: Upload surefire reports
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: surefire-java${{ matrix.java }}-${{ matrix.module }}
+          path: '**/target/surefire-reports/'
+          retention-days: 7
+
+      - name: Upload coverage to Codecov
+        if: matrix.java == '11'
         run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
 
-      # Set up JDK 17 for SonarCloud.
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+  sonar:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    needs: [ paths-filter, unit-test ]
+    if: ${{ always() && (needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push') }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Download all jacoco exec files (Java 11)
+        uses: actions/download-artifact@v8
+        with:
+          pattern: jacoco-exec-java11-*
+          path: all-jacoco-exec/
+          merge-multiple: true
+
+      - name: Set up JDK 17 for SonarCloud
+        uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: 'adopt'
-      # Sonar check need to run after jacoco report generated.
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
+          restore-keys: ${{ runner.os }}-maven-
+
+      # Use jacococli.jar instead of jacoco:merge Maven goal.
+      # The 'fileSets' parameter of jacoco:merge cannot be passed via -D on
+      # the command line; it must be declared in pom.xml <configuration>.
+      # jacococli.jar merge accepts file paths directly, no XML config needed.
+      - name: Download jacococli.jar
+        run: |
+          JACOCO_VERSION=$(./mvnw help:evaluate -Dexpression=jacoco.version -q -DforceStdout 2>/dev/null || echo "0.8.14")
+          echo "Using JaCoCo version: $JACOCO_VERSION"
+          mvn dependency:get \
+            -Dartifact=org.jacoco:org.jacoco.cli:${JACOCO_VERSION}:jar:nodeps \
+            -Ddest=/tmp/jacococli.jar \
+            -q
+          # Fallback: copy from local .m2 cache if dependency:get did not place it at -Ddest
+          find ~/.m2 -name "org.jacoco.cli-*-nodeps.jar" | head -1 | xargs -I{} cp {} /tmp/jacococli.jar || true
+
+      - name: Merge JaCoCo exec files via jacococli
+        run: |
+          # Collect all .exec files under the downloaded artifact directory
+          EXEC_FILES=$(find all-jacoco-exec/ -name "*.exec" | tr '\n' ' ')
+          echo "Merging exec files: $EXEC_FILES"
+          mkdir -p target
+          java -jar /tmp/jacococli.jar merge $EXEC_FILES \
+            --destfile target/merged.exec
+
+      - name: Generate merged JaCoCo XML report
+        run: |
+          ./mvnw jacoco:report \
+            -Djacoco.dataFile=target/merged.exec \
+            -Dspotless.skip=true \
+            -Dmaven.test.skip=true
+
       - name: Run SonarCloud Analysis
         run: >
           ./mvnw --batch-mode verify sonar:sonar
@@ -110,11 +241,30 @@ jobs:
           -DskipUT=true
           -Danalyze.skip=true
 
+  publish-test-results:
+    name: Publish Test Results
+    runs-on: ubuntu-latest
+    needs: unit-test
+    if: always()
+    steps:
+      - name: Download all surefire reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: surefire-java11-*
+          path: all-surefire/
+          merge-multiple: true
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: all-surefire/**/*.xml
+          comment_mode: off
+
   result:
     name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ unit-test, paths-filter ]
+    needs: [ unit-test, paths-filter, sonar ]
     if: always()
     steps:
       - name: Status
@@ -125,5 +275,9 @@ jobs:
           fi
           if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
             echo "Unit Test Failed!"
+            exit -1
+          fi
+          if [[ ${{ needs.sonar.result }} != 'success' ]]; then
+            echo "SonarCloud Analysis Failed!"
             exit -1
           fi

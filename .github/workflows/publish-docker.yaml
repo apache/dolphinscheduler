@@ -33,10 +33,10 @@ jobs:
       packages: write
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Cache local Maven repository
         uses: actions/cache@v4
         with:
