@@ -150,18 +150,13 @@ public class HttpTaskTest {
     public void testHandleWithComplexHttpBody() throws Exception {
         String httpBody = "{\"name\":\"tom\",\"scores\":[100,98],\"metadata\":{\"grade\":\"A\"}}";
         String httpResponse = "{\"status\": \"success\"}";
-
-        MockWebServer server = new MockWebServer();
-        mockWebServers.add(server);
-        server.start();
-        server.setDispatcher(generateMockDispatcher(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, httpResponse));
-
-        String paramData = generateHttpParameters(server.url(DEFAULT_MOCK_PATH).toString(), HttpRequestMethod.POST,
-                httpBody, new ArrayList<>(), HttpCheckCondition.STATUS_CODE_DEFAULT, "");
-        HttpTask httpTask = generateHttpTaskFromParamData(paramData, null);
+        String url = withMockWebServer(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, httpResponse);
+        HttpTask httpTask = generateHttpTask(url, HttpRequestMethod.POST, httpBody,
+                new ArrayList<>(), null, HttpCheckCondition.STATUS_CODE_DEFAULT, "");
 
         httpTask.handle(null);
 
+        MockWebServer server = getLatestMockWebServer();
         RecordedRequest recordedRequest = server.takeRequest(1, TimeUnit.SECONDS);
         Assertions.assertNotNull(recordedRequest);
         String actualRequestBody = recordedRequest.getBody().readUtf8();
@@ -266,9 +261,21 @@ public class HttpTaskTest {
                                       String condition, int actualResponseCode,
                                       String actualResponseBody) throws IOException {
         String url = withMockWebServer(mockPath, actualResponseCode, actualResponseBody);
+        return generateHttpTask(url, httpRequestMethod, httpBody, httpParams, prepareParamsMap,
+                httpCheckConditionType, condition);
+    }
+
+    private HttpTask generateHttpTask(String url, HttpRequestMethod httpRequestMethod, String httpBody,
+                                      List<HttpProperty> httpParams,
+                                      Map<String, String> prepareParamsMap, HttpCheckCondition httpCheckConditionType,
+                                      String condition) throws JsonProcessingException {
         String paramData =
                 generateHttpParameters(url, httpRequestMethod, httpBody, httpParams, httpCheckConditionType, condition);
         return generateHttpTaskFromParamData(paramData, prepareParamsMap);
+    }
+
+    private MockWebServer getLatestMockWebServer() {
+        return mockWebServers.get(mockWebServers.size() - 1);
     }
 
     private HttpTask generateHttpTaskFromParamData(String paramData, Map<String, String> prepareParamsMap) {
