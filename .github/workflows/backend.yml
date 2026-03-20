@@ -37,7 +37,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
@@ -56,7 +56,7 @@ jobs:
         java: [ '8', '11' ]
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up JDK ${{ matrix.java }}
@@ -83,7 +83,7 @@ jobs:
                  -Danalyze.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: ${{ matrix.java == '8' }}
         name: Upload Binary Package
         with:
@@ -114,14 +114,14 @@ jobs:
           sudo docker image prune --all --force
           sudo docker builder prune -a
       - run: df -h
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Collect Workflow Telemetry
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         name: Download Binary Package
         with:
           # Only run cluster test on jdk8
@@ -145,7 +145,7 @@ jobs:
           - name: schema-check-with-postgresql
             script: .github/workflows/schema-check/postgresql/start-job.sh
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Collect Workflow Telemetry
@@ -153,7 +153,7 @@ jobs:
         with:
           comment_on_pr: false
       - name: Download Binary Package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev

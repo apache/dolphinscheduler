@@ -15,188 +15,269 @@
 # limitations under the License.
 #
 
+name: Test
+
 on:
   pull_request:
   push:
+    paths-ignore:
+      - '**/*.md'
+      - 'dolphinscheduler-ui'
     branches:
-      - dev
       - '[0-9]+.[0-9]+.[0-9]+-prepare'
       - '[0-9]+.[0-9]+.[0-9]+-release'
-
-name: E2E
+      - 'dev'
 
 concurrency:
-  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  group: unit-test-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
-permissions:
-  pull-requests: write
 
 jobs:
   paths-filter:
-    name: E2E-Path-Filter
+    name: Unit-Test-Path-Filter
     runs-on: ubuntu-latest
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
           filters: |
             not-ignore:
               - '!(docs/**)'
-  build:
-    name: E2E-Build
-    needs: paths-filter
+
+  generate-matrix:
+    name: Generate Module Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Parse modules from pom.xml
+        id: set-matrix
+        run: |
+          MODULES=$(python3 - <<'EOF'
+          import xml.etree.ElementTree as ET, json, re
+
+          tree = ET.parse('pom.xml')
+          ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+          root = tree.getroot()
+
+          # Support both namespaced and non-namespaced pom.xml
+          modules = root.findall('.//m:modules/m:module', ns)
+          if not modules:
+              modules = root.findall('.//modules/module')
+
+          # Exclude aggregator-only or non-testable modules
+          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
+          result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
+          print(json.dumps(result))
+          EOF
+          )
+
+          echo "matrix={\"module\":$MODULES}" >> "$GITHUB_OUTPUT"
+          echo "Discovered modules: $MODULES"
+
+  unit-test:
+    name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
+    needs: [ paths-filter, generate-matrix ]
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Sanity Check
-        uses: ./.github/actions/sanity-check
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
-          restore-keys: ${{ runner.os }}-maven-
-      - name: Build Image
-        run: |
-          ./mvnw -B clean install \
-          -Dmaven.test.skip=true \
-          -Dspotless.skip=true \
-          -Pdocker,staging \
-          -Ddocker.tag=ci \
-          -Danalyze.skip=true
-      - name: Export Docker Images
-        run: |
-          docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
-          && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v4
-        name: Upload Docker Images
-        with:
-          name: standalone-image-e2e
-          path: /tmp/standalone-image.tar
-          retention-days: 1
-  e2e:
-    name: ${{ matrix.case.name }}
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
     strategy:
+      fail-fast: false
       matrix:
-        case:
-          - name: TenantE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.TenantE2ETest
-          - name: UserE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.UserE2ETest
-          - name: WorkerGroupE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.WorkerGroupE2ETest
-          - name: ProjectE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.ProjectE2ETest
-          - name: QueueE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.QueueE2ETest
-          - name: EnvironmentE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.EnvironmentE2ETest
-          - name: ClusterE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.ClusterE2ETest
-          - name: TokenE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.TokenE2ETest
-          - name: WorkflowE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
-          - name: WorkflowHttpTaskE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowHttpTaskE2ETest
-          - name: WorkflowJavaTaskE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.WorkflowJavaTaskE2ETest
-#          - name: WorkflowForSwitch
-#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
-          - name: FileManageE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
-          - name: MysqlDataSourceE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
-          - name: ClickhouseDataSourceE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
-          - name: PostgresDataSourceE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
-          - name: ShellTaskE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.tasks.ShellTaskE2ETest
-          - name: PythonTaskE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.tasks.PythonTaskE2ETest
-          - name: SqlServerDataSourceE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
-          - name: HiveDataSourceE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
-          - name: DolphinDBDataSourceE2ETest
-            class: org.apache.dolphinscheduler.e2e.cases.DolphinDBDataSourceE2ETest
-    env:
-      RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
+        java: [ '8', '11' ]
+        module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
+    timeout-minutes: 60
     steps:
-      - run: df -h
-      - name: "node-cleanup"
-        run: |
-         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-         sudo docker image prune --all --force
-         sudo docker builder prune -a
-      - run: df -h
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: 11
-          distribution: 'adopt'
+
       - name: Collect Workflow Telemetry
         uses: ./.github/actions/workflow-telemetry-action
         with:
           comment_on_pr: false
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
+
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v4
-        name: Download Docker Images
-        with:
-          name: standalone-image-e2e
-          path: /tmp
-      - name: Load Docker Images
+
+      # Use -am (--also-make) so Maven automatically builds all upstream
+      # dependency modules before running tests in the target module.
+      # -DskipTests=true skips tests in dependency modules; only the
+      # target module (-pl) runs its unit tests via verify.
+      - name: Run Unit Tests (${{ matrix.module }})
         run: |
-          docker load -i /tmp/standalone-image.tar
-      - run: df -h
-      - name: Run Test
-        run: |
-          ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
-            -DfailIfNoTests=false \
-            -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v4
+          export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          ./mvnw verify -B \
+            -pl "${{ matrix.module }}" \
+            -am \
+            -DskipTests=true \
+            -Dmaven.test.skip=false \
+            -pl "${{ matrix.module }}" \
+            -Dspotless.skip=true \
+            -DskipUT=false \
+            -Danalyze.skip=true
+
+      - name: Collect jacoco exec files
         if: always()
-        name: Upload Recording
+        run: |
+          mkdir -p /tmp/jacoco-exec
+          find . -name "jacoco.exec" -exec cp --backup=numbered {} /tmp/jacoco-exec/ \;
+
+      - name: Upload jacoco exec
+        uses: actions/upload-artifact@v6
+        if: always()
         with:
-          name: recording-${{ matrix.case.name }}
-          path: ${{ env.RECORDING_PATH }}
+          name: jacoco-exec-java${{ matrix.java }}-${{ matrix.module }}
+          path: /tmp/jacoco-exec/
           retention-days: 1
-  result:
-    name: E2E
+
+      - name: Upload surefire reports
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: surefire-java${{ matrix.java }}-${{ matrix.module }}
+          path: '**/target/surefire-reports/'
+          retention-days: 7
+
+      - name: Upload coverage to Codecov
+        if: matrix.java == '11'
+        run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
+
+  sonar:
+    name: SonarCloud Analysis
     runs-on: ubuntu-latest
+    needs: [ paths-filter, unit-test ]
+    if: ${{ always() && (needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push') }}
     timeout-minutes: 30
-    needs: [ e2e, paths-filter ]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Download all jacoco exec files (Java 11)
+        uses: actions/download-artifact@v8
+        with:
+          pattern: jacoco-exec-java11-*
+          path: all-jacoco-exec/
+          merge-multiple: true
+
+      - name: Set up JDK 17 for SonarCloud
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'adopt'
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
+          restore-keys: ${{ runner.os }}-maven-
+
+      # Use jacococli.jar instead of jacoco:merge Maven goal.
+      # The 'fileSets' parameter of jacoco:merge cannot be passed via -D on
+      # the command line; it must be declared in pom.xml <configuration>.
+      # jacococli.jar merge accepts file paths directly, no XML config needed.
+      - name: Download jacococli.jar
+        run: |
+          JACOCO_VERSION=$(./mvnw help:evaluate -Dexpression=jacoco.version -q -DforceStdout 2>/dev/null || echo "0.8.14")
+          echo "Using JaCoCo version: $JACOCO_VERSION"
+          mvn dependency:get \
+            -Dartifact=org.jacoco:org.jacoco.cli:${JACOCO_VERSION}:jar:nodeps \
+            -Ddest=/tmp/jacococli.jar \
+            -q
+          # Fallback: copy from local .m2 cache if dependency:get did not place it at -Ddest
+          find ~/.m2 -name "org.jacoco.cli-*-nodeps.jar" | head -1 | xargs -I{} cp {} /tmp/jacococli.jar || true
+
+      - name: Merge JaCoCo exec files via jacococli
+        run: |
+          # Collect all .exec files under the downloaded artifact directory
+          EXEC_FILES=$(find all-jacoco-exec/ -name "*.exec" | tr '\n' ' ')
+          echo "Merging exec files: $EXEC_FILES"
+          mkdir -p target
+          java -jar /tmp/jacococli.jar merge $EXEC_FILES \
+            --destfile target/merged.exec
+
+      - name: Generate merged JaCoCo XML report
+        run: |
+          ./mvnw jacoco:report \
+            -Djacoco.dataFile=target/merged.exec \
+            -Dspotless.skip=true \
+            -Dmaven.test.skip=true
+
+      - name: Run SonarCloud Analysis
+        run: >
+          ./mvnw --batch-mode verify sonar:sonar
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          -Dmaven.test.skip=true
+          -Dspotless.skip=true
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=apache
+          -Dsonar.core.codeCoveragePlugin=jacoco
+          -Dsonar.projectKey=apache-dolphinscheduler
+          -Dsonar.token=e4058004bc6be89decf558ac819aa1ecbee57682
+          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
+          -Dhttp.keepAlive=false
+          -Dmaven.wagon.http.pool=false
+          -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+          -DskipUT=true
+          -Danalyze.skip=true
+
+  publish-test-results:
+    name: Publish Test Results
+    runs-on: ubuntu-latest
+    needs: unit-test
+    if: always()
+    steps:
+      - name: Download all surefire reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: surefire-java11-*
+          path: all-surefire/
+          merge-multiple: true
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: all-surefire/**/*.xml
+          comment_mode: off
+
+  result:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [ unit-test, paths-filter, sonar ]
     if: always()
     steps:
       - name: Status
         run: |
           if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
-            echo "Skip E2E!"
+            echo "Skip Unit Test!"
             exit 0
           fi
-          if [[ ${{ needs.e2e.result }} != 'success' ]]; then
-            echo "E2E Failed!"
+          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+            echo "Unit Test Failed!"
+            exit -1
+          fi
+          if [[ ${{ needs.sonar.result }} != 'success' ]]; then
+            echo "SonarCloud Analysis Failed!"
             exit -1
           fi
