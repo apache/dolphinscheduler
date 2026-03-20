@@ -39,7 +39,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
@@ -53,7 +53,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Parse modules from pom.xml
         id: set-matrix
@@ -92,7 +92,7 @@ jobs:
         module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
 
@@ -107,7 +107,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
@@ -142,7 +142,7 @@ jobs:
           find . -name "jacoco.exec" -exec cp --backup=numbered {} /tmp/jacoco-exec/ \;
 
       - name: Upload jacoco exec
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: jacoco-exec-java${{ matrix.java }}-${{ matrix.module }}
@@ -150,7 +150,7 @@ jobs:
           retention-days: 1
 
       - name: Upload surefire reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: surefire-java${{ matrix.java }}-${{ matrix.module }}
@@ -168,20 +168,20 @@ jobs:
     if: ${{ always() && (needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push') }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
           fetch-depth: 0
 
       - name: Download all jacoco exec files (Java 11)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: jacoco-exec-java11-*
           path: all-jacoco-exec/
           merge-multiple: true
 
       - name: Set up JDK 17 for SonarCloud
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: 'adopt'
@@ -248,7 +248,7 @@ jobs:
     if: always()
     steps:
       - name: Download all surefire reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: surefire-java11-*
           path: all-surefire/
