@@ -72,7 +72,6 @@ public class MasterCoordinator extends AbstractHAServer {
     @Override
     public void close() {
         taskGroupCoordinator.close();
-        workflowSerialCoordinator.close();
         log.info("MasterCoordinator shutdown...");
     }
 

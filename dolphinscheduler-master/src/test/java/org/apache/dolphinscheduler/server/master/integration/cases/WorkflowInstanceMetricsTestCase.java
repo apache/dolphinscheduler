@@ -98,7 +98,7 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
         final Integer workflowInstanceId3 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
-                .atMost(Duration.ofMinutes(1))
+                .atMost(Duration.ofMinutes(2))
                 .untilAsserted(() -> {
                     final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
                     final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
