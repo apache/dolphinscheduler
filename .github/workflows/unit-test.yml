@@ -58,8 +58,6 @@ jobs:
       - name: Parse modules from pom.xml
         id: set-matrix
         run: |
-          # Extract sub-modules from root pom.xml <modules> section,
-          # excluding modules that have no unit tests
           MODULES=$(python3 - <<'EOF'
           import xml.etree.ElementTree as ET, json, re
 
@@ -67,7 +65,6 @@ jobs:
           ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
           root = tree.getroot()
 
-          # Support both namespaced and non-namespaced pom.xml
           modules = root.findall('.//m:modules/m:module', ns)
           if not modules:
               modules = root.findall('.//modules/module')
@@ -119,10 +116,6 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      # Use -am (--also-make) so Maven automatically builds all upstream
-      # dependency modules before running tests in the target module.
-      # DskipTests=true skips tests in dependency modules; only the
-      # target module (-pl) runs its unit tests via verify.
       - name: Run Unit Tests (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
@@ -193,13 +186,27 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      - name: Merge JaCoCo exec files
+      # 用 jacococli.jar 替代 jacoco:merge，直接传入目录下所有 .exec 文件
+      # jacoco:merge 的 fileSets 无法通过命令行 -D 传入，只能用 CLI 工具
+      - name: Download jacococli.jar
         run: |
-          ./mvnw jacoco:merge \
-            -Djacoco.dataFileIncludes="all-jacoco-exec/*.exec" \
-            -Djacoco.destFile=target/merged.exec \
-            -Dspotless.skip=true \
-            -Dmaven.test.skip=true
+          JACOCO_VERSION=$(./mvnw help:evaluate -Dexpression=jacoco.version -q -DforceStdout 2>/dev/null || echo "0.8.14")
+          echo "Using JaCoCo version: $JACOCO_VERSION"
+          mvn dependency:get \
+            -Dartifact=org.jacoco:org.jacoco.cli:${JACOCO_VERSION}:jar:nodeps \
+            -Ddest=/tmp/jacococli.jar \
+            -q
+          # fallback: copy from local .m2 cache
+          find ~/.m2 -name "org.jacoco.cli-*-nodeps.jar" | head -1 | xargs -I{} cp {} /tmp/jacococli.jar || true
+
+      - name: Merge JaCoCo exec files via jacococli
+        run: |
+          # Collect all .exec files under the downloaded artifact directory
+          EXEC_FILES=$(find all-jacoco-exec/ -name "*.exec" | tr '\n' ' ')
+          echo "Merging exec files: $EXEC_FILES"
+          mkdir -p target
+          java -jar /tmp/jacococli.jar merge $EXEC_FILES \
+            --destfile target/merged.exec
 
       - name: Generate merged JaCoCo XML report
         run: |

@@ -68,7 +68,7 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="MASTERLOGFILE"/>
