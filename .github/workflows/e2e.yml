@@ -114,8 +114,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowHttpTaskE2ETest
           - name: WorkflowJavaTaskE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowJavaTaskE2ETest
-          #          - name: WorkflowForSwitch
-          #            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
+#          - name: WorkflowForSwitch
+#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
           - name: FileManageE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
           - name: MysqlDataSourceE2ETest
