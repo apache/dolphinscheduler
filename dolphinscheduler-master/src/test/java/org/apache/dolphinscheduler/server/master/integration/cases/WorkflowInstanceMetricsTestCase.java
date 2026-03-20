@@ -31,14 +31,12 @@ import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics
 
 import java.time.Duration;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 
-@Disabled
 public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTestCase {
 
     @Test

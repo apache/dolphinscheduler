@@ -80,7 +80,11 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
             throw new IllegalStateException("WorkflowSerialCoordinator is already started");
         }
         if (internalThread != null) {
-            throw new IllegalStateException("InternalThread is already started");
+            if (internalThread.isAlive()) {
+                throw new IllegalStateException("InternalThread is already started");
+            }
+            // The previous thread has exited, clear the stale reference and allow restart.
+            internalThread = null;
         }
         flag = true;
         internalThread = new BaseDaemonThread(this::doStart) {
@@ -169,7 +173,20 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
+        if (!flag && internalThread == null) {
+            log.warn("WorkflowSerialCoordinator is already closed");
+            return;
+        }
         flag = false;
+        try {
+            if (internalThread != null) {
+                internalThread.interrupt();
+            }
+        } catch (Exception ex) {
+            log.error("Close internalThread failed", ex);
+        }
+        internalThread = null;
+        log.info("WorkflowSerialCoordinator closed");
     }
 }
