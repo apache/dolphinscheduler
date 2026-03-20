@@ -338,26 +338,6 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * Retrieves the list of databases available in a specific data source.
-     *
-     * @param loginUser the current logged-in user (injected from session)
-     * @param datasourceId the unique identifier of the data source
-     * @return a list of database names/options accessible to the user
-     */
-    @Operation(summary = "databases", description = "GET_DATASOURCE_DATABASE_NOTES")
-    @Parameters({
-            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1"))
-    })
-    @GetMapping(value = "/databases")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(GET_DATASOURCE_DATABASES_ERROR)
-    public Result<Object> getDatabases(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam("datasourceId") Integer datasourceId) {
-        List<ParamsOptions> options = dataSourceService.getDatabases(loginUser, datasourceId);
-        return Result.success(options);
-    }
-
-    /**
      * Retrieves the list of tables within a specific database of a data source.
      *
      * @param loginUser the current logged-in user (injected from session)
@@ -406,4 +386,23 @@ public class DataSourceController extends BaseController {
         return Result.success(options);
     }
 
+    /**
+     * Retrieves the list of databases available in a specific data source.
+     *
+     * @param loginUser the current logged-in user (injected from session)
+     * @param datasourceId the unique identifier of the data source
+     * @return a list of database names/options accessible to the user
+     */
+    @Operation(summary = "databases", description = "GET_DATASOURCE_DATABASE_NOTES")
+    @Parameters({
+            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1"))
+    })
+    @GetMapping(value = "/databases")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_DATABASES_ERROR)
+    public Result<Object> getDatabases(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam("datasourceId") Integer datasourceId) {
+        List<ParamsOptions> options = dataSourceService.getDatabases(loginUser, datasourceId);
+        return Result.success(options);
+    }
 }
